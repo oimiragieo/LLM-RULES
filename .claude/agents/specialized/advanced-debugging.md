@@ -277,14 +277,14 @@ Skill({ skill: 'troubleshooting-regression' }); // Regression investigation
 
 ### Contextual Skills (When Applicable)
 
-| Condition              | Skill                             | Purpose                       |
-| ---------------------- | --------------------------------- | ----------------------------- |
-| Regression introduced  | `troubleshooting-regression`      | Structured regression bisect  |
-| Recovery needed        | `recovery`                        | System recovery procedures    |
-| Log analysis           | `logging-module-usage`            | Structured log analysis       |
-| Writing fix with tests | `tdd`                             | RED/GREEN/REFACTOR cycle      |
-| Session task tracking  | `task-management-protocol`        | Multi-step investigation mgmt |
-| Context pressure high  | `context-compressor` | Context compression           |
+| Condition              | Skill                        | Purpose                       |
+| ---------------------- | ---------------------------- | ----------------------------- |
+| Regression introduced  | `troubleshooting-regression` | Structured regression bisect  |
+| Recovery needed        | `recovery`                   | System recovery procedures    |
+| Log analysis           | `logging-module-usage`       | Structured log analysis       |
+| Writing fix with tests | `tdd`                        | RED/GREEN/REFACTOR cycle      |
+| Session task tracking  | `task-management-protocol`   | Multi-step investigation mgmt |
+| Context pressure high  | `context-compressor`         | Context compression           |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 

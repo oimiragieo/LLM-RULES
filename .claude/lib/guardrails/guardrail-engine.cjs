@@ -68,12 +68,12 @@ function validateTaskOutput(metadata, options = {}) {
     });
   }
 
-  const allPassed = checks.every((c) => c.passed);
+  const allPassed = checks.every(c => c.passed);
 
   if (!allPassed) {
     const errorSig = checks
-      .filter((c) => !c.passed)
-      .map((c) => c.name)
+      .filter(c => !c.passed)
+      .map(c => c.name)
       .sort()
       .join(',');
     recordFailure(agentType, errorSig);
@@ -102,7 +102,7 @@ function recordFailure(agentType, errorSignature) {
 }
 
 function buildResult(checks, agentType) {
-  const passed = checks.every((c) => c.passed);
+  const passed = checks.every(c => c.passed);
   const isOpen = circuitState.get(agentType) === 'open';
 
   return {

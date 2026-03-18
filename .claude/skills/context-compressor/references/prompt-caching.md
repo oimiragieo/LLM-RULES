@@ -25,11 +25,11 @@ Why this matters: prompt caching is based on exact prefix reuse. If volatile tex
 
 ## Provider telemetry fields worth watching
 
-| Provider | Field |
-| --- | --- |
-| Claude | `cache_read_input_tokens` |
+| Provider       | Field                                       |
+| -------------- | ------------------------------------------- |
+| Claude         | `cache_read_input_tokens`                   |
 | OpenAI / Codex | `usage.prompt_tokens_details.cached_tokens` |
-| Gemini | `cachedContentTokenCount` |
+| Gemini         | `cachedContentTokenCount`                   |
 
 If those stay at zero across repeated prompts with the same stable prefix, the harness or prompt assembly is likely invalidating cache reuse.
 

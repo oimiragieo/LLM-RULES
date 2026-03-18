@@ -145,7 +145,7 @@ function recordEvidence(sessionId, { hypothesis_id, type, content, supports }) {
   session.updated_at = new Date().toISOString();
 
   // Auto-update hypothesis status
-  const hyp = session.hypotheses.find((h) => h.id === hypothesis_id);
+  const hyp = session.hypotheses.find(h => h.id === hypothesis_id);
   if (hyp && hyp.status === 'untested') {
     hyp.status = 'testing';
   }
@@ -169,7 +169,7 @@ function setRootCause(sessionId, rootCause, confirmedHypothesisId) {
   session.updated_at = new Date().toISOString();
 
   if (confirmedHypothesisId) {
-    const hyp = session.hypotheses.find((h) => h.id === confirmedHypothesisId);
+    const hyp = session.hypotheses.find(h => h.id === confirmedHypothesisId);
     if (hyp) hyp.status = 'confirmed';
   }
 
@@ -200,15 +200,22 @@ function getSession(sessionId) {
  */
 function listSessions() {
   ensureDir();
-  const files = fs.readdirSync(DEBUG_DIR).filter((f) => f.endsWith('.json'));
-  return files.map((f) => {
-    try {
-      const session = JSON.parse(fs.readFileSync(path.join(DEBUG_DIR, f), 'utf8'));
-      return { id: session.id, bug_id: session.bug_id, status: session.status, created_at: session.created_at };
-    } catch {
-      return null;
-    }
-  }).filter(Boolean);
+  const files = fs.readdirSync(DEBUG_DIR).filter(f => f.endsWith('.json'));
+  return files
+    .map(f => {
+      try {
+        const session = JSON.parse(fs.readFileSync(path.join(DEBUG_DIR, f), 'utf8'));
+        return {
+          id: session.id,
+          bug_id: session.bug_id,
+          status: session.status,
+          created_at: session.created_at,
+        };
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
 }
 
 function loadSession(sessionId) {

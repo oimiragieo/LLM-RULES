@@ -15,7 +15,7 @@ const DEFAULT_WEIGHTS = {
   accuracy: 0.25,
   groundedness: 0.25,
   coherence: 0.15,
-  completeness: 0.20,
+  completeness: 0.2,
   helpfulness: 0.15,
 };
 
@@ -85,7 +85,7 @@ function scoreDimension(name, score, options = {}) {
     name,
     score: Math.round(score * 100) / 100,
     weight: options.weight ?? DEFAULT_WEIGHTS[name],
-    evidence: (options.evidence || []).map((e) => ({
+    evidence: (options.evidence || []).map(e => ({
       type: e.type,
       source: e.source,
       excerpt: (e.excerpt || '').substring(0, 200),
@@ -111,9 +111,7 @@ function computeComposite(dimensions) {
     weightedSum += dim.score * dim.weight;
   }
 
-  return totalWeight > 0
-    ? Math.round((weightedSum / totalWeight) * 100) / 100
-    : 0;
+  return totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 100) / 100 : 0;
 }
 
 /**

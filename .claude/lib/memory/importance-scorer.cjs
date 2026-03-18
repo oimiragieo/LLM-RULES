@@ -102,7 +102,7 @@ function scoreImportance(text, area) {
 function scoreBatch(items) {
   if (!Array.isArray(items)) return [];
   return items
-    .map((item) => ({
+    .map(item => ({
       ...item,
       score: scoreImportance(item.text, item.area),
     }))
@@ -117,7 +117,7 @@ function scoreBatch(items) {
  * @returns {Array<{text: string, area?: string, score: number}>}
  */
 function filterByImportance(items, minScore = 0.5) {
-  return scoreBatch(items).filter((item) => item.score >= minScore);
+  return scoreBatch(items).filter(item => item.score >= minScore);
 }
 
 /**

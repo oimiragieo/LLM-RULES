@@ -1219,9 +1219,9 @@ After compression, extracted insights are deduplicated against existing memory:
 
 ### Key files
 
-| File                                                                            | Purpose                                                |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `.claude/tools/cli/hybrid-search.cjs`                                           | `--compress` command handler                           |
+| File                                                               | Purpose                                                |
+| ------------------------------------------------------------------ | ------------------------------------------------------ |
+| `.claude/tools/cli/hybrid-search.cjs`                              | `--compress` command handler                           |
 | `.claude/skills/context-compressor/scripts/main.cjs`               | Pipeline orchestration, dedup, adaptive ratio          |
 | `.claude/skills/context-compressor/scripts/_compression_engine.py` | Python compression engine (Jaccard + position scoring) |
 

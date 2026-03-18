@@ -292,14 +292,14 @@ Skill({ skill: 'doc-generator' }); // Generate structured reports
 
 ### Contextual Skills (When Applicable)
 
-| Condition                        | Skill                             | Purpose                                      |
-| -------------------------------- | --------------------------------- | -------------------------------------------- |
+| Condition                        | Skill                | Purpose                                      |
+| -------------------------------- | -------------------- | -------------------------------------------- |
 | Large feedback corpus to process | `context-compressor` | Compress search results efficiently          |
-| Need to visualize clusters       | `diagram-generator`               | Generate cluster maps and signal diagrams    |
-| Generating structured reports    | `doc-generator`                   | Produce formatted analysis documents         |
-| Research on analysis techniques  | `research-synthesis`              | Current best practices for feedback analysis |
-| Context limit approached         | `context-compressor`              | Compress context to stay effective           |
-| Prior feedback patterns needed   | `memory-search`                   | Retrieve prior analysis patterns             |
+| Need to visualize clusters       | `diagram-generator`  | Generate cluster maps and signal diagrams    |
+| Generating structured reports    | `doc-generator`      | Produce formatted analysis documents         |
+| Research on analysis techniques  | `research-synthesis` | Current best practices for feedback analysis |
+| Context limit approached         | `context-compressor` | Compress context to stay effective           |
+| Prior feedback patterns needed   | `memory-search`      | Retrieve prior analysis patterns             |
 
 ## Output Locations
 

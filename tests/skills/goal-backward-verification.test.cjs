@@ -14,15 +14,7 @@ const SKILL_PATH = path.resolve(
   'SKILL.md'
 );
 
-const QA_AGENT_PATH = path.resolve(
-  __dirname,
-  '..',
-  '..',
-  '.claude',
-  'agents',
-  'core',
-  'qa.md'
-);
+const QA_AGENT_PATH = path.resolve(__dirname, '..', '..', '.claude', 'agents', 'core', 'qa.md');
 
 describe('goal-backward-verification skill', () => {
   test('SKILL.md exists', () => {

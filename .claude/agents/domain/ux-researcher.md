@@ -177,16 +177,16 @@ When executing research tasks, follow this 8-step approach:
 
 ### Contextual Skills (Invoke When Applicable)
 
-| Condition                                            | Skill                             | Purpose                                                 |
-| ---------------------------------------------------- | --------------------------------- | ------------------------------------------------------- |
-| Creating research artifacts (diagrams, journey maps) | `diagram-generator`               | Generate visual research deliverables                   |
-| Writing research reports or documentation            | `doc-generator`                   | Produce structured, high-quality documentation          |
-| Planning complex multi-method studies                | `brainstorming`                   | Explore method options and research design alternatives |
-| Validating completeness of research deliverables     | `checklist-generator`             | Generate research completeness checklists               |
-| Context approaching limits                           | `context-compressor`              | Compress context before continuation                    |
-| Large evidence set to synthesize                     | `context-compressor` | Compress evidence without losing key signals            |
-| Finding existing research artifacts in codebase      | `ripgrep`                         | Fast search for prior research files                    |
-| Querying prior agent learnings                       | `memory-search`                   | Semantic search over prior session memory               |
+| Condition                                            | Skill                 | Purpose                                                 |
+| ---------------------------------------------------- | --------------------- | ------------------------------------------------------- |
+| Creating research artifacts (diagrams, journey maps) | `diagram-generator`   | Generate visual research deliverables                   |
+| Writing research reports or documentation            | `doc-generator`       | Produce structured, high-quality documentation          |
+| Planning complex multi-method studies                | `brainstorming`       | Explore method options and research design alternatives |
+| Validating completeness of research deliverables     | `checklist-generator` | Generate research completeness checklists               |
+| Context approaching limits                           | `context-compressor`  | Compress context before continuation                    |
+| Large evidence set to synthesize                     | `context-compressor`  | Compress evidence without losing key signals            |
+| Finding existing research artifacts in codebase      | `ripgrep`             | Fast search for prior research files                    |
+| Querying prior agent learnings                       | `memory-search`       | Semantic search over prior session memory               |
 
 ## Example Interactions
 

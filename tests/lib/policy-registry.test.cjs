@@ -93,7 +93,14 @@ describe('policy-registry (F9)', () => {
     });
 
     it('includes custom registered agents', () => {
-      registerPolicy({ agent_id: 'my-agent', allowed_tools: [], required_skills: [], invariant_ids: [], forbidden_paths: [], constraints: {} });
+      registerPolicy({
+        agent_id: 'my-agent',
+        allowed_tools: [],
+        required_skills: [],
+        invariant_ids: [],
+        forbidden_paths: [],
+        constraints: {},
+      });
       const ids = getAllPolicyAgentIds();
       assert.ok(ids.includes('my-agent'));
     });

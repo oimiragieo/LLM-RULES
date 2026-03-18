@@ -266,10 +266,10 @@ Skill({ skill: 'task-management-protocol' }); // Session task tracking
 
 ### Contextual Skills (When Applicable)
 
-| Condition             | Skill                             | Purpose                     |
-| --------------------- | --------------------------------- | --------------------------- |
-| Jira operations       | `jira-pm`                         | Jira board/issue management |
-| Linear operations     | `linear-pm`                       | Linear cycle/roadmap mgmt   |
+| Condition             | Skill                | Purpose                     |
+| --------------------- | -------------------- | --------------------------- |
+| Jira operations       | `jira-pm`            | Jira board/issue management |
+| Linear operations     | `linear-pm`          | Linear cycle/roadmap mgmt   |
 | Context pressure high | `context-compressor` | Context compression         |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.

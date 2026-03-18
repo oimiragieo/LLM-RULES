@@ -206,13 +206,13 @@ Invoke these skills at task start:
 
 ### Contextual Skills (When Applicable)
 
-| Condition               | Skill                             | Purpose                               |
-| ----------------------- | --------------------------------- | ------------------------------------- |
-| Large content analysis  | `context-compressor` | Compress extensive brand documents    |
-| Before marking complete | `verification-before-completion`  | Evidence-based completion validation  |
-| Context pressure high   | `context-compressor`              | Reduce token usage in long sessions   |
-| Searching brand files   | `ripgrep`                         | Fast text search across brand assets  |
-| Semantic search needed  | `memory-search`                   | Find related brand patterns in memory |
+| Condition               | Skill                            | Purpose                               |
+| ----------------------- | -------------------------------- | ------------------------------------- |
+| Large content analysis  | `context-compressor`             | Compress extensive brand documents    |
+| Before marking complete | `verification-before-completion` | Evidence-based completion validation  |
+| Context pressure high   | `context-compressor`             | Reduce token usage in long sessions   |
+| Searching brand files   | `ripgrep`                        | Fast text search across brand assets  |
+| Semantic search needed  | `memory-search`                  | Find related brand patterns in memory |
 
 ## Example Interactions
 

@@ -5,9 +5,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 
-const {
-  evaluateChecklist,
-} = require('../../.claude/lib/orchestration/checklist-evaluator.cjs');
+const { evaluateChecklist } = require('../../.claude/lib/orchestration/checklist-evaluator.cjs');
 
 describe('checklist-evaluator', () => {
   describe('file_exists checks', () => {
@@ -60,9 +58,7 @@ describe('checklist-evaluator', () => {
           id: 'missing-pattern',
           description: 'impossible pattern',
           check_type: 'grep_match',
-          check_value:
-            path.join(process.cwd(), 'package.json') +
-            ':ZZZYYYXXX_NONEXISTENT',
+          check_value: path.join(process.cwd(), 'package.json') + ':ZZZYYYXXX_NONEXISTENT',
         },
       ]);
       assert.equal(result.failed.length, 1);

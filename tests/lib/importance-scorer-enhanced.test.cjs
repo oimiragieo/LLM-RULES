@@ -42,7 +42,7 @@ describe('importance-scorer enhanced (E2)', () => {
       ];
       const result = filterByImportance(items, 0.6);
       assert.ok(result.length >= 1);
-      assert.ok(result.every((r) => r.score >= 0.6));
+      assert.ok(result.every(r => r.score >= 0.6));
     });
 
     it('uses default threshold of 0.5', () => {

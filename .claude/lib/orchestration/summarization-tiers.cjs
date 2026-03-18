@@ -169,22 +169,22 @@ function summarizeTruncation(content, contentType, options) {
 
   if (contentType === 'code') {
     const functions = lines
-      .filter((l) => /^(function|const\s+\w+\s*=|class\s+|module\.exports)/.test(l.trim()))
-      .map((l) => l.trim().substring(0, 60))
+      .filter(l => /^(function|const\s+\w+\s*=|class\s+|module\.exports)/.test(l.trim()))
+      .map(l => l.trim().substring(0, 60))
       .slice(0, 10);
     return `[${filePath}] ${lineCount} lines, ${functions.length} exports: ${functions.join('; ')}`;
   }
 
   if (contentType === 'logs') {
-    const errorCount = lines.filter((l) => /error|fatal|critical/i.test(l)).length;
-    const warnCount = lines.filter((l) => /warn/i.test(l)).length;
+    const errorCount = lines.filter(l => /error|fatal|critical/i.test(l)).length;
+    const warnCount = lines.filter(l => /warn/i.test(l)).length;
     return `[${filePath}] ${lineCount} log lines, ${errorCount} errors, ${warnCount} warnings`;
   }
 
   // documentation/conversation
   const headings = lines
-    .filter((l) => /^#{1,3}\s/.test(l))
-    .map((l) => l.replace(/^#+\s*/, ''))
+    .filter(l => /^#{1,3}\s/.test(l))
+    .map(l => l.replace(/^#+\s*/, ''))
     .slice(0, 8);
   return `[${filePath}] ${lineCount} lines, sections: ${headings.join(', ') || 'none'}`;
 }
@@ -253,14 +253,14 @@ function summarizeCodeAggressive(lines, options) {
 // --- Log summarization helpers ---
 
 function summarizeLogsNormal(lines) {
-  const errors = lines.filter((l) => /error|fatal|critical/i.test(l));
-  const warnings = lines.filter((l) => /warn/i.test(l));
-  const unique = [...new Set(errors.map((l) => l.substring(0, 120)))].slice(0, 10);
+  const errors = lines.filter(l => /error|fatal|critical/i.test(l));
+  const warnings = lines.filter(l => /warn/i.test(l));
+  const unique = [...new Set(errors.map(l => l.substring(0, 120)))].slice(0, 10);
 
   const result = [`// ${lines.length} log lines total`];
   if (unique.length > 0) {
     result.push(`// ${errors.length} errors (${unique.length} unique):`);
-    unique.forEach((e) => result.push(`  ${e}`));
+    unique.forEach(e => result.push(`  ${e}`));
   }
   if (warnings.length > 0) {
     result.push(`// ${warnings.length} warnings`);
@@ -269,8 +269,8 @@ function summarizeLogsNormal(lines) {
 }
 
 function summarizeLogsAggressive(lines) {
-  const errorCount = lines.filter((l) => /error|fatal|critical/i.test(l)).length;
-  const warnCount = lines.filter((l) => /warn/i.test(l)).length;
+  const errorCount = lines.filter(l => /error|fatal|critical/i.test(l)).length;
+  const warnCount = lines.filter(l => /warn/i.test(l)).length;
   return `${lines.length} lines: ${errorCount} errors, ${warnCount} warnings`;
 }
 
@@ -292,11 +292,11 @@ function summarizeConversationNormal(lines) {
   const result = [`// ${lines.length} conversation lines`];
   if (decisions.length > 0) {
     result.push(`// Decisions (${decisions.length}):`);
-    decisions.slice(0, 5).forEach((d) => result.push(`  - ${d}`));
+    decisions.slice(0, 5).forEach(d => result.push(`  - ${d}`));
   }
   if (questions.length > 0) {
     result.push(`// Questions (${questions.length}):`);
-    questions.slice(0, 3).forEach((q) => result.push(`  - ${q}`));
+    questions.slice(0, 3).forEach(q => result.push(`  - ${q}`));
   }
   return result.join('\n');
 }
@@ -315,9 +315,7 @@ function summarizeDocsNormal(lines) {
 }
 
 function summarizeDocsAggressive(lines) {
-  const headings = lines
-    .filter((l) => /^#{1,3}\s/.test(l.trim()))
-    .map((l) => l.trim());
+  const headings = lines.filter(l => /^#{1,3}\s/.test(l.trim())).map(l => l.trim());
   return headings.join('\n') || `// ${lines.length} lines`;
 }
 

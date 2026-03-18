@@ -32,7 +32,7 @@ const CONTRACTS_FILE = path.join(
   '..',
   'context',
   'runtime',
-  'data-contracts.json',
+  'data-contracts.json'
 );
 
 /**
@@ -78,9 +78,7 @@ function validateWaveDependencies(waveTasks, completedTaskIds) {
     for (const depId of task.blockedBy) {
       if (!completed.has(depId)) {
         missing.push(depId);
-        errors.push(
-          `Task ${task.id} requires ${depId} to be completed first`,
-        );
+        errors.push(`Task ${task.id} requires ${depId} to be completed first`);
       }
     }
   }
@@ -127,7 +125,7 @@ function validateDataContracts(waveTasks, taskOutputs, contracts) {
         if (isRequired) {
           missing.push(`${contract.producer_task_id}.${spec.key}`);
           errors.push(
-            `Required output key "${spec.key}" missing from task ${contract.producer_task_id}`,
+            `Required output key "${spec.key}" missing from task ${contract.producer_task_id}`
           );
         }
         continue;
@@ -175,14 +173,12 @@ function validateType(value, expectedType, key, taskId) {
         return `${taskId}.${key}: expected object, got ${Array.isArray(value) ? 'array' : typeof value}`;
       break;
     case 'array':
-      if (!Array.isArray(value))
-        return `${taskId}.${key}: expected array, got ${typeof value}`;
+      if (!Array.isArray(value)) return `${taskId}.${key}: expected array, got ${typeof value}`;
       break;
     case 'file_path':
       if (typeof value !== 'string')
         return `${taskId}.${key}: expected file_path (string), got ${typeof value}`;
-      if (!fs.existsSync(value))
-        return `${taskId}.${key}: file not found at ${value}`;
+      if (!fs.existsSync(value)) return `${taskId}.${key}: file not found at ${value}`;
       break;
     default:
       return `${taskId}.${key}: unknown type "${expectedType}"`;
@@ -198,7 +194,7 @@ function validateType(value, expectedType, key, taskId) {
 function createDataContract(producerTaskId, outputKeys) {
   const contracts = loadContracts();
   // Replace any existing contract for this producer
-  const idx = contracts.findIndex((c) => c.producer_task_id === producerTaskId);
+  const idx = contracts.findIndex(c => c.producer_task_id === producerTaskId);
   const contract = { producer_task_id: producerTaskId, output_keys: outputKeys };
 
   if (idx >= 0) {

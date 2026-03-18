@@ -28,7 +28,7 @@ describe('large-file-interceptor', () => {
     });
 
     it('auto-detects content type', () => {
-      const bigLogs = ('2026-01-01 ERROR fail\n').repeat(5000);
+      const bigLogs = '2026-01-01 ERROR fail\n'.repeat(5000);
       // logs limit is 30000, this is ~110000 chars
       assert.equal(shouldIntercept(bigLogs), true);
     });

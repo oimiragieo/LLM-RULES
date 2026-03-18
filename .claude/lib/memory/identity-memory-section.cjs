@@ -26,7 +26,14 @@ const AGENT_MEMORY_FILTERS = {
   developer: ['implementation', 'pattern', 'gotcha', 'bug', 'fix', 'convention', 'tdd'],
   qa: ['test', 'coverage', 'regression', 'flaky', 'assertion', 'validation'],
   architect: ['architecture', 'adr', 'decision', 'pattern', 'scalability', 'design'],
-  'security-architect': ['security', 'vulnerability', 'cve', 'owasp', 'authentication', 'injection'],
+  'security-architect': [
+    'security',
+    'vulnerability',
+    'cve',
+    'owasp',
+    'authentication',
+    'injection',
+  ],
   'code-reviewer': ['review', 'pattern', 'anti-pattern', 'convention', 'standard'],
   planner: ['plan', 'dependency', 'risk', 'estimation', 'scope', 'requirement'],
   devops: ['deploy', 'ci', 'docker', 'kubernetes', 'pipeline', 'infrastructure'],
@@ -107,9 +114,7 @@ function collectRelevantEntries(agentType, maxEntries) {
   }
 
   // Sort by relevance score, take top N
-  return entries
-    .sort((a, b) => b.score - a.score)
-    .slice(0, maxEntries);
+  return entries.sort((a, b) => b.score - a.score).slice(0, maxEntries);
 }
 
 /**

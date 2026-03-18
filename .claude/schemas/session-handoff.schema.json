@@ -12,7 +12,10 @@
     "next_action": {
       "type": "object",
       "properties": {
-        "description": { "type": "string", "description": "What to do IMMEDIATELY in the new session" },
+        "description": {
+          "type": "string",
+          "description": "What to do IMMEDIATELY in the new session"
+        },
         "command": { "type": ["string", "null"], "description": "Command to run if applicable" },
         "task_id": { "type": ["string", "null"], "description": "Task ID to resume" },
         "agent_type": { "type": ["string", "null"], "description": "Recommended agent to spawn" }
@@ -49,7 +52,10 @@
           "items": { "type": "string" },
           "description": "Things the new session MUST know"
         },
-        "max_features_per_agent": { "type": "integer", "description": "Spawn limit from experience" },
+        "max_features_per_agent": {
+          "type": "integer",
+          "description": "Spawn limit from experience"
+        },
         "token_budget_notes": { "type": "string" }
       }
     },

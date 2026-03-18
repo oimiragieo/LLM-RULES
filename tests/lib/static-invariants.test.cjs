@@ -76,7 +76,7 @@ describe('static-invariants (F3)', () => {
   it('getInvariantsByCategory filters correctly', () => {
     const routing = getInvariantsByCategory('routing');
     assert.ok(routing.length >= 3);
-    assert.ok(routing.every((i) => i.category === 'routing'));
+    assert.ok(routing.every(i => i.category === 'routing'));
   });
 
   it('getInvariantIds returns all IDs', () => {

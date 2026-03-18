@@ -62,7 +62,9 @@ const CHECKPOINT_TYPES = {
  */
 function createCheckpoint({ id, type, description, task_id, options }) {
   if (!CHECKPOINT_TYPES[type]) {
-    throw new Error(`Invalid checkpoint type: ${type}. Valid: ${Object.keys(CHECKPOINT_TYPES).join(', ')}`);
+    throw new Error(
+      `Invalid checkpoint type: ${type}. Valid: ${Object.keys(CHECKPOINT_TYPES).join(', ')}`
+    );
   }
   return {
     id,
@@ -70,7 +72,7 @@ function createCheckpoint({ id, type, description, task_id, options }) {
     description,
     task_id,
     status: 'pending',
-    options: type === 'decision' ? (options || []) : undefined,
+    options: type === 'decision' ? options || [] : undefined,
     selected_option: undefined,
     verified_by: undefined,
     timestamp: new Date().toISOString(),

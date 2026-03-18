@@ -8,11 +8,7 @@ const yaml = require('js-yaml');
 const CONTRACT_MARKER = '<!-- agent-template-contract:v1 -->';
 const REQUIRED_HEADINGS = ['## Token Saver Invocation Rule'];
 const REQUIRED_SKILLS_BASE = ['task-management-protocol'];
-const REQUIRED_SKILLS_SEARCH_HEAVY = [
-  'ripgrep',
-  'code-semantic-search',
-  'context-compressor',
-];
+const REQUIRED_SKILLS_SEARCH_HEAVY = ['ripgrep', 'code-semantic-search', 'context-compressor'];
 const SEARCH_HEAVY_PATTERNS = [/code-semantic-search/, /ripgrep/, /pnpm search:code/];
 
 function isAgentFile(filePath) {

@@ -114,9 +114,7 @@ function checkGrepMatch(id, value, severity) {
     return {
       id,
       passed: found,
-      message: found
-        ? undefined
-        : `Pattern "${pattern}" not found in ${filePath}`,
+      message: found ? undefined : `Pattern "${pattern}" not found in ${filePath}`,
       severity,
     };
   } catch (err) {
@@ -170,7 +168,9 @@ function checkCustom(id, expression, severity) {
     return {
       id,
       passed: result,
-      message: result ? undefined : `${envCmpMatch[1]} ${op} '${expected}' is false (actual: '${val}')`,
+      message: result
+        ? undefined
+        : `${envCmpMatch[1]} ${op} '${expected}' is false (actual: '${val}')`,
       severity,
     };
   }

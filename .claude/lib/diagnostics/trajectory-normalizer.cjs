@@ -119,7 +119,7 @@ function normalizeSessionLog(gapLogEntries, sessionId, agentType) {
       input_summary: entry.description || '',
       output_summary: entry.context || '',
       success: entry.type !== 'error' && entry.type !== 'hook-warning',
-      error_category: entry.type === 'error' ? (entry.errorCategory || 'unknown') : null,
+      error_category: entry.type === 'error' ? entry.errorCategory || 'unknown' : null,
     });
   }
 

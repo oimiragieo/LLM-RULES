@@ -24,7 +24,6 @@ const COMPRESSION_STATS_PATH = path.join(PROJECT_ROOT, '.claude/context/compress
 const COMPRESSION_REMINDER_PATH = path.join(RUNTIME_DIR, 'compression-reminder.txt');
 const COMPRESSION_REMINDER_JSON_PATH = path.join(RUNTIME_DIR, 'compression-reminder.json');
 
-
 // Thresholds
 const READ_SIZE_THRESHOLD = 10000; // 10 KB
 const FETCH_SIZE_THRESHOLD = 5000; // 5 KB
@@ -126,7 +125,11 @@ function checkCompressionNeeded(context) {
  * @returns {{ triggered: boolean, reminderWritten: boolean }}
  */
 function triggerCompression(options = {}) {
-  const { reason = 'compression requested', urgency = 'medium', _simulateFailure = false } = options;
+  const {
+    reason = 'compression requested',
+    urgency = 'medium',
+    _simulateFailure = false,
+  } = options;
 
   try {
     // Simulate failure if test flag is set

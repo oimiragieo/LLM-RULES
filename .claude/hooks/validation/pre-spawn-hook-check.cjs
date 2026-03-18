@@ -18,13 +18,19 @@ const path = require('path');
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 let _input = '';
-process.stdin.on('data', (chunk) => {
+process.stdin.on('data', chunk => {
   _input += chunk;
 });
 
 process.stdin.on('end', () => {
   try {
-    const validatorPath = path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'hook-file-validator.cjs');
+    const validatorPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'lib',
+      'utils',
+      'hook-file-validator.cjs'
+    );
     const { validateHookFiles } = require(validatorPath);
     const result = validateHookFiles(PROJECT_ROOT);
 

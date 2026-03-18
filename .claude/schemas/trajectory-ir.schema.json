@@ -67,7 +67,15 @@
         },
         "action_type": {
           "type": "string",
-          "enum": ["tool_call", "task_spawn", "task_update", "skill_invoke", "decision", "error", "observation"],
+          "enum": [
+            "tool_call",
+            "task_spawn",
+            "task_update",
+            "skill_invoke",
+            "decision",
+            "error",
+            "observation"
+          ],
           "description": "Type of action taken"
         },
         "tool_name": {

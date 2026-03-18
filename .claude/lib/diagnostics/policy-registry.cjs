@@ -20,7 +20,7 @@ const REGISTRY_FILE = path.join(
   '..',
   'context',
   'runtime',
-  'policy-registry.json',
+  'policy-registry.json'
 );
 
 /**
@@ -39,7 +39,15 @@ const REGISTRY_FILE = path.join(
 const DEFAULT_POLICIES = {
   router: {
     agent_id: 'router',
-    allowed_tools: ['Task', 'TaskList', 'TaskCreate', 'TaskUpdate', 'TaskGet', 'Read', 'AskUserQuestion'],
+    allowed_tools: [
+      'Task',
+      'TaskList',
+      'TaskCreate',
+      'TaskUpdate',
+      'TaskGet',
+      'Read',
+      'AskUserQuestion',
+    ],
     required_skills: [],
     invariant_ids: ['INV-R01', 'INV-R02', 'INV-R03', 'INV-T01', 'INV-T02'],
     forbidden_paths: ['.claude/skills/', '.claude/agents/', '.claude/hooks/'],

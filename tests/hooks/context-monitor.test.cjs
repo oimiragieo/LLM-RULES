@@ -40,7 +40,9 @@ describe('context-monitor hook', () => {
   test('hook implements debounce logic', () => {
     const content = fs.readFileSync(HOOK_PATH, 'utf8');
     assert.ok(
-      content.includes('debounce') || content.includes('DEBOUNCE') || content.includes('lastWarning'),
+      content.includes('debounce') ||
+        content.includes('DEBOUNCE') ||
+        content.includes('lastWarning'),
       'Hook should implement debounce'
     );
   });
@@ -55,10 +57,7 @@ describe('context-monitor hook', () => {
 
   test('hook exits 0 (fail-open advisory)', () => {
     const content = fs.readFileSync(HOOK_PATH, 'utf8');
-    assert.ok(
-      content.includes('process.exit(0)'),
-      'Advisory hook should exit 0'
-    );
+    assert.ok(content.includes('process.exit(0)'), 'Advisory hook should exit 0');
     // Should NOT contain exit(2) as primary path (advisory, not security)
   });
 });

@@ -27,12 +27,18 @@
 const VALIDATION_CHECKS = {
   code: [
     { name: 'exports_preserved', description: 'Module exports are mentioned in compressed output' },
-    { name: 'function_names_preserved', description: 'Function/class names appear in compressed output' },
+    {
+      name: 'function_names_preserved',
+      description: 'Function/class names appear in compressed output',
+    },
     { name: 'file_path_preserved', description: 'Source file path is referenced' },
     { name: 'reduction_achieved', description: 'Meaningful size reduction (>30%)' },
   ],
   documentation: [
-    { name: 'headings_preserved', description: 'Section headings from original appear in compressed' },
+    {
+      name: 'headings_preserved',
+      description: 'Section headings from original appear in compressed',
+    },
     { name: 'key_terms_preserved', description: 'Domain-specific terms survive compression' },
     { name: 'reduction_achieved', description: 'Meaningful size reduction (>30%)' },
   ],
@@ -89,7 +95,7 @@ function validateCompression(original, compressed, options = {}) {
     checks.push(...validateConversationCompression(original, compressed));
   }
 
-  const passedCount = checks.filter((c) => c.passed).length;
+  const passedCount = checks.filter(c => c.passed).length;
   const score = checks.length > 0 ? passedCount / checks.length : 0;
 
   return {
@@ -106,7 +112,7 @@ function validateCodeCompression(original, compressed, options) {
 
   // Check function/class names preserved
   const funcNames = extractFunctionNames(original);
-  const preserved = funcNames.filter((n) => compressedLower.includes(n.toLowerCase()));
+  const preserved = funcNames.filter(n => compressedLower.includes(n.toLowerCase()));
   checks.push({
     check: 'function_names_preserved',
     passed: funcNames.length === 0 || preserved.length >= Math.ceil(funcNames.length * 0.5),
@@ -114,15 +120,20 @@ function validateCodeCompression(original, compressed, options) {
   });
 
   // Check exports preserved
-  const exportLines = original.split('\n').filter((l) => /module\.exports|exports\./.test(l));
-  const exportsFound = exportLines.some((l) => {
+  const exportLines = original.split('\n').filter(l => /module\.exports|exports\./.test(l));
+  const exportsFound = exportLines.some(l => {
     const key = l.match(/(?:module\.exports|exports\.(\w+))/);
     return key && compressedLower.includes(key[0].toLowerCase());
   });
   checks.push({
     check: 'exports_preserved',
     passed: exportLines.length === 0 || exportsFound,
-    detail: exportLines.length > 0 ? (exportsFound ? 'Exports referenced' : 'Exports missing') : 'No exports to check',
+    detail:
+      exportLines.length > 0
+        ? exportsFound
+          ? 'Exports referenced'
+          : 'Exports missing'
+        : 'No exports to check',
   });
 
   // Check file path preserved
@@ -144,9 +155,9 @@ function validateDocsCompression(original, compressed) {
   // Check headings preserved
   const headings = original
     .split('\n')
-    .filter((l) => /^#{1,3}\s/.test(l))
-    .map((l) => l.replace(/^#+\s*/, '').trim());
-  const preserved = headings.filter((h) => compressedLower.includes(h.toLowerCase()));
+    .filter(l => /^#{1,3}\s/.test(l))
+    .map(l => l.replace(/^#+\s*/, '').trim());
+  const preserved = headings.filter(h => compressedLower.includes(h.toLowerCase()));
   checks.push({
     check: 'headings_preserved',
     passed: headings.length === 0 || preserved.length >= Math.ceil(headings.length * 0.3),
@@ -155,7 +166,7 @@ function validateDocsCompression(original, compressed) {
 
   // Check key terms (words that appear 3+ times)
   const keyTerms = extractKeyTerms(original);
-  const termsPreserved = keyTerms.filter((t) => compressedLower.includes(t));
+  const termsPreserved = keyTerms.filter(t => compressedLower.includes(t));
   checks.push({
     check: 'key_terms_preserved',
     passed: keyTerms.length === 0 || termsPreserved.length >= Math.ceil(keyTerms.length * 0.5),
@@ -169,7 +180,7 @@ function validateLogsCompression(original, compressed) {
   const checks = [];
 
   // Check error references
-  const errorLines = original.split('\n').filter((l) => /error|fatal|critical/i.test(l));
+  const errorLines = original.split('\n').filter(l => /error|fatal|critical/i.test(l));
   const hasErrorRef = /\berror/i.test(compressed) || /\d+\s*error/i.test(compressed);
   checks.push({
     check: 'error_count_preserved',
@@ -195,7 +206,7 @@ function validateConversationCompression(original, compressed) {
   // Check decisions preserved
   const decisionLines = original
     .split('\n')
-    .filter((l) => /\bdecid|chose|decision|agreed|let'?s\s+use\b/i.test(l));
+    .filter(l => /\bdecid|chose|decision|agreed|let'?s\s+use\b/i.test(l));
   const hasDecisionRef = /decision|chose|agreed/i.test(compressed);
   checks.push({
     check: 'decisions_preserved',
@@ -210,11 +221,7 @@ function validateConversationCompression(original, compressed) {
 
 function extractFunctionNames(code) {
   const names = [];
-  const patterns = [
-    /function\s+(\w+)/g,
-    /const\s+(\w+)\s*=\s*(?:async\s+)?\(/g,
-    /class\s+(\w+)/g,
-  ];
+  const patterns = [/function\s+(\w+)/g, /const\s+(\w+)\s*=\s*(?:async\s+)?\(/g, /class\s+(\w+)/g];
   for (const pattern of patterns) {
     let match;
     while ((match = pattern.exec(code)) !== null) {

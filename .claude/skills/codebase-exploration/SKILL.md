@@ -254,15 +254,15 @@ rg "require\('./auth'\|from './auth'" -l
 
 ## Tool Selection Matrix (External Repos)
 
-| Need               | Tool                              | Why                                   |
-| ------------------ | --------------------------------- | ------------------------------------- |
-| File discovery     | `Glob`                            | Fast pattern matching                 |
-| Content search     | `Grep` (ripgrep)                  | Regex across whole repo               |
-| Targeted read      | `Read` with `offset/limit`        | Windowed, token-efficient             |
-| Structure patterns | `ast-grep` (if installed)         | Language-aware                        |
-| Definitions        | LSP (if server available)         | Compiler-level accuracy               |
-| External context   | `WebFetch` + docs URL             | Find docs, articles about the project |
-| Compression        | `context-compressor` | When >60K tokens                      |
+| Need               | Tool                       | Why                                   |
+| ------------------ | -------------------------- | ------------------------------------- |
+| File discovery     | `Glob`                     | Fast pattern matching                 |
+| Content search     | `Grep` (ripgrep)           | Regex across whole repo               |
+| Targeted read      | `Read` with `offset/limit` | Windowed, token-efficient             |
+| Structure patterns | `ast-grep` (if installed)  | Language-aware                        |
+| Definitions        | LSP (if server available)  | Compiler-level accuracy               |
+| External context   | `WebFetch` + docs URL      | Find docs, articles about the project |
+| Compression        | `context-compressor`       | When >60K tokens                      |
 
 **Tools NOT available for external repos:**
 

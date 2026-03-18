@@ -269,10 +269,10 @@ _"This information is intended for educational purposes and does not constitute 
 
 ### Contextual Skills (When Applicable)
 
-| Condition                  | Skill                             | Purpose                            |
-| -------------------------- | --------------------------------- | ---------------------------------- |
-| Large corpus of research   | `context-compressor` | Compress evidence before synthesis |
-| Before claiming completion | `verification-before-completion`  | Evidence-based completion gates    |
+| Condition                  | Skill                            | Purpose                            |
+| -------------------------- | -------------------------------- | ---------------------------------- |
+| Large corpus of research   | `context-compressor`             | Compress evidence before synthesis |
+| Before claiming completion | `verification-before-completion` | Evidence-based completion gates    |
 
 ## Token Saver Invocation Rule
 

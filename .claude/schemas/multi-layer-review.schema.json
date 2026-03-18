@@ -36,7 +36,10 @@
               "type": "object",
               "properties": {
                 "id": { "type": "string" },
-                "severity": { "type": "string", "enum": ["blocker", "critical", "suggestion", "nit"] },
+                "severity": {
+                  "type": "string",
+                  "enum": ["blocker", "critical", "suggestion", "nit"]
+                },
                 "category": { "type": "string" },
                 "file": { "type": "string" },
                 "line": { "type": ["integer", "null"] },

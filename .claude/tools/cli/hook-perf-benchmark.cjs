@@ -94,7 +94,7 @@ function main() {
 
   if (totalMs > 100) {
     console.log('\nSlow hooks:');
-    for (const r of results.filter((r) => r.status === 'SLOW')) {
+    for (const r of results.filter(r => r.status === 'SLOW')) {
       console.log(`  - ${r.matcher}: ${r.ms.toFixed(1)}ms`);
     }
   }

@@ -55,14 +55,14 @@ Skill({ skill: 'proactive-audit' });
 
 ## Mandatory Skills
 
-| Skill                             | Purpose                            | When                 |
-| --------------------------------- | ---------------------------------- | -------------------- |
-| `task-management-protocol`        | Track audit progress               | Always               |
-| `ripgrep`                         | Fast targeted artifact search      | During checks        |
-| `code-semantic-search`            | Pattern discovery across artifacts | When investigating   |
-| `context-compressor` | Compress large audit results       | When output is large |
-| `verification-before-completion`  | Gate completion on zero CRITICAL   | Before marking done  |
-| `memory-search`                   | Check prior audit patterns         | At start             |
+| Skill                            | Purpose                            | When                 |
+| -------------------------------- | ---------------------------------- | -------------------- |
+| `task-management-protocol`       | Track audit progress               | Always               |
+| `ripgrep`                        | Fast targeted artifact search      | During checks        |
+| `code-semantic-search`           | Pattern discovery across artifacts | When investigating   |
+| `context-compressor`             | Compress large audit results       | When output is large |
+| `verification-before-completion` | Gate completion on zero CRITICAL   | Before marking done  |
+| `memory-search`                  | Check prior audit patterns         | At start             |
 
 ## Step 1: Detect Changed Artifacts
 

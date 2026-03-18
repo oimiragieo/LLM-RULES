@@ -10,6 +10,35 @@
 
 ---
 
+## Research Pipeline Completion & Reflection (2026-03-18) [Batch 8 reflections]
+
+**[WORKFLOW] Multi-Agent Research Pipeline Lifecycle**
+
+- Full research pipeline on external frameworks (BMAD, GSD, CrewAI, +5 secondary) completed with 8 sequential research tasks
+- Task 1: Repository discovery (8 repos cloned)
+- Tasks 2-4: Parallel deep-dive analysis per framework (BMAD: 9 agents/34 workflows, GSD: 12 features, CrewAI: 14 features)
+- Task 5: Secondary repository analysis (5 additional repos)
+- Task 6: Feature consolidation (47 features across all frameworks, P0-P3 priorities)
+- Task 7: External LLM review (Gemini+Codex validation), plan refinement (14 changes), DAG memory structure demoted
+- Task 8: Architecture approval (30 GO features, 17 deferred, 5-phase 16-week timeline)
+- Total: ~51 raw features → 47 verified features after review gates
+
+**[PATTERN] Atomic Handshake for Reflection Batches**
+
+- Reflection queue processed atomically: each reflection-task marked `completed` with `processedReflectionIds` array
+- Enables reflection-cleanup.cjs to remove processed entries from queue without race conditions
+- Required for long-running pipelines that spawn multiple background tasks with reflection requirements
+- Pattern: TaskUpdate({ status: 'completed', metadata: { processedReflectionIds: [...] } })
+
+**[INSIGHT] Research Pipeline Quality Gates**
+
+- Multi-LLM review (Gemini + Codex) as post-synthesis gate → caught 14+ inconsistencies
+- Feature count validation (51 raw → 47 verified) requires explicit de-duplication step
+- Timeline overestimate risk identified: complex frameworks need +30-50% buffer
+- DAG-based memory structure (tasks → subtasks → features) useful for tracking but overkill for flat feature lists; recommend file-based consolidation for future pipelines
+
+---
+
 ## 8-Framework Analysis Pipeline Pattern (2026-03-17) [Tasks 4-7, batch reflection]
 
 **[WORKFLOW] Multi-Framework Research → Synthesis → Multi-LLM Review → Architect GO**

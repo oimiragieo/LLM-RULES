@@ -27,7 +27,7 @@ describe('guardrail-engine', () => {
     });
     assert.strictEqual(result.passed, true);
     assert.ok(Array.isArray(result.checks));
-    assert.ok(result.checks.every((c) => c.passed));
+    assert.ok(result.checks.every(c => c.passed));
   });
 
   test('output missing summary fails guardrail', () => {
@@ -37,7 +37,7 @@ describe('guardrail-engine', () => {
       filesModified: [],
     });
     assert.strictEqual(result.passed, false);
-    const failedCheck = result.checks.find((c) => !c.passed);
+    const failedCheck = result.checks.find(c => !c.passed);
     assert.ok(failedCheck, 'Should have a failing check');
     assert.ok(failedCheck.message.includes('summary'), 'Should mention summary');
   });
@@ -66,17 +66,11 @@ describe('guardrail-engine', () => {
     engine.resetCircuit('test-agent');
 
     // First failure
-    engine.validateTaskOutput(
-      { status: 'success' },
-      { agentType: 'test-agent' }
-    );
+    engine.validateTaskOutput({ status: 'success' }, { agentType: 'test-agent' });
     assert.strictEqual(engine.getCircuitState('test-agent'), 'closed');
 
     // Second identical failure
-    engine.validateTaskOutput(
-      { status: 'success' },
-      { agentType: 'test-agent' }
-    );
+    engine.validateTaskOutput({ status: 'success' }, { agentType: 'test-agent' });
     assert.strictEqual(engine.getCircuitState('test-agent'), 'open');
   });
 
@@ -104,14 +98,8 @@ describe('guardrail-engine', () => {
     engine.resetCircuit('test-agent-3');
 
     // Trigger circuit breaker
-    engine.validateTaskOutput(
-      { status: 'success' },
-      { agentType: 'test-agent-3' }
-    );
-    const result = engine.validateTaskOutput(
-      { status: 'success' },
-      { agentType: 'test-agent-3' }
-    );
+    engine.validateTaskOutput({ status: 'success' }, { agentType: 'test-agent-3' });
+    const result = engine.validateTaskOutput({ status: 'success' }, { agentType: 'test-agent-3' });
     assert.strictEqual(result.circuitBreakerTripped, true);
   });
 

@@ -58,14 +58,14 @@ Invoke proactively after:
 
 Invoke before starting this skill:
 
-| Skill                             | Purpose                        | When                 |
-| --------------------------------- | ------------------------------ | -------------------- |
-| `task-management-protocol`        | Track scan progress            | Always               |
-| `ripgrep`                         | Fast targeted code search      | When investigating   |
-| `code-semantic-search`            | Concept discovery              | When pattern hunting |
-| `context-compressor` | Compress large audit results   | When output is large |
-| `verification-before-completion`  | Gate completion on zero errors | Before marking done  |
-| `memory-search`                   | Check prior audit patterns     | At start             |
+| Skill                            | Purpose                        | When                 |
+| -------------------------------- | ------------------------------ | -------------------- |
+| `task-management-protocol`       | Track scan progress            | Always               |
+| `ripgrep`                        | Fast targeted code search      | When investigating   |
+| `code-semantic-search`           | Concept discovery              | When pattern hunting |
+| `context-compressor`             | Compress large audit results   | When output is large |
+| `verification-before-completion` | Gate completion on zero errors | Before marking done  |
+| `memory-search`                  | Check prior audit patterns     | At start             |
 
 ## Iron Laws
 

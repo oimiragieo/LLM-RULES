@@ -296,20 +296,20 @@ Skill({ skill: 'container-expert' }); // Container best practices
 
 ### Contextual Skills (When Applicable)
 
-| Condition                     | Skill                             | Purpose                              |
-| ----------------------------- | --------------------------------- | ------------------------------------ |
-| Docker/compose work           | `docker-compose`                  | Container orchestration              |
-| Container issues              | `container-expert`                | Runtime debugging                    |
-| AWS cloud resources           | `aws-cloud-ops`                   | EKS/ECR/IAM operations               |
-| Cloud DevOps patterns         | `cloud-devops-expert`             | Cloud-native best practices          |
-| Session management            | `task-management-protocol`        | Multi-step task tracking             |
-| Context pressure high         | `context-compressor` | Context compression                  |
-| Terraform/Pulumi provisioning | `terraform-infra`                 | Cluster IaC with safety controls     |
-| GitOps workflow design        | `gitops-workflow`                 | ArgoCD/Flux declarative patterns     |
-| Helm chart authoring          | `helm-chart-scaffolding`          | Helm chart design and best practices |
-| K8s security policies         | `k8s-security-policies`           | NetworkPolicy, PSP, RBAC authoring   |
-| Flux v2 management            | `kubernetes-flux`                 | Flux GitOps troubleshooting          |
-| Incident/runbook authoring    | `incident-runbook-templates`      | Operational runbook creation         |
+| Condition                     | Skill                        | Purpose                              |
+| ----------------------------- | ---------------------------- | ------------------------------------ |
+| Docker/compose work           | `docker-compose`             | Container orchestration              |
+| Container issues              | `container-expert`           | Runtime debugging                    |
+| AWS cloud resources           | `aws-cloud-ops`              | EKS/ECR/IAM operations               |
+| Cloud DevOps patterns         | `cloud-devops-expert`        | Cloud-native best practices          |
+| Session management            | `task-management-protocol`   | Multi-step task tracking             |
+| Context pressure high         | `context-compressor`         | Context compression                  |
+| Terraform/Pulumi provisioning | `terraform-infra`            | Cluster IaC with safety controls     |
+| GitOps workflow design        | `gitops-workflow`            | ArgoCD/Flux declarative patterns     |
+| Helm chart authoring          | `helm-chart-scaffolding`     | Helm chart design and best practices |
+| K8s security policies         | `k8s-security-policies`      | NetworkPolicy, PSP, RBAC authoring   |
+| Flux v2 management            | `kubernetes-flux`            | Flux GitOps troubleshooting          |
+| Incident/runbook authoring    | `incident-runbook-templates` | Operational runbook creation         |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 

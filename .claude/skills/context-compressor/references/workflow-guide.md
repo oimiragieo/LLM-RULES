@@ -11,13 +11,13 @@ Use this guide when you need to decide which script or compression mode to run.
 
 ## Script chooser
 
-| Need | Script | Notes |
-| --- | --- | --- |
-| Raw vs compressed token profile | `profile_tokens.py` | Fastest first pass |
-| Produce compressed context | `compress_context.py` | Supports baseline, query-guided, and evidence-aware modes |
-| Check sufficiency only | `validate_evidence.py` | Exits non-zero when evidence is insufficient |
-| Run profile + compression + evidence together | `run_skill_workflow.py` | Best default for end-to-end use |
-| Check TOON vs JSON output policy | `benchmark_toon_vs_json.py` | Regression guard for structured output formatting |
+| Need                                          | Script                      | Notes                                                     |
+| --------------------------------------------- | --------------------------- | --------------------------------------------------------- |
+| Raw vs compressed token profile               | `profile_tokens.py`         | Fastest first pass                                        |
+| Produce compressed context                    | `compress_context.py`       | Supports baseline, query-guided, and evidence-aware modes |
+| Check sufficiency only                        | `validate_evidence.py`      | Exits non-zero when evidence is insufficient              |
+| Run profile + compression + evidence together | `run_skill_workflow.py`     | Best default for end-to-end use                           |
+| Check TOON vs JSON output policy              | `benchmark_toon_vs_json.py` | Regression guard for structured output formatting         |
 
 ## Input types
 

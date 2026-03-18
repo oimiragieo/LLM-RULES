@@ -132,7 +132,7 @@ describe('E6: Debug State', () => {
     const session = createDebugSession({ bugId: 'BUG-5', description: 'Bug 5' });
     createdSessions.push(session.id);
     const list = listSessions();
-    assert.ok(list.some((s) => s.id === session.id));
+    assert.ok(list.some(s => s.id === session.id));
   });
 
   it('throws for missing session', () => {

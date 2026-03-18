@@ -26,10 +26,7 @@ describe('hook-perf-benchmark tool', () => {
 
   test('tool reports per-hook latency', () => {
     const content = fs.readFileSync(TOOL_PATH, 'utf8');
-    assert.ok(
-      content.includes('ms') && content.includes('latency'),
-      'Should report latency in ms'
-    );
+    assert.ok(content.includes('ms') && content.includes('latency'), 'Should report latency in ms');
   });
 
   test('tool identifies budget breaches at 100ms', () => {

@@ -23,7 +23,7 @@ Verify that task outputs actually achieve stated goals through 4 progressive lev
 ## When to Invoke
 
 ```javascript
-Skill({ skill: 'goal-backward-verification' })
+Skill({ skill: 'goal-backward-verification' });
 ```
 
 Invoke when:

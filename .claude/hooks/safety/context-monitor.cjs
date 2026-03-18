@@ -32,7 +32,7 @@ let toolUsesSinceLastWarning = 0;
 
 try {
   let _inputData = '';
-  process.stdin.on('data', (chunk) => {
+  process.stdin.on('data', chunk => {
     _inputData += chunk;
   });
 

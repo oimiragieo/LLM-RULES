@@ -7,13 +7,7 @@ const { spawnSync } = require('node:child_process');
 
 const { PROJECT_ROOT } = require('../../../lib/utils/project-root.cjs');
 
-const RUNTIME_DIR = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'runtime',
-  'context-compressor'
-);
+const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'context-compressor');
 
 // Python scripts live in context-compressor (archived source)
 const PYTHON_SCRIPTS_DIR = path.join(

@@ -6,7 +6,10 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const { extractHookPaths, validateHookFiles } = require('../../.claude/lib/utils/hook-file-validator.cjs');
+const {
+  extractHookPaths,
+  validateHookFiles,
+} = require('../../.claude/lib/utils/hook-file-validator.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 

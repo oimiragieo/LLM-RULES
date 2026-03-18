@@ -40,7 +40,7 @@ describe('B4: Checkpoint Protocol', () => {
 
   it('rejects invalid checkpoint type', () => {
     assert.throws(() =>
-      createCheckpoint({ id: 'x', type: 'invalid', description: 'x', task_id: '1' }),
+      createCheckpoint({ id: 'x', type: 'invalid', description: 'x', task_id: '1' })
     );
   });
 
@@ -88,7 +88,8 @@ describe('D6: Compression Validation', () => {
   return total;
 }
 module.exports = { calculateTotal };`;
-    const compressed = '// calculateTotal: computes total from items array\n// exports: calculateTotal';
+    const compressed =
+      '// calculateTotal: computes total from items array\n// exports: calculateTotal';
     const result = validateCompression(original, compressed, { contentType: 'code' });
     assert.ok(result.checks.length > 0);
   });
@@ -97,7 +98,7 @@ module.exports = { calculateTotal };`;
     const original = '# Setup\nInstall deps\n# Usage\nRun the app\n# API\nEndpoints here';
     const compressed = '# Setup\n# Usage\n# API';
     const result = validateCompression(original, compressed, { contentType: 'documentation' });
-    const headingCheck = result.checks.find((c) => c.check === 'headings_preserved');
+    const headingCheck = result.checks.find(c => c.check === 'headings_preserved');
     assert.ok(headingCheck);
     assert.equal(headingCheck.passed, true);
   });
@@ -106,7 +107,7 @@ module.exports = { calculateTotal };`;
     const original = 'short';
     const compressed = 'this is actually much longer than the original content was';
     const result = validateCompression(original, compressed, { contentType: 'documentation' });
-    assert.ok(result.warnings.some((w) => w.includes('LARGER')));
+    assert.ok(result.warnings.some(w => w.includes('LARGER')));
   });
 
   it('handles empty content', () => {
@@ -118,7 +119,7 @@ module.exports = { calculateTotal };`;
     const original = '2026-01-01 ERROR db fail\n2026-01-02 INFO ok\n2026-01-03 ERROR timeout';
     const compressed = '3 lines: 2 errors, 0 warnings. 2026-01-01 to 2026-01-03';
     const result = validateCompression(original, compressed, { contentType: 'logs' });
-    const errorCheck = result.checks.find((c) => c.check === 'error_count_preserved');
+    const errorCheck = result.checks.find(c => c.check === 'error_count_preserved');
     assert.ok(errorCheck);
   });
 });

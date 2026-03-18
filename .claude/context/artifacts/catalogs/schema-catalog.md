@@ -278,7 +278,7 @@ All skill output schemas follow the pattern: `skill-{name}-output.schema.json`
 | skill-summarize-changes-output.schema.json                  | summarize-changes                  | Development   |
 | skill-swarm-coordination-output.schema.json                 | swarm-coordination                 | Patterns      |
 | skill-task-management-protocol-output.schema.json           | task-management-protocol           | Patterns      |
-| skill-context-compressor.json                  | context-compressor    | Context       |
+| skill-context-compressor.json                               | context-compressor                 | Context       |
 | skill-track-management-output.schema.json                   | track-management                   | Development   |
 | skill-workflow-patterns-output.schema.json                  | workflow-patterns                  | Patterns      |
 | skill-writing-skills-output.schema.json                     | writing-skills                     | Documentation |

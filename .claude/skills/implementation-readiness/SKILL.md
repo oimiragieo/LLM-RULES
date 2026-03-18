@@ -23,7 +23,7 @@ Validates that a plan is ready for implementation before agents are spawned. Pre
 ## When to Invoke
 
 ```javascript
-Skill({ skill: 'implementation-readiness' })
+Skill({ skill: 'implementation-readiness' });
 ```
 
 Invoke when:
@@ -102,7 +102,11 @@ For HIGH/EPIC tasks:
   "complexity": "HIGH",
   "checks": [
     { "name": "plan-completeness", "passed": true, "details": "8/8 tasks complete" },
-    { "name": "architecture-compliance", "passed": true, "details": "All paths follow conventions" },
+    {
+      "name": "architecture-compliance",
+      "passed": true,
+      "details": "All paths follow conventions"
+    },
     { "name": "dependency-graph", "passed": true, "details": "DAG valid, critical path: 4 tasks" },
     { "name": "risk-assessment", "passed": true, "details": "Rollback strategy documented" },
     { "name": "test-strategy", "passed": false, "details": "Task 3 missing test file path" }

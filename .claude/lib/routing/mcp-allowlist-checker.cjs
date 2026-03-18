@@ -21,7 +21,7 @@ const ALLOWLIST_FILE = path.join(
   '..',
   'context',
   'runtime',
-  'mcp-allowlists.json',
+  'mcp-allowlists.json'
 );
 
 /**
@@ -84,7 +84,7 @@ function isToolAllowed(agentId, serverName, toolName) {
   }
 
   // Check allowlist
-  const serverConfig = config.mcp_servers.find((s) => s.name === serverName);
+  const serverConfig = config.mcp_servers.find(s => s.name === serverName);
   if (!serverConfig) {
     // No explicit allow — permissive for agents without config, restrictive for router
     if (agentId === 'router') {

@@ -364,12 +364,12 @@ Skill({ skill: 'enhance-prompt' }); // Clarify vague marketing briefs
 
 ### Contextual Skills (When Applicable)
 
-| Condition                      | Skill                             | Purpose                               |
-| ------------------------------ | --------------------------------- | ------------------------------------- |
-| Vague or ambiguous brief       | `enhance-prompt`                  | Clarify requirements before executing |
-| Strategy creation needed       | `brainstorming`                   | Socratic design refinement            |
-| Research required              | `research-synthesis`              | Synthesize best practices from web    |
-| Context limit approached       | `context-compressor`              | Compress context to stay effective    |
+| Condition                      | Skill                | Purpose                               |
+| ------------------------------ | -------------------- | ------------------------------------- |
+| Vague or ambiguous brief       | `enhance-prompt`     | Clarify requirements before executing |
+| Strategy creation needed       | `brainstorming`      | Socratic design refinement            |
+| Research required              | `research-synthesis` | Synthesize best practices from web    |
+| Context limit approached       | `context-compressor` | Compress context to stay effective    |
 | Many search results to process | `context-compressor` | Compress search results efficiently   |
 
 ## Output Locations

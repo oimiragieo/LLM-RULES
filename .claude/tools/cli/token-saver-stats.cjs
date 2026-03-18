@@ -36,9 +36,7 @@ function main() {
   if (!fs.existsSync(TELEMETRY_FILE)) {
     console.log('\x1b[36m============== TOKEN SAVER TRACKER ==============\x1b[0m');
     console.log('\x1b[33mNo telemetry data found yet.\x1b[0m');
-    console.log(
-      'Use `Skill({ skill: "context-compressor" })` to start saving tokens.'
-    );
+    console.log('Use `Skill({ skill: "context-compressor" })` to start saving tokens.');
     console.log('\x1b[36m=================================================\x1b[0m');
     return;
   }

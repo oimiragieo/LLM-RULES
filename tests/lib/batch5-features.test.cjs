@@ -25,13 +25,13 @@ describe('C3: Edge Case Hunter', () => {
     const code = 'if (arr.length === 0) return;\nconst first = arr[0];';
     const findings = huntEdgeCases(code, { filePath: 'test.js', categories: ['boundary'] });
     assert.ok(findings.length >= 1);
-    assert.ok(findings.some((f) => f.category === 'boundary'));
+    assert.ok(findings.some(f => f.category === 'boundary'));
   });
 
   it('detects type coercion', () => {
     const code = 'if (x == null) return;';
     const findings = huntEdgeCases(code, { categories: ['typeCoercion'] });
-    assert.ok(findings.some((f) => f.category === 'typeCoercion'));
+    assert.ok(findings.some(f => f.category === 'typeCoercion'));
   });
 
   it('detects security edge cases', () => {
@@ -40,7 +40,7 @@ describe('C3: Edge Case Hunter', () => {
     const code = evl + '\nel.innerHTML = data;';
     const findings = huntEdgeCases(code, { categories: ['security'] });
     assert.ok(findings.length >= 1);
-    assert.ok(findings.every((f) => f.risk === 'high'));
+    assert.ok(findings.every(f => f.risk === 'high'));
   });
 
   it('returns empty for clean code', () => {
@@ -53,15 +53,11 @@ describe('C3: Edge Case Hunter', () => {
   it('includes file and line info', () => {
     const code = 'JSON.parse(input);';
     const findings = huntEdgeCases(code, { filePath: 'src/api.js' });
-    assert.ok(findings.some((f) => f.file === 'src/api.js' && f.line === 1));
+    assert.ok(findings.some(f => f.file === 'src/api.js' && f.line === 1));
   });
 
   it('summarizeFindings groups by category', () => {
-    const findings = [
-      { category: 'boundary' },
-      { category: 'boundary' },
-      { category: 'security' },
-    ];
+    const findings = [{ category: 'boundary' }, { category: 'boundary' }, { category: 'security' }];
     const summary = summarizeFindings(findings);
     assert.equal(summary.boundary, 2);
     assert.equal(summary.security, 1);
@@ -141,10 +137,7 @@ describe('F5: LLM-as-Judge', () => {
       evaluator: 'test',
       target: { task_id: 't2' },
     });
-    const dims = [
-      scoreDimension('accuracy', 0.2),
-      scoreDimension('completeness', 0.3),
-    ];
+    const dims = [scoreDimension('accuracy', 0.2), scoreDimension('completeness', 0.3)];
     const result = finalizeEvaluation(eval_, dims);
     assert.equal(result.verdict, 'fail');
   });

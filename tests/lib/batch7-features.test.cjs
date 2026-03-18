@@ -105,9 +105,7 @@ describe('E7: Session Handoff Builder', () => {
         batch_progress: '5/10',
         critical_notes: ['Do not spawn agents'],
       },
-      alternatives: [
-        { description: 'Start fresh session', command: 'claude' },
-      ],
+      alternatives: [{ description: 'Start fresh session', command: 'claude' }],
     });
 
     const md = formatHandoffMarkdown(handoff);

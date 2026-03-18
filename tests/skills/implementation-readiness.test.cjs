@@ -26,10 +26,7 @@ describe('implementation-readiness skill', () => {
       content.includes('Architecture Compliance'),
       'Missing Check 2: Architecture Compliance'
     );
-    assert.ok(
-      content.includes('Dependency Graph'),
-      'Missing Check 3: Dependency Graph Validity'
-    );
+    assert.ok(content.includes('Dependency Graph'), 'Missing Check 3: Dependency Graph Validity');
     assert.ok(content.includes('Risk Assessment'), 'Missing Check 4: Risk Assessment');
     assert.ok(content.includes('Test Strategy'), 'Missing Check 5: Test Strategy');
   });
@@ -50,10 +47,7 @@ describe('implementation-readiness skill', () => {
   test('has valid frontmatter', () => {
     const content = fs.readFileSync(SKILL_PATH, 'utf8');
     assert.ok(content.startsWith('---'), 'Must start with frontmatter');
-    assert.ok(
-      content.includes('name: implementation-readiness'),
-      'Must have name in frontmatter'
-    );
+    assert.ok(content.includes('name: implementation-readiness'), 'Must have name in frontmatter');
   });
 
   test('integrates with router-decision.md Step 7', () => {

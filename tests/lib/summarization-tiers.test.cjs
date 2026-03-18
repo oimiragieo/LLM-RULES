@@ -57,17 +57,11 @@ describe('summarization-tiers', () => {
     });
 
     it('detects logs', () => {
-      assert.equal(
-        detectContentType('2026-03-18 10:00:00 INFO Starting\n[ERROR] Failed'),
-        'logs',
-      );
+      assert.equal(detectContentType('2026-03-18 10:00:00 INFO Starting\n[ERROR] Failed'), 'logs');
     });
 
     it('detects conversation', () => {
-      assert.equal(
-        detectContentType('User: Hello\nAssistant: Hi there'),
-        'conversation',
-      );
+      assert.equal(detectContentType('User: Hello\nAssistant: Hi there'), 'conversation');
     });
   });
 

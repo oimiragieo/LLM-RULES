@@ -78,16 +78,19 @@ The following workflows guide this agent's execution:
 ## Mandatory Workflow (ALWAYS FOLLOW)
 
 **Step 0: Invoke the skill**
+
 ```
 Skill({ skill: 'context-compressor' })
 ```
 
 **Step 1: Profile** — measure before compressing
+
 ```bash
 python .claude/skills/context-compressor/scripts/profile_tokens.py --file <path> --output-format auto
 ```
 
 **Step 2: Compress** — use the right mode
+
 ```bash
 # Quick general compression (no specific question)
 python .claude/skills/context-compressor/scripts/compress_context.py --file <path> --mode baseline --output-format auto
@@ -100,11 +103,13 @@ python .claude/skills/context-compressor/scripts/run_skill_workflow.py --file <p
 ```
 
 **Step 3: For JSON/framework payloads** — use input adapter
+
 ```bash
 python .claude/skills/context-compressor/scripts/compress_context.py --json-file <payload.json> --input-adapter auto --mode query_guided --query "<question>" --output-format auto
 ```
 
 **Step 4: Validate evidence** — check compressed output still answers safely
+
 ```bash
 python .claude/skills/context-compressor/scripts/validate_evidence.py --file <path> --query "<question>" --min-similarity 0.4 --output-format json
 ```

@@ -18,19 +18,34 @@ const EDGE_CASE_CATEGORIES = {
   boundary: {
     name: 'Boundary Conditions',
     patterns: [
-      { regex: /\.length\s*[><=]=?\s*0/g, description: 'Array/string length check — verify empty case handled' },
+      {
+        regex: /\.length\s*[><=]=?\s*0/g,
+        description: 'Array/string length check — verify empty case handled',
+      },
       { regex: /\[\s*0\s*\]/g, description: 'First element access — verify non-empty array' },
       { regex: /\.slice\(/g, description: 'Slice operation — verify start/end bounds' },
-      { regex: /parseInt|parseFloat|Number\(/g, description: 'Number parsing — verify NaN/Infinity handling' },
-      { regex: /Math\.(max|min|floor|ceil|round)/g, description: 'Math operation — verify extreme values' },
+      {
+        regex: /parseInt|parseFloat|Number\(/g,
+        description: 'Number parsing — verify NaN/Infinity handling',
+      },
+      {
+        regex: /Math\.(max|min|floor|ceil|round)/g,
+        description: 'Math operation — verify extreme values',
+      },
     ],
   },
   nullability: {
     name: 'Null/Undefined Handling',
     patterns: [
       { regex: /\w+\.\w+\.\w+/g, description: 'Deep property access — verify intermediate nulls' },
-      { regex: /(?<!\?)\.\w+\(/g, description: 'Method call without optional chaining — may throw on null' },
-      { regex: /JSON\.parse\(/g, description: 'JSON.parse without try/catch — throws on invalid input' },
+      {
+        regex: /(?<!\?)\.\w+\(/g,
+        description: 'Method call without optional chaining — may throw on null',
+      },
+      {
+        regex: /JSON\.parse\(/g,
+        description: 'JSON.parse without try/catch — throws on invalid input',
+      },
       { regex: /\.split\(/g, description: 'String.split — verify non-null input' },
     ],
   },
@@ -45,8 +60,14 @@ const EDGE_CASE_CATEGORIES = {
   concurrency: {
     name: 'Concurrency Hazards',
     patterns: [
-      { regex: /\.forEach\(.*await/g, description: 'await inside forEach — does not work as expected' },
-      { regex: /setTimeout\(.*,\s*0\)/g, description: 'setTimeout(fn, 0) — execution order not guaranteed' },
+      {
+        regex: /\.forEach\(.*await/g,
+        description: 'await inside forEach — does not work as expected',
+      },
+      {
+        regex: /setTimeout\(.*,\s*0\)/g,
+        description: 'setTimeout(fn, 0) — execution order not guaranteed',
+      },
       { regex: /fs\.\w+Sync\(/g, description: 'Sync file I/O — blocks event loop' },
     ],
   },
@@ -56,7 +77,10 @@ const EDGE_CASE_CATEGORIES = {
       { regex: /\bev[a]l\s*\(/g, description: 'Dynamic code execution — code injection risk' },
       { regex: /innerHTML|outerHTML/g, description: 'innerHTML — XSS risk if user input' },
       { regex: /shell:\s*true/g, description: 'shell: true — command injection risk' },
-      { regex: /__proto__|constructor\.prototype/g, description: 'Prototype access — pollution risk' },
+      {
+        regex: /__proto__|constructor\.prototype/g,
+        description: 'Prototype access — pollution risk',
+      },
     ],
   },
 };

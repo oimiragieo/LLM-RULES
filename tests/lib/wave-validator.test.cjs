@@ -31,7 +31,7 @@ describe('wave-validator', () => {
     it('passes when all dependencies completed', () => {
       const result = validateWaveDependencies(
         [{ id: 'task-3', blockedBy: ['task-1', 'task-2'] }],
-        ['task-1', 'task-2'],
+        ['task-1', 'task-2']
       );
       assert.equal(result.valid, true);
       assert.equal(result.missing.length, 0);
@@ -40,7 +40,7 @@ describe('wave-validator', () => {
     it('fails when dependency not completed', () => {
       const result = validateWaveDependencies(
         [{ id: 'task-3', blockedBy: ['task-1', 'task-2'] }],
-        ['task-1'],
+        ['task-1']
       );
       assert.equal(result.valid, false);
       assert.deepEqual(result.missing, ['task-2']);
@@ -48,10 +48,7 @@ describe('wave-validator', () => {
     });
 
     it('passes for tasks with no blockers', () => {
-      const result = validateWaveDependencies(
-        [{ id: 'task-1' }],
-        [],
-      );
+      const result = validateWaveDependencies([{ id: 'task-1' }], []);
       assert.equal(result.valid, true);
     });
 
@@ -61,7 +58,7 @@ describe('wave-validator', () => {
           { id: 'task-3', blockedBy: ['task-1'] },
           { id: 'task-4', blockedBy: ['task-1'] },
         ],
-        [],
+        []
       );
       assert.equal(result.missing.length, 1);
       assert.deepEqual(result.missing, ['task-1']);
@@ -81,7 +78,7 @@ describe('wave-validator', () => {
               { key: 'count', type: 'number', required: true },
             ],
           },
-        ],
+        ]
       );
       assert.equal(result.valid, true);
       assert.equal(result.errors.length, 0);
@@ -94,11 +91,9 @@ describe('wave-validator', () => {
         [
           {
             producer_task_id: 'task-1',
-            output_keys: [
-              { key: 'plan_file', type: 'string', required: true },
-            ],
+            output_keys: [{ key: 'plan_file', type: 'string', required: true }],
           },
-        ],
+        ]
       );
       assert.equal(result.valid, false);
       assert.ok(result.missing.includes('task-1.plan_file'));
@@ -111,11 +106,9 @@ describe('wave-validator', () => {
         [
           {
             producer_task_id: 'task-1',
-            output_keys: [
-              { key: 'notes', type: 'string', required: false },
-            ],
+            output_keys: [{ key: 'notes', type: 'string', required: false }],
           },
-        ],
+        ]
       );
       assert.equal(result.valid, true);
     });
@@ -127,11 +120,9 @@ describe('wave-validator', () => {
         [
           {
             producer_task_id: 'task-1',
-            output_keys: [
-              { key: 'count', type: 'number', required: true },
-            ],
+            output_keys: [{ key: 'count', type: 'number', required: true }],
           },
-        ],
+        ]
       );
       assert.equal(result.valid, false);
       assert.ok(result.errors[0].includes('expected number'));
@@ -146,7 +137,7 @@ describe('wave-validator', () => {
             producer_task_id: 'task-1',
             output_keys: [{ key: 'items', type: 'array' }],
           },
-        ],
+        ]
       );
       assert.equal(result.valid, true);
     });
@@ -160,32 +151,26 @@ describe('wave-validator', () => {
             producer_task_id: 'task-1',
             output_keys: [{ key: 'data', type: 'object' }],
           },
-        ],
+        ]
       );
       assert.equal(result.valid, false);
       assert.ok(result.errors[0].includes('expected object'));
     });
 
     it('skips contracts for non-dependent producers', () => {
-      const result = validateDataContracts(
-        [{ id: 'task-2', blockedBy: ['task-1'] }],
-        {},
-        [
-          {
-            producer_task_id: 'task-99',
-            output_keys: [{ key: 'x', type: 'string', required: true }],
-          },
-        ],
-      );
+      const result = validateDataContracts([{ id: 'task-2', blockedBy: ['task-1'] }], {}, [
+        {
+          producer_task_id: 'task-99',
+          output_keys: [{ key: 'x', type: 'string', required: true }],
+        },
+      ]);
       assert.equal(result.valid, true);
     });
   });
 
   describe('createDataContract / getContracts', () => {
     it('creates and retrieves a contract', () => {
-      createDataContract('task-1', [
-        { key: 'plan', type: 'string', required: true },
-      ]);
+      createDataContract('task-1', [{ key: 'plan', type: 'string', required: true }]);
       const contracts = getContracts();
       assert.equal(contracts.length, 1);
       assert.equal(contracts[0].producer_task_id, 'task-1');

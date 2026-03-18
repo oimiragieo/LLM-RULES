@@ -250,13 +250,13 @@ Skill({ skill: 'doc-generator' }); // Generate structured reports
 
 ### Contextual Skills (When Applicable)
 
-| Condition                        | Skill                             | Purpose                                     |
-| -------------------------------- | --------------------------------- | ------------------------------------------- |
+| Condition                        | Skill                | Purpose                                     |
+| -------------------------------- | -------------------- | ------------------------------------------- |
 | Large document corpus            | `context-compressor` | Compress regulatory documents efficiently   |
-| Generating structured reports    | `doc-generator`                   | Produce formatted compliance reports        |
-| Research on current regulations  | `research-synthesis`              | Synthesize current regulatory guidance      |
-| Context limit approached         | `context-compressor`              | Compress context to stay effective          |
-| Prior compliance patterns needed | `memory-search`                   | Retrieve prior compliance analysis patterns |
+| Generating structured reports    | `doc-generator`      | Produce formatted compliance reports        |
+| Research on current regulations  | `research-synthesis` | Synthesize current regulatory guidance      |
+| Context limit approached         | `context-compressor` | Compress context to stay effective          |
+| Prior compliance patterns needed | `memory-search`      | Retrieve prior compliance analysis patterns |
 
 ## Output Locations
 

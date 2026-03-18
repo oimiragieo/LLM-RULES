@@ -82,8 +82,8 @@ function memoryDescribe(fileName) {
     const stat = fs.statSync(filePath);
     const lines = content.split('\n');
     const sections = lines
-      .filter((l) => /^#{1,3}\s/.test(l))
-      .map((l) => l.replace(/^#+\s*/, '').trim());
+      .filter(l => /^#{1,3}\s/.test(l))
+      .map(l => l.replace(/^#+\s*/, '').trim());
 
     return {
       file: baseName,
@@ -165,7 +165,7 @@ function memoryExpand(fileName, heading) {
  */
 function getMemoryFiles() {
   if (!fs.existsSync(MEMORY_DIR)) return [];
-  return fs.readdirSync(MEMORY_DIR).filter((f) => f.endsWith('.md'));
+  return fs.readdirSync(MEMORY_DIR).filter(f => f.endsWith('.md'));
 }
 
 module.exports = {

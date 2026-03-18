@@ -18,14 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const OUTPUTS_FILE = path.join(
-  __dirname,
-  '..',
-  '..',
-  'context',
-  'runtime',
-  'task-outputs.json',
-);
+const OUTPUTS_FILE = path.join(__dirname, '..', '..', 'context', 'runtime', 'task-outputs.json');
 
 /**
  * Load outputs from disk.
@@ -139,7 +132,7 @@ function resolveOutputRef(ref) {
 function resolveAllRefs(template) {
   if (!template || typeof template !== 'string') return template;
 
-  return template.replace(/\$(?:task-)?[\w-]+\.[\w-]+/g, (match) => {
+  return template.replace(/\$(?:task-)?[\w-]+\.[\w-]+/g, match => {
     const resolved = resolveOutputRef(match);
     return resolved !== undefined ? String(resolved) : match;
   });

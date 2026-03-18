@@ -24,7 +24,7 @@ const SKILL_INDEX_FILE = path.join(
   '..',
   'context',
   'runtime',
-  'skill-route-index.json',
+  'skill-route-index.json'
 );
 
 /**
@@ -94,13 +94,13 @@ function findBestSkills(query, options = {}) {
   const queryKeywords = extractKeywords(query);
   if (queryKeywords.length === 0) return [];
 
-  const scored = index.map((skill) => {
+  const scored = index.map(skill => {
     const score = computeKeywordScore(queryKeywords, skill.keywords);
     return { skill: skill.name, score, description: skill.description };
   });
 
   return scored
-    .filter((s) => s.score >= minScore)
+    .filter(s => s.score >= minScore)
     .sort((a, b) => b.score - a.score)
     .slice(0, maxResults);
 }
@@ -168,19 +168,55 @@ function extractDescription(content) {
  */
 function extractKeywords(text) {
   const stopwords = new Set([
-    'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had',
-    'her', 'was', 'one', 'our', 'out', 'has', 'have', 'with', 'this', 'that',
-    'from', 'they', 'been', 'use', 'will', 'each', 'make', 'how', 'when',
-    'what', 'which', 'their', 'then', 'into', 'some', 'more', 'also', 'using',
+    'the',
+    'and',
+    'for',
+    'are',
+    'but',
+    'not',
+    'you',
+    'all',
+    'can',
+    'had',
+    'her',
+    'was',
+    'one',
+    'our',
+    'out',
+    'has',
+    'have',
+    'with',
+    'this',
+    'that',
+    'from',
+    'they',
+    'been',
+    'use',
+    'will',
+    'each',
+    'make',
+    'how',
+    'when',
+    'what',
+    'which',
+    'their',
+    'then',
+    'into',
+    'some',
+    'more',
+    'also',
+    'using',
   ]);
 
-  return [...new Set(
-    text
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, ' ')
-      .split(/\s+/)
-      .filter((w) => w.length >= 3 && !stopwords.has(w)),
-  )];
+  return [
+    ...new Set(
+      text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length >= 3 && !stopwords.has(w))
+    ),
+  ];
 }
 
 /**

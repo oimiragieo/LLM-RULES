@@ -5,9 +5,7 @@
       "id": 1,
       "prompt": "Compress this document for a question-answering workflow and tell me what the retry rules are. Use a mode that prioritizes query relevance and mention whether the result still looks safe to answer from.",
       "expected_output": "A compressed, query-guided result with token savings and a clear statement about retry-rule evidence sufficiency.",
-      "files": [
-        "tests/fixtures/skill_context_sample.txt"
-      ],
+      "files": ["tests/fixtures/skill_context_sample.txt"],
       "expectations": [
         "The workflow uses query-guided or evidence-aware compression rather than a generic baseline.",
         "The response reports token savings or compression ratio.",
@@ -18,9 +16,7 @@
       "id": 2,
       "prompt": "Run the full local workflow on this sample file and fail loudly if the compressed result is not safe enough to answer from.",
       "expected_output": "An end-to-end workflow run using the bundled scripts, including evidence validation behavior and a clear success or insufficiency outcome.",
-      "files": [
-        "tests/fixtures/skill_context_sample.txt"
-      ],
+      "files": ["tests/fixtures/skill_context_sample.txt"],
       "expectations": [
         "The workflow uses run_skill_workflow.py.",
         "The result surfaces evidence sufficiency rather than guessing.",
