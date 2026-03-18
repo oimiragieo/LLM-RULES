@@ -43,7 +43,7 @@ skills:
   - ripgrep
   - sequential-thinking
   - task-management-protocol
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
 identity:
   role: Strategic Project Manager
@@ -955,7 +955,7 @@ Total: 15 files → Checkpoint REQUIRED
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -1086,7 +1086,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

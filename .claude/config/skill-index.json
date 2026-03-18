@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-18T02:11:59.546Z",
+  "generatedAt": "2026-03-18T02:22:19.488Z",
   "metadata": {
-    "totalSkills": 313,
+    "totalSkills": 312,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-18T02:11:59.547Z",
+    "lastValidated": "2026-03-18T02:22:19.489Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -3765,33 +3765,6 @@
         "Write"
       ],
       "agentPrimary": [
-        "context-compressor",
-        "devops"
-      ],
-      "agentSupporting": [
-        "developer",
-        "planner",
-        "reflection-agent",
-        "prompt-engineer",
-        "researcher",
-        "swarm-coordinator",
-        "artifact-integrator"
-      ],
-      "tags": [
-        "memory",
-        "context-compressor"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
-    "token-saver-context-compression": {
-      "name": "token-saver-context-compression",
-      "displayName": "Token Saver Context Compression",
-      "category": "Other",
-      "domain": "other",
-      "description": "Search-aware context compression workflow for agent-studio. Use pnpm hybrid search + token-saver compression, then persist distilled learnings via MemoryRecord.",
-      "requiredTools": [],
-      "agentPrimary": [
         "developer",
         "planner",
         "architect",
@@ -3861,10 +3834,18 @@
         "code-simplifier",
         "researcher"
       ],
-      "agentSupporting": [],
+      "agentSupporting": [
+        "developer",
+        "planner",
+        "reflection-agent",
+        "prompt-engineer",
+        "researcher",
+        "swarm-coordinator",
+        "artifact-integrator"
+      ],
       "tags": [
-        "other",
-        "token-saver-context-compression"
+        "memory",
+        "context-compressor"
       ],
       "priority": 1,
       "aliasOf": null
@@ -8446,7 +8427,6 @@
         "rule-creator",
         "tool-creator",
         "artifact-integrator",
-        "token-saver-context-compression",
         "memory-quality-auditor",
         "pipeline-reflection-ux",
         "assimilate",
@@ -8820,7 +8800,6 @@
         "rule-creator",
         "tool-creator",
         "artifact-integrator",
-        "token-saver-context-compression",
         "memory-quality-auditor",
         "task-management-protocol",
         "context-driven-development",
@@ -10461,7 +10440,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert",
         "code-analyzer",
         "code-style-validator",
@@ -10476,7 +10455,6 @@
         "modern-python",
         "typescript-expert",
         "security-architect",
-        "context-compressor",
         "property-based-testing",
         "powershell-expert",
         "pyqt6-ui-development-rules",
@@ -10687,9 +10665,8 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
-        "verification-before-completion",
         "context-compressor",
+        "verification-before-completion",
         "spec-gathering",
         "context-degradation",
         "brainstorming",
@@ -10712,7 +10689,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "security-architect",
         "project-analyzer",
         "brainstorming",
@@ -10731,7 +10708,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-analyzer",
         "rule-auditor",
         "qa-workflow",
@@ -10754,7 +10731,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "diagram-generator",
         "api-development-expert",
         "architecture-review"
@@ -10768,7 +10745,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion",
         "interactive-requirements-gathering",
         "brainstorming",
@@ -10785,7 +10762,6 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
         "verification-before-completion",
         "insight-extraction"
       ],
@@ -10808,7 +10784,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "sequential-thinking",
         "spec-gathering",
         "dispatching-parallel-agents",
@@ -10820,7 +10796,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "task-management-protocol"
       ],
       "heartbeat-orchestrator": [
@@ -10831,7 +10807,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "python-pro": [
@@ -10845,7 +10821,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "git-expert",
         "poetry-rye-dependency-management",
@@ -10864,7 +10840,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert",
         "memory-forensics"
       ],
@@ -10878,7 +10854,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "git-expert",
         "fiber-logging-and-project-structure",
@@ -10894,7 +10870,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert",
         "git-expert",
         "react-expert",
@@ -10911,7 +10887,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "database-expert",
         "modern-python",
@@ -10928,7 +10904,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "ui-components-expert",
         "accessibility",
         "tdd",
@@ -10950,7 +10926,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "debugging",
         "drizzle-orm-rules"
@@ -10965,7 +10941,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "mobile-ui-development-rule",
         "ui-components-expert",
         "security-architect"
@@ -10980,7 +10956,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "dto-conventions",
         "service-class-conventions",
@@ -10996,7 +10972,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "styling-expert",
         "tdd",
         "seo-and-meta-tags-in-sveltekit",
@@ -11014,7 +10990,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "tall-stack-general",
         "composer-dependency-management"
@@ -11029,7 +11005,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "styling-expert",
         "paraglide-js-internationalization-i18n",
         "form-and-actions-in-sveltekit",
@@ -11045,7 +11021,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
         "tauri-security-rules",
@@ -11061,7 +11037,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "mobile-ui-development-rule",
         "expo-mobile-app-rule",
         "nativewind-and-tailwind-css-compatibility"
@@ -11076,7 +11052,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "database-expert",
         "pandas-data-manipulation-rules",
         "large-data-with-dask",
@@ -11093,7 +11069,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "typescript-expert",
         "state-management-expert",
         "react-expert"
@@ -11106,7 +11082,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "design-and-user-experience-guidelines",
         "ui-components-expert",
         "ios-expert",
@@ -11123,7 +11099,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "tdd"
       ],
@@ -11137,7 +11113,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "git-expert"
       ],
       "gamedev-pro": [
@@ -11149,7 +11125,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-quality-expert"
       ],
@@ -11160,7 +11136,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "python-backend-expert",
         "data-expert"
       ],
@@ -11172,7 +11148,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "llm-council"
       ],
       "web3-blockchain-expert": [
@@ -11183,7 +11159,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "security-architect",
         "tdd"
       ],
@@ -11195,7 +11171,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert",
         "tdd",
         "graphql-expert"
@@ -11206,7 +11182,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "brand-guardian": [
@@ -11215,7 +11191,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "compliance-checker": [
@@ -11224,7 +11200,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "feedback-synthesizer": [
@@ -11233,7 +11209,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "marketing-strategist": [
@@ -11242,7 +11218,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "llm-architect": [
@@ -11251,7 +11227,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "architecture-review",
         "diagram-generator"
       ],
@@ -11264,7 +11240,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert"
       ],
       "microservices-architect": [
@@ -11275,7 +11251,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "container-expert",
         "security-architect"
       ],
@@ -11285,9 +11261,8 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
-        "thinking-tools",
-        "context-compressor"
+        "context-compressor",
+        "thinking-tools"
       ],
       "pm-coordinator": [
         "plan-generator",
@@ -11296,7 +11271,7 @@
         "verification-before-completion",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "interactive-requirements-gathering",
         "brainstorming",
         "jira-pm",
@@ -11309,7 +11284,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "incident-runbook-templates"
       ],
@@ -11319,7 +11294,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion",
         "insight-extraction"
       ],
@@ -11329,7 +11304,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "data-scientist": [
@@ -11392,7 +11367,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert"
       ],
       "code-reviewer": [
@@ -11407,7 +11382,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-style-validator",
         "rule-auditor",
         "agent-evaluation",
@@ -11429,7 +11404,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "rule-auditor",
         "dependency-analyzer",
         "doc-generator",
@@ -11457,7 +11432,6 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
         "helm-chart-scaffolding",
         "gitops-workflow",
         "k8s-security-policies",
@@ -11478,7 +11452,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "incident-runbook-templates",
         "on-call-handoff-patterns",
         "postmortem-writing",
@@ -11497,7 +11471,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "sentry-monitoring",
         "security-architect",
@@ -11511,7 +11485,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "doc-generator",
         "project-analyzer"
       ],
@@ -11523,7 +11497,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "doc-generator",
         "project-analyzer"
       ],
@@ -11534,7 +11508,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "doc-generator",
         "code-analyzer"
       ],
@@ -11545,7 +11519,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "doc-generator"
       ],
       "conductor-validator": [
@@ -11558,7 +11532,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "rule-auditor",
         "project-analyzer"
       ],
@@ -11573,7 +11547,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "code-analyzer",
         "security-architect"
@@ -11588,7 +11562,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "architecture-review",
         "diagram-generator",
         "drizzle-orm-rules"
@@ -11601,7 +11575,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-analyzer",
         "chrome-browser"
@@ -11614,7 +11588,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "container-expert"
       ],
@@ -11626,7 +11600,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-analyzer",
         "auth-security-expert"
@@ -11640,7 +11614,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-quality-expert",
         "chrome-browser"
@@ -11654,7 +11628,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "incident-runbook-templates"
       ],
@@ -11668,7 +11642,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-quality-expert"
       ],
@@ -11682,7 +11656,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "debugging"
       ],
@@ -11692,9 +11666,8 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
-        "verification-before-completion",
         "context-compressor",
+        "verification-before-completion",
         "scientific-skills",
         "arxiv-mcp"
       ],
@@ -11775,7 +11748,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert",
         "code-analyzer",
         "code-style-validator",
@@ -11790,7 +11763,6 @@
         "modern-python",
         "typescript-expert",
         "security-architect",
-        "context-compressor",
         "property-based-testing",
         "powershell-expert",
         "pyqt6-ui-development-rules",
@@ -12001,9 +11973,8 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
-        "verification-before-completion",
         "context-compressor",
+        "verification-before-completion",
         "spec-gathering",
         "context-degradation",
         "brainstorming",
@@ -12026,7 +11997,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "security-architect",
         "project-analyzer",
         "brainstorming",
@@ -12045,7 +12016,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-analyzer",
         "rule-auditor",
         "qa-workflow",
@@ -12068,7 +12039,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "diagram-generator",
         "api-development-expert",
         "architecture-review"
@@ -12082,7 +12053,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion",
         "interactive-requirements-gathering",
         "brainstorming",
@@ -12099,7 +12070,6 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
         "verification-before-completion",
         "insight-extraction"
       ],
@@ -12122,7 +12092,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "sequential-thinking",
         "spec-gathering",
         "dispatching-parallel-agents",
@@ -12134,7 +12104,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "task-management-protocol"
       ],
       "heartbeat-orchestrator": [
@@ -12145,7 +12115,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "python-pro": [
@@ -12159,7 +12129,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "git-expert",
         "poetry-rye-dependency-management",
@@ -12178,7 +12148,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert",
         "memory-forensics"
       ],
@@ -12192,7 +12162,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "git-expert",
         "fiber-logging-and-project-structure",
@@ -12208,7 +12178,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert",
         "git-expert",
         "react-expert",
@@ -12225,7 +12195,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "database-expert",
         "modern-python",
@@ -12242,7 +12212,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "ui-components-expert",
         "accessibility",
         "tdd",
@@ -12264,7 +12234,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "debugging",
         "drizzle-orm-rules"
@@ -12279,7 +12249,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "mobile-ui-development-rule",
         "ui-components-expert",
         "security-architect"
@@ -12294,7 +12264,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "dto-conventions",
         "service-class-conventions",
@@ -12310,7 +12280,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "styling-expert",
         "tdd",
         "seo-and-meta-tags-in-sveltekit",
@@ -12328,7 +12298,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "api-development-expert",
         "tall-stack-general",
         "composer-dependency-management"
@@ -12343,7 +12313,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "styling-expert",
         "paraglide-js-internationalization-i18n",
         "form-and-actions-in-sveltekit",
@@ -12359,7 +12329,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
         "tauri-security-rules",
@@ -12375,7 +12345,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "mobile-ui-development-rule",
         "expo-mobile-app-rule",
         "nativewind-and-tailwind-css-compatibility"
@@ -12390,7 +12360,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "database-expert",
         "pandas-data-manipulation-rules",
         "large-data-with-dask",
@@ -12407,7 +12377,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "typescript-expert",
         "state-management-expert",
         "react-expert"
@@ -12420,7 +12390,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "design-and-user-experience-guidelines",
         "ui-components-expert",
         "ios-expert",
@@ -12437,7 +12407,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "tdd"
       ],
@@ -12451,7 +12421,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "git-expert"
       ],
       "gamedev-pro": [
@@ -12463,7 +12433,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-quality-expert"
       ],
@@ -12474,7 +12444,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "python-backend-expert",
         "data-expert"
       ],
@@ -12486,7 +12456,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "llm-council"
       ],
       "web3-blockchain-expert": [
@@ -12497,7 +12467,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "security-architect",
         "tdd"
       ],
@@ -12509,7 +12479,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert",
         "tdd",
         "graphql-expert"
@@ -12520,7 +12490,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "brand-guardian": [
@@ -12529,7 +12499,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "compliance-checker": [
@@ -12538,7 +12508,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "feedback-synthesizer": [
@@ -12547,7 +12517,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "marketing-strategist": [
@@ -12556,7 +12526,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "llm-architect": [
@@ -12565,7 +12535,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "architecture-review",
         "diagram-generator"
       ],
@@ -12578,7 +12548,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert"
       ],
       "microservices-architect": [
@@ -12589,7 +12559,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "container-expert",
         "security-architect"
       ],
@@ -12599,9 +12569,8 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
-        "thinking-tools",
-        "context-compressor"
+        "context-compressor",
+        "thinking-tools"
       ],
       "pm-coordinator": [
         "plan-generator",
@@ -12610,7 +12579,7 @@
         "verification-before-completion",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "interactive-requirements-gathering",
         "brainstorming",
         "jira-pm",
@@ -12623,7 +12592,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "incident-runbook-templates"
       ],
@@ -12633,7 +12602,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion",
         "insight-extraction"
       ],
@@ -12643,7 +12612,7 @@
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ],
       "data-scientist": [
@@ -12706,7 +12675,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-quality-expert"
       ],
       "code-reviewer": [
@@ -12721,7 +12690,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "code-style-validator",
         "rule-auditor",
         "agent-evaluation",
@@ -12743,7 +12712,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "rule-auditor",
         "dependency-analyzer",
         "doc-generator",
@@ -12771,7 +12740,6 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
         "helm-chart-scaffolding",
         "gitops-workflow",
         "k8s-security-policies",
@@ -12792,7 +12760,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "incident-runbook-templates",
         "on-call-handoff-patterns",
         "postmortem-writing",
@@ -12811,7 +12779,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "sentry-monitoring",
         "security-architect",
@@ -12825,7 +12793,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "doc-generator",
         "project-analyzer"
       ],
@@ -12837,7 +12805,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "doc-generator",
         "project-analyzer"
       ],
@@ -12848,7 +12816,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "doc-generator",
         "code-analyzer"
       ],
@@ -12859,7 +12827,7 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
+        "context-compressor",
         "doc-generator"
       ],
       "conductor-validator": [
@@ -12872,7 +12840,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "rule-auditor",
         "project-analyzer"
       ],
@@ -12887,7 +12855,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "code-analyzer",
         "security-architect"
@@ -12902,7 +12870,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "architecture-review",
         "diagram-generator",
         "drizzle-orm-rules"
@@ -12915,7 +12883,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-analyzer",
         "chrome-browser"
@@ -12928,7 +12896,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "debugging",
         "container-expert"
       ],
@@ -12940,7 +12908,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-analyzer",
         "auth-security-expert"
@@ -12954,7 +12922,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-quality-expert",
         "chrome-browser"
@@ -12968,7 +12936,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "incident-runbook-templates"
       ],
@@ -12982,7 +12950,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "code-quality-expert"
       ],
@@ -12996,7 +12964,7 @@
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
-        "token-saver-context-compression",
+        "context-compressor",
         "tdd",
         "debugging"
       ],
@@ -13006,9 +12974,8 @@
         "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "token-saver-context-compression",
-        "verification-before-completion",
         "context-compressor",
+        "verification-before-completion",
         "scientific-skills",
         "arxiv-mcp"
       ],

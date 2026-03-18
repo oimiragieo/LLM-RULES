@@ -14,7 +14,7 @@
 
 1. Keep diagnosis deterministic and log-first to avoid speculative patching.
 2. Prefer retrieval-first (`pnpm search:code`) before broad direct file reads in triage loops.
-3. Use compression (`token-saver-context-compression`) only under context pressure; do not force it for small traces.
+3. Use compression (`context-compressor`) only under context pressure; do not force it for small traces.
 
 ## Non-goals
 

@@ -39,7 +39,7 @@ skills:
   - session-handoff
   - session-transcript-analyzer
   - task-management-protocol
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
   - artifact-integrator
 context_files:
@@ -251,7 +251,7 @@ Skill({ skill: 'verification-before-completion' });
 Skill({ skill: 'code-analyzer' });
 Skill({ skill: 'insight-extraction' });
 Skill({ skill: 'framework-context' });
-Skill({ skill: 'token-saver-context-compression' });
+Skill({ skill: 'context-compressor' });
 ```
 
 > **CRITICAL**: Use `Skill()` tool to invoke skill workflows, not just read skill files.
@@ -902,7 +902,7 @@ TaskList();
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -959,7 +959,7 @@ Skill({ skill: 'verification-before-completion' }); // Quality gates
 Skill({ skill: 'code-analyzer' }); // Static analysis
 Skill({ skill: 'insight-extraction' }); // Pattern extraction
 Skill({ skill: 'framework-context' }); // Framework grounding
-Skill({ skill: 'token-saver-context-compression' }); // Compress large evidence blocks
+Skill({ skill: 'context-compressor' }); // Compress large evidence blocks
 ```
 
 ### Automatic Skills (Always Invoke)
@@ -1033,7 +1033,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

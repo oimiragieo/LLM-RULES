@@ -163,7 +163,7 @@ Use `node .claude/skills/agent-updater/scripts/main.cjs --agent <target> --mode 
 ## Tooling
 
 - Search evidence with `pnpm search:code` and search skills.
-- Use `token-saver-context-compression` only for large prompt diffs.
+- Use `context-compressor` only for large prompt diffs.
 - Use `recommend-evolution` if update is insufficient and net-new artifact needed.
 
 ## Ecosystem Alignment Research Gate
@@ -214,7 +214,7 @@ After: write learnings/decisions/issues updates.
 
 **CRITICAL PROTOCOL INJECTION RULE:**
 If you are updating an agent and it is missing the \`## Search Protocol\` or missing the \`## Memory Protocol (MANDATORY)\` blocks, or if its existing Memory Protocol only reads \`learnings.md\`, you MUST inject or update these blocks to match the framework standard exactly (which mandates querying semantic memory `node .claude/lib/memory/memory-search.cjs` and reading BOTH learnings and decisions).
-Also, ensure the agent's frontmatter \`skills:\` array contains \`ripgrep\`, \`token-saver-context-compression\`, and \`code-semantic-search\`.
+Also, ensure the agent's frontmatter \`skills:\` array contains \`ripgrep\`, \`context-compressor\`, and \`code-semantic-search\`.
 
 **TASK LIFECYCLE INJECTION RULE (MANDATORY):**
 If you are updating an agent and it is missing the `## Task Progress Protocol (MANDATORY)` section (or only has a partial version missing the `metadata.summary` field, `filesModified` array, or the Three Iron Laws), you MUST inject or update this section. The canonical template is in `.claude/templates/spawn/universal-agent-spawn.md`. Every agent file MUST contain:

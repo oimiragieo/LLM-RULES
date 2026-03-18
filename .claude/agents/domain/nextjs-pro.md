@@ -36,7 +36,7 @@ skills:
   - react-expert
   - ripgrep
   - task-management-protocol
-  - token-saver-context-compression
+  - context-compressor
   - typescript-expert
   - verification-before-completion
 context_files: null
@@ -728,7 +728,7 @@ This agent can search code efficiently using the hybrid search system:
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -882,7 +882,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

@@ -28,7 +28,7 @@ skills:
   - swarm-coordination
   - task-management-protocol
   - verification-before-completion
-  - token-saver-context-compression
+  - context-compressor
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -152,7 +152,7 @@ Skill({ skill: 'task-management-protocol' }); // Task tracking and distribution
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -218,7 +218,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

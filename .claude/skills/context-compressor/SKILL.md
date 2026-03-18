@@ -237,7 +237,7 @@ node .claude/skills/context-compressor/scripts/main.cjs --query "<question>" --m
 Direct Python engine (advanced):
 
 ```bash
-python .claude/skills/token-saver-context-compression/scripts/run_skill_workflow.py --file <path> --mode evidence_aware --query "<question>" --output-format json --fail-on-insufficient-evidence
+python .claude/skills/context-compressor/scripts/run_skill_workflow.py --file <path> --mode evidence_aware --query "<question>" --output-format json --fail-on-insufficient-evidence
 ```
 
 ### Step 5: Validate Compression

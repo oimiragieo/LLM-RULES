@@ -111,7 +111,7 @@ manager.recordDiscovery({ text: 'BM25 indexer supports lazy IDF', area: 'search'
 
 - **@ENVIRONMENT_CONFIG.md** - Memory-related environment variables
 - **@TASK_TRACKING_GUIDE.md** - TaskUpdate protocol (task tracking is not relaxed by memory mode)
-- **@SKILL_CATALOG_TABLE.md** - `context-compressor` and `token-saver-context-compression` skills
+- **@SKILL_CATALOG_TABLE.md** - `context-compressor` and `context-compressor` skills
 - `.claude/rules/memory-protocol.md` - Agent-facing memory protocol rules
 
 ---

@@ -100,7 +100,7 @@ function computeAudit() {
       id: `remediate-${item}`,
       action:
         item === 'stale_ratio_estimate'
-          ? 'refresh memory entries with token-saver-context-compression and remove stale items'
+          ? 'refresh memory entries with context-compressor and remove stale items'
           : `add tests/guards to improve ${item}`,
     })),
   };

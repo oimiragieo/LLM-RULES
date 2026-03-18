@@ -49,7 +49,7 @@ If 2+ indicators are present, treat as one zone higher than token count suggests
 
 **Yellow (32-64K):**
 
-- Invoke `Skill({ skill: 'token-saver-context-compression' })` at the current phase boundary
+- Invoke `Skill({ skill: 'context-compressor' })` at the current phase boundary
 - Remove completed phase content from active context
 - Keep: current task spec, key decisions, in-progress file list
 
@@ -85,7 +85,7 @@ If 2+ indicators are present, treat as one zone higher than token count suggests
 
 ## Integration
 
-- Pairs with: `context-compressor`, `token-saver-context-compression`, `session-handoff`
+- Pairs with: `context-compressor`, `context-compressor`, `session-handoff`
 - Called by: `planner` (at plan start), `developer` (after each phase), `router` (before large spawns)
 - Trigger: Check at every phase boundary, not just when problems appear
 
@@ -94,7 +94,7 @@ If 2+ indicators are present, treat as one zone higher than token count suggests
 1. **ALWAYS** check token count at every phase boundary — not just when problems appear or after completing a large task.
 2. **NEVER** continue complex multi-step tasks past 100K tokens in the same agent context — spawn a fresh subagent with a compressed handoff instead.
 3. **ALWAYS** treat 2+ early warning indicators as one severity zone higher than the raw token count suggests.
-4. **ALWAYS** invoke `token-saver-context-compression` at Yellow zone (32–64K) before context bloat becomes severe — prevention is cheaper than recovery.
+4. **ALWAYS** invoke `context-compressor` at Yellow zone (32–64K) before context bloat becomes severe — prevention is cheaper than recovery.
 5. **NEVER** claim a task complete without writing a context summary when operating in Red or Critical zone — if it's not written down, the next agent won't know it happened.
 
 ## Anti-Patterns

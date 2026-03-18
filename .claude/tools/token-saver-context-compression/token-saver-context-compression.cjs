@@ -1,6 +1,6 @@
 'use strict';
 
-const { main } = require('../../skills/token-saver-context-compression/scripts/main.cjs');
+const { main } = require('../../skills/context-compressor/scripts/main.cjs');
 
 function parseArgs(argv) {
   const options = {};

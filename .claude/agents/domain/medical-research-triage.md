@@ -36,7 +36,7 @@ skills:
   - ripgrep
   - scientific-skills
   - task-management-protocol
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
 context_files:
   - '@.claude/agent-memory/medical-research-triage/MEMORY.md'
@@ -271,12 +271,12 @@ _"This information is intended for educational purposes and does not constitute 
 
 | Condition                  | Skill                             | Purpose                            |
 | -------------------------- | --------------------------------- | ---------------------------------- |
-| Large corpus of research   | `token-saver-context-compression` | Compress evidence before synthesis |
+| Large corpus of research   | `context-compressor` | Compress evidence before synthesis |
 | Before claiming completion | `verification-before-completion`  | Evidence-based completion gates    |
 
 ## Token Saver Invocation Rule
 
-When exploring large repositories, analyzing vast log files, or reading extensive documentation, ALWAYS use the `token-saver-context-compression` skill BEFORE performing analysis. This significantly reduces token burn and protects context limits.
+When exploring large repositories, analyzing vast log files, or reading extensive documentation, ALWAYS use the `context-compressor` skill BEFORE performing analysis. This significantly reduces token burn and protects context limits.
 
 ## Output Locations
 
@@ -369,7 +369,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

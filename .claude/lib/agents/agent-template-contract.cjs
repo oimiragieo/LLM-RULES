@@ -11,7 +11,7 @@ const REQUIRED_SKILLS_BASE = ['task-management-protocol'];
 const REQUIRED_SKILLS_SEARCH_HEAVY = [
   'ripgrep',
   'code-semantic-search',
-  'token-saver-context-compression',
+  'context-compressor',
 ];
 const SEARCH_HEAVY_PATTERNS = [/code-semantic-search/, /ripgrep/, /pnpm search:code/];
 
@@ -101,7 +101,7 @@ function validateAgentContent(content, { requireMarker = true } = {}) {
     }
   }
 
-  if (!/Use `Skill\(\{ skill: 'token-saver-context-compression' \}\)`/.test(content)) {
+  if (!/Use `Skill\(\{ skill: 'context-compressor' \}\)`/.test(content)) {
     warnings.push(
       'Token Saver Invocation Rule does not include explicit Skill() invocation example'
     );
@@ -165,7 +165,7 @@ function renderAgentTemplate({
     'task-management-protocol',
     'ripgrep',
     'code-semantic-search',
-    'token-saver-context-compression',
+    'context-compressor',
     'verification-before-completion',
   ],
 }) {
@@ -205,7 +205,7 @@ Goal: Deliver correct outcomes with search-grounded context.
 
 ## Token Saver Invocation Rule
 
-Use \`Skill({ skill: 'token-saver-context-compression' })\` only when context pressure is high and normal search+read would over-expand tokens.
+Use \`Skill({ skill: 'context-compressor' })\` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 - You need to synthesize across many search hits (typically 10+ candidates).

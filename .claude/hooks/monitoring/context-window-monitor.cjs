@@ -98,7 +98,7 @@ function buildWarningMessage(usagePct, tokensUsed, budget) {
     return (
       `CRITICAL: Context window is ${usedPct}% full (${tokensUsed.toLocaleString()} / ${budget.toLocaleString()} tokens). ` +
       `Only ~${remainingPct}% remaining. ` +
-      `Run token-saver-context-compression IMMEDIATELY or initiate a session handoff via /session-handoff. ` +
+      `Run context-compressor IMMEDIATELY or initiate a session handoff via /session-handoff. ` +
       `New agent spawns may fail without compression.`
     );
   }
@@ -107,7 +107,7 @@ function buildWarningMessage(usagePct, tokensUsed, budget) {
     return (
       `WARNING: Context window is ${usedPct}% full (${tokensUsed.toLocaleString()} / ${budget.toLocaleString()} tokens). ` +
       `Only ~${remainingPct}% remaining. ` +
-      `Consider running token-saver-context-compression or planning a session handoff soon.`
+      `Consider running context-compressor or planning a session handoff soon.`
     );
   }
 

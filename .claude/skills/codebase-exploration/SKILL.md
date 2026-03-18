@@ -19,7 +19,7 @@ Invoke when:
 - Investigating a codebase to answer a specific question
 - Performing due diligence on third-party code
 
-**Token budget: 34K total. Hard stop at 60K — invoke `token-saver-context-compression` immediately.**
+**Token budget: 34K total. Hard stop at 60K — invoke `context-compressor` immediately.**
 
 ## Enforcement Hooks
 
@@ -166,7 +166,7 @@ rg -n "function processOrder" src/core/engine.ts
 **If context exceeds 60K tokens after this phase:**
 
 ```javascript
-Skill({ skill: 'token-saver-context-compression' });
+Skill({ skill: 'context-compressor' });
 ```
 
 ---
@@ -262,7 +262,7 @@ rg "require\('./auth'\|from './auth'" -l
 | Structure patterns | `ast-grep` (if installed)         | Language-aware                        |
 | Definitions        | LSP (if server available)         | Compiler-level accuracy               |
 | External context   | `WebFetch` + docs URL             | Find docs, articles about the project |
-| Compression        | `token-saver-context-compression` | When >60K tokens                      |
+| Compression        | `context-compressor` | When >60K tokens                      |
 
 **Tools NOT available for external repos:**
 
@@ -278,7 +278,7 @@ rg "require\('./auth'\|from './auth'" -l
 - **NEVER** accumulate raw tool output in context — write findings to files immediately
 - **NEVER** read entire large files — use `offset/limit` for all reads (max 200 lines)
 - **NEVER** guess at file contents — use `rg -n` to find exact line numbers first
-- **NEVER** proceed past 60K tokens without invoking `token-saver-context-compression`
+- **NEVER** proceed past 60K tokens without invoking `context-compressor`
 - **NEVER** read more than 10 files in Phase 4
 
 ## Iron Laws
@@ -286,7 +286,7 @@ rg "require\('./auth'\|from './auth'" -l
 1. **ALWAYS** write findings to a report file after each phase — not at the end; raw tool output accumulated in context triggers "lost in the middle" degradation.
 2. **ALWAYS** use `offset/limit` on `Read` for any file over 200 lines — full-file reads of large files consume 5-15K tokens in a single operation.
 3. **NEVER** start Phase 4 without completing Phase 3 search — reading files without search context is breadth-first anti-pattern.
-4. **ALWAYS** invoke `token-saver-context-compression` when context exceeds 60K tokens — not after; at the boundary.
+4. **ALWAYS** invoke `context-compressor` when context exceeds 60K tokens — not after; at the boundary.
 5. **ALWAYS** return only a file path + 5-bullet summary — the report file is the artifact, not the inline response.
 
 ## Memory Protocol (MANDATORY)

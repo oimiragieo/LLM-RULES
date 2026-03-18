@@ -27,7 +27,7 @@ skills:
   - code-semantic-search
   - ripgrep
   - context-compressor
-  - token-saver-context-compression
+  - context-compressor
   - memory-search
   - task-management-protocol
   - verification-before-completion
@@ -168,7 +168,7 @@ When context cannot be compressed further and session must be handed off:
 
 ```javascript
 Skill({ skill: 'context-compressor' });
-Skill({ skill: 'token-saver-context-compression' });
+Skill({ skill: 'context-compressor' });
 ```
 
 ### Step 1: Assess Context Budget
@@ -212,7 +212,7 @@ Read `.claude/context/memory/learnings.md`
 
 ## Token Saver Invocation Rule
 
-- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.
+- If your context gets too large, utilize the Skill({ skill: 'context-compressor' }) to reduce token load.
 
 - Must use Skill({ skill: 'ripgrep' }) for semantic discovery.
 

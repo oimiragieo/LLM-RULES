@@ -135,7 +135,7 @@ The system is comprehensive (2000+ lines of documentation across 3 files), but t
 
 ### 3.3 Is token-saver skill a stub?
 
-**NO, it is functional.** `token-saver-context-compression/SKILL.md` (138 lines) documents:
+**NO, it is functional.** `context-compressor/SKILL.md` (138 lines) documents:
 - Integration with `pnpm search:code` for retrieval
 - Python compression engine (`run_skill_workflow.py`)
 - Node.js wrapper (`scripts/main.cjs`)
@@ -171,7 +171,7 @@ However, the `tools: []` field in frontmatter (line 8) is empty, which means it 
 - Evidence: line 22: `/override/i` matches any occurrence of "override" in any context
 - Risk: Silent information loss in memory injection for lines containing "override"
 
-**FINDING M-3 (INFO): token-saver-context-compression requires Python 3.10+.**
+**FINDING M-3 (INFO): context-compressor requires Python 3.10+.**
 
 The skill's SKILL.md line 106 states `Python 3.10+` is required. The framework is primarily Node.js/CJS. If Python is not installed or is the wrong version, the compression pipeline fails. No fallback to a Node-only compression path exists.
 

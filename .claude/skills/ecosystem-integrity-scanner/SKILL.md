@@ -63,7 +63,7 @@ Invoke before starting this skill:
 | `task-management-protocol`        | Track scan progress            | Always               |
 | `ripgrep`                         | Fast targeted code search      | When investigating   |
 | `code-semantic-search`            | Concept discovery              | When pattern hunting |
-| `token-saver-context-compression` | Compress large audit results   | When output is large |
+| `context-compressor` | Compress large audit results   | When output is large |
 | `verification-before-completion`  | Gate completion on zero errors | Before marking done  |
 | `memory-search`                   | Check prior audit patterns     | At start             |
 

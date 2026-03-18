@@ -48,7 +48,7 @@ process.stdin.on('end', () => {
 
     if (tokens >= BLOCK_THRESHOLD) {
       process.stderr.write(
-        `spawn-token-guard: BLOCKED — spawn prompt ~${tokens.toLocaleString()} tokens exceeds ${BLOCK_THRESHOLD.toLocaleString()} hard limit. Run context compression first (token-saver-context-compression skill).\n`
+        `spawn-token-guard: BLOCKED — spawn prompt ~${tokens.toLocaleString()} tokens exceeds ${BLOCK_THRESHOLD.toLocaleString()} hard limit. Run context compression first (context-compressor skill).\n`
       );
       process.exit(2);
     }

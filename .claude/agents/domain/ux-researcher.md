@@ -28,7 +28,7 @@ skills:
   - code-structural-search
   - memory-search
   - ripgrep
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
   - task-management-protocol
 context_files: null
@@ -184,7 +184,7 @@ When executing research tasks, follow this 8-step approach:
 | Planning complex multi-method studies                | `brainstorming`                   | Explore method options and research design alternatives |
 | Validating completeness of research deliverables     | `checklist-generator`             | Generate research completeness checklists               |
 | Context approaching limits                           | `context-compressor`              | Compress context before continuation                    |
-| Large evidence set to synthesize                     | `token-saver-context-compression` | Compress evidence without losing key signals            |
+| Large evidence set to synthesize                     | `context-compressor` | Compress evidence without losing key signals            |
 | Finding existing research artifacts in codebase      | `ripgrep`                         | Fast search for prior research files                    |
 | Querying prior agent learnings                       | `memory-search`                   | Semantic search over prior session memory               |
 
@@ -299,7 +299,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

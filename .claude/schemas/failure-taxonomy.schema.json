@@ -95,7 +95,7 @@
       "taskId": "task-12",
       "agent": "master-orchestrator",
       "evidence": "spawn-token-guard.cjs blocked: ~135,000 tokens",
-      "remediation": "Run token-saver-context-compression before spawning"
+      "remediation": "Run context-compressor before spawning"
     }
   ]
 }

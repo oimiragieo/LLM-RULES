@@ -165,7 +165,7 @@ function isTokenSaverSkillInvocation(toolInput) {
     toolInput?.id ||
     null;
   if (!skillNameRaw) return false;
-  return String(skillNameRaw).trim().toLowerCase() === 'token-saver-context-compression';
+  return String(skillNameRaw).trim().toLowerCase() === 'context-compressor';
 }
 
 function recordToolGovernanceEvidence(toolName, toolInput, hookInput) {
@@ -744,7 +744,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
             },
             bypassWarning:
               '[READ SAFETY][bypass] Context pressure is high and token-saver evidence is missing. ' +
-              `Auto-windowed to offset=0, limit=${limit}; run token-saver-context-compression before more large Reads.`,
+              `Auto-windowed to offset=0, limit=${limit}; run context-compressor before more large Reads.`,
           };
         }
         return {
@@ -752,7 +752,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
           action: 'block',
           message:
             '[READ SAFETY] Context pressure is high for this session. ' +
-            'Invoke `Skill({ skill: "token-saver-context-compression" })` before large Read calls.',
+            'Invoke `Skill({ skill: "context-compressor" })` before large Read calls.',
         };
       }
     }

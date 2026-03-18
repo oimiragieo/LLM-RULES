@@ -1222,8 +1222,8 @@ After compression, extracted insights are deduplicated against existing memory:
 | File                                                                            | Purpose                                                |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------ |
 | `.claude/tools/cli/hybrid-search.cjs`                                           | `--compress` command handler                           |
-| `.claude/skills/token-saver-context-compression/scripts/main.cjs`               | Pipeline orchestration, dedup, adaptive ratio          |
-| `.claude/skills/token-saver-context-compression/scripts/_compression_engine.py` | Python compression engine (Jaccard + position scoring) |
+| `.claude/skills/context-compressor/scripts/main.cjs`               | Pipeline orchestration, dedup, adaptive ratio          |
+| `.claude/skills/context-compressor/scripts/_compression_engine.py` | Python compression engine (Jaccard + position scoring) |
 
 ---
 

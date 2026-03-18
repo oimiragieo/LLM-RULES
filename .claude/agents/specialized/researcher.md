@@ -44,7 +44,7 @@ skills:
   - research-synthesis
   - ripgrep
   - task-management-protocol
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
 context_files: null
 ---
@@ -235,7 +235,7 @@ Skill({ skill: 'codebase-exploration' });
 1. **NEVER** read files breadth-first — always search-first, read-selectively
 2. **NEVER** read entire large files — use `Read` with `offset/limit` (max 200 lines per read)
 3. **ALWAYS** write findings to a report file incrementally — do not accumulate in context
-4. **ALWAYS** invoke `Skill({ skill: 'token-saver-context-compression' })` if context approaches 60K tokens
+4. **ALWAYS** invoke `Skill({ skill: 'context-compressor' })` if context approaches 60K tokens
 
 The skill provides a 7-phase progressive protocol:
 
@@ -646,7 +646,7 @@ TaskList();
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -715,7 +715,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

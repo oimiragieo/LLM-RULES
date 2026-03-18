@@ -33,7 +33,7 @@ Select-String -Path $p -Pattern "No pending reflections|status\":\"no_pending\"|
 ```
 
 ```powershell
-Select-String -Path $p -Pattern "Large direct Read|requires search evidence first|token-saver-context-compression|Bash redirection\/heredoc"
+Select-String -Path $p -Pattern "Large direct Read|requires search evidence first|context-compressor|Bash redirection\/heredoc"
 ```
 
 ## 2.1 Trace-First Commands
@@ -178,7 +178,7 @@ Symptoms:
 
 - `Read` blocked with:
   - `requires search evidence first`, or
-  - `Context pressure is high ... invoke token-saver-context-compression`.
+  - `Context pressure is high ... invoke context-compressor`.
 
 Root cause:
 
@@ -189,7 +189,7 @@ Fix:
 
 1. Run `pnpm search:code -- "<query>" --limit 5` (or hybrid search).
 2. Retry `Read` with `offset/limit` (or line window).
-3. If prompted, invoke `Skill({ skill: "token-saver-context-compression" })` and retry.
+3. If prompted, invoke `Skill({ skill: "context-compressor" })` and retry.
 
 ### I. Bash artifact-write guard appears inconsistent
 
@@ -338,7 +338,7 @@ pnpm search:code -- "TASKUPDATE-FIRST" --limit 10
 pnpm search:code -- "MEMORY-FIRST" --limit 10
 pnpm search:code -- "Bash redirection/heredoc" --limit 10
 pnpm search:code -- "requires search evidence first" --limit 10
-pnpm search:code -- "token-saver-context-compression" --limit 10
+pnpm search:code -- "context-compressor" --limit 10
 ```
 
 When debugging a specific hook:
@@ -485,7 +485,7 @@ Expected:
 Prompt template:
 
 ```text
-Process a large-context task; if read-safety indicates context pressure, invoke token-saver-context-compression before large reads.
+Process a large-context task; if read-safety indicates context pressure, invoke context-compressor before large reads.
 ```
 
 Expected:

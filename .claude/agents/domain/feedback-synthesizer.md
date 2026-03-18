@@ -34,7 +34,7 @@ skills:
   - code-structural-search
   - memory-search
   - ripgrep
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
   - task-management-protocol
 context_files: null
@@ -294,7 +294,7 @@ Skill({ skill: 'doc-generator' }); // Generate structured reports
 
 | Condition                        | Skill                             | Purpose                                      |
 | -------------------------------- | --------------------------------- | -------------------------------------------- |
-| Large feedback corpus to process | `token-saver-context-compression` | Compress search results efficiently          |
+| Large feedback corpus to process | `context-compressor` | Compress search results efficiently          |
 | Need to visualize clusters       | `diagram-generator`               | Generate cluster maps and signal diagrams    |
 | Generating structured reports    | `doc-generator`                   | Produce formatted analysis documents         |
 | Research on analysis techniques  | `research-synthesis`              | Current best practices for feedback analysis |
@@ -372,7 +372,7 @@ node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -396,7 +396,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

@@ -72,7 +72,7 @@ function classifyLine(line) {
       severity: 'medium',
       pattern: /\[TOKEN-SAVER\]|token saver required|context pressure/i,
       owner: '.claude/hooks/routing/user-prompt-unified.core.cjs',
-      action: 'Invoke token-saver-context-compression when context pressure threshold triggers.',
+      action: 'Invoke context-compressor when context pressure threshold triggers.',
     },
     {
       id: 'hook_error',

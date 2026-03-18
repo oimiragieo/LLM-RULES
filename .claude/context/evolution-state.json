@@ -175,8 +175,8 @@
       "path": ".claude/skills/",
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
-      "description": "Production-readiness sweep batch 45: thinking-tools (v1.0.0 verified, Check 8 fix, Iron Laws + Anti-Patterns), token-saver-context-compression (v1.0.0 verified, Iron Laws + Anti-Patterns), track-management (v1.0→v1.0.0 semver fix, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["thinking-tools", "token-saver-context-compression", "track-management"]
+      "description": "Production-readiness sweep batch 45: thinking-tools (v1.0.0 verified, Check 8 fix, Iron Laws + Anti-Patterns), context-compressor (v1.0.0 verified, Iron Laws + Anti-Patterns), track-management (v1.0→v1.0.0 semver fix, verified, Iron Laws + Anti-Patterns).",
+      "affected": ["thinking-tools", "context-compressor", "track-management"]
     },
     {
       "id": "2026-02-22-batch44-skill-updater-sweep",
@@ -895,10 +895,10 @@
       "completedAt": "2026-02-15T00:00:00.000Z"
     },
     {
-      "id": "2026-02-15-token-saver-context-compression-skill",
+      "id": "2026-02-15-context-compressor-skill",
       "artifactType": "skill",
-      "name": "token-saver-context-compression",
-      "path": ".claude/skills/token-saver-context-compression/SKILL.md",
+      "name": "context-compressor",
+      "path": ".claude/skills/context-compressor/SKILL.md",
       "status": "completed",
       "completedAt": "2026-02-15T00:00:00.000Z"
     },

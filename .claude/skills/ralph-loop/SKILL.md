@@ -22,7 +22,7 @@ skills:
   - task-management-protocol
   - ripgrep
   - code-semantic-search
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
   - memory-search
 ---

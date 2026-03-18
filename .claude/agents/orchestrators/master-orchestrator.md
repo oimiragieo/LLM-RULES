@@ -34,7 +34,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - wave-executor
-  - token-saver-context-compression
+  - context-compressor
   - system-health-check
 ---
 
@@ -281,7 +281,7 @@ Skill({ skill: 'context-compressor' });
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

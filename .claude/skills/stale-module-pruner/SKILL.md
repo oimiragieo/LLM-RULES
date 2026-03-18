@@ -59,7 +59,7 @@ Invoke when:
 | `task-management-protocol`        | Track pruning progress       | Always               |
 | `ripgrep`                         | Search for module references | During scan          |
 | `code-semantic-search`            | Verify intent when uncertain | On ambiguous hits    |
-| `token-saver-context-compression` | Compress large result sets   | When output is large |
+| `context-compressor` | Compress large result sets   | When output is large |
 | `verification-before-completion`  | Gate completion              | Before marking done  |
 | `memory-search`                   | Check prior pruning patterns | At start             |
 

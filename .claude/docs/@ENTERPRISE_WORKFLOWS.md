@@ -33,7 +33,7 @@ Complete catalog of 18+ enterprise workflows for multi-agent orchestration, secu
 | Consensus Voting        | `.claude/workflows/consensus-voting-skill-workflow.md`                | consensus                         |
 | Database Design         | `.claude/workflows/database-architect-skill-workflow.md`              | schema workflows                  |
 | Context Compression     | `.claude/workflows/context-compressor-skill-workflow.md`              | summarization                     |
-| Token Saver Compression | `.claude/workflows/token-saver-context-compression-skill-workflow.md` | search-aware evidence compression |
+| Token Saver Compression | `.claude/workflows/context-compressor-skill-workflow.md` | search-aware evidence compression |
 | Post-Creation Valid.    | `.claude/workflows/core/post-creation-validation.md`                  | artifact integration              |
 | **Domain Development**  | `.claude/workflows/domain-development-workflow.md`                    | **TDD for domain agents**         |
 | **Code Review**         | `.claude/workflows/code-review-workflow.md`                           | **two-pass review**               |

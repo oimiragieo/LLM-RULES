@@ -301,7 +301,7 @@ function buildResult(input) {
     ],
     optionalInvocations: [
       "Skill({ skill: 'assimilate' })",
-      "Skill({ skill: 'token-saver-context-compression' })",
+      "Skill({ skill: 'context-compressor' })",
       "Skill({ skill: 'recommend-evolution' })",
     ],
     research: buildResearchChecklist({ topic: input.topic, skillName: resolved.skillName }),

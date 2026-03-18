@@ -60,7 +60,7 @@ Skill({ skill: 'proactive-audit' });
 | `task-management-protocol`        | Track audit progress               | Always               |
 | `ripgrep`                         | Fast targeted artifact search      | During checks        |
 | `code-semantic-search`            | Pattern discovery across artifacts | When investigating   |
-| `token-saver-context-compression` | Compress large audit results       | When output is large |
+| `context-compressor` | Compress large audit results       | When output is large |
 | `verification-before-completion`  | Gate completion on zero CRITICAL   | Before marking done  |
 | `memory-search`                   | Check prior audit patterns         | At start             |
 

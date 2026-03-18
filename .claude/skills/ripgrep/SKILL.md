@@ -123,9 +123,9 @@ pnpm search:tokens .
 - `✓ OK` (<8K tokens) — safe to `Read` the entire file
 - `△ MEDIUM` (8-32K) — use `Read` with `offset`/`limit` parameters, or `search:file`
 - `⚠ LARGE` (32-100K) — prefer `search:code` over full Read; only read targeted sections
-- `⚠ OVER` (>100K) — MUST use `search:code` or invoke `token-saver-context-compression` skill
+- `⚠ OVER` (>100K) — MUST use `search:code` or invoke `context-compressor` skill
 
-**When to invoke `token-saver-context-compression`:**
+**When to invoke `context-compressor`:**
 
 - Directory total exceeds 100K tokens and you need to understand the whole subsystem
 - File exceeds 32K tokens and you need a summary rather than specific lines

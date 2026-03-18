@@ -15,12 +15,12 @@ const RUNTIME_DIR = path.join(
   'context-compressor'
 );
 
-// Python scripts live in token-saver-context-compression (archived source)
+// Python scripts live in context-compressor (archived source)
 const PYTHON_SCRIPTS_DIR = path.join(
   PROJECT_ROOT,
   '.claude',
   'skills',
-  'token-saver-context-compression',
+  'context-compressor',
   'scripts'
 );
 
@@ -176,15 +176,15 @@ function mapCompressionToMemoryRecords(compressionOutput, metadata = {}) {
       records[target].push({
         text,
         timestamp,
-        source: sourceQuery || 'token-saver-context-compression',
+        source: sourceQuery || 'context-compressor',
       });
       continue;
     }
     records[target].push({
       text,
       timestamp,
-      source: sourceQuery || 'token-saver-context-compression',
-      section: 'token-saver-context-compression',
+      source: sourceQuery || 'context-compressor',
+      section: 'context-compressor',
     });
   }
 

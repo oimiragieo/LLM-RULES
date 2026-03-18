@@ -15,7 +15,7 @@ Persistence must flow through MemoryRecord (or tool-level Write/Edit) so `.claud
 
 ## Decisions
 
-1. **Skill location**: vendored in `.claude/skills/token-saver-context-compression/`
+1. **Skill location**: vendored in `.claude/skills/context-compressor/`
 2. **Trigger**: manual skill invocation only (v1; no automatic hooks)
 3. **Search source**: existing hybrid search (`pnpm search:code`)
 4. **Interop format**: JSON-only for wrapper/pipeline
@@ -45,7 +45,7 @@ Outputs:
 - `decisions` if text matches: `decision|tradeoff|choose|selected|rationale`
 - `patterns` fallback for all other distilled evidence
 
-Reference implementation: `.claude/skills/token-saver-context-compression/scripts/main.cjs` (`classifyMemoryTarget`, `mapCompressionToMemoryRecords`).
+Reference implementation: `.claude/skills/context-compressor/scripts/main.cjs` (`classifyMemoryTarget`, `mapCompressionToMemoryRecords`).
 
 ## Test Strategy
 

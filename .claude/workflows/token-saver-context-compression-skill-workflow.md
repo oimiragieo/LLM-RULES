@@ -1,4 +1,4 @@
-# token-saver-context-compression Skill Workflow
+# context-compressor Skill Workflow
 
 1. Capture user query and compression mode.
 2. Retrieve candidate context with `pnpm search:code`.

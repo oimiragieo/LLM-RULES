@@ -45,7 +45,7 @@ skills:
   - code-structural-search
   - task-management-protocol
   - verification-before-completion
-  - token-saver-context-compression
+  - context-compressor
 context_files: null
 mcp_servers:
   - Exa
@@ -124,7 +124,7 @@ Skill({ skill: 'codebase-exploration' });
 2. **Search-first workflow**: Use Grep/ripgrep to locate patterns before reading files
 3. **Windowed reads**: All `Read` calls MUST use `offset/limit` (max 200 lines per call)
 4. **Write-findings-immediately**: After each phase, write findings to `.claude/context/tmp/` — never accumulate in context
-5. **Hard stop at 60K tokens**: Invoke `token-saver-context-compression` before exceeding this limit
+5. **Hard stop at 60K tokens**: Invoke `context-compressor` before exceeding this limit
 
 **Return to caller:** file path + 5-bullet summary. Do NOT inline the full analysis.
 
@@ -132,7 +132,7 @@ Skill({ skill: 'codebase-exploration' });
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -243,7 +243,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

@@ -46,7 +46,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "planner": {
@@ -68,7 +68,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ]
       },
@@ -97,7 +97,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "qa": {
@@ -122,7 +122,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "technical-writer": {
@@ -139,7 +139,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "pm": {
@@ -155,7 +155,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ]
       },
@@ -174,7 +174,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ]
       },
@@ -202,7 +202,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "general-assistant": {
@@ -215,7 +215,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression",
+          "context-compressor",
           "task-management-protocol"
         ]
       },
@@ -229,7 +229,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ]
       }
@@ -256,7 +256,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "rust-pro": {
@@ -273,7 +273,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "golang-pro": {
@@ -293,7 +293,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "typescript-pro": {
@@ -310,7 +310,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "fastapi-pro": {
@@ -327,7 +327,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "frontend-pro": {
@@ -347,7 +347,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "nodejs-pro": {
@@ -365,7 +365,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "ios-pro": {
@@ -382,7 +382,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "java-pro": {
@@ -402,7 +402,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "nextjs-pro": {
@@ -421,7 +421,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "php-pro": {
@@ -438,7 +438,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "sveltekit-expert": {
@@ -456,7 +456,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "tauri-desktop-developer": {
@@ -473,7 +473,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "expo-mobile-developer": {
@@ -489,7 +489,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "data-engineer": {
@@ -507,7 +507,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "graphql-pro": {
@@ -524,7 +524,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "mobile-ux-reviewer": {
@@ -541,7 +541,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "ai-ml-specialist": {
@@ -555,7 +555,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "android-pro": {
@@ -569,7 +569,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "gamedev-pro": {
@@ -583,7 +583,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "scientific-research-expert": {
@@ -595,7 +595,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "multi-llm-consultant": {
@@ -607,7 +607,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "web3-blockchain-expert": {
@@ -621,7 +621,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "api-designer": {
@@ -637,7 +637,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "aso-specialist": {
@@ -647,7 +647,7 @@
           "memory-search",
           "ripgrep",
           "task-management-protocol",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ],
         "contextual": [],
@@ -660,7 +660,7 @@
           "memory-search",
           "ripgrep",
           "task-management-protocol",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ],
         "contextual": [],
@@ -673,7 +673,7 @@
           "memory-search",
           "ripgrep",
           "task-management-protocol",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ],
         "contextual": [],
@@ -686,7 +686,7 @@
           "memory-search",
           "ripgrep",
           "task-management-protocol",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ],
         "contextual": [],
@@ -699,7 +699,7 @@
           "memory-search",
           "ripgrep",
           "task-management-protocol",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ],
         "contextual": [],
@@ -714,7 +714,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "mcp-developer": {
@@ -728,7 +728,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "microservices-architect": {
@@ -742,7 +742,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "prompt-engineer": {
@@ -754,7 +754,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "pm-coordinator": {
@@ -769,7 +769,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "kubernetes-specialist": {
@@ -781,7 +781,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "medical-research-triage": {
@@ -792,7 +792,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ]
       },
@@ -803,7 +803,7 @@
           "memory-search",
           "ripgrep",
           "task-management-protocol",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ],
         "contextual": [],
@@ -872,7 +872,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "code-reviewer": {
@@ -891,7 +891,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "security-architect": {
@@ -915,7 +915,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "devops": {
@@ -949,7 +949,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "devops-troubleshooter": {
@@ -971,7 +971,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "incident-responder": {
@@ -988,7 +988,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "c4-context": {
@@ -1000,7 +1000,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "c4-container": {
@@ -1012,7 +1012,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "c4-component": {
@@ -1024,7 +1024,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "c4-code": {
@@ -1036,7 +1036,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "conductor-validator": {
@@ -1050,7 +1050,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "reverse-engineer": {
@@ -1072,7 +1072,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "database-architect": {
@@ -1089,7 +1089,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "accessibility-tester": {
@@ -1105,7 +1105,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "chaos-engineer": {
@@ -1121,7 +1121,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "penetration-tester": {
@@ -1137,7 +1137,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "performance-engineer": {
@@ -1153,7 +1153,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "sre-engineer": {
@@ -1169,7 +1169,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "advanced-debugging": {
@@ -1183,7 +1183,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "code-simplifier": {
@@ -1197,7 +1197,7 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "context-compressor"
         ]
       },
       "researcher": {
@@ -1210,7 +1210,7 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "token-saver-context-compression",
+          "context-compressor",
           "verification-before-completion"
         ]
       }

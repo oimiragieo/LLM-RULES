@@ -597,7 +597,7 @@ async function main() {
     // Import token-saver main function
     const tokenSaverPath = path.resolve(
       __dirname,
-      '../../skills/token-saver-context-compression/scripts/main.cjs'
+      '../../skills/context-compressor/scripts/main.cjs'
     );
     const { main: tokenSaverMain } = require(tokenSaverPath);
 

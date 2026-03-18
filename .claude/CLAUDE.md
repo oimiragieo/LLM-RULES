@@ -473,7 +473,7 @@ Router does not handle command routing — commands are injected as user message
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 80K tokens  | Spawn `context-compressor` proactively                                                                                                                                                                                                                                                              |
 | 120K tokens | **WARNING:** Compression mandatory before new spawns                                                                                                                                                                                                                                                |
-| 150K tokens | **RED LINE:** You MUST proactively summarize your context and execute `token-saver-context-compression` or manual truncation BEFORE accumulating 150K tokens. Reading massive log files or directories without `grep` will cause API crash errors. No new agent spawns until compression completes. |
+| 150K tokens | **RED LINE:** You MUST proactively summarize your context and execute `context-compressor` or manual truncation BEFORE accumulating 150K tokens. Reading massive log files or directories without `grep` will cause API crash errors. No new agent spawns until compression completes. |
 
 If `.claude/context/runtime/compression-reminder.txt` exists, handle compression before spawning new agents.
 

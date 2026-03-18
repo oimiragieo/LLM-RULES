@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Skill Contract: token-saver-context-compression",
-  "description": "Optional registry schema for token-saver-context-compression runtime payloads.",
+  "title": "Skill Contract: context-compressor",
+  "description": "Optional registry schema for context-compressor runtime payloads.",
   "type": "object",
   "required": ["ok"],
   "properties": {

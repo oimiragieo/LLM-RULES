@@ -29,7 +29,7 @@ skills:
   - code-semantic-search
   - ripgrep
   - memory-search
-  - token-saver-context-compression
+  - context-compressor
   - task-management-protocol
   - verification-before-completion
 tags:
@@ -227,7 +227,7 @@ Use `Read` only for known specific file paths. Never use `Grep` or `Glob` for op
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

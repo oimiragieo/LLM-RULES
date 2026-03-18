@@ -35,7 +35,7 @@ skills:
   - memory-search
   - ripgrep
   - task-management-protocol
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
 context_files: null
 ---
@@ -303,7 +303,7 @@ Skill({ skill: 'container-expert' }); // Container best practices
 | AWS cloud resources           | `aws-cloud-ops`                   | EKS/ECR/IAM operations               |
 | Cloud DevOps patterns         | `cloud-devops-expert`             | Cloud-native best practices          |
 | Session management            | `task-management-protocol`        | Multi-step task tracking             |
-| Context pressure high         | `token-saver-context-compression` | Context compression                  |
+| Context pressure high         | `context-compressor` | Context compression                  |
 | Terraform/Pulumi provisioning | `terraform-infra`                 | Cluster IaC with safety controls     |
 | GitOps workflow design        | `gitops-workflow`                 | ArgoCD/Flux declarative patterns     |
 | Helm chart authoring          | `helm-chart-scaffolding`          | Helm chart design and best practices |
@@ -325,7 +325,7 @@ Skill({ skill: 'container-expert' }); // Container best practices
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high.
 
 Invoke token-saver when ANY of these hold:
 
@@ -413,7 +413,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

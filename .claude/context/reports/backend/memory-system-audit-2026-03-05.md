@@ -180,7 +180,7 @@ child.unref();  // non-blocking, fire-and-forget
 
 | Agent | Matrix Location | "always" Array Contents |
 |-------|----------------|-------------------------|
-| aso-specialist | lines 628-638 | `["code-semantic-search","code-structural-search","memory-search","ripgrep","token-saver-context-compression","verification-before-completion"]` |
+| aso-specialist | lines 628-638 | `["code-semantic-search","code-structural-search","memory-search","ripgrep","context-compressor","verification-before-completion"]` |
 | brand-guardian | lines 639-650 | Same 6 skills — no task-management-protocol |
 | compliance-checker | lines 651-662 | Same 6 skills — no task-management-protocol |
 | feedback-synthesizer | lines 663-674 | Same 6 skills — no task-management-protocol |

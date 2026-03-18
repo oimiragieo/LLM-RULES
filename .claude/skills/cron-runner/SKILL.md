@@ -46,7 +46,7 @@ Your ping MUST conform strictly to this expanded schema:
 - `queue_depth_snapshot`: How many items were in the `.processing.jsonl` batch you just consumed (0 if you found no file).
 - `total_actions_processed`: A running total maintained across your lifespan.
 - `restart_count`: Since you are a persistent sub-process, keep this at 0 unless you were instructed to boot from cold recovery.
-- `token_watermark_estimate`: Your own estimate of your context usage. When you approach 100k, initiate the `token-saver-context-compression` skill or simply `/clear` yourself via the standard reset mechanisms.
+- `token_watermark_estimate`: Your own estimate of your context usage. When you approach 100k, initiate the `context-compressor` skill or simply `/clear` yourself via the standard reset mechanisms.
 
 ## Operating Guidelines
 

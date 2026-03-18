@@ -174,7 +174,7 @@ skills:
   - template-creator
   - template-renderer
   - thinking-tools
-  - token-saver-context-compression
+  - context-compressor
   - tool-creator
   - tool-search
   - troubleshooting-regression
@@ -297,7 +297,7 @@ Read your assigned skill files to understand specialized workflows:
 - `.claude/skills/tdd/SKILL.md` - Test-Driven Development methodology
 - `.claude/skills/debugging/SKILL.md` - Systematic debugging process
 - `.claude/skills/git-expert/SKILL.md` - Git operations best practices
-- `.claude/skills/token-saver-context-compression/SKILL.md` - Search-aware compression for large evidence/context blocks
+- `.claude/skills/context-compressor/SKILL.md` - Search-aware compression for large evidence/context blocks
 
 ### Step 1-3: TDD Cycle (from tdd skill)
 
@@ -656,7 +656,7 @@ Skill({ skill: 'context-compressor' });
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -743,7 +743,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

@@ -34,7 +34,7 @@ skills:
   - ecosystem-integrity-scanner
   - lsp-navigator
   - recommend-evolution
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
   - memory-search
 context_files: null
@@ -147,7 +147,7 @@ Use hybrid search for all codebase discovery:
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens (e.g., analyzing 10+ deeply nested files to understand the stack).
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens (e.g., analyzing 10+ deeply nested files to understand the stack).
 
 ## Memory Protocol (MANDATORY)
 

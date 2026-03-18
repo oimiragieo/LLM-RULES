@@ -35,7 +35,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
-  - token-saver-context-compression
+  - context-compressor
 context_files: null
 ---
 
@@ -271,4 +271,4 @@ Read `.claude/context/memory/learnings.md`
 
 ## Token Saver Invocation Rule
 
-- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.
+- If your context gets too large, utilize the Skill({ skill: 'context-compressor' }) to reduce token load.

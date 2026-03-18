@@ -37,7 +37,7 @@ Never output the completion signal unless:
 
 - `verification-before-completion` — Verification gate pattern
 - `task-management-protocol` — Task state synchronization
-- `token-saver-context-compression` — Context management for long loops
+- `context-compressor` — Context management for long loops
 
 ### Related Files
 

@@ -2,7 +2,7 @@
 
 # Token-Saver Skill Audit Report
 
-**Skill:** `token-saver-context-compression`
+**Skill:** `context-compressor`
 **Date:** 2026-03-05
 **Auditor:** code-reviewer (task #5)
 **Scope:** skill-index.json coverage, agent-skill-matrix.json coverage, SKILL.md integrity, functional integration, context window budget verification
@@ -11,7 +11,7 @@
 
 ## Executive Summary
 
-The `token-saver-context-compression` skill is well-integrated across the framework. It is listed as a high-impact skill in CLAUDE.md Section 8.5, correctly verified in SKILL.md, and assigned to virtually all agents that have "always" arrays defined in agent-skill-matrix.json. The primary finding is a **functional gap**: the `compression-reminder.txt` mechanism (Phase 3) is opt-in via an environment variable, not automatic — meaning no hook creates this file by default, which reduces the practical trigger surface for the skill.
+The `context-compressor` skill is well-integrated across the framework. It is listed as a high-impact skill in CLAUDE.md Section 8.5, correctly verified in SKILL.md, and assigned to virtually all agents that have "always" arrays defined in agent-skill-matrix.json. The primary finding is a **functional gap**: the `compression-reminder.txt` mechanism (Phase 3) is opt-in via an environment variable, not automatic — meaning no hook creates this file by default, which reduces the practical trigger surface for the skill.
 
 **Overall Assessment: GOOD with one actionable finding**
 
@@ -25,7 +25,7 @@ Found at line 2191 of `.claude/config/skill-index.json`.
 
 ```json
 {
-  "name": "token-saver-context-compression",
+  "name": "context-compressor",
   "category": "Other",
   "domain": "other",
   "requiredTools": [],
@@ -83,7 +83,7 @@ Read `.claude/context/config/agent-skill-matrix.json` across all agent categorie
 
 The orchestrator agents (master-orchestrator, evolution-orchestrator, artifact-integrator, swarm-coordinator, party-orchestrator) were not verified in agent-skill-matrix.json — if they lack "always" entries entirely, their token-saver assignment depends solely on their frontmatter skills lists.
 
-**Assessment: PASS** — All agents with defined "always" arrays include token-saver-context-compression. The two intentional exceptions (router, reflection-agent) are by design.
+**Assessment: PASS** — All agents with defined "always" arrays include context-compressor. The two intentional exceptions (router, reflection-agent) are by design.
 
 ---
 
@@ -91,12 +91,12 @@ The orchestrator agents (master-orchestrator, evolution-orchestrator, artifact-i
 
 ### File Location
 
-`.claude/skills/token-saver-context-compression/SKILL.md`
+`.claude/skills/context-compressor/SKILL.md`
 
 ### Frontmatter
 
 ```yaml
-name: token-saver-context-compression
+name: context-compressor
 version: 1.0.0
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
@@ -131,9 +131,9 @@ SKILL.md includes an explicit anti-patterns table distinguishing correct vs. inc
 
 | Artifact | Path | Status |
 |---|---|---|
-| Workflow | `.claude/workflows/token-saver-context-compression-skill-workflow.md` | Referenced in SKILL.md |
-| Tool | `.claude/tools/token-saver-context-compression/token-saver-context-compression.cjs` | Confirmed present |
-| Command | `.claude/commands/token-saver-context-compression.md` | Confirmed present |
+| Workflow | `.claude/workflows/context-compressor-skill-workflow.md` | Referenced in SKILL.md |
+| Tool | `.claude/tools/context-compressor/context-compressor.cjs` | Confirmed present |
+| Command | `.claude/commands/context-compressor.md` | Confirmed present |
 | Scripts | `run_skill_workflow.py`, `compress_context.py`, `validate_evidence.py`, `profile_tokens.py` | All present in skill directory |
 | Pre/Post hooks | `hooks/pre-execute.cjs`, `hooks/post-execute.cjs` | Present |
 | Schemas | `schemas/input.schema.json`, `schemas/output.schema.json` | Present |
@@ -152,9 +152,9 @@ SKILL.md Step 1 explicitly requires `pnpm search:code` as the first action befor
 
 ### CLAUDE.md Section 8.5 (High-Impact Skill Listing)
 
-**Verified.** CLAUDE.md Section 8.5 explicitly lists `token-saver-context-compression` as a high-impact workflow enhancement skill:
+**Verified.** CLAUDE.md Section 8.5 explicitly lists `context-compressor` as a high-impact workflow enhancement skill:
 
-> "High-impact skills: `artifact-integrator`, `brainstorming`, `proactive-audit`, `qa-workflow`, `commit-validator`, `creation-feasibility-gate`, `dispatching-parallel-agents`, `smart-revert`, `token-saver-context-compression`, `recommend-evolution`, `ralph-loop`, `wave-executor`, `enhance-prompt`."
+> "High-impact skills: `artifact-integrator`, `brainstorming`, `proactive-audit`, `qa-workflow`, `commit-validator`, `creation-feasibility-gate`, `dispatching-parallel-agents`, `smart-revert`, `context-compressor`, `recommend-evolution`, `ralph-loop`, `wave-executor`, `enhance-prompt`."
 
 **Assessment: PASS**
 
@@ -164,7 +164,7 @@ SKILL.md Step 1 explicitly requires `pnpm search:code` as the first action befor
 
 > "Do not preload broad skill instructions in prompt text. Invoke only required skills at runtime (for example `tdd`, `debugging`)."
 
-The spawn template does NOT inline token-saver skill instructions — agents invoke it on-demand via `Skill({ skill: 'token-saver-context-compression' })`. This is the correct design.
+The spawn template does NOT inline token-saver skill instructions — agents invoke it on-demand via `Skill({ skill: 'context-compressor' })`. This is the correct design.
 
 **Assessment: PASS**
 
@@ -172,7 +172,7 @@ The spawn template does NOT inline token-saver skill instructions — agents inv
 
 **Verified.** CLAUDE.md Section 2 (Spawning Agents) includes:
 
-> "Token Saver Routing Rule: Router does not run token-saver directly. Router delegates to spawned agents and only instructs `token-saver-context-compression` when context pressure is high."
+> "Token Saver Routing Rule: Router does not run token-saver directly. Router delegates to spawned agents and only instructs `context-compressor` when context pressure is high."
 
 This rule is correctly positioned in the spawn template section, ensuring the router never executes compression itself.
 
@@ -296,7 +296,7 @@ The compression-trigger.cjs library exists but is not wired into any hook that i
 ### P3: Verify Orchestrator agent-skill-matrix.json Entries
 
 **File:** `.claude/context/config/agent-skill-matrix.json`
-**Change:** Confirm orchestrators have token-saver-context-compression in their "always" arrays (or frontmatter skills)
+**Change:** Confirm orchestrators have context-compressor in their "always" arrays (or frontmatter skills)
 **Why:** If orchestrators lack "always" entries entirely, they may not get token-saver assigned via the 3-layer registry resolution system.
 
 ### P3 (lower priority): Context Threshold Hook
@@ -307,7 +307,7 @@ The compression-trigger.cjs library exists but is not wired into any hook that i
 
 ## Files Audited
 
-- `.claude/skills/token-saver-context-compression/SKILL.md`
+- `.claude/skills/context-compressor/SKILL.md`
 - `.claude/config/skill-index.json` (lines 2191–2269)
 - `.claude/context/config/agent-skill-matrix.json` (multiple windows)
 - `.claude/context/agent-registry.json`

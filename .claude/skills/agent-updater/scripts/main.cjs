@@ -20,7 +20,7 @@ const MANDATORY_SKILLS = Object.freeze([
   'task-management-protocol',
   'ripgrep',
   'code-semantic-search',
-  'token-saver-context-compression',
+  'context-compressor',
   'verification-before-completion',
   'memory-search',
 ]);

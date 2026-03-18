@@ -19,7 +19,7 @@ skills:
   - task-management-protocol
   - ripgrep
   - code-semantic-search
-  - token-saver-context-compression
+  - context-compressor
   - omega-gemini-cli
   - omega-codex-cli
 context_files:
@@ -382,7 +382,7 @@ cat .claude/context/memory/learnings.md
 
 ## Token Saver Invocation Rule
 
-Invoke `token-saver-context-compression` only when context pressure is high and normal search+read would over-expand tokens.
+Invoke `context-compressor` only when context pressure is high and normal search+read would over-expand tokens.
 
 Use when ANY of these conditions hold:
 
@@ -393,5 +393,5 @@ Use when ANY of these conditions hold:
 Do NOT invoke for normal single-invariant checks (few bash commands, short output).
 
 ```javascript
-Skill({ skill: 'token-saver-context-compression' });
+Skill({ skill: 'context-compressor' });
 ```

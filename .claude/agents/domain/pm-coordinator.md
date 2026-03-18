@@ -35,7 +35,7 @@ skills:
   - ripgrep
   - spec-gathering
   - task-management-protocol
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
 context_files: null
 ---
@@ -270,13 +270,13 @@ Skill({ skill: 'task-management-protocol' }); // Session task tracking
 | --------------------- | --------------------------------- | --------------------------- |
 | Jira operations       | `jira-pm`                         | Jira board/issue management |
 | Linear operations     | `linear-pm`                       | Linear cycle/roadmap mgmt   |
-| Context pressure high | `token-saver-context-compression` | Context compression         |
+| Context pressure high | `context-compressor` | Context compression         |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high.
 
 Invoke token-saver when ANY of these hold:
 
@@ -341,7 +341,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

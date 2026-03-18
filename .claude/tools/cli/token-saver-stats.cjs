@@ -11,7 +11,7 @@ const TELEMETRY_FILE = path.join(
   '.claude',
   'context',
   'runtime',
-  'token-saver-context-compression',
+  'context-compressor',
   'token-saver-telemetry.jsonl'
 );
 
@@ -37,7 +37,7 @@ function main() {
     console.log('\x1b[36m============== TOKEN SAVER TRACKER ==============\x1b[0m');
     console.log('\x1b[33mNo telemetry data found yet.\x1b[0m');
     console.log(
-      'Use `Skill({ skill: "token-saver-context-compression" })` to start saving tokens.'
+      'Use `Skill({ skill: "context-compressor" })` to start saving tokens.'
     );
     console.log('\x1b[36m=================================================\x1b[0m');
     return;

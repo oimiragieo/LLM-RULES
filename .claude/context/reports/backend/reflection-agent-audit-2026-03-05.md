@@ -438,7 +438,7 @@ if (toolInput.run_in_background !== true) return { pass: true };
 ### Findings Update
 
 **F-01 (MEDIUM) — RESOLVED**: The `agent-skill-matrix.json` `always` array for reflection-agent NOW contains 7 skills:
-`verification-before-completion`, `task-management-protocol`, `memory-search`, `ripgrep`, `code-semantic-search`, `code-structural-search`, `token-saver-context-compression` (lines 196-204). This was fixed in the EPIC enterprise audit session (commit c5d1d429).
+`verification-before-completion`, `task-management-protocol`, `memory-search`, `ripgrep`, `code-semantic-search`, `code-structural-search`, `context-compressor` (lines 196-204). This was fixed in the EPIC enterprise audit session (commit c5d1d429).
 
 **F-03 (MEDIUM) — RESOLVED**: `ripgrep` is now in the `always` array (line 200). Fixed same session.
 

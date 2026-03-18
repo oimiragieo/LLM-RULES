@@ -33,7 +33,7 @@ skills:
   - code-structural-search
   - memory-search
   - ripgrep
-  - token-saver-context-compression
+  - context-compressor
   - task-management-protocol
   - verification-before-completion
 context_files: null
@@ -157,7 +157,7 @@ Evidence-first (no keyword recommendation without volume data) · Character disc
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

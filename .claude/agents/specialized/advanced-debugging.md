@@ -39,7 +39,7 @@ skills:
   - ripgrep
   - smart-debug
   - task-management-protocol
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
 context_files: null
 ---
@@ -284,7 +284,7 @@ Skill({ skill: 'troubleshooting-regression' }); // Regression investigation
 | Log analysis           | `logging-module-usage`            | Structured log analysis       |
 | Writing fix with tests | `tdd`                             | RED/GREEN/REFACTOR cycle      |
 | Session task tracking  | `task-management-protocol`        | Multi-step investigation mgmt |
-| Context pressure high  | `token-saver-context-compression` | Context compression           |
+| Context pressure high  | `context-compressor` | Context compression           |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 
@@ -300,7 +300,7 @@ Skill({ skill: 'troubleshooting-regression' }); // Regression investigation
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high.
 
 Invoke token-saver when ANY of these hold:
 
@@ -367,7 +367,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

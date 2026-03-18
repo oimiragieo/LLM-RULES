@@ -114,7 +114,7 @@
 
 ## P1: Skill Registration Gaps — Index Staleness
 
-**Issue**: `.claude/context/agent-registry.json` reflects old agent count (72 agents, should be 74). ecosystem-auditor and token-saver-context-compression missing.
+**Issue**: `.claude/context/agent-registry.json` reflects old agent count (72 agents, should be 74). ecosystem-auditor and context-compressor missing.
 
 **Impact**: Routing table out-of-sync; health check tests fail.
 

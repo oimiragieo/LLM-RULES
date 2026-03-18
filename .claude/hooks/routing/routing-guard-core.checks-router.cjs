@@ -374,7 +374,7 @@ function checkRouterReadGovernance(toolName, toolInput = {}) {
   const message =
     '[ROUTER-FIRST PROTOCOL VIOLATION][ROUTER READ GOVERNANCE] Unwindowed Read blocked in router mode. ' +
     'Run hybrid search first (`pnpm search:code`), then use Read with offset/limit. ' +
-    'If context pressure is high, invoke token-saver-context-compression before large reads.';
+    'If context pressure is high, invoke context-compressor before large reads.';
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };

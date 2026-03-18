@@ -39,7 +39,7 @@ skills:
   - ripgrep
   - task-management-protocol
   - tdd
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
 context_files: null
 hooks: {}
@@ -536,7 +536,7 @@ Skill({ skill: 'code-quality-expert' }); // Best practices review
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

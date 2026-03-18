@@ -34,7 +34,7 @@ skills:
   - code-structural-search
   - memory-search
   - ripgrep
-  - token-saver-context-compression
+  - context-compressor
   - verification-before-completion
   - task-management-protocol
 context_files: null
@@ -370,7 +370,7 @@ Skill({ skill: 'enhance-prompt' }); // Clarify vague marketing briefs
 | Strategy creation needed       | `brainstorming`                   | Socratic design refinement            |
 | Research required              | `research-synthesis`              | Synthesize best practices from web    |
 | Context limit approached       | `context-compressor`              | Compress context to stay effective    |
-| Many search results to process | `token-saver-context-compression` | Compress search results efficiently   |
+| Many search results to process | `context-compressor` | Compress search results efficiently   |
 
 ## Output Locations
 
@@ -433,7 +433,7 @@ node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -467,7 +467,7 @@ Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glo
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
