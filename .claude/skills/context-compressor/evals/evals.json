@@ -1,0 +1,42 @@
+{
+  "skill_name": "token-saver-context",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Compress this document for a question-answering workflow and tell me what the retry rules are. Use a mode that prioritizes query relevance and mention whether the result still looks safe to answer from.",
+      "expected_output": "A compressed, query-guided result with token savings and a clear statement about retry-rule evidence sufficiency.",
+      "files": [
+        "tests/fixtures/skill_context_sample.txt"
+      ],
+      "expectations": [
+        "The workflow uses query-guided or evidence-aware compression rather than a generic baseline.",
+        "The response reports token savings or compression ratio.",
+        "The response explicitly addresses whether the retry-rule evidence is sufficient."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run the full local workflow on this sample file and fail loudly if the compressed result is not safe enough to answer from.",
+      "expected_output": "An end-to-end workflow run using the bundled scripts, including evidence validation behavior and a clear success or insufficiency outcome.",
+      "files": [
+        "tests/fixtures/skill_context_sample.txt"
+      ],
+      "expectations": [
+        "The workflow uses run_skill_workflow.py.",
+        "The result surfaces evidence sufficiency rather than guessing.",
+        "The output makes it clear what to do next if evidence is insufficient."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I have a LangChain-style JSON payload and want it compressed into a cache-friendly context block for a specific question. Show me the command pattern I should use and what output format policy applies.",
+      "expected_output": "A command using JSON input adaptation, query-guided compression, and an explanation of when TOON vs JSON output should be used.",
+      "files": [],
+      "expectations": [
+        "The response uses the JSON adapter flow.",
+        "The response mentions cache-friendly prompt structure or stable-prefix concerns.",
+        "The response explains TOON, JSON, or auto output behavior."
+      ]
+    }
+  ]
+}

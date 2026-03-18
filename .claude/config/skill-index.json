@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-18T02:25:14.759Z",
+  "generatedAt": "2026-03-18T03:39:27.054Z",
   "metadata": {
     "totalSkills": 312,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-18T02:25:14.760Z",
+    "lastValidated": "2026-03-18T03:39:27.055Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -3759,10 +3759,11 @@
       "displayName": "Context Compressor",
       "category": "Memory",
       "domain": "memory",
-      "description": "Search-aware context compression workflow. Reduces token usage while preserving decision-critical information. Integrates pnpm hybrid search, Python compression engine, ccusage cost tracking, and MemoryRecord persistence.",
+      "description": "Compress large context before reasoning to reduce token usage while preserving evidence. Use this whenever the user mentions huge files, long prompts, RAG payloads, prompt caching, expensive sessions, codebase context, chat history compaction, or wants the same answer quality with fewer tokens.",
       "requiredTools": [
         "Read",
-        "Write"
+        "Write",
+        "Bash"
       ],
       "agentPrimary": [
         "developer",
@@ -9920,6 +9921,7 @@
         "template-creator",
         "schema-creator",
         "tool-creator",
+        "context-compressor",
         "memory-quality-auditor",
         "session-handoff",
         "insight-extraction",

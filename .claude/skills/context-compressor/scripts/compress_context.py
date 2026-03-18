@@ -9,7 +9,7 @@ from pathlib import Path
 
 from _compression_engine import compress_text, evaluate_evidence
 from _output_format import render_output
-from _runtime import read_text_input
+from _runtime import read_text_or_adapted_input
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -18,6 +18,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--text", type=str, default="", help="Inline text input.")
     parser.add_argument("--file", type=Path, help="Path to UTF-8 text file.")
+    parser.add_argument("--json", type=str, default="", help="Inline JSON input to adapt.")
+    parser.add_argument("--json-file", type=Path, help="Path to JSON input to adapt.")
+    parser.add_argument(
+        "--input-adapter",
+        choices=["raw_json", "langchain_json", "llamaindex_json", "auto"],
+        default="raw_json",
+        help="Adapter used when --json/--json-file is provided.",
+    )
     parser.add_argument(
         "--file-id", type=str, default="skill_context_doc", help="Document identifier."
     )
@@ -53,7 +61,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
-    text = read_text_input(args)
+    text, adapter_meta = read_text_or_adapted_input(args)
     if not text.strip():
         print("No input text provided.", file=sys.stderr)
         return 2
@@ -90,6 +98,8 @@ def main() -> int:
             min_similarity=args.min_similarity,
             top_k=args.top_k,
         )
+    if adapter_meta is not None:
+        payload["input_adapter"] = adapter_meta
 
     rendered, resolved, meta = render_output(
         payload, args.output_format, auto_min_rows=args.auto_min_rows

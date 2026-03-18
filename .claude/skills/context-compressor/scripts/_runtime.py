@@ -9,6 +9,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from _external_adapters import adapt_input_to_text
+
 
 def read_text_input(args: argparse.Namespace) -> str:
     """Read text from --text, --file, or stdin."""
@@ -29,3 +31,13 @@ def read_json_input(args: argparse.Namespace) -> Any:
     if not raw:
         raise ValueError("No JSON input provided.")
     return json.loads(raw)
+
+
+def read_text_or_adapted_input(args: argparse.Namespace) -> tuple[str, dict[str, Any] | None]:
+    """Read text input, optionally adapting external JSON payloads."""
+    if getattr(args, "json", "") or getattr(args, "json_file", None):
+        payload = read_json_input(args)
+        adapter = getattr(args, "input_adapter", "raw_json")
+        text, metadata = adapt_input_to_text(payload, adapter=adapter)
+        return text, metadata
+    return read_text_input(args), None

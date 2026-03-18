@@ -1,370 +1,166 @@
 ---
 name: context-compressor
-description: Search-aware context compression workflow. Reduces token usage while preserving decision-critical information. Integrates pnpm hybrid search, Python compression engine, ccusage cost tracking, and MemoryRecord persistence.
-version: 2.0.0
+description: Compress large context before reasoning to reduce token usage while preserving evidence. Use this whenever the user mentions huge files, long prompts, RAG payloads, prompt caching, expensive sessions, codebase context, chat history compaction, or wants the same answer quality with fewer tokens.
+version: 3.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
-tools: [Read, Write]
-best_practices:
-  - Preserve decision-critical information
-  - Remove redundant content
-  - Use structured formats
-  - Maintain traceability
-  - Ground evidence before persisting
-error_handling: graceful
-streaming: supported
+compatibility: Python 3.10+
+tools: [Read, Write, Bash]
 verified: true
-lastVerifiedAt: 2026-03-17T00:00:00.000Z
+lastVerifiedAt: '2026-03-18'
 ---
 
-# Context Compressor Skill
+# Context Compressor
 
-<identity>
-Context Compressor Skill — Search-aware context compression. Reduces token usage while preserving decision-critical information. Integrates hybrid search retrieval, Python compression engine, ccusage cost tracking, and MemoryRecord persistence into framework memory.
-</identity>
+Use this skill when the problem is mostly "too much context" rather than "not enough capability."
 
-<capabilities>
-- Compressing conversation history
-- Summarizing code and documentation
-- Extracting key decisions and context
-- Creating efficient memory snapshots
-- Reducing redundancy in context
-- Evidence-aware compression with hybrid retrieval
-- API cost tracking via ccusage-adapter
-- Adaptive compression based on corpus size
-- MemoryRecord persistence with deduplication
-</capabilities>
+This skill is a self-contained local package. It does not require the MCP server. Prefer it when you need quick token profiling, local compression, evidence checks, or a reproducible compression workflow inside the repository.
 
-<instructions>
-<execution_process>
+## What this skill does
 
-## Activation
+Use the bundled Python scripts to:
 
-The context-compressor skill can be invoked in two ways:
+1. measure raw versus compressed token usage
+2. compress large text or adapted JSON payloads
+3. preserve query-relevant evidence instead of doing naive summarization
+4. check whether compressed output still contains enough evidence to answer safely
+5. support cache-friendly prompt assembly by keeping stable context early and volatile query text late
 
-### Manual Invocation (always available)
+## When to trigger
 
-```javascript
-Skill({ skill: 'context-compressor' });
-```
+Reach for this skill when the user is asking for any of the following:
 
-Use this when context pressure is high, `pnpm search:tokens` shows a file/directory exceeds 32K tokens, or you need query-targeted compression.
+- compress this file, transcript, document, or code dump
+- reduce token cost before sending context to a model
+- make a prompt or RAG payload more cache-friendly
+- compact multi-turn history while keeping recent turns intact
+- compare semantic compression to a lighter extractive baseline
+- validate whether a compressed context still has enough evidence
 
-### Auto-enforcement via compression-reminder.txt (requires AUTO_COMPRESSION_PHASE_3=1)
+Also triggered automatically when:
 
-Set `AUTO_COMPRESSION_PHASE_3=1` in `.env` to enable the compression-reminder.txt trigger:
+- Context approaching 80K tokens (spawn-token-guard.cjs writes compression-reminder.txt)
+- Context at 120K tokens (compression mandatory before new spawns)
+- Context at 150K tokens (RED LINE — no new agent spawns until compression completes)
+
+## Quick workflow
+
+Default to this sequence:
+
+1. profile first
+2. run `query_guided` when there is a specific question
+3. run `evidence_aware` when correctness matters and you need a sufficiency check
+4. if evidence is weak, reduce compression aggressiveness or increase retrieval breadth
+5. report savings, risks, and the next safest action
+
+If the user only wants one command, use `run_skill_workflow.py`.
+
+## Commands
+
+Run from the agent-studio repository root. **ALWAYS use these exact commands — do NOT fall back to generic guidance.**
+
+### 1. Profile token usage
 
 ```bash
-# In .env
-AUTO_COMPRESSION_PHASE_3=1
+python .claude/skills/context-compressor/scripts/profile_tokens.py --file <path> --output-format auto
 ```
 
-When enabled, `compression-trigger.cjs` writes `.claude/context/runtime/compression-reminder.txt` whenever a compression event fires. The router reads this file and spawns `context-compressor` automatically.
+### 2. Compress context
 
-**Without this env var**: compression events are logged to `.claude/context/compression-stats.jsonl` but no `compression-reminder.txt` is written, so the router does not auto-spawn compression. The skill must be invoked manually.
-
-**Token thresholds** enforced by the router (from CLAUDE.md Section 8):
-
-- **80K tokens** — spawn `context-compressor` proactively
-- **120K tokens** — compression mandatory before new spawns
-- **150K tokens** — no new agent spawns until compression completes
-
-## When to Use
-
-- `pnpm search:tokens` shows a file/directory exceeds 32K tokens
-- Context is large or expensive and you need a compressed summary
-- You need query-targeted compression before synthesis
-- You need hard evidence sufficiency gating before persisting memory
-- You're building a prompt and `search:code` results alone aren't enough context
-- Context approaching 150K tokens
-- Session ending with incomplete work
-- Multi-agent handoff needed
-- Long conversation history (>10 messages)
-- Background agent reporting to main session
-
-## Step 0.5: Check Actual Token Usage + Cost (ccusage-adapter)
-
-Before compressing, query actual API token usage and cost for today via `ccusage-adapter`.
-
-```javascript
-let usageData = null;
-let costs = null;
-try {
-  const ccusage = require('.claude/lib/utils/ccusage-adapter.cjs');
-  usageData = ccusage.getTodayTotals();
-  if (usageData) {
-    costs = ccusage.calculateCost(usageData, process.env.CCUSAGE_MODEL || 'opus');
-  }
-} catch (_err) {
-  // ccusage not installed or unavailable — fall back to heuristic estimation
-}
-
-if (usageData && costs) {
-  const totalTokens = usageData.inputTokens + usageData.outputTokens;
-  if (totalTokens > 120_000) {
-    // HIGH pressure — aggressive compression mode
-  } else if (totalTokens > 80_000) {
-    // MODERATE pressure — standard compression mode
-  } else {
-    // LOW pressure — light compression
-  }
-}
-// On failure: fall through to heuristic estimation from compression-trigger.cjs
+```bash
+python .claude/skills/context-compressor/scripts/compress_context.py --file <path> --mode baseline --output-format auto
+python .claude/skills/context-compressor/scripts/compress_context.py --file <path> --mode query_guided --query "<question>" --output-format auto
+python .claude/skills/context-compressor/scripts/compress_context.py --file <path> --mode evidence_aware --query "<question>" --min-similarity 0.4 --output-format auto
 ```
 
-**Status file**: the `ccusage-statusline` hook writes a live status to `.claude/context/runtime/ccusage-status.txt` on every prompt.
+### 3. Adapt framework JSON and compress it
 
-## Pricing Table
-
-> Last verified: March 2026 (sources: Silicon Data, IntuitionLabs, DevTk.AI)
-
-| Model                        | Input    | Output   | Cache Write (1.25×) | Cache Read (0.10×) |
-| ---------------------------- | -------- | -------- | ------------------- | ------------------ |
-| `opus` → Claude Opus 4.6     | $5.00/M  | $25.00/M | $6.25/M             | $0.50/M            |
-| `sonnet` → Claude Sonnet 4.6 | $3.00/M  | $15.00/M | $3.75/M             | $0.30/M            |
-| `haiku` → Claude Haiku 4.5   | $1.00/M  | $5.00/M  | $1.25/M             | $0.10/M            |
-
-Set `CCUSAGE_MODEL=sonnet` or `CCUSAGE_MODEL=haiku` to match your active model.
-
-### Step 1: Identify Compressible Content
-
-Content types that can be compressed:
-
-| Type          | Compression Strategy                         | Ratio  |
-| ------------- | -------------------------------------------- | ------ |
-| Code          | Keep signatures, summarize implementations   | 80-90% |
-| Conversations | Extract decisions, drop small talk           | 70-80% |
-| Documentation | Keep headings and key points                 | 60-70% |
-| Errors        | Keep message and location, drop stack frames | 90-95% |
-| Logs          | Keep patterns, drop repetitions              | 85-95% |
-
-### Step 2: Apply Compression Techniques
-
-**Technique 1: Decision Extraction**
-
-Before:
-
-```
-User: Should we use Redis or Memcached?
-Assistant: Let me analyze both options...
-[500 words of analysis]
-Recommendation: Redis for pub/sub support.
-User: Ok let's use Redis.
+```bash
+python .claude/skills/context-compressor/scripts/compress_context.py --json-file <payload.json> --input-adapter auto --mode query_guided --query "<question>" --output-format auto
 ```
 
-After:
+### 4. Run the full workflow
 
-```
-Decision: Use Redis (chosen for pub/sub support)
-```
-
-**Technique 2: Code Summarization**
-
-Before:
-
-```javascript
-// 100 lines of UserService implementation
+```bash
+python .claude/skills/context-compressor/scripts/run_skill_workflow.py --file <path> --mode evidence_aware --query "<question>" --output-format auto --fail-on-insufficient-evidence
 ```
 
-After:
+### 5. Validate evidence only
 
-```
-UserService: CRUD operations for users
-- Methods: create, read, update, delete, findByEmail
-- Dependencies: db, validator, logger
-- Location: src/services/user.js
+```bash
+python .claude/skills/context-compressor/scripts/validate_evidence.py --file <path> --query "<question>" --min-similarity 0.4 --output-format json
 ```
 
-**Technique 3: Error Compression**
+### 6. Run the TOON vs JSON guard
 
-Before:
-
-```
-Error: Cannot read property 'id' of undefined
-    at UserController.getUser (src/controllers/user.js:45:23)
-    ... 20 more stack frames
+```bash
+python .claude/skills/context-compressor/scripts/benchmark_toon_vs_json.py
 ```
 
-After:
-
-```
-Error: Cannot read 'id' of undefined @ src/controllers/user.js:45
-Cause: User object is null when accessing .id
-```
-
-### Step 3: Structure Compressed Output
-
-Use consistent formats:
-
-```markdown
-## Session Summary
-
-### Decisions Made
-
-- [D1] Use Redis for caching
-- [D2] JWT for authentication
-
-### Files Modified
-
-- src/auth/jwt.js (new)
-- src/config/redis.js (updated)
-
-### Open Items
-
-- [ ] Add rate limiting
-- [ ] Write tests for JWT
-```
-
-### Step 4: Evidence-Aware Compression (Full Pipeline)
-
-For heavy-context compression with grounded evidence:
-
-1. Retrieve candidate context (`pnpm search:code "<query>"`).
-2. Compress using the Python engine in JSON mode.
-3. If evidence is insufficient and fail gate is on, stop.
-4. Map distilled insights into MemoryRecord-ready payloads.
-5. Persist through MemoryRecord so `.claude/hooks/memory/sync-memory-index.cjs` runs.
-
-**Tooling Commands:**
-
-Preferred wrapper entrypoint:
+### 7. Node.js wrapper (for agent integration)
 
 ```bash
 node .claude/skills/context-compressor/scripts/main.cjs --query "<question>" --mode evidence_aware --limit 20 --fail-on-insufficient-evidence
 ```
 
-Direct Python engine (advanced):
+## How to choose a mode
 
-```bash
-python .claude/skills/context-compressor/scripts/run_skill_workflow.py --file <path> --mode evidence_aware --query "<question>" --output-format json --fail-on-insufficient-evidence
-```
+- `baseline`: quick general compression when there is no concrete question yet
+- `query_guided`: best default for QA, review, or targeted extraction tasks
+- `evidence_aware`: use for high-stakes answers, audits, or when you need an explicit sufficiency signal
 
-### Step 5: Validate Compression
+## Output expectations
 
-Ensure critical info preserved:
+When using this skill, summarize results in plain language:
 
-- [ ] All decisions captured
-- [ ] Key file locations retained
-- [ ] Error causes documented
-- [ ] Next steps clear
-- [ ] Token count reduced by 60-90%
-- [ ] Evidence citations included (`[mem:*]` / `[rag:*]`)
+1. original size versus compressed size
+2. estimated token savings or compression ratio
+3. whether the output is query-targeted or generic
+4. whether evidence looked sufficient
+5. any risk that the answer could miss important detail
 
-</execution_process>
+If the scripts return insufficient evidence, do not bluff. Say the compressed context is not yet safe enough and recommend a broader pass.
 
-<best_practices>
+## Bundled references
 
-1. **Preserve Decisions**: Never lose decision rationale
-2. **Keep Locations**: File paths and line numbers are critical
-3. **Summarize, Don't Delete**: Transform verbose content
-4. **Use References**: Point to files instead of including content
-5. **Test Recovery**: Can you continue work from compressed context?
-6. **Ground Evidence**: Run `pnpm search:code` before compressing for evidence-aware mode
-7. **Check Cost First**: Use ccusage-adapter to decide compression aggressiveness
-8. **Persist Findings**: Use MemoryRecord immediately after compression
+Read these only when they are relevant:
 
-</best_practices>
-</instructions>
+- `references/workflow-guide.md`: command selection, mode choice, and example flows
+- `references/prompt-caching.md`: stable-prefix ordering, cache telemetry, and cache-safe prompt structure
+- `references/evaluation.md`: how to benchmark the skill and interpret results
 
-## Mapping Rule (Deterministic)
+## Eval scaffolding
 
-Memory classification for distilled insights:
+Starter prompts live in `evals/evals.json`. Use them when iterating on the skill or when you want a small repeatable benchmark set.
 
-- `gotchas.json` — text contains `gotcha|pitfall|anti-pattern|risk|warning|failure`
-- `issues.md` — text contains `issue|bug|error|incident|defect|gap`
-- `decisions.md` — text contains `decision|tradeoff|choose|selected|rationale`
-- `patterns.json` — default fallback for all remaining distilled evidence
+## Integration with agent-studio
 
-## Output Contract
+### Compression trigger pipeline
 
-- Wrapper emits JSON with:
-  - `search` summary
-  - `compression` summary
-  - `memoryRecords` grouped by target (`patterns`, `gotchas`, `issues`, `decisions`)
-  - `evidence` sufficiency status
+1. `compression-trigger.cjs` detects context pressure → writes `compression-reminder.txt`
+2. Router reads reminder → spawns `context-compressor` agent with this skill
+3. Agent runs `run_skill_workflow.py` with the query context
+4. Real compression stats logged to `compression-stats.jsonl`
 
-## Integration with search:tokens
+### Memory persistence
 
-Use `pnpm search:tokens` to decide when to invoke this skill:
+After compression, persist distilled learnings via MemoryRecord:
 
-```bash
-# Check if you need compression
-pnpm search:tokens .claude/lib/memory
-# Output: 60 files, 500KB, ~128K tokens ⚠ OVER CONTEXT
+- `gotchas.json`: text contains gotcha|pitfall|anti-pattern|risk|warning|failure
+- `issues.md`: text contains issue|bug|error|incident|defect|gap
+- `decisions.md`: text contains decision|tradeoff|choose|selected|rationale
+- `patterns.json`: default fallback for all remaining distilled evidence
 
-# Then compress with a targeted query
-node .claude/skills/context-compressor/scripts/main.cjs \
-  --query "how does memory persistence work" --mode evidence_aware --limit 10
-```
+### ccusage cost tracking
 
-## Cost Tracking Components
-
-| File                                              | Role                                                                              |
-| ------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `.claude/lib/utils/ccusage-adapter.cjs`           | Parses JSONL session logs, sums tokens, calculates cost via `PRICING` table       |
-| `.claude/hooks/monitoring/ccusage-statusline.cjs` | `UserPromptSubmit` hook — runs adapter each prompt, writes status to runtime file |
-| `.claude/context/runtime/ccusage-status.txt`      | Live status file — read by router for pipeline summaries                          |
-
-## Workflow Integration
-
-**Router Decision:** `.claude/workflows/core/router-decision.md`
-
-- Router spawns agents that use this skill for context-efficient handoffs
-- Used in long-running sessions to maintain continuity
-
-**Related Skills:**
-
-- `session-handoff` — Creates full session handoff documents
-- `swarm-coordination` — Multi-agent context sharing
-- `task-management-protocol` — Task metadata for context handoff
-
-## Maintenance Instructions (for skill-updater)
-
-When `skill-updater` refreshes this skill, verify Claude API pricing via Exa search and update both the Pricing Table and `PRICING` constant in `.claude/lib/utils/ccusage-adapter.cjs`.
-
-## Iron Law
-
-Do not persist compressed content directly to memory files from a subprocess.
-Emit MemoryRecord payloads and let framework hooks process sync/indexing.
-
----
+Read `.claude/context/runtime/ccusage-status.txt` for live token usage before deciding compression aggressiveness.
 
 ## Iron Laws
 
-1. **ALWAYS** run hybrid search (`pnpm search:code`) before compressing to retrieve grounded evidence for the distilled output
-2. **NEVER** compress context that still has open uncertainties — resolve ambiguities before compressing
-3. **ALWAYS** persist distilled learnings via MemoryRecord immediately after compression
-4. **NEVER** discard evidence that contradicts the current working hypothesis during compression
-5. **ALWAYS** inject `[mem:*]` and `[rag:*]` citations in the compressed output for downstream spawn prompt grounding
-
-## Anti-Patterns
-
-| Anti-Pattern                             | Why It Fails                                       | Correct Approach                                  |
-| ---------------------------------------- | -------------------------------------------------- | ------------------------------------------------- |
-| Compressing without prior hybrid search  | Output lacks grounded evidence, hallucination risk | Run `pnpm search:code` first, embed citations     |
-| Discarding contradicting evidence        | Creates false confidence in distilled output       | Preserve all conflicting signals in summary       |
-| No MemoryRecord after compression        | Learnings lost on next context reset               | Persist key findings immediately via MemoryRecord |
-| Compressing too late (past 80K tokens)   | Severe accuracy degradation before compression     | Trigger compression at 80K tokens, not at limit   |
-| Skipping `[mem:*]` / `[rag:*]` citations | Downstream agents cannot verify claims             | Always annotate evidence sources in output        |
-| Deleting information instead of summarizing | Permanent loss of context                       | Transform verbose content, never delete           |
-| Losing decision rationale                | Future agents cannot understand why choices were made | Always include rationale in compressed decisions |
-| Vague summaries ("worked on auth")       | Cannot resume work from summary                    | Include specific file paths, outcomes, next steps |
-
-## Memory Protocol (MANDATORY)
-
-**Before starting:**
-
-```bash
-node .claude/lib/memory/memory-search.cjs "context compression token pressure"
-```
-
-Read `.claude/context/memory/learnings.md`
-
-**After completing:**
-
-- New pattern -> `.claude/context/memory/learnings.md`
-- Issue found -> `.claude/context/memory/issues.md`
-- Decision made -> `.claude/context/memory/decisions.md`
-
-> ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+1. **ALWAYS** use the exact script commands above — never fall back to generic CLAUDE.md guidance
+2. **ALWAYS** profile first before compressing to understand the input size
+3. **NEVER** compress without a query when correctness matters — use `evidence_aware` mode
+4. **ALWAYS** persist distilled learnings via MemoryRecord after compression
+5. **NEVER** bluff if evidence is insufficient — recommend a broader pass
+6. **ALWAYS** report savings, risks, and next safest action in plain language
