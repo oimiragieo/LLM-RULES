@@ -1,62 +1,38 @@
-## Session Handoff — 2026-03-17T22:45:00Z
+## Session Handoff — 2026-03-18T01:30:00Z
 
-**NEXT ACTION (IMMEDIATE):** Check if C5 (task output guardrails) was committed by background agent. Run `git log --oneline -7`. If C5 is there, continue to Phase 2C. If not, implement C5 manually (task-output-validator.cjs + test). Then continue 47-feature pipeline.
+**NEXT ACTION (IMMEDIATE):** Implement remaining 20 features from the 47-feature upgrade plan. Spawn agents in batches of 3 features each (smaller prompts to avoid "Prompt is too long"). Use sonnet model for subagents to reduce token cost.
 
-### Progress (13+/47 features):
+### Completed (27/47 features + infrastructure):
+**Features:** A1, A2, A3, A4, A5, B1, B3, C4, C5, C6, D2, D3, D7, D8, E1, F1, F2, G1, G5, H1 + Wave 1/2 + F8 precursor
+**P0 Fixes:** Hook path resolution (55 hooks), compression stub removed, compression consolidated v3.0, global compression rule
+**Infrastructure:** hook-file-validator, pre-spawn-hook-check, TROUBLESHOOTING.md, worktree-hook-research, compression-audit, token-saver-5000 integrated
 
-**Committed this session:**
+### Remaining 20 Features (batch in groups of 3):
+**Batch 1:** B2 (output-key chaining), C7 (structured checklists), B7 (execution hardening)
+**Batch 2:** D4 (three-level summarization), D5 (large file interception), E2 (importance scoring)
+**Batch 3:** F3 (static invariants), F4 (trajectory IR), F9 (policy registry)
+**Batch 4:** B4 (checkpoint protocol), D6 (compression validation), H2 (skill auto-routing)
+**Batch 5:** C1 (multi-layer review), C3 (edge case hunter), F5 (LLM-as-judge)
+**Batch 6:** E5 (memory tools), E6 (debug state), G3 (memory sections)
+**Batch 7:** G6 (MCP allowlists), E7 (session handoff)
 
-- f12ca5a9 docs: add Agent Tiers documentation (G5)
-- cd7f870f feat: add reflection score tracker utility
-- fa7ce7fd feat: add plan-format schema with verify/done/files fields (A2)
-- 58b5e632 feat: A3 Nyquist validation for requirement-to-test mapping
-- C5 (task output guardrails): PENDING — background agent was committing when session ended
+### Critical Memory Notes:
+- MAX PLAN SUBSCRIPTION covers 1M context — no extra API cost for Opus
+- But user sees $200+ API charges — investigate with Anthropic support
+- NEVER spawn agents with >3 features — "Prompt is too long" at this session size
+- USE SONNET for subagents to reduce cost
+- ALWAYS report token usage from ccusage-status.txt at milestones
+- Compression rule is NOW GLOBAL — all agents will see it
+- Context-compressor agent v2.0 has Python script commands
+- Hook MODULE_NOT_FOUND fixed with cd prefix (commit 437833d7)
+- Pre-spawn hook check validates hook files before agent spawn (commit 7149f8ee)
 
-**Prior session commits (on main):**
+### Session Stats:
+- 30 commits this session
+- 74K tokens / $119 theoretical (Max plan)
+- $730 cache savings
+- 177 files renamed in compression consolidation
 
-- fab627b8 D8 configurable context thresholds
-- 183a1721 F1 failure taxonomy schema
-- e973c18f C4 severity taxonomy + G1 agent fingerprinting
-- 27da15da D7 anomaly preservation
-- 2ee33a56 H1 SKILL.md frontmatter parser
-- 846a9dab CHANGELOG/README Phase 1 updates
-- 8fb048f7 Wave 1 framework upgrades
-- a98ec724 Wave 2 upgrades
-- 38dd8c47 Wave 2 NEW features
-
-### Remaining Work Queue:
-
-1. **C5** — Check if committed, finish if not
-2. **Phase 2C** — A1 (discuss-phase skill), A4 (readiness gate), A5 (plan quality enhancement)
-3. **Phase 2D** — C6 (definition of done), C7 (structured checklists), B7 (execution hardening)
-4. **Phase 3** — B1 (wave execution), B3 (node repair), D2 (context assembly), D3 (incremental compaction)
-5. **Phase 4** — E1, F2, F3, D6, F4, C1, C3, B4 (P1 features)
-6. **Phase 5** — H2, F5, E5, E6, A6, A7 (P1/P2 features)
-7. **Deferred Phase 1** — G3 (memory sections), G6 (MCP allowlists), E7 (session handoff)
-8. **Multi-LLM review** at each phase gate
-9. **Documentation** — CHANGELOG, README updates per phase
-
-### Dirty Files on Main (need commit):
-
-- .claude/agents/orchestrators/artifact-integrator.md
-- .claude/agents/specialized/researcher.md
-- .claude/context/memory/issues.md, learnings.md
-- .claude/docs/AGENT_TIERS.md
-- .claude/lib/utils/reflection-score-tracker.cjs
-- .claude/skills/codebase-exploration/SKILL.md
-
-### Key Reports:
-
-- Gap analysis: .claude/context/reports/feature-gap-analysis-2026-03-17.md
-- Upgrade plan: .claude/context/plans/framework-upgrade-plan-2026-03-17.md
-- Unified features: .claude/context/reports/unified-feature-adoption-list-2026-03-17.md
-
-### Known Issues:
-
-- Creator guard blocks agent-updater in worktrees — use CREATOR_GUARD=warn for direct edits
-- Hook MODULE_NOT_FOUND when session CWD is pruned worktree (PREVIOUS SESSION ISSUE)
-- Agents in worktrees frequently skip TaskUpdate(completed)
-
+### Dirty Files: None (all committed)
 ### Blockers: None
-
-### Decisions Pending: None
+### Decisions Pending: Investigate API charges on Max plan
