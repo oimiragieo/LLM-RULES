@@ -218,27 +218,33 @@ rg "require\('./auth'\|from './auth'" -l
 # Codebase Analysis: [Project Name]
 
 ## Project Profile
+
 - Type: [library/API/CLI/SaaS/etc]
 - Language: [primary language + version]
 - Framework: [frameworks detected]
 - Entry points: [file:line refs]
 
 ## Architecture
+
 [Text diagram of key components and connections]
 
 ## Key Findings
+
 1. [Finding with file:line reference]
 2. [Finding with file:line reference]
 
 ## Dependencies
+
 - Production: [key deps]
 - Dev: [key deps]
 
 ## Test Coverage Assessment
+
 - Test files: [count, location]
 - Framework: [jest/pytest/etc]
 
 ## Unknowns / Follow-up Questions
+
 - [What couldn't be determined without deeper analysis]
 ```
 
@@ -248,15 +254,15 @@ rg "require\('./auth'\|from './auth'" -l
 
 ## Tool Selection Matrix (External Repos)
 
-| Need | Tool | Why |
-|------|------|-----|
-| File discovery | `Glob` | Fast pattern matching |
-| Content search | `Grep` (ripgrep) | Regex across whole repo |
-| Targeted read | `Read` with `offset/limit` | Windowed, token-efficient |
-| Structure patterns | `ast-grep` (if installed) | Language-aware |
-| Definitions | LSP (if server available) | Compiler-level accuracy |
-| External context | `WebFetch` + docs URL | Find docs, articles about the project |
-| Compression | `token-saver-context-compression` | When >60K tokens |
+| Need               | Tool                              | Why                                   |
+| ------------------ | --------------------------------- | ------------------------------------- |
+| File discovery     | `Glob`                            | Fast pattern matching                 |
+| Content search     | `Grep` (ripgrep)                  | Regex across whole repo               |
+| Targeted read      | `Read` with `offset/limit`        | Windowed, token-efficient             |
+| Structure patterns | `ast-grep` (if installed)         | Language-aware                        |
+| Definitions        | LSP (if server available)         | Compiler-level accuracy               |
+| External context   | `WebFetch` + docs URL             | Find docs, articles about the project |
+| Compression        | `token-saver-context-compression` | When >60K tokens                      |
 
 **Tools NOT available for external repos:**
 

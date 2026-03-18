@@ -1,3 +1,73 @@
+## Session CWD in Pruned Worktree Breaks ALL Hooks (2026-03-17) [Task 5 reflection]
+
+**[CRITICAL] Hook MODULE_NOT_FOUND: Cause and Prevention**
+
+- When an agent session's CWD is inside a git worktree that has since been pruned/deleted, ALL hooks fail with MODULE_NOT_FOUND because `require()` paths resolve relative to the (now-deleted) CWD
+- Symptoms: every hook exits with error, lint/test/format runs interrupted, task completes partially
+- Prevention: before spawning agents in worktrees, verify the worktree still exists via `git worktree list`
+- Recovery: re-run interrupted commands (lint/test/format) from the main repo root after confirming CWD is valid
+- Related: test suite and format runs from 2026-03-17 session were interrupted by this failure; need re-run from main
+
+---
+
+## 8-Framework Analysis Pipeline Pattern (2026-03-17) [Tasks 4-7, batch reflection]
+
+**[WORKFLOW] Multi-Framework Research → Synthesis → Multi-LLM Review → Architect GO**
+
+- Pipeline: clone/read 8 frameworks → deep-dive researchers (parallel) → synthesizer → Codex+Gemini review → architect review → implementation plan
+- This pattern extracts 51 raw features that compress to 47 verified features after multi-LLM review
+- Feature count discrepancy detection: Codex found 61 vs claimed 51 — root cause was Codex counting sub-items as features. Resolution: re-count from primary source, confirm with Gemini
+- Architecture contradiction detection: H1 (skill invocation via Skill() tool) conflicts with "auto-discovery" concept from frameworks; resolution: preserve mandatory Skill() invocation, deprecate auto-discovery
+- Multi-LLM review gate is highly effective — both Gemini and Codex independently read actual repo files before commenting (not hallucinated), producing concrete actionable feedback
+- Key Gemini+Codex consensus items from 2026-03-17 session: (1) add repo map generation, (2) use token-budget gate not file count, (3) need synthesis agent for cross-cutting concerns
+
+**[WORKFLOW] Feature Planning: 5-Phase Over 47 Features**
+
+- Architect GO at 47 features / 5 phases — plan at `.claude/context/plans/framework-upgrade-plan-2026-03-17.md`
+- Phase buffer: timeline +30-50% vs initial estimate (multi-LLM review identified scope underestimation)
+- Priority adjustments from review: D1 P0→P1, C1 P0→P1, A2 P1→P0, D8 P1→P0
+
+---
+
+## Closed-Loop Evolution Trigger Implementation (2026-03-17) [Task 11, commit a681c4df]
+
+**[FRAMEWORK] reflection-agent Step 5.7: Score-Triggered Agent Evolution**
+
+- Step 5.7 added to reflection-agent: uses `reflection-score-tracker.cjs` to check consecutive low scores (threshold: 3)
+- On 3+ consecutive lows: queues agent-updater evolution request to `.claude/context/runtime/reflection-spawn-request.json`
+- Circuit breaker: `isEvolutionEligible()` enforces 24h cooldown per agent (prevents thrashing)
+- Protected agents (NEVER auto-evolve): router, planner, master-orchestrator, evolution-orchestrator
+- Score trend reporting: declining → `[TREND-ALERT]` to learnings.md; improving/stable → no action
+- Companion files: `reflection-score-tracker.cjs` + `tests/lib/reflection-score-tracker.test.cjs` (17 tests, all passing)
+- Validation passed: lint + format + 17 tests green before commit
+
+---
+
+## Codebase Exploration Skill: 7-Phase Protocol (2026-03-17) [Task 12, 14, commits b7ec5577/3c01f782/1f5e6583]
+
+**[CODE] codebase-exploration skill creation pipeline**
+
+- Skill created at `.claude/skills/codebase-exploration/SKILL.md` (7-phase protocol)
+- Phase progression: (1) token budget assessment, (2) repo map, (3) entry point identification, (4) dependency graph, (5) hot module identification, (6) targeted deep reads, (7) synthesis
+- Key LLM-agent codebase exploration research (task 12): synthesized 12+ sources incl. SWE-bench, LocAgent, Complexity Trap, Aider, Cursor, OpenHands → 6-phase protocol with token budgets
+- Post-Gemini/Codex review upgrades: repo map generation added, token-budget gate replaces file-count gate, synthesis agent for cross-cutting concerns
+- Researcher + artifact-integrator agents updated to use smart exploration integration (commits 3c01f782, 1f5e6583)
+- Pattern: research (task 12) → multi-LLM review (task 13) → implementation (task 14) is a proven 3-step creator flow
+
+---
+
+## Worktree Hook MODULE_NOT_FOUND — SYSTEMIC Pattern (2026-03-17) [Multiple tasks]
+
+**[INFRA] Stop/Pre/PostToolUse hooks fail with MODULE_NOT_FOUND after worktree deletion**
+
+- Root cause: Claude Code caches CWD at session start; worktree deletion breaks relative path resolution
+- Pattern: appears in EVERY task reflection in 2026-03-17 session (tasks 11, 12, 13, 14) — confirmed systemic
+- Non-blocking (hooks error, don't crash the session) but noisy
+- Fix: start fresh session after worktree cleanup; do not rely on hook registration in worktree-aware sessions
+- Source agent: router (agent-a3ba653c worktree cleanup context)
+
+---
+
 ## Telegram UX EPIC Waves 1-2 (2026-03-16) [Task #13, commits 4529e28a + 4752d04a]
 
 **Agent:** nodejs-pro | **Status:** Waves 1-2 complete, Waves 3-5 in fresh session
@@ -351,3 +421,7 @@ All 8 loops registered and verified. Heartbeat ecosystem is active for this sess
 - Refreshed agent: .claude/agents/specialized/code-reviewer.md (2026-03-17)
 
 - Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-17)
+
+- Refreshed agent: .claude/agents/specialized/researcher.md (2026-03-17)
+
+- Refreshed agent: .claude/agents/specialized/researcher.md (2026-03-17)

@@ -53,7 +53,10 @@ describe('reflection-score-tracker', () => {
     });
 
     it('skips entries without agentId or scores', () => {
-      fs.writeFileSync(logPath, '{"agentId":"dev"}\n{"scores":{"a":7}}\n{"agentId":"dev","scores":{"a":8}}\n');
+      fs.writeFileSync(
+        logPath,
+        '{"agentId":"dev"}\n{"scores":{"a":7}}\n{"agentId":"dev","scores":{"a":8}}\n'
+      );
       const result = readReflectionLog(logPath);
       assert.strictEqual(result.length, 1);
     });
@@ -70,9 +73,7 @@ describe('reflection-score-tracker', () => {
     });
 
     it('computes average score across dimensions', () => {
-      writeLog([
-        makeEntry('dev', { accuracy: 8, completeness: 6, coherence: 10 }),
-      ]);
+      writeLog([makeEntry('dev', { accuracy: 8, completeness: 6, coherence: 10 })]);
       const summary = getAgentScoreSummary('dev', logPath);
       assert.strictEqual(summary.avgScore, 8); // (8+6+10)/3 = 8
       assert.strictEqual(summary.entryCount, 1);
@@ -137,9 +138,7 @@ describe('reflection-score-tracker', () => {
     });
 
     it('limits to rolling window of 10', () => {
-      const entries = Array.from({ length: 15 }, (_, i) =>
-        makeEntry('dev', { a: i < 12 ? 9 : 3 })
-      );
+      const entries = Array.from({ length: 15 }, (_, i) => makeEntry('dev', { a: i < 12 ? 9 : 3 }));
       writeLog(entries);
       const summary = getAgentScoreSummary('dev', logPath);
       // Only last 10 entries considered (indices 5-14: five 9s then three 3s)
@@ -175,10 +174,7 @@ describe('reflection-score-tracker', () => {
     });
 
     it('returns empty array when no agents underperform', () => {
-      writeLog([
-        makeEntry('dev', { a: 8 }),
-        makeEntry('qa', { a: 9 }),
-      ]);
+      writeLog([makeEntry('dev', { a: 8 }), makeEntry('qa', { a: 9 })]);
       const underperforming = getUnderperformingAgents(3, logPath);
       assert.strictEqual(underperforming.length, 0);
     });
@@ -194,10 +190,7 @@ describe('reflection-score-tracker', () => {
     });
 
     it('rejects agents without enough consecutive lows', () => {
-      writeLog([
-        makeEntry('dev', { a: 8 }),
-        makeEntry('dev', { a: 5 }),
-      ]);
+      writeLog([makeEntry('dev', { a: 8 }), makeEntry('dev', { a: 5 })]);
       const result = isEvolutionEligible('dev', logPath);
       assert.strictEqual(result.eligible, false);
     });

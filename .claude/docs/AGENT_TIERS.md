@@ -39,16 +39,16 @@ Pure data fetch and format conversion. Zero token cost.
 
 **Examples in agent-studio:**
 
-| Work Unit | Role |
-|---|---|
-| `Read` tool | File retrieval |
-| `scripts/build-code-index.cjs` | BM25 + vector index construction |
-| `scripts/build-agent-registry.cjs` | Registry compilation from agent frontmatter |
-| `scripts/validate-configs.cjs` | JSON schema validation |
-| `.claude/lib/memory/memory-rotator.cjs` | File-size-based memory archive rotation |
-| `.claude/lib/memory/memory-deduplicator.cjs` | Duplicate memory entry removal |
-| `.claude/hooks/routing/routing-guard.cjs` | PreToolUse enforcement (rule-based, no LLM) |
-| `pnpm search:code` (BM25 mode) | Keyword-ranked code search |
+| Work Unit                                    | Role                                        |
+| -------------------------------------------- | ------------------------------------------- |
+| `Read` tool                                  | File retrieval                              |
+| `scripts/build-code-index.cjs`               | BM25 + vector index construction            |
+| `scripts/build-agent-registry.cjs`           | Registry compilation from agent frontmatter |
+| `scripts/validate-configs.cjs`               | JSON schema validation                      |
+| `.claude/lib/memory/memory-rotator.cjs`      | File-size-based memory archive rotation     |
+| `.claude/lib/memory/memory-deduplicator.cjs` | Duplicate memory entry removal              |
+| `.claude/hooks/routing/routing-guard.cjs`    | PreToolUse enforcement (rule-based, no LLM) |
+| `pnpm search:code` (BM25 mode)               | Keyword-ranked code search                  |
 
 **When to use Tier 1:**
 
@@ -73,14 +73,14 @@ Deterministic processing with optional lightweight LLM assistance.
 
 **Examples in agent-studio:**
 
-| Agent / Component | Role | Trigger |
-|---|---|---|
-| `context-compressor` | Reduces token usage via compression | Context >80K tokens |
-| `task-manager` | Closes stale tasks, audits task hygiene | Drain gate, `stale-tasks.json` |
-| `commit-validator` | Validates commit message format (regex, no LLM) | Pre-commit hook |
-| `code-simplifier` | Bounded refactoring with scope limits | Architect-approved refactors |
-| `reflection-agent` | Scores completed work against rubric | Post-pipeline audit |
-| `heartbeat-orchestrator` | Registers and checks cron loops | Heartbeat reminder |
+| Agent / Component        | Role                                            | Trigger                        |
+| ------------------------ | ----------------------------------------------- | ------------------------------ |
+| `context-compressor`     | Reduces token usage via compression             | Context >80K tokens            |
+| `task-manager`           | Closes stale tasks, audits task hygiene         | Drain gate, `stale-tasks.json` |
+| `commit-validator`       | Validates commit message format (regex, no LLM) | Pre-commit hook                |
+| `code-simplifier`        | Bounded refactoring with scope limits           | Architect-approved refactors   |
+| `reflection-agent`       | Scores completed work against rubric            | Post-pipeline audit            |
+| `heartbeat-orchestrator` | Registers and checks cron loops                 | Heartbeat reminder             |
 
 **When to use Tier 2:**
 
@@ -105,16 +105,16 @@ Full LLM reasoning for non-deterministic, creative, or analytical work.
 
 **Examples in agent-studio:**
 
-| Agent | Domain | Model | Key Skills |
-|---|---|---|---|
-| `developer` | Feature implementation | sonnet | `tdd`, `debugging`, `git-expert` |
-| `architect` | System design | opus | `architecture-review`, `diagram-generator` |
-| `planner` | Task decomposition | opus | `plan-generator`, `writing-plans` |
-| `qa` | Test strategy and execution | opus | `tdd`, `qa-workflow`, `webapp-testing` |
-| `security-architect` | Threat modeling | opus | `security-scanning`, `auth-security-expert` |
-| `code-reviewer` | Code quality gates | sonnet | `audit-context-building`, `fix-review` |
-| `technical-writer` | Documentation | sonnet | `doc-generator`, `writing-skills` |
-| `researcher` | Web research and synthesis | sonnet | `research-synthesis`, Exa MCP |
+| Agent                | Domain                      | Model  | Key Skills                                  |
+| -------------------- | --------------------------- | ------ | ------------------------------------------- |
+| `developer`          | Feature implementation      | sonnet | `tdd`, `debugging`, `git-expert`            |
+| `architect`          | System design               | opus   | `architecture-review`, `diagram-generator`  |
+| `planner`            | Task decomposition          | opus   | `plan-generator`, `writing-plans`           |
+| `qa`                 | Test strategy and execution | opus   | `tdd`, `qa-workflow`, `webapp-testing`      |
+| `security-architect` | Threat modeling             | opus   | `security-scanning`, `auth-security-expert` |
+| `code-reviewer`      | Code quality gates          | sonnet | `audit-context-building`, `fix-review`      |
+| `technical-writer`   | Documentation               | sonnet | `doc-generator`, `writing-skills`           |
+| `researcher`         | Web research and synthesis  | sonnet | `research-synthesis`, Exa MCP               |
 
 **When to use Tier 3:**
 
@@ -127,15 +127,15 @@ Full LLM reasoning for non-deterministic, creative, or analytical work.
 
 ## Decision Matrix
 
-| Question | Tier 1 | Tier 2 | Tier 3 |
-|---|---|---|---|
-| Needs reasoning or judgment? | No | Minimal | Yes |
-| Output deterministic? | Yes | Mostly | No |
-| Token cost | 0 | Low (haiku) | High (sonnet/opus) |
-| Can cache results? | Yes | Usually | Rarely |
-| Typical execution time | <1s | 5–30s | 30s–10min |
-| Failure mode | Crash / wrong format | Wrong format | Wrong answer |
-| Can run in unlimited parallel? | Yes | Yes | No (cost and overlap risk) |
+| Question                       | Tier 1               | Tier 2       | Tier 3                     |
+| ------------------------------ | -------------------- | ------------ | -------------------------- |
+| Needs reasoning or judgment?   | No                   | Minimal      | Yes                        |
+| Output deterministic?          | Yes                  | Mostly       | No                         |
+| Token cost                     | 0                    | Low (haiku)  | High (sonnet/opus)         |
+| Can cache results?             | Yes                  | Usually      | Rarely                     |
+| Typical execution time         | <1s                  | 5–30s        | 30s–10min                  |
+| Failure mode                   | Crash / wrong format | Wrong format | Wrong answer               |
+| Can run in unlimited parallel? | Yes                  | Yes          | No (cost and overlap risk) |
 
 ---
 
@@ -169,12 +169,12 @@ Design pipelines to use Tier 1 and Tier 2 for data preparation and reserve Tier 
 
 ## Model Selection by Tier
 
-| Tier | Typical Model | Rationale |
-|---|---|---|
-| Tier 1 | None | Pure computation |
-| Tier 2 | haiku | Speed and cost efficiency for bounded tasks |
-| Tier 3 (standard) | sonnet | Balanced quality/cost for most agent work |
-| Tier 3 (complex) | opus | Architecture decisions, security analysis, orchestration |
+| Tier              | Typical Model | Rationale                                                |
+| ----------------- | ------------- | -------------------------------------------------------- |
+| Tier 1            | None          | Pure computation                                         |
+| Tier 2            | haiku         | Speed and cost efficiency for bounded tasks              |
+| Tier 3 (standard) | sonnet        | Balanced quality/cost for most agent work                |
+| Tier 3 (complex)  | opus          | Architecture decisions, security analysis, orchestration |
 
 The router resolves models from `config.yaml` (ADR-075). See `.claude/docs/@MODEL_SELECTION.md` for the full precedence chain.
 
@@ -184,13 +184,13 @@ The router resolves models from `config.yaml` (ADR-075). See `.claude/docs/@MODE
 
 When creating a new agent, script, or hook, determine the tier first:
 
-| Question | Answer YES → Tier |
-|---|---|
-| Does this unit call an LLM at all? | No → **Tier 1** |
-| Does this unit use haiku for simple transforms only? | Yes → **Tier 2** |
-| Does this unit require sonnet/opus reasoning? | Yes → **Tier 3** |
-| Does this unit bridge an external system (Exa, GitHub, CI)? | Tier 1 if data-only, Tier 3 if reasoning over it |
-| Unsure? | Start at **Tier 3**, refactor down if the task proves deterministic |
+| Question                                                    | Answer YES → Tier                                                   |
+| ----------------------------------------------------------- | ------------------------------------------------------------------- |
+| Does this unit call an LLM at all?                          | No → **Tier 1**                                                     |
+| Does this unit use haiku for simple transforms only?        | Yes → **Tier 2**                                                    |
+| Does this unit require sonnet/opus reasoning?               | Yes → **Tier 3**                                                    |
+| Does this unit bridge an external system (Exa, GitHub, CI)? | Tier 1 if data-only, Tier 3 if reasoning over it                    |
+| Unsure?                                                     | Start at **Tier 3**, refactor down if the task proves deterministic |
 
 **Creating new capabilities by tier:**
 

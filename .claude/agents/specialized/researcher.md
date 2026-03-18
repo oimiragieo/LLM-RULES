@@ -1,4 +1,6 @@
 ---
+verified: true
+lastVerifiedAt: 2026-03-17T22:08:56.111Z
 name: researcher
 version: 1.0.0
 description: >-
@@ -12,6 +14,9 @@ context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
 priority: medium
+mcp_servers:
+  - Exa
+  - Ref
 extended_thinking: true
 tools:
   - Read

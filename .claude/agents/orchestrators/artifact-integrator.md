@@ -47,6 +47,10 @@ skills:
   - verification-before-completion
   - token-saver-context-compression
 context_files: null
+mcp_servers:
+  - Exa
+  - Ref
+  - filesystem
 ---
 
 <!-- agent-template-contract:v1 -->

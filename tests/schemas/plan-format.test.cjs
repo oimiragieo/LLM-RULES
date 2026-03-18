@@ -107,14 +107,8 @@ describe('plan-format schema', () => {
     const taskItems = phaseItems.properties.tasks.items;
     assert.ok(taskItems.properties.command, 'task must have command property');
     assert.ok(taskItems.properties.rollback, 'task must have rollback property');
-    assert.ok(
-      !taskItems.required.includes('command'),
-      'command must be optional'
-    );
-    assert.ok(
-      !taskItems.required.includes('rollback'),
-      'rollback must be optional'
-    );
+    assert.ok(!taskItems.required.includes('command'), 'command must be optional');
+    assert.ok(!taskItems.required.includes('rollback'), 'rollback must be optional');
   });
 
   test('plan title should be required', () => {

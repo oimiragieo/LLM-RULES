@@ -130,18 +130,27 @@ function isEvolutionEligible(agentId, logPath) {
 
   const summary = getAgentScoreSummary(agentId, logPath);
   if (summary.consecutiveLowCount < 3) {
-    return { eligible: false, reason: `Only ${summary.consecutiveLowCount} consecutive lows (need 3+)` };
+    return {
+      eligible: false,
+      reason: `Only ${summary.consecutiveLowCount} consecutive lows (need 3+)`,
+    };
   }
 
   // Check cooldown — look for recent evolution requests
-  const spawnRequestPath = path.resolve(__dirname, '../../context/runtime/reflection-spawn-request.json');
+  const spawnRequestPath = path.resolve(
+    __dirname,
+    '../../context/runtime/reflection-spawn-request.json'
+  );
   if (fs.existsSync(spawnRequestPath)) {
     try {
       const requests = JSON.parse(fs.readFileSync(spawnRequestPath, 'utf8'));
-      const recentEvolution = requests.find(r =>
-        r.trigger === 'low-score-evolution' &&
-        r.context && r.context.includes(agentId) &&
-        r.timestamp && (Date.now() - new Date(r.timestamp).getTime()) < EVOLUTION_COOLDOWN_MS
+      const recentEvolution = requests.find(
+        r =>
+          r.trigger === 'low-score-evolution' &&
+          r.context &&
+          r.context.includes(agentId) &&
+          r.timestamp &&
+          Date.now() - new Date(r.timestamp).getTime() < EVOLUTION_COOLDOWN_MS
       );
       if (recentEvolution) {
         return { eligible: false, reason: `Evolution requested within last 24h (cooldown active)` };
