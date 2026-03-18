@@ -219,6 +219,15 @@
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/evolution/quality-gate-validator.cjs"
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/pre-spawn-hook-check.cjs"
+          }
+        ]
       }
     ],
     "PostToolUse": [
