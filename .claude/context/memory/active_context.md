@@ -1,38 +1,57 @@
-## Session Handoff — 2026-03-18T01:30:00Z
+## Session Handoff — 2026-03-18T20:00:00Z
 
-**NEXT ACTION (IMMEDIATE):** Implement remaining 20 features from the 47-feature upgrade plan. Spawn agents in batches of 3 features each (smaller prompts to avoid "Prompt is too long"). Use sonnet model for subagents to reduce token cost.
+**NEXT ACTION (IMMEDIATE):** Implement Phase 3 of the EPIC Framework Evolution Plan (6 features: trust scoring, composite memory, cost accounting, circuit breakers, distillator validation, codebase mapping). Start with Task 3.1 (Agent Trust Scoring). Continue TDD pattern. Context exhausted after implementing 10 features in Phases 1-2.
 
-### Completed (27/47 features + infrastructure):
-**Features:** A1, A2, A3, A4, A5, B1, B3, C4, C5, C6, D2, D3, D7, D8, E1, F1, F2, G1, G5, H1 + Wave 1/2 + F8 precursor
-**P0 Fixes:** Hook path resolution (55 hooks), compression stub removed, compression consolidated v3.0, global compression rule
-**Infrastructure:** hook-file-validator, pre-spawn-hook-check, TROUBLESHOOTING.md, worktree-hook-research, compression-audit, token-saver-5000 integrated
+### EPIC Framework Evolution — Current State
 
-### Remaining 20 Features (batch in groups of 3):
-**Batch 1:** B2 (output-key chaining), C7 (structured checklists), B7 (execution hardening)
-**Batch 2:** D4 (three-level summarization), D5 (large file interception), E2 (importance scoring)
-**Batch 3:** F3 (static invariants), F4 (trajectory IR), F9 (policy registry)
-**Batch 4:** B4 (checkpoint protocol), D6 (compression validation), H2 (skill auto-routing)
-**Batch 5:** C1 (multi-layer review), C3 (edge case hunter), F5 (LLM-as-judge)
-**Batch 6:** E5 (memory tools), E6 (debug state), G3 (memory sections)
-**Batch 7:** G6 (MCP allowlists), E7 (session handoff)
+**Completed Phases:**
+- Phase 1: 6/6 features done (schemas, failure taxonomy, goal verification, adversarial review, readiness gate, velocity tracking)
+- Phase 2: 4/4 features done (guardrail engine, context monitor, previous task injector, hook perf benchmark)
 
-### Critical Memory Notes:
-- MAX PLAN SUBSCRIPTION covers 1M context — no extra API cost for Opus
-- But user sees $200+ API charges — investigate with Anthropic support
-- NEVER spawn agents with >3 features — "Prompt is too long" at this session size
-- USE SONNET for subagents to reduce cost
-- ALWAYS report token usage from ccusage-status.txt at milestones
-- Compression rule is NOW GLOBAL — all agents will see it
-- Context-compressor agent v2.0 has Python script commands
-- Hook MODULE_NOT_FOUND fixed with cd prefix (commit 437833d7)
-- Pre-spawn hook check validates hook files before agent spawn (commit 7149f8ee)
+**Total: 10/30 GO features implemented. 81 tests passing. 10 commits.**
 
-### Session Stats:
-- 30 commits this session
-- 74K tokens / $119 theoretical (Max plan)
-- $730 cache savings
-- 177 files renamed in compression consolidation
+**NOT YET STARTED:**
+- Phase 3: Quality Scoring and Memory (6 features — Tasks 3.1-3.6)
+- Phase 4: Advanced Orchestration (5 features — Tasks 4.1-4.5)
+- Phase 5: Evaluation and Polish (9 features — Tasks 5.1-5.10)
 
-### Dirty Files: None (all committed)
-### Blockers: None
-### Decisions Pending: Investigate API charges on Max plan
+### Implementation Plan:
+`.claude/context/plans/epic-framework-evolution-plan-2026-03-18.md`
+
+### Phase 3 Tasks (DO NEXT):
+1. **Task 3.1: Agent Trust Scoring (P0-08)** — `.claude/lib/routing/trust-scorer.cjs`, add trustScore to agent-registry.json, use in routing
+2. **Task 3.2: Composite Memory Scoring (P1-03)** — `.claude/lib/memory/composite-scorer.cjs`, similarity+recency+importance
+3. **Task 3.3: Cost/Token Accounting (N1)** — `.claude/lib/metrics/token-accountant.cjs`, per-task token tracking
+4. **Task 3.4: Circuit Breakers (N2)** — `.claude/lib/routing/circuit-breaker.cjs`, fallback chains
+5. **Task 3.5: Distillator Validation (P1-09)** — Add --validate flag to context-compressor Python scripts
+6. **Task 3.6: Codebase Mapping (P1-07)** — 7 template files + skill update
+
+### Key Files Created This Session:
+- `.claude/schemas/task-output.schema.json` — Task output validation
+- `.claude/schemas/guardrail-result.schema.json` — Guardrail result validation
+- `.claude/schemas/failure-taxonomy.schema.json` — 10-category failure classification (updated)
+- `.claude/skills/goal-backward-verification/SKILL.md` — 4-level verification
+- `.claude/skills/implementation-readiness/SKILL.md` — 5-check readiness gate
+- `.claude/lib/metrics/velocity-tracker.cjs` — Velocity tracking
+- `.claude/lib/guardrails/guardrail-engine.cjs` — Output guardrails with circuit breaker
+- `.claude/lib/spawn/previous-task-injector.cjs` — Prior task context injection
+- `.claude/hooks/safety/context-monitor.cjs` — Real-time context pressure monitoring
+- `.claude/tools/cli/hook-perf-benchmark.cjs` — Hook performance measurement
+
+### Implementation Rules:
+- TDD for every feature (red-green-refactor)
+- Use skill-creator for new skills (Gate 4)
+- pnpm lint:fix && pnpm format after each feature
+- Commit after each feature passes tests
+- Max 2 heavy agents in parallel (subagent spawning fails at this context depth — implement directly)
+- Keep spawn prompts under 2KB
+
+### Git Log (recent):
+```
+0a6f26d9 feat: implement Phase 2 execution reliability (P0-02, P0-04, P0-09)
+b8063d24 feat: integrate failure taxonomy into reflection-agent rubric (P0-05)
+91112a39 feat: add implementation-readiness gate skill (P0-07) and wire adversarial-review (P0-06)
+887f2336 feat: add goal-backward verification skill (P0-01)
+27c68d5e feat: add velocity tracking module (P0-10)
+dcf45b82 feat: add output schema interface (P0-11)
+```
