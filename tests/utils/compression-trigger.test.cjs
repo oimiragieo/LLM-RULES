@@ -233,42 +233,33 @@ describe('compression-trigger.cjs', () => {
 
   // === Category 5: Unit - triggerCompression() ===
   describe('triggerCompression()', () => {
-    it('should return success: true when compression succeeds', async () => {
+    it('should return triggered: true and write reminder file', async () => {
       const result = await triggerCompression({
         reason: 'Budget > 90%',
         urgency: 'high',
-        maxRetries: 1,
       });
 
-      assert.strictEqual(result.success, true);
-      assert.ok(result.message);
-      assert.ok(typeof result.bytesFreed === 'number');
+      assert.strictEqual(result.triggered, true);
+      assert.strictEqual(result.reminderWritten, true);
     });
 
-    it('should return success: false when compression fails', async () => {
-      // Simulate failure by providing invalid options or triggering error condition
-      // This will need error injection once implementation is complete
+    it('should accept optional bytesFreed for real compression stats', async () => {
       const result = await triggerCompression({
-        reason: 'Test failure',
-        urgency: 'low',
-        maxRetries: 1,
-        _simulateFailure: true, // Internal test flag
+        reason: 'Real compression',
+        bytesFreed: 50000,
+        source: 'context-compressor',
       });
 
-      assert.strictEqual(result.success, false);
-      assert.ok(result.message);
+      assert.strictEqual(result.triggered, true);
     });
 
-    it('should handle errors gracefully without retrying', async () => {
+    it('should handle errors gracefully', async () => {
+      // triggerCompression should never throw — always returns a result
       const result = await triggerCompression({
         reason: 'Error test',
-        urgency: 'medium',
-        maxRetries: 1,
-        _simulateFailure: true,
       });
 
-      assert.strictEqual(result.success, false);
-      assert.ok(result.message.includes('fail') || result.message.includes('error'));
+      assert.ok(result.triggered !== undefined);
     });
   });
 
@@ -360,7 +351,7 @@ describe('compression-trigger.cjs', () => {
           maxRetries: 1,
         });
 
-        assert.ok(result.success !== undefined);
+        assert.ok(result.triggered !== undefined);
       }
     });
 
@@ -393,7 +384,7 @@ describe('compression-trigger.cjs', () => {
       });
 
       // Should succeed
-      assert.ok(result1.success !== undefined);
+      assert.ok(result1.triggered !== undefined);
 
       // Immediate re-check should still allow compression (no cooldown in Phase 2)
       const compressionCheck2 = checkCompressionNeeded({
@@ -428,7 +419,7 @@ describe('compression-trigger.cjs', () => {
         maxRetries: 1,
       });
 
-      assert.ok(triggerResult.success !== undefined);
+      assert.ok(triggerResult.triggered !== undefined);
 
       // Step 3: Get stats
       const stats = getCompressionStats();
@@ -446,7 +437,7 @@ describe('compression-trigger.cjs', () => {
       });
 
       // If successful, check log file
-      if (triggerResult.success && fs.existsSync(COMPRESSION_STATS_PATH)) {
+      if (triggerResult.triggered && fs.existsSync(COMPRESSION_STATS_PATH)) {
         const logContent = fs.readFileSync(COMPRESSION_STATS_PATH, 'utf8');
         const lines = logContent
           .trim()

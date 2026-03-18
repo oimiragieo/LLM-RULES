@@ -657,9 +657,13 @@ function maybeAutoCompress(tokenStatus) {
   if (!autoCompression?.enabled) {
     return { enabled: false };
   }
-  const maxTokens = tokenStatus?.maxTokens || 0;
   const promptTokens = tokenStatus?.promptTokens || 0;
-  const percentUsed = maxTokens ? (promptTokens / maxTokens) * 100 : 0;
+  // Use the context window size (not maxTokens which is the output token limit).
+  // Default to 200000 (Claude opus/sonnet context window) or read from env.
+  const contextWindowSize =
+    Number(process.env.CONTEXT_THRESHOLD_RED) ||
+    (tokenStatus?.model && String(tokenStatus.model).includes('opus') ? 200000 : 200000);
+  const percentUsed = contextWindowSize ? (promptTokens / contextWindowSize) * 100 : 0;
   const thresholdPercent = Number(autoCompression.trigger_threshold || 0.9) * 100;
   if (percentUsed < thresholdPercent) {
     return { enabled: true, needed: false };

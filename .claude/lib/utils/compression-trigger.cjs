@@ -23,8 +23,7 @@ const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const COMPRESSION_STATS_PATH = path.join(PROJECT_ROOT, '.claude/context/compression-stats.jsonl');
 const COMPRESSION_REMINDER_PATH = path.join(RUNTIME_DIR, 'compression-reminder.txt');
 const COMPRESSION_REMINDER_JSON_PATH = path.join(RUNTIME_DIR, 'compression-reminder.json');
-const AUTO_COMPRESSION_PHASE_3 =
-  process.env.AUTO_COMPRESSION_PHASE_3 === '1' || process.env.AUTO_COMPRESSION_PHASE_3 === 'true';
+
 
 // Thresholds
 const READ_SIZE_THRESHOLD = 10000; // 10 KB
@@ -113,18 +112,21 @@ function checkCompressionNeeded(context) {
 }
 
 /**
- * Trigger compression skill
+ * Trigger compression signaling
+ *
+ * Writes compression-reminder.txt so the Router picks it up on next prompt.
+ * Only logs to compression-stats.jsonl when real stats (bytesFreed) are provided.
  *
  * @param {{
- *   reason: string,
- *   urgency: "low"|"medium"|"high",
- *   maxRetries?: number,
+ *   reason?: string,
+ *   urgency?: "low"|"medium"|"high",
+ *   bytesFreed?: number,
  *   _simulateFailure?: boolean
  * }} options - Compression options
- * @returns {Promise<{ success: boolean, message: string, bytesFreed: number }>}
+ * @returns {{ triggered: boolean, reminderWritten: boolean }}
  */
-async function triggerCompression(options) {
-  const { reason, urgency, _simulateFailure = false } = options;
+function triggerCompression(options = {}) {
+  const { reason = 'compression requested', urgency = 'medium', _simulateFailure = false } = options;
 
   try {
     // Simulate failure if test flag is set
@@ -132,64 +134,54 @@ async function triggerCompression(options) {
       throw new Error('Simulated compression failure');
     }
 
-    // In Phase 2, we don't actually invoke the skill
-    // We just simulate success and log the event
-    const bytesFreed = Math.floor(Math.random() * 50000) + 10000; // Simulate 10-60 KB freed
-
-    // Log compression event
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      reason,
-      urgency,
-      bytesFreed,
-      success: true,
-    };
-
-    // Ensure directory exists
-    const logDir = path.dirname(COMPRESSION_STATS_PATH);
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir, { recursive: true });
+    // Write the reminder file so the Router picks it up on next prompt
+    if (!fs.existsSync(RUNTIME_DIR)) {
+      fs.mkdirSync(RUNTIME_DIR, { recursive: true });
     }
+    fs.writeFileSync(COMPRESSION_REMINDER_PATH, 'compression_needed\n', 'utf8');
+    fs.writeFileSync(
+      COMPRESSION_REMINDER_JSON_PATH,
+      JSON.stringify(
+        {
+          reason,
+          urgency,
+          timestamp: new Date().toISOString(),
+        },
+        null,
+        2
+      ),
+      'utf8'
+    );
 
-    // Append to JSONL file
-    fs.appendFileSync(COMPRESSION_STATS_PATH, JSON.stringify(logEntry) + '\n', 'utf8');
+    // Only log to stats when real bytesFreed stats are provided by caller
+    if (options.bytesFreed && options.bytesFreed > 0) {
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        reason,
+        urgency,
+        bytesFreed: options.bytesFreed,
+        success: true,
+      };
 
-    // Phase 3 (optional): write a reminder file for Router/agents to act on
-    if (AUTO_COMPRESSION_PHASE_3) {
-      try {
-        if (!fs.existsSync(RUNTIME_DIR)) {
-          fs.mkdirSync(RUNTIME_DIR, { recursive: true });
-        }
-        fs.writeFileSync(COMPRESSION_REMINDER_PATH, 'compression_needed\n', 'utf8');
-        fs.writeFileSync(
-          COMPRESSION_REMINDER_JSON_PATH,
-          JSON.stringify(
-            {
-              reason,
-              urgency,
-              timestamp: new Date().toISOString(),
-            },
-            null,
-            2
-          ),
-          'utf8'
-        );
-      } catch (_err) {
-        // Best-effort; reminder is advisory only
+      // Ensure directory exists
+      const logDir = path.dirname(COMPRESSION_STATS_PATH);
+      if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
       }
+
+      // Append to JSONL file
+      fs.appendFileSync(COMPRESSION_STATS_PATH, JSON.stringify(logEntry) + '\n', 'utf8');
     }
 
     return {
-      success: true,
-      message: `Compression triggered: ${reason} (${bytesFreed} bytes freed)`,
-      bytesFreed,
+      triggered: true,
+      reminderWritten: true,
     };
-  } catch (error) {
-    // Error handling - don't retry in Phase 2
+  } catch (_error) {
+    // Best-effort; reminder is advisory only
     return {
-      success: false,
-      message: `Compression failed: ${error.message}`,
-      bytesFreed: 0,
+      triggered: false,
+      reminderWritten: false,
     };
   }
 }
