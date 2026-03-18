@@ -14,7 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/startup/worktree-prune-on-start.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/worktree-prune-on-start.cjs"
           }
         ]
       },
@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/monitoring/ccusage-statusline.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/ccusage-statusline.cjs"
           }
         ]
       },
@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/startup/startup-failopen-audit.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/startup-failopen-audit.cjs"
           }
         ]
       },
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/user-prompt-unified.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/user-prompt-unified.cjs"
           }
         ]
       },
@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/handover-detector.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/handover-detector.cjs"
           }
         ]
       },
@@ -59,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session/session-budget-watchdog.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/session-budget-watchdog.cjs"
           }
         ]
       }
@@ -70,7 +70,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/pre-tool-unified.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/pre-tool-unified.cjs"
           }
         ]
       },
@@ -79,7 +79,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/router-tool-lockdown.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/router-tool-lockdown.cjs"
           }
         ]
       },
@@ -88,7 +88,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/external-content-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/external-content-guard.cjs"
           }
         ]
       },
@@ -97,7 +97,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/bash-pretool-bundle.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/bash-pretool-bundle.cjs"
           }
         ]
       },
@@ -106,7 +106,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/hybrid-search-enforcer.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/hybrid-search-enforcer.cjs"
           }
         ]
       },
@@ -115,7 +115,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/routing-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs"
           }
         ]
       },
@@ -124,7 +124,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/write-pretool-bundle.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/write-pretool-bundle.cjs"
           }
         ]
       },
@@ -133,7 +133,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/evolution/conflict-detector.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/evolution/conflict-detector.cjs"
           }
         ]
       },
@@ -142,7 +142,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/validate-skill-invocation.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/validate-skill-invocation.cjs"
           }
         ]
       },
@@ -151,11 +151,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/reflection/reflection-step0-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/reflection-step0-guard.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/heartbeat-step05-check.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/heartbeat-step05-check.cjs"
           }
         ]
       },
@@ -164,7 +164,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/routing-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs"
           }
         ]
       },
@@ -173,7 +173,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/routing-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs"
           }
         ]
       },
@@ -182,15 +182,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/worktree-preflight-check.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/worktree-preflight-check.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/spawn-token-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/spawn-token-guard.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/task-pretool-orchestrator.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/task-pretool-orchestrator.cjs"
           }
         ]
       },
@@ -199,7 +199,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/finish-only-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/finish-only-guard.cjs"
           }
         ]
       },
@@ -208,15 +208,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/validation/taskupdate-contract-validator.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/taskupdate-contract-validator.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/validation/pre-completion-validation.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/pre-completion-validation.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/evolution/quality-gate-validator.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/evolution/quality-gate-validator.cjs"
           }
         ]
       }
@@ -227,15 +227,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/metrics/post-tool-metrics-unified.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/metrics/post-tool-metrics-unified.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/monitoring/context-window-monitor.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/context-window-monitor.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/monitoring/hook-error-detector.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/hook-error-detector.cjs"
           }
         ]
       },
@@ -244,7 +244,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/post-task-unified.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/post-task-unified.cjs"
           }
         ]
       },
@@ -253,29 +253,29 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/workflow/post-completion-chain.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/workflow/post-completion-chain.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/reflection/reflection-cleanup.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/reflection-cleanup.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/quality/artifact-scoring-ledger-hook.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/quality/artifact-scoring-ledger-hook.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/workflow/post-creation-integration.cjs",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/workflow/post-creation-integration.cjs",
             "timeout": 5000
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/workflow/workflow-watchdog-hook.cjs",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/workflow/workflow-watchdog-hook.cjs",
             "timeout": 3000
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/cleanup/worktree-auto-cleanup.cjs",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/cleanup/worktree-auto-cleanup.cjs",
             "timeout": 10000
           }
         ]
@@ -285,7 +285,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/validation/subagent-citation-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/subagent-citation-guard.cjs"
           }
         ]
       },
@@ -294,19 +294,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/bypass-audit-hook.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/bypass-audit-hook.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/memory/sync-memory-index.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/memory/sync-memory-index.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/agent-registry-auto-refresh.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/agent-registry-auto-refresh.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/code-index-updater.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/code-index-updater.cjs"
           }
         ]
       },
@@ -315,7 +315,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session/post-edit-scanner.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/post-edit-scanner.cjs"
           }
         ]
       },
@@ -324,7 +324,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session/analysis-paralysis-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/analysis-paralysis-guard.cjs"
           }
         ]
       },
@@ -333,7 +333,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/memory/sync-memory-index.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/memory/sync-memory-index.cjs"
           }
         ]
       },
@@ -342,7 +342,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/reflection/unified-reflection-handler.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/unified-reflection-handler.cjs"
           }
         ]
       }
@@ -353,7 +353,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/metrics/post-tool-metrics-unified.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/metrics/post-tool-metrics-unified.cjs"
           }
         ]
       },
@@ -362,7 +362,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/reflection/unified-reflection-handler.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/unified-reflection-handler.cjs"
           }
         ]
       }
@@ -373,19 +373,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/lifecycle/session-end-memory-promotion.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/lifecycle/session-end-memory-promotion.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/reflection/unified-reflection-handler.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/unified-reflection-handler.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/reflection/reflection-queue-processor.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/reflection-queue-processor.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
           }
         ]
       }
@@ -396,7 +396,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session/pre-compact.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/pre-compact.cjs"
           }
         ]
       }
@@ -407,15 +407,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/validation/check-console-log.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/check-console-log.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/session/pre-compact.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/pre-compact.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
           }
         ]
       }
