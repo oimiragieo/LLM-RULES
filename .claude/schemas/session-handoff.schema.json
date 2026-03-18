@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "session-handoff",
+  "title": "Structured Session Handoff",
+  "description": "Standardized continue-here fields for session handoff between agents or sessions",
+  "type": "object",
+  "properties": {
+    "handoff_id": { "type": "string" },
+    "from_session": { "type": "string" },
+    "to_session": { "type": ["string", "null"] },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "next_action": {
+      "type": "object",
+      "properties": {
+        "description": { "type": "string", "description": "What to do IMMEDIATELY in the new session" },
+        "command": { "type": ["string", "null"], "description": "Command to run if applicable" },
+        "task_id": { "type": ["string", "null"], "description": "Task ID to resume" },
+        "agent_type": { "type": ["string", "null"], "description": "Recommended agent to spawn" }
+      },
+      "required": ["description"]
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "completed_tasks": { "type": "array", "items": { "type": "string" } },
+        "pending_tasks": { "type": "array", "items": { "type": "string" } },
+        "blocked_tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "task_id": { "type": "string" },
+              "blocker": { "type": "string" }
+            }
+          }
+        },
+        "key_decisions": { "type": "array", "items": { "type": "string" } },
+        "dirty_files": { "type": "array", "items": { "type": "string" } },
+        "active_branch": { "type": ["string", "null"] }
+      }
+    },
+    "continue_here": {
+      "type": "object",
+      "properties": {
+        "plan_file": { "type": ["string", "null"], "description": "Path to current plan file" },
+        "batch_progress": { "type": "string", "description": "e.g., '12/20 features done'" },
+        "critical_notes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Things the new session MUST know"
+        },
+        "max_features_per_agent": { "type": "integer", "description": "Spawn limit from experience" },
+        "token_budget_notes": { "type": "string" }
+      }
+    },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "command": { "type": ["string", "null"] }
+        }
+      },
+      "description": "Alternative approaches if primary next_action fails"
+    }
+  },
+  "required": ["handoff_id", "timestamp", "next_action", "context"]
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "multi-layer-review",
+  "title": "Multi-Layer Code Review",
+  "description": "Defines a multi-layer review workflow with blind hunter, edge case hunter, and consolidation sub-reviews",
+  "type": "object",
+  "properties": {
+    "review_id": { "type": "string" },
+    "target": {
+      "type": "object",
+      "properties": {
+        "files": { "type": "array", "items": { "type": "string" } },
+        "task_id": { "type": "string" },
+        "commit_sha": { "type": ["string", "null"] }
+      },
+      "required": ["files"]
+    },
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "layer_id": { "type": "string" },
+          "layer_type": {
+            "type": "string",
+            "enum": ["blind_hunter", "edge_case_hunter", "security_scan", "consolidation"]
+          },
+          "agent": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "completed", "skipped"]
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "severity": { "type": "string", "enum": ["blocker", "critical", "suggestion", "nit"] },
+                "category": { "type": "string" },
+                "file": { "type": "string" },
+                "line": { "type": ["integer", "null"] },
+                "description": { "type": "string" },
+                "suggested_fix": { "type": ["string", "null"] }
+              },
+              "required": ["id", "severity", "description"]
+            }
+          }
+        },
+        "required": ["layer_id", "layer_type", "status"]
+      }
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["approve", "request_changes", "needs_discussion", "pending"]
+    },
+    "opt_in_complexity": {
+      "type": "string",
+      "enum": ["HIGH", "EPIC"],
+      "description": "Multi-layer review only activates for HIGH/EPIC complexity"
+    }
+  },
+  "required": ["review_id", "target", "layers", "verdict"]
+}

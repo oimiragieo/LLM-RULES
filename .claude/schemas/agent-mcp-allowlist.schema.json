@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "agent-mcp-allowlist",
+  "title": "Per-Agent MCP Server Allowlist",
+  "description": "Defines which MCP servers an agent is permitted to use, added to agent frontmatter",
+  "type": "object",
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "description": "Agent identifier"
+    },
+    "mcp_servers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "MCP server name as registered in settings.json"
+          },
+          "tools_allowed": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Specific tool names allowed (empty = all tools)"
+          },
+          "required": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether this server is required for the agent to function"
+          }
+        },
+        "required": ["name"]
+      },
+      "description": "List of MCP servers this agent may access"
+    },
+    "mcp_deny": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "MCP server names explicitly denied (overrides any allowlist)"
+    }
+  },
+  "required": ["agent_id", "mcp_servers"]
+}
