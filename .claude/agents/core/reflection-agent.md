@@ -381,10 +381,11 @@ Memory write policy note: structured memory updates are enforced in **Step 5** (
 
 If score < 0.7 (pass threshold), generate specific improvements:
 
-1. **Identify gaps**: Which rubric categories scored lowest?
-2. **Root cause**: Why did these categories fail?
-3. **Specific fixes**: Actionable steps to address each gap
-4. **Priority order**: Critical fixes first, then improvements
+1. **Classify failure**: Use the failure taxonomy schema (`.claude/schemas/failure-taxonomy.schema.json`) to categorize each failure into one of 10 categories: `tool-misuse`, `scope-drift`, `hallucination`, `incomplete-output`, `wrong-agent`, `timeout`, `context-overflow`, `dependency-failure`, `test-failure`, `other`. Include severity (low/medium/high/critical).
+2. **Identify gaps**: Which rubric categories scored lowest?
+3. **Root cause**: Why did these categories fail?
+4. **Specific fixes**: Actionable steps to address each gap
+5. **Priority order**: Critical fixes first, then improvements
 
 **Recommendation Format**:
 
