@@ -1,0 +1,299 @@
+'use strict';
+
+const { describe, it } = require('node:test');
+const assert = require('node:assert/strict');
+
+const {
+  TokenAccountant,
+  MODEL_PRICING,
+} = require('../../.claude/lib/metrics/token-accountant.cjs');
+
+// --- helpers ---
+
+function makeAccountant() {
+  return new TokenAccountant();
+}
+
+// ─── MODEL_PRICING ──────────────────────────────────────────────────────────
+
+describe('MODEL_PRICING', () => {
+  it('has pricing for haiku, sonnet, opus', () => {
+    assert.ok('haiku' in MODEL_PRICING);
+    assert.ok('sonnet' in MODEL_PRICING);
+    assert.ok('opus' in MODEL_PRICING);
+  });
+
+  it('each model has input and output cost per 1K tokens', () => {
+    for (const [model, pricing] of Object.entries(MODEL_PRICING)) {
+      assert.ok(typeof pricing.input === 'number', `${model} missing input`);
+      assert.ok(typeof pricing.output === 'number', `${model} missing output`);
+      assert.ok(pricing.input > 0, `${model} input must be positive`);
+      assert.ok(pricing.output > 0, `${model} output must be positive`);
+    }
+  });
+
+  it('opus is most expensive, haiku is cheapest', () => {
+    assert.ok(MODEL_PRICING.opus.input > MODEL_PRICING.sonnet.input);
+    assert.ok(MODEL_PRICING.sonnet.input > MODEL_PRICING.haiku.input);
+    assert.ok(MODEL_PRICING.opus.output > MODEL_PRICING.sonnet.output);
+    assert.ok(MODEL_PRICING.sonnet.output > MODEL_PRICING.haiku.output);
+  });
+});
+
+// ─── recordUsage ────────────────────────────────────────────────────────────
+
+describe('recordUsage', () => {
+  it('stores a usage record', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 1000,
+      outputTokens: 500,
+      model: 'sonnet',
+      agentType: 'developer',
+    });
+    const stats = acc.getTaskCost('task-1');
+    assert.ok(stats !== null);
+  });
+
+  it('accumulates multiple records for the same task', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 1000,
+      outputTokens: 500,
+      model: 'sonnet',
+      agentType: 'developer',
+    });
+    acc.recordUsage('task-1', {
+      inputTokens: 2000,
+      outputTokens: 1000,
+      model: 'sonnet',
+      agentType: 'developer',
+    });
+    const cost = acc.getTaskCost('task-1');
+    assert.ok(cost.totalTokens === 4500);
+  });
+
+  it('handles missing model (defaults to sonnet pricing)', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', { inputTokens: 1000, outputTokens: 500, agentType: 'developer' });
+    const cost = acc.getTaskCost('task-1');
+    assert.ok(cost.costUSD > 0);
+  });
+
+  it('handles missing agentType gracefully', () => {
+    const acc = makeAccountant();
+    assert.doesNotThrow(() => {
+      acc.recordUsage('task-1', { inputTokens: 1000, outputTokens: 500, model: 'haiku' });
+    });
+  });
+
+  it('ignores invalid taskId', () => {
+    const acc = makeAccountant();
+    assert.doesNotThrow(() => {
+      acc.recordUsage('', { inputTokens: 100, outputTokens: 50 });
+      acc.recordUsage(null, { inputTokens: 100, outputTokens: 50 });
+    });
+  });
+
+  it('treats negative token counts as 0', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: -100,
+      outputTokens: -50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    const cost = acc.getTaskCost('task-1');
+    assert.equal(cost.totalTokens, 0);
+    assert.equal(cost.costUSD, 0);
+  });
+});
+
+// ─── getTaskCost ────────────────────────────────────────────────────────────
+
+describe('getTaskCost', () => {
+  it('calculates cost based on model pricing', () => {
+    const acc = makeAccountant();
+    // 1000 input tokens * $3/1K = $3, 500 output tokens * $15/1K = $7.5
+    acc.recordUsage('task-1', {
+      inputTokens: 1000,
+      outputTokens: 500,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    const cost = acc.getTaskCost('task-1');
+    assert.ok(Math.abs(cost.costUSD - 10.5) < 0.001, `expected $10.5, got $${cost.costUSD}`);
+  });
+
+  it('returns null for unknown task', () => {
+    const acc = makeAccountant();
+    assert.equal(acc.getTaskCost('nonexistent'), null);
+  });
+
+  it('returns correct structure', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'haiku',
+      agentType: 'qa',
+    });
+    const cost = acc.getTaskCost('task-1');
+    assert.ok(typeof cost.inputTokens === 'number');
+    assert.ok(typeof cost.outputTokens === 'number');
+    assert.ok(typeof cost.totalTokens === 'number');
+    assert.ok(typeof cost.costUSD === 'number');
+    assert.equal(cost.totalTokens, cost.inputTokens + cost.outputTokens);
+  });
+
+  it('uses haiku pricing correctly', () => {
+    const acc = makeAccountant();
+    // 1000 input * $0.25/1K = $0.25, 1000 output * $1.25/1K = $1.25
+    acc.recordUsage('task-1', {
+      inputTokens: 1000,
+      outputTokens: 1000,
+      model: 'haiku',
+      agentType: 'dev',
+    });
+    const cost = acc.getTaskCost('task-1');
+    assert.ok(Math.abs(cost.costUSD - 1.5) < 0.001, `expected $1.5, got $${cost.costUSD}`);
+  });
+
+  it('uses opus pricing correctly', () => {
+    const acc = makeAccountant();
+    // 1000 input * $15/1K = $15, 1000 output * $75/1K = $75
+    acc.recordUsage('task-1', {
+      inputTokens: 1000,
+      outputTokens: 1000,
+      model: 'opus',
+      agentType: 'dev',
+    });
+    const cost = acc.getTaskCost('task-1');
+    assert.ok(Math.abs(cost.costUSD - 90) < 0.001, `expected $90, got $${cost.costUSD}`);
+  });
+});
+
+// ─── getSessionTotal ────────────────────────────────────────────────────────
+
+describe('getSessionTotal', () => {
+  it('aggregates all tasks', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 1000,
+      outputTokens: 500,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    acc.recordUsage('task-2', {
+      inputTokens: 2000,
+      outputTokens: 1000,
+      model: 'haiku',
+      agentType: 'qa',
+    });
+    const total = acc.getSessionTotal();
+    assert.equal(total.inputTokens, 3000);
+    assert.equal(total.outputTokens, 1500);
+    assert.equal(total.totalTokens, 4500);
+  });
+
+  it('returns zero for empty accountant', () => {
+    const acc = makeAccountant();
+    const total = acc.getSessionTotal();
+    assert.equal(total.inputTokens, 0);
+    assert.equal(total.outputTokens, 0);
+    assert.equal(total.totalTokens, 0);
+    assert.equal(total.costUSD, 0);
+    assert.equal(total.taskCount, 0);
+  });
+
+  it('includes taskCount', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    acc.recordUsage('task-2', {
+      inputTokens: 200,
+      outputTokens: 100,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    const total = acc.getSessionTotal();
+    assert.equal(total.taskCount, 2);
+  });
+});
+
+// ─── getByAgent ─────────────────────────────────────────────────────────────
+
+describe('getByAgent', () => {
+  it('filters usage by agentType', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 1000,
+      outputTokens: 500,
+      model: 'sonnet',
+      agentType: 'developer',
+    });
+    acc.recordUsage('task-2', {
+      inputTokens: 2000,
+      outputTokens: 1000,
+      model: 'sonnet',
+      agentType: 'qa',
+    });
+    acc.recordUsage('task-3', {
+      inputTokens: 500,
+      outputTokens: 250,
+      model: 'sonnet',
+      agentType: 'developer',
+    });
+
+    const devUsage = acc.getByAgent('developer');
+    assert.equal(devUsage.inputTokens, 1500);
+    assert.equal(devUsage.outputTokens, 750);
+    assert.equal(devUsage.taskCount, 2);
+
+    const qaUsage = acc.getByAgent('qa');
+    assert.equal(qaUsage.inputTokens, 2000);
+    assert.equal(qaUsage.taskCount, 1);
+  });
+
+  it('returns zero for unknown agent', () => {
+    const acc = makeAccountant();
+    const usage = acc.getByAgent('nonexistent');
+    assert.equal(usage.inputTokens, 0);
+    assert.equal(usage.taskCount, 0);
+  });
+});
+
+// ─── toJSON ─────────────────────────────────────────────────────────────────
+
+describe('toJSON', () => {
+  it('returns serializable object', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    const json = acc.toJSON();
+    assert.ok(typeof json === 'object');
+    assert.doesNotThrow(() => JSON.stringify(json));
+  });
+
+  it('includes tasks and session total', () => {
+    const acc = makeAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    const json = acc.toJSON();
+    assert.ok('tasks' in json);
+    assert.ok('session' in json);
+    assert.ok('task-1' in json.tasks);
+  });
+});
