@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "wave-data-contract",
+  "title": "Wave Data Contract",
+  "description": "Defines what outputs a producer task promises to produce for downstream consumers",
+  "type": "object",
+  "properties": {
+    "producer_task_id": {
+      "type": "string",
+      "description": "Task ID of the producing task"
+    },
+    "output_keys": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Name of the output key"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["string", "number", "boolean", "object", "array", "file_path"],
+            "description": "Expected type of the output value"
+          },
+          "required": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether this output key is required"
+          }
+        },
+        "required": ["key", "type"],
+        "additionalProperties": false
+      },
+      "description": "List of output keys this task will produce"
+    }
+  },
+  "required": ["producer_task_id", "output_keys"],
+  "additionalProperties": false
+}

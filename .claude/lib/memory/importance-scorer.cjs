@@ -93,8 +93,79 @@ function scoreImportance(text, area) {
   return Math.round(clamped * 100) / 100;
 }
 
+/**
+ * Score a batch of memory items and return them sorted by importance (highest first).
+ *
+ * @param {Array<{text: string, area?: string, id?: string}>} items
+ * @returns {Array<{text: string, area?: string, id?: string, score: number}>}
+ */
+function scoreBatch(items) {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((item) => ({
+      ...item,
+      score: scoreImportance(item.text, item.area),
+    }))
+    .sort((a, b) => b.score - a.score);
+}
+
+/**
+ * Filter items above a minimum importance threshold.
+ *
+ * @param {Array<{text: string, area?: string}>} items
+ * @param {number} [minScore=0.5] - Minimum score to include
+ * @returns {Array<{text: string, area?: string, score: number}>}
+ */
+function filterByImportance(items, minScore = 0.5) {
+  return scoreBatch(items).filter((item) => item.score >= minScore);
+}
+
+/**
+ * Score with configurable weights. Allows callers to override the default
+ * keyword boost/penalty and area boosters.
+ *
+ * @param {string} text
+ * @param {Object} [options]
+ * @param {string} [options.area]
+ * @param {number} [options.highKeywordBoost=0.1]
+ * @param {number} [options.lowKeywordPenalty=0.1]
+ * @param {Record<string, number>} [options.areaBoosters]
+ * @param {string[]} [options.highKeywords]
+ * @param {string[]} [options.lowKeywords]
+ * @returns {number} Score in [0.1, 1.0]
+ */
+function scoreWithWeights(text, options = {}) {
+  if (typeof text !== 'string' || text.length === 0) return BASE_SCORE;
+
+  const lower = text.toLowerCase();
+  let score = BASE_SCORE;
+
+  const hiBoost = options.highKeywordBoost ?? HIGH_KEYWORD_BOOST;
+  const loPenalty = options.lowKeywordPenalty ?? LOW_KEYWORD_PENALTY;
+  const hiKw = options.highKeywords || HIGH_KEYWORDS;
+  const loKw = options.lowKeywords || LOW_KEYWORDS;
+  const boosters = options.areaBoosters || AREA_BOOSTERS;
+
+  for (const kw of hiKw) {
+    if (lower.includes(kw)) score += hiBoost;
+  }
+  for (const kw of loKw) {
+    if (lower.includes(kw)) score -= loPenalty;
+  }
+  if (options.area) {
+    const boost = boosters[options.area.toLowerCase()];
+    if (boost) score += boost;
+  }
+
+  const clamped = Math.min(SCORE_MAX, Math.max(SCORE_MIN, score));
+  return Math.round(clamped * 100) / 100;
+}
+
 module.exports = {
   scoreImportance,
+  scoreBatch,
+  filterByImportance,
+  scoreWithWeights,
   HIGH_KEYWORDS,
   LOW_KEYWORDS,
   AREA_BOOSTERS,

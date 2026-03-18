@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "trajectory-ir",
+  "title": "Trajectory Intermediate Representation",
+  "description": "Canonical schema for normalizing session logs into cross-session analyzable trajectory records",
+  "type": "object",
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Unique session identifier"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Session start timestamp (ISO 8601)"
+    },
+    "ended_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Session end timestamp"
+    },
+    "agent_type": {
+      "type": "string",
+      "description": "Primary agent type for this trajectory"
+    },
+    "task_id": {
+      "type": ["string", "null"],
+      "description": "Associated task ID if applicable"
+    },
+    "model": {
+      "type": "string",
+      "description": "Model used (haiku, sonnet, opus)"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/TrajectoryStep"
+      },
+      "description": "Ordered list of agent steps"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failure", "partial", "timeout", "cancelled"],
+      "description": "Final outcome of the trajectory"
+    },
+    "metrics": {
+      "$ref": "#/definitions/TrajectoryMetrics"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Arbitrary metadata"
+    }
+  },
+  "required": ["session_id", "started_at", "agent_type", "steps", "outcome"],
+  "definitions": {
+    "TrajectoryStep": {
+      "type": "object",
+      "properties": {
+        "step_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "action_type": {
+          "type": "string",
+          "enum": ["tool_call", "task_spawn", "task_update", "skill_invoke", "decision", "error", "observation"],
+          "description": "Type of action taken"
+        },
+        "tool_name": {
+          "type": ["string", "null"],
+          "description": "Tool name if action_type is tool_call"
+        },
+        "input_summary": {
+          "type": "string",
+          "description": "Brief summary of input (not full content)"
+        },
+        "output_summary": {
+          "type": "string",
+          "description": "Brief summary of output"
+        },
+        "duration_ms": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "success": {
+          "type": "boolean"
+        },
+        "error_category": {
+          "type": ["string", "null"],
+          "description": "Failure taxonomy category if success=false"
+        }
+      },
+      "required": ["step_number", "action_type", "success"]
+    },
+    "TrajectoryMetrics": {
+      "type": "object",
+      "properties": {
+        "total_steps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_duration_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tokens_used": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "files_modified": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
