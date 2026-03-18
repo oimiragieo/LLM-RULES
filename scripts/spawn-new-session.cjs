@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const { spawn, execFileSync } = require('child_process');
 const { writeHandoverLog } = require('../.claude/lib/context/shift-change-log-writer.cjs');
@@ -211,10 +212,30 @@ function main() {
   // handoff. The detector uses it to safely clear the inherited session-id.json
   // (which belongs to the old session) without a race condition — the old session
   // never has this env var set, so it cannot mistakenly re-claim the handover log.
+  //
+  // CRITICAL FIX (2026-03-18): Instead of `-p continue` (too vague — new session
+  // sat idle 10min processing reflections), extract the NEXT ACTION from
+  // active_context.md and pass it as an explicit seed prompt. This ensures the
+  // new session starts working immediately instead of burning context on pre-flight.
+  const activeCtxPath = path.join(process.cwd(), '.claude/context/memory/active_context.md');
+  let seedPrompt = 'continue';
+  try {
+    if (fs.existsSync(activeCtxPath)) {
+      const ctx = fs.readFileSync(activeCtxPath, 'utf8');
+      const nextActionMatch = ctx.match(/\*\*NEXT ACTION \(IMMEDIATE\):\*\*\s*(.+?)(?:\n|$)/);
+      if (nextActionMatch) {
+        seedPrompt = `Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top. Skip reflections — go straight to implementation. Here is the action: ${nextActionMatch[1].trim().slice(0, 500)}`;
+      }
+    }
+  } catch {
+    // Fall back to 'continue' if active_context.md can't be read
+  }
+  // Escape double quotes for shell embedding
+  const escapedPrompt = seedPrompt.replace(/"/g, '\\"');
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p continue && claude ${interactiveFlags} -c`;
+    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p "${escapedPrompt}" && claude ${interactiveFlags} -c`;
   } else {
-    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p continue && claude ${interactiveFlags} -c`;
+    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p "${escapedPrompt}" && claude ${interactiveFlags} -c`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);

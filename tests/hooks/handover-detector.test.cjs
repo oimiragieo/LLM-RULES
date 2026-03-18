@@ -314,26 +314,20 @@ test('handover-detector > M8.1: injected message contains Step 0 pre-flight bloc
   assert.strictEqual(res.allow, true);
   assert.ok(res.message, 'Should inject message');
 
-  // Step 0 pre-flight header must be present
-  assert.ok(res.message.includes('Step 0'), 'Should include Step 0');
-  assert.ok(
-    res.message.includes('DO NOT call TaskList()'),
-    'Should include TaskList block warning'
-  );
-  assert.ok(
-    res.message.includes('reflection-reminder.txt'),
-    'Should reference reflection-reminder.txt'
-  );
-  assert.ok(res.message.includes('Step 0.4'), 'Should include Step 0.4');
-  assert.ok(res.message.includes('stale-tasks.json'), 'Should reference stale-tasks.json');
-  assert.ok(res.message.includes('Step 0.5'), 'Should include Step 0.5');
-  assert.ok(
-    res.message.includes('integration-queue.jsonl'),
-    'Should reference integration-queue.jsonl'
-  );
-
-  // Handover context must still be present
+  // IMMEDIATE ACTION must come FIRST (before any pre-flight)
+  assert.ok(res.message.includes('IMMEDIATE ACTION'), 'Should include IMMEDIATE ACTION header');
   assert.ok(res.message.includes('Resume the refactor task'), 'Should include resumeInstructions');
+
+  // Pre-flight section must exist but labeled as BACKGROUND (not blocking)
+  assert.ok(res.message.includes('Pre-flight'), 'Should include pre-flight section');
+  assert.ok(res.message.includes('BACKGROUND'), 'Pre-flight should be labeled BACKGROUND');
+  assert.ok(res.message.includes('stale-tasks.json'), 'Should reference stale-tasks.json');
+  assert.ok(res.message.includes('reflection-spawn-request.json'), 'Should reference reflection queue');
+
+  // IMMEDIATE ACTION must appear BEFORE pre-flight in the message
+  const actionIdx = res.message.indexOf('IMMEDIATE ACTION');
+  const preflightIdx = res.message.indexOf('Pre-flight');
+  assert.ok(actionIdx < preflightIdx, 'IMMEDIATE ACTION must come before Pre-flight');
 
   // Clean up
   if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);

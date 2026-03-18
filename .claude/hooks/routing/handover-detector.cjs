@@ -61,18 +61,16 @@ function formatResumeInstructions(resumeInstructions) {
 }
 
 function formatResumeMessage(log) {
-  // M8.1: Step 0 pre-flight block — prepended so it has highest attention priority
-  let msg = `## SHIFT CHANGE RESUME — MANDATORY PRE-FLIGHT (DO NOT SKIP)\n\n`;
-  msg += `**DO NOT call TaskList() until Steps 0–0.5 are fully complete.**\n\n`;
-  msg += `Execute in order before routing:\n`;
-  msg += `- **Step 0**: Check \`reflection-reminder.txt\` + \`reflection-spawn-request.json\` — spawn reflection-agent for each pending request\n`;
-  msg += `- **Step 0.4**: Check \`.claude/context/runtime/stale-tasks.json\` — close each stale task via TaskUpdate before proceeding\n`;
-  msg += `- **Step 0.5**: Check \`.claude/context/runtime/integration-queue.jsonl\` — spawn artifact-integrator (background) if entries exist\n\n`;
-  msg += `---\n\n`;
+  // CRITICAL FIX (2026-03-18): NEXT ACTION goes FIRST, pre-flight SECOND.
+  // Previous bug: pre-flight reflections consumed all context before the new
+  // session ever reached the actual work directive. The new session would process
+  // 10+ stale reflections and then sit idle.
+  let msg = `## SHIFT CHANGE RESUME\n\n`;
 
-  // Handover context — handle both structured JSON and legacy string formats
+  // 1. ACTION FIRST — what to do immediately
   const formattedInstructions = formatResumeInstructions(log.resumeInstructions);
-  msg += `SHIFT CHANGE RESUME: ${formattedInstructions || log.fallbackInstruction || 'Run TaskList() to discover pending work, check active_context.md'}\n\n`;
+  msg += `### IMMEDIATE ACTION\n\n`;
+  msg += `${formattedInstructions || log.fallbackInstruction || 'Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top.'}\n\n`;
   if (log.contextSummary) {
     msg += `Context: ${log.contextSummary}\n\n`;
   }
@@ -81,9 +79,17 @@ function formatResumeMessage(log) {
     log.pendingActions.forEach(a => {
       msg += `- [${a.priority}] ${a.description}\n`;
     });
+    msg += '\n';
   } else if (log.fallbackInstruction) {
-    msg += `Fallback: ${log.fallbackInstruction}\n`;
+    msg += `Fallback: ${log.fallbackInstruction}\n\n`;
   }
+
+  // 2. PRE-FLIGHT SECOND — handle in background or skip on handoff
+  msg += `---\n\n`;
+  msg += `### Pre-flight (BACKGROUND — do NOT block on these)\n\n`;
+  msg += `Clear reflection queue by writing \`[]\` to \`reflection-spawn-request.json\` (stale from previous session). `;
+  msg += `Check \`stale-tasks.json\` and close any entries. `;
+  msg += `These are from the OLD session — do not let them delay the IMMEDIATE ACTION above.\n`;
   return msg;
 }
 
