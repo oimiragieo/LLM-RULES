@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-18T21:10:42.571Z",
+  "generatedAt": "2026-03-18T21:13:35.327Z",
   "metadata": {
-    "totalSkills": 313,
+    "totalSkills": 314,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-18T21:10:42.572Z",
+    "lastValidated": "2026-03-18T21:13:35.328Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7681,6 +7681,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "implementation-readiness": {
+      "name": "implementation-readiness",
+      "displayName": "Implementation Readiness",
+      "category": "Other",
+      "domain": "other",
+      "description": "Gate for HIGH/EPIC tasks that validates plan completeness and architecture compliance before implementation begins",
+      "requiredTools": [
+        "Read",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "implementation-readiness"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "init": {
       "name": "init",
       "displayName": "Init",
@@ -8541,6 +8563,7 @@
         "heartbeat",
         "huggingface",
         "imagen-generation",
+        "implementation-readiness",
         "init",
         "knowledge-graph",
         "lsp-navigator",
@@ -8960,6 +8983,7 @@
         "heartbeat",
         "huggingface",
         "imagen-generation",
+        "implementation-readiness",
         "init",
         "knowledge-graph",
         "lsp-navigator",
@@ -9362,6 +9386,7 @@
         "heartbeat",
         "huggingface",
         "imagen-generation",
+        "implementation-readiness",
         "init",
         "knowledge-graph",
         "lsp-navigator",
@@ -10166,6 +10191,7 @@
         "claude-api",
         "deep-research",
         "goal-backward-verification",
+        "implementation-readiness",
         "knowledge-graph",
         "ml-experiment-loop",
         "regulatory-compliance",
@@ -10302,6 +10328,7 @@
         "commit-security-scan",
         "deep-research",
         "goal-backward-verification",
+        "implementation-readiness",
         "knowledge-graph",
         "ml-experiment-loop",
         "regulatory-compliance",
@@ -10659,6 +10686,7 @@
         "google-workspace",
         "huggingface",
         "imagen-generation",
+        "implementation-readiness",
         "init",
         "knowledge-graph",
         "lsp-navigator",
@@ -11968,6 +11996,7 @@
         "google-workspace",
         "huggingface",
         "imagen-generation",
+        "implementation-readiness",
         "init",
         "knowledge-graph",
         "lsp-navigator",

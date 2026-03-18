@@ -40,6 +40,7 @@ skills:
   - task-management-protocol
   - tdd
   - context-compressor
+  - adversarial-review
   - verification-before-completion
 context_files: null
 hooks: {}
