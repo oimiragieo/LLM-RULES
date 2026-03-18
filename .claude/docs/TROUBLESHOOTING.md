@@ -679,3 +679,165 @@ Fix Applied / Tooling Available:
 - ALWAYS use `node scripts/reduce-debug-log.mjs <log_path>` to squash massive debug logs (often achieving 90%+ noise reduction by extracting only hook decisions, exceptions, and side-channel metadata) before trying to read them.
 - Never run `node scripts/reduce-debug-log.mjs <log_path>` on the debug file directly. Instead, copy the file to a new location and run the script on the copy (preferably a .tmp folder).
 - To detect UI tool blockers (like git conflicts or authentication denies) that do not appear in background logs, run `node scripts/analyze-session-transcript.mjs <log_path>`. This compiles a markdown report detailing `Tool Errors`, systemic bypasses, and top tool failures grouped by intent.
+
+## 15. Hook MODULE_NOT_FOUND After Worktree Cleanup (P0 — Most Common)
+
+**Symptoms:**
+
+- All hooks fail with `Error: Cannot find module '...\.claude\worktrees\agent-XXXX\.claude\hooks\...'`
+- Every tool call shows "hook error" in output
+- Session becomes unenforceable (no security, no metrics, no validation)
+
+**Root Cause:**
+
+Claude Code changes the session CWD to a worktree path when spawning subagents. When the worktree is later pruned or deleted, the CWD points to a non-existent directory. All hooks that use relative paths fail because the process cannot resolve them from a directory that no longer exists.
+
+**5-Step Diagnostic Playbook:**
+
+1. **Analyze error signature**: Look for a worktree path in the MODULE_NOT_FOUND message. A path containing `.claude/worktrees/agent-` confirms this issue.
+2. **Understand worktree architecture**: `git worktree add` checks out only committed files. Any hook `.cjs` file that exists locally but is not committed to git will not exist in the worktree.
+3. **Verify settings.json hook commands**: Check `.claude/settings.json` and confirm every `"command"` value uses the absolute `cd` prefix pattern: `cd "C:/dev/projects/agent-studio" && node .claude/hooks/...`
+4. **Check git tracking**: Run `git ls-files .claude/hooks/` and compare against every hook referenced in `settings.json`. Any hook present in `settings.json` but absent from `git ls-files` output will crash worktree agents.
+5. **Auto-fix**: Run `node .claude/lib/utils/hook-file-validator.cjs` for automated diagnosis, or manually run `git add .claude/hooks/ && git commit -m "chore: track all hook files"`.
+
+**Prevention:**
+
+- Hook commands in `settings.json` must always use the absolute cd prefix: `cd "C:/dev/projects/agent-studio" && node .claude/hooks/path/to/hook.cjs`
+- All hook `.cjs` files must be committed to git. An untracked hook is invisible inside any worktree.
+- The `pre-spawn-hook-check.cjs` validation hook warns when untracked hooks are detected before a spawn.
+
+**Quick Fix (session already broken):**
+
+Start a fresh session. The new session initializes with the correct CWD pointing to the project root. Then commit any untracked hooks to prevent recurrence.
+
+## 16. Creator Guard Blocks Agent or Skill Edits
+
+**Symptoms:** `CREATOR_GUARD: Write blocked` when attempting to edit files under `.claude/agents/`, `.claude/skills/`, or `.claude/hooks/`
+
+**Root Cause:** `unified-creator-guard.cjs` enforces Gate 4 of the router policy. Direct writes to creator-managed paths are blocked regardless of content or intent — including restorations and copies of existing content.
+
+**Fix:** Use the correct creator or updater skill for the path being modified:
+
+- Agent files: `Skill({ skill: 'agent-updater' })`
+- Skill files: `Skill({ skill: 'skill-updater' })`
+- Hook files: `Skill({ skill: 'hook-creator' })`
+- Workflow files: `Skill({ skill: 'workflow-creator' })`
+
+**Emergency Override (development only):** Set `CREATOR_GUARD=warn` in `.env` to downgrade blocks to warnings. Never use `warn` or `off` in a production session.
+
+**Reference:** `.claude/docs/@ENFORCEMENT_HOOKS.md` — `unified-creator-guard.cjs` section
+
+## 17. Agent Spawn Fails: "Failed to resolve base branch HEAD"
+
+**Symptoms:** The `Task` tool returns `Failed to resolve base branch "HEAD": git rev-parse failed` or similar git resolution errors when trying to spawn a subagent.
+
+**Root Cause:** The session CWD is inside a worktree directory that has already been pruned or deleted. Git cannot resolve `HEAD` because the working tree path no longer exists on disk.
+
+**Fix:**
+
+```bash
+git worktree prune
+rm -rf .claude/worktrees/agent-*
+```
+
+Then retry the spawn from the same session. The git state will be clean and HEAD will resolve correctly.
+
+**Prevention:** Run `git worktree prune` as part of session startup. The `worktree-prune-on-start.cjs` hook does this automatically on each UserPromptSubmit event.
+
+## 18. Tests Timeout or Hang Indefinitely
+
+**Symptoms:** `pnpm test` stops producing output and never exits, or times out after the 120-second limit.
+
+**Root Cause:** Two common causes:
+
+1. A `setTimeout` or `setInterval` without `.unref()` keeps the Node.js event loop alive after tests finish. The process cannot exit naturally.
+2. A SQLite database file is held open across test cases. The next test that tries to delete or recreate the file hits a Windows `EBUSY` lock.
+
+**Fix for timer leaks:** Add `.unref()` to any timer that should not block process exit:
+
+```javascript
+const timer = setTimeout(callback, delay);
+timer.unref(); // allows process to exit if this is the only pending handle
+```
+
+**Fix for SQLite locks:** Call `db.close()` in `afterEach` before any `fs.rmSync` or file cleanup:
+
+```javascript
+afterEach(() => {
+  db.close();
+  fs.rmSync(dbPath, { force: true });
+});
+```
+
+**Reference:** MEMORY.md — "TaskStateMachine TTL timer" entry confirms `.unref()` is required on all internal timers.
+
+## 19. Context Overflow / "Prompt is too long"
+
+**Symptoms:** An agent spawn fails immediately with an error containing "Prompt is too long" or "context length exceeded". No tools are called by the spawned agent.
+
+**Root Cause:** The total context passed to the model — system prompt, injected rules, conversation history, and spawn prompt — exceeds the model's input limit. This is most likely to occur in long sessions where conversation history has accumulated.
+
+**Fix options (in order of preference):**
+
+1. Spawn `context-compressor` to compress the current session context, then retry the spawn.
+2. Start a fresh session. Long-running sessions accumulate context that cannot be trimmed without a reset.
+3. Reduce the spawn prompt size. Keep spawn prompts under 2KB by referencing plan file paths rather than inlining plan content.
+
+**Prevention:**
+
+- Keep spawn prompts under 2KB. Reference files by path; do not inline large blocks of content.
+- Compress context proactively at 80K tokens (see Section 8 of CLAUDE.md).
+- If `learnings.md` exceeds 500 lines, prune it before the session begins — large memory files are injected into every spawn prompt and inflate total context.
+
+## 20. Worktree Agents Commit to Their Branch, Not Main
+
+**Symptoms:** An agent reports successful completion, but `git log --oneline main` shows no new commits. Running `git branch` reveals one or more `worktree-agent-*` branches with recent commits.
+
+**Root Cause:** Worktree agents default to the branch that was checked out in their worktree. Unless the spawn prompt explicitly instructs the agent to work on `main`, commits land on the isolated worktree branch.
+
+**Recovery:**
+
+```bash
+# Find the worktree branch with the work
+git log --oneline worktree-agent-XXXX -5
+
+# Cherry-pick or merge the commits to main
+git switch main
+git cherry-pick <commit-sha>
+```
+
+**Prevention:** Include an explicit instruction in all spawn prompts: "Commit your changes directly to the `main` branch. Do not create a new branch."
+
+The developer agent's worktree isolation logic also has a bypass for `.claude/` paths — `shouldOverrideWorktreeIsolation()` returns `true` for framework artifact paths and forces `isolation: none`, which means those agents always operate on the main branch.
+
+## 21. ESLint Blocks Commit (Pre-commit Hook)
+
+**Symptoms:** A `git commit` is rejected with output containing `COMMIT BLOCKED: ESLint issues detected` or `ESLint found N problem(s)`.
+
+**Root Cause:** The project runs ESLint in `--max-warnings=0` mode. Any warning is treated as a hard failure. Common triggers include: using `JSON.parse()` instead of `safeParseJSON()` in hook files, using `shell: true` in child process spawns, or introducing `console.log` in production code.
+
+**Fix:**
+
+```bash
+pnpm lint:fix
+```
+
+This auto-fixes many violations. For remaining issues, inspect the ESLint output and resolve manually.
+
+**Common violations and their correct forms:**
+
+| Violation | Fix |
+|---|---|
+| `JSON.parse(untrustedInput)` | Use `safeParseJSON()` from `.claude/lib/utils/safe-json.cjs` |
+| `spawn(..., { shell: true })` | Use `spawn(cmd, args, { shell: false })` with array arguments |
+| `console.log(...)` in non-test code | Use structured logging or remove the statement |
+
+After fixing, run `pnpm lint:fix && pnpm format` and confirm both exit cleanly before retrying the commit.
+
+## Related Resources
+
+- `Skill({ skill: 'worktree-hook-doctor' })` — Automated hook diagnosis
+- `.claude/lib/utils/hook-file-validator.cjs` — Hook file validation utility
+- `.claude/docs/@ENFORCEMENT_HOOKS.md` — Hook enforcement reference
+- `.claude/docs/@ENVIRONMENT_CONFIG.md` — Environment variable overrides for enforcement modes
+- `.claude/docs/DEVELOPER_WORKFLOW.md` — Standard development workflow
