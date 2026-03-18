@@ -826,11 +826,11 @@ This auto-fixes many violations. For remaining issues, inspect the ESLint output
 
 **Common violations and their correct forms:**
 
-| Violation | Fix |
-|---|---|
-| `JSON.parse(untrustedInput)` | Use `safeParseJSON()` from `.claude/lib/utils/safe-json.cjs` |
-| `spawn(..., { shell: true })` | Use `spawn(cmd, args, { shell: false })` with array arguments |
-| `console.log(...)` in non-test code | Use structured logging or remove the statement |
+| Violation                           | Fix                                                           |
+| ----------------------------------- | ------------------------------------------------------------- |
+| `JSON.parse(untrustedInput)`        | Use `safeParseJSON()` from `.claude/lib/utils/safe-json.cjs`  |
+| `spawn(..., { shell: true })`       | Use `spawn(cmd, args, { shell: false })` with array arguments |
+| `console.log(...)` in non-test code | Use structured logging or remove the statement                |
 
 After fixing, run `pnpm lint:fix && pnpm format` and confirm both exit cleanly before retrying the commit.
 

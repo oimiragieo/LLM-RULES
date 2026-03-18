@@ -3,7 +3,9 @@
 **NEXT ACTION (IMMEDIATE):** Check if C5 (task output guardrails) was committed by background agent. Run `git log --oneline -7`. If C5 is there, continue to Phase 2C. If not, implement C5 manually (task-output-validator.cjs + test). Then continue 47-feature pipeline.
 
 ### Progress (13+/47 features):
+
 **Committed this session:**
+
 - f12ca5a9 docs: add Agent Tiers documentation (G5)
 - cd7f870f feat: add reflection score tracker utility
 - fa7ce7fd feat: add plan-format schema with verify/done/files fields (A2)
@@ -11,6 +13,7 @@
 - C5 (task output guardrails): PENDING — background agent was committing when session ended
 
 **Prior session commits (on main):**
+
 - fab627b8 D8 configurable context thresholds
 - 183a1721 F1 failure taxonomy schema
 - e973c18f C4 severity taxonomy + G1 agent fingerprinting
@@ -22,6 +25,7 @@
 - 38dd8c47 Wave 2 NEW features
 
 ### Remaining Work Queue:
+
 1. **C5** — Check if committed, finish if not
 2. **Phase 2C** — A1 (discuss-phase skill), A4 (readiness gate), A5 (plan quality enhancement)
 3. **Phase 2D** — C6 (definition of done), C7 (structured checklists), B7 (execution hardening)
@@ -33,6 +37,7 @@
 9. **Documentation** — CHANGELOG, README updates per phase
 
 ### Dirty Files on Main (need commit):
+
 - .claude/agents/orchestrators/artifact-integrator.md
 - .claude/agents/specialized/researcher.md
 - .claude/context/memory/issues.md, learnings.md
@@ -41,14 +46,17 @@
 - .claude/skills/codebase-exploration/SKILL.md
 
 ### Key Reports:
+
 - Gap analysis: .claude/context/reports/feature-gap-analysis-2026-03-17.md
 - Upgrade plan: .claude/context/plans/framework-upgrade-plan-2026-03-17.md
 - Unified features: .claude/context/reports/unified-feature-adoption-list-2026-03-17.md
 
 ### Known Issues:
+
 - Creator guard blocks agent-updater in worktrees — use CREATOR_GUARD=warn for direct edits
 - Hook MODULE_NOT_FOUND when session CWD is pruned worktree (PREVIOUS SESSION ISSUE)
 - Agents in worktrees frequently skip TaskUpdate(completed)
 
 ### Blockers: None
+
 ### Decisions Pending: None

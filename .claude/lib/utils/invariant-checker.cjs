@@ -4,7 +4,15 @@
  * Banned tools for the router agent (subset of known routing violations).
  * Extend as needed.
  */
-const ROUTER_BANNED_TOOLS = new Set(['Edit', 'Write', 'Bash', 'Glob', 'Grep', 'WebSearch', 'WebFetch']);
+const ROUTER_BANNED_TOOLS = new Set([
+  'Edit',
+  'Write',
+  'Bash',
+  'Glob',
+  'Grep',
+  'WebSearch',
+  'WebFetch',
+]);
 
 /**
  * Built-in invariant: no banned tool usage by the router.

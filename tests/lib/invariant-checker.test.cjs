@@ -2,7 +2,10 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { checkInvariants, BUILT_IN_INVARIANTS } = require('../../.claude/lib/utils/invariant-checker.cjs');
+const {
+  checkInvariants,
+  BUILT_IN_INVARIANTS,
+} = require('../../.claude/lib/utils/invariant-checker.cjs');
 
 describe('invariant-checker', () => {
   const BASE_TIME = new Date('2026-01-08T00:00:00Z');
@@ -24,9 +27,7 @@ describe('invariant-checker', () => {
   });
 
   it('detects banned tool usage', () => {
-    const events = [
-      makeEvent('tool_use', 'router', 'Grep', 0),
-    ];
+    const events = [makeEvent('tool_use', 'router', 'Grep', 0)];
     const result = checkInvariants({ events, invariants: BUILT_IN_INVARIANTS });
     assert.equal(result.passed, false);
     const violation = result.violations.find(v => v.rule === 'no-banned-tools');
@@ -64,9 +65,14 @@ describe('invariant-checker', () => {
   it('supports custom invariants alongside built-ins', () => {
     const customInvariant = {
       rule: 'no-write-by-router',
-      check: (events) => events
-        .filter(e => e.agent === 'router' && e.tool === 'Write')
-        .map(e => ({ rule: 'no-write-by-router', event: e, reason: 'Router must not use Write' })),
+      check: events =>
+        events
+          .filter(e => e.agent === 'router' && e.tool === 'Write')
+          .map(e => ({
+            rule: 'no-write-by-router',
+            event: e,
+            reason: 'Router must not use Write',
+          })),
     };
     const events = [
       makeEvent('tool_use', 'developer', 'TaskUpdate', 0),

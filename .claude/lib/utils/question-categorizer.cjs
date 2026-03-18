@@ -124,7 +124,11 @@ const KEYWORD_MAP = {
  */
 function categorizeQuestion(question) {
   if (!question || typeof question !== 'string') {
-    return { category: 'Scope', confidence: 0, reason: 'Empty or invalid question; defaulting to Scope' };
+    return {
+      category: 'Scope',
+      confidence: 0,
+      reason: 'Empty or invalid question; defaulting to Scope',
+    };
   }
 
   const lower = question.toLowerCase();

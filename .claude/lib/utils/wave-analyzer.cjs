@@ -54,7 +54,7 @@ function analyzeWaves(tasks) {
 
     const nextQueue = [];
     for (const id of queue) {
-      for (const dependent of (dependents.get(id) || [])) {
+      for (const dependent of dependents.get(id) || []) {
         const newDegree = inDegree.get(dependent) - 1;
         inDegree.set(dependent, newDegree);
         if (newDegree === 0) {

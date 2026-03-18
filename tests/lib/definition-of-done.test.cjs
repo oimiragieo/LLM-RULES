@@ -30,9 +30,15 @@ describe('definition-of-done', () => {
   it('each checklist item has id, category, description, checked', () => {
     const result = checkDefinitionOfDone({});
     result.checklist.forEach(item => {
-      assert.ok(typeof item.id === 'string' && item.id.length > 0, `Missing id: ${JSON.stringify(item)}`);
+      assert.ok(
+        typeof item.id === 'string' && item.id.length > 0,
+        `Missing id: ${JSON.stringify(item)}`
+      );
       assert.ok(typeof item.category === 'string', `Missing category: ${JSON.stringify(item)}`);
-      assert.ok(typeof item.description === 'string', `Missing description: ${JSON.stringify(item)}`);
+      assert.ok(
+        typeof item.description === 'string',
+        `Missing description: ${JSON.stringify(item)}`
+      );
       assert.ok(typeof item.checked === 'boolean', `Missing checked: ${JSON.stringify(item)}`);
     });
   });

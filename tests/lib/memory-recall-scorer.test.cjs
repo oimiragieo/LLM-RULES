@@ -9,9 +9,24 @@ describe('memory-recall-scorer', () => {
 
   it('returns results sorted by compositeScore descending', () => {
     const results = [
-      { text: 'low', similarity: 0.2, timestamp: new Date('2026-01-07T00:00:00Z'), importance: 0.2 },
-      { text: 'high', similarity: 0.9, timestamp: new Date('2026-01-08T00:00:00Z'), importance: 0.9 },
-      { text: 'mid', similarity: 0.5, timestamp: new Date('2026-01-05T00:00:00Z'), importance: 0.5 },
+      {
+        text: 'low',
+        similarity: 0.2,
+        timestamp: new Date('2026-01-07T00:00:00Z'),
+        importance: 0.2,
+      },
+      {
+        text: 'high',
+        similarity: 0.9,
+        timestamp: new Date('2026-01-08T00:00:00Z'),
+        importance: 0.9,
+      },
+      {
+        text: 'mid',
+        similarity: 0.5,
+        timestamp: new Date('2026-01-05T00:00:00Z'),
+        importance: 0.5,
+      },
     ];
     const scored = scoreAndSort({ results, now: NOW });
     assert.equal(scored[0].text, 'high');
@@ -28,9 +43,7 @@ describe('memory-recall-scorer', () => {
   });
 
   it('recency is 1.0 when timestamp equals now', () => {
-    const results = [
-      { text: 'fresh', similarity: 0.0, timestamp: NOW, importance: 0.0 },
-    ];
+    const results = [{ text: 'fresh', similarity: 0.0, timestamp: NOW, importance: 0.0 }];
     const scored = scoreAndSort({ results, now: NOW });
     // compositeScore = 0.5*0 + 0.3*1.0 + 0.2*0 = 0.3
     assert.ok(Math.abs(scored[0].compositeScore - 0.3) < 1e-9);

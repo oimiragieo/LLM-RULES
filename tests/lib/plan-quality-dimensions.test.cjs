@@ -3,7 +3,10 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 
-const { assessPlanQuality, DIMENSIONS } = require('../../.claude/lib/utils/plan-quality-dimensions.cjs');
+const {
+  assessPlanQuality,
+  DIMENSIONS,
+} = require('../../.claude/lib/utils/plan-quality-dimensions.cjs');
 
 // Minimal valid plan object
 const minimalPlan = {
@@ -64,7 +67,10 @@ describe('assessPlanQuality', () => {
   it('scores are between 0 and 1 inclusive', () => {
     const result = assessPlanQuality(minimalPlan);
     for (const dim of result.dimensions) {
-      assert.ok(dim.score >= 0 && dim.score <= 1, `Score out of range for ${dim.name}: ${dim.score}`);
+      assert.ok(
+        dim.score >= 0 && dim.score <= 1,
+        `Score out of range for ${dim.name}: ${dim.score}`
+      );
     }
   });
 
