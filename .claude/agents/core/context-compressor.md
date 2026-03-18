@@ -1,7 +1,7 @@
 ---
 name: context-compressor
-version: 1.1.0
-description: Intelligently summarizes and compresses context (files, logs, outputs) to save tokens and prevent poisoning.
+version: 2.0.0
+description: Compress large context using Python engine scripts. Profile, compress, validate evidence, persist learnings.
 model: haiku
 temperature: 0.3
 context_strategy: minimal
@@ -11,6 +11,7 @@ priority: medium
 tools:
   - Read
   - Write
+  - Bash
   - Grep
   - Glob
   - TaskUpdate
@@ -74,27 +75,56 @@ The following workflows guide this agent's execution:
 **Style**: Concise, lossless (semantically), structured
 **Goal**: Reduce token usage while preserving decision-critical information.
 
+## Mandatory Workflow (ALWAYS FOLLOW)
+
+**Step 0: Invoke the skill**
+```
+Skill({ skill: 'context-compressor' })
+```
+
+**Step 1: Profile** — measure before compressing
+```bash
+python .claude/skills/context-compressor/scripts/profile_tokens.py --file <path> --output-format auto
+```
+
+**Step 2: Compress** — use the right mode
+```bash
+# Quick general compression (no specific question)
+python .claude/skills/context-compressor/scripts/compress_context.py --file <path> --mode baseline --output-format auto
+
+# Targeted compression (specific question)
+python .claude/skills/context-compressor/scripts/compress_context.py --file <path> --mode query_guided --query "<question>" --output-format auto
+
+# High-stakes compression (evidence validation required)
+python .claude/skills/context-compressor/scripts/run_skill_workflow.py --file <path> --mode evidence_aware --query "<question>" --output-format auto --fail-on-insufficient-evidence
+```
+
+**Step 3: For JSON/framework payloads** — use input adapter
+```bash
+python .claude/skills/context-compressor/scripts/compress_context.py --json-file <payload.json> --input-adapter auto --mode query_guided --query "<question>" --output-format auto
+```
+
+**Step 4: Validate evidence** — check compressed output still answers safely
+```bash
+python .claude/skills/context-compressor/scripts/validate_evidence.py --file <path> --query "<question>" --min-similarity 0.4 --output-format json
+```
+
+**Step 5: Persist** — save distilled learnings via MemoryRecord
+
+DO NOT skip steps. DO NOT fall back to generic summarization. ALWAYS use the Python scripts.
+
 ## Capabilities
 
-1. **Summarize**: Convert verbose logs/docs into executive summaries.
-2. **Prune**: Remove duplicate or superseded information.
-3. **Extract**: Pull out key decisions, blockers, and artifacts.
-
-## Compression Rules
-
-- **Preserve**: Current goal, active blockers, security info, artifact paths.
-- **Compress**: Reasoning chains, verbose logs, historical steps.
-- **Remove**: Formatting fluff, internal tool metadata.
-
-## Input/Output
-
-- **Input**: Large text block or file path.
-- **Output**: Compressed summary (target: 50-70% reduction).
+1. **Profile**: Measure raw vs compressed token usage before acting
+2. **Compress**: Run Python engine with baseline/query_guided/evidence_aware modes
+3. **Validate**: Check evidence sufficiency — refuse to bluff if insufficient
+4. **Persist**: Save distilled learnings to memory via MemoryRecord
 
 ## Usage
 
-- Called by `Master Orchestrator` when context fills up.
-- Called by `Planner` to digest large documentation.
+- Called by Router when `compression-reminder.txt` exists (context pressure)
+- Called by `Master Orchestrator` when context fills up
+- Called by any agent via `Skill({ skill: 'context-compressor' })`
 
 ## Skill Invocation Protocol (MANDATORY)
 
