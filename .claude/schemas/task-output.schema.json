@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/task-output",
+  "title": "Task Output",
+  "description": "Structured output schema for agent task completions. Validates TaskUpdate metadata for consistency and downstream processing.",
+  "type": "object",
+  "required": ["summary", "status", "filesModified"],
+  "properties": {
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "Brief description of what was accomplished"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failure"],
+      "description": "Task completion status"
+    },
+    "filesModified": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 500 },
+      "maxItems": 200,
+      "description": "List of file paths modified during the task"
+    },
+    "keyDecisions": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 500 },
+      "maxItems": 50,
+      "description": "Key decisions made during task execution"
+    },
+    "discoveries": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 500 },
+      "maxItems": 50,
+      "description": "Important findings discovered during task execution"
+    },
+    "deviations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rule": { "type": "string", "maxLength": 20 },
+          "description": { "type": "string", "maxLength": 500 }
+        }
+      },
+      "maxItems": 20,
+      "description": "Deviations from the original plan (per deviation-rules protocol)"
+    },
+    "tokensEstimated": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Estimated tokens consumed during this task"
+    },
+    "completedAt": {
+      "type": "string",
+      "description": "ISO 8601 timestamp of task completion (e.g. 2026-03-18T10:00:00Z)"
+    }
+  },
+  "additionalProperties": true
+}

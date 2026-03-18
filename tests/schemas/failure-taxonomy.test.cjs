@@ -43,16 +43,16 @@ describe('F1: 10-Category Failure Taxonomy Schema', () => {
       schema.definitions?.failureCategory?.enum;
 
     const expected = [
-      'tool_misuse',
-      'task_scope_violation',
-      'context_overflow',
-      'state_corruption',
-      'dependency_failure',
+      'tool-misuse',
+      'scope-drift',
+      'hallucination',
+      'incomplete-output',
+      'wrong-agent',
       'timeout',
-      'permission_denied',
-      'validation_failure',
-      'integration_failure',
-      'unknown',
+      'context-overflow',
+      'dependency-failure',
+      'test-failure',
+      'other',
     ];
 
     for (const cat of expected) {
@@ -74,6 +74,6 @@ describe('F1: 10-Category Failure Taxonomy Schema', () => {
     const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf-8'));
     assert.ok(schema.required, 'Schema must have required fields');
     assert.ok(schema.required.includes('category'), 'category must be required');
-    assert.ok(schema.required.includes('description'), 'description must be required');
+    assert.ok(schema.required.includes('severity'), 'severity must be required');
   });
 });

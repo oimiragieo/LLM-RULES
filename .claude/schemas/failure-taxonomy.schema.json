@@ -1,101 +1,51 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema#",
-  "$id": "https://claude.ai/schemas/failure-taxonomy",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/failure-taxonomy",
   "title": "Failure Taxonomy",
-  "description": "10-category failure taxonomy for classifying agent failures in the reflection-agent rubric. Each failure must be categorized for root cause analysis and pattern detection.",
+  "description": "10-category failure taxonomy for classifying agent failures. Used by reflection-agent rubric, session-gap-log, and guardrail system.",
   "type": "object",
-  "required": ["category", "description"],
+  "required": ["category", "severity"],
   "properties": {
     "category": {
       "type": "string",
-      "description": "The failure category from the 10-category taxonomy",
+      "description": "Failure category classification",
       "enum": [
-        "tool_misuse",
-        "task_scope_violation",
-        "context_overflow",
-        "state_corruption",
-        "dependency_failure",
+        "tool-misuse",
+        "scope-drift",
+        "hallucination",
+        "incomplete-output",
+        "wrong-agent",
         "timeout",
-        "permission_denied",
-        "validation_failure",
-        "integration_failure",
-        "unknown"
+        "context-overflow",
+        "dependency-failure",
+        "test-failure",
+        "other"
       ]
     },
     "severity": {
       "type": "string",
-      "description": "Severity level of the failure",
-      "enum": ["critical", "high", "medium", "low"]
+      "description": "Failure severity level",
+      "enum": ["low", "medium", "high", "critical"]
     },
     "description": {
       "type": "string",
-      "description": "Human-readable description of the failure",
-      "minLength": 10
+      "maxLength": 1000,
+      "description": "Human-readable description of the failure"
     },
     "taskId": {
       "type": "string",
-      "description": "The task ID where the failure occurred"
+      "maxLength": 100,
+      "description": "Task ID where the failure occurred"
     },
-    "agent": {
+    "agentType": {
       "type": "string",
-      "description": "The agent type that experienced the failure"
-    },
-    "evidence": {
-      "type": "string",
-      "description": "Evidence supporting the categorization (log excerpt, error message, etc.)"
-    },
-    "remediation": {
-      "type": "string",
-      "description": "Recommended remediation action"
+      "maxLength": 100,
+      "description": "Agent type that experienced the failure"
     },
     "timestamp": {
       "type": "string",
-      "format": "date-time",
-      "description": "ISO 8601 timestamp when the failure was recorded"
+      "description": "ISO 8601 timestamp of the failure (e.g. 2026-03-18T10:00:00Z)"
     }
   },
-  "additionalProperties": false,
-  "$defs": {
-    "failureCategory": {
-      "type": "string",
-      "enum": [
-        "tool_misuse",
-        "task_scope_violation",
-        "context_overflow",
-        "state_corruption",
-        "dependency_failure",
-        "timeout",
-        "permission_denied",
-        "validation_failure",
-        "integration_failure",
-        "unknown"
-      ],
-      "description": "Canonical 10-category failure taxonomy"
-    },
-    "severity": {
-      "type": "string",
-      "enum": ["critical", "high", "medium", "low"],
-      "description": "Failure severity levels"
-    }
-  },
-  "examples": [
-    {
-      "category": "tool_misuse",
-      "severity": "high",
-      "description": "Agent used Write tool on a creator-guarded path (.claude/skills/)",
-      "taskId": "task-5",
-      "agent": "developer",
-      "evidence": "unified-creator-guard.cjs blocked Write to .claude/skills/tdd/SKILL.md",
-      "remediation": "Use Skill({ skill: 'skill-updater' }) instead of direct Write"
-    },
-    {
-      "category": "context_overflow",
-      "severity": "critical",
-      "description": "Spawn prompt exceeded 120K token block threshold",
-      "taskId": "task-12",
-      "agent": "master-orchestrator",
-      "evidence": "spawn-token-guard.cjs blocked: ~135,000 tokens",
-      "remediation": "Run context-compressor before spawning"
-    }
-  ]
+  "additionalProperties": false
 }

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/guardrail-result",
+  "title": "Guardrail Result",
+  "description": "Result of a guardrail validation check on task output. Used by task-output-guardrail hook.",
+  "type": "object",
+  "required": ["passed", "checks"],
+  "properties": {
+    "passed": {
+      "type": "boolean",
+      "description": "Whether all guardrail checks passed"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "passed", "message"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Name of the guardrail check"
+          },
+          "passed": {
+            "type": "boolean",
+            "description": "Whether this individual check passed"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Human-readable result message"
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 20,
+      "description": "Individual check results"
+    },
+    "retryCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5,
+      "description": "Number of retry attempts made"
+    },
+    "circuitBreakerTripped": {
+      "type": "boolean",
+      "description": "Whether the circuit breaker was activated (2+ identical failures)"
+    },
+    "escalated": {
+      "type": "boolean",
+      "description": "Whether the failure was escalated to the router"
+    }
+  },
+  "additionalProperties": false
+}
