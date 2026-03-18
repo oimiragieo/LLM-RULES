@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-18T03:39:27.054Z",
+  "generatedAt": "2026-03-18T21:10:42.571Z",
   "metadata": {
-    "totalSkills": 312,
+    "totalSkills": 313,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-18T03:39:27.055Z",
+    "lastValidated": "2026-03-18T21:10:42.572Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7564,6 +7564,29 @@
       "priority": 3,
       "aliasOf": null
     },
+    "goal-backward-verification": {
+      "name": "goal-backward-verification",
+      "displayName": "Goal Backward Verification",
+      "category": "Other",
+      "domain": "other",
+      "description": "Verify that task outputs actually achieve stated goals through 4 progressive levels of verification",
+      "requiredTools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "goal-backward-verification"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "google-workspace": {
       "name": "google-workspace",
       "displayName": "Google Workspace",
@@ -8513,6 +8536,7 @@
         "figma",
         "fintech-engineer",
         "frontend-design",
+        "goal-backward-verification",
         "google-workspace",
         "heartbeat",
         "huggingface",
@@ -8931,6 +8955,7 @@
         "figma",
         "fintech-engineer",
         "frontend-design",
+        "goal-backward-verification",
         "google-workspace",
         "heartbeat",
         "huggingface",
@@ -9332,6 +9357,7 @@
         "figma",
         "fintech-engineer",
         "frontend-design",
+        "goal-backward-verification",
         "google-workspace",
         "heartbeat",
         "huggingface",
@@ -9995,6 +10021,7 @@
         "feedback-analysis",
         "figma",
         "fintech-engineer",
+        "goal-backward-verification",
         "heartbeat",
         "knowledge-graph",
         "lsp-navigator",
@@ -10138,6 +10165,7 @@
         "browser-automation",
         "claude-api",
         "deep-research",
+        "goal-backward-verification",
         "knowledge-graph",
         "ml-experiment-loop",
         "regulatory-compliance",
@@ -10273,6 +10301,7 @@
         "codebase-cleaner",
         "commit-security-scan",
         "deep-research",
+        "goal-backward-verification",
         "knowledge-graph",
         "ml-experiment-loop",
         "regulatory-compliance",
@@ -10626,6 +10655,7 @@
         "figma",
         "fintech-engineer",
         "frontend-design",
+        "goal-backward-verification",
         "google-workspace",
         "huggingface",
         "imagen-generation",
@@ -11934,6 +11964,7 @@
         "figma",
         "fintech-engineer",
         "frontend-design",
+        "goal-backward-verification",
         "google-workspace",
         "huggingface",
         "imagen-generation",

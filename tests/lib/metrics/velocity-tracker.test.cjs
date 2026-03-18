@@ -27,9 +27,7 @@ beforeEach(() => {
     fs.unlinkSync(DATA_PATH);
   }
   // Clear require cache so module re-reads file
-  delete require.cache[
-    require.resolve('../../../.claude/lib/metrics/velocity-tracker.cjs')
-  ];
+  delete require.cache[require.resolve('../../../.claude/lib/metrics/velocity-tracker.cjs')];
 });
 
 afterEach(() => {
@@ -42,9 +40,7 @@ afterEach(() => {
 });
 
 function loadTracker() {
-  delete require.cache[
-    require.resolve('../../../.claude/lib/metrics/velocity-tracker.cjs')
-  ];
+  delete require.cache[require.resolve('../../../.claude/lib/metrics/velocity-tracker.cjs')];
   return require('../../../.claude/lib/metrics/velocity-tracker.cjs');
 }
 

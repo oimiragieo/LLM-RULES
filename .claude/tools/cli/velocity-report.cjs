@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-const {
-  getOverallVelocity,
-  getVelocityStats,
-} = require('../../lib/metrics/velocity-tracker.cjs');
+const { getOverallVelocity, getVelocityStats } = require('../../lib/metrics/velocity-tracker.cjs');
 
 const overall = getOverallVelocity();
 
@@ -20,18 +17,13 @@ if (overall.agentBreakdown.length === 0) {
 } else {
   for (const agent of overall.agentBreakdown) {
     const stats = getVelocityStats(agent.agentType);
-    const trendIcon =
-      agent.trend === 'improving'
-        ? '+'
-        : agent.trend === 'degrading'
-          ? '-'
-          : '=';
+    const trendIcon = agent.trend === 'improving' ? '+' : agent.trend === 'degrading' ? '-' : '=';
     console.log(
       `  ${agent.agentType}: ${agent.taskCount} tasks, avg ${(agent.avgDuration / 1000).toFixed(1)}s [${trendIcon} ${agent.trend}]`
     );
     if (stats.last5Durations.length > 0) {
       console.log(
-        `    last 5: ${stats.last5Durations.map((d) => (d / 1000).toFixed(1) + 's').join(', ')}`
+        `    last 5: ${stats.last5Durations.map(d => (d / 1000).toFixed(1) + 's').join(', ')}`
       );
     }
   }

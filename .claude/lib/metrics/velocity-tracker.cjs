@@ -3,14 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DATA_PATH = path.resolve(
-  __dirname,
-  '..',
-  '..',
-  'context',
-  'memory',
-  'velocity-data.json'
-);
+const DATA_PATH = path.resolve(__dirname, '..', '..', 'context', 'memory', 'velocity-data.json');
 
 const MAX_COMPLETIONS_PER_AGENT = 100;
 const TREND_THRESHOLD = 0.15; // 15% change = significant
@@ -67,7 +60,7 @@ function getVelocityStats(agentType) {
   const completions = agent.completions;
   const totalDuration = completions.reduce((sum, c) => sum + c.durationMs, 0);
   const avgDuration = Math.round(totalDuration / completions.length);
-  const last5 = completions.slice(-5).map((c) => c.durationMs);
+  const last5 = completions.slice(-5).map(c => c.durationMs);
 
   return {
     taskCount: completions.length,

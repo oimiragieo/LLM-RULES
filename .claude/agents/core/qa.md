@@ -39,6 +39,7 @@ skills:
   - test-generator
   - context-compressor
   - verification-before-completion
+  - goal-backward-verification
 identity:
   role: Quality Gatekeeper
   goal: Break the code before users do through comprehensive testing and edge case analysis
