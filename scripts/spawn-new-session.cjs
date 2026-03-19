@@ -217,31 +217,47 @@ function main() {
   // sat idle 10min processing reflections), extract the NEXT ACTION from
   // active_context.md and pass it as an explicit seed prompt. This ensures the
   // new session starts working immediately instead of burning context on pre-flight.
+  // Lazy-load approach: write full handoff prompt to a file, then use
+  // @file reference in -p flag. Claude Code loads @path references into
+  // the prompt context automatically. This avoids command-line length
+  // limits that caused black-window hangs on Windows.
   const activeCtxPath = path.join(process.cwd(), '.claude/context/memory/active_context.md');
-  let seedPrompt = 'continue';
+  const handoffPromptPath = path.join(process.cwd(), '.claude/context/runtime/handoff-seed-prompt.md');
+
+  // Build the seed prompt file with explicit instructions + @file reference
   try {
-    if (fs.existsSync(activeCtxPath)) {
-      const ctx = fs.readFileSync(activeCtxPath, 'utf8');
-      // Match NEXT ACTION in multiple formats:
-      // - ## NEXT ACTION (IMMEDIATE)    (H2 header)
-      // - **NEXT ACTION (IMMEDIATE):**  (bold with colon)
-      // - NEXT ACTION (IMMEDIATE):      (plain with colon)
-      // Capture everything until the next ## heading or end of file
-      const nextActionMatch = ctx.match(
-        /(?:#{1,3}\s+|\*\*)?NEXT ACTION\s*\(IMMEDIATE\):?\*?\*?\s*\n([\s\S]+?)(?=\n#{1,3}\s|\n---|$)/
-      );
-      if (nextActionMatch) {
-        // Keep seed prompt SHORT — long prompts break Windows cmd line limits
-        // and cause black-window hangs with -p flag.
-        // Just tell the new session WHERE to read, not WHAT to do inline.
-        seedPrompt =
-          'Read .claude/context/memory/active_context.md and execute ALL tasks under NEXT ACTION. Do NOT stop after one task. Do NOT just clean up stale tasks. Execute the FULL pipeline described in that file.';
-      }
-    }
+    const promptContent = [
+      '# Session Handoff — Execute Immediately',
+      '',
+      'You are resuming work from a previous session. Execute ALL tasks below autonomously.',
+      'Do NOT stop after one task. Do NOT just clean up stale tasks. Complete the FULL pipeline.',
+      '',
+      '## Instructions',
+      '',
+      fs.existsSync(activeCtxPath)
+        ? fs.readFileSync(activeCtxPath, 'utf8')
+        : 'Run TaskList() to discover pending work.',
+      '',
+      '## Rules',
+      '',
+      '- Spawn specialist agents for each task — do NOT implement directly',
+      '- Call TaskUpdate(in_progress) before work, TaskUpdate(completed) after',
+      '- Max 2 heavy agents in parallel',
+      '- Run pnpm lint:fix && pnpm format before committing',
+      '- Report progress after each wave completes',
+    ].join('\n');
+    fs.writeFileSync(handoffPromptPath, promptContent, 'utf8');
   } catch {
-    // Fall back to 'continue' if active_context.md can't be read
+    // Fall back — write minimal prompt
+    fs.writeFileSync(
+      handoffPromptPath,
+      'Read .claude/context/memory/active_context.md and execute ALL tasks under NEXT ACTION.',
+      'utf8'
+    );
   }
-  // Escape double quotes for shell embedding
+
+  // Use @file reference — Claude Code resolves this to file contents in the prompt
+  const seedPrompt = `@${handoffPromptPath.replace(/\\/g, '/')}`;
   const escapedPrompt = seedPrompt.replace(/"/g, '\\"');
   if (process.platform === 'win32') {
     cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p "${escapedPrompt}" && claude ${interactiveFlags} -c`;
