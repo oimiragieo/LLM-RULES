@@ -1,103 +1,209 @@
+/* global performance */
 'use strict';
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
+
 const {
-  checkInvariants,
-  BUILT_IN_INVARIANTS,
-} = require('../../.claude/lib/utils/invariant-checker.cjs');
+  generateInvariants,
+  checkInvariant,
+  checkAction,
+  Verdict,
+} = require('../../.claude/lib/validation/invariant-checker.cjs');
 
-describe('invariant-checker', () => {
-  const BASE_TIME = new Date('2026-01-08T00:00:00Z');
-  const makeEvent = (type, agent, tool, offsetSec = 0) => ({
-    type,
-    agent,
-    tool,
-    timestamp: new Date(BASE_TIME.getTime() + offsetSec * 1000),
+// ─── Verdict constants ──────────────────────────────────────────────────────
+
+describe('Verdict constants', () => {
+  it('exports trichotomy values', () => {
+    assert.equal(Verdict.CLEAR_PASS, 'clear_pass');
+    assert.equal(Verdict.CLEAR_FAIL, 'clear_fail');
+    assert.equal(Verdict.UNCLEAR, 'unclear');
   });
+});
 
-  it('returns passed:true and no violations for a clean event stream', () => {
-    const events = [
-      makeEvent('tool_use', 'developer', 'Read', 0),
-      makeEvent('tool_use', 'developer', 'TaskUpdate', 1),
-    ];
-    const result = checkInvariants({ events, invariants: BUILT_IN_INVARIANTS });
-    assert.equal(result.passed, true);
-    assert.deepEqual(result.violations, []);
-  });
+// ─── generateInvariants ─────────────────────────────────────────────────────
 
-  it('detects banned tool usage', () => {
-    const events = [makeEvent('tool_use', 'router', 'Grep', 0)];
-    const result = checkInvariants({ events, invariants: BUILT_IN_INVARIANTS });
-    assert.equal(result.passed, false);
-    const violation = result.violations.find(v => v.rule === 'no-banned-tools');
-    assert.ok(violation, 'should have a no-banned-tools violation');
-    assert.ok(violation.reason.includes('Grep'));
-  });
-
-  it('detects missing TaskUpdate in an agent session', () => {
-    const events = [
-      makeEvent('tool_use', 'developer', 'Read', 0),
-      makeEvent('tool_use', 'developer', 'Write', 1),
-      makeEvent('tool_use', 'developer', 'Bash', 2),
-      // No TaskUpdate
-    ];
-    const result = checkInvariants({ events, invariants: BUILT_IN_INVARIANTS });
-    assert.equal(result.passed, false);
-    const violation = result.violations.find(v => v.rule === 'requires-task-update');
-    assert.ok(violation, 'should have a requires-task-update violation');
-  });
-
-  it('detects excessive tool calls (>100)', () => {
-    const events = [];
-    for (let i = 0; i < 101; i++) {
-      events.push(makeEvent('tool_use', 'developer', 'Read', i));
-    }
-    // Add TaskUpdate to avoid that violation
-    events.push(makeEvent('tool_use', 'developer', 'TaskUpdate', 102));
-    const result = checkInvariants({ events, invariants: BUILT_IN_INVARIANTS });
-    assert.equal(result.passed, false);
-    const violation = result.violations.find(v => v.rule === 'max-tool-calls');
-    assert.ok(violation, 'should have a max-tool-calls violation');
-    assert.ok(violation.reason.includes('102') || violation.reason.includes('101'));
-  });
-
-  it('supports custom invariants alongside built-ins', () => {
-    const customInvariant = {
-      rule: 'no-write-by-router',
-      check: events =>
-        events
-          .filter(e => e.agent === 'router' && e.tool === 'Write')
-          .map(e => ({
-            rule: 'no-write-by-router',
-            event: e,
-            reason: 'Router must not use Write',
-          })),
+describe('generateInvariants', () => {
+  it('generates tool invariants from frontmatter', () => {
+    const frontmatter = {
+      name: 'developer',
+      tools: ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate'],
     };
-    const events = [
-      makeEvent('tool_use', 'developer', 'TaskUpdate', 0),
-      makeEvent('tool_use', 'router', 'Write', 1),
-    ];
-    const result = checkInvariants({ events, invariants: [customInvariant] });
-    assert.equal(result.passed, false);
-    assert.equal(result.violations[0].rule, 'no-write-by-router');
+    const invariants = generateInvariants(frontmatter);
+    const toolInvariant = invariants.find(i => i.type === 'allowed_tools');
+    assert.ok(toolInvariant);
+    assert.deepEqual(toolInvariant.allowedTools, ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate']);
   });
 
-  it('returns passed:false when multiple invariants are violated', () => {
-    const events = [
-      makeEvent('tool_use', 'router', 'Grep', 0), // banned tool
-      // no TaskUpdate — missing
-    ];
-    const result = checkInvariants({ events, invariants: BUILT_IN_INVARIANTS });
-    assert.equal(result.passed, false);
-    assert.ok(result.violations.length >= 2);
+  it('generates skill invariants from frontmatter', () => {
+    const frontmatter = {
+      name: 'developer',
+      tools: ['Read'],
+      skills: ['tdd', 'debugging'],
+    };
+    const invariants = generateInvariants(frontmatter);
+    const skillInvariant = invariants.find(i => i.type === 'allowed_skills');
+    assert.ok(skillInvariant);
+    assert.deepEqual(skillInvariant.allowedSkills, ['tdd', 'debugging']);
   });
 
-  it('returns passed:true for empty events with no built-in violations', () => {
-    // Empty stream: no banned tools, no tool calls at all (max-tool-calls fine),
-    // but missing TaskUpdate would trigger. Use custom empty invariants.
-    const result = checkInvariants({ events: [], invariants: [] });
-    assert.equal(result.passed, true);
-    assert.deepEqual(result.violations, []);
+  it('generates model invariant from frontmatter', () => {
+    const frontmatter = {
+      name: 'security-architect',
+      tools: ['Read'],
+      model: 'opus',
+    };
+    const invariants = generateInvariants(frontmatter);
+    const modelInvariant = invariants.find(i => i.type === 'required_model');
+    assert.ok(modelInvariant);
+    assert.equal(modelInvariant.model, 'opus');
+  });
+
+  it('handles missing tools gracefully', () => {
+    const frontmatter = { name: 'test-agent' };
+    const invariants = generateInvariants(frontmatter);
+    const toolInvariant = invariants.find(i => i.type === 'allowed_tools');
+    assert.ok(toolInvariant);
+    assert.deepEqual(toolInvariant.allowedTools, []);
+  });
+
+  it('handles missing skills gracefully', () => {
+    const frontmatter = { name: 'test-agent', tools: ['Read'] };
+    const invariants = generateInvariants(frontmatter);
+    const skillInvariant = invariants.find(i => i.type === 'allowed_skills');
+    assert.ok(skillInvariant);
+    assert.deepEqual(skillInvariant.allowedSkills, []);
+  });
+
+  it('returns empty invariants for null frontmatter', () => {
+    const invariants = generateInvariants(null);
+    assert.ok(Array.isArray(invariants));
+    assert.equal(invariants.length, 0);
+  });
+
+  it('generates agent name invariant', () => {
+    const frontmatter = { name: 'qa', tools: ['Read'] };
+    const invariants = generateInvariants(frontmatter);
+    const nameInvariant = invariants.find(i => i.type === 'agent_name');
+    assert.ok(nameInvariant);
+    assert.equal(nameInvariant.name, 'qa');
+  });
+});
+
+// ─── checkInvariant ─────────────────────────────────────────────────────────
+
+describe('checkInvariant', () => {
+  it('CLEAR_PASS when tool is in allowed list', () => {
+    const invariant = { type: 'allowed_tools', allowedTools: ['Read', 'Write', 'Edit'] };
+    const action = { tool: 'Read' };
+    const result = checkInvariant(invariant, action);
+    assert.equal(result.verdict, Verdict.CLEAR_PASS);
+  });
+
+  it('CLEAR_FAIL when tool is not in allowed list', () => {
+    const invariant = { type: 'allowed_tools', allowedTools: ['Read'] };
+    const action = { tool: 'Write' };
+    const result = checkInvariant(invariant, action);
+    assert.equal(result.verdict, Verdict.CLEAR_FAIL);
+    assert.ok(result.reason.includes('Write'));
+  });
+
+  it('UNCLEAR when tool is unknown/missing', () => {
+    const invariant = { type: 'allowed_tools', allowedTools: ['Read'] };
+    const action = {};
+    const result = checkInvariant(invariant, action);
+    assert.equal(result.verdict, Verdict.UNCLEAR);
+  });
+
+  it('CLEAR_PASS for skill in allowed list', () => {
+    const invariant = { type: 'allowed_skills', allowedSkills: ['tdd', 'debugging'] };
+    const action = { skill: 'tdd' };
+    const result = checkInvariant(invariant, action);
+    assert.equal(result.verdict, Verdict.CLEAR_PASS);
+  });
+
+  it('UNCLEAR for skill not in list (advisory)', () => {
+    const invariant = { type: 'allowed_skills', allowedSkills: ['tdd'] };
+    const action = { skill: 'unknown-skill' };
+    const result = checkInvariant(invariant, action);
+    assert.equal(result.verdict, Verdict.UNCLEAR);
+  });
+
+  it('CLEAR_PASS for model check matching', () => {
+    const invariant = { type: 'required_model', model: 'opus' };
+    const action = { model: 'opus' };
+    const result = checkInvariant(invariant, action);
+    assert.equal(result.verdict, Verdict.CLEAR_PASS);
+  });
+
+  it('CLEAR_FAIL for model mismatch', () => {
+    const invariant = { type: 'required_model', model: 'opus' };
+    const action = { model: 'haiku' };
+    const result = checkInvariant(invariant, action);
+    assert.equal(result.verdict, Verdict.CLEAR_FAIL);
+  });
+
+  it('UNCLEAR for unknown invariant type', () => {
+    const invariant = { type: 'unknown_type' };
+    const action = { tool: 'Read' };
+    const result = checkInvariant(invariant, action);
+    assert.equal(result.verdict, Verdict.UNCLEAR);
+  });
+});
+
+// ─── checkAction ────────────────────────────────────────────────────────────
+
+describe('checkAction', () => {
+  it('returns CLEAR_PASS when all invariants pass', () => {
+    const invariants = [
+      { type: 'allowed_tools', allowedTools: ['Read', 'Write'] },
+      { type: 'agent_name', name: 'developer' },
+    ];
+    const action = { tool: 'Read' };
+    const result = checkAction(invariants, action);
+    assert.equal(result.verdict, Verdict.CLEAR_PASS);
+    assert.equal(result.checks.length, 2);
+  });
+
+  it('returns CLEAR_FAIL when any invariant fails', () => {
+    const invariants = [
+      { type: 'allowed_tools', allowedTools: ['Read'] },
+      { type: 'required_model', model: 'opus' },
+    ];
+    const action = { tool: 'Write', model: 'opus' };
+    const result = checkAction(invariants, action);
+    assert.equal(result.verdict, Verdict.CLEAR_FAIL);
+  });
+
+  it('returns UNCLEAR when no fail but some unclear', () => {
+    const invariants = [
+      { type: 'allowed_tools', allowedTools: ['Read'] },
+      { type: 'unknown_type' },
+    ];
+    const action = { tool: 'Read' };
+    const result = checkAction(invariants, action);
+    assert.equal(result.verdict, Verdict.UNCLEAR);
+  });
+
+  it('handles empty invariants', () => {
+    const result = checkAction([], { tool: 'Read' });
+    assert.equal(result.verdict, Verdict.CLEAR_PASS);
+  });
+
+  it('includes agent name in result', () => {
+    const invariants = [{ type: 'agent_name', name: 'qa' }];
+    const result = checkAction(invariants, { tool: 'Read' });
+    assert.equal(result.agentName, 'qa');
+  });
+
+  it('performance: checks 100 invariants under 5ms', () => {
+    const invariants = [];
+    for (let i = 0; i < 100; i++) {
+      invariants.push({ type: 'allowed_tools', allowedTools: ['Read', 'Write', 'Edit'] });
+    }
+    const start = performance.now();
+    checkAction(invariants, { tool: 'Read' });
+    const elapsed = performance.now() - start;
+    assert.ok(elapsed < 5, `Took ${elapsed.toFixed(2)}ms, expected <5ms`);
   });
 });
