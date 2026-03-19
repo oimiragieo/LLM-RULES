@@ -232,7 +232,11 @@ function main() {
       );
       if (nextActionMatch) {
         // Take first 800 chars of the NEXT ACTION section (multi-line)
-        const actionText = nextActionMatch[1].trim().slice(0, 800).replace(/\n/g, ' ').replace(/\s+/g, ' ');
+        const actionText = nextActionMatch[1]
+          .trim()
+          .slice(0, 800)
+          .replace(/\n/g, ' ')
+          .replace(/\s+/g, ' ');
         seedPrompt = `Read .claude/context/memory/active_context.md and execute ALL tasks listed under NEXT ACTION. Do NOT stop after one task. Do NOT just clean up stale tasks. Execute the FULL pipeline: ${actionText}`;
       }
     }

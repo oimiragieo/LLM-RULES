@@ -9,9 +9,8 @@ maxTurns: 18
 permissionMode: default
 priority: high
 verified: true
-lastVerifiedAt: "2026-03-19T00:00:00.000Z"
-tools:
-  [Read, Write, Edit, Bash, Grep, Glob, MemoryRecord, TaskUpdate, Skill]
+lastVerifiedAt: '2026-03-19T00:00:00.000Z'
+tools: [Read, Write, Edit, Bash, Grep, Glob, MemoryRecord, TaskUpdate, Skill]
 skills:
   - memory-audit
   - context-compressor
@@ -34,18 +33,18 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `pre-tool-unified.cjs` | PreToolUse(*) | Validates tool scope, path safety, Windows compat (11 checks) | -- |
-| `post-tool-metrics-unified.cjs` | PostToolUse(*) | Metrics collection, execution monitoring, logging | -- |
-| `routing-guard.cjs` | PreToolUse(TaskCreate) | Enforces planner-first, specialist routing compliance | SPECIALIST_ROUTING_ENFORCEMENT |
-| `bash-pretool-bundle.cjs` | PreToolUse(Bash) | Command injection validator, null sanitizer | -- |
-| `write-pretool-bundle.cjs` | PreToolUse(Write\|Edit) | File safety, path validation, creator-guard checks | CREATOR_GUARD |
-| `taskupdate-contract-validator.cjs` | PostToolUse(TaskUpdate) | Validates TaskUpdate metadata schema | -- |
-| `pre-completion-validation.cjs` | PostToolUse(TaskUpdate) | Validates IMPLEMENTATION_RESULT block on completed status | -- |
-| `reflection-cleanup.cjs` | PostToolUse(TaskUpdate) | Processes reflection queue on task completion | -- |
-| `adaptive-quality-gate.cjs` | PostToolUse(*) | Dynamic quality checks based on task complexity | -- |
-| `hook-error-detector.cjs` | PostToolUse(*) | Detects and surfaces hook execution errors | -- |
+| Hook                                | Event                   | Purpose                                                       | Override                       |
+| ----------------------------------- | ----------------------- | ------------------------------------------------------------- | ------------------------------ |
+| `pre-tool-unified.cjs`              | PreToolUse(\*)          | Validates tool scope, path safety, Windows compat (11 checks) | --                             |
+| `post-tool-metrics-unified.cjs`     | PostToolUse(\*)         | Metrics collection, execution monitoring, logging             | --                             |
+| `routing-guard.cjs`                 | PreToolUse(TaskCreate)  | Enforces planner-first, specialist routing compliance         | SPECIALIST_ROUTING_ENFORCEMENT |
+| `bash-pretool-bundle.cjs`           | PreToolUse(Bash)        | Command injection validator, null sanitizer                   | --                             |
+| `write-pretool-bundle.cjs`          | PreToolUse(Write\|Edit) | File safety, path validation, creator-guard checks            | CREATOR_GUARD                  |
+| `taskupdate-contract-validator.cjs` | PostToolUse(TaskUpdate) | Validates TaskUpdate metadata schema                          | --                             |
+| `pre-completion-validation.cjs`     | PostToolUse(TaskUpdate) | Validates IMPLEMENTATION_RESULT block on completed status     | --                             |
+| `reflection-cleanup.cjs`            | PostToolUse(TaskUpdate) | Processes reflection queue on task completion                 | --                             |
+| `adaptive-quality-gate.cjs`         | PostToolUse(\*)         | Dynamic quality checks based on task complexity               | --                             |
+| `hook-error-detector.cjs`           | PostToolUse(\*)         | Detects and surfaces hook execution errors                    | --                             |
 
 See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -53,12 +52,12 @@ See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
-| Memory Protocol | `.claude/rules/memory-protocol.md` | Memory tier architecture, read/write rules |
-| Cleanup Always | `.claude/rules/cleanup-always.md` | End-of-task cleanup scan |
-| Deviation Protocol | `.claude/rules/deviation-protocol.md` | Unexpected finding handling |
+| Workflow              | Path                                     | When to Use                                |
+| --------------------- | ---------------------------------------- | ------------------------------------------ |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance       |
+| Memory Protocol       | `.claude/rules/memory-protocol.md`       | Memory tier architecture, read/write rules |
+| Cleanup Always        | `.claude/rules/cleanup-always.md`        | End-of-task cleanup scan                   |
+| Deviation Protocol    | `.claude/rules/deviation-protocol.md`    | Unexpected finding handling                |
 
 **Output Standards** (from workspace-conventions):
 
@@ -201,10 +200,10 @@ Write a memory health report to `.claude/context/reports/backend/memory-health-r
 const status = {
   lastRunAt: new Date().toISOString(),
   lastRunBy: 'memory-manager',
-  filesRotated: [],       // fill from step 3
-  duplicatesRemoved: 0,   // fill from step 2
-  bytesReclaimed: 0,      // fill from measurements
-  nextRecommendedRun: ''  // ISO date + N days
+  filesRotated: [], // fill from step 3
+  duplicatesRemoved: 0, // fill from step 2
+  bytesReclaimed: 0, // fill from measurements
+  nextRecommendedRun: '', // ISO date + N days
 };
 ```
 
@@ -236,16 +235,16 @@ When executing tasks, follow this 8-step approach:
 
 ## Example Interactions
 
-| User Request | Agent Action |
-|---|---|
-| "Run a memory health audit" | Full audit: baseline → dedup check → rotation check → health report |
-| "Memory files are too large, clean them up" | Dry-run analysis → report size candidates → rotate on confirmation |
-| "Show me memory stats" | Baseline assessment only → formatted report of sizes/entry counts |
-| "Deduplicate learnings.md" | Run memory-deduplicator.cjs on learnings.md → report duplicates found |
-| "Archive old decisions" | Identify entries older than threshold → move to archive/decisions-YYYY-MM.md |
-| "Check when memory was last maintained" | Read maintenance-status.json → report last run time and outcomes |
-| "Prune low-value memory entries" | Run smart-pruner in analyze mode → show candidates → prune on confirmation |
-| "Clean up stale STM/MTM session files" | List sessions older than current → remove expired files → update status |
+| User Request                                | Agent Action                                                                 |
+| ------------------------------------------- | ---------------------------------------------------------------------------- |
+| "Run a memory health audit"                 | Full audit: baseline → dedup check → rotation check → health report          |
+| "Memory files are too large, clean them up" | Dry-run analysis → report size candidates → rotate on confirmation           |
+| "Show me memory stats"                      | Baseline assessment only → formatted report of sizes/entry counts            |
+| "Deduplicate learnings.md"                  | Run memory-deduplicator.cjs on learnings.md → report duplicates found        |
+| "Archive old decisions"                     | Identify entries older than threshold → move to archive/decisions-YYYY-MM.md |
+| "Check when memory was last maintained"     | Read maintenance-status.json → report last run time and outcomes             |
+| "Prune low-value memory entries"            | Run smart-pruner in analyze mode → show candidates → prune on confirmation   |
+| "Clean up stale STM/MTM session files"      | List sessions older than current → remove expired files → update status      |
 
 ## Output Locations
 

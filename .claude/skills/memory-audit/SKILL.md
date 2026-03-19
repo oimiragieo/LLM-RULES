@@ -6,9 +6,9 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Bash, Grep, Glob, TaskUpdate]
-args: "[--auto-fix] [--report-only]"
+args: '[--auto-fix] [--report-only]'
 agents: [memory-manager, qa, architect, developer]
-category: "Memory & Context"
+category: 'Memory & Context'
 tags: [memory, audit, health-check, observability, dedup]
 ---
 
@@ -44,11 +44,11 @@ grep -c "^type:" "$MEMORY_DIR/"*.md 2>/dev/null | grep -v MEMORY
 
 **Thresholds:**
 
-| Metric | OK | WARN | CRITICAL |
-|--------|-----|------|----------|
+| Metric          | OK   | WARN    | CRITICAL           |
+| --------------- | ---- | ------- | ------------------ |
 | MEMORY.md lines | <150 | 150-199 | >=200 (truncated!) |
-| Total files | <20 | 20-30 | >30 |
-| Feedback ratio | <70% | 70-85% | >85% (skewed) |
+| Total files     | <20  | 20-30   | >30                |
+| Feedback ratio  | <70% | 70-85%  | >85% (skewed)      |
 
 **Check:** Flag files present in directory but not referenced in MEMORY.md (orphaned).
 
@@ -67,15 +67,15 @@ find .claude/context/memory/ -name "*.bak" | wc -l
 
 **Thresholds:**
 
-| Metric | OK | WARN | CRITICAL |
-|--------|-----|------|----------|
-| Directory size | <5MB | 5-10MB | >10MB |
-| Total files | <120 | 120-200 | >200 |
-| learnings.md lines | <300 | 300-500 | >500 (blocks spawning!) |
-| decisions.md lines | <200 | 200-400 | >400 |
-| issues.md lines | <300 | 300-500 | >500 |
-| Delegation PID files | 0 | 1-10 | >10 |
-| .bak files | 0 | 1-3 | >3 |
+| Metric               | OK   | WARN    | CRITICAL                |
+| -------------------- | ---- | ------- | ----------------------- |
+| Directory size       | <5MB | 5-10MB  | >10MB                   |
+| Total files          | <120 | 120-200 | >200                    |
+| learnings.md lines   | <300 | 300-500 | >500 (blocks spawning!) |
+| decisions.md lines   | <200 | 200-400 | >400                    |
+| issues.md lines      | <300 | 300-500 | >500                    |
+| Delegation PID files | 0    | 1-10    | >10                     |
+| .bak files           | 0    | 1-3     | >3                      |
 
 **Verify:** STM/MTM/LTM directories exist with content.
 
@@ -141,15 +141,20 @@ Write structured report to `.claude/context/reports/memory-audit-{YYYY-MM-DD}.md
 ## Health Score: {0-100}/100
 
 ## Summary Table
+
 | System | Metric | Current | Threshold | Status |
-|--------|--------|---------|-----------|--------|
+| ------ | ------ | ------- | --------- | ------ |
 
 ## Findings
+
 ### P0 (Critical)
+
 ### P1 (High)
+
 ### P2 (Low)
 
 ## Recommendations
+
 1. ...
 ```
 
