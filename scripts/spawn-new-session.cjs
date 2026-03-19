@@ -222,7 +222,10 @@ function main() {
   // the prompt context automatically. This avoids command-line length
   // limits that caused black-window hangs on Windows.
   const activeCtxPath = path.join(process.cwd(), '.claude/context/memory/active_context.md');
-  const handoffPromptPath = path.join(process.cwd(), '.claude/context/runtime/handoff-seed-prompt.md');
+  const handoffPromptPath = path.join(
+    process.cwd(),
+    '.claude/context/runtime/handoff-seed-prompt.md'
+  );
 
   // Build the seed prompt file with explicit instructions + @file reference
   try {
@@ -256,13 +259,18 @@ function main() {
     );
   }
 
-  // Use @file reference — Claude Code resolves this to file contents in the prompt
-  const seedPrompt = `@${handoffPromptPath.replace(/\\/g, '/')}`;
-  const escapedPrompt = seedPrompt.replace(/"/g, '\\"');
+  // Launch interactive session directly — NO -p flag.
+  // The handover-detector.cjs UserPromptSubmit hook detects CLAUDE_FRESH_SPAWN=1
+  // and injects the handoff context on the first user prompt.
+  // The handoff-seed-prompt.md file is available for the user or hook to read.
+  //
+  // Why not -p: (1) -p runs in print mode (no TUI, black window until done),
+  // (2) @file syntax doesn't work in -p flag (literal text only),
+  // (3) long prompts hit Windows cmd line limits causing hangs.
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p "${escapedPrompt}" && claude ${interactiveFlags} -c`;
+    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags}`;
   } else {
-    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p "${escapedPrompt}" && claude ${interactiveFlags} -c`;
+    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags}`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
