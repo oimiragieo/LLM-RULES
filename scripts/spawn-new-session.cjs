@@ -231,13 +231,11 @@ function main() {
         /(?:#{1,3}\s+|\*\*)?NEXT ACTION\s*\(IMMEDIATE\):?\*?\*?\s*\n([\s\S]+?)(?=\n#{1,3}\s|\n---|$)/
       );
       if (nextActionMatch) {
-        // Take first 800 chars of the NEXT ACTION section (multi-line)
-        const actionText = nextActionMatch[1]
-          .trim()
-          .slice(0, 800)
-          .replace(/\n/g, ' ')
-          .replace(/\s+/g, ' ');
-        seedPrompt = `Read .claude/context/memory/active_context.md and execute ALL tasks listed under NEXT ACTION. Do NOT stop after one task. Do NOT just clean up stale tasks. Execute the FULL pipeline: ${actionText}`;
+        // Keep seed prompt SHORT — long prompts break Windows cmd line limits
+        // and cause black-window hangs with -p flag.
+        // Just tell the new session WHERE to read, not WHAT to do inline.
+        seedPrompt =
+          'Read .claude/context/memory/active_context.md and execute ALL tasks under NEXT ACTION. Do NOT stop after one task. Do NOT just clean up stale tasks. Execute the FULL pipeline described in that file.';
       }
     }
   } catch {
