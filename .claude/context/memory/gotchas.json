@@ -123,5 +123,15 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "588ffda1f1841069f25f83ac3542bf5ad836e3fb"
+  },
+  {
+    "text": "CROSS-REFERENCE: CC auto-memory stores platform gotchas in ~/.claude/projects/.../memory/reference_technical_fixes.md (Windows paths, SQLite EBUSY, hook exit codes). Agent-studio gotchas.json stores operational gotchas. Both systems are canonical for their domain — CC for behavioral guidance, agent-studio for operational patterns. Do not duplicate entries across systems.",
+    "area": "cross-system",
+    "timestamp": "2026-03-19T15:31:10.894Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "cross-ref-cc-as-memory-2026-03-19"
   }
 ]

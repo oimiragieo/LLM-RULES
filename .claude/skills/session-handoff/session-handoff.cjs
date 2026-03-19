@@ -147,8 +147,8 @@ function buildResumeInstructions() {
     risks.push(...issueLines.map(l => l.replace(/^[-*]\s+/, '')));
   }
 
-  // Resume prompt
-  const resumePrompt = `You are resuming an in-progress session. Start by running TaskList() to discover pending work, then check active_context.md for details.`;
+  // Resume prompt — be explicit about executing ALL work, not just discovering it
+  const resumePrompt = `You are resuming an in-progress session. Read .claude/context/memory/active_context.md FIRST and execute ALL tasks listed under NEXT ACTION (IMMEDIATE). Do NOT stop after one task — complete the FULL pipeline. Use TaskList() to track progress. Spawn specialist agents for each wave. Do NOT just clean up stale tasks and stop.`;
 
   return {
     objective,

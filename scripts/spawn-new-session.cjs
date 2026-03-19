@@ -222,9 +222,18 @@ function main() {
   try {
     if (fs.existsSync(activeCtxPath)) {
       const ctx = fs.readFileSync(activeCtxPath, 'utf8');
-      const nextActionMatch = ctx.match(/\*\*NEXT ACTION \(IMMEDIATE\):\*\*\s*(.+?)(?:\n|$)/);
+      // Match NEXT ACTION in multiple formats:
+      // - ## NEXT ACTION (IMMEDIATE)    (H2 header)
+      // - **NEXT ACTION (IMMEDIATE):**  (bold with colon)
+      // - NEXT ACTION (IMMEDIATE):      (plain with colon)
+      // Capture everything until the next ## heading or end of file
+      const nextActionMatch = ctx.match(
+        /(?:#{1,3}\s+|\*\*)?NEXT ACTION\s*\(IMMEDIATE\):?\*?\*?\s*\n([\s\S]+?)(?=\n#{1,3}\s|\n---|$)/
+      );
       if (nextActionMatch) {
-        seedPrompt = `Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top. Skip reflections — go straight to implementation. Here is the action: ${nextActionMatch[1].trim().slice(0, 500)}`;
+        // Take first 800 chars of the NEXT ACTION section (multi-line)
+        const actionText = nextActionMatch[1].trim().slice(0, 800).replace(/\n/g, ' ').replace(/\s+/g, ' ');
+        seedPrompt = `Read .claude/context/memory/active_context.md and execute ALL tasks listed under NEXT ACTION. Do NOT stop after one task. Do NOT just clean up stale tasks. Execute the FULL pipeline: ${actionText}`;
       }
     }
   } catch {
