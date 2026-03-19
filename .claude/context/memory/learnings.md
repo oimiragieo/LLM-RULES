@@ -39,6 +39,32 @@
 
 ---
 
+## Session Handoff Regex Patterns & Resume Prompt Instrumentation (2026-03-19) [Task 10 reflection]
+
+**[PATTERN] NEXT ACTION Header Detection in Session Handoff**
+
+- `spawn-new-session.cjs` had regex that only matched `**bold:** format` for NEXT ACTION extraction
+- This caused handoff parser to fall back to generic "continue previous work" prompt, missing specific pending work
+- Fix: regex now matches `## H2` headers via `^\s*##\s+NEXT\s+ACTION` pattern
+- Key learning: session handoff prompts must be robust to multiple formatting styles (markdown headers are more stable than inline bold)
+- Pattern: structured markdown headers (## NEXT ACTION) are more reliable than prose markers (**bold:**) in multi-agent pipelines
+
+**[PATTERN] Resume Prompt Explicit Instrumentation**
+
+- `session-handoff.cjs` resumePrompt now explicitly says "execute ALL pending tasks in the queue"
+- Previous version: vague language ("continue" / "resume") led to agents pausing work prematurely
+- Fix: explicit instruction "Execute ALL tasks" removes ambiguity
+- Pattern: session handoff prompts must use imperative language, not suggestive language, when work is pending
+- Instruction clarity directly impacts whether spawned agents complete the full pipeline vs stopping early
+
+**[CURATION] Decisions**
+
+- Retain: regex pattern for H2 header matching (reusable across other handoff implementations)
+- Retain: explicit instrumentation pattern (applicable to all session handoff contexts)
+- Archive: specific session-handoff.cjs line numbers (implementation detail, not reusable guidance)
+
+---
+
 ## Session CWD in Pruned Worktree Breaks ALL Hooks (2026-03-17) [Task 5 reflection]
 
 **[CRITICAL] Hook MODULE_NOT_FOUND: Cause and Prevention**
