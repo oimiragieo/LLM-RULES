@@ -1,6 +1,8 @@
-## Session Handoff — 2026-03-18T23:00:00Z
+## Session Handoff — 2026-03-19
 
 **STATUS: EPIC Framework Evolution — ALL 30/30 FEATURES COMPLETE**
+
+**NEXT ACTION (IMMEDIATE):** Run reflection-agent to assess Phase 4-5 implementation quality. Spawn `qa` agent to run full test suite (`pnpm test`). Spawn `code-reviewer` to review the 14 new modules. Do NOT implement directly — always spawn specialist agents.
 
 ### Completed Phases:
 
@@ -12,30 +14,15 @@
 
 **Total: 30/30 GO features. 424+ tests passing (161 Phase 1-3 + 263 Phase 4-5).**
 
-### Phase 4 Modules:
-
-| Module | Location | Tests |
-|--------|----------|-------|
-| wave-grouper.cjs | `.claude/lib/orchestration/wave-grouper.cjs` | 26 |
-| conditional-executor.cjs | `.claude/lib/orchestration/conditional-executor.cjs` | 20 |
-| invariant-checker.cjs | `.claude/lib/validation/invariant-checker.cjs` | 22 |
-| autonomous-executor.cjs | `.claude/lib/orchestration/autonomous-executor.cjs` | 24 |
-| routing-v2.cjs | `.claude/lib/routing/routing-v2.cjs` | 16 |
-
-### Phase 5 Modules:
-
-| Module | Location | Tests |
-|--------|----------|-------|
-| prm-scorer.cjs | `.claude/lib/metrics/prm-scorer.cjs` | 20 |
-| eval-runner.cjs | `.claude/lib/metrics/eval-runner.cjs` | 17 |
-| dag-store.cjs | `.claude/lib/memory/dag-store.cjs` | 18 |
-| model-profiles.cjs | `.claude/lib/routing/model-profiles.cjs` | 17 |
-| pause-resume.cjs | `.claude/lib/orchestration/pause-resume.cjs` | 16 |
-| atomic-committer.cjs | `.claude/lib/git/atomic-committer.cjs` | 18 |
-| quick-flow.cjs | `.claude/lib/orchestration/quick-flow.cjs` | 20 |
-| ast-compressor.cjs | `.claude/lib/compression/ast-compressor.cjs` | 16 |
-| multi-export.cjs | `.claude/lib/export/multi-export.cjs` | 13 |
+### Post-implementation fixes applied:
+- MCP tool bypass in hook enforcement closed (commit 6a29f00d)
+- settings.json matchers updated for mcp__filesystem__* tools
+- router-tool-lockdown.cjs and unified-creator-guard.cjs updated with MCP mapping functions
 
 ### Implementation Plan:
-
 `.claude/context/plans/epic-framework-evolution-plan-2026-03-18.md`
+
+### Key: Router MUST spawn agents, never implement directly
+- Even if context seems deep, a fresh session has fresh context and CAN spawn
+- MCP tools bypass hook enforcement — router must never use them for file operations
+- Always route: developer for code, qa for tests, code-reviewer for review
