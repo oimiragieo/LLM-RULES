@@ -53,6 +53,12 @@
       "description": "Skills always active for this agent (from matrix always list), uncapped",
       "items": { "type": "string", "maxLength": 200 },
       "maxItems": 200
+    },
+    "fingerprint": {
+      "type": "string",
+      "description": "Agent fingerprint UUID for integrity verification",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "maxLength": 36
     }
   },
   "$defs": {

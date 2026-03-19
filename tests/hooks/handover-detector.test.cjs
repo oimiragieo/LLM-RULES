@@ -322,7 +322,10 @@ test('handover-detector > M8.1: injected message contains Step 0 pre-flight bloc
   assert.ok(res.message.includes('Pre-flight'), 'Should include pre-flight section');
   assert.ok(res.message.includes('BACKGROUND'), 'Pre-flight should be labeled BACKGROUND');
   assert.ok(res.message.includes('stale-tasks.json'), 'Should reference stale-tasks.json');
-  assert.ok(res.message.includes('reflection-spawn-request.json'), 'Should reference reflection queue');
+  assert.ok(
+    res.message.includes('reflection-spawn-request.json'),
+    'Should reference reflection queue'
+  );
 
   // IMMEDIATE ACTION must appear BEFORE pre-flight in the message
   const actionIdx = res.message.indexOf('IMMEDIATE ACTION');

@@ -234,6 +234,35 @@ function rotateIfNeeded(filePath, options = {}) {
   // Write truncated active file atomically
   atomicWriteSync(filePath, truncatedContent);
 
+  // Clean up .bak file — rotation succeeded, backup is no longer needed
+  const bakPath = filePath + '.bak';
+  try {
+    if (fs.existsSync(bakPath)) {
+      fs.unlinkSync(bakPath);
+    }
+  } catch (_) {
+    // Non-critical — .bak cleanup failure should not block rotation
+  }
+
+  // Clean up stale delegation PID files (> 24 hours old)
+  try {
+    const memoryDir = path.dirname(filePath);
+    const entries = fs.readdirSync(memoryDir);
+    const now = Date.now();
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    for (const entry of entries) {
+      if (entry.startsWith('delegations.pid-') && entry.endsWith('.json')) {
+        const fullPath = path.join(memoryDir, entry);
+        const stat = fs.statSync(fullPath);
+        if (now - stat.mtimeMs > ONE_DAY_MS) {
+          fs.unlinkSync(fullPath);
+        }
+      }
+    }
+  } catch (_) {
+    // Non-critical — delegation cleanup failure should not block rotation
+  }
+
   // Calculate metrics
   const archivedBytes = sectionsToArchive.reduce((sum, s) => sum + s.content.length, 0);
 

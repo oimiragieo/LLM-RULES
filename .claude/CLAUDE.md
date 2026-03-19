@@ -344,6 +344,7 @@ Never claim completion with open tasks or unprocessed reflections.
 | Memory leak / profiling / root cause      | `advanced-debugging`     |
 | Heartbeat loops / cron ecosystem mgmt     | `heartbeat-orchestrator` |
 | Task hygiene / stale task audit           | `task-manager`           |
+| Memory audit / memory health / cleanup    | `memory-manager`         |
 
 Full table and new agent entries: **@AGENT_ROUTING_TABLE.md** (canonical source for routing).
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`

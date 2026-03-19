@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-17T06:36:27.655Z",
+  "generatedAt": "2026-03-19T14:56:56.958Z",
   "metadata": {
-    "totalAgents": 101,
-    "healthyAgents": 101,
+    "totalAgents": 102,
+    "healthyAgents": 102,
     "degradedAgents": 0,
     "unavailableAgents": 0,
-    "lastHealthCheck": "2026-03-17T06:36:27.655Z",
-    "lastFullScan": "2026-03-17T06:36:27.655Z"
+    "lastHealthCheck": "2026-03-19T14:56:56.958Z",
+    "lastFullScan": "2026-03-19T14:56:56.958Z"
   },
   "agents": {
     "architect": {
@@ -15,6 +15,7 @@
       "displayName": "architect",
       "category": "core",
       "filePath": ".claude/agents/core/architect.md",
+      "fingerprint": "27c70e5a-ad25-58fa-91f0-2b5f2af9256a",
       "capabilities": [
         {
           "name": "architect",
@@ -115,14 +116,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.639Z",
+        "lastUpdate": "2026-03-19T14:56:56.940Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.641Z",
-        "updatedAt": "2026-03-17T06:36:27.641Z"
+        "createdAt": "2026-03-19T14:56:56.941Z",
+        "updatedAt": "2026-03-19T14:56:56.941Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -139,14 +140,16 @@
       "displayName": "context-compressor",
       "category": "core",
       "filePath": ".claude/agents/core/context-compressor.md",
+      "fingerprint": "631019cd-c73d-5366-972b-76bbd0e291d0",
       "capabilities": [
         {
           "name": "context-compressor",
           "domain": "code",
-          "description": "Intelligently summarizes and compresses context (files, logs, outputs) to save tokens and prevent poisoning.",
+          "description": "Compress large context using Python engine scripts. Profile, compress, validate evidence, persist learnings.",
           "triggerPhrases": [
             "context",
             "compressor",
+            "validate",
             "code-semantic-search",
             "code-structural-search",
             "context-compressor",
@@ -156,12 +159,12 @@
             "session-handoff",
             "summarize-changes",
             "task-management-protocol",
-            "context-compressor",
             "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Write",
+            "Bash",
             "Grep",
             "Glob",
             "TaskUpdate",
@@ -170,7 +173,6 @@
             "TaskGet",
             "Skill",
             "MemoryRecord",
-            "Bash",
             "Edit"
           ],
           "skills": [
@@ -183,7 +185,6 @@
             "session-handoff",
             "summarize-changes",
             "task-management-protocol",
-            "context-compressor",
             "verification-before-completion",
             "insight-extraction"
           ],
@@ -191,6 +192,7 @@
           "tags": [
             "context",
             "compressor",
+            "validate",
             "code-semantic-search",
             "code-structural-search",
             "context-compressor",
@@ -200,7 +202,6 @@
             "session-handoff",
             "summarize-changes",
             "task-management-protocol",
-            "context-compressor",
             "verification-before-completion",
             "insight-extraction"
           ]
@@ -216,14 +217,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.641Z",
+        "lastUpdate": "2026-03-19T14:56:56.942Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
-        "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.641Z",
-        "updatedAt": "2026-03-17T06:36:27.641Z"
+        "version": "2.0.0",
+        "createdAt": "2026-03-19T14:56:56.942Z",
+        "updatedAt": "2026-03-19T14:56:56.942Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -240,6 +241,7 @@
       "displayName": "developer",
       "category": "core",
       "filePath": ".claude/agents/core/developer.md",
+      "fingerprint": "6748e8a5-a313-5338-9c63-33e2decc966a",
       "capabilities": [
         {
           "name": "developer",
@@ -488,7 +490,6 @@
             "modern-python",
             "typescript-expert",
             "security-architect",
-            "context-compressor",
             "agent-tool-design"
           ],
           "examples": [],
@@ -556,14 +557,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.642Z",
+        "lastUpdate": "2026-03-19T14:56:56.942Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.642Z",
-        "updatedAt": "2026-03-17T06:36:27.642Z"
+        "createdAt": "2026-03-19T14:56:56.942Z",
+        "updatedAt": "2026-03-19T14:56:56.942Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -581,6 +582,7 @@
       "displayName": "general-assistant",
       "category": "core",
       "filePath": ".claude/agents/core/general-assistant.md",
+      "fingerprint": "b329928e-bbc7-5b18-8c7e-e021f3d48017",
       "capabilities": [
         {
           "name": "general-assistant",
@@ -606,7 +608,6 @@
             "insight-extraction",
             "research-synthesis",
             "interactive-requirements-gathering",
-            "context-compressor",
             "code-structural-search",
             "verification-before-completion"
           ],
@@ -642,7 +643,6 @@
             "insight-extraction",
             "research-synthesis",
             "interactive-requirements-gathering",
-            "context-compressor",
             "code-structural-search",
             "verification-before-completion"
           ],
@@ -667,7 +667,6 @@
             "insight-extraction",
             "research-synthesis",
             "interactive-requirements-gathering",
-            "context-compressor",
             "code-structural-search",
             "verification-before-completion"
           ]
@@ -683,14 +682,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.642Z",
+        "lastUpdate": "2026-03-19T14:56:56.943Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.642Z",
-        "updatedAt": "2026-03-17T06:36:27.642Z"
+        "createdAt": "2026-03-19T14:56:56.943Z",
+        "updatedAt": "2026-03-19T14:56:56.943Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -707,6 +706,7 @@
       "displayName": "planner",
       "category": "core",
       "filePath": ".claude/agents/core/planner.md",
+      "fingerprint": "58510171-f77f-5d91-b7c9-590a4e83e2be",
       "capabilities": [
         {
           "name": "planner",
@@ -766,7 +766,6 @@
             "task-management-protocol",
             "context-compressor",
             "verification-before-completion",
-            "context-compressor",
             "spec-gathering",
             "context-degradation",
             "brainstorming",
@@ -793,7 +792,6 @@
             "task-management-protocol",
             "context-compressor",
             "verification-before-completion",
-            "context-compressor",
             "spec-gathering",
             "context-degradation",
             "brainstorming",
@@ -813,14 +811,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.642Z",
+        "lastUpdate": "2026-03-19T14:56:56.943Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.4.0",
-        "createdAt": "2026-03-17T06:36:27.642Z",
-        "updatedAt": "2026-03-17T06:36:27.642Z"
+        "createdAt": "2026-03-19T14:56:56.943Z",
+        "updatedAt": "2026-03-19T14:56:56.943Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -837,6 +835,7 @@
       "displayName": "pm",
       "category": "core",
       "filePath": ".claude/agents/core/pm.md",
+      "fingerprint": "b72c505c-28c6-5ded-a0fb-c3486e758308",
       "capabilities": [
         {
           "name": "pm",
@@ -917,14 +916,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.643Z",
+        "lastUpdate": "2026-03-19T14:56:56.943Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.643Z",
-        "updatedAt": "2026-03-17T06:36:27.643Z"
+        "createdAt": "2026-03-19T14:56:56.943Z",
+        "updatedAt": "2026-03-19T14:56:56.943Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -941,6 +940,7 @@
       "displayName": "qa",
       "category": "core",
       "filePath": ".claude/agents/core/qa.md",
+      "fingerprint": "46f6dfc6-9b3c-503f-8b0e-cb3c3a49d6b7",
       "capabilities": [
         {
           "name": "qa",
@@ -961,7 +961,8 @@
             "tdd",
             "test-generator",
             "context-compressor",
-            "verification-before-completion"
+            "verification-before-completion",
+            "goal-backward-verification"
           ],
           "requiredTools": [
             "Read",
@@ -993,6 +994,7 @@
             "test-generator",
             "context-compressor",
             "verification-before-completion",
+            "goal-backward-verification",
             "code-analyzer",
             "rule-auditor",
             "qa-workflow",
@@ -1021,6 +1023,7 @@
             "test-generator",
             "context-compressor",
             "verification-before-completion",
+            "goal-backward-verification",
             "code-analyzer",
             "rule-auditor",
             "qa-workflow",
@@ -1044,14 +1047,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.643Z",
+        "lastUpdate": "2026-03-19T14:56:56.943Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.643Z",
-        "updatedAt": "2026-03-17T06:36:27.643Z"
+        "createdAt": "2026-03-19T14:56:56.943Z",
+        "updatedAt": "2026-03-19T14:56:56.943Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1068,6 +1071,7 @@
       "displayName": "reflection-agent",
       "category": "core",
       "filePath": ".claude/agents/core/reflection-agent.md",
+      "fingerprint": "da1decaf-aa3c-5617-82a2-c90d6d21468f",
       "capabilities": [
         {
           "name": "reflection-agent",
@@ -1122,7 +1126,6 @@
             "context-compressor",
             "verification-before-completion",
             "artifact-integrator",
-            "context-compressor",
             "summarize-changes",
             "agent-evaluation",
             "debug-log-analysis"
@@ -1146,7 +1149,6 @@
             "context-compressor",
             "verification-before-completion",
             "artifact-integrator",
-            "context-compressor",
             "summarize-changes",
             "agent-evaluation",
             "debug-log-analysis"
@@ -1163,14 +1165,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.643Z",
+        "lastUpdate": "2026-03-19T14:56:56.944Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.644Z",
-        "updatedAt": "2026-03-17T06:36:27.644Z"
+        "createdAt": "2026-03-19T14:56:56.944Z",
+        "updatedAt": "2026-03-19T14:56:56.944Z"
       },
       "alwaysSkills": []
     },
@@ -1179,6 +1181,7 @@
       "displayName": "technical-program-manager",
       "category": "core",
       "filePath": ".claude/agents/core/technical-program-manager.md",
+      "fingerprint": "c6c6a061-51cb-5ce7-8f4c-4bb161fe04dd",
       "capabilities": [
         {
           "name": "technical-program-manager",
@@ -1263,14 +1266,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.944Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.944Z",
+        "updatedAt": "2026-03-19T14:56:56.944Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1287,6 +1290,7 @@
       "displayName": "technical-writer",
       "category": "core",
       "filePath": ".claude/agents/core/technical-writer.md",
+      "fingerprint": "7b0067e2-897f-5b79-8541-8cb1f3274c55",
       "capabilities": [
         {
           "name": "technical-writer",
@@ -1370,14 +1374,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.944Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.944Z",
+        "updatedAt": "2026-03-19T14:56:56.944Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1394,6 +1398,7 @@
       "displayName": "accessibility-tester",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/accessibility-tester.md",
+      "fingerprint": "a2b7284f-e2bc-50f6-85fe-814b720e72ec",
       "capabilities": [
         {
           "name": "accessibility-tester",
@@ -1473,14 +1478,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.944Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.944Z",
+        "updatedAt": "2026-03-19T14:56:56.944Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1497,6 +1502,7 @@
       "displayName": "advanced-debugging",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/advanced-debugging.md",
+      "fingerprint": "ac56bbef-84ed-5926-aa18-32747f211d6f",
       "capabilities": [
         {
           "name": "advanced-debugging",
@@ -1583,14 +1589,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.944Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.944Z",
+        "updatedAt": "2026-03-19T14:56:56.944Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1607,6 +1613,7 @@
       "displayName": "c4-code",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/c4-code.md",
+      "fingerprint": "1d83fe6e-9abe-54a7-a304-bf824581530b",
       "capabilities": [
         {
           "name": "c4-code",
@@ -1680,14 +1687,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.945Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.945Z",
+        "updatedAt": "2026-03-19T14:56:56.945Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1702,6 +1709,7 @@
       "displayName": "c4-component",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/c4-component.md",
+      "fingerprint": "1fed9204-511f-57b4-8d48-ee22292b2fb8",
       "capabilities": [
         {
           "name": "c4-component",
@@ -1775,14 +1783,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.945Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.945Z",
+        "updatedAt": "2026-03-19T14:56:56.945Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1797,6 +1805,7 @@
       "displayName": "c4-container",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/c4-container.md",
+      "fingerprint": "d2141665-284b-5697-8199-84d994a192b7",
       "capabilities": [
         {
           "name": "c4-container",
@@ -1873,14 +1882,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.945Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.945Z",
+        "updatedAt": "2026-03-19T14:56:56.945Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1895,6 +1904,7 @@
       "displayName": "c4-context",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/c4-context.md",
+      "fingerprint": "a8f760f3-7cd4-5324-a43f-7106f809af73",
       "capabilities": [
         {
           "name": "c4-context",
@@ -1970,14 +1980,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.945Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.945Z",
+        "updatedAt": "2026-03-19T14:56:56.945Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1992,6 +2002,7 @@
       "displayName": "chaos-engineer",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/chaos-engineer.md",
+      "fingerprint": "d5c2dd59-73fe-5039-aac5-921cbd108a98",
       "capabilities": [
         {
           "name": "chaos-engineer",
@@ -2074,14 +2085,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.945Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.945Z",
+        "updatedAt": "2026-03-19T14:56:56.945Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2098,6 +2109,7 @@
       "displayName": "code-reviewer",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/code-reviewer.md",
+      "fingerprint": "3a2e39cb-da1d-5917-899a-7294127235f3",
       "capabilities": [
         {
           "name": "code-reviewer",
@@ -2121,6 +2133,7 @@
             "task-management-protocol",
             "tdd",
             "context-compressor",
+            "adversarial-review",
             "verification-before-completion"
           ],
           "requiredTools": [
@@ -2151,6 +2164,7 @@
             "task-management-protocol",
             "tdd",
             "context-compressor",
+            "adversarial-review",
             "verification-before-completion",
             "code-style-validator",
             "rule-auditor",
@@ -2179,6 +2193,7 @@
             "task-management-protocol",
             "tdd",
             "context-compressor",
+            "adversarial-review",
             "verification-before-completion",
             "code-style-validator",
             "rule-auditor",
@@ -2200,14 +2215,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.645Z",
+        "lastUpdate": "2026-03-19T14:56:56.945Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.645Z",
-        "updatedAt": "2026-03-17T06:36:27.645Z"
+        "createdAt": "2026-03-19T14:56:56.945Z",
+        "updatedAt": "2026-03-19T14:56:56.945Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2226,6 +2241,7 @@
       "displayName": "code-simplifier",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/code-simplifier.md",
+      "fingerprint": "48671f20-44a6-5b90-8d89-4a89c07f70bd",
       "capabilities": [
         {
           "name": "code-simplifier",
@@ -2307,14 +2323,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.646Z",
+        "lastUpdate": "2026-03-19T14:56:56.946Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.646Z",
-        "updatedAt": "2026-03-17T06:36:27.646Z"
+        "createdAt": "2026-03-19T14:56:56.946Z",
+        "updatedAt": "2026-03-19T14:56:56.946Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2331,6 +2347,7 @@
       "displayName": "conductor-validator",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/conductor-validator.md",
+      "fingerprint": "fbbbd6ca-5dc9-593d-b89e-b4d9847f4b63",
       "capabilities": [
         {
           "name": "conductor-validator",
@@ -2411,14 +2428,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.646Z",
+        "lastUpdate": "2026-03-19T14:56:56.946Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.646Z",
-        "updatedAt": "2026-03-17T06:36:27.646Z"
+        "createdAt": "2026-03-19T14:56:56.946Z",
+        "updatedAt": "2026-03-19T14:56:56.946Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2435,6 +2452,7 @@
       "displayName": "database-architect",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/database-architect.md",
+      "fingerprint": "2d7f0542-f618-5a49-9fb6-a1604ba0bf63",
       "capabilities": [
         {
           "name": "database-architect",
@@ -2522,14 +2540,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.646Z",
+        "lastUpdate": "2026-03-19T14:56:56.946Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.646Z",
-        "updatedAt": "2026-03-17T06:36:27.646Z"
+        "createdAt": "2026-03-19T14:56:56.946Z",
+        "updatedAt": "2026-03-19T14:56:56.946Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2546,6 +2564,7 @@
       "displayName": "devops-troubleshooter",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/devops-troubleshooter.md",
+      "fingerprint": "ff24b9e9-b8e0-5218-8f84-3b358952cf43",
       "capabilities": [
         {
           "name": "devops-troubleshooter",
@@ -2635,14 +2654,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.646Z",
+        "lastUpdate": "2026-03-19T14:56:56.946Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.646Z",
-        "updatedAt": "2026-03-17T06:36:27.646Z"
+        "createdAt": "2026-03-19T14:56:56.946Z",
+        "updatedAt": "2026-03-19T14:56:56.946Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2659,6 +2678,7 @@
       "displayName": "devops",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/devops.md",
+      "fingerprint": "83e5debc-8b70-5163-82af-bc2e628c2c81",
       "capabilities": [
         {
           "name": "devops",
@@ -2686,7 +2706,6 @@
             "ripgrep",
             "task-management-protocol",
             "terraform-infra",
-            "context-compressor",
             "verification-before-completion"
           ],
           "requiredTools": [
@@ -2724,7 +2743,6 @@
             "ripgrep",
             "task-management-protocol",
             "terraform-infra",
-            "context-compressor",
             "verification-before-completion",
             "helm-chart-scaffolding",
             "gitops-workflow",
@@ -2759,7 +2777,6 @@
             "ripgrep",
             "task-management-protocol",
             "terraform-infra",
-            "context-compressor",
             "verification-before-completion",
             "helm-chart-scaffolding",
             "gitops-workflow",
@@ -2783,14 +2800,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.646Z",
+        "lastUpdate": "2026-03-19T14:56:56.947Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.646Z",
-        "updatedAt": "2026-03-17T06:36:27.646Z"
+        "createdAt": "2026-03-19T14:56:56.947Z",
+        "updatedAt": "2026-03-19T14:56:56.947Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2807,8 +2824,7 @@
         "memory-search",
         "ripgrep",
         "code-semantic-search",
-        "code-structural-search",
-        "context-compressor"
+        "code-structural-search"
       ]
     },
     "ecosystem-auditor": {
@@ -2816,6 +2832,7 @@
       "displayName": "ecosystem-auditor",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/ecosystem-auditor.md",
+      "fingerprint": "c7cc602e-8919-5e8e-a05d-c0e2a8c779cc",
       "capabilities": [
         {
           "name": "ecosystem-auditor",
@@ -2894,14 +2911,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.646Z",
+        "lastUpdate": "2026-03-19T14:56:56.947Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.646Z",
-        "updatedAt": "2026-03-17T06:36:27.646Z"
+        "createdAt": "2026-03-19T14:56:56.947Z",
+        "updatedAt": "2026-03-19T14:56:56.947Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2918,6 +2935,7 @@
       "displayName": "incident-responder",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/incident-responder.md",
+      "fingerprint": "c70e6219-7019-5f87-9ba9-502a23caa5f0",
       "capabilities": [
         {
           "name": "incident-responder",
@@ -3004,14 +3022,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.646Z",
+        "lastUpdate": "2026-03-19T14:56:56.948Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.646Z",
-        "updatedAt": "2026-03-17T06:36:27.646Z"
+        "createdAt": "2026-03-19T14:56:56.948Z",
+        "updatedAt": "2026-03-19T14:56:56.948Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3023,11 +3041,96 @@
         "context-compressor"
       ]
     },
+    "memory-manager": {
+      "id": "memory-manager",
+      "displayName": "memory-manager",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/memory-manager.md",
+      "fingerprint": "c361860c-fd1d-5593-bfaa-d160ce2a17d0",
+      "capabilities": [
+        {
+          "name": "memory-manager",
+          "domain": "code",
+          "description": "Orchestrates memory health audits and cleanup — use when memory files are bloated, stale, or need rotation/deduplication.",
+          "triggerPhrases": [
+            "memory",
+            "manager",
+            "orchestrates",
+            "audits",
+            "memory-audit",
+            "context-compressor",
+            "memory-search",
+            "task-management-protocol",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "MemoryRecord",
+            "TaskUpdate",
+            "Skill",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet"
+          ],
+          "skills": [
+            "memory-audit",
+            "context-compressor",
+            "memory-search",
+            "task-management-protocol",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
+          ],
+          "examples": [],
+          "tags": [
+            "memory",
+            "manager",
+            "orchestrates",
+            "audits",
+            "memory-audit",
+            "context-compressor",
+            "memory-search",
+            "task-management-protocol",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "haiku"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-19T14:56:56.948Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-19T14:56:56.948Z",
+        "updatedAt": "2026-03-19T14:56:56.948Z"
+      },
+      "alwaysSkills": []
+    },
     "penetration-tester": {
       "id": "penetration-tester",
       "displayName": "penetration-tester",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/penetration-tester.md",
+      "fingerprint": "5dc73ecc-a7c2-597b-8369-0156c1a3e466",
       "capabilities": [
         {
           "name": "penetration-tester",
@@ -3111,14 +3214,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.646Z",
+        "lastUpdate": "2026-03-19T14:56:56.948Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-17T06:36:27.646Z",
-        "updatedAt": "2026-03-17T06:36:27.646Z"
+        "createdAt": "2026-03-19T14:56:56.948Z",
+        "updatedAt": "2026-03-19T14:56:56.948Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3135,6 +3238,7 @@
       "displayName": "performance-engineer",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/performance-engineer.md",
+      "fingerprint": "51cbb355-b0d8-59cc-b85a-8039fe2c06b5",
       "capabilities": [
         {
           "name": "performance-engineer",
@@ -3218,14 +3322,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.647Z",
+        "lastUpdate": "2026-03-19T14:56:56.948Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.647Z",
-        "updatedAt": "2026-03-17T06:36:27.647Z"
+        "createdAt": "2026-03-19T14:56:56.948Z",
+        "updatedAt": "2026-03-19T14:56:56.948Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3242,6 +3346,7 @@
       "displayName": "researcher",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/researcher.md",
+      "fingerprint": "d2f6bf19-ac06-5595-ad0f-ec555ce5fd8e",
       "capabilities": [
         {
           "name": "researcher",
@@ -3251,6 +3356,7 @@
             "researcher",
             "building",
             "arxiv-mcp",
+            "codebase-exploration",
             "code-semantic-search",
             "code-structural-search",
             "deep-research",
@@ -3281,6 +3387,7 @@
           ],
           "skills": [
             "arxiv-mcp",
+            "codebase-exploration",
             "code-semantic-search",
             "code-structural-search",
             "deep-research",
@@ -3292,7 +3399,6 @@
             "task-management-protocol",
             "context-compressor",
             "verification-before-completion",
-            "context-compressor",
             "scientific-skills"
           ],
           "examples": [],
@@ -3300,6 +3406,7 @@
             "researcher",
             "building",
             "arxiv-mcp",
+            "codebase-exploration",
             "code-semantic-search",
             "code-structural-search",
             "deep-research",
@@ -3311,7 +3418,6 @@
             "task-management-protocol",
             "context-compressor",
             "verification-before-completion",
-            "context-compressor",
             "scientific-skills"
           ]
         }
@@ -3326,14 +3432,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.647Z",
+        "lastUpdate": "2026-03-19T14:56:56.948Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.647Z",
-        "updatedAt": "2026-03-17T06:36:27.647Z"
+        "createdAt": "2026-03-19T14:56:56.948Z",
+        "updatedAt": "2026-03-19T14:56:56.948Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -3348,6 +3454,7 @@
       "displayName": "reverse-engineer",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/reverse-engineer.md",
+      "fingerprint": "572534c2-c5e5-5bac-9981-9fbdf536724f",
       "capabilities": [
         {
           "name": "reverse-engineer",
@@ -3432,14 +3539,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.647Z",
+        "lastUpdate": "2026-03-19T14:56:56.948Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.647Z",
-        "updatedAt": "2026-03-17T06:36:27.647Z"
+        "createdAt": "2026-03-19T14:56:56.948Z",
+        "updatedAt": "2026-03-19T14:56:56.948Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3456,6 +3563,7 @@
       "displayName": "security-architect",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/security-architect.md",
+      "fingerprint": "7d418a5c-a1be-50f8-ae37-39eb79a48fbb",
       "capabilities": [
         {
           "name": "security-architect",
@@ -3565,14 +3673,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.647Z",
+        "lastUpdate": "2026-03-19T14:56:56.948Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.647Z",
-        "updatedAt": "2026-03-17T06:36:27.647Z"
+        "createdAt": "2026-03-19T14:56:56.948Z",
+        "updatedAt": "2026-03-19T14:56:56.948Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3589,6 +3697,7 @@
       "displayName": "sre-engineer",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/sre-engineer.md",
+      "fingerprint": "6adeb2e6-a432-5e1a-bbf6-b2a0df60551e",
       "capabilities": [
         {
           "name": "sre-engineer",
@@ -3672,14 +3781,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.647Z",
+        "lastUpdate": "2026-03-19T14:56:56.949Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.647Z",
-        "updatedAt": "2026-03-17T06:36:27.647Z"
+        "createdAt": "2026-03-19T14:56:56.949Z",
+        "updatedAt": "2026-03-19T14:56:56.949Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3696,6 +3805,7 @@
       "displayName": "task-manager",
       "category": "specialized",
       "filePath": ".claude/agents/specialized/task-manager.md",
+      "fingerprint": "c64ede23-e0ef-52b5-a9f3-713f553b2e03",
       "capabilities": [
         {
           "name": "task-manager",
@@ -3765,14 +3875,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.647Z",
+        "lastUpdate": "2026-03-19T14:56:56.949Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.647Z",
-        "updatedAt": "2026-03-17T06:36:27.647Z"
+        "createdAt": "2026-03-19T14:56:56.949Z",
+        "updatedAt": "2026-03-19T14:56:56.949Z"
       },
       "alwaysSkills": []
     },
@@ -3781,6 +3891,7 @@
       "displayName": "ai-ml-specialist",
       "category": "domain",
       "filePath": ".claude/agents/domain/ai-ml-specialist.md",
+      "fingerprint": "e9e12639-a499-5759-b658-dd4fad13e884",
       "capabilities": [
         {
           "name": "ai-ml-specialist",
@@ -3856,14 +3967,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.647Z",
+        "lastUpdate": "2026-03-19T14:56:56.949Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.647Z",
-        "updatedAt": "2026-03-17T06:36:27.647Z"
+        "createdAt": "2026-03-19T14:56:56.949Z",
+        "updatedAt": "2026-03-19T14:56:56.949Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3880,6 +3991,7 @@
       "displayName": "android-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/android-pro.md",
+      "fingerprint": "d1a561df-ace5-5632-b2af-ec119d387164",
       "capabilities": [
         {
           "name": "android",
@@ -3960,14 +4072,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.648Z",
+        "lastUpdate": "2026-03-19T14:56:56.949Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.648Z",
-        "updatedAt": "2026-03-17T06:36:27.648Z"
+        "createdAt": "2026-03-19T14:56:56.949Z",
+        "updatedAt": "2026-03-19T14:56:56.949Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3984,6 +4096,7 @@
       "displayName": "angular-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/angular-pro.md",
+      "fingerprint": "b38ab89b-8525-56f8-8c72-f6d97faef518",
       "capabilities": [
         {
           "name": "angular",
@@ -4058,14 +4171,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.648Z",
+        "lastUpdate": "2026-03-19T14:56:56.949Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.648Z",
-        "updatedAt": "2026-03-17T06:36:27.648Z"
+        "createdAt": "2026-03-19T14:56:56.949Z",
+        "updatedAt": "2026-03-19T14:56:56.949Z"
       },
       "alwaysSkills": []
     },
@@ -4074,6 +4187,7 @@
       "displayName": "api-designer",
       "category": "domain",
       "filePath": ".claude/agents/domain/api-designer.md",
+      "fingerprint": "2ed6f15f-eff4-5922-abcd-17d60da3be73",
       "capabilities": [
         {
           "name": "api-designer",
@@ -4155,14 +4269,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.648Z",
+        "lastUpdate": "2026-03-19T14:56:56.949Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.648Z",
-        "updatedAt": "2026-03-17T06:36:27.648Z"
+        "createdAt": "2026-03-19T14:56:56.949Z",
+        "updatedAt": "2026-03-19T14:56:56.949Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4179,6 +4293,7 @@
       "displayName": "aso-specialist",
       "category": "domain",
       "filePath": ".claude/agents/domain/aso-specialist.md",
+      "fingerprint": "45aa6082-6962-54fb-a2ce-f9457ec9c68c",
       "capabilities": [
         {
           "name": "aso-specialist",
@@ -4250,14 +4365,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.648Z",
+        "lastUpdate": "2026-03-19T14:56:56.949Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.648Z",
-        "updatedAt": "2026-03-17T06:36:27.648Z"
+        "createdAt": "2026-03-19T14:56:56.949Z",
+        "updatedAt": "2026-03-19T14:56:56.949Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4274,6 +4389,7 @@
       "displayName": "azure-infra-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/azure-infra-pro.md",
+      "fingerprint": "89584ac8-6111-51ca-90e6-40e20d541e53",
       "capabilities": [
         {
           "name": "azure-infra",
@@ -4349,14 +4465,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.648Z",
+        "lastUpdate": "2026-03-19T14:56:56.949Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.648Z",
-        "updatedAt": "2026-03-17T06:36:27.648Z"
+        "createdAt": "2026-03-19T14:56:56.949Z",
+        "updatedAt": "2026-03-19T14:56:56.949Z"
       },
       "alwaysSkills": []
     },
@@ -4365,6 +4481,7 @@
       "displayName": "brand-guardian",
       "category": "domain",
       "filePath": ".claude/agents/domain/brand-guardian.md",
+      "fingerprint": "fd99c82d-990a-597d-8cd0-7a14ec8dcb8a",
       "capabilities": [
         {
           "name": "brand-guardian",
@@ -4434,14 +4551,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.649Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.649Z",
-        "updatedAt": "2026-03-17T06:36:27.649Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4458,6 +4575,7 @@
       "displayName": "business-analyst",
       "category": "domain",
       "filePath": ".claude/agents/domain/business-analyst.md",
+      "fingerprint": "63cc9d81-2514-5d1e-bb34-982484b410da",
       "capabilities": [
         {
           "name": "business-analyst",
@@ -4529,14 +4647,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.649Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.649Z",
-        "updatedAt": "2026-03-17T06:36:27.649Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": []
     },
@@ -4545,6 +4663,7 @@
       "displayName": "compliance-checker",
       "category": "domain",
       "filePath": ".claude/agents/domain/compliance-checker.md",
+      "fingerprint": "bfd302f9-ad48-5a4b-8b5b-ee28ea1742a9",
       "capabilities": [
         {
           "name": "compliance-checker",
@@ -4618,14 +4737,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.649Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.649Z",
-        "updatedAt": "2026-03-17T06:36:27.649Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4642,6 +4761,7 @@
       "displayName": "context-manager",
       "category": "domain",
       "filePath": ".claude/agents/domain/context-manager.md",
+      "fingerprint": "89530238-51e2-5201-8b0c-67e35674660f",
       "capabilities": [
         {
           "name": "context-manager",
@@ -4653,7 +4773,6 @@
             "coordinates",
             "code-semantic-search",
             "ripgrep",
-            "context-compressor",
             "context-compressor",
             "memory-search",
             "task-management-protocol",
@@ -4677,7 +4796,6 @@
             "code-semantic-search",
             "ripgrep",
             "context-compressor",
-            "context-compressor",
             "memory-search",
             "task-management-protocol",
             "verification-before-completion"
@@ -4689,7 +4807,6 @@
             "coordinates",
             "code-semantic-search",
             "ripgrep",
-            "context-compressor",
             "context-compressor",
             "memory-search",
             "task-management-protocol",
@@ -4707,14 +4824,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.649Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.649Z",
-        "updatedAt": "2026-03-17T06:36:27.649Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": []
     },
@@ -4723,6 +4840,7 @@
       "displayName": "data-engineer",
       "category": "domain",
       "filePath": ".claude/agents/domain/data-engineer.md",
+      "fingerprint": "655d69c6-46ef-54b9-8d3f-145557e3ec9a",
       "capabilities": [
         {
           "name": "data-engineer",
@@ -4809,14 +4927,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.649Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.649Z",
-        "updatedAt": "2026-03-17T06:36:27.649Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4833,6 +4951,7 @@
       "displayName": "data-scientist",
       "category": "domain",
       "filePath": ".claude/agents/domain/data-scientist.md",
+      "fingerprint": "941872be-7736-5366-9cd2-17b37c253d2f",
       "capabilities": [
         {
           "name": "data-scientist",
@@ -4916,14 +5035,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.649Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.649Z",
-        "updatedAt": "2026-03-17T06:36:27.649Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": [
         "ripgrep",
@@ -4937,6 +5056,7 @@
       "displayName": "django-developer",
       "category": "domain",
       "filePath": ".claude/agents/domain/django-developer.md",
+      "fingerprint": "628194cd-a41c-525d-92d6-d2dc7789428e",
       "capabilities": [
         {
           "name": "django-developer",
@@ -5016,14 +5136,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.649Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.649Z",
-        "updatedAt": "2026-03-17T06:36:27.649Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": []
     },
@@ -5032,6 +5152,7 @@
       "displayName": "dotnet-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/dotnet-pro.md",
+      "fingerprint": "def16f1b-1b7c-5ec0-b953-3096f64bd890",
       "capabilities": [
         {
           "name": "dotnet",
@@ -5108,14 +5229,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.649Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.649Z",
-        "updatedAt": "2026-03-17T06:36:27.649Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": []
     },
@@ -5124,6 +5245,7 @@
       "displayName": "expo-mobile-developer",
       "category": "domain",
       "filePath": ".claude/agents/domain/expo-mobile-developer.md",
+      "fingerprint": "ee197eeb-385c-542b-ab80-2702bd2fa290",
       "capabilities": [
         {
           "name": "expo-mobile-developer",
@@ -5208,14 +5330,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.649Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.649Z",
-        "updatedAt": "2026-03-17T06:36:27.649Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5232,6 +5354,7 @@
       "displayName": "fastapi-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/fastapi-pro.md",
+      "fingerprint": "754fce63-781b-5a41-82c1-43eafb488ce7",
       "capabilities": [
         {
           "name": "fastapi",
@@ -5318,14 +5441,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.950Z",
+        "updatedAt": "2026-03-19T14:56:56.950Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5342,6 +5465,7 @@
       "displayName": "feedback-synthesizer",
       "category": "domain",
       "filePath": ".claude/agents/domain/feedback-synthesizer.md",
+      "fingerprint": "02d2d38c-0d76-5b2d-b07c-f705821f31eb",
       "capabilities": [
         {
           "name": "feedback-synthesizer",
@@ -5409,14 +5533,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.950Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -5433,6 +5557,7 @@
       "displayName": "frontend-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/frontend-pro.md",
+      "fingerprint": "f8ff3ad2-48cf-5a8f-baec-da495cc09edf",
       "capabilities": [
         {
           "name": "frontend",
@@ -5536,14 +5661,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5560,6 +5685,7 @@
       "displayName": "gamedev-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/gamedev-pro.md",
+      "fingerprint": "dd76768d-ba3c-563f-892a-d88ad62fe8dd",
       "capabilities": [
         {
           "name": "gamedev",
@@ -5637,14 +5763,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5661,6 +5787,7 @@
       "displayName": "golang-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/golang-pro.md",
+      "fingerprint": "107bb806-c1cc-549a-a17d-35048205bf7d",
       "capabilities": [
         {
           "name": "golang",
@@ -5748,14 +5875,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5772,6 +5899,7 @@
       "displayName": "graphql-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/graphql-pro.md",
+      "fingerprint": "42d6505f-09a0-545b-ab80-85da8d22586a",
       "capabilities": [
         {
           "name": "graphql",
@@ -5858,14 +5986,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5882,6 +6010,7 @@
       "displayName": "ios-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/ios-pro.md",
+      "fingerprint": "5513fdfa-714b-5a3f-9825-88a44c7044f8",
       "capabilities": [
         {
           "name": "ios",
@@ -5964,14 +6093,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5988,6 +6117,7 @@
       "displayName": "iot-engineer",
       "category": "domain",
       "filePath": ".claude/agents/domain/iot-engineer.md",
+      "fingerprint": "9ef4ce74-db93-5765-9649-5fb4ca1a1ae4",
       "capabilities": [
         {
           "name": "iot-engineer",
@@ -6053,14 +6183,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": []
     },
@@ -6069,6 +6199,7 @@
       "displayName": "java-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/java-pro.md",
+      "fingerprint": "73c92a3b-ea16-5c9e-8193-7f62a140a959",
       "capabilities": [
         {
           "name": "java",
@@ -6156,14 +6287,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6180,6 +6311,7 @@
       "displayName": "kotlin-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/kotlin-pro.md",
+      "fingerprint": "deef9e3f-171c-58f3-ad1a-cb4a4d686a01",
       "capabilities": [
         {
           "name": "kotlin",
@@ -6254,14 +6386,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": []
     },
@@ -6270,6 +6402,7 @@
       "displayName": "kubernetes-specialist",
       "category": "domain",
       "filePath": ".claude/agents/domain/kubernetes-specialist.md",
+      "fingerprint": "b79632aa-232f-523a-bf4b-bca81a65c882",
       "capabilities": [
         {
           "name": "kubernetes-specialist",
@@ -6347,14 +6480,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.650Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.650Z",
-        "updatedAt": "2026-03-17T06:36:27.650Z"
+        "createdAt": "2026-03-19T14:56:56.951Z",
+        "updatedAt": "2026-03-19T14:56:56.951Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6369,6 +6502,7 @@
       "displayName": "legacy-modernizer",
       "category": "domain",
       "filePath": ".claude/agents/domain/legacy-modernizer.md",
+      "fingerprint": "d75ac36b-b081-5fa4-ad70-b1ac1cb87507",
       "capabilities": [
         {
           "name": "legacy-modernizer",
@@ -6447,22 +6581,27 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.951Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.952Z",
+        "updatedAt": "2026-03-19T14:56:56.952Z"
       },
-      "alwaysSkills": ["ripgrep", "task-management-protocol", "verification-before-completion"]
+      "alwaysSkills": [
+        "ripgrep",
+        "task-management-protocol",
+        "verification-before-completion"
+      ]
     },
     "legal-advisor": {
       "id": "legal-advisor",
       "displayName": "legal-advisor",
       "category": "domain",
       "filePath": ".claude/agents/domain/legal-advisor.md",
+      "fingerprint": "89accb5f-6fc7-50f4-98cc-334581f2c1d0",
       "capabilities": [
         {
           "name": "legal-advisor",
@@ -6538,14 +6677,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.952Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.952Z",
+        "updatedAt": "2026-03-19T14:56:56.952Z"
       },
       "alwaysSkills": []
     },
@@ -6554,6 +6693,7 @@
       "displayName": "llm-architect",
       "category": "domain",
       "filePath": ".claude/agents/domain/llm-architect.md",
+      "fingerprint": "e2834ad9-86f4-5f05-8e8a-dd323b833aad",
       "capabilities": [
         {
           "name": "llm-architect",
@@ -6628,14 +6768,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.952Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.952Z",
+        "updatedAt": "2026-03-19T14:56:56.952Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6650,6 +6790,7 @@
       "displayName": "m365-admin",
       "category": "domain",
       "filePath": ".claude/agents/domain/m365-admin.md",
+      "fingerprint": "80b648d4-585f-5cfd-8027-aefbdf9a3a85",
       "capabilities": [
         {
           "name": "m365-admin",
@@ -6718,14 +6859,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.952Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.952Z",
+        "updatedAt": "2026-03-19T14:56:56.952Z"
       },
       "alwaysSkills": []
     },
@@ -6734,6 +6875,7 @@
       "displayName": "marketing-strategist",
       "category": "domain",
       "filePath": ".claude/agents/domain/marketing-strategist.md",
+      "fingerprint": "405ba20c-70b0-5457-828d-f6a6902e520d",
       "capabilities": [
         {
           "name": "marketing-strategist",
@@ -6803,14 +6945,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.952Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.952Z",
+        "updatedAt": "2026-03-19T14:56:56.952Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -6827,6 +6969,7 @@
       "displayName": "mcp-developer",
       "category": "domain",
       "filePath": ".claude/agents/domain/mcp-developer.md",
+      "fingerprint": "66caeadc-c692-5a88-b329-ef063113a25f",
       "capabilities": [
         {
           "name": "mcp-developer",
@@ -6904,14 +7047,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.952Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.952Z",
+        "updatedAt": "2026-03-19T14:56:56.952Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6928,6 +7071,7 @@
       "displayName": "medical-research-triage",
       "category": "domain",
       "filePath": ".claude/agents/domain/medical-research-triage.md",
+      "fingerprint": "e90fd1fd-a7f2-53ac-a2de-fd175d338312",
       "capabilities": [
         {
           "name": "medical-research-triage",
@@ -7004,14 +7148,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.952Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.952Z",
+        "updatedAt": "2026-03-19T14:56:56.952Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -7026,6 +7170,7 @@
       "displayName": "microservices-architect",
       "category": "domain",
       "filePath": ".claude/agents/domain/microservices-architect.md",
+      "fingerprint": "7dffaa51-3165-5c13-8a5d-d3d79a629fc2",
       "capabilities": [
         {
           "name": "microservices-architect",
@@ -7107,14 +7252,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.952Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.952Z",
+        "updatedAt": "2026-03-19T14:56:56.952Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7129,12 +7274,16 @@
       "displayName": "ml-researcher",
       "category": "domain",
       "filePath": ".claude/agents/domain/ml-researcher.md",
+      "fingerprint": "3e60fe9c-53b5-5fab-997c-1d7ac6af2888",
       "capabilities": [
         {
           "name": "ml-researcher",
           "domain": "research",
           "description": "Autonomous Machine Learning Researcher focused on optimizing a target scalar score within a fixed time budget.",
-          "triggerPhrases": ["researcher", "fixed"],
+          "triggerPhrases": [
+            "researcher",
+            "fixed"
+          ],
           "requiredTools": [
             "Read",
             "Write",
@@ -7150,7 +7299,10 @@
           ],
           "skills": [],
           "examples": [],
-          "tags": ["researcher", "fixed"]
+          "tags": [
+            "researcher",
+            "fixed"
+          ]
         }
       ],
       "constraints": {
@@ -7163,14 +7315,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.953Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.953Z",
+        "updatedAt": "2026-03-19T14:56:56.953Z"
       },
       "alwaysSkills": []
     },
@@ -7179,6 +7331,7 @@
       "displayName": "mlops-engineer",
       "category": "domain",
       "filePath": ".claude/agents/domain/mlops-engineer.md",
+      "fingerprint": "f01ee1b6-23d0-5bd3-81c2-d3167452d45c",
       "capabilities": [
         {
           "name": "mlops-engineer",
@@ -7259,14 +7412,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.953Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.953Z",
+        "updatedAt": "2026-03-19T14:56:56.953Z"
       },
       "alwaysSkills": [
         "ripgrep",
@@ -7280,6 +7433,7 @@
       "displayName": "mobile-ux-reviewer",
       "category": "domain",
       "filePath": ".claude/agents/domain/mobile-ux-reviewer.md",
+      "fingerprint": "1ae4b535-2eea-52ae-bb62-6a16681660d0",
       "capabilities": [
         {
           "name": "mobile-ux-reviewer",
@@ -7372,14 +7526,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.651Z",
+        "lastUpdate": "2026-03-19T14:56:56.953Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.651Z",
-        "updatedAt": "2026-03-17T06:36:27.651Z"
+        "createdAt": "2026-03-19T14:56:56.953Z",
+        "updatedAt": "2026-03-19T14:56:56.953Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7394,6 +7548,7 @@
       "displayName": "multi-llm-consultant",
       "category": "domain",
       "filePath": ".claude/agents/domain/multi-llm-consultant.md",
+      "fingerprint": "f879ec21-22e9-5c4d-a232-429aeca8d268",
       "capabilities": [
         {
           "name": "multi-llm-consultant",
@@ -7510,14 +7665,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.953Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.953Z",
+        "updatedAt": "2026-03-19T14:56:56.953Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7532,6 +7687,7 @@
       "displayName": "nextjs-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/nextjs-pro.md",
+      "fingerprint": "6e85cd4e-5041-5d55-ad6a-eca27f5610ce",
       "capabilities": [
         {
           "name": "nextjs",
@@ -7623,14 +7779,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.953Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.953Z",
+        "updatedAt": "2026-03-19T14:56:56.953Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7647,6 +7803,7 @@
       "displayName": "nlp-engineer",
       "category": "domain",
       "filePath": ".claude/agents/domain/nlp-engineer.md",
+      "fingerprint": "47b9df9d-e625-5fc8-bf75-7c2b8244b427",
       "capabilities": [
         {
           "name": "nlp-engineer",
@@ -7729,14 +7886,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.953Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.953Z",
+        "updatedAt": "2026-03-19T14:56:56.953Z"
       },
       "alwaysSkills": [
         "ripgrep",
@@ -7750,6 +7907,7 @@
       "displayName": "nodejs-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/nodejs-pro.md",
+      "fingerprint": "390815f3-91cc-593b-a637-3796ed3047be",
       "capabilities": [
         {
           "name": "nodejs",
@@ -7835,14 +7993,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.954Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.954Z",
+        "updatedAt": "2026-03-19T14:56:56.954Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7859,6 +8017,7 @@
       "displayName": "php-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/php-pro.md",
+      "fingerprint": "c1fd5a6f-166f-5fd2-9754-71d9a80bb036",
       "capabilities": [
         {
           "name": "php",
@@ -7941,14 +8100,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.954Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.954Z",
+        "updatedAt": "2026-03-19T14:56:56.954Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7965,6 +8124,7 @@
       "displayName": "pm-coordinator",
       "category": "domain",
       "filePath": ".claude/agents/domain/pm-coordinator.md",
+      "fingerprint": "0d7ebc8e-7595-5051-a302-d2b0c2db0138",
       "capabilities": [
         {
           "name": "pm-coordinator",
@@ -8045,14 +8205,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.954Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.954Z",
+        "updatedAt": "2026-03-19T14:56:56.954Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8067,6 +8227,7 @@
       "displayName": "postgres-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/postgres-pro.md",
+      "fingerprint": "f615c35b-f34a-5b7f-a56a-f5f44f88dedc",
       "capabilities": [
         {
           "name": "postgres",
@@ -8139,14 +8300,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.954Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.954Z",
+        "updatedAt": "2026-03-19T14:56:56.954Z"
       },
       "alwaysSkills": []
     },
@@ -8155,6 +8316,7 @@
       "displayName": "product-manager",
       "category": "domain",
       "filePath": ".claude/agents/domain/product-manager.md",
+      "fingerprint": "f8afe881-8e5f-51f7-a6f2-5d66df0174c7",
       "capabilities": [
         {
           "name": "product-manager",
@@ -8228,14 +8390,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.954Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.954Z",
+        "updatedAt": "2026-03-19T14:56:56.954Z"
       },
       "alwaysSkills": []
     },
@@ -8244,6 +8406,7 @@
       "displayName": "prompt-engineer",
       "category": "domain",
       "filePath": ".claude/agents/domain/prompt-engineer.md",
+      "fingerprint": "1ae7894d-e092-5f96-b5ff-51e71eb430c7",
       "capabilities": [
         {
           "name": "prompt-engineer",
@@ -8291,8 +8454,7 @@
             "task-management-protocol",
             "context-compressor",
             "verification-before-completion",
-            "thinking-tools",
-            "context-compressor"
+            "thinking-tools"
           ],
           "examples": [],
           "tags": [
@@ -8311,8 +8473,7 @@
             "task-management-protocol",
             "context-compressor",
             "verification-before-completion",
-            "thinking-tools",
-            "context-compressor"
+            "thinking-tools"
           ]
         }
       ],
@@ -8326,14 +8487,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.954Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.954Z",
+        "updatedAt": "2026-03-19T14:56:56.954Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8348,6 +8509,7 @@
       "displayName": "python-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/python-pro.md",
+      "fingerprint": "50744c7e-4551-58c6-afce-95003d805178",
       "capabilities": [
         {
           "name": "python",
@@ -8442,14 +8604,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.954Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.954Z",
+        "updatedAt": "2026-03-19T14:56:56.954Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8466,6 +8628,7 @@
       "displayName": "quant-analyst",
       "category": "domain",
       "filePath": ".claude/agents/domain/quant-analyst.md",
+      "fingerprint": "1b66aa64-7be0-5d03-a555-8fc5ffe8e463",
       "capabilities": [
         {
           "name": "quant-analyst",
@@ -8540,14 +8703,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.955Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.955Z",
+        "updatedAt": "2026-03-19T14:56:56.955Z"
       },
       "alwaysSkills": []
     },
@@ -8556,6 +8719,7 @@
       "displayName": "rails-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/rails-pro.md",
+      "fingerprint": "55730457-7788-58d9-95fb-e82c6ee3d9d2",
       "capabilities": [
         {
           "name": "rails",
@@ -8629,14 +8793,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.652Z",
+        "lastUpdate": "2026-03-19T14:56:56.955Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.652Z",
-        "updatedAt": "2026-03-17T06:36:27.652Z"
+        "createdAt": "2026-03-19T14:56:56.955Z",
+        "updatedAt": "2026-03-19T14:56:56.955Z"
       },
       "alwaysSkills": []
     },
@@ -8645,6 +8809,7 @@
       "displayName": "rust-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/rust-pro.md",
+      "fingerprint": "8cf22b97-dd94-5316-9ea6-b551a2c1dbbc",
       "capabilities": [
         {
           "name": "rust",
@@ -8726,14 +8891,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.955Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.955Z",
+        "updatedAt": "2026-03-19T14:56:56.955Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8750,6 +8915,7 @@
       "displayName": "scientific-research-expert",
       "category": "domain",
       "filePath": ".claude/agents/domain/scientific-research-expert.md",
+      "fingerprint": "6bd072a5-f4f6-5581-a4cf-13f0f8715d1d",
       "capabilities": [
         {
           "name": "scientific-research",
@@ -8829,14 +8995,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.955Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.955Z",
+        "updatedAt": "2026-03-19T14:56:56.955Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8851,6 +9017,7 @@
       "displayName": "spring-boot-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/spring-boot-pro.md",
+      "fingerprint": "adfba885-93a8-5d27-be44-41f55ebfe046",
       "capabilities": [
         {
           "name": "spring-boot",
@@ -8929,14 +9096,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.955Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.955Z",
+        "updatedAt": "2026-03-19T14:56:56.955Z"
       },
       "alwaysSkills": []
     },
@@ -8945,6 +9112,7 @@
       "displayName": "sql-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/sql-pro.md",
+      "fingerprint": "565cadec-460e-5c5d-a08a-de08e5b1366a",
       "capabilities": [
         {
           "name": "sql",
@@ -9017,14 +9185,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.955Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.955Z",
+        "updatedAt": "2026-03-19T14:56:56.955Z"
       },
       "alwaysSkills": []
     },
@@ -9033,6 +9201,7 @@
       "displayName": "sveltekit-expert",
       "category": "domain",
       "filePath": ".claude/agents/domain/sveltekit-expert.md",
+      "fingerprint": "fde3ee31-a3ce-5dd5-b647-08f6aaafb205",
       "capabilities": [
         {
           "name": "sveltekit",
@@ -9117,14 +9286,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.955Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.955Z",
+        "updatedAt": "2026-03-19T14:56:56.955Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -9141,6 +9310,7 @@
       "displayName": "swift-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/swift-pro.md",
+      "fingerprint": "3e060649-bd51-5bd3-8547-ba53d6fc2a88",
       "capabilities": [
         {
           "name": "swift",
@@ -9217,14 +9387,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.955Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.955Z",
+        "updatedAt": "2026-03-19T14:56:56.955Z"
       },
       "alwaysSkills": []
     },
@@ -9233,6 +9403,7 @@
       "displayName": "tauri-desktop-developer",
       "category": "domain",
       "filePath": ".claude/agents/domain/tauri-desktop-developer.md",
+      "fingerprint": "07aa6cc7-3620-5981-a71b-5589fee6d0c3",
       "capabilities": [
         {
           "name": "tauri-desktop-developer",
@@ -9319,14 +9490,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.955Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.955Z",
+        "updatedAt": "2026-03-19T14:56:56.955Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -9343,6 +9514,7 @@
       "displayName": "terraform-engineer",
       "category": "domain",
       "filePath": ".claude/agents/domain/terraform-engineer.md",
+      "fingerprint": "2e84c786-3155-5989-bbe8-0f89b216f0b9",
       "capabilities": [
         {
           "name": "terraform-engineer",
@@ -9429,14 +9601,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.956Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.956Z",
+        "updatedAt": "2026-03-19T14:56:56.956Z"
       },
       "alwaysSkills": [
         "ripgrep",
@@ -9450,6 +9622,7 @@
       "displayName": "terragrunt-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/terragrunt-pro.md",
+      "fingerprint": "1383d2ae-c195-57dd-8c2a-ff34b56d3a69",
       "capabilities": [
         {
           "name": "terragrunt",
@@ -9521,14 +9694,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.956Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.956Z",
+        "updatedAt": "2026-03-19T14:56:56.956Z"
       },
       "alwaysSkills": []
     },
@@ -9537,6 +9710,7 @@
       "displayName": "typescript-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/typescript-pro.md",
+      "fingerprint": "fb7e284e-c7ec-5c5a-ae9b-b2cdc155ac43",
       "capabilities": [
         {
           "name": "typescript",
@@ -9624,14 +9798,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.956Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.956Z",
+        "updatedAt": "2026-03-19T14:56:56.956Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -9648,6 +9822,7 @@
       "displayName": "ux-researcher",
       "category": "domain",
       "filePath": ".claude/agents/domain/ux-researcher.md",
+      "fingerprint": "9df7e4fe-c352-5390-8286-828209990bbc",
       "capabilities": [
         {
           "name": "ux-researcher",
@@ -9719,14 +9894,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.653Z",
+        "lastUpdate": "2026-03-19T14:56:56.956Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.653Z",
-        "updatedAt": "2026-03-17T06:36:27.653Z"
+        "createdAt": "2026-03-19T14:56:56.956Z",
+        "updatedAt": "2026-03-19T14:56:56.956Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -9743,6 +9918,7 @@
       "displayName": "web3-blockchain-expert",
       "category": "domain",
       "filePath": ".claude/agents/domain/web3-blockchain-expert.md",
+      "fingerprint": "a4c1eafa-2702-5bfc-a054-55209b891e48",
       "capabilities": [
         {
           "name": "web3-blockchain",
@@ -9821,14 +9997,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.654Z",
+        "lastUpdate": "2026-03-19T14:56:56.956Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.654Z",
-        "updatedAt": "2026-03-17T06:36:27.654Z"
+        "createdAt": "2026-03-19T14:56:56.956Z",
+        "updatedAt": "2026-03-19T14:56:56.956Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -9845,6 +10021,7 @@
       "displayName": "windows-infra-pro",
       "category": "domain",
       "filePath": ".claude/agents/domain/windows-infra-pro.md",
+      "fingerprint": "ca268789-02fc-5b5a-be61-50af83c3f18e",
       "capabilities": [
         {
           "name": "windows-infra",
@@ -9915,14 +10092,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.654Z",
+        "lastUpdate": "2026-03-19T14:56:56.956Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.654Z",
-        "updatedAt": "2026-03-17T06:36:27.654Z"
+        "createdAt": "2026-03-19T14:56:56.956Z",
+        "updatedAt": "2026-03-19T14:56:56.956Z"
       },
       "alwaysSkills": []
     },
@@ -9931,6 +10108,7 @@
       "displayName": "wordpress-master",
       "category": "domain",
       "filePath": ".claude/agents/domain/wordpress-master.md",
+      "fingerprint": "b5180888-62c4-55dc-89bc-a7f8292be724",
       "capabilities": [
         {
           "name": "wordpress-master",
@@ -9999,14 +10177,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.654Z",
+        "lastUpdate": "2026-03-19T14:56:56.956Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.654Z",
-        "updatedAt": "2026-03-17T06:36:27.654Z"
+        "createdAt": "2026-03-19T14:56:56.956Z",
+        "updatedAt": "2026-03-19T14:56:56.956Z"
       },
       "alwaysSkills": []
     },
@@ -10015,6 +10193,7 @@
       "displayName": "artifact-integrator",
       "category": "orchestrator",
       "filePath": ".claude/agents/orchestrators/artifact-integrator.md",
+      "fingerprint": "de71e411-38d6-5898-84fa-45b6721d1f8b",
       "capabilities": [
         {
           "name": "artifact-integrator",
@@ -10032,6 +10211,7 @@
             "ingest",
             "onboard repo",
             "integrate repo",
+            "codebase-exploration",
             "memory-search",
             "project-onboarding",
             "ripgrep",
@@ -10058,6 +10238,7 @@
             "WebFetch"
           ],
           "skills": [
+            "codebase-exploration",
             "memory-search",
             "project-onboarding",
             "ripgrep",
@@ -10065,7 +10246,6 @@
             "code-structural-search",
             "task-management-protocol",
             "verification-before-completion",
-            "context-compressor",
             "context-compressor"
           ],
           "examples": [],
@@ -10079,6 +10259,7 @@
             "integrate",
             "onboard",
             "ingest",
+            "codebase-exploration",
             "memory-search",
             "project-onboarding",
             "ripgrep",
@@ -10086,7 +10267,6 @@
             "code-structural-search",
             "task-management-protocol",
             "verification-before-completion",
-            "context-compressor",
             "context-compressor"
           ]
         }
@@ -10101,14 +10281,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.654Z",
+        "lastUpdate": "2026-03-19T14:56:56.956Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.654Z",
-        "updatedAt": "2026-03-17T06:36:27.654Z"
+        "createdAt": "2026-03-19T14:56:56.956Z",
+        "updatedAt": "2026-03-19T14:56:56.956Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -10122,6 +10302,7 @@
       "displayName": "evolution-orchestrator",
       "category": "orchestrator",
       "filePath": ".claude/agents/orchestrators/evolution-orchestrator.md",
+      "fingerprint": "30df2864-0913-5295-bab1-e83d19f2f599",
       "capabilities": [
         {
           "name": "evolution-orchestrator",
@@ -10223,14 +10404,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.654Z",
+        "lastUpdate": "2026-03-19T14:56:56.957Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-17T06:36:27.654Z",
-        "updatedAt": "2026-03-17T06:36:27.654Z"
+        "createdAt": "2026-03-19T14:56:56.957Z",
+        "updatedAt": "2026-03-19T14:56:56.957Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -10245,6 +10426,7 @@
       "displayName": "heartbeat-orchestrator",
       "category": "orchestrator",
       "filePath": ".claude/agents/orchestrators/heartbeat-orchestrator.md",
+      "fingerprint": "ccc7aaa8-27df-5c00-875c-5d461cd7e195",
       "capabilities": [
         {
           "name": "heartbeat-orchestrator",
@@ -10314,14 +10496,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.654Z",
+        "lastUpdate": "2026-03-19T14:56:56.957Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.654Z",
-        "updatedAt": "2026-03-17T06:36:27.654Z"
+        "createdAt": "2026-03-19T14:56:56.957Z",
+        "updatedAt": "2026-03-19T14:56:56.957Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -10338,6 +10520,7 @@
       "displayName": "master-orchestrator",
       "category": "orchestrator",
       "filePath": ".claude/agents/orchestrators/master-orchestrator.md",
+      "fingerprint": "db1b92c5-4af8-5b2c-a2b1-1a5619b52d60",
       "capabilities": [
         {
           "name": "master-orchestrator",
@@ -10431,14 +10614,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.654Z",
+        "lastUpdate": "2026-03-19T14:56:56.957Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.654Z",
-        "updatedAt": "2026-03-17T06:36:27.654Z"
+        "createdAt": "2026-03-19T14:56:56.957Z",
+        "updatedAt": "2026-03-19T14:56:56.957Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -10453,6 +10636,7 @@
       "displayName": "party-orchestrator",
       "category": "orchestrator",
       "filePath": ".claude/agents/orchestrators/party-orchestrator.md",
+      "fingerprint": "3edbc735-427b-53a9-9b9b-10f3948e848a",
       "capabilities": [
         {
           "name": "party-orchestrator",
@@ -10525,14 +10709,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.655Z",
+        "lastUpdate": "2026-03-19T14:56:56.957Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-17T06:36:27.655Z",
-        "updatedAt": "2026-03-17T06:36:27.655Z"
+        "createdAt": "2026-03-19T14:56:56.957Z",
+        "updatedAt": "2026-03-19T14:56:56.957Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -10546,6 +10730,7 @@
       "displayName": "swarm-coordinator",
       "category": "orchestrator",
       "filePath": ".claude/agents/orchestrators/swarm-coordinator.md",
+      "fingerprint": "74376b46-25aa-5fd5-9aa2-868489378288",
       "capabilities": [
         {
           "name": "swarm-coordinator",
@@ -10589,8 +10774,7 @@
             "task-management-protocol",
             "verification-before-completion",
             "context-compressor",
-            "dispatching-parallel-agents",
-            "context-compressor"
+            "dispatching-parallel-agents"
           ],
           "examples": [],
           "tags": [
@@ -10605,8 +10789,7 @@
             "task-management-protocol",
             "verification-before-completion",
             "context-compressor",
-            "dispatching-parallel-agents",
-            "context-compressor"
+            "dispatching-parallel-agents"
           ]
         }
       ],
@@ -10620,14 +10803,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-17T06:36:27.655Z",
+        "lastUpdate": "2026-03-19T14:56:56.957Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-17T06:36:27.655Z",
-        "updatedAt": "2026-03-17T06:36:27.655Z"
+        "createdAt": "2026-03-19T14:56:56.957Z",
+        "updatedAt": "2026-03-19T14:56:56.957Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -10639,107 +10822,312 @@
   },
   "index": {
     "byCapability": {
-      "architect": ["architect"],
-      "context-compressor": ["context-compressor"],
-      "developer": ["developer"],
-      "general-assistant": ["general-assistant"],
-      "planner": ["planner"],
-      "pm": ["pm"],
-      "qa": ["qa"],
-      "reflection-agent": ["reflection-agent"],
-      "technical-program-manager": ["technical-program-manager"],
-      "technical-writer": ["technical-writer"],
-      "accessibility-tester": ["accessibility-tester"],
-      "advanced-debugging": ["advanced-debugging"],
-      "c4-code": ["c4-code"],
-      "c4-component": ["c4-component"],
-      "c4-container": ["c4-container"],
-      "c4-context": ["c4-context"],
-      "chaos-engineer": ["chaos-engineer"],
-      "code-reviewer": ["code-reviewer"],
-      "code-simplifier": ["code-simplifier"],
-      "conductor-validator": ["conductor-validator"],
-      "database-architect": ["database-architect"],
-      "devops-troubleshooter": ["devops-troubleshooter"],
-      "devops": ["devops"],
-      "ecosystem-auditor": ["ecosystem-auditor"],
-      "incident-responder": ["incident-responder"],
-      "penetration-tester": ["penetration-tester"],
-      "performance-engineer": ["performance-engineer"],
-      "researcher": ["researcher"],
-      "reverse-engineer": ["reverse-engineer"],
-      "security-architect": ["security-architect"],
-      "sre-engineer": ["sre-engineer"],
-      "task-manager": ["task-manager"],
-      "ai-ml-specialist": ["ai-ml-specialist"],
-      "android": ["android-pro"],
-      "angular": ["angular-pro"],
-      "api-designer": ["api-designer"],
-      "aso-specialist": ["aso-specialist"],
-      "azure-infra": ["azure-infra-pro"],
-      "brand-guardian": ["brand-guardian"],
-      "business-analyst": ["business-analyst"],
-      "compliance-checker": ["compliance-checker"],
-      "context-manager": ["context-manager"],
-      "data-engineer": ["data-engineer"],
-      "data-scientist": ["data-scientist"],
-      "django-developer": ["django-developer"],
-      "dotnet": ["dotnet-pro"],
-      "expo-mobile-developer": ["expo-mobile-developer"],
-      "fastapi": ["fastapi-pro"],
-      "feedback-synthesizer": ["feedback-synthesizer"],
-      "frontend": ["frontend-pro"],
-      "gamedev": ["gamedev-pro"],
-      "golang": ["golang-pro"],
-      "graphql": ["graphql-pro"],
-      "ios": ["ios-pro"],
-      "iot-engineer": ["iot-engineer"],
-      "java": ["java-pro"],
-      "kotlin": ["kotlin-pro"],
-      "kubernetes-specialist": ["kubernetes-specialist"],
-      "legacy-modernizer": ["legacy-modernizer"],
-      "legal-advisor": ["legal-advisor"],
-      "llm-architect": ["llm-architect"],
-      "m365-admin": ["m365-admin"],
-      "marketing-strategist": ["marketing-strategist"],
-      "mcp-developer": ["mcp-developer"],
-      "medical-research-triage": ["medical-research-triage"],
-      "microservices-architect": ["microservices-architect"],
-      "ml-researcher": ["ml-researcher"],
-      "mlops-engineer": ["mlops-engineer"],
-      "mobile-ux-reviewer": ["mobile-ux-reviewer"],
-      "multi-llm-consultant": ["multi-llm-consultant"],
-      "nextjs": ["nextjs-pro"],
-      "nlp-engineer": ["nlp-engineer"],
-      "nodejs": ["nodejs-pro"],
-      "php": ["php-pro"],
-      "pm-coordinator": ["pm-coordinator"],
-      "postgres": ["postgres-pro"],
-      "product-manager": ["product-manager"],
-      "prompt-engineer": ["prompt-engineer"],
-      "python": ["python-pro"],
-      "quant-analyst": ["quant-analyst"],
-      "rails": ["rails-pro"],
-      "rust": ["rust-pro"],
-      "scientific-research": ["scientific-research-expert"],
-      "spring-boot": ["spring-boot-pro"],
-      "sql": ["sql-pro"],
-      "sveltekit": ["sveltekit-expert"],
-      "swift": ["swift-pro"],
-      "tauri-desktop-developer": ["tauri-desktop-developer"],
-      "terraform-engineer": ["terraform-engineer"],
-      "terragrunt": ["terragrunt-pro"],
-      "typescript": ["typescript-pro"],
-      "ux-researcher": ["ux-researcher"],
-      "web3-blockchain": ["web3-blockchain-expert"],
-      "windows-infra": ["windows-infra-pro"],
-      "wordpress-master": ["wordpress-master"],
-      "artifact-integrator": ["artifact-integrator"],
-      "evolution-orchestrator": ["evolution-orchestrator"],
-      "heartbeat-orchestrator": ["heartbeat-orchestrator"],
-      "master-orchestrator": ["master-orchestrator"],
-      "party-orchestrator": ["party-orchestrator"],
-      "swarm-coordinator": ["swarm-coordinator"]
+      "architect": [
+        "architect"
+      ],
+      "context-compressor": [
+        "context-compressor"
+      ],
+      "developer": [
+        "developer"
+      ],
+      "general-assistant": [
+        "general-assistant"
+      ],
+      "planner": [
+        "planner"
+      ],
+      "pm": [
+        "pm"
+      ],
+      "qa": [
+        "qa"
+      ],
+      "reflection-agent": [
+        "reflection-agent"
+      ],
+      "technical-program-manager": [
+        "technical-program-manager"
+      ],
+      "technical-writer": [
+        "technical-writer"
+      ],
+      "accessibility-tester": [
+        "accessibility-tester"
+      ],
+      "advanced-debugging": [
+        "advanced-debugging"
+      ],
+      "c4-code": [
+        "c4-code"
+      ],
+      "c4-component": [
+        "c4-component"
+      ],
+      "c4-container": [
+        "c4-container"
+      ],
+      "c4-context": [
+        "c4-context"
+      ],
+      "chaos-engineer": [
+        "chaos-engineer"
+      ],
+      "code-reviewer": [
+        "code-reviewer"
+      ],
+      "code-simplifier": [
+        "code-simplifier"
+      ],
+      "conductor-validator": [
+        "conductor-validator"
+      ],
+      "database-architect": [
+        "database-architect"
+      ],
+      "devops-troubleshooter": [
+        "devops-troubleshooter"
+      ],
+      "devops": [
+        "devops"
+      ],
+      "ecosystem-auditor": [
+        "ecosystem-auditor"
+      ],
+      "incident-responder": [
+        "incident-responder"
+      ],
+      "memory-manager": [
+        "memory-manager"
+      ],
+      "penetration-tester": [
+        "penetration-tester"
+      ],
+      "performance-engineer": [
+        "performance-engineer"
+      ],
+      "researcher": [
+        "researcher"
+      ],
+      "reverse-engineer": [
+        "reverse-engineer"
+      ],
+      "security-architect": [
+        "security-architect"
+      ],
+      "sre-engineer": [
+        "sre-engineer"
+      ],
+      "task-manager": [
+        "task-manager"
+      ],
+      "ai-ml-specialist": [
+        "ai-ml-specialist"
+      ],
+      "android": [
+        "android-pro"
+      ],
+      "angular": [
+        "angular-pro"
+      ],
+      "api-designer": [
+        "api-designer"
+      ],
+      "aso-specialist": [
+        "aso-specialist"
+      ],
+      "azure-infra": [
+        "azure-infra-pro"
+      ],
+      "brand-guardian": [
+        "brand-guardian"
+      ],
+      "business-analyst": [
+        "business-analyst"
+      ],
+      "compliance-checker": [
+        "compliance-checker"
+      ],
+      "context-manager": [
+        "context-manager"
+      ],
+      "data-engineer": [
+        "data-engineer"
+      ],
+      "data-scientist": [
+        "data-scientist"
+      ],
+      "django-developer": [
+        "django-developer"
+      ],
+      "dotnet": [
+        "dotnet-pro"
+      ],
+      "expo-mobile-developer": [
+        "expo-mobile-developer"
+      ],
+      "fastapi": [
+        "fastapi-pro"
+      ],
+      "feedback-synthesizer": [
+        "feedback-synthesizer"
+      ],
+      "frontend": [
+        "frontend-pro"
+      ],
+      "gamedev": [
+        "gamedev-pro"
+      ],
+      "golang": [
+        "golang-pro"
+      ],
+      "graphql": [
+        "graphql-pro"
+      ],
+      "ios": [
+        "ios-pro"
+      ],
+      "iot-engineer": [
+        "iot-engineer"
+      ],
+      "java": [
+        "java-pro"
+      ],
+      "kotlin": [
+        "kotlin-pro"
+      ],
+      "kubernetes-specialist": [
+        "kubernetes-specialist"
+      ],
+      "legacy-modernizer": [
+        "legacy-modernizer"
+      ],
+      "legal-advisor": [
+        "legal-advisor"
+      ],
+      "llm-architect": [
+        "llm-architect"
+      ],
+      "m365-admin": [
+        "m365-admin"
+      ],
+      "marketing-strategist": [
+        "marketing-strategist"
+      ],
+      "mcp-developer": [
+        "mcp-developer"
+      ],
+      "medical-research-triage": [
+        "medical-research-triage"
+      ],
+      "microservices-architect": [
+        "microservices-architect"
+      ],
+      "ml-researcher": [
+        "ml-researcher"
+      ],
+      "mlops-engineer": [
+        "mlops-engineer"
+      ],
+      "mobile-ux-reviewer": [
+        "mobile-ux-reviewer"
+      ],
+      "multi-llm-consultant": [
+        "multi-llm-consultant"
+      ],
+      "nextjs": [
+        "nextjs-pro"
+      ],
+      "nlp-engineer": [
+        "nlp-engineer"
+      ],
+      "nodejs": [
+        "nodejs-pro"
+      ],
+      "php": [
+        "php-pro"
+      ],
+      "pm-coordinator": [
+        "pm-coordinator"
+      ],
+      "postgres": [
+        "postgres-pro"
+      ],
+      "product-manager": [
+        "product-manager"
+      ],
+      "prompt-engineer": [
+        "prompt-engineer"
+      ],
+      "python": [
+        "python-pro"
+      ],
+      "quant-analyst": [
+        "quant-analyst"
+      ],
+      "rails": [
+        "rails-pro"
+      ],
+      "rust": [
+        "rust-pro"
+      ],
+      "scientific-research": [
+        "scientific-research-expert"
+      ],
+      "spring-boot": [
+        "spring-boot-pro"
+      ],
+      "sql": [
+        "sql-pro"
+      ],
+      "sveltekit": [
+        "sveltekit-expert"
+      ],
+      "swift": [
+        "swift-pro"
+      ],
+      "tauri-desktop-developer": [
+        "tauri-desktop-developer"
+      ],
+      "terraform-engineer": [
+        "terraform-engineer"
+      ],
+      "terragrunt": [
+        "terragrunt-pro"
+      ],
+      "typescript": [
+        "typescript-pro"
+      ],
+      "ux-researcher": [
+        "ux-researcher"
+      ],
+      "web3-blockchain": [
+        "web3-blockchain-expert"
+      ],
+      "windows-infra": [
+        "windows-infra-pro"
+      ],
+      "wordpress-master": [
+        "wordpress-master"
+      ],
+      "artifact-integrator": [
+        "artifact-integrator"
+      ],
+      "evolution-orchestrator": [
+        "evolution-orchestrator"
+      ],
+      "heartbeat-orchestrator": [
+        "heartbeat-orchestrator"
+      ],
+      "master-orchestrator": [
+        "master-orchestrator"
+      ],
+      "party-orchestrator": [
+        "party-orchestrator"
+      ],
+      "swarm-coordinator": [
+        "swarm-coordinator"
+      ]
     },
     "byDomain": {
       "architecture": [
@@ -10766,6 +11154,7 @@
         "conductor-validator",
         "devops-troubleshooter",
         "ecosystem-auditor",
+        "memory-manager",
         "performance-engineer",
         "reverse-engineer",
         "sre-engineer",
@@ -10822,11 +11211,24 @@
         "windows-infra-pro",
         "wordpress-master"
       ],
-      "planning": ["planner", "pm"],
-      "documentation": ["technical-writer"],
-      "testing": ["accessibility-tester"],
-      "devops": ["devops", "incident-responder"],
-      "security": ["penetration-tester", "security-architect"],
+      "planning": [
+        "planner",
+        "pm"
+      ],
+      "documentation": [
+        "technical-writer"
+      ],
+      "testing": [
+        "accessibility-tester"
+      ],
+      "devops": [
+        "devops",
+        "incident-responder"
+      ],
+      "security": [
+        "penetration-tester",
+        "security-architect"
+      ],
       "research": [
         "researcher",
         "medical-research-triage",
@@ -10834,9 +11236,17 @@
         "scientific-research-expert",
         "ux-researcher"
       ],
-      "ai-ml": ["ai-ml-specialist", "web3-blockchain-expert"],
-      "frontend": ["frontend-pro", "nextjs-pro"],
-      "mobile": ["mobile-ux-reviewer"],
+      "ai-ml": [
+        "ai-ml-specialist",
+        "web3-blockchain-expert"
+      ],
+      "frontend": [
+        "frontend-pro",
+        "nextjs-pro"
+      ],
+      "mobile": [
+        "mobile-ux-reviewer"
+      ],
       "orchestration": [
         "pm-coordinator",
         "artifact-integrator",
@@ -10876,6 +11286,7 @@
         "devops",
         "ecosystem-auditor",
         "incident-responder",
+        "memory-manager",
         "penetration-tester",
         "performance-engineer",
         "researcher",
@@ -10986,6 +11397,7 @@
       "devops",
       "ecosystem-auditor",
       "incident-responder",
+      "memory-manager",
       "penetration-tester",
       "performance-engineer",
       "researcher",

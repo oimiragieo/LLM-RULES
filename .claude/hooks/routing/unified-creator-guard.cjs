@@ -592,7 +592,11 @@ function validateCreatorWorkflow(toolName, toolInput) {
   // Write/Edit to existing file = updating, not creating - allow without creator token
   // Skill-updater and similar updater workflows edit existing artifacts legitimately
   // SEC-FIX MCP-BYPASS-001: Use effectiveToolName to catch MCP equivalents too
-  if ((effectiveToolName === 'Write' || effectiveToolName === 'Edit') && fileExists && !requiresAlwaysOnCreator) {
+  if (
+    (effectiveToolName === 'Write' || effectiveToolName === 'Edit') &&
+    fileExists &&
+    !requiresAlwaysOnCreator
+  ) {
     return { pass: true };
   }
 

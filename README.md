@@ -75,7 +75,7 @@ Agent Studio natively supports integrating with other headless LLM Code CLIs (Ge
 
 ## Current Footprint
 
-- Agents: 75 files (includes 12 isolated worktree variants)
+- Agents: 102 files (includes 12 isolated worktree variants)
 - Skills: 552 `SKILL.md` definitions
 - Rules: 113 docs
 - Schemas: 319 `*.schema.json`

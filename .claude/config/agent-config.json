@@ -1396,6 +1396,21 @@
         "Write"
       ],
       "model": "claude-sonnet-4-6"
+    },
+    "memory-manager": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskUpdate",
+        "Write"
+      ],
+      "thinkingDefault": "none",
+      "model": "claude-haiku-4-5"
     }
   },
   "thinkingBudgetMap": {

@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-18T21:51:51.075Z",
+  "generatedAt": "2026-03-19T14:56:57.487Z",
   "metadata": {
-    "totalSkills": 314,
+    "totalSkills": 315,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-18T21:51:51.076Z",
+    "lastValidated": "2026-03-19T14:56:57.488Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7859,6 +7859,30 @@
       "priority": 3,
       "aliasOf": null
     },
+    "memory-audit": {
+      "name": "memory-audit",
+      "displayName": "Memory Audit",
+      "category": "Other",
+      "domain": "other",
+      "description": "Comprehensive health check across CC auto-memory and agent-studio memory systems — detects orphans, duplicates, staleness, and threshold violations",
+      "requiredTools": [
+        "Read",
+        "Bash",
+        "Grep",
+        "Glob",
+        "TaskUpdate"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "memory-audit"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "ml-experiment-loop": {
       "name": "ml-experiment-loop",
       "displayName": "Ml Experiment Loop",
@@ -8571,6 +8595,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "memory-audit",
         "ml-experiment-loop",
         "pipeline-evaluator",
         "plan-quality-verifier",
@@ -8991,6 +9016,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "memory-audit",
         "ml-experiment-loop",
         "pipeline-evaluator",
         "plan-quality-verifier",
@@ -9394,6 +9420,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "memory-audit",
         "ml-experiment-loop",
         "pipeline-evaluator",
         "plan-quality-verifier",
@@ -10052,6 +10079,7 @@
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
+        "memory-audit",
         "ml-experiment-loop",
         "plan-quality-verifier",
         "pptx",
@@ -10193,6 +10221,7 @@
         "goal-backward-verification",
         "implementation-readiness",
         "knowledge-graph",
+        "memory-audit",
         "ml-experiment-loop",
         "regulatory-compliance",
         "scientific-skills",
@@ -10330,6 +10359,7 @@
         "goal-backward-verification",
         "implementation-readiness",
         "knowledge-graph",
+        "memory-audit",
         "ml-experiment-loop",
         "regulatory-compliance",
         "scientific-skills",
@@ -10451,6 +10481,7 @@
       "TaskUpdate": [
         "task-management-protocol",
         "heartbeat",
+        "memory-audit",
         "scheduled-tasks",
         "telegram-polling",
         "user-research"
@@ -10694,6 +10725,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "memory-audit",
         "ml-experiment-loop",
         "pipeline-evaluator",
         "plan-quality-verifier",
@@ -12004,6 +12036,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "memory-audit",
         "ml-experiment-loop",
         "pipeline-evaluator",
         "plan-quality-verifier",

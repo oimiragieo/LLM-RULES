@@ -666,6 +666,23 @@ const INTENT_KEYWORDS = {
     'pipeline hygiene',
   ],
   'code-reviewer': ['code-reviewer', 'code', 'reviewer'],
+  'memory-manager': [
+    'memory-manager',
+    'memory audit',
+    'memory health',
+    'memory cleanup',
+    'memory rotation',
+    'memory bloat',
+    'memory deduplication',
+    'prune memory',
+    'rotate memory',
+    'memory maintenance',
+    'memory files',
+    'memory tier',
+    'learnings.md size',
+    'decisions.md size',
+    'memory stats',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

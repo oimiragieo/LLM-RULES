@@ -313,6 +313,13 @@ const ROUTING_TABLE = {
   'task-hygiene': 'task-manager',
   'task-audit': 'task-manager',
 
+  // Memory Management
+  'memory-audit': 'memory-manager',
+  'memory-health': 'memory-manager',
+  'memory-cleanup': 'memory-manager',
+  'memory-rotation': 'memory-manager',
+  'memory-maintenance': 'memory-manager',
+
   // Ecosystem Evolution
   audit: 'ecosystem-auditor',
   auditor: 'ecosystem-auditor',

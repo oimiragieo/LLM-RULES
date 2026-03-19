@@ -177,6 +177,7 @@ const INTENT_TO_AGENT = {
   heartbeat: 'heartbeat-orchestrator',
   'ecosystem-auditor': 'ecosystem-auditor',
   'task-manager': 'task-manager',
+  'memory-manager': 'memory-manager',
 };
 
 module.exports = { INTENT_TO_AGENT };

@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "lastEvolution": "2026-03-15-system-health-check",
+  "lastEvolution": "2026-03-19-memory-manager",
   "evolutions": [
+    {
+      "id": "2026-03-19-memory-manager",
+      "artifactType": "agent",
+      "name": "memory-manager",
+      "path": ".claude/agents/specialized/memory-manager.md",
+      "status": "completed",
+      "completedAt": "2026-03-19T00:00:00.000Z",
+      "category": "Memory Management",
+      "agents": ["memory-manager"],
+      "description": "Created memory-manager specialized agent for orchestrating memory health audits and cleanup.",
+      "affected": ["memory-manager"]
+    },
     {
       "id": "2026-03-15-system-health-check",
       "artifactType": "skill",
