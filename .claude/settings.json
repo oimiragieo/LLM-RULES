@@ -75,7 +75,7 @@
         ]
       },
       {
-        "matcher": "Bash|Glob|Grep|Edit|Write|WebSearch|WebFetch",
+        "matcher": "Bash|Glob|Grep|Edit|Write|WebSearch|WebFetch|mcp__filesystem__write_file|mcp__filesystem__edit_file|mcp__filesystem__read_file|mcp__filesystem__create_directory|mcp__filesystem__move_file",
         "hooks": [
           {
             "type": "command",
@@ -120,7 +120,7 @@
         ]
       },
       {
-        "matcher": "Edit|Write|NotebookEdit",
+        "matcher": "Edit|Write|NotebookEdit|mcp__filesystem__write_file|mcp__filesystem__edit_file",
         "hooks": [
           {
             "type": "command",

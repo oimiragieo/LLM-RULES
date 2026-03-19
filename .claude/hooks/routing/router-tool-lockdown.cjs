@@ -63,6 +63,61 @@ const ROUTER_BANNED_TOOLS = [
 ];
 
 /**
+ * MCP tool name prefix patterns that map to banned native tools.
+ * Any MCP tool whose name starts with one of these prefixes is treated
+ * as the equivalent native banned tool for enforcement purposes.
+ *
+ * SEC-FIX MCP-BYPASS-001: Without this mapping, the router can bypass
+ * ALL hook enforcement by using MCP filesystem/shell tools instead of
+ * native Write/Edit/Bash. This was proven in production where the router
+ * used mcp__filesystem__write_file to create 14 files without any hook
+ * firing, despite ROUTER_TOOL_LOCKDOWN_ENFORCEMENT=block.
+ */
+const MCP_TOOL_MAPPINGS = [
+  // Filesystem MCP tools → Write/Edit equivalents
+  { prefix: 'mcp__filesystem__write', nativeTool: 'Write' },
+  { prefix: 'mcp__filesystem__edit', nativeTool: 'Edit' },
+  { prefix: 'mcp__filesystem__create', nativeTool: 'Write' },
+  { prefix: 'mcp__filesystem__delete', nativeTool: 'Write' },
+  { prefix: 'mcp__filesystem__move', nativeTool: 'Write' },
+  { prefix: 'mcp__filesystem__copy', nativeTool: 'Write' },
+  // Shell/exec MCP tools → Bash equivalent
+  { prefix: 'mcp__shell__', nativeTool: 'Bash' },
+  { prefix: 'mcp__exec__', nativeTool: 'Bash' },
+  { prefix: 'mcp__terminal__', nativeTool: 'Bash' },
+  // Search MCP tools → Grep/Glob equivalents
+  { prefix: 'mcp__filesystem__search', nativeTool: 'Grep' },
+  { prefix: 'mcp__filesystem__list', nativeTool: 'Glob' },
+  { prefix: 'mcp__filesystem__glob', nativeTool: 'Glob' },
+  // Web MCP tools → WebSearch/WebFetch equivalents
+  { prefix: 'mcp__web__search', nativeTool: 'WebSearch' },
+  { prefix: 'mcp__web__fetch', nativeTool: 'WebFetch' },
+  { prefix: 'mcp__fetch__', nativeTool: 'WebFetch' },
+];
+
+/**
+ * Map an MCP tool name to its equivalent native banned tool.
+ * Returns the native tool name if a mapping is found, or null otherwise.
+ *
+ * @param {string} toolName - The tool name to check
+ * @returns {string|null} The equivalent native tool name, or null if not an MCP tool
+ */
+function mapMcpToNativeTool(toolName) {
+  if (!toolName || typeof toolName !== 'string') return null;
+  // Quick check: all MCP tools start with 'mcp__'
+  if (!toolName.startsWith('mcp__')) return null;
+  const lower = toolName.toLowerCase();
+  for (const mapping of MCP_TOOL_MAPPINGS) {
+    if (lower.startsWith(mapping.prefix)) {
+      return mapping.nativeTool;
+    }
+  }
+  // Catch-all: any unrecognized mcp__ tool is still suspicious for router use.
+  // Map to a generic banned tool so it gets caught by the enforcement check.
+  return 'Bash';
+}
+
+/**
  * Whitelisted Bash commands the router may use (read-only git discovery).
  * Matches CLAUDE.md Section 0 allowlist.
  */
@@ -191,13 +246,22 @@ function checkRouterToolLockdown(toolName, toolInput, hookInput, cwd = process.c
     return { pass: true };
   }
 
+  // SEC-FIX MCP-BYPASS-001: Map MCP tools to their native equivalents.
+  // If an MCP tool maps to a banned native tool, enforce the same restrictions.
+  let effectiveToolName = toolName;
+  const mcpMapping = mapMcpToNativeTool(toolName);
+  if (mcpMapping) {
+    effectiveToolName = mcpMapping;
+  }
+
   // If tool is whitelisted for router, always allow
+  // Note: MCP tools are NOT whitelisted — only native tool names are in the whitelist.
   if (ROUTER_WHITELISTED_TOOLS.includes(toolName)) {
     return { pass: true };
   }
 
-  // If tool is not in the banned list, allow (unknown tools pass through)
-  if (!ROUTER_BANNED_TOOLS.includes(toolName)) {
+  // If tool is not in the banned list (and not an MCP equivalent), allow
+  if (!ROUTER_BANNED_TOOLS.includes(effectiveToolName)) {
     return { pass: true };
   }
 
@@ -207,7 +271,8 @@ function checkRouterToolLockdown(toolName, toolInput, hookInput, cwd = process.c
   }
 
   // Special case: Bash with whitelisted command (git status, git log, etc.)
-  if (toolName === 'Bash' && toolInput) {
+  // Note: MCP shell tools are NEVER whitelisted — only native Bash with specific commands.
+  if (toolName === 'Bash' && !mcpMapping && toolInput) {
     const command = toolInput.command || '';
     if (isWhitelistedBashCommand(command)) {
       return { pass: true };
@@ -215,9 +280,10 @@ function checkRouterToolLockdown(toolName, toolInput, hookInput, cwd = process.c
   }
 
   // Build the block/warn message
-  const agent = suggestAgent(toolName);
+  const agent = suggestAgent(effectiveToolName);
+  const mcpNote = mcpMapping ? ` (MCP equivalent of ${effectiveToolName})` : '';
   const message =
-    `[ROUTER-LOCKDOWN] Router is FORBIDDEN from using ${toolName}. ` +
+    `[ROUTER-LOCKDOWN] Router is FORBIDDEN from using ${toolName}${mcpNote}. ` +
     `Spawn an agent instead: Task({ task_id: 'task-N', subagent_type: '${agent}', prompt: '...' }). ` +
     'Section 0 CLAUDE.md Tool Lockdown.';
 
@@ -278,7 +344,9 @@ module.exports = {
   checkRouterToolLockdown,
   isRouterSession,
   isWhitelistedBashCommand,
+  mapMcpToNativeTool,
   ROUTER_WHITELISTED_TOOLS,
   ROUTER_BANNED_TOOLS,
+  MCP_TOOL_MAPPINGS,
   main,
 };

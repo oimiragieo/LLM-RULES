@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint max-lines: ["warn", 900] */
 /**
  * Unified Creator Guard Hook
  * ==========================
@@ -197,6 +198,42 @@ const DEFAULT_TTL_MS = (() => {
  * Tools that this hook monitors
  */
 const WATCHED_TOOLS = ['Edit', 'Write', 'NotebookEdit'];
+
+/**
+ * MCP tool name prefixes that map to watched native tools.
+ * SEC-FIX MCP-BYPASS-001: MCP filesystem tools bypass the creator guard
+ * because their names don't match the WATCHED_TOOLS list. This mapping
+ * ensures MCP equivalents are treated identically to native tools.
+ *
+ * @type {Array<{prefix: string, nativeTool: string}>}
+ */
+const MCP_WATCHED_MAPPINGS = [
+  { prefix: 'mcp__filesystem__write', nativeTool: 'Write' },
+  { prefix: 'mcp__filesystem__edit', nativeTool: 'Edit' },
+  { prefix: 'mcp__filesystem__create', nativeTool: 'Write' },
+  { prefix: 'mcp__filesystem__delete', nativeTool: 'Write' },
+  { prefix: 'mcp__filesystem__move', nativeTool: 'Write' },
+  { prefix: 'mcp__filesystem__copy', nativeTool: 'Write' },
+];
+
+/**
+ * Map an MCP tool name to its equivalent native watched tool.
+ * Returns the native tool name if a mapping is found, or null otherwise.
+ *
+ * @param {string} toolName - The tool name to check
+ * @returns {string|null} The equivalent native tool name, or null if not an MCP tool
+ */
+function mapMcpToWatchedTool(toolName) {
+  if (!toolName || typeof toolName !== 'string') return null;
+  if (!toolName.startsWith('mcp__')) return null;
+  const lower = toolName.toLowerCase();
+  for (const mapping of MCP_WATCHED_MAPPINGS) {
+    if (lower.startsWith(mapping.prefix)) {
+      return mapping.nativeTool;
+    }
+  }
+  return null;
+}
 
 // =============================================================================
 // CORE FUNCTIONS
@@ -502,8 +539,16 @@ function validateArtifactContent(artifactType, content) {
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
 function validateCreatorWorkflow(toolName, toolInput) {
-  // Only check Edit/Write/NotebookEdit tools
-  if (!WATCHED_TOOLS.includes(toolName)) {
+  // SEC-FIX MCP-BYPASS-001: Map MCP tools to their native equivalents.
+  // If an MCP tool maps to a watched native tool, enforce the same restrictions.
+  let effectiveToolName = toolName;
+  const mcpMapping = mapMcpToWatchedTool(toolName);
+  if (mcpMapping) {
+    effectiveToolName = mcpMapping;
+  }
+
+  // Only check Edit/Write/NotebookEdit tools (or their MCP equivalents)
+  if (!WATCHED_TOOLS.includes(effectiveToolName)) {
     return { pass: true };
   }
 
@@ -546,7 +591,8 @@ function validateCreatorWorkflow(toolName, toolInput) {
 
   // Write/Edit to existing file = updating, not creating - allow without creator token
   // Skill-updater and similar updater workflows edit existing artifacts legitimately
-  if ((toolName === 'Write' || toolName === 'Edit') && fileExists && !requiresAlwaysOnCreator) {
+  // SEC-FIX MCP-BYPASS-001: Use effectiveToolName to catch MCP equivalents too
+  if ((effectiveToolName === 'Write' || effectiveToolName === 'Edit') && fileExists && !requiresAlwaysOnCreator) {
     return { pass: true };
   }
 
@@ -622,8 +668,10 @@ async function main() {
     const toolName = getToolName(hookInput);
     const toolInput = getToolInput(hookInput);
 
-    // Skip if not a watched tool
-    if (!toolName || !WATCHED_TOOLS.includes(toolName)) {
+    // Skip if not a watched tool (or its MCP equivalent)
+    // SEC-FIX MCP-BYPASS-001: Check MCP mappings before skipping
+    const effectiveTool = mapMcpToWatchedTool(toolName) || toolName;
+    if (!toolName || !WATCHED_TOOLS.includes(effectiveTool)) {
       process.exit(0);
     }
 
@@ -782,6 +830,9 @@ module.exports = {
   validateCreatorWorkflow,
   findRequiredCreator,
   generateViolationMessage,
+  // MCP bypass prevention (SEC-FIX MCP-BYPASS-001)
+  mapMcpToWatchedTool,
+  MCP_WATCHED_MAPPINGS,
   // State management
   isCreatorActive,
   markCreatorActive,
