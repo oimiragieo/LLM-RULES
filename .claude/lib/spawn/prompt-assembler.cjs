@@ -207,7 +207,7 @@ function buildBasePrompt(basePrompt, agentType, presetId, projectRoot) {
       `\n\n## TOKEN USAGE REPORTING (End-of-Task)\n` +
       `At the END of your task (before calling TaskUpdate(completed)), report token usage by running:\n` +
       '```\n' +
-      'npx ccusage --today 2>/dev/null | tail -5\n' +
+      'npx ccusage --today 2>&1 || echo "ccusage not available"\n' +
       '```\n' +
       `Include the output in your completion summary so the router can track session costs.\n`;
     mergedBasePrompt = mergedBasePrompt + tokenReportingBlock;
