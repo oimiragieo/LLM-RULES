@@ -346,7 +346,7 @@ Skip this phase for GREENFIELD projects.
 | Large brownfield refactor (>5 files) | **PLAN-FIRST**: Full Phase 0 + 0.5, then TDD per microtask                 | Scope too large for TDD-first              |
 | Unclear requirements                 | **PLAN-FIRST** with spec-init: Gather requirements first                   | Can't write tests without knowing behavior |
 
-**TDD-FIRST shortcut**: When TDD-FIRST is selected, skip Phase 0 research. Go directly to:
+**TDD-FIRST shortcut**: When TDD-FIRST is selected, use Phase 0-Lite (1 targeted search query, no full research report). Then:
 
 1. Write failing test(s) capturing desired behavior
 2. Plan minimal implementation to make tests pass
@@ -401,7 +401,7 @@ When producing microtask DAGs, assign each task a `wave` number (1-10):
 
 | Complexity | Phase 0 (Research)              | Phase 0.5 (Codebase)         | Plan Depth                   | TDD Approach                      |
 | ---------- | ------------------------------- | ---------------------------- | ---------------------------- | --------------------------------- |
-| TRIVIAL    | Skip                            | Skip                         | Single task, no plan file    | TDD-first if code change          |
+| TRIVIAL    | Phase 0-Lite (1 query)          | Skip                         | Single task, no plan file    | TDD-first if code change          |
 | LOW        | 1 search query                  | Brief scan (if brownfield)   | 1-2 phases, inline plan      | TDD-first preferred               |
 | MEDIUM     | Standard Phase 0                | If brownfield                | 3-5 phases, plan file        | Plan-first, TDD in implementation |
 | HIGH       | Full Phase 0                    | Mandatory (brownfield)       | 5-7 phases, microtask DAG    | Plan-first, TDD per wave          |
