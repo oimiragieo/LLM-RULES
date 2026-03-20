@@ -155,6 +155,65 @@ function buildBasePrompt(basePrompt, agentType, presetId, projectRoot) {
   }
   // === END SAFETY PREAMBLE ===
 
+  // === AGENT PROTOCOL ENFORCEMENT (Patch 4) ===
+  // Inject protocol blocks so spawned agents know their role and required contracts.
+  // Kill switch: set SPAWN_AGENT_PROTOCOL=off to disable.
+  const AGENT_PROTOCOL_ENABLED =
+    String(process.env.SPAWN_AGENT_PROTOCOL || 'on').toLowerCase() !== 'off';
+  if (AGENT_PROTOCOL_ENABLED && !mergedBasePrompt.includes('SPAWNED AGENT PROTOCOL')) {
+    const agentProtocol =
+      `\n\n## SPAWNED AGENT PROTOCOL (Mandatory)\n` +
+      `You are a **SPAWNED AGENT**, not the Router. You CAN and SHOULD use Write, Edit, Bash, Grep, Glob directly. You MUST use TaskUpdate to report progress.\n\n` +
+      `### TaskList-First Rule\n` +
+      `Before calling \`TaskCreate\`, you MUST call \`TaskList()\` first. This is enforced by \`routing-guard.cjs\` and will BLOCK your TaskCreate if skipped.\n\n` +
+      `### TaskUpdate Completion Contract\n` +
+      `When marking a task completed, you MUST include all required metadata fields:\n` +
+      `\`\`\`\n` +
+      `TaskUpdate({\n` +
+      `  taskId: "YOUR-ID",\n` +
+      `  status: "completed",\n` +
+      `  metadata: {\n` +
+      `    summary: "Description of what was accomplished (>50 chars)",\n` +
+      `    filesModified: ["path/to/file1", "path/to/file2"],\n` +
+      `    completedAt: new Date().toISOString()\n` +
+      `  }\n` +
+      `})\n` +
+      `\`\`\`\n` +
+      `The \`taskupdate-contract-validator.cjs\` hook enforces these fields. Missing \`summary\`, \`filesModified\`, or \`completedAt\` will be BLOCKED.\n`;
+    mergedBasePrompt = mergedBasePrompt + agentProtocol;
+  }
+  // === END AGENT PROTOCOL ENFORCEMENT ===
+
+  // === TOKEN REPORTING INJECTION (Patch 5) ===
+  // Inject token reporting instruction for planner and orchestrator agents so they
+  // report usage at the end of their task. Only these high-level agents get the
+  // instruction to avoid noise from leaf agents.
+  // Kill switch: set SPAWN_TOKEN_REPORTING=off to disable.
+  const TOKEN_REPORTING_ENABLED =
+    String(process.env.SPAWN_TOKEN_REPORTING || 'on').toLowerCase() !== 'off';
+  const TOKEN_REPORTING_AGENTS = [
+    'planner',
+    'master-orchestrator',
+    'evolution-orchestrator',
+    'heartbeat-orchestrator',
+    'devops',
+  ];
+  if (
+    TOKEN_REPORTING_ENABLED &&
+    TOKEN_REPORTING_AGENTS.includes(agentType) &&
+    !mergedBasePrompt.includes('TOKEN USAGE REPORTING')
+  ) {
+    const tokenReportingBlock =
+      `\n\n## TOKEN USAGE REPORTING (End-of-Task)\n` +
+      `At the END of your task (before calling TaskUpdate(completed)), report token usage by running:\n` +
+      '```\n' +
+      'npx ccusage --today 2>/dev/null | tail -5\n' +
+      '```\n' +
+      `Include the output in your completion summary so the router can track session costs.\n`;
+    mergedBasePrompt = mergedBasePrompt + tokenReportingBlock;
+  }
+  // === END TOKEN REPORTING INJECTION ===
+
   return mergedBasePrompt;
 }
 

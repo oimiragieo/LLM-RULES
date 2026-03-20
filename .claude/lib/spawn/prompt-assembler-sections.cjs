@@ -2,7 +2,6 @@
 'use strict';
 
 const DEFAULT_SKILL_SECTION_MODE = 'full';
-const _BANNER_LINE = '+======================================================================+';
 
 function normalizeSkillSectionMode(mode) {
   const value = String(mode || DEFAULT_SKILL_SECTION_MODE)
@@ -37,9 +36,28 @@ function buildToolsSection(tools) {
     }
   }
 
+  // === AGENT ROLE CLARITY ===
+  section += '\n## YOU ARE A SPAWNED AGENT (NOT the Router)\n\n';
   section +=
-    '\n**CRITICAL/MANDATORY:** Call TaskUpdate({ taskId, status: "in_progress" }) when starting work.\n';
-  section += 'Call TaskUpdate({ taskId, status: "completed" }) when done.\n';
+    'You are a **spawned subagent**, not the Router. You CAN and SHOULD use tools like Write, Edit, Bash, Grep, Glob directly to complete your work. ';
+  section += 'You MUST use TaskUpdate to report your progress.\n\n';
+
+  // === TASKUPDATE CONTRACT (required fields) ===
+  section += '## TASKUPDATE CONTRACT (MANDATORY)\n\n';
+  section +=
+    '**STEP 1 — FIRST action:** `TaskUpdate({ taskId: "YOUR-ID", status: "in_progress" })`\n\n';
+  section += '**STEP 2 — Do your work.**\n\n';
+  section +=
+    '**STEP 3 — LAST action (after all work is verified):**\n```\nTaskUpdate({\n  taskId: "YOUR-ID",\n  status: "completed",\n  metadata: {\n    summary: "What was accomplished (>50 chars required)",\n    filesModified: ["path/to/file1", "path/to/file2"],\n    completedAt: new Date().toISOString()\n  }\n})\n```\n';
+  section +=
+    '**WARNING:** The `taskupdate-contract-validator.cjs` hook enforces that `metadata.summary`, `metadata.filesModified`, and `metadata.completedAt` are present on completion. Missing fields will be BLOCKED.\n\n';
+
+  // === TASKLIST-FIRST ENFORCEMENT ===
+  section += '## TASKLIST-FIRST PROTOCOL\n\n';
+  section +=
+    'Before using `TaskCreate`, you **MUST** call `TaskList()` first. This is enforced by hooks and will **block you** if skipped.\n\n';
+
+  // === GENERAL TOOL GUIDANCE ===
   section +=
     'Before editing an existing file (especially `.claude/context/reports/*`), Read it first; if it does not exist, create it with Write.\n';
   section +=

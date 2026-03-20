@@ -1857,6 +1857,22 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
   recordUserPromptResult(result);
   // Correction detection (additive — runs after all existing checks)
   checkCorrectionPatterns(userPrompt);
+  // Token reporting reminder — nudge the router to include token reporting in planner spawns.
+  // This is a lightweight stderr hint; the actual injection happens in prompt-assembler.cjs (Patch 5).
+  // Kill switch: set SPAWN_TOKEN_REPORTING=off to suppress.
+  if (String(process.env.SPAWN_TOKEN_REPORTING || 'on').toLowerCase() !== 'off') {
+    try {
+      const statusFile = path.join(RUNTIME_DIR, 'ccusage-status.txt');
+      if (fs.existsSync(statusFile)) {
+        const status = fs.readFileSync(statusFile, 'utf8').trim();
+        if (status) {
+          process.stderr.write(`[token-report] ${status.split('\n')[0]}\n`);
+        }
+      }
+    } catch (_tokenErr) {
+      // Fail-open: never block prompt over token reporting
+    }
+  }
   return result;
 }
 // =============================================================================
