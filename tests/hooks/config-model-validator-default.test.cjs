@@ -21,7 +21,7 @@ test('checkConfigModelValidator defaults to block on model mismatch', () => {
 
     const result = routingGuard.checkConfigModelValidator('Task', {
       prompt: 'You are zzzunknown',
-      model: 'claude-opus-4-5-20251101',
+      model: 'claude-opus-4-6',
     });
 
     assert.strictEqual(result.pass, false);
@@ -37,7 +37,7 @@ test('checkConfigModelValidator warns when explicitly configured to warn', () =>
 
     const result = routingGuard.checkConfigModelValidator('Task', {
       prompt: 'You are zzzunknown',
-      model: 'claude-opus-4-5-20251101',
+      model: 'claude-opus-4-6',
     });
 
     assert.strictEqual(result.pass, true);

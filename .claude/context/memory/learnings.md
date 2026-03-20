@@ -1,3 +1,51 @@
+## Ecosystem Audit Remediation (2026-03-20) [Task 8 Reflection]
+
+**[PATTERN] Fail-Open vs Fail-Closed Hook Exit Codes**
+
+When a hook makes a security decision (allow vs block), exit code choice is critical:
+
+- `exit(0)`: Allow or warn — safe to fail open on unexpected errors
+- `exit(2)`: Block or deny — must fail CLOSED on unexpected errors
+
+Example: evolution-state-guard.cjs checks evolution lock. If lock-held condition returns `exit(0)`, concurrent evolutions proceed (bypass). Must use `exit(2)` to block concurrency violation.
+
+Found in: ecosystem-audit-task-8 (commit 108819dc). Violations fixed on lines 314, 347.
+Severity: CRITICAL (SEC-008 compliance)
+Reuse: HIGH — applies to all future hooks implementing security/concurrency controls
+
+---
+
+**[GOTCHA] Context Bloat: Rules Files Kill Agent Working Context**
+
+Claude Code auto-injects all `.claude/rules/*.md` files into every agent spawn. This codebase had 141 rules files (857KB = ~200K tokens), leaving agents near-zero working context.
+
+Symptoms: agents fail with "Prompt is too long" at 0 tool uses; architect/code-reviewer agents exhaust context after 40-50 tool calls; only lightweight agents (explore, researcher) complete successfully.
+
+Root cause: Domain-specific rules (database-architect.md 11KB, ripgrep.md 14KB, plugin-development.md 11KB) should be skills (loaded on-demand), not always-on rules.
+
+Mitigation: Keep ~15 universal rules (~50KB), convert 126 domain rules to skills (~806KB loaded on-demand).
+Expected impact: agent spawn context 200K→30K tokens, working context nearly-zero→170K+ tokens.
+
+Found in: critical-rules-bloat-finding.md (ecosystem-audit-task-8)
+Priority: P0 (affects agent completion rates)
+
+---
+
+**[GOTCHA] Debounce Counters Ineffective in Ephemeral Hooks**
+
+Attempted to rate-limit hook warnings in context-monitor.cjs via counter: `toolUsesSinceLastWarning++` with `if (counter >= 5) warn`.
+
+The counter is declared at module level but hooks exit immediately after one invocation. State is never persisted, so counter always resets to 0 on next hook call.
+
+Result: debounce never triggers; counter serves no purpose.
+Solution: Remove the counter. Accept that all warnings fire (acceptable for context monitoring).
+
+Lesson: Hooks are ephemeral (live for one tool use). Don't use in-process state for persistence. Use external state (files, env) or accept stateless behavior.
+
+Found in: ecosystem-audit-task-8 (context-monitor.cjs debounce logic removed)
+
+---
+
 ## Memory Management Pipeline Complete (2026-03-19) [Batch 10 reflections]
 
 **[WORKFLOW] Memory Bloat Recovery Pipeline — Pattern and Outcomes**
@@ -240,3 +288,149 @@ Key governance actions taken:
 ---
 
 - Created new agent: memory-manager (2026-03-19)
+
+## 2026-03-19 — Router Compliance Audit (wave-2c-router-compliance)
+
+**Gates 0-5: Enforced.** Gates 0 (reflection), 1 (planner-first), 2 (security), 3 (tool lockdown), 4 (creator guard), 5 (architect-first) all have mechanical hook enforcement.
+
+**Gate 6 (Proactive Audit): NOT enforced by hooks.** Relies entirely on router instruction-following. No PostToolUse hook detects framework path changes and triggers QA spawn.
+
+**MCP tool lockdown gap:** settings.json lockdown matcher only lists 5 specific MCP filesystem tools. Any MCP tool from a future MCP server (browser, github, exa) would bypass router-tool-lockdown.cjs. Currently no risk because mcpServers is empty, but fragile.
+
+**NotebookEdit missing from lockdown matcher:** unified-creator-guard.cjs covers NotebookEdit but router-tool-lockdown.cjs does not.
+
+**Specialist keyword map incomplete:** master-orchestrator, advanced-debugging, heartbeat-orchestrator, task-manager, memory-manager have no keyword entries in SPECIALIST_KEYWORD_MAP — routing for those agent types is not mechanically enforced against "developer" misrouting.
+
+**Report:** `.claude/context/reports/router-compliance-2026-03-19.md`
+
+## LSP Best Practices vs lsp-navigator Gap Analysis (2026-03-19) [Task wave-4b-lsp-research]
+
+**Source**: `.claude/context/reports/lsp-research-2026-03-19.md`
+
+Key gaps found:
+
+- GAP-1 (P1): lsp-navigator skill missing `getDiagnostics` — industry standard is edit→diagnose loop
+- GAP-2 (P1): lsp-navigator skill missing `codeActions` and `rename` — Cursor/Windsurf/Kiro/Claude Code 2.0.74+ all expose these
+- GAP-3 (P2): No LSP-over-MCP bridge fallback (LSAP standard emerging at github.com/lsp-client/LSAP)
+- GAP-5 (P3): CJS pre-check guideline missing — agents find out reactively after empty results
+  Strengths: layered search hierarchy, agent-specific contracts, documented CJS limitation, Windows path normalization
+
+- Created new agent: qa-guardian (2026-03-19)
+
+- Created new agent: contract-check (2026-03-19)
+
+- Created new agent: bool-action (2026-03-19)
+
+- Created new agent: repo-onboarder (2026-03-19)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-19)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-19)
+
+- Updated workflow: evolution-workflow (2026-03-19)
+
+- Updated workflow: missing-workflow-xyz (2026-03-19)
+
+- Created new agent: qa-guardian (2026-03-19)
+
+- Created new agent: contract-check (2026-03-19)
+
+- Created new agent: bool-action (2026-03-19)
+
+- Created new agent: repo-onboarder (2026-03-19)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-19)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-19)
+
+- Updated workflow: evolution-workflow (2026-03-19)
+
+- Updated workflow: missing-workflow-xyz (2026-03-19)
+
+## Full Memory Health Audit Complete (2026-03-19) [Health Score: 78/100]
+
+**[AUDIT] Comprehensive Memory System Health Check**
+
+- Full memory audit completed: 7.8MB directory with 109 files across all subsystems
+- Core metrics: learnings.md ~250 lines, decisions.md ~200 lines, issues.md ~317 lines — all within healthy ranges
+- JSON stores healthy: gotchas.json (13), patterns.json (43), discoveries.json (349), access-stats.json, codebase_map.json (84KB, under 500-entry cap)
+- Archive structure sound: 12 files showing proper monthly/dated rotation pattern. Archive snapshot activity is normal behavior, not bloat.
+- CC auto-memory: 51 lines, 24 files — healthy index of user feedback patterns with zero orphans
+- Cross-system dedup: ZERO duplicates detected between CC auto-memory and agent-studio stores. Proper architectural separation maintained.
+- Named memory API: Correctly deprecated with DEPRECATED.md notice and clear RFC pathway. 70+ unused library modules support the API but feature has zero usage.
+- Session tiers: STM/MTM/LTM directory structure properly initialized and maintained
+- Staleness check: No active memory entries older than 30 days. All archival properly segregated.
+- Report: .claude/context/reports/backend/memory-health-audit-2026-03-19.md with detailed scoring and recommendations
+- Recommendations: (1) Monitor codebase_map.json for rapid growth (2) Named memory RFC when deprecation timeline is finalized (3) Archive rotation monitoring if directory exceeds 20MB
+
+**[PATTERN] Memory audit as routine health check**
+
+- Memory system is well-maintained with robust rotation and archival patterns
+- Archive snapshot activity represents normal monthly/dated rotation — no remediation needed
+- Regular health audits (every 2 weeks) recommended to maintain this state
+- System supports 5+ years of memory accumulation at current growth rate
+
+**[DECISION] Archive snapshot strategy**
+
+- Multiple snapshots per month in archive/ is correct behavior
+- Represents checkpoints during weekly/daily rotation cycles
+- Do not consolidate or delete snapshot files — they provide audit trail
+- Monitor total archive size quarterly; implement cold storage if exceeds 20MB/month
+
+## [2026-03-19] TDD Skill Gap Analysis
+
+- Internal TDD skill v1.3.0 LEADS industry on: TDP (verbatim test injection), multi-agent decomposition (qa→dev→reflection), anti-test-hacking checks, session-persistent state, bounded repair loops
+- P0 gap: No contract/schema-based assertions for AI agent output testing (Zod/JSON Schema pattern)
+- P1 gaps: behavior vs implementation-detail anti-patterns, cross-session flakiness tracking, property-based testing guidance
+- Report: .claude/context/reports/backend/tdd-gap-analysis-2026-03-19.md
+
+## [2026-03-19] Security Hook Exit Code Audit Pattern
+
+When auditing security hooks for fail-closed compliance, grep ALL hooks — not just the one under review. The C-01 evolution-state-guard finding revealed that router-tool-lockdown.cjs and write-pretool-bundle.cjs may share the same exit(0) anti-pattern on block paths. A single targeted grep covers the full surface:
+
+```bash
+grep -rn "process.exit(0)" .claude/hooks/ | grep -v "# " | grep -v "//"
+```
+
+Cross-reference with the hooks that are classified as security hooks (fail-closed policy per hooks.md).
+
+## [2026-03-19] H-01 False Positive Pattern: JSDoc vs Runtime
+
+When a threshold mismatch is reported between "default" and "documented" values, always check:
+
+1. The JSDoc @param default (may be stale documentation)
+2. The actual runtime default in the destructuring assignment
+3. The named constant used
+
+In memory-rotator.cjs: JSDoc says 20KB, runtime constant DEFAULT_THRESHOLD_KB = 40KB. Severity was HIGH but actual runtime is correct — only JSDoc needs fixing.
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-20)
+
+- Created new agent: qa-guardian (2026-03-20)
+
+- Updated workflow: evolution-workflow (2026-03-20)
+
+- Updated workflow: missing-workflow-xyz (2026-03-20)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-20)
+
+- Created new agent: contract-check (2026-03-20)
+
+- Created new agent: bool-action (2026-03-20)
+
+- Created new agent: repo-onboarder (2026-03-20)
+
+## TDD Skill Gap Analysis (2026-03-20, Task #7)
+
+- Internal TDD skill v1.3.0 is at/above 2026 industry standards
+- Two LOW-severity gaps: (1) missing agent-evaluation skill cross-ref in AI Output Evaluation section; (2) LSP Pre-RED gate should be MANDATORY for existing APIs, OPTIONAL for new
+- Stryker 7.0 supports Vitest; v9.0.1 adds partial browser mode support (still not full)
+- Report: .claude/context/artifacts/research-reports/tdd-2026-research-2026-03-20.md
+
+## 2026-03-20 — safeParseJSON Catch Block Behavior After Migration
+
+When replacing `JSON.parse()` with `safeParseJSON(content, null, null, null)`, the surrounding try/catch becomes dead code for JSON parse failures (safeParseJSON handles them internally and never throws for that case). However, the catch is NOT fully dead — it still fires for: (a) non-string inputs, (b) RangeError on structuredClone, (c) stderr write errors. Keep catch blocks as defense-in-depth, or annotate as `// defensive — safeParseJSON handles JSON errors; catch is for edge cases`.
+
+When inlineDefaults are provided (e.g., `{ raw: r.metadata }`), the catch block that assigns the same fallback is redundant for JSON errors but not fully dead. Worth annotating.
+
+safeParseJSON returns Object.create(null) — safe for `typeof x.prop` checks, but breaks `obj.hasOwnProperty()`. Use `Object.prototype.hasOwnProperty.call(obj, key)` or `'key' in obj` instead.

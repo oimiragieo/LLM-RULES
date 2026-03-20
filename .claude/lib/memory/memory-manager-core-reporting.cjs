@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createLogger } = require('../utils/logger.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const logger = createLogger('memory-manager');
 
@@ -46,7 +47,7 @@ function createReportingOps({ PROJECT_ROOT, CONFIG, getMemoryDir }) {
     const mapPath = path.join(memoryDir, 'codebase_map.json');
     if (fs.existsSync(mapPath)) {
       try {
-        const codebaseMap = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+        const { data: codebaseMap } = safeParseJSON(fs.readFileSync(mapPath, 'utf8'), {});
         result.codebaseMapEntries = Object.keys(codebaseMap.discovered_files || {}).length;
 
         if (result.codebaseMapEntries > CONFIG.CODEBASE_MAP_WARN_ENTRIES) {
@@ -92,7 +93,7 @@ function createReportingOps({ PROJECT_ROOT, CONFIG, getMemoryDir }) {
     const gotchasFile = path.join(memoryDir, 'gotchas.json');
     if (fs.existsSync(gotchasFile)) {
       try {
-        const gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
+        const { data: gotchas } = safeParseJSON(fs.readFileSync(gotchasFile, 'utf8'), []);
         stats.gotchas_count = Array.isArray(gotchas)
           ? gotchas.length
           : gotchas.gotchas
@@ -109,7 +110,7 @@ function createReportingOps({ PROJECT_ROOT, CONFIG, getMemoryDir }) {
     const patternsFile = path.join(memoryDir, 'patterns.json');
     if (fs.existsSync(patternsFile)) {
       try {
-        const patterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
+        const { data: patterns } = safeParseJSON(fs.readFileSync(patternsFile, 'utf8'), []);
         stats.patterns_count = Array.isArray(patterns)
           ? patterns.length
           : patterns.patterns
@@ -126,7 +127,7 @@ function createReportingOps({ PROJECT_ROOT, CONFIG, getMemoryDir }) {
     const mapFile = path.join(memoryDir, 'codebase_map.json');
     if (fs.existsSync(mapFile)) {
       try {
-        const map = JSON.parse(fs.readFileSync(mapFile, 'utf8'));
+        const { data: map } = safeParseJSON(fs.readFileSync(mapFile, 'utf8'), {});
         stats.discoveries_count = Object.keys(map.discovered_files || {}).length;
         stats.total_size_bytes += fs.statSync(mapFile).size;
       } catch (e) {

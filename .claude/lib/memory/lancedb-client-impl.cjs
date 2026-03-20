@@ -14,6 +14,7 @@
 const path = require('path');
 const fs = require('fs');
 const { createLogger } = require('../utils/logger.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 const {
   TYPED_METADATA_FIELDS,
   buildLegacyMetadataWhereClause,
@@ -450,7 +451,7 @@ class MemoryVectorStore {
           worker.stdoutBuf = worker.stdoutBuf.slice(idx + 1);
           if (!line) continue;
           try {
-            const msg = JSON.parse(line);
+            const msg = safeParseJSON(line, null, null, null);
             if (msg.ready) continue;
             if (resolved) return;
             resolved = true;
@@ -565,7 +566,7 @@ class MemoryVectorStore {
           worker.stdoutBuf = worker.stdoutBuf.slice(idx + 1);
           if (!line) continue;
           try {
-            const msg = JSON.parse(line);
+            const msg = safeParseJSON(line, null, null, null);
             if (msg.ready) {
               clearTimeout(timeout);
               worker.proc.stdout.removeListener('data', onData);
@@ -593,7 +594,7 @@ class MemoryVectorStore {
           worker.stdoutBuf = worker.stdoutBuf.slice(idx + 1);
           if (!line) continue;
           try {
-            const msg = JSON.parse(line);
+            const msg = safeParseJSON(line, null, null, null);
             worker.proc.stdout.removeListener('data', onData);
             if (msg.ok) {
               resolve(msg);
@@ -1248,7 +1249,7 @@ class MemoryVectorStore {
     const mapped = results.map(r => {
       let metadata = {};
       try {
-        metadata = JSON.parse(r.metadata);
+        metadata = safeParseJSON(r.metadata, null, null, { raw: r.metadata });
       } catch (_e) {
         metadata = { raw: r.metadata };
       }

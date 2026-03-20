@@ -576,8 +576,16 @@ function loadConstitutionContext(projectRoot) {
 function appendConstitutionSection(assembled, context) {
   const { constitution, behaviour } = context;
 
-  if (!constitution && !behaviour) return assembled;
   if (assembled.includes('## Agent Constitution')) return assembled;
+
+  /** When injectSections already added ## Dynamic behaviour rules, do not clip behaviour again here (dedupe). */
+  const hasDynamicBehaviourRules = assembled.includes('## Dynamic behaviour rules');
+
+  if (hasDynamicBehaviourRules) {
+    if (!constitution) return assembled;
+  } else if (!constitution && !behaviour) {
+    return assembled;
+  }
 
   const lines = [];
   lines.push('## Agent Constitution');
@@ -598,7 +606,7 @@ function appendConstitutionSection(assembled, context) {
     lines.push(clip(constitution, 1800));
   }
 
-  if (behaviour) {
+  if (!hasDynamicBehaviourRules && behaviour) {
     if (constitution) lines.push('');
     lines.push(clip(behaviour, 1200));
   }
