@@ -270,6 +270,24 @@ Skill({ skill: 'context-compressor' }); // Memory-efficient patterns
 Skill({ skill: 'tdd' }); // TDD-style planning contract
 ```
 
+### Step 0.5: Project Context Classification
+
+Before planning, classify the project context:
+
+| Signal                         | Greenfield                  | Brownfield                       | Hybrid                               |
+| ------------------------------ | --------------------------- | -------------------------------- | ------------------------------------ |
+| Existing source code in scope? | No                          | Yes                              | Yes (new module in existing project) |
+| Existing tests covering scope? | No                          | Yes                              | Partial                              |
+| Request language               | "Build/create from scratch" | "Add/fix/change/update/refactor" | "Add new module/service to existing" |
+
+**Classification Rules:**
+
+- **GREENFIELD**: No existing code to integrate with. Emphasize vision, architecture design, technology selection.
+- **BROWNFIELD**: Modifying or extending existing codebase. Mandatory codebase analysis phase. Emphasize regression safety, convention adherence.
+- **HYBRID**: New functionality in existing project. Analyze integration points, then design new module.
+
+Record classification in plan frontmatter: `context: greenfield|brownfield|hybrid`
+
 ### Phase 0: Research & Planning (MANDATORY)
 
 **CRITICAL**: Before creating any implementation plan, you MUST complete Phase 0 research. This phase cannot be skipped (ADR-045).
@@ -305,6 +323,34 @@ Skill({ skill: 'tdd' }); // TDD-style planning contract
      - [ ] Edge cases considered and documented
 
 **If ANY gate fails, return to research. DO NOT proceed to implementation planning.**
+
+### Phase 0.5: Codebase Analysis (BROWNFIELD/HYBRID only)
+
+Skip this phase for GREENFIELD projects.
+
+1. **Map Existing System**: Use `pnpm search:code` and `pnpm search:structure` to understand project layout and patterns
+2. **Identify Integration Points**: Search for code the change will touch. Document file paths, function signatures, data flows.
+3. **Document Current State**: Record existing patterns, naming conventions, architectural decisions in plan preamble
+4. **Assess Regression Risk**: Identify tests covering affected areas. Note untested paths as risks.
+5. **Discover Constraints**: Existing APIs, data formats, configuration patterns that MUST be preserved
+
+**Output**: Codebase analysis section in plan file with: files affected, conventions discovered, risks identified, constraints to preserve.
+
+### Step 0.7: TDD-First vs Plan-First Decision
+
+| Condition                            | Approach                                                                   | Rationale                                  |
+| ------------------------------------ | -------------------------------------------------------------------------- | ------------------------------------------ |
+| Bug fix with reproducible symptom    | **TDD-FIRST**: Write failing test capturing the bug, then plan minimal fix | Test proves the bug exists and fix works   |
+| Small brownfield change (<3 files)   | **TDD-FIRST**: Write test for desired behavior, then implement             | Faster than full planning for small scope  |
+| New feature in greenfield            | **PLAN-FIRST**: Design architecture, then TDD during implementation        | Need architecture before tests make sense  |
+| Large brownfield refactor (>5 files) | **PLAN-FIRST**: Full Phase 0 + 0.5, then TDD per microtask                 | Scope too large for TDD-first              |
+| Unclear requirements                 | **PLAN-FIRST** with spec-init: Gather requirements first                   | Can't write tests without knowing behavior |
+
+**TDD-FIRST shortcut**: When TDD-FIRST is selected, skip Phase 0 research. Go directly to:
+
+1. Write failing test(s) capturing desired behavior
+2. Plan minimal implementation to make tests pass
+3. Implement using Red-Green-Refactor cycle
 
 ### Phase 1+: Implementation Planning
 
@@ -350,6 +396,18 @@ When producing microtask DAGs, assign each task a `wave` number (1-10):
 - Wave N+1: Tasks that depend on Wave N completions
 - Tasks within the same wave CAN run in parallel if owned_paths don't overlap
 - Schema: `.claude/schemas/microtask-dag-wave.schema.json`
+
+### Complexity-Adaptive Plan Depth
+
+| Complexity | Phase 0 (Research)              | Phase 0.5 (Codebase)         | Plan Depth                   | TDD Approach                      |
+| ---------- | ------------------------------- | ---------------------------- | ---------------------------- | --------------------------------- |
+| TRIVIAL    | Skip                            | Skip                         | Single task, no plan file    | TDD-first if code change          |
+| LOW        | 1 search query                  | Brief scan (if brownfield)   | 1-2 phases, inline plan      | TDD-first preferred               |
+| MEDIUM     | Standard Phase 0                | If brownfield                | 3-5 phases, plan file        | Plan-first, TDD in implementation |
+| HIGH       | Full Phase 0                    | Mandatory (brownfield)       | 5-7 phases, microtask DAG    | Plan-first, TDD per wave          |
+| EPIC       | Full Phase 0 + architect review | Mandatory + architect review | Multi-plan with orchestrator | Plan-first, TDD per module        |
+
+Do NOT over-plan TRIVIAL/LOW tasks. A one-line config change does not need a 7-phase plan.
 
 ## Memory-Efficient Planning
 
@@ -441,6 +499,27 @@ Instead: `pnpm search:code "router."` → read top 10 → ask if more needed
 ## Output
 
 Always produce a structured plan in markdown format, saved to `.claude/context/plans/`.
+
+### Greenfield Plan Template Sections
+
+When context is GREENFIELD, the plan MUST include:
+
+- **Vision**: What does success look like? Who are the users? What problem does this solve?
+- **Technology Stack Selection**: Language, framework, database, deployment target with rationale
+- **Architecture Decision Records**: Key decisions with alternatives considered and rationale
+- **Initial Project Structure**: Directory layout, module boundaries, naming conventions
+- **MVP Scope**: What is the minimum viable first version?
+
+### Brownfield Plan Template Sections
+
+When context is BROWNFIELD or HYBRID, the plan MUST include:
+
+- **Current State Analysis**: What exists today? Key files, patterns, dependencies
+- **Change Impact Assessment**: Which files will be modified? What tests cover them?
+- **Regression Risk Matrix**: What could break? How will we verify nothing broke?
+- **Existing Conventions**: Naming, patterns, architecture decisions that MUST be preserved
+- **Integration Verification**: How to verify changes work with existing code
+- **Rollback Strategy**: Per-phase rollback commands if changes need to be reverted
 
 ### must_haves Block (MANDATORY)
 

@@ -903,3 +903,94 @@ Pattern reuse: MEDIUM — document in spawn templates, recommend non-worktree fo
 - Fix 2: Add SessionEnd worktree cleanup hook
 - Fix 3: Register worktree prune in heartbeat cron for periodic execution
 - Skipped separate plan file — well-scoped fixes derived directly from research (good judgment for LOW complexity)
+
+---
+
+## Batch Reflection: 4 Routine Completions (2026-03-20) [Tasks 8, 4, 6, 9]
+
+**[PATTERN] Sequential Quality Gate Sequence for QA Tasks**
+
+- Task 8 executed: lint (0 errors) → format (clean) → validate (67/67 pass) → cleanup (3 slop files deleted)
+- Pattern produces highest rubric scores (95%+ overall) and maximum confidence
+- Sequence works because each gate is independent yet builds on prior gate success
+- Recommendation: Standardize this pattern for all quality assurance tasks going forward
+
+**[PATTERN] Multi-Source Research Tasks with Verification**
+
+- Tasks 4 & 6: Both research tasks produced structured reports with external sources (Codex/Gemini analysis for Task 4, ArXiv citations for Task 6)
+- Pattern: discovery → synthesis → multi-source validation → artifact generation
+- Consistency across 2+ research tasks suggests this is a reliable template
+- Gap detected: tasks 4 & 6 don't explicitly document verification step (e.g., "sources cross-checked via...")
+- Future research tasks should state verification methodology in summary
+
+**[INSIGHT] Verification Discipline Correlates with Score Quality**
+
+- Task 8 & 9 (quantified claims: 0 errors, 67/67 pass, commit hash b1a39abf, +1162/-325) score 15-20% higher than tasks with vague summaries
+- Explicit metrics + verification commands run = 0.95+ rubric scores
+- Pattern: metrics discipline is a leading indicator of task quality and enables audit trail
+
+**[SIGNAL] Large Commits Risk Bundling (Task 9 observation)**
+
+- Task 9 commit: 1162 insertions, 325 deletions (net +837 LOC)
+- Diff ratio suggests refactoring + feature work bundled together
+- Recommendation: Future large commits should state scope explicitly (refactoring vs feature vs infrastructure)
+- Guideline: Keep single-commit LOC changes <400 for auditability (or split into logical commits per scope)
+
+---
+
+## Multi-LLM Consultation on Path Traversal & WAL Security (2026-03-20) [Task 9 Codex + Claude consensus]
+
+**[SECURITY] Path Traversal Defense: 6 Additional Vectors Beyond .. Check**
+
+- Consensus finding from Codex + Claude: simple `..` detection is insufficient for path traversal defense
+- Required comprehensive checks: (1) symbolic link resolution, (2) case-sensitivity variations (Windows), (3) Unicode normalization, (4) null-byte injection, (5) double-encoding, (6) mount point escapes
+- Implementation: defensive path canonicalization BEFORE any file operation check
+- Pattern applies to: file-upload handlers, script loaders, template resolvers, artifact integrators
+- Source: Multi-LLM consultation (2026-03-20), dual-validation across Codex + Claude
+
+**[INFRASTRUCTURE] Infrastructure-First Approach for Template Fixes**
+
+- Consensus: Do NOT add permanent general-purpose alias for fixing templates
+- Instead: invest in infrastructure improvements to template system itself (resolver, schema validation, path handling)
+- Rationale: aliases hide systemic problems; infrastructure fixes solve root causes
+- Example anti-pattern: "workaround" ENV var that becomes permanent → blocks future improvements
+- Pattern: short-term workaround (acceptable) vs long-term alias (must be eliminated)
+- Source: Multi-LLM consultation identifying infrastructure debt patterns
+
+**[ARCHITECTURE] WAL (Write-Ahead Logging) Protocol Runtime Enforcement**
+
+- Consensus finding: WAL protocol design is incomplete without runtime enforcement layer
+- Design phase alone insufficient; must include: (1) enforcement hooks at pre-write, (2) log validation on read, (3) recovery procedures, (4) circuit breakers on write failures
+- Required for: memory system updates, critical state transitions, artifact creation workflows
+- Implementation must be synchronous (blocking) at enforcement points, not post-hoc validation
+- Current agent-studio memory protocol: partially WAL-aware (appends) but lacks enforcement layer
+- Source: Multi-LLM consultation on system reliability patterns
+
+---
+
+## Research Pipeline Completion & Reflection (2026-03-18) [Batch 8 reflections]
+
+**[WORKFLOW] Multi-Agent Research Pipeline Lifecycle**
+
+- Full research pipeline on external frameworks (BMAD, GSD, CrewAI, +5 secondary) completed with 8 sequential research tasks
+- Task 1: Repository discovery (8 repos cloned)
+- Tasks 2-4: Parallel deep-dive analysis per framework (BMAD: 9 agents/34 workflows, GSD: 12 features, CrewAI: 14 features)
+- Task 5: Secondary repository analysis (5 additional repos)
+- Task 6: Feature consolidation (47 features across all frameworks, P0-P3 priorities)
+- Task 7: External LLM review (Gemini+Codex validation), plan refinement (14 changes), DAG memory structure demoted
+- Task 8: Architecture approval (30 GO features, 17 deferred, 5-phase 16-week timeline)
+- Total: ~51 raw features → 47 verified features after review gates
+
+**[PATTERN] Atomic Handshake for Reflection Batches**
+
+- Reflection queue processed atomically: each reflection-task marked `completed` with `processedReflectionIds` array
+- Enables reflection-cleanup.cjs to remove processed entries from queue without race conditions
+- Required for long-running pipelines that spawn multiple background tasks with reflection requirements
+- Pattern: TaskUpdate({ status: 'completed', metadata: { processedReflectionIds: [...] } })
+
+**[INSIGHT] Research Pipeline Quality Gates**
+
+- Multi-LLM review (Gemini + Codex) as post-synthesis gate → caught 14+ inconsistencies
+- Feature count validation (51 raw → 47 verified) requires explicit de-duplication step
+- Timeline overestimate risk identified: complex frameworks need +30-50% buffer
+- DAG-based memory structure (tasks → subtasks → features) useful for tracking but overkill for flat feature lists; recommend file-based consolidation for future pipelines
