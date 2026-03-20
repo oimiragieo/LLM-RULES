@@ -107,4 +107,57 @@ Skill info`;
     // Verify constitution was added
     assert.ok(result.includes('## Agent Constitution'), 'Expected constitution added');
   });
+
+  test('dedupes behaviour when ## Dynamic behaviour rules already present (production path)', () => {
+    const uniqueToken = 'UNIQUE_BEHAV_RULE_TOKEN_FOR_DEDUPE_TEST';
+    const assembledPrompt = `## AVAILABLE_TOOLS
+Read
+
+## Memory Context (Auto-Loaded)
+mem body
+
+## Dynamic behaviour rules
+
+${uniqueToken}
+
+## Task tail
+`;
+
+    const constitutionContext = {
+      constitution: '# Constitution\n\nConstOnlyBodyForDedupe',
+      behaviour: `${uniqueToken} extra behaviour noise that would be clipped if duplicated`,
+    };
+
+    const result = appendConstitutionSection(assembledPrompt, constitutionContext);
+
+    assert.ok(result.includes('## Dynamic behaviour rules'), 'Dynamic behaviour section preserved');
+    assert.ok(
+      result.includes(uniqueToken),
+      'Behaviour body still appears under Dynamic behaviour rules'
+    );
+
+    const acIdx = result.indexOf('## Agent Constitution');
+    const memIdx = result.indexOf('## Memory Context (Auto-Loaded)');
+    assert.ok(acIdx !== -1 && memIdx !== -1, 'Expected constitution and memory markers');
+    assert.ok(acIdx < memIdx, 'Agent Constitution before Memory Context');
+
+    const agentConstSlice = result.slice(acIdx, memIdx);
+    assert.ok(
+      agentConstSlice.includes('ConstOnlyBodyForDedupe'),
+      'Agent Constitution should include constitution text'
+    );
+    assert.ok(
+      !agentConstSlice.includes(uniqueToken),
+      'Agent Constitution must not repeat behaviour body when Dynamic behaviour rules exists'
+    );
+
+    const matches = result.match(
+      new RegExp(uniqueToken.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')
+    );
+    assert.strictEqual(
+      matches ? matches.length : 0,
+      1,
+      'Unique behaviour token should appear exactly once in full prompt'
+    );
+  });
 });

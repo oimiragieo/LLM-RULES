@@ -352,6 +352,13 @@ function removeSubSection(prompt, header) {
   return (prompt.slice(0, start) + '\n' + prompt.slice(end + 1)).trim();
 }
 
+function isSpawnPromptBudgetLogEnabled() {
+  const v = String(process.env.SPAWN_PROMPT_BUDGET_LOG || '')
+    .trim()
+    .toLowerCase();
+  return v === 'on' || v === '1' || v === 'true';
+}
+
 function enforcePromptBudget(prompt) {
   if (!prompt || typeof prompt !== 'string') return prompt;
   if (!Number.isFinite(MAX_SPAWN_PROMPT_CHARS) || MAX_SPAWN_PROMPT_CHARS <= 0) {
@@ -359,7 +366,9 @@ function enforcePromptBudget(prompt) {
   }
   if (prompt.length <= MAX_SPAWN_PROMPT_CHARS) return prompt;
 
+  const beforeChars = prompt.length;
   let reduced = prompt;
+  const removedHeaders = [];
   const removalOrder = [
     { type: 'top', header: '## Memory Context (Auto-Loaded)' },
     { type: 'sub', header: '### Entity Graph (SQLite)' },
@@ -371,15 +380,32 @@ function enforcePromptBudget(prompt) {
 
   for (const item of removalOrder) {
     if (reduced.length <= MAX_SPAWN_PROMPT_CHARS) break;
+    const prev = reduced;
     reduced =
       item.type === 'top'
         ? removeTopLevelSection(reduced, item.header)
         : removeSubSection(reduced, item.header);
+    if (reduced !== prev) {
+      removedHeaders.push(item.header);
+    }
   }
 
+  let hardTruncated = false;
   if (reduced.length > MAX_SPAWN_PROMPT_CHARS) {
+    hardTruncated = true;
     const keep = Math.max(0, MAX_SPAWN_PROMPT_CHARS - TRUNCATION_NOTICE.length);
     reduced = reduced.slice(0, keep) + TRUNCATION_NOTICE;
+  }
+
+  if (isSpawnPromptBudgetLogEnabled()) {
+    stderrLog('spawn_prompt_budget', {
+      event: 'spawn_prompt_budget',
+      beforeChars,
+      afterChars: reduced.length,
+      maxChars: MAX_SPAWN_PROMPT_CHARS,
+      removedHeaders,
+      hardTruncated,
+    });
   }
 
   return reduced;

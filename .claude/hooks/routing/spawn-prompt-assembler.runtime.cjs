@@ -50,6 +50,8 @@ const {
   inferAgentFromPrompt,
   loadConstitutionContext,
   appendConstitutionSection,
+  loadAgentSoulContent,
+  appendSoulSection,
   appendConfigModelSection,
   resolveConfigModel,
   extractRequiredOutputs,
@@ -399,6 +401,10 @@ async function main() {
 
     const constitutionContext = loadConstitutionContext(PROJECT_ROOT);
     assembled = appendConstitutionSection(assembled, constitutionContext);
+
+    // Soul personality injection (general-assistant soul.md)
+    const soulContent = loadAgentSoulContent(agentType, PROJECT_ROOT);
+    assembled = appendSoulSection(assembled, soulContent);
 
     const activePreset = getActivePreset();
     if (activePreset) {

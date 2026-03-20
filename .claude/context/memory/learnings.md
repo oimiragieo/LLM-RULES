@@ -87,6 +87,60 @@ Found in: ecosystem-audit-task-8 (context-monitor.cjs debounce logic removed)
 
 ---
 
+## Ecosystem Audit Remediation Fixes (2026-03-20) [Task 10 & 1 reflections]
+
+**[PATTERN] safeParseJSON API Contract & Implementation**
+
+The `safeParseJSON()` utility from `.claude/lib/utils/safe-json.cjs` has a specific parameter order that differs from intuitive expectations:
+
+- **Signature**: `safeParseJSON(jsonString, schemaName, validationFn?, fallbackDefaults)`
+- **Return**: Parsed value directly (NOT `{ success, data, error }`)
+- **Second param**: schemaName is for logging/diagnostics, not validation
+- **Fourth param**: fallbackDefaults are returned on parse failure
+- **Handles**: Malformed JSON (returns fallback), prototype pollution (strips **proto**), circular references
+
+Violations found: 3x raw `JSON.parse()` in `lancedb-client-impl.cjs` (Task 10)
+Fix: Replaced with `safeParseJSON(json, "lancedb-config", null, {})`
+Pattern reuse: HIGH — all hook input parsing, memory I/O, config loading must use safeParseJSON
+Priority: CRITICAL (SEC-005 compliance)
+
+---
+
+**[GOTCHA] Model ID Staleness in Test Fixtures**
+
+Test fixtures hardcode model IDs without update automation. Over time, model IDs deprecate but tests continue using old IDs, causing:
+
+- Type mismatches with actual API responses
+- Test-specific model-routing inconsistencies
+- Silent failures when fixture models diverge from production
+
+Examples:
+
+- `claude-opus-4` (old) → `claude-opus-4-6` (current)
+- `claude-3-sonnet` (old) → `claude-3-5-sonnet-20241022` (current)
+
+Found in: `config-model-validator.test.cjs` (Task 10)
+Mitigation: Use environment variable lookup in tests: `process.env.DEFAULT_MODEL || 'claude-opus-4-6'`
+Pattern reuse: MEDIUM — apply to all agent/config tests that validate model selection logic
+
+---
+
+**[GOTCHA] Worktree Agent Context Pressure with Large CLAUDE.md**
+
+Worktree agents receive full CLAUDE.md as system context. For heavyweight agents (architect, planner, security-architect), this can cause:
+
+- "prompt is too long" rejection at spawn time (before first tool use)
+- Context already exhausted before agent can work
+- Workaround tasks stuck indefinitely, visible to Router as "orphaned"
+
+Root cause: CLAUDE.md is comprehensive (~280KB = 70K+ tokens) to support all agents/orchestrators.
+Workaround: Use non-worktree agents for large prompt jobs, OR use lighter agent types (haiku) when worktree is necessary.
+
+Found in: Task 10 ecosystem audit (worktree agent context exceeded)
+Pattern reuse: MEDIUM — document in spawn templates, recommend non-worktree for complex tasks
+
+---
+
 ## Session Handoff Regex Patterns & Resume Prompt Instrumentation (2026-03-19) [Task 10 reflection]
 
 **[PATTERN] NEXT ACTION Header Detection in Session Handoff**

@@ -722,6 +722,102 @@ function shouldOverrideWorktreeIsolation(prompt, agentType) {
 }
 
 /**
+ * parseAgentFrontmatterSimple - Extract YAML frontmatter from agent markdown file.
+ * Returns a plain object of key/value pairs from the frontmatter block, or null if none.
+ *
+ * @param {string} content - Raw markdown file content
+ * @returns {Object|null}
+ */
+function parseAgentFrontmatterSimple(content) {
+  if (!content || typeof content !== 'string') return null;
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return null;
+  const result = {};
+  const lines = match[1].split('\n');
+  for (const line of lines) {
+    const colonIdx = line.indexOf(':');
+    if (colonIdx <= 0) continue;
+    const key = line.slice(0, colonIdx).trim();
+    const value = line
+      .slice(colonIdx + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, '');
+    if (key) result[key] = value;
+  }
+  return result;
+}
+
+/**
+ * loadAgentSoulContent - Load the soul file referenced in agent frontmatter.
+ * Returns soul file content if the agent has a `soul` frontmatter field pointing to
+ * a readable file, or empty string if not applicable.
+ *
+ * @param {string} agentType - Agent type id (e.g. 'general-assistant')
+ * @param {string} [projectRoot] - Project root path
+ * @returns {string}
+ */
+function loadAgentSoulContent(agentType, projectRoot) {
+  const root = projectRoot || PROJECT_ROOT;
+  try {
+    // Locate the agent file
+    const agentsRoot = path.join(root, '.claude', 'agents');
+    if (!fs.existsSync(agentsRoot)) return '';
+    const normalized = String(agentType || '')
+      .trim()
+      .toLowerCase();
+    const target = `${normalized}.md`;
+
+    // Walk the agents directory to find the file
+    let agentFilePath = '';
+    const stack = [agentsRoot];
+    while (stack.length > 0 && !agentFilePath) {
+      const dir = stack.pop();
+      let entries;
+      try {
+        entries = fs.readdirSync(dir, { withFileTypes: true });
+      } catch (_e) {
+        continue;
+      }
+      for (const entry of entries) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          stack.push(full);
+        } else if (entry.isFile() && entry.name.toLowerCase() === target) {
+          agentFilePath = full;
+          break;
+        }
+      }
+    }
+
+    if (!agentFilePath) return '';
+    const content = fs.readFileSync(agentFilePath, 'utf8');
+    const frontmatter = parseAgentFrontmatterSimple(content);
+    if (!frontmatter || !frontmatter.soul) return '';
+
+    // Resolve soul path relative to project root
+    const soulPath = path.join(root, frontmatter.soul);
+    if (!fs.existsSync(soulPath)) return '';
+    return fs.readFileSync(soulPath, 'utf8').trim();
+  } catch (_e) {
+    return '';
+  }
+}
+
+/**
+ * appendSoulSection - Append soul personality content to a prompt.
+ * Skips if soul content is empty or the prompt already contains a Soul section.
+ *
+ * @param {string} prompt - Base spawn prompt
+ * @param {string} soulContent - Content from the soul file
+ * @returns {string} Updated prompt
+ */
+function appendSoulSection(prompt, soulContent) {
+  if (!soulContent || !soulContent.trim()) return prompt;
+  if (prompt.includes('## Soul (Personality)')) return prompt;
+  return `${prompt}\n\n## Soul (Personality)\n<soul-content>\n${soulContent.trim()}\n</soul-content>\n`;
+}
+
+/**
  * loadProjectContext - Load project-context.md from a given project root.
  * Returns the file contents as a string, or empty string if missing.
  *
@@ -776,6 +872,8 @@ module.exports = {
   hasArtifactWriterTools,
   buildMissingWriterToolsMessage,
   shouldOverrideWorktreeIsolation,
+  loadAgentSoulContent,
+  appendSoulSection,
   loadProjectContext,
   appendProjectContextSection,
 };

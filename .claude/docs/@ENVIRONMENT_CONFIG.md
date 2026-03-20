@@ -110,6 +110,7 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 | `RAG_AT_SPAWN_MAX_CHARS`                  | number     | 1800       | Character cap for `Task-Relevant Memory (RAG)` subsection to protect prompt budget.                                   |
 | `RAG_AT_SPAWN`                            | on/off     | on         | Global kill switch for async RAG-at-spawn retrieval; `off` disables query retrieval even if `memoryQuery` is passed.  |
 | `SPAWN_PROMPT_MAX_CHARS`                  | number     | 40000      | Hard max chars for assembled spawn prompt before section trimming.                                                    |
+| `SPAWN_PROMPT_BUDGET_LOG`                 | on/off     | off        | When on, emit stderr JSON (`spawn_prompt_budget`) after section removal / hard truncation in `enforcePromptBudget`.   |
 | `SPAWN_SKILL_SECTION_MODE`                | enum       | names_only | Skill section verbosity (`names_only` or `full`).                                                                     |
 | `SPAWN_ASSEMBLY_PROFILING`                | true/false | false      | Emit dev-only spawn assembly timing + token burn metrics.                                                             |
 | `SPAWN_ADAPTIVE_ENRICHMENT`               | true/false | false      | Dynamically throttle expensive prompt enrichment based on runtime metrics.                                            |

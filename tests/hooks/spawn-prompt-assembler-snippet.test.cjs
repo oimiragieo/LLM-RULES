@@ -65,6 +65,34 @@ test('enforcePromptBudget removes heavy context sections when prompt is oversize
   assert.ok(!output.includes('## Memory Context (Auto-Loaded)'));
 });
 
+test('enforcePromptBudget emits stderr JSON when SPAWN_PROMPT_BUDGET_LOG=on', () => {
+  const prevLog = process.env.SPAWN_PROMPT_BUDGET_LOG;
+  process.env.SPAWN_PROMPT_BUDGET_LOG = 'on';
+  const errors = [];
+  const origErr = console.error;
+  console.error = (...args) => {
+    errors.push(args.map(String).join(' '));
+  };
+  try {
+    const oversized = ['# Base', '## Memory Context (Auto-Loaded)', 'A'.repeat(45000)].join('\n\n');
+
+    enforcePromptBudget(oversized);
+
+    const line = errors.find(e => e.includes('spawn_prompt_budget'));
+    assert.ok(line, 'expected spawn_prompt_budget log line');
+    const row = JSON.parse(line);
+    assert.strictEqual(row.message, 'spawn_prompt_budget');
+    assert.strictEqual(row.event, 'spawn_prompt_budget');
+    assert.ok(Number(row.beforeChars) > 40000);
+    assert.ok(Array.isArray(row.removedHeaders));
+    assert.ok(row.afterChars <= 40000);
+  } finally {
+    console.error = origErr;
+    if (prevLog === undefined) delete process.env.SPAWN_PROMPT_BUDGET_LOG;
+    else process.env.SPAWN_PROMPT_BUDGET_LOG = prevLog;
+  }
+});
+
 test('getPromptFingerprint is deterministic for same input', () => {
   const a = getPromptFingerprint({
     agentType: 'developer',

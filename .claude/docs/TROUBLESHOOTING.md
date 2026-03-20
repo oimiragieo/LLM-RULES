@@ -191,6 +191,22 @@ Fix:
 2. Retry `Read` with `offset/limit` (or line window).
 3. If prompted, invoke `Skill({ skill: "context-compressor" })` and retry.
 
+### H.1 Context budget: two layers (host vs repo)
+
+Symptoms:
+
+- Subagents hit context limits quickly; confusion about whether `.claude/rules/*.md` is duplicated inside the spawn assembler.
+
+Facts:
+
+1. **Host layer (Claude Code / IDE)** may inject project `CLAUDE.md` and files under `.claude/rules/` according to product settings. That path is **not** implemented by `spawn-prompt-assembler` and does not read every rule file from disk into the hook-assembled string.
+2. **Repo layer** — the Task spawn hook assembles tools/skills, memory/RAG tiers, `## Dynamic behaviour rules` (from `.claude/context/memory/behaviour.md` via `prompt-assembler`), optional `## Agent Constitution` (from `constitution.md`, with behaviour deduped when Dynamic behaviour is already present), then enforces `SPAWN_PROMPT_MAX_CHARS` (default 40000) via section trimming and optional hard truncation.
+
+Tuning:
+
+- See `.claude/docs/@ENVIRONMENT_CONFIG.md` for `SPAWN_PROMPT_MAX_CHARS`, `SPAWN_PROMPT_ENTITY_GRAPH`, `SPAWN_PROMPT_SEMANTIC_MEMORY`, `RAG_AT_SPAWN_MAX_CHARS`, `MEMORY_TIER_B_MAX_TOKENS`, and optional `SPAWN_PROMPT_BUDGET_LOG=on` (stderr JSON when trimming/truncation runs).
+- Comment-only presets in `.env.example` under **Context slimming (spawn prompt)**.
+
 ### I. Bash artifact-write guard appears inconsistent
 
 Symptoms:
