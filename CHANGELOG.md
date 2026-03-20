@@ -7,7 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **CRITICAL (ISS-1)**: `router-tool-lockdown.cjs` block path now exits with code 2 instead of 0 — previously all block verdicts were silently allowed by the runtime
+- **CRITICAL (ISS-6)**: `write-pretool-bundle.cjs` all 7 block paths now exit with code 2 instead of 0 — routing guard, creator guard, agent contract, pre-write, evolution guard, research enforcement, and quality gate blocks were all silently bypassed
+- Agent registry regenerated to reflect current 74-agent count
+- Worktree prune now uses directory mtime fallback for branches without embedded timestamps (fixes stale worktree accumulation from Claude Code native Agent tool)
+- SessionEnd hook now runs worktree prune on session exit (catches crashed/timed-out agents)
+- Cleaned 11 stale worktree directories and 9 orphaned branches
+
+### Changed
+
+- Planner agent (v1.4.0 → v1.5.0): now MUST include token usage reporting step at end of every phase in generated plans — reads `.claude/context/runtime/ccusage-status.txt`
+- Context-compressor skill: expanded ccusage cost tracking section with explicit file format and Router milestone reporting requirement
+
 ### Added
+
+- Agent Teams experimental integration: environment variables (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`, `CLAUDE_CODE_SUBAGENT_MODEL`) documented in `.env.example` with usage notes
+- Memory WAL (Write-Ahead Log) protocol design specification for Agent Teams parallel session synchronization in `memory-protocol.md` (design spec — runtime enforcement not yet implemented)
+- Memory queue directory (`.claude/context/memory/queue/`) for session-isolated memory writes
+- Agent frontmatter compatibility audit confirming 74 agents align with native Claude Code sub-agent format
+- Multi-LLM validated architecture: Gemini + Codex confirmed Router-subordinate Agent Teams design
 
 - **B2 — Output-key chaining** (`.claude/lib/orchestration/task-output-chain.cjs`): standardizes `$task-N.key` reference pattern for downstream tasks to resolve upstream outputs by key name, with `setTaskOutput`, `getTaskOutput`, `resolveOutputRef`, and `resolveAllRefs` APIs
 - **C7 — Structured checklists with halt conditions** (`.claude/lib/orchestration/checklist-evaluator.cjs`): evaluates structured checklists where each item can specify `halt_on_fail: true` to stop pipeline execution; supports `file_exists`, `test_passes`, `grep_match`, and sandboxed `custom` check types; schema at `.claude/schemas/checklist-halt-condition.schema.json`

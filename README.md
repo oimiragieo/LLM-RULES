@@ -69,6 +69,10 @@ Agent Studio dynamically supports Git Worktree isolation for dangerous/massive s
 
 **Important for Worktrees:** The ecosystem setup wizard automatically enables Git optimization (`core.untrackedCache true` and `core.fsmonitor true`). This prevents Git from hanging or triggering "too many active changes" warnings during massive parallel file generation or background vector indexing operations.
 
+### Agent Teams (Experimental)
+
+Agent Studio is designed to support Claude Code's Agent Teams feature for multi-session parallel coordination (Claude Code v2.1.32+, Opus 4.6 required). The Router-subordinate architecture allows the router to dispatch work to teammate agents running in parallel sessions. A WAL (Write-Ahead Log) memory synchronization protocol is planned to ensure safe concurrent writes to shared memory files during parallel execution. Enable via `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` and optionally set `CLAUDE_CODE_SUBAGENT_MODEL` for sub-agent cost optimization. Configure display mode via `teammateMode` in `settings.json` or the `--teammate-mode` CLI flag.
+
 ### Multi-LLM Consulting & Council
 
 Agent Studio natively supports integrating with other headless LLM Code CLIs (Gemini, Codex, Cursor, and Claude Code). The `multi-llm-consultant` agent can dynamically detect which of these CLIs are authenticated on your system and distribute prompts in parallel. It also features a built-in `llm-council` skill that automatically runs a robust 3-stage deliberation protocol (independent completions -> anonymized peer review & ranking -> chairman synthesis) for complex architectural decisions.

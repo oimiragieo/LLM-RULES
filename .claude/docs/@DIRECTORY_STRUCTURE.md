@@ -91,6 +91,7 @@ context/
 │   ├── maintenance-status.json # Weekly maintenance tracking
 │   ├── archive/
 │   ├── named/               # Named memory API: readMemory/writeMemory (CLAUDE.md Section 8)
+│   ├── queue/               # Agent Teams WAL session queue files
 │   ├── stm/                 # STM tier: session data written by user-prompt-unified.cjs
 │   ├── mtm/                 # MTM tier: canonical recent-session storage (active)
 │   ├── ltm/                 # LTM tier: summarized session data written by memory-tiers.cjs
@@ -115,6 +116,7 @@ context/
 ├── sessions/                # Session data (used by consensus-voting and swarm-coordinator for session state)
 ├── teams/
 │   └── [team-name].csv
+├── tasks/                   # Agent Teams git-based task lock files (experimental)
 ├── tmp/                     # Temporary files (auto-cleaned 24h)
 ├── workflows/               # Workflow state data
 ├── agent-catalog.json       # Generated simplified view of agent-registry.json (NOT a duplicate)

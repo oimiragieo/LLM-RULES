@@ -154,7 +154,14 @@ After compression, persist distilled learnings via MemoryRecord:
 
 ### ccusage cost tracking
 
-Read `.claude/context/runtime/ccusage-status.txt` for live token usage before deciding compression aggressiveness.
+Read `.claude/context/runtime/ccusage-status.txt` for live token usage before deciding compression aggressiveness. This file is auto-updated by `ccusage-statusline.cjs` on every tool use. Format:
+
+```
+[tokens] 135,345 today (in: 14,850 / out: 120,495) | Cost: $127.4826
+[cache] $627.2992 saved | 139,399,832 reads, 8,751,364 writes
+```
+
+**The Router MUST display this at every pipeline milestone** (P0 user feedback). Fallback: `ccusage --no-color 2>&1 | tail -5`.
 
 ## Iron Laws
 

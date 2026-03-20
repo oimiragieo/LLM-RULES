@@ -109,3 +109,33 @@ manager.recordDiscovery({ text: 'BM25 indexer supports lazy IDF', area: 'search'
 - Memory management rebuild architecture (documented in `.claude/docs/MEMORY_SYSTEM.md`)
 - `.claude/lib/memory/` - Memory subsystem implementation
 - `context-compressor` skill - Compression strategies
+
+## Agent Teams Memory Synchronization (WAL Protocol)
+
+> **DESIGN SPECIFICATION — Not yet enforced at runtime.** This section describes the intended WAL protocol for Agent Teams parallel execution. The protocol requires runtime enforcement (a PreToolUse hook or equivalent) to redirect memory writes during Agent Teams sessions. Until that hook is implemented, agents will continue using direct-write paths and concurrent write collisions are possible.
+
+When running Agent Teams (multi-session parallel execution), each session writes memory deltas to an isolated queue file to prevent concurrent write collisions.
+
+### Queue Files
+
+- Location: `.claude/context/memory/queue/`
+- Format: `session-{id}.jsonl` (one JSON object per line)
+- Each entry: `{ "timestamp": "ISO", "source": "session-id", "type": "learning|decision|issue|pattern|gotcha", "content": "...", "scope": "local|global", "confidence": 0.0-1.0 }`
+
+### Write Protocol
+
+1. During Agent Teams execution, agents write ONLY to their session queue file
+2. Never write directly to canonical memory files during parallel execution
+3. Each queue entry includes source session ID for traceability
+
+### Merge Protocol (Router-Mediated)
+
+1. After all Agent Teams sessions complete, Router spawns memory-manager to reconcile
+2. memory-manager reads all queue files, deduplicates, resolves conflicts by timestamp
+3. Approved entries are appended to canonical memory files
+4. Queue files are archived to `.claude/context/memory/queue/archive/`
+
+### Cleanup
+
+- Queue files older than 24 hours are auto-archived
+- Archive files older than 7 days may be deleted

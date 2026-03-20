@@ -318,7 +318,7 @@ async function main() {
 
     if (!result.pass) {
       console.log(formatResult(result.result, result.message));
-      process.exit(0);
+      process.exit(2);
       return;
     }
 

@@ -147,6 +147,28 @@ function isStale(branch) {
     }
   }
 
+  // DIRECTORY-MTIME FALLBACK: Claude Code's native Agent tool creates branches without
+  // embedded timestamps (e.g. "worktree-agent-a1627c08"). For these, fall back to the
+  // worktree directory's mtime to determine age. If the directory is older than
+  // WORKTREE_TTL_MS, treat as TTL-expired and stale.
+  if (branchCreationAgeMs === null) {
+    try {
+      const wtDir = path.join(WORKTREES_DIR, branch.replace('worktree-', ''));
+      if (fs.existsSync(wtDir)) {
+        const stat = fs.statSync(wtDir);
+        const dirAgeMs = Date.now() - stat.mtimeMs;
+        if (dirAgeMs < WORKTREE_SHIELD_MS) {
+          return false; // Directory is young — shield engaged
+        }
+        if (dirAgeMs > WORKTREE_TTL_MS) {
+          return true; // Directory is older than TTL — stale
+        }
+      }
+    } catch (_statErr) {
+      // Non-fatal — fall through to git-merge check
+    }
+  }
+
   try {
     const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
     // SE-02: shell: false, array args

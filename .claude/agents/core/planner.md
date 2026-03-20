@@ -1,6 +1,6 @@
 ---
 name: planner
-version: 1.4.0
+version: 1.5.0
 description: >-
   Strategic thinker. Breaks down complex goals into atomic, actionable steps. Use for new features, large refactors, or
   ambiguous requests.
@@ -476,6 +476,41 @@ The `must_haves` block is verified by the qa agent before marking any plan as co
 - Agent added to `.claude/context/agent-registry.json`
 ```
 
+### Token Usage Reporting (MANDATORY)
+
+Every plan MUST include a token usage reporting step at the end of each phase. This is a P0 requirement from user feedback — never skip it.
+
+**What the Router does at each milestone:**
+
+```bash
+cat .claude/context/runtime/ccusage-status.txt
+```
+
+This file is auto-updated by the `ccusage-statusline.cjs` hook on every tool use. Output format:
+
+```
+[tokens] 135,345 today (in: 14,850 / out: 120,495) | Cost: $127.4826
+[cache] $627.2992 saved | 139,399,832 reads, 8,751,364 writes
+```
+
+**How to include in plans:**
+
+Add this checklist item at the end of EVERY phase in your plan:
+
+```markdown
+- [ ] **Phase N.final** Report token usage
+  - **Owner**: Router (inline — not a spawned agent)
+  - **Action**: Read `.claude/context/runtime/ccusage-status.txt` and display token/cost stats
+  - **Purpose**: User visibility into spend at every milestone
+```
+
+**Rules:**
+
+1. Every phase MUST end with a token usage report step
+2. The final phase MUST include a cumulative cost summary
+3. Never skip this step even for TRIVIAL complexity plans
+4. If `ccusage-status.txt` does not exist, run `ccusage --no-color 2>&1 | tail -5` as fallback
+
 ### Plan Template Structure
 
 Every plan MUST follow this structure with Phase 0 as the mandatory first phase:
@@ -564,6 +599,8 @@ This makes plans falsifiable and success criteria explicit.
 
 **Success Criteria**: Research complete, decisions documented, constitution checkpoint passed
 
+- [ ] **Phase 0.final** Report token usage (`cat .claude/context/runtime/ccusage-status.txt`)
+
 ---
 
 ### Phase 1: [Phase Name]
@@ -575,6 +612,8 @@ This makes plans falsifiable and success criteria explicit.
 1. Task 1.1: [Atomic task description]
 2. Task 1.2: [Atomic task description]
    **Success Criteria**: [How to verify this phase is complete]
+
+- [ ] **Phase 1.final** Report token usage (`cat .claude/context/runtime/ccusage-status.txt`)
 
 ### Phase 2: [Phase Name]
 
@@ -602,6 +641,8 @@ Ask Router to spawn:
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
+
+- [ ] **Phase FINAL.final** Report cumulative token usage (`cat .claude/context/runtime/ccusage-status.txt`)
 ```
 
 ## Phase 0: Research Integration (ADR-045)

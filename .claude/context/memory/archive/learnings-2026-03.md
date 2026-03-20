@@ -631,3 +631,184 @@ Pattern identified: Agent scope control failures + incomplete task metadata acro
 - Updated workflow: evolution-workflow (2026-03-12)
 
 - Updated workflow: missing-workflow-xyz (2026-03-12)
+
+---
+
+## Ecosystem Audit Remediation (2026-03-20) [Task 8 Reflection]
+
+**[PATTERN] Fail-Open vs Fail-Closed Hook Exit Codes**
+
+When a hook makes a security decision (allow vs block), exit code choice is critical:
+
+- `exit(0)`: Allow or warn — safe to fail open on unexpected errors
+- `exit(2)`: Block or deny — must fail CLOSED on unexpected errors
+
+Example: evolution-state-guard.cjs checks evolution lock. If lock-held condition returns `exit(0)`, concurrent evolutions proceed (bypass). Must use `exit(2)` to block concurrency violation.
+
+Found in: ecosystem-audit-task-8 (commit 108819dc). Violations fixed on lines 314, 347.
+Severity: CRITICAL (SEC-008 compliance)
+Reuse: HIGH — applies to all future hooks implementing security/concurrency controls
+
+---
+
+**[GOTCHA] Context Bloat: Rules Files Kill Agent Working Context**
+
+Claude Code auto-injects all `.claude/rules/*.md` files into every agent spawn. This codebase had 141 rules files (857KB = ~200K tokens), leaving agents near-zero working context.
+
+Symptoms: agents fail with "Prompt is too long" at 0 tool uses; architect/code-reviewer agents exhaust context after 40-50 tool calls; only lightweight agents (explore, researcher) complete successfully.
+
+Root cause: Domain-specific rules (database-architect.md 11KB, ripgrep.md 14KB, plugin-development.md 11KB) should be skills (loaded on-demand), not always-on rules.
+
+Mitigation: Keep ~15 universal rules (~50KB), convert 126 domain rules to skills (~806KB loaded on-demand).
+Expected impact: agent spawn context 200K→30K tokens, working context nearly-zero→170K+ tokens.
+
+Found in: critical-rules-bloat-finding.md (ecosystem-audit-task-8)
+Priority: P0 (affects agent completion rates)
+
+---
+
+**[GOTCHA] Debounce Counters Ineffective in Ephemeral Hooks**
+
+Attempted to rate-limit hook warnings in context-monitor.cjs via counter: `toolUsesSinceLastWarning++` with `if (counter >= 5) warn`.
+
+The counter is declared at module level but hooks exit immediately after one invocation. State is never persisted, so counter always resets to 0 on next hook call.
+
+Result: debounce never triggers; counter serves no purpose.
+Solution: Remove the counter. Accept that all warnings fire (acceptable for context monitoring).
+
+Lesson: Hooks are ephemeral (live for one tool use). Don't use in-process state for persistence. Use external state (files, env) or accept stateless behavior.
+
+Found in: ecosystem-audit-task-8 (context-monitor.cjs debounce logic removed)
+
+---
+
+## Memory Management Pipeline Complete (2026-03-19) [Batch 10 reflections]
+
+**[WORKFLOW] Memory Bloat Recovery Pipeline — Pattern and Outcomes**
+
+- Full memory system cleanup pipeline completed in a single session with 8 active tasks
+- MEMORY.md pruned 227→48 lines; 3 structured reference files extracted to separate files
+- Memory directory reduced from 261 files/7.8MB to ~105 files via deletion of 146 orphaned delegation PIDs, 2 .bak artifacts, and 8 old metrics files
+- learnings.md pruned 456→174 lines; STATE.md reset; metrics files pruned
+- All 16/16 tests passed after changes
+
+**[PATTERN] memory-rotator.cjs Auto-Cleanup Enhancement**
+
+- `memory-rotator.cjs` enhanced to auto-clean `.bak` files and stale delegation PIDs during rotation
+- Pattern: embed cleanup logic in the rotator rather than relying on separate manual cleanup tasks
+- This prevents future accumulation of orphaned PIDs and backup artifacts
+- Health check command confirms memory state: `Memory dir 7.8MB/105 files`
+
+**[ARCHITECTURE] Multi-LLM Consensus for Memory Architecture**
+
+- Codex + Claude + Gemini consensus reached on dual memory coexistence strategy (session 2026-03-19)
+- Three LLMs independently reviewed the memory architecture and converged on the same approach
+- Multi-LLM review as an architecture validation gate is highly effective — surface contradictions that single-model review misses
+- Consensus artifact: `.claude/context/memory/archive/` strategy documented in decisions.md
+
+**[SKILL] memory-audit Skill as Sensor Component**
+
+- `memory-audit` skill created with 7-step workflow using sensor/controller pattern
+- Sensor: monitors memory health metrics (file count, size, duplication rate, age of entries)
+- Controller: generates actionable tasks for cleanup when thresholds exceeded
+- Pattern: skills can serve as lightweight monitoring sensors without needing full agent infrastructure
+- This is the canonical approach for memory health monitoring going forward
+
+**[CURATION] Decisions for these learnings**
+
+- Retain: memory-rotator auto-cleanup pattern (high reuse, prevents recurring bloat)
+- Retain: multi-LLM consensus gate pattern (high reuse for architectural decisions)
+- Retain: memory-audit sensor/controller pattern (high reuse for maintenance workflows)
+- Archive: specific file count numbers (low retrieval value; specific to this session state)
+
+---
+
+## Ecosystem Audit Remediation Fixes (2026-03-20) [Task 10 & 1 reflections]
+
+**[PATTERN] safeParseJSON API Contract & Implementation**
+
+The `safeParseJSON()` utility from `.claude/lib/utils/safe-json.cjs` has a specific parameter order that differs from intuitive expectations:
+
+- **Signature**: `safeParseJSON(jsonString, schemaName, validationFn?, fallbackDefaults)`
+- **Return**: Parsed value directly (NOT `{ success, data, error }`)
+- **Second param**: schemaName is for logging/diagnostics, not validation
+- **Fourth param**: fallbackDefaults are returned on parse failure
+- **Handles**: Malformed JSON (returns fallback), prototype pollution (strips **proto**), circular references
+
+Violations found: 3x raw `JSON.parse()` in `lancedb-client-impl.cjs` (Task 10)
+Fix: Replaced with `safeParseJSON(json, "lancedb-config", null, {})`
+Pattern reuse: HIGH — all hook input parsing, memory I/O, config loading must use safeParseJSON
+Priority: CRITICAL (SEC-005 compliance)
+
+---
+
+**[GOTCHA] Model ID Staleness in Test Fixtures**
+
+Test fixtures hardcode model IDs without update automation. Over time, model IDs deprecate but tests continue using old IDs, causing:
+
+- Type mismatches with actual API responses
+- Test-specific model-routing inconsistencies
+- Silent failures when fixture models diverge from production
+
+Examples:
+
+- `claude-opus-4` (old) → `claude-opus-4-6` (current)
+- `claude-3-sonnet` (old) → `claude-3-5-sonnet-20241022` (current)
+
+Found in: `config-model-validator.test.cjs` (Task 10)
+Mitigation: Use environment variable lookup in tests: `process.env.DEFAULT_MODEL || 'claude-opus-4-6'`
+Pattern reuse: MEDIUM — apply to all agent/config tests that validate model selection logic
+
+---
+
+**[GOTCHA] Worktree Agent Context Pressure with Large CLAUDE.md**
+
+Worktree agents receive full CLAUDE.md as system context. For heavyweight agents (architect, planner, security-architect), this can cause:
+
+- "prompt is too long" rejection at spawn time (before first tool use)
+- Context already exhausted before agent can work
+- Workaround tasks stuck indefinitely, visible to Router as "orphaned"
+
+Root cause: CLAUDE.md is comprehensive (~280KB = 70K+ tokens) to support all agents/orchestrators.
+Workaround: Use non-worktree agents for large prompt jobs, OR use lighter agent types (haiku) when worktree is necessary.
+
+Found in: Task 10 ecosystem audit (worktree agent context exceeded)
+Pattern reuse: MEDIUM — document in spawn templates, recommend non-worktree for complex tasks
+
+---
+
+## Session Handoff Regex Patterns & Resume Prompt Instrumentation (2026-03-19) [Task 10 reflection]
+
+**[PATTERN] NEXT ACTION Header Detection in Session Handoff**
+
+- `spawn-new-session.cjs` had regex that only matched `**bold:** format` for NEXT ACTION extraction
+- This caused handoff parser to fall back to generic "continue previous work" prompt, missing specific pending work
+- Fix: regex now matches `## H2` headers via `^\s*##\s+NEXT\s+ACTION` pattern
+- Key learning: session handoff prompts must be robust to multiple formatting styles (markdown headers are more stable than inline bold)
+- Pattern: structured markdown headers (## NEXT ACTION) are more reliable than prose markers (**bold:**) in multi-agent pipelines
+
+**[PATTERN] Resume Prompt Explicit Instrumentation**
+
+- `session-handoff.cjs` resumePrompt now explicitly says "execute ALL pending tasks in the queue"
+- Previous version: vague language ("continue" / "resume") led to agents pausing work prematurely
+- Fix: explicit instruction "Execute ALL tasks" removes ambiguity
+- Pattern: session handoff prompts must use imperative language, not suggestive language, when work is pending
+- Instruction clarity directly impacts whether spawned agents complete the full pipeline vs stopping early
+
+**[CURATION] Decisions**
+
+- Retain: regex pattern for H2 header matching (reusable across other handoff implementations)
+- Retain: explicit instrumentation pattern (applicable to all session handoff contexts)
+- Archive: specific session-handoff.cjs line numbers (implementation detail, not reusable guidance)
+
+---
+
+## Session CWD in Pruned Worktree Breaks ALL Hooks (2026-03-17) [Task 5 reflection]
+
+**[CRITICAL] Hook MODULE_NOT_FOUND: Cause and Prevention**
+
+- When an agent session's CWD is inside a git worktree that has since been pruned/deleted, ALL hooks fail with MODULE_NOT_FOUND because `require()` paths resolve relative to the (now-deleted) CWD
+- Symptoms: every hook exits with error, lint/test/format runs interrupted, task completes partially
+- Prevention: before spawning agents in worktrees, verify the worktree still exists via `git worktree list`
+- Recovery: re-run interrupted commands (lint/test/format) from the main repo root after confirming CWD is valid
+- Related: test suite and format runs from 2026-03-17 session were interrupted by this failure; need re-run from main
