@@ -812,3 +812,94 @@ Pattern reuse: MEDIUM — document in spawn templates, recommend non-worktree fo
 - Prevention: before spawning agents in worktrees, verify the worktree still exists via `git worktree list`
 - Recovery: re-run interrupted commands (lint/test/format) from the main repo root after confirming CWD is valid
 - Related: test suite and format runs from 2026-03-17 session were interrupted by this failure; need re-run from main
+
+---
+
+## Ecosystem Audit & Worktree Lifecycle Analysis (2026-03-20) [2 reflections]
+
+**[PATTERN] Full Ecosystem Audit Success Metrics**
+
+- Test pass rate 98.6% (3042/3085) with 43 pre-existing failures and 0 regressions from fixes is the quality bar for ecosystem-wide audits
+- Security-specific tests (11/11) must be 100% pass — no tolerance for security test failures
+- Validation + lint + format must all pass before marking audit complete
+- CHANGELOG update is part of the audit deliverable, not a follow-up task
+
+**[GOTCHA] Worktree Lifecycle Gaps — Crash/Timeout Path**
+
+- `worktree-auto-cleanup.cjs` only triggers on `TaskUpdate(completed)` — agents that crash or timeout never trigger cleanup, leaving orphaned worktrees
+- `WORKTREE_TTL_MS` defaults to 24h but no cron job enforces the TTL — worktrees can persist indefinitely after agent failure
+- `budget-tracker.json` (used by context-window-monitor) may not be populated in worktree agents, causing silent monitoring gaps
+- No `compression-reminder.txt` trigger exists specific to worktree agents — they can bloat without warning
+
+**[INSIGHT] maxTurns Not the Bloat Cause**
+
+- All core agents use `maxTurns=18` — this is not the cause of worktree agent context bloat
+- Bloat root cause is more likely: large file reads without compression, or missing context budget enforcement in worktree-isolated environments
+
+**[ACTION-NEEDED] Worktree Cleanup Requires Cron Enforcement**
+
+- Need a cron-based or heartbeat-based worktree reaper that enforces WORKTREE_TTL_MS independently of TaskUpdate
+- Alternative: a PostToolUse hook on Stop event that checks for orphaned worktrees
+- Without this, every crashed worktree agent leaks disk space and potentially stale branch refs
+
+---
+
+## Worktree Lifecycle & Prune Hardening (2026-03-20) [Reflections 5-6]
+
+**[PATTERN] Worktree Prune Mtime Fallback**
+
+- `worktree-prune.cjs` now falls back to directory mtime (`fs.statSync`) when branch names lack embedded timestamps
+- Claude Code native Agent worktrees use different naming conventions than agent-studio worktrees — no timestamp in branch name
+- Without the fallback, these worktrees were never pruned and accumulated (11 stale dirs + 9 orphaned branches found)
+- Fix: check branch name for timestamp first, fall back to directory mtime, compare against age threshold
+
+**[PATTERN] SessionEnd Hook for Worktree Cleanup**
+
+- Added SessionEnd hook to run worktree prune on every session exit — ensures cleanup even if heartbeat cron misses
+- Heartbeat cron registered at 6-hour interval as secondary safety net
+- Defense-in-depth: SessionEnd (primary) + heartbeat cron (secondary) prevents worktree accumulation
+
+**[INSIGHT] Worktree Accumulation is Silent**
+
+- Stale worktrees and orphaned branches accumulate silently with no user-visible symptoms until disk pressure or git slowdown
+- Proactive pruning via hooks is essential — relying on manual cleanup leads to unbounded growth
+- The 11+9 cleanup batch demonstrates that even a few days without pruning causes significant accumulation
+
+---
+
+## Worktree Context Bloat Root Cause & Solutions (2026-03-20) [Reflections 3-4]
+
+**[ROOT CAUSE] Worktree Agent Context Accumulation**
+
+- Worktree agents accumulate ~967K tokens because `maxTurns: 18` applies uniformly to all agents regardless of execution context
+- `spawn-token-guard.cjs` guards spawn PROMPT size (blocks at 120K), NOT the agent's internal context accumulation during its tool-use loop
+- `session-budget-watchdog.cjs` fires at 140K/160K/180K for the main router session, but spawned agents in worktrees are separate sessions with separate budgets — no cross-session enforcement
+- Each tool-use turn accumulates ~54K tokens on average (large file reads, test output) — 18 turns = ~967K worst case
+
+**[PATTERN] maxTurns as Primary Context Lever for Worktree Agents**
+
+- Recommended: `maxTurns: 10` for worktree agents (vs 18 for main session agents)
+- Caps worst-case context at ~180K tokens, under the autocompact threshold
+- If agent exhausts turns, router can re-spawn with fresh context (industry pattern from ccswarm framework)
+- Single-task focused agents don't need 18 turns — most single-file tasks complete in 8-10
+
+**[PATTERN] TTL-Based Worktree Cleanup (Event-Independent)**
+
+- `worktree-auto-cleanup.cjs` depends on `TaskUpdate(completed)` which worktree agents skip (known issue from feedback_worktree_taskupdate.md)
+- Result: 14 stale worktree directories accumulate with no cleanup trigger
+- Solution: `git worktree prune --expire 24.hours.ago` is time-based and does NOT depend on agent events
+- Must be registered in heartbeat cron for periodic execution, not just event-driven cleanup
+
+**[INSIGHT] Context Compression Timing — Intervene at Output, Not at Overflow**
+
+- Academic research (arxiv 2511.22729): Replace large tool outputs with memory pointers AT tool-output time, not retrospectively at overflow
+- Token savings of 7x demonstrated (6,411 to 842 tokens for same data)
+- Current gap: compression fires too late (150K threshold designed for router, not sub-agents)
+- PostToolUse hook to compress outputs >5K chars would prevent accumulation before it starts
+
+**[DECISION] 3-Fix Worktree Cleanup Plan (2026-03-20)**
+
+- Fix 1: Enhance startup hook with `git worktree prune` + TTL-based directory cleanup
+- Fix 2: Add SessionEnd worktree cleanup hook
+- Fix 3: Register worktree prune in heartbeat cron for periodic execution
+- Skipped separate plan file — well-scoped fixes derived directly from research (good judgment for LOW complexity)

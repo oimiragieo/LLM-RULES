@@ -1170,7 +1170,14 @@ function recordUserPromptResult(result) {
       }
     }
     console.error('|                                                  |');
-    console.error('| Use Task tool to spawn: ' + candidates[0].agent.name.padEnd(24) + '|');
+    const isHighComplexity = planningReq.complexity === 'high' || planningReq.complexity === 'epic';
+    if (isHighComplexity) {
+      console.error('| Spawn PLANNER first via Task tool                |');
+      const planningContext = `${intent} -> ${candidates[0].agent.name}`;
+      console.error('| Planning context: ' + planningContext.padEnd(30) + '|');
+    } else {
+      console.error('| Use Task tool to spawn: ' + candidates[0].agent.name.padEnd(24) + '|');
+    }
     console.error('+--------------------------------------------------+\n');
   }
   return result;

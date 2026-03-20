@@ -130,6 +130,15 @@ CHECKS.push({
     const enforcement = getEnforcementMode('FILE_PLACEMENT_GUARD', 'block');
     if (enforcement === 'off') return { pass: true };
 
+    // Path traversal defense: reject .. segments
+    if (filePath.includes('..')) {
+      return {
+        pass: false,
+        result: 'block',
+        message: 'Path traversal detected: .. segments not allowed',
+      };
+    }
+
     // Disallowed directories
     const disallowedPatterns = [/\/\.git\//, /\/node_modules\//, /\.claude\/context\/code-index/];
 

@@ -719,3 +719,59 @@ pnpm add -D @stryker-mutator/core @stryker-mutator/jest-runner
 - `.claude/hooks/routing/routing-guard.cjs`
 - `.claude/hooks/safety/unified-creator-guard.cjs`
 - `.claude/lib/routing/routing-table.cjs`
+
+## Validation Phase: TDAD Dependency Map (P0)
+
+Before committing, agents MUST identify which test files cover the changed source files. Use compiler-assisted reference discovery or targeted grep:
+
+```bash
+# Find tests that import the changed file
+grep -r "import.*changedFile\|require.*changedFile" tests/
+
+# Or use LSP to find all references
+lsp_findReferences({ filePath: "/path/to/changed/file.ts", line: 1, character: 1 })
+```
+
+Build a dependency map and run ONLY those tests first (70% faster regression detection per arXiv:2603.17973):
+
+```bash
+# 1. Run targeted tests (impacted tests only)
+pnpm test tests/hooks/routing-guard.test.cjs
+
+# 2. Verify no regressions in targeted scope
+# 3. Only then run full suite
+pnpm test
+```
+
+**Rationale:** Full test suites can exceed 5 minutes on large repos. Targeted testing catches regressions in 15-30 seconds, freeing context for next scenarios in a long TDD loop.
+
+## Validation Phase: Spec-Gaming Detection (P0)
+
+In the Validate phase, verify the implementation hasn't gamed test assertions:
+
+**Checklist:**
+
+- [ ] Tests assert behavior, not implementation details (no testing private variables or class internals)
+- [ ] No hardcoded expected values were copied from test to implementation
+- [ ] Mutation score ≥80% indicates test quality is sufficient for detecting regressions
+- [ ] Review: could the code pass tests while being fundamentally wrong?
+
+**Run mutation testing if available:**
+
+```bash
+# Test suite strength validation — mutations should be caught
+pnpm stryker run
+
+# If mutation score < 80%, tests are too weak:
+# - Add negative tests
+# - Add boundary condition tests
+# - Verify assertions are on behavior, not mocks
+```
+
+**Spec-gaming examples to catch:**
+
+- ✗ Implementation hardcodes `return 42` to pass test expecting `42` → mutation testing catches this
+- ✗ Test mocks behavior instead of asserting it → mutation testing shows 0% mutation killed
+- ✗ Test checks log message instead of behavior → flip the assertion, implementation still passes
+
+**Agent-Studio targets:** After completing security-critical hook or routing changes, run mutation testing before marking task complete.

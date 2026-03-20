@@ -308,6 +308,7 @@ const ROUTING_TABLE = {
   help: 'general-assistant',
   clarify: 'general-assistant',
   overview: 'general-assistant',
+  'general-purpose': 'general-assistant',
 
   // Task Management
   'task-hygiene': 'task-manager',

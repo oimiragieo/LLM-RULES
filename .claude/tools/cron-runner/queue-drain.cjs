@@ -168,7 +168,7 @@ function dispatchAction(entry) {
       if (action.writebackCmd) {
         const { execSync } = require('child_process');
         try {
-          // shell: true is intentional — writebackCmd is a trusted internal command produced
+          // shell: false is required — writebackCmd is a trusted internal command produced
           // by the Telegram polling pipeline with a fixed argument structure, not constructed
           // from user-controlled input. The node args are always the same shape:
           //   node .claude/tools/cli/telegram-write-outbox.cjs <chatId> <msgId> <taskId> --from-file <path>

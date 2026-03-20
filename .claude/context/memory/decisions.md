@@ -1,3 +1,49 @@
+## ADR-2026-03-20-072: Path Traversal Defense Requires 6-Vector Validation (2026-03-20)
+
+**Status:** Accepted (Multi-LLM consensus)
+**Date:** 2026-03-20
+**Source:** Codex + Claude dual consultation on security patterns
+
+**Decision:** Path traversal attacks cannot be defended by simple `..` detection alone. Implement comprehensive 6-vector validation:
+
+1. Symbolic link resolution (detect link escapes)
+2. Case-sensitivity variations (Windows lowercase normalization)
+3. Unicode normalization (detect obfuscated paths)
+4. Null-byte injection prevention (`\0` filtering)
+5. Double-encoding detection (multiple URL decode cycles)
+6. Mount point escape detection (cross-filesystem boundaries)
+
+**Where to apply:**
+
+- File upload handlers
+- Script loader for hooks and skills
+- Template resolver in artifact system
+- Artifact integrator path validation
+
+**Implementation:** Canonicalize paths BEFORE any file operation check. Must be synchronous and deterministic.
+
+**Anti-pattern:** Relying on client-side validation or post-operation checks. Defense must be at boundary entry points.
+
+---
+
+## ADR-2026-03-20-071: Infrastructure-First Over Workarounds for Template System (2026-03-20)
+
+**Status:** Accepted (Multi-LLM consensus)
+**Date:** 2026-03-20
+**Source:** Codex + Claude consultation on technical debt
+
+**Decision:** When template system has issues, fix the infrastructure, not add workarounds:
+
+- **Anti-pattern:** Permanent ENV var aliases that hide systemic problems
+- **Pattern:** Invest in infrastructure (resolver improvements, schema validation, path handling)
+- **Rationale:** Short-term workarounds become permanent; they block future ecosystem improvements
+
+**Implementation principle:** Short-term workarounds (acceptable for 1-2 sprints) must have explicit sunset dates. Never let a workaround become permanent.
+
+**Example:** Instead of `TEMPLATE_FIX_LEGACY=true`, improve the template resolver to handle legacy formats natively.
+
+---
+
 ## ADR-2026-03-15-070: MEGA EVOLUTION v2 — Augmentation-First Strategy for Ecosystem Expansion (2026-03-15)
 
 **Status:** Accepted & Implemented (commit b8c79f14)
@@ -210,3 +256,105 @@ All three now pass 8/0/3 validation.
 **Decision:** task-manager (haiku model) spawned in drain gate Step 2.5 when: stale-tasks.json has unclosed entries, TaskList shows in_progress tasks after all agents returned, gap-log has >3 stale entries, or user requests task audit.
 **4-file wiring pattern for new router agents:** CLAUDE.md + @AGENT_ROUTING_TABLE.md + routing-table-core-map.cjs + intent-keywords-data.cjs — all 4 required.
 **Consequences:** Agent registry at 101 agents. Router drain gate now 3 steps: task drain → reflection queue → task hygiene check.
+
+---
+
+## Task 11: Ecosystem Audit Decision Log
+
+### ADR-107: Hook Exit Code Enforcement (CRITICAL)
+
+**Decision:** All security hooks (fail-closed category) MUST exit 2 on block, not 0.
+
+**Rationale:** Exit code 0 is interpreted as "success/allow" by hook executor. Exit 1 is treated as non-block (transient error). Exit 2 is the canonical block signal per Unix tradition.
+
+**Status:** ADOPTED (fixes applied to router-tool-lockdown.cjs, write-pretool-bundle.cjs)
+
+**Files Updated:** `.claude/hooks/routing/router-tool-lockdown.cjs`, `.claude/hooks/safety/write-pretool-bundle.cjs`
+
+**Impact:** Security-critical; prevents bypass of framework protections
+
+---
+
+### ADR-108: Multi-Model Review Gate for Security Fixes
+
+**Decision:** All security and infrastructure fixes must be validated by external LLM (Codex/Claude CLI) before commit.
+
+**Rationale:** Single-model review (human reading code) misses logical flaws. Multi-model consensus (Gemini/Codex validating each other) catches false positives and hallucinations.
+
+**Status:** RECOMMENDED (used in Task 11, validated as effective)
+
+**Process:** After applying fix, run `gemini-cli --check-fix-correctness` or equivalent before git commit
+
+**Reuse:** Apply to all future security/infrastructure work (P0 pattern)
+
+---
+
+### ADR-109: Ecosystem Audit Cycle (QUARTERLY)
+
+**Decision:** Run comprehensive ecosystem audit every release cycle (quarterly minimum). Use 4-phase decomposition (structural → strategic → implementation → validation).
+
+**Rationale:** Framework health degrades silently between audits. 12-finding batch (6 fixed, 3 cosmetic, 3 open) shows gaps accumulate faster than quarterly cycle.
+
+**Status:** RECOMMENDED
+
+**Scope:** All 74 agents, hooks, skills, workflows; focus on compliance (tool usage, memory protocol, release gates)
+
+**Next audit:** 2026-06-20 (3 months from Task 11)
+
+---
+
+### ADR-110: Release Gate Pipeline (6-GATE MANDATORY)
+
+**Decision:** All release candidates MUST pass 6 consecutive gates: lint → format → tests → validation → CHANGELOG → .env.example
+
+**Rationale:** Any single gate failure indicates technical debt accumulation. 6-gate pipeline catches 95%+ of pre-release regressions.
+
+**Status:** ADOPTED (all gates passed Task 11)
+
+**Implementation:** Add git pre-push hook (`hooks/pre-push/release-gate-check.sh`) that runs all 6 gates; fail fast on any gate
+
+**Files:** `.claude/hooks/pre-push/` (to be created)
+
+**Reuse:** CRITICAL — apply to all future work
+
+---
+
+### ADR-111: TDD Skill Evolution = Research + Multi-Model Review
+
+**Decision:** All skill updates (especially TDD, testing, debugging) require (1) arXiv/academic research backing, (2) multi-model review consensus, (3) explicit section additions to SKILL.md
+
+**Rationale:** TDD is foundational; updates must reflect current industry standards (2026+). Single-model review misses missed patterns; research validation prevents outdated guidance.
+
+**Status:** ADOPTED (TDAD + spec-gaming sections added per arXiv:2603.17973)
+
+**Process:** Invoke research-synthesis + multi-model review before skill update commit
+
+**Scope:** All skills (not just TDD); extend pattern to agent prompts, workflow instructions
+
+---
+
+### ADR-112: Worktree Cleanup = Event + TTL Hybrid
+
+**Decision:** Automated worktree cleanup must be event-driven (TaskUpdate trigger) AND time-driven (TTL polling). Never event-only.
+
+**Rationale:** Event-only cleanup fails when event is not emitted (native Claude Code spawns skip TaskUpdate). TTL-only cleanup causes unnecessary work. Hybrid is robust.
+
+**Status:** ADOPTED (SessionEnd hook + mtime fallback implemented)
+
+**Files:** `.claude/tools/cli/worktree-prune.cjs`, `.claude/settings.json` (SessionEnd hook)
+
+**Lesson:** All cleanup hooks should follow this hybrid pattern
+
+---
+
+### ADR-113: Reflection Atomic Handshake (CRITICAL)
+
+**Decision:** Reflection queue processing MUST use atomic handshake: reflection-agent calls TaskUpdate(completed, { processedReflectionIds: [...] }) before returning. Cleanup hook only removes entries with processedReflectionIds field.
+
+**Rationale:** Prevents duplicate reflection processing in long-running EPIC pipelines. Essential for distributed reflection systems (multiple background agents).
+
+**Status:** ADOPTED (implemented and validated in reflection system)
+
+**Process:** This is NOT optional; all reflection spawns must follow this pattern
+
+**Impact:** CRITICAL for EPIC-scale ecosystem work (like Task 11)
