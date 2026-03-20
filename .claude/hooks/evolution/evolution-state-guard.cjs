@@ -22,7 +22,7 @@
  * - 0: Allow operation (valid transition, or warn/off mode)
  * - 2: Block operation (invalid transition in block mode)
  *
- * The hook fails open (exits 0) on errors to avoid blocking legitimate work.
+ * The hook fails CLOSED (exits 2) on errors (SEC-008 compliance for security hooks).
  */
 
 'use strict';
@@ -129,8 +129,8 @@ function acquireEvolutionLock(owner) {
       }
       return false; // Active lock held by another process
     }
-    // Unexpected error — fail open to avoid blocking legitimate work
-    return true;
+    // Unexpected error — fail closed to avoid bypassing lock (SEC-008)
+    return false;
   }
 }
 
@@ -311,7 +311,7 @@ async function main() {
         const msg = `[EVOLUTION LOCK] Evolution already in progress (owner: ${currentLock.owner || 'unknown'}, since: ${currentLock.since || 'unknown'}). Cannot start a concurrent evolution run. Wait for the current run to complete or expire (TTL: 30 minutes).`;
         if (enforcement === 'block') {
           console.log(JSON.stringify({ result: 'block', message: msg }));
-          process.exit(0);
+          process.exit(2);
         } else {
           console.log(JSON.stringify({ result: 'warn', message: msg }));
           process.exit(0);
@@ -344,7 +344,7 @@ async function main() {
         // Best-effort
       }
       console.log(JSON.stringify({ result: 'block', message }));
-      process.exit(0);
+      process.exit(2);
     } else {
       // Default to warn
       console.log(JSON.stringify({ result: 'warn', message }));

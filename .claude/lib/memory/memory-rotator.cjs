@@ -30,7 +30,7 @@ const PERMANENT_TAG_REGEX = /\[PERMANENT\]/i;
 const RESOLVED_STATUS_REGEX = /\*\*Status:\s*RESOLVED\*\*/i;
 
 // Default options
-const DEFAULT_THRESHOLD_KB = 20;
+const DEFAULT_THRESHOLD_KB = 40;
 const DEFAULT_KEEP_SECTIONS = 10;
 
 /**

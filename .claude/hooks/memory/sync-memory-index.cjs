@@ -35,7 +35,7 @@ const { EntityExtractor } = require('../../lib/memory/entity-extractor.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
-const CORE_MEMORY_MARKDOWN_FILES = new Set(['decisions.md', 'issues.md']);
+const CORE_MEMORY_MARKDOWN_FILES = new Set(['decisions.md', 'issues.md', 'learnings.md']);
 const CORE_MEMORY_JSON_FILES = new Set(['patterns.json', 'gotchas.json']);
 const EMBEDDING_MEMORY_FILES = new Set([
   'learnings.md',

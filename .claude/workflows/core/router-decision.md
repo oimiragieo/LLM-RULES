@@ -11,7 +11,7 @@
 **Verification:**
 
 ```bash
-grep "router-decision" .claude\CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED!"
+grep "router-decision" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED!"
 ```
 
 **WHY**: This workflow defines how the Router operates. CLAUDE.md directs the Router here.
