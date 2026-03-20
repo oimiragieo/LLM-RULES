@@ -217,60 +217,25 @@ function main() {
   // sat idle 10min processing reflections), extract the NEXT ACTION from
   // active_context.md and pass it as an explicit seed prompt. This ensures the
   // new session starts working immediately instead of burning context on pre-flight.
-  // Lazy-load approach: write full handoff prompt to a file, then use
-  // @file reference in -p flag. Claude Code loads @path references into
-  // the prompt context automatically. This avoids command-line length
-  // limits that caused black-window hangs on Windows.
   const activeCtxPath = path.join(process.cwd(), '.claude/context/memory/active_context.md');
-  const handoffPromptPath = path.join(
-    process.cwd(),
-    '.claude/context/runtime/handoff-seed-prompt.md'
-  );
-
-  // Build the seed prompt file with explicit instructions + @file reference
+  let seedPrompt = 'continue';
   try {
-    const promptContent = [
-      '# Session Handoff — Execute Immediately',
-      '',
-      'You are resuming work from a previous session. Execute ALL tasks below autonomously.',
-      'Do NOT stop after one task. Do NOT just clean up stale tasks. Complete the FULL pipeline.',
-      '',
-      '## Instructions',
-      '',
-      fs.existsSync(activeCtxPath)
-        ? fs.readFileSync(activeCtxPath, 'utf8')
-        : 'Run TaskList() to discover pending work.',
-      '',
-      '## Rules',
-      '',
-      '- Spawn specialist agents for each task — do NOT implement directly',
-      '- Call TaskUpdate(in_progress) before work, TaskUpdate(completed) after',
-      '- Max 2 heavy agents in parallel',
-      '- Run pnpm lint:fix && pnpm format before committing',
-      '- Report progress after each wave completes',
-    ].join('\n');
-    fs.writeFileSync(handoffPromptPath, promptContent, 'utf8');
+    if (fs.existsSync(activeCtxPath)) {
+      const ctx = fs.readFileSync(activeCtxPath, 'utf8');
+      const nextActionMatch = ctx.match(/\*\*NEXT ACTION \(IMMEDIATE\):\*\*\s*(.+?)(?:\n|$)/);
+      if (nextActionMatch) {
+        seedPrompt = `Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top. Skip reflections — go straight to implementation. Here is the action: ${nextActionMatch[1].trim().slice(0, 500)}`;
+      }
+    }
   } catch {
-    // Fall back — write minimal prompt
-    fs.writeFileSync(
-      handoffPromptPath,
-      'Read .claude/context/memory/active_context.md and execute ALL tasks under NEXT ACTION.',
-      'utf8'
-    );
+    // Fall back to 'continue' if active_context.md can't be read
   }
-
-  // Launch interactive session directly — NO -p flag.
-  // The handover-detector.cjs UserPromptSubmit hook detects CLAUDE_FRESH_SPAWN=1
-  // and injects the handoff context on the first user prompt.
-  // The handoff-seed-prompt.md file is available for the user or hook to read.
-  //
-  // Why not -p: (1) -p runs in print mode (no TUI, black window until done),
-  // (2) @file syntax doesn't work in -p flag (literal text only),
-  // (3) long prompts hit Windows cmd line limits causing hangs.
+  // Escape double quotes for shell embedding
+  const escapedPrompt = seedPrompt.replace(/"/g, '\\"');
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags}`;
+    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p "${escapedPrompt}" && claude ${interactiveFlags} -c`;
   } else {
-    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags}`;
+    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p "${escapedPrompt}" && claude ${interactiveFlags} -c`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
