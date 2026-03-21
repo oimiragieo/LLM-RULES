@@ -16,6 +16,7 @@
 const crypto = require('crypto');
 const fs = require('fs').promises;
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 /**
  * Merkle Tree Node
@@ -275,7 +276,7 @@ class MerkleTree {
   static async load(filePath) {
     try {
       const data = await fs.readFile(filePath, 'utf8');
-      const json = JSON.parse(data);
+      const json = safeParseJSON(data);
       return MerkleNode.fromJSON(json);
     } catch (_err) {
       return null;

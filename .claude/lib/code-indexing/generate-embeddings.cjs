@@ -23,6 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // ─── CLI arg parsing ────────────────────────────────────────────────────────
 
@@ -206,7 +207,7 @@ function fileToChunks(filePath, tier) {
 
   let data;
   try {
-    data = JSON.parse(raw);
+    data = safeParseJSON(raw);
   } catch (err) {
     console.error(`[WARN] Cannot parse JSON ${filePath}: ${err.message}`);
     return [];

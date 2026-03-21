@@ -10,6 +10,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // Default configuration for embedding generation
 const DEFAULT_OPTIONS = {
@@ -376,7 +377,7 @@ class EmbeddingGenerator {
 
     try {
       const data = await fs.readFile(this.options.cachePath, 'utf-8');
-      const cacheData = JSON.parse(data);
+      const cacheData = safeParseJSON(data);
       this.cache = new Map(Object.entries(cacheData));
       console.log(`Loaded ${this.cache.size} cached embeddings`);
     } catch (_error) {

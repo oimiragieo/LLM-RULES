@@ -427,5 +427,27 @@
     "confidence": "high",
     "evidence": "init skill created, committed, integration verified",
     "id": "ecosystem_bootstrap_pattern"
+  },
+  {
+    "text": "[BATCH-REFLECTION] Atomic Multi-File Commit Pattern (2026-03-21): Group related security fixes, phantom ref replacements, and sanitizer improvements into a single atomic commit. Validate with pre-commit hooks before committing. Evidence: commit 371bbf05 (29 files, all fixes, score 0.92). Area: git/devops",
+    "area": "main",
+    "timestamp": "2026-03-21T15:06:00.037Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "0de8adf8bf4754795bf8121fc93e669892341fad",
+    "importance": 0.6
+  },
+  {
+    "text": "[BATCH-REFLECTION] Multi-Model Consensus Pattern (2026-03-21): Use Gemini + Codex consultation to validate prioritization of security findings. Cross-model agreement elevates issues from P1 to P0. Evidence: Task 15 multi-model review elevated MCP gap and memory sanitizer to P0/CRITICAL. Area: security/architecture",
+    "area": "main",
+    "timestamp": "2026-03-21T15:06:06.553Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "8ad09b7e412ede2d9d373d8911cc56234fda134e",
+    "importance": 0.8
   }
 ]

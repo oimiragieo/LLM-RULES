@@ -129,5 +129,16 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "cross-ref-cc-as-memory-2026-03-19"
+  },
+  {
+    "text": "[BATCH-REFLECTION] Security Sanitizer Integration Gotcha (2026-03-21): sanitizeMemoryContent() returns {safe, sanitized, detections} object — callers must use result.sanitized property, NOT the whole object. Assigning the whole object writes [object Object] to file. Fix: always destructure or access .sanitized property explicitly. Area: security/memory",
+    "area": "main",
+    "timestamp": "2026-03-21T15:06:12.997Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "1c46997f01b032462ea2c8b80ff1d8b2a5cb8932",
+    "importance": 0.6
   }
 ]

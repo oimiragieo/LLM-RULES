@@ -23,6 +23,7 @@
 'use strict';
 
 const { configureCudaPath } = require('../memory/lancedb-client-helpers.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // Configure CUDA path before loading any ONNX/embedding libraries
 configureCudaPath();
@@ -200,7 +201,7 @@ process.stdin.on('data', chunk => {
 
     let msg;
     try {
-      msg = JSON.parse(line);
+      msg = safeParseJSON(line);
     } catch (_e) {
       process.stdout.write(JSON.stringify({ ok: false, error: 'Invalid JSON' }) + '\n');
       continue;

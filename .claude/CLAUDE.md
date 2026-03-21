@@ -170,7 +170,7 @@ See **@ROUTER_OPERATIONS.md** for format, bash command template, and full entry 
 
 Before spawning `developer`, check Step 6.5 in `router-decision.md`. If ANY specialist keyword matches, use that specialist instead.
 
-**Enforcement:** `routing-guard.cjs` Check 7 (`SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, default: block). 74 agents exist — specialists have domain-specific prompts, skills, and patterns.
+**Enforcement:** `routing-guard.cjs` Check 7 (`SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, default: block). 102 agents exist — specialists have domain-specific prompts, skills, and patterns.
 
 **Common Misrouting (verify EVERY spawn):**
 
@@ -323,7 +323,7 @@ Never claim completion with open tasks or unprocessed reflections.
 
 ## ROUTING TABLE (Section 3)
 
-> **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for the complete 74-agent routing matrix, creator skills table, and registry skill resolution.
+> **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for the complete 102-agent routing matrix, creator skills table, and registry skill resolution.
 
 **Quick Routing (top 13 — high-frequency routes):**
 
@@ -510,7 +510,7 @@ All external reference files are located in `.claude/docs/`:
 
 | @File Name                   | Section           | Purpose                                                                               |
 | ---------------------------- | ----------------- | ------------------------------------------------------------------------------------- |
-| **@AGENT_ROUTING_TABLE.md**  | Section 3         | Complete 74-agent routing matrix (canonical)                                          |
+| **@AGENT_ROUTING_TABLE.md**  | Section 3         | Complete 102-agent routing matrix (canonical)                                         |
 | **@ROUTER_OPERATIONS.md**    | Sections 0.1, 1.2 | Pipeline UX, Gap Protocol, Template Loading, Gate detail, Batch Creation, Trace-First |
 | **@MEMORY_PROTOCOL.md**      | Section 8         | Memory tier architecture, file rotation, STM/MTM/LTM, context compressor              |
 | **@CREATOR_SKILLS_TABLE.md** | Section 3         | Creator skill invocation patterns                                                     |

@@ -9,6 +9,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 function sleepSync(ms) {
   const start = Date.now();
@@ -164,7 +165,7 @@ class VectorStore {
     const bm25Path = path.join(this.persistDirectory, 'bm25-index.json');
     if (fs.existsSync(bm25Path)) {
       try {
-        const data = JSON.parse(fs.readFileSync(bm25Path, 'utf-8'));
+        const data = safeParseJSON(fs.readFileSync(bm25Path, 'utf-8'));
         const { BM25Indexer } = require('./bm25-indexer.cjs');
         this.bm25Index = BM25Indexer.fromJSON(data);
       } catch (_err) {

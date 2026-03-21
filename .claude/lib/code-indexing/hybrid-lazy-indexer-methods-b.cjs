@@ -3,6 +3,7 @@
 const { spawnSync } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 let LanceDB = null;
 let Embedder = null;
 
@@ -16,7 +17,7 @@ class HybridLazyIndexerMethodsB {
     for (const line of lines) {
       if (!line) continue;
       try {
-        const data = JSON.parse(line);
+        const data = safeParseJSON(line);
 
         if (data.type === 'begin') {
           current = { file: data.data.path.text, matches: [] };
@@ -93,7 +94,7 @@ class HybridLazyIndexerMethodsB {
     if (!metadata) return {};
     if (typeof metadata === 'string') {
       try {
-        return JSON.parse(metadata);
+        return safeParseJSON(metadata);
       } catch {
         return {};
       }

@@ -12,6 +12,7 @@
 
 const { spawn } = require('child_process');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // Language mapping from Phase 1 names to ast-grep names
 const LANGUAGE_MAP = {
@@ -232,7 +233,7 @@ class AstGrepSearch {
         // ast-grep returns 0 if matches found, 1 if no matches (not an error)
         if (code === 0 || code === 1) {
           try {
-            const results = JSON.parse(stdout || '[]');
+            const results = safeParseJSON(stdout || '[]');
             const formatted = this._formatResults(results, options.maxResults);
 
             // Cache the results before returning
