@@ -579,3 +579,17 @@ Usage-frequency weighting should augment thresholds in future iteration.
 - Updated workflow: missing-workflow-xyz (2026-03-21)
 
 - Created new agent: repo-onboarder (2026-03-21)
+
+## [2026-03-21] OpenClaw Research Findings
+
+**OpenClaw** (github.com/openclaw/openclaw) is the most popular open-source agent framework (328k stars, March 2026). Key architectural patterns relevant to Agent Studio:
+
+1. **Skill format**: `SKILL.md` in skill directory — nearly identical to Agent Studio's pattern. Strong validation of our approach.
+2. **SOUL.md**: Dedicated agent identity file (separate from code). Agent persona is a first-class runtime concept.
+3. **HEARTBEAT.md + daemon**: Scheduled 30-min heartbeat for autonomous monitoring. Direct parallel to Agent Studio's heartbeat-orchestrator.
+4. **LCM (Lossless Context Manager)**: SQLite FTS5 stores every message immutably + summary DAG for compaction. More sophisticated than Agent Studio's STM/MTM/LTM rotation.
+5. **Activation/decay tiers**: Hot/warm/cool fact tiers (Hebbian-inspired). More nuanced than file-size-based rotation.
+6. **PinchBench**: Community agent benchmark — 5 dimensions: reasoning, tool use, instruction following, context retention, task completion.
+7. **ClawHub registry**: 13,729 community skills. Comparable to Agent Studio skill registry but community-extensible.
+
+Report: `.claude/context/artifacts/research-reports/openclaw-research-2026-03-21.md`

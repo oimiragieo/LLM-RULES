@@ -1,0 +1,112 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-21T00:00:00Z",
+  "models": {
+    "claude-opus-4-6": {
+      "provider": "anthropic",
+      "accuracy": {
+        "taskCompletion": 0.94,
+        "codeGeneration": 0.91,
+        "reasoning": 0.96
+      },
+      "latency": {
+        "tokensPerSecond": 45,
+        "timeToFirstToken": 850,
+        "medianResponseMs": 3200
+      },
+      "memory": {
+        "peakRamMb": 0,
+        "contextWindow": 200000,
+        "maxOutputTokens": 128000
+      },
+      "cost": {
+        "inputPer1MTokens": 5.0,
+        "outputPer1MTokens": 25.0,
+        "cachePer1MTokens": 1.25
+      },
+      "safety": {
+        "promptInjectionResistance": 0.97,
+        "refusalAppropriatenessScore": 0.95,
+        "jailbreakResistance": 0.98
+      }
+    },
+    "claude-sonnet-4-6": {
+      "provider": "anthropic",
+      "accuracy": {
+        "taskCompletion": 0.9,
+        "codeGeneration": 0.88,
+        "reasoning": 0.92
+      },
+      "latency": {
+        "tokensPerSecond": 85,
+        "timeToFirstToken": 450,
+        "medianResponseMs": 1800
+      },
+      "memory": {
+        "peakRamMb": 0,
+        "contextWindow": 200000,
+        "maxOutputTokens": 64000
+      },
+      "cost": {
+        "inputPer1MTokens": 3.0,
+        "outputPer1MTokens": 15.0,
+        "cachePer1MTokens": 0.75
+      },
+      "safety": {
+        "promptInjectionResistance": 0.95,
+        "refusalAppropriatenessScore": 0.93,
+        "jailbreakResistance": 0.96
+      }
+    },
+    "claude-haiku-4-5": {
+      "provider": "anthropic",
+      "accuracy": {
+        "taskCompletion": 0.82,
+        "codeGeneration": 0.79,
+        "reasoning": 0.84
+      },
+      "latency": {
+        "tokensPerSecond": 150,
+        "timeToFirstToken": 200,
+        "medianResponseMs": 800
+      },
+      "memory": {
+        "peakRamMb": 0,
+        "contextWindow": 200000,
+        "maxOutputTokens": 64000
+      },
+      "cost": {
+        "inputPer1MTokens": 1.0,
+        "outputPer1MTokens": 5.0,
+        "cachePer1MTokens": 0.1
+      },
+      "safety": {
+        "promptInjectionResistance": 0.9,
+        "refusalAppropriatenessScore": 0.88,
+        "jailbreakResistance": 0.92
+      }
+    }
+  },
+  "dimensions": {
+    "accuracy": {
+      "weight": 0.3,
+      "description": "Task completion rate, code generation quality, reasoning correctness"
+    },
+    "latency": {
+      "weight": 0.2,
+      "description": "Tokens per second, time to first token, median response time"
+    },
+    "memory": {
+      "weight": 0.15,
+      "description": "Peak RAM usage, context window size, max output tokens"
+    },
+    "cost": {
+      "weight": 0.2,
+      "description": "Input token cost, output token cost, cache cost"
+    },
+    "safety": {
+      "weight": 0.15,
+      "description": "Prompt injection resistance, refusal accuracy, jailbreak resistance"
+    }
+  }
+}

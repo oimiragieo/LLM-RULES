@@ -1,0 +1,16 @@
+{
+  "twitter:competitor": {
+    "handle": "@competitor",
+    "platform": "twitter",
+    "updated_at": "2026-03-21T18:30:26.086Z",
+    "window_days": 30,
+    "sample_size": 20,
+    "metrics": {
+      "avg_likes": 271.5,
+      "avg_shares": 70.3,
+      "avg_comments": 38.6,
+      "avg_engagement_rate": 11.45,
+      "total_posts": 20
+    }
+  }
+}

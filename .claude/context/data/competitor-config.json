@@ -1,0 +1,51 @@
+{
+  "competitors": [
+    {
+      "handle": "@example_competitor",
+      "platform": "twitter",
+      "baseline_window_days": 30,
+      "enabled": true
+    },
+    {
+      "handle": "example-company",
+      "platform": "linkedin",
+      "baseline_window_days": 30,
+      "enabled": true
+    },
+    {
+      "handle": "example_brand",
+      "platform": "instagram",
+      "baseline_window_days": 30,
+      "enabled": false
+    }
+  ],
+  "alert_thresholds": {
+    "multiplier": 2.0,
+    "min_engagement_count": 50,
+    "cooldown_minutes": 60
+  },
+  "notification_channels": {
+    "twilio": {
+      "enabled": false,
+      "account_sid_env": "TWILIO_ACCOUNT_SID",
+      "auth_token_env": "TWILIO_AUTH_TOKEN",
+      "from_number_env": "TWILIO_FROM_NUMBER",
+      "to_number_env": "TWILIO_TO_NUMBER"
+    },
+    "pushover": {
+      "enabled": false,
+      "user_key_env": "PUSHOVER_USER_KEY",
+      "api_token_env": "PUSHOVER_API_TOKEN",
+      "priority": 1
+    },
+    "slack": {
+      "enabled": false,
+      "webhook_url_env": "SLACK_WEBHOOK_URL",
+      "channel": "#competitor-alerts"
+    }
+  },
+  "polling": {
+    "interval_minutes": 60,
+    "max_posts_per_poll": 20
+  }
+}
