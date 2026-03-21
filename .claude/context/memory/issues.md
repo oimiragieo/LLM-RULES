@@ -1,23 +1,3 @@
-## P3: Task 16 Token Reporting Missing Error Handling (2026-03-20)
-
-**Issue**: Token reporting (Task 16) depends on external `ccusage` command availability. If command is unavailable (test environment, missing install), ccusage-statusline.cjs will fail silently or throw uncaught exception.
-**Impact**: Router may fail to display token usage, or worse, crash mid-execution if ccusage is not found.
-**Workaround**: Add try/catch in ccusage-statusline.cjs hook to gracefully degrade (log warning, continue without token display).
-**Priority**: Low (development environments typically have ccusage; production varies)
-**Status**: OPEN
-
----
-
-## P3: Task 17 Multi-LLM Review Findings Not Consolidated (2026-03-20)
-
-**Issue**: Task 17 completed multi-LLM review (Gemini + Codex external review) and fixed unused variable. Review findings from Gemini/Codex were not consolidated to learnings.md or separate findings document.
-**Impact**: External LLM insights are lost; future sessions don't know what Gemini/Codex suggested about codebase. Knowledge is trapped in task context.
-**Fix**: Create consolidation step after multi-LLM reviews: extract key findings, categorize (architectural, code quality, security), append to learnings.md + tag source (Gemini/Codex/etc).
-**Priority**: Medium (visibility/knowledge loss; low operational impact)
-**Status**: OPEN
-
----
-
 ## P1: Rule-Creator Gaps — Missing Fallback Logic
 
 **Issue**: When rule file doesn't exist, skill-creator fails silently. No manifest validation before writing.

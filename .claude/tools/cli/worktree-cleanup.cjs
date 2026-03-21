@@ -326,7 +326,13 @@ function runPhase1(activeWorktreeBranches, defaultBranch) {
   console.log(`\nPhase 1 summary: ${removed} deleted, ${skipped} skipped, ${errors} errors\n`);
 }
 
-function _runPhase2(activeWorktrees, defaultBranch, normalizedCwd, normalizedProjectRoot, normalizedWorktreesDir) {
+function _runPhase2(
+  activeWorktrees,
+  defaultBranch,
+  normalizedCwd,
+  normalizedProjectRoot,
+  normalizedWorktreesDir
+) {
   console.log('Phase 2: Stale Worktree Directory Cleanup');
   console.log('------------------------------------------');
 
@@ -385,7 +391,9 @@ function _runPhase2(activeWorktrees, defaultBranch, normalizedCwd, normalizedPro
     }
     const label = noUnique ? 'merged into main' : 'has unique commits (--force)';
     if (DRY_RUN) {
-      console.log(`  [DRY-RUN] REMOVE  ${shortPath}  [${branch}]  (${label}, dir ${ageHours}h old)`);
+      console.log(
+        `  [DRY-RUN] REMOVE  ${shortPath}  [${branch}]  (${label}, dir ${ageHours}h old)`
+      );
       removed++;
     } else {
       try {
@@ -399,9 +407,13 @@ function _runPhase2(activeWorktrees, defaultBranch, normalizedCwd, normalizedPro
         }
         const branchResult = deleteBranch(branch, defaultBranch);
         if (branchResult.success) {
-          console.log(`  REMOVED  ${shortPath}  [${branch}]  (${label}, dir ${ageHours}h old) + branch deleted`);
+          console.log(
+            `  REMOVED  ${shortPath}  [${branch}]  (${label}, dir ${ageHours}h old) + branch deleted`
+          );
         } else {
-          console.log(`  REMOVED  ${shortPath}  [${branch}]  (${label}) — WARN: branch delete: ${branchResult.error}`);
+          console.log(
+            `  REMOVED  ${shortPath}  [${branch}]  (${label}) — WARN: branch delete: ${branchResult.error}`
+          );
         }
         removed++;
       } catch (err) {

@@ -1,3 +1,39 @@
+## ADR-2026-03-21: Monolith-to-Microservices Migration Architecture Decisions (2026-03-21)
+
+**Status:** Proposed
+**Date:** 2026-03-21
+**Source:** Microservices Architect agent, general-purpose migration blueprint
+
+**Decisions (6 ADRs documented in full at monolith-to-microservices-architecture-2026-03-21.md):**
+
+1. **ADR-001: Strangler Fig as Primary Migration Strategy** -- Incremental extraction via API Gateway routing. Zero-downtime, per-service rollback. 12-18 month timeline trades speed for safety.
+2. **ADR-002: Orchestrated Sagas for Order Fulfillment** -- Central saga coordinator in Order Service for 5+ step flows. Choreography reserved for simple 2-3 step notification/audit flows.
+3. **ADR-003: Database-per-Service with CDC for Transition** -- Debezium CDC bridges monolith and new service databases during migration. Eliminates shared database anti-pattern.
+4. **ADR-004: gRPC for Internal Sync, REST for External** -- Binary efficiency for service-to-service; REST for client-facing APIs via API Gateway.
+5. **ADR-005: Event Sourcing for Order Management Only** -- Core domain gets full audit trail and temporal queries. Supporting/generic subdomains use standard CRUD + outbox pattern.
+6. **ADR-006: Defer Service Mesh Until 8+ Services** -- Linkerd adopted when cross-cutting concern management becomes a bottleneck. Application-level mTLS/retries for early services.
+
+**Artifact:** `.claude/context/artifacts/analysis/monolith-to-microservices-architecture-2026-03-21.md`
+
+---
+
+## SDR-2026-03-21: Microservices Security Architecture Decisions (2026-03-21)
+
+**Status:** Proposed
+**Date:** 2026-03-21
+**Source:** Security Architect agent, microservices migration companion review
+
+**Decisions (4 SDRs documented in full at microservices-security-architecture-2026-03-21.md):**
+
+1. **SDR-001: mTLS via Service Mesh** -- Use Istio/Linkerd mesh mTLS over application-level TLS. Transparent enforcement, automatic cert rotation, ~1-2ms latency tradeoff.
+2. **SDR-002: Token Exchange for PII Services** -- Use RFC 8693 Token Exchange (not propagation) for services handling PII/financial data. Limits blast radius of compromised tokens.
+3. **SDR-003: OPA Sidecar Authorization** -- Deploy OPA as sidecar for fine-grained authz over application-level RBAC. Git-versioned Rego policies ensure consistency.
+4. **SDR-004: Distroless Base Images** -- Default to Google Distroless for production. No shell, no pkg manager = minimal attack surface. Debug via kubectl debug.
+
+**Artifact:** `.claude/context/artifacts/analysis/microservices-security-architecture-2026-03-21.md`
+
+---
+
 ## ADR-2026-03-20-072: Path Traversal Defense Requires 6-Vector Validation (2026-03-20)
 
 **Status:** Accepted (Multi-LLM consensus)
@@ -162,199 +198,3 @@ node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | n
 **Trigger:** Security audit of all active `.claude/hooks/` files (65 files scanned).
 **Decision:** All 65 production hook files are shell:false compliant. The one `shell:true` instance in `tools/cron-runner/queue-drain.cjs` is documented-intentional (non-hook tool, trusted internal command). This establishes a verified compliance baseline as of 2026-03-11. Track any new hook additions against this baseline via CI.
 **Consequences:** shell:false baseline confirmed. Future hook authors must not use `shell:true` in production hook code. The cron-runner exception must be unit-tested to assert `writebackCmd` is assembled from hardcoded parts only.
-
----
-
-## ADR-2026-03-01-063: Python/DevOps orphaned skill wiring batch (2026-03-01)
-
-**Status:** ACCEPTED
-**Date:** 2026-03-01
-**Trigger:** Orphaned skill sweep -- 5 skills (modern-python, poetry-rye-dependency-management, pyqt6-ui-development-rules, powershell-expert, feature-flag-management) had no agent-skill-matrix entries and defaulted to developer/Other.
-**Decision:** Wire each skill to domain-appropriate agents via agent-skill-matrix.json AND agent frontmatter. modern-python primary to python-pro; poetry-rye and pyqt6 secondary/contextual to python-pro; powershell to developer+devops; feature-flags to developer+devops+qa. Update CATEGORY_MAP in generate-skill-index-definitions.cjs for correct index classification.
-**Alternatives:** Could have created dedicated domain agents for each, but skills are cross-cutting and fit better as augmentations to existing agents.
-**Consequences:** 5 fewer orphaned catalog skills. python-pro now has comprehensive Python tooling coverage. devops gains PowerShell and feature-flag capabilities.
-
-## ADR-2026-02-23-062: stale-module-pruner and proactive-audit skill-updater pass (2026-02-23)
-
-**Status:** ACCEPTED
-**Date:** 2026-02-23
-**Trigger:** User requested skill-updater on stale-module-pruner and proactive-audit.
-
-**Decision:** (1) stale-module-pruner: rewrote stub SKILL.md to v1.0.0 with real workflow (ripgrep-based dead code crawl, dry-run gate, prune report), 5 Iron Laws, 5 Anti-Patterns, Memory Protocol, 6 mandatory skills. Fixed catalog: added to Quick Reference Core Development row (16→17) since parseMarkdownTable() only reads first table. Added developer to agent assignments. (2) proactive-audit: upgraded v1.1.0→v1.2.0, added Mandatory Skills table (6 skills), updated lastVerifiedAt. Both pass validate-integration.
-
----
-
-## ADR-2026-02-22-046: Batch 35 Skill-Updater Sweep
-
-**Date:** 2026-02-22
-**Status:** Accepted
-
-**Skills updated:** recommend-evolution, requesting-code-review, research-synthesis
-
-**Changes applied:**
-
-- `recommend-evolution` (v1.0.0→v1.1.0): Set verified=true, updated lastVerifiedAt. Replaced single-law prose code block with 5 Iron Laws (never spawn orchestrator directly, always validate trigger thresholds, never request evolution for integration gaps, always dual-record to JSONL+report, never proceed without evidence). Added Anti-Patterns table (5 rows).
-- `requesting-code-review` (v1.0.0→v1.1.0): Set verified=true, updated lastVerifiedAt. Added 5 Iron Laws (always capture SHAs first, never skip review, always fix Critical before proceeding, never argue without evidence, always review at mandatory checkpoints). Added Anti-Patterns table (5 rows).
-- `research-synthesis` (v1.0.0→v1.1.0): Set verified=true, updated lastVerifiedAt. Replaced 6-law prose code block "Iron Laws of Research Synthesis" with proper 5 numbered Iron Laws (never create without research, never exceed 5 queries, never exceed 10 KB, always analyze existing codebase, always document decision sources). Added Anti-Patterns table (5 rows).
-
-All three now pass 8/0/3 validation.
-
----
-
-## ADR-2026-02-22-047: Batch 36 Skill-Updater Sweep
-
-**Date:** 2026-02-22
-**Status:** Accepted
-
-**Skills updated:** response-rater, ripgrep, scientific-skills
-
-**Changes applied:**
-
-- `response-rater` (v2.0→v2.0.0 semver fix): Set verified=true, updated lastVerifiedAt. Replaced `## Rules` prose with 5 Iron Laws (always consistent rubric, never skip justification, always use defined thresholds, never vague recommendations, always prioritize by impact). Added Anti-Patterns table (5 rows).
-- `ripgrep` (v1.1.0, updated lastVerifiedAt): Set verified=true. Fixed Check 8 false positive — removed `TODO` from `rg "TODO|FIXME|HACK|STUB"` grep example (replaced with `rg "FIXME|HACK|STUB"`). Added Iron Laws (always search:structure first, never hybrid search for audits, always rg -F before edits, never fzf in agent automation, always scope searches). Added Anti-Patterns table (5 rows).
-- `scientific-skills` (v2.17.0, updated lastVerifiedAt): Set verified=true. Added 5 Iron Laws (always query databases first, never analyze without documenting, always chain skills, never report without statistical validation, always visualize intermediate results). Added Anti-Patterns table (5 rows). Added Memory Protocol section (was missing).
-
-All three now pass 8/0/3 validation.
-
-- [shift-change handover] Decision: marker-file over PID kill (2026-03-11)
-
-## ADR-125: lsp-navigator P2 Gap in Non-Code-Primary Agents (2026-03-12)
-
-**Status:** Accepted
-**Decision:** `lsp-navigator` skill is NOT required for ops/infra/research-focused agents (researcher, ecosystem-auditor, devops, reverse-engineer, database-architect, performance-engineer, sre-engineer, incident-responder, chaos-engineer). It is a P2 enhancement for these 9 agents, not a P0/P1 compliance requirement.
-**Rationale:** These agents' primary workflows do not require compiler-level symbol navigation. LSP is most valuable for agents doing deep code authoring or refactoring (developer, code-reviewer, architect, qa, code-simplifier, security-architect, typescript-pro, etc.). Forcing lsp-navigator on ops/infra agents adds noise to their skills list without functional benefit.
-**Evidence:** Agent wiring compliance audit 2026-03-11 — all 18 code-work agents that do need LSP already have it. The 9 agents missing it have ops/infra/research primary workflows.
-**Next action:** Add lsp-navigator to these 9 agents in next agent update cycle (non-urgent).
-
-## ADR-2026-03-12-066: Extend drain gate to include reflection queue check
-
-**Date:** 2026-03-12
-**Status:** Decided
-
-**Problem:** Reflections queued during a pipeline (via TaskUpdate post-tool hooks) are not caught until the next UserPromptSubmit, because Step 0 only fires on new user messages. Router writes deliverable before reflections are processed.
-
-**Decision:** The Completion Reporting drain gate (CLAUDE.md Section 2) must include a reflection queue check as step 3:
-
-1. TaskList() → zero tasks
-2. Read reflection-spawn-request.json → if entries > 0, spawn reflection-agents BEFORE writing deliverable
-3. Only then write the completion summary
-
-**Why not a per-prompt validator:** Expensive (fires on every response). The drain gate check is free — it only costs 1 file read at natural pipeline completion points, not on every single router response.
-
-**Implementation needed:**
-
-- Update CLAUDE.md "Completion Reporting (Drain Gate)" section
-- Update router-decision.md Step drain gate
-- No hook changes needed — infrastructure already works correctly
-
-**Root cause of 2026-03-12 incident:** Drain gate only checked TaskList(), not reflection queue. 5 reflections left unprocessed until next UserPromptSubmit.
-
-## ADR-2026-03-16-001: task-manager Wired into Router Drain Gate (2026-03-16)
-
-**Status:** Accepted & Implemented (commit 49b9e851)
-**Context:** HIGH/EPIC pipelines accumulated stale tasks post-completion with no automated cleanup.
-**Decision:** task-manager (haiku model) spawned in drain gate Step 2.5 when: stale-tasks.json has unclosed entries, TaskList shows in_progress tasks after all agents returned, gap-log has >3 stale entries, or user requests task audit.
-**4-file wiring pattern for new router agents:** CLAUDE.md + @AGENT_ROUTING_TABLE.md + routing-table-core-map.cjs + intent-keywords-data.cjs — all 4 required.
-**Consequences:** Agent registry at 101 agents. Router drain gate now 3 steps: task drain → reflection queue → task hygiene check.
-
----
-
-## Task 11: Ecosystem Audit Decision Log
-
-### ADR-107: Hook Exit Code Enforcement (CRITICAL)
-
-**Decision:** All security hooks (fail-closed category) MUST exit 2 on block, not 0.
-
-**Rationale:** Exit code 0 is interpreted as "success/allow" by hook executor. Exit 1 is treated as non-block (transient error). Exit 2 is the canonical block signal per Unix tradition.
-
-**Status:** ADOPTED (fixes applied to router-tool-lockdown.cjs, write-pretool-bundle.cjs)
-
-**Files Updated:** `.claude/hooks/routing/router-tool-lockdown.cjs`, `.claude/hooks/safety/write-pretool-bundle.cjs`
-
-**Impact:** Security-critical; prevents bypass of framework protections
-
----
-
-### ADR-108: Multi-Model Review Gate for Security Fixes
-
-**Decision:** All security and infrastructure fixes must be validated by external LLM (Codex/Claude CLI) before commit.
-
-**Rationale:** Single-model review (human reading code) misses logical flaws. Multi-model consensus (Gemini/Codex validating each other) catches false positives and hallucinations.
-
-**Status:** RECOMMENDED (used in Task 11, validated as effective)
-
-**Process:** After applying fix, run `gemini-cli --check-fix-correctness` or equivalent before git commit
-
-**Reuse:** Apply to all future security/infrastructure work (P0 pattern)
-
----
-
-### ADR-109: Ecosystem Audit Cycle (QUARTERLY)
-
-**Decision:** Run comprehensive ecosystem audit every release cycle (quarterly minimum). Use 4-phase decomposition (structural → strategic → implementation → validation).
-
-**Rationale:** Framework health degrades silently between audits. 12-finding batch (6 fixed, 3 cosmetic, 3 open) shows gaps accumulate faster than quarterly cycle.
-
-**Status:** RECOMMENDED
-
-**Scope:** All 74 agents, hooks, skills, workflows; focus on compliance (tool usage, memory protocol, release gates)
-
-**Next audit:** 2026-06-20 (3 months from Task 11)
-
----
-
-### ADR-110: Release Gate Pipeline (6-GATE MANDATORY)
-
-**Decision:** All release candidates MUST pass 6 consecutive gates: lint → format → tests → validation → CHANGELOG → .env.example
-
-**Rationale:** Any single gate failure indicates technical debt accumulation. 6-gate pipeline catches 95%+ of pre-release regressions.
-
-**Status:** ADOPTED (all gates passed Task 11)
-
-**Implementation:** Add git pre-push hook (`hooks/pre-push/release-gate-check.sh`) that runs all 6 gates; fail fast on any gate
-
-**Files:** `.claude/hooks/pre-push/` (to be created)
-
-**Reuse:** CRITICAL — apply to all future work
-
----
-
-### ADR-111: TDD Skill Evolution = Research + Multi-Model Review
-
-**Decision:** All skill updates (especially TDD, testing, debugging) require (1) arXiv/academic research backing, (2) multi-model review consensus, (3) explicit section additions to SKILL.md
-
-**Rationale:** TDD is foundational; updates must reflect current industry standards (2026+). Single-model review misses missed patterns; research validation prevents outdated guidance.
-
-**Status:** ADOPTED (TDAD + spec-gaming sections added per arXiv:2603.17973)
-
-**Process:** Invoke research-synthesis + multi-model review before skill update commit
-
-**Scope:** All skills (not just TDD); extend pattern to agent prompts, workflow instructions
-
----
-
-### ADR-112: Worktree Cleanup = Event + TTL Hybrid
-
-**Decision:** Automated worktree cleanup must be event-driven (TaskUpdate trigger) AND time-driven (TTL polling). Never event-only.
-
-**Rationale:** Event-only cleanup fails when event is not emitted (native Claude Code spawns skip TaskUpdate). TTL-only cleanup causes unnecessary work. Hybrid is robust.
-
-**Status:** ADOPTED (SessionEnd hook + mtime fallback implemented)
-
-**Files:** `.claude/tools/cli/worktree-prune.cjs`, `.claude/settings.json` (SessionEnd hook)
-
-**Lesson:** All cleanup hooks should follow this hybrid pattern
-
----
-
-### ADR-113: Reflection Atomic Handshake (CRITICAL)
-
-**Decision:** Reflection queue processing MUST use atomic handshake: reflection-agent calls TaskUpdate(completed, { processedReflectionIds: [...] }) before returning. Cleanup hook only removes entries with processedReflectionIds field.
-
-**Rationale:** Prevents duplicate reflection processing in long-running EPIC pipelines. Essential for distributed reflection systems (multiple background agents).
-
-**Status:** ADOPTED (implemented and validated in reflection system)
-
-**Process:** This is NOT optional; all reflection spawns must follow this pattern
-
-**Impact:** CRITICAL for EPIC-scale ecosystem work (like Task 11)

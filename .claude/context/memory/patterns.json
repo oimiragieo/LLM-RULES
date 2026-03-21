@@ -449,5 +449,17 @@
     "dedupStatus": "create",
     "id": "8ad09b7e412ede2d9d373d8911cc56234fda134e",
     "importance": 0.8
+  },
+  {
+    "text": "BMAD-Method comparison as external validation: cross-referencing framework against external AI methodology (BMAD-METHOD) surfaces architectural gaps invisible to self-referential internal audit. Applied in EPIC ecosystem audit 2026-03-21 — produced project-context.md for consistent AI agent behavior and confirmed 102-agent registry.",
+    "area": "framework",
+    "timestamp": "2026-03-21T18:10:25.057Z",
+    "id": "pattern-bmad-external-validation-2026-03-21"
+  },
+  {
+    "text": "Destructive CLI safety pattern: always default to dry-run, require explicit --execute flag for destructive action, include age guard (min 2h) for recently-created resources, refuse deletion if resource has unique commits vs main. Reference: worktree-cleanup.cjs (590 lines, 2026-03-21 commit 9f3a9e3e).",
+    "area": "tooling",
+    "timestamp": "2026-03-21T18:10:25.057Z",
+    "id": "pattern-destructive-cli-safety-2026-03-21"
   }
 ]

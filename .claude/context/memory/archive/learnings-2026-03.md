@@ -1013,3 +1013,51 @@ Pattern reuse: MEDIUM — document in spawn templates, recommend non-worktree fo
 - Architect GO at 47 features / 5 phases — plan at `.claude/context/plans/framework-upgrade-plan-2026-03-17.md`
 - Phase buffer: timeline +30-50% vs initial estimate (multi-LLM review identified scope underestimation)
 - Priority adjustments from review: D1 P0→P1, C1 P0→P1, A2 P1→P0, D8 P1→P0
+
+---
+
+## EPIC Ecosystem Audit Delivery Patterns (2026-03-21) [Task 7, commit 9f3a9e3e]
+
+**[SECURITY] Hook Exit-Code Enforcement: Silent Bypass via exit 0**
+
+- Root cause of ISS-1 and ISS-6: `router-tool-lockdown.cjs` and `write-pretool-bundle.cjs` had block paths using `process.exit(0)` instead of `process.exit(2)`
+- Impact: ALL block verdicts were silently allowed by Claude Code runtime — hooks appeared to work but never actually blocked
+- Fix: audit every PreToolUse hook for `process.exit(0)` in block paths; replace with `process.exit(2)`
+- Pattern: security hooks MUST exit 2 to block, exit 0 to allow — exit 1 is treated as error (not block)
+
+**[WORKFLOW] BMAD Comparison as External Validation Methodology**
+
+- Comparing framework against BMAD-METHOD (external AI agent methodology) surfaced gaps invisible to internal audit
+- Key output: project-context.md added for consistent AI agent behavior (from BMAD) + 102-agent registry confirmed
+- Pattern: annual cross-methodology comparison is higher-signal than self-referential audit alone
+
+**[TOOLING] Worktree Cleanup CLI Safety Pattern**
+
+- `worktree-cleanup.cjs` (590 lines): dry-run default, `--execute` required for destructive action, age guard (2h min), unique-commit safety check
+- SE-01 compliance: all paths normalized with `.replace(/\\/g, '/')`
+- SE-02 compliance: all execFileSync calls use `shell: false` with array args
+- Pattern: all destructive maintenance CLIs should default to dry-run, require explicit `--execute`, and refuse branches with unique commits
+
+---
+
+## Closed-Loop Evolution Trigger Implementation (2026-03-17) [Task 11, commit a681c4df]
+
+**[FRAMEWORK] reflection-agent Step 5.7: Score-Triggered Agent Evolution**
+
+- Step 5.7 added to reflection-agent: uses `reflection-score-tracker.cjs` to check consecutive low scores (threshold: 3)
+- On 3+ consecutive lows: queues agent-updater evolution request to `.claude/context/runtime/reflection-spawn-request.json`
+- Circuit breaker: `isEvolutionEligible()` enforces 24h cooldown per agent (prevents thrashing)
+- Protected agents (NEVER auto-evolve): router, planner, master-orchestrator, evolution-orchestrator
+- Score trend reporting: declining → `[TREND-ALERT]` to learnings.md; improving/stable → no action
+- Companion files: `reflection-score-tracker.cjs` + `tests/lib/reflection-score-tracker.test.cjs` (17 tests, all passing)
+- Validation passed: lint + format + 17 tests green before commit
+
+---
+
+## Codebase Exploration Skill: 7-Phase Protocol (2026-03-17) [Task 12, 14, commits b7ec5577/3c01f782/1f5e6583]
+
+**[CODE] codebase-exploration skill creation pipeline**
+
+- Skill created at `.claude/skills/codebase-exploration/SKILL.md` (7-phase protocol)
+- Phase progression: (1) token budget assessment, (2) repo map, (3) entry point identification, (4) dependency graph, (5) hot module identification, (6) targeted deep reads, (7) synthesis
+- Key LLM-agent codebase exploration research (task 12): synthesized 12+ sources incl. SWE-bench, LocAgent, Complexity Trap, Aider, Cursor, OpenHands → 6-phase protocol with token budgets

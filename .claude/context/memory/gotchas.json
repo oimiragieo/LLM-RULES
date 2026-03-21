@@ -140,5 +140,11 @@
     "dedupStatus": "create",
     "id": "1c46997f01b032462ea2c8b80ff1d8b2a5cb8932",
     "importance": 0.6
+  },
+  {
+    "text": "Hook exit-code silent bypass: PreToolUse hooks using process.exit(0) in their block path silently ALLOW the operation — Claude Code runtime treats exit 0 as allow. Only exit 2 blocks. Exit 1 is treated as error (not block). Caused ISS-1 (router-tool-lockdown.cjs) and ISS-6 (write-pretool-bundle.cjs — 7 block paths all silently allowed). Fix: audit every PreToolUse hook block path for exit 0 and replace with exit 2.",
+    "area": "security",
+    "timestamp": "2026-03-21T18:10:33.007Z",
+    "id": "gotcha-hook-exit-code-silent-bypass-2026-03-21"
   }
 ]

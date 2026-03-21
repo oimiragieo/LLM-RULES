@@ -1,27 +1,3 @@
-## Closed-Loop Evolution Trigger Implementation (2026-03-17) [Task 11, commit a681c4df]
-
-**[FRAMEWORK] reflection-agent Step 5.7: Score-Triggered Agent Evolution**
-
-- Step 5.7 added to reflection-agent: uses `reflection-score-tracker.cjs` to check consecutive low scores (threshold: 3)
-- On 3+ consecutive lows: queues agent-updater evolution request to `.claude/context/runtime/reflection-spawn-request.json`
-- Circuit breaker: `isEvolutionEligible()` enforces 24h cooldown per agent (prevents thrashing)
-- Protected agents (NEVER auto-evolve): router, planner, master-orchestrator, evolution-orchestrator
-- Score trend reporting: declining → `[TREND-ALERT]` to learnings.md; improving/stable → no action
-- Companion files: `reflection-score-tracker.cjs` + `tests/lib/reflection-score-tracker.test.cjs` (17 tests, all passing)
-- Validation passed: lint + format + 17 tests green before commit
-
----
-
-## Codebase Exploration Skill: 7-Phase Protocol (2026-03-17) [Task 12, 14, commits b7ec5577/3c01f782/1f5e6583]
-
-**[CODE] codebase-exploration skill creation pipeline**
-
-- Skill created at `.claude/skills/codebase-exploration/SKILL.md` (7-phase protocol)
-- Phase progression: (1) token budget assessment, (2) repo map, (3) entry point identification, (4) dependency graph, (5) hot module identification, (6) targeted deep reads, (7) synthesis
-- Key LLM-agent codebase exploration research (task 12): synthesized 12+ sources incl. SWE-bench, LocAgent, Complexity Trap, Aider, Cursor, OpenHands → 6-phase protocol with token budgets
-
----
-
 ## Spawn Protocol Enforcement Batch (2026-03-20) [Tasks 15-18, commit fe75e181]
 
 **[WORKFLOW] TaskList-first + TaskUpdate atomicity + token visibility hardening**
