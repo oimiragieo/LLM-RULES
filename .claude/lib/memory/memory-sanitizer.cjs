@@ -142,18 +142,37 @@ function extractCodeBlocks(content) {
 }
 
 /**
+ * Strip prototype pollution keys (__proto__, constructor, prototype) from content.
+ *
+ * @param {string} contentStr - Content string to clean
+ * @returns {string} Content with prototype pollution patterns removed
+ */
+function stripPrototypePollution(contentStr) {
+  // Remove __proto__ assignments and JSON keys
+  let cleaned = contentStr.replace(/\.__proto__\s*=[^;\n]*/g, '');
+  cleaned = cleaned.replace(/["'`]__proto__["'`]\s*:\s*[^,}\n]*/g, '');
+  // Remove constructor.prototype manipulation
+  cleaned = cleaned.replace(/constructor\.prototype[^;\n]*/g, '');
+  // Remove standalone __proto__, constructor, prototype JSON keys
+  cleaned = cleaned.replace(/["'`](constructor|prototype)["'`]\s*:\s*[^,}\n]*/g, '');
+  return cleaned;
+}
+
+/**
  * Sanitize memory content by detecting dangerous patterns
  *
  * @param {string} content - Memory content to sanitize
- * @returns {Object} { safe: boolean, original: string, detections: string[] }
+ * @returns {Object} { safe: boolean, sanitized: string, original: string, detections: string[] }
  *   - safe: true if no dangerous patterns detected
- *   - original: the original input content (unchanged); field name makes clear this is NOT sanitized output
+ *   - sanitized: cleaned content with prototype pollution keys stripped
+ *   - original: the original input content (unchanged)
  *   - detections: array of detected dangerous pattern descriptions
  *
  * @example
  * const result = sanitizeMemoryContent('Run: rm -rf /tmp');
  * // result.safe = false
- * // result.original = 'Run: rm -rf /tmp'  (the original, not cleaned content)
+ * // result.original = 'Run: rm -rf /tmp'
+ * // result.sanitized = 'Run: rm -rf /tmp' (cleaned of proto pollution if any)
  * // result.detections = ['shell injection: rm -rf command']
  */
 function sanitizeMemoryContent(content) {
@@ -194,16 +213,20 @@ function sanitizeMemoryContent(content) {
     );
   }
 
+  // Produce actually sanitized content (strip prototype pollution keys)
+  const sanitized = stripPrototypePollution(contentStr);
+
   return {
     safe: detections.length === 0,
-    sanitized: contentStr,
-    original: contentStr, // Renamed from 'sanitized': this is the original content, not a cleaned version
+    sanitized,
+    original: contentStr,
     detections,
   };
 }
 
 module.exports = {
   sanitizeMemoryContent,
+  stripPrototypePollution, // Export for testing
   DANGEROUS_PATTERNS, // Export for testing
   extractCodeBlocks, // Export for testing
 };

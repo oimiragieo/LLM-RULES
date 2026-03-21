@@ -106,7 +106,7 @@ Before starting this workflow:
 ```javascript
 Task({
   task_id: 'task-1',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Architect checking if artifact exists locally',
   prompt: `You are the ARCHITECT agent.
 
@@ -194,7 +194,7 @@ Always record in pre-check-results.md:
 ```javascript
 Task({
   task_id: 'task-2',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Developer cloning external artifact to isolated temp directory',
   prompt: `You are the DEVELOPER agent.
 
@@ -244,7 +244,7 @@ Clone external artifact to isolated temporary directory for validation.
 ```javascript
 Task({
   task_id: 'task-3',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Architect analyzing source artifact structure',
   prompt: `You are the ARCHITECT agent.
 
@@ -291,7 +291,7 @@ Analyze the structure and contents of the isolated external artifact.
 ```javascript
 Task({
   task_id: 'task-4',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Architect analyzing framework target location',
   prompt: `You are the ARCHITECT agent.
 
@@ -346,7 +346,7 @@ Analyze the target location in the framework where artifact will be integrated.
 ```javascript
 Task({
   task_id: 'task-5',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Planner creating integration plan',
   prompt: `You are the PLANNER agent.
 
@@ -406,7 +406,7 @@ Create a detailed plan for integrating the external artifact into the framework.
 ```javascript
 Task({
   task_id: 'task-6',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Architect reviewing integration plan for structural alignment',
   prompt: `You are the ARCHITECT agent.
 
@@ -456,7 +456,7 @@ Review integration plan for framework structural alignment and compatibility.
 ```javascript
 Task({
   task_id: 'task-7',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'Security Architect reviewing for vulnerabilities and supply chain risks',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -575,7 +575,7 @@ Review external artifact for security vulnerabilities and supply chain risks.
 ```javascript
 Task({
   task_id: 'task-8',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Planner consolidating review feedback into updated plan',
   prompt: `You are the PLANNER agent.
 
@@ -633,7 +633,7 @@ Update integration plan based on architect and security reviews.
 ```javascript
 Task({
   task_id: 'task-9',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Creator agent executing integration from temp to framework',
   prompt: `You are the {{CREATOR_AGENT}} agent.
 
@@ -701,7 +701,7 @@ Execute the integration plan to move artifact from temp to framework location.
 ```javascript
 Task({
   task_id: 'task-10',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Developer cleaning up temporary integration directory',
   prompt: `You are the DEVELOPER agent.
 
@@ -752,7 +752,7 @@ Clean up temporary directory after successful integration.
 ```javascript
 Task({
   task_id: 'task-11',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'QA verifying integration works correctly',
   prompt: `You are the QA agent.
 
@@ -949,7 +949,7 @@ After each phase, verify:
 ```javascript
 Task({
   task_id: 'task-12',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Developer executing rollback of failed integration',
   prompt: `You are the DEVELOPER agent.
 
@@ -1109,7 +1109,7 @@ This workflow can be adapted for:
 // Router spawning external-integration workflow
 Task({
   task_id: 'task-13',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Orchestrating external-integration workflow',
   prompt: `Execute external-integration workflow.
 

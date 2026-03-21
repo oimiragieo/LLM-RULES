@@ -59,7 +59,7 @@ This workflow performs comprehensive architecture reviews by:
 ```javascript
 Task({
   task_id: 'task-1',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Exploring codebase structure for architecture review',
   prompt: `You are the DEVELOPER agent in exploration mode.
 
@@ -101,7 +101,7 @@ Explore codebase structure to gather context for architecture review.
 ```javascript
 Task({
   task_id: 'task-2',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Auditing existing architecture documentation',
   prompt: `You are the DEVELOPER agent.
 
@@ -155,7 +155,7 @@ Audit existing architecture documentation.
 ```javascript
 Task({
   task_id: 'task-3',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus', // Complex reasoning required
   description: 'Analyzing architectural patterns and quality',
   prompt: `You are the ARCHITECT agent.
@@ -210,7 +210,7 @@ Analyze architectural patterns and quality metrics.
 ```javascript
 Task({
   task_id: 'task-4',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Assessing technical debt and maintenance burden',
   prompt: `You are the ARCHITECT agent.
 
@@ -277,7 +277,7 @@ Assess technical debt and maintenance burden.
 ```javascript
 Task({
   task_id: 'task-5',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus', // Security requires careful reasoning
   description: 'Security architecture review',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -334,7 +334,7 @@ Perform comprehensive security architecture review.
 ```javascript
 Task({
   task_id: 'task-6',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Scanning dependencies for known vulnerabilities',
   prompt: `You are the SECURITY-ARCHITECT agent.
 
@@ -388,7 +388,7 @@ Scan dependencies for security vulnerabilities.
 ```javascript
 Task({
   task_id: 'task-7',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Consolidating architecture review findings',
   prompt: `You are the CODE-REVIEWER agent.
 
@@ -544,7 +544,7 @@ The architecture review is complete when:
 // Router spawning architecture review workflow
 Task({
   task_id: 'task-8',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Executing architecture review workflow',
   prompt: `Execute architecture review workflow.
 

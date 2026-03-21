@@ -35,7 +35,7 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 1. Incident Detection and Classification
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "You are the INCIDENT-RESPONDER agent. Read .claude/agents/specialized/incident-responder.md
 
 ## Instructions
@@ -48,7 +48,7 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 2. Observability Analysis
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "You are the DEVOPS-TROUBLESHOOTER agent. Read .claude/agents/specialized/devops-troubleshooter.md
 
 ## Instructions
@@ -62,7 +62,7 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 3. Initial Mitigation
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "You are the INCIDENT-RESPONDER agent. Read .claude/agents/specialized/incident-responder.md
 
 ## Instructions
@@ -77,7 +77,7 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 4. Deep System Debugging
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "You are the DEVOPS-TROUBLESHOOTER agent. Read .claude/agents/specialized/devops-troubleshooter.md
 
 ## Instructions
@@ -90,7 +90,7 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 5. Security Assessment
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "You are the SECURITY-ARCHITECT agent. Read .claude/agents/specialized/security-architect.md
 
 ## Instructions
@@ -103,7 +103,7 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 6. Performance Engineering Analysis
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "Analyze performance aspects of incident: $ARGUMENTS. Examine: 1) Resource utilization patterns, 2) Query optimization opportunities, 3) Caching effectiveness, 4) Load balancer health, 5) CDN performance, 6) Autoscaling triggers. Identify bottlenecks and capacity issues."
 - Output: Performance bottlenecks, resource recommendations, optimization opportunities
 - Context: Debug findings, current mitigation state
@@ -112,7 +112,7 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 7. Fix Implementation
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "You are the DEVELOPER agent. Read .claude/agents/core/developer.md
 
 ## Instructions
@@ -125,7 +125,7 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 8. Deployment and Validation
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "Execute emergency deployment for incident fix: $ARGUMENTS. Process: 1) Blue-green or canary deployment, 2) Progressive rollout with monitoring, 3) Health check validation at each stage, 4) Rollback triggers configured, 5) Real-time monitoring during deployment. Coordinate with incident command."
 - Output: Deployment status, validation results, monitoring dashboard, rollback readiness
 - Context: Fix implementation, current system state
@@ -134,14 +134,14 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 9. Stakeholder Communication
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "Manage incident communication for: $ARGUMENTS. Create: 1) Status page updates (public-facing), 2) Internal engineering updates (technical details), 3) Executive summary (business impact/ETA), 4) Customer support briefing (talking points), 5) Timeline documentation with key decisions. Update every 15-30 minutes based on severity."
 - Output: Communication artifacts, status updates, stakeholder briefings, timeline log
 - Context: All previous phases, current resolution status
 
 ### 10. Customer Impact Assessment
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "Assess and document customer impact for incident: $ARGUMENTS. Analyze: 1) Affected user segments and geography, 2) Failed transactions or data loss, 3) SLA violations and contractual implications, 4) Customer support ticket volume, 5) Revenue impact estimation. Prepare proactive customer outreach list."
 - Output: Customer impact report, SLA analysis, outreach recommendations
 - Context: Resolution progress, communication status
@@ -150,14 +150,14 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 11. Blameless Postmortem
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "Conduct blameless postmortem for incident: $ARGUMENTS. Document: 1) Complete incident timeline with decisions, 2) Root cause and contributing factors (systems focus), 3) What went well in response, 4) What could improve, 5) Action items with owners and deadlines, 6) Lessons learned for team education. Follow SRE postmortem best practices."
 - Output: Postmortem document, action items list, process improvements, training needs
 - Context: Complete incident history, all agent outputs
 
 ### 12. Monitoring and Alert Enhancement
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "You are the DEVOPS-TROUBLESHOOTER agent. Read .claude/agents/specialized/devops-troubleshooter.md
 
 ## Instructions
@@ -170,7 +170,7 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 
 ### 13. System Hardening
 
-- Use Task tool with subagent_type="general-purpose"
+- Use Task tool with subagent_type="developer"
 - Prompt: "Design system improvements to prevent incident: $ARGUMENTS. Propose: 1) Architecture changes for resilience (circuit breakers, bulkheads), 2) Graceful degradation strategies, 3) Capacity planning adjustments, 4) Technical debt prioritization, 5) Dependency reduction opportunities. Create implementation roadmap."
 - Output: Architecture improvements, resilience patterns, technical debt items, roadmap
 - Context: Postmortem action items, performance analysis

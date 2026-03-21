@@ -516,7 +516,7 @@ This precedence prevents generic regex matches from overriding explicit keyword 
 ```javascript
 Task({
   task_id: 'task-2',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'Party orchestrator coordinating team discussion',
   allowed_tools: [
@@ -693,7 +693,7 @@ Non-negotiable routing requirements in this mode:
 // Example: Bug fix
 Task({
   task_id: 'task-3',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'sonnet',
   description: 'Developer fixing login bug',
   prompt: `You are the DEVELOPER agent.
@@ -753,7 +753,7 @@ If any condition fails, fall back to phased/sequential spawn.
 // Example: Security-sensitive feature
 Task({
   task_id: 'task-4',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'sonnet',
   description: 'Planner designing payment feature',
   prompt: `You are the PLANNER agent.
@@ -777,7 +777,7 @@ Design payment processing feature.
 
 Task({
   task_id: 'task-5',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus', // Use opus for security review
   description: 'Security reviewing payment design',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -894,7 +894,7 @@ Triage → Dynamic Creation → Design → Implement → Review → Deploy → D
 
 | Phase             | Agents                                             |
 | ----------------- | -------------------------------------------------- |
-| PHASE_0_TRIAGE    | general-purpose                                    |
+| PHASE_0_TRIAGE    | developer                                          |
 | PHASE_1_DESIGN    | architect, planner, security-architect (high risk) |
 | PHASE_2_IMPLEMENT | developer, domain experts                          |
 | PHASE_3_REVIEW    | code-reviewer, security-architect (high risk)      |
@@ -956,7 +956,7 @@ if (workflowState) {
 // Spawn explorer(s) - can be parallel if independent areas
 Task({
   task_id: 'task-6',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Exploring codebase for feature context',
   prompt: `You are the ARCHITECT agent in exploration mode.
 
@@ -985,7 +985,7 @@ Explore codebase to understand {area_of_interest}.
 ```javascript
 Task({
   task_id: 'task-7',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Planner creating feature plan',
   prompt: `You are the PLANNER agent.
 
@@ -1016,7 +1016,7 @@ Create plan for {feature_name} based on exploration findings.
 // Spawn BOTH reviewers in same response for parallel execution
 Task({
   task_id: 'task-8',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Architect reviewing plan',
   prompt: `You are the ARCHITECT agent.
 
@@ -1039,7 +1039,7 @@ Review plan for architectural concerns.
 
 Task({
   task_id: 'task-9',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'Security reviewing plan',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -1070,7 +1070,7 @@ Review plan for security concerns.
 // For plans: Consolidate reviews
 Task({
   task_id: 'task-10',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Consolidating review feedback',
   prompt: `You are the PLANNER agent in consolidation mode.
 
@@ -1096,7 +1096,7 @@ Update plan based on architect and security reviews.
 // For implementation: Execute the plan
 Task({
   task_id: 'task-11',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Implementing approved plan',
   prompt: `You are the DEVELOPER agent.
 
@@ -1128,7 +1128,7 @@ Implement {feature_name} according to approved plan.
 ```javascript
 Task({
   task_id: 'task-12',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   run_in_background: true,
   description: 'QA running full test suite',
   prompt: `You are the QA agent.
@@ -1167,7 +1167,7 @@ Run full test suite and report results.
 // Example: Use haiku for quick syntax check
 Task({
   task_id: 'task-13',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'haiku',
   description: 'Quick syntax validation',
   prompt: '...',
@@ -1176,7 +1176,7 @@ Task({
 // Example: Use opus for security review
 Task({
   task_id: 'task-14',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'Security architecture review',
   prompt: '...',
@@ -1446,7 +1446,7 @@ Task({
    ```javascript
    Task({
      task_id: 'task-16',
-     subagent_type: 'general-purpose', // REQUIRED
+     subagent_type: 'developer', // REQUIRED
      description: 'Brief description', // REQUIRED
      prompt: '...', // REQUIRED
      model: 'sonnet', // optional
@@ -1455,7 +1455,7 @@ Task({
    ```
 
 2. **Verify subagent_type is valid:**
-   Valid types: `general-purpose`, `Explore`, `Plan`, `Bash`, `code-reviewer`,
+   Valid types: `developer`, `Explore`, `Plan`, `Bash`, `code-reviewer`,
    `security-architect`, `devops`, `architect`, `developer`, `qa`
 
 3. **Ensure prompt includes:**
@@ -1476,7 +1476,7 @@ Task({ task_id: 'task-17', prompt: 'Do something' });
 // FIXED:
 Task({
   task_id: 'task-18',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Doing something specific',
   prompt: `You are the DEVELOPER agent.
 

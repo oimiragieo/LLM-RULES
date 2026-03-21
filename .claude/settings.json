@@ -93,7 +93,7 @@
         ]
       },
       {
-        "matcher": "Bash",
+        "matcher": "Bash|mcp__shell__|mcp__exec__|mcp__terminal__",
         "hooks": [
           {
             "type": "command",

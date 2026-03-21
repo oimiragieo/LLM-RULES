@@ -994,3 +994,22 @@ Pattern reuse: MEDIUM — document in spawn templates, recommend non-worktree fo
 - Feature count validation (51 raw → 47 verified) requires explicit de-duplication step
 - Timeline overestimate risk identified: complex frameworks need +30-50% buffer
 - DAG-based memory structure (tasks → subtasks → features) useful for tracking but overkill for flat feature lists; recommend file-based consolidation for future pipelines
+
+---
+
+## 8-Framework Analysis Pipeline Pattern (2026-03-17) [Tasks 4-7, batch reflection]
+
+**[WORKFLOW] Multi-Framework Research → Synthesis → Multi-LLM Review → Architect GO**
+
+- Pipeline: clone/read 8 frameworks → deep-dive researchers (parallel) → synthesizer → Codex+Gemini review → architect review → implementation plan
+- This pattern extracts 51 raw features that compress to 47 verified features after multi-LLM review
+- Feature count discrepancy detection: Codex found 61 vs claimed 51 — root cause was Codex counting sub-items as features. Resolution: re-count from primary source, confirm with Gemini
+- Architecture contradiction detection: H1 (skill invocation via Skill() tool) conflicts with "auto-discovery" concept from frameworks; resolution: preserve mandatory Skill() invocation, deprecate auto-discovery
+- Multi-LLM review gate is highly effective — both Gemini and Codex independently read actual repo files before commenting (not hallucinated), producing concrete actionable feedback
+- Key Gemini+Codex consensus items from 2026-03-17 session: (1) add repo map generation, (2) use token-budget gate not file count, (3) need synthesis agent for cross-cutting concerns
+
+**[WORKFLOW] Feature Planning: 5-Phase Over 47 Features**
+
+- Architect GO at 47 features / 5 phases — plan at `.claude/context/plans/framework-upgrade-plan-2026-03-17.md`
+- Phase buffer: timeline +30-50% vs initial estimate (multi-LLM review identified scope underestimation)
+- Priority adjustments from review: D1 P0→P1, C1 P0→P1, A2 P1→P0, D8 P1→P0

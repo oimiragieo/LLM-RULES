@@ -71,7 +71,7 @@ This workflow provides a systematic approach to security assessment that covers 
 ```javascript
 Task({
   task_id: 'task-1',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'Threat modeling - attack surface identification',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -114,7 +114,7 @@ For each entry point, analyze:
 ```javascript
 Task({
   task_id: 'task-2',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'Threat prioritization using DREAD',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -153,7 +153,7 @@ Prioritize threats identified in attack surface analysis.
 ```javascript
 Task({
   task_id: 'task-3',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'OWASP Top 10 vulnerability analysis',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -236,7 +236,7 @@ Scan codebase for OWASP Top 10 (2021) vulnerabilities.
 ```javascript
 Task({
   task_id: 'task-4',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Secrets and credentials scanning',
   prompt: `You are the SECURITY-ARCHITECT agent.
 
@@ -273,7 +273,7 @@ Scan for exposed secrets and credentials.
 ```javascript
 Task({
   task_id: 'task-5',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Dependency CVE analysis',
   prompt: `You are the DEVELOPER agent.
 
@@ -310,7 +310,7 @@ Audit all dependencies for known vulnerabilities.
 ```javascript
 Task({
   task_id: 'task-6',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Supply chain security analysis',
   prompt: `You are the SECURITY-ARCHITECT agent.
 
@@ -348,7 +348,7 @@ Analyze supply chain security risks.
 ```javascript
 Task({
   task_id: 'task-7',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Automated penetration testing',
   prompt: `You are the SECURITY-ARCHITECT agent.
 
@@ -387,7 +387,7 @@ Execute automated vulnerability tests on identified attack surfaces.
 ```javascript
 Task({
   task_id: 'task-8',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Manual security testing scenarios',
   prompt: `You are the SECURITY-ARCHITECT agent.
 
@@ -422,7 +422,7 @@ Design manual security test scenarios for complex vulnerabilities.
 ```javascript
 Task({
   task_id: 'task-9',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'Vulnerability prioritization and remediation planning',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -455,7 +455,7 @@ Consolidate all findings and create prioritized remediation plan.
 ```javascript
 Task({
   task_id: 'task-10',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Create security fix tickets',
   prompt: `You are the SECURITY-ARCHITECT agent.
 
@@ -551,7 +551,7 @@ The following conditions BLOCK deployment:
 // Router spawning security audit workflow
 Task({
   task_id: 'task-11',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'Orchestrating security audit workflow',
   prompt: `Execute security architect workflow.

@@ -457,7 +457,7 @@ As a Router, you would coordinate this workflow like:
 // (repeat for each directory)
 Task({
   task_id: 'task-1',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'C4 Code analysis for src/api',
   prompt: 'You are C4-CODE agent. Read .claude/agents/specialized/c4-code.md...',
 });
@@ -465,7 +465,7 @@ Task({
 // Phase 2: Spawn c4-component agent to synthesize
 Task({
   task_id: 'task-2',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'C4 Component synthesis',
   prompt: 'You are C4-COMPONENT agent. Read .claude/agents/specialized/c4-component.md...',
 });
@@ -473,7 +473,7 @@ Task({
 // Phase 3: Spawn c4-container agent
 Task({
   task_id: 'task-3',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'C4 Container mapping',
   prompt: 'You are C4-CONTAINER agent. Read .claude/agents/specialized/c4-container.md...',
 });
@@ -481,7 +481,7 @@ Task({
 // Phase 4: Spawn c4-context agent
 Task({
   task_id: 'task-4',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'C4 Context documentation',
   prompt: 'You are C4-CONTEXT agent. Read .claude/agents/specialized/c4-context.md...',
 });

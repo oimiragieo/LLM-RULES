@@ -10,7 +10,7 @@ triggers:
 - backlog refinement
 - roadmap prioritization
   agents:
-- general-purpose (with PM context)
+- developer (with PM context)
 
 ---
 
@@ -535,7 +535,7 @@ Cycle Time = Date story completed - Date story started
 ### Provenance Headers
 
 ```markdown
-<!-- Agent: general-purpose | Task: #{task-id} | Session: {YYYY-MM-DD} -->
+<!-- Agent: developer | Task: #{task-id} | Session: {YYYY-MM-DD} -->
 ```
 
 ## Success Criteria

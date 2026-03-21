@@ -98,7 +98,7 @@ Before starting this workflow:
 ```javascript
 Task({
   task_id: 'task-1',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Checking if artifact exists in framework',
   prompt: `You are the ARCHITECT agent.
 
@@ -165,7 +165,7 @@ Subject: Discover artifact: $ARTIFACT_NAME
 ```javascript
 Task({
   task_id: 'task-2',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Comparing artifact versions and analyzing changes needed',
   prompt: `You are the ARCHITECT agent.
 
@@ -232,7 +232,7 @@ Record version decisions to .claude/context/memory/decisions.md
 ```javascript
 Task({
   task_id: 'task-3',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Planning artifact lifecycle action',
   prompt: `You are the PLANNER agent.
 
@@ -316,7 +316,7 @@ Subject: Plan lifecycle action for: $ARTIFACT_NAME
 ```javascript
 Task({
   task_id: 'task-4',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Creating new artifact: $ARTIFACT_NAME',
   prompt: `You are the ${CREATOR_AGENT} agent.
 
@@ -386,7 +386,7 @@ Record creation to .claude/context/memory/learnings.md
 ```javascript
 Task({
   task_id: 'task-5',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Updating existing artifact: $ARTIFACT_NAME',
   prompt: `You are the DEVELOPER agent.
 
@@ -453,7 +453,7 @@ Record update to .claude/context/memory/learnings.md
 ```javascript
 Task({
   task_id: 'task-6',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Deprecating artifact: $ARTIFACT_NAME',
   prompt: `You are the DEVELOPER agent.
 
@@ -526,7 +526,7 @@ Record deprecation to .claude/context/memory/decisions.md
 ```javascript
 Task({
   task_id: 'task-7',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Updating framework catalogs and registries',
   prompt: `You are the DEVELOPER agent.
 
@@ -598,7 +598,7 @@ Record integration to .claude/context/memory/learnings.md
 ```javascript
 Task({
   task_id: 'task-8',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Assigning skill to appropriate agents',
   prompt: `You are the PLANNER agent.
 
@@ -666,7 +666,7 @@ Record assignments to .claude/context/memory/decisions.md
 ```javascript
 Task({
   task_id: 'task-9',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Testing artifact integration',
   prompt: `You are the QA agent.
 
@@ -745,7 +745,7 @@ Record test results to .claude/context/memory/learnings.md
 ```javascript
 Task({
   task_id: 'task-10',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Final verification of artifact lifecycle completion',
   prompt: `You are the ARCHITECT agent.
 
@@ -938,7 +938,7 @@ This workflow can be adapted for:
 // User: "Create a new skill for Kubernetes deployment"
 Task({
   task_id: 'task-11',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Managing lifecycle for k8s-deploy skill',
   prompt: `Execute artifact-lifecycle workflow for new skill.
 
@@ -974,7 +974,7 @@ For managing multiple artifacts at once:
 ```javascript
 Task({
   task_id: 'task-12',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Batch lifecycle management for multiple artifacts',
   prompt: `Execute artifact-lifecycle workflow for multiple artifacts.
 

@@ -24,7 +24,7 @@ Orchestrates the full project setup using Context-Driven Development methodology
 ```javascript
 Task({
   task_id: 'task-1',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Analyze project for setup',
   prompt: `You are the EXPLORER agent.
 
@@ -64,7 +64,7 @@ Report: { classification, tech_stack_detected, frameworks, key_files }
 ```javascript
 Task({
   task_id: 'task-2',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Define product vision',
   prompt: `You are the PLANNER agent.
 
@@ -104,7 +104,7 @@ Use A/B/C/D/E question format from interactive-requirements-gathering skill.
 ```javascript
 Task({
   task_id: 'task-3',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Configure tech stack',
   prompt: `You are the PLANNER agent. Read .claude/agents/core/planner.md
 
@@ -145,7 +145,7 @@ Create:
 ```javascript
 Task({
   task_id: 'task-4',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Configure development workflow',
   prompt: `You are the PLANNER agent. Read .claude/agents/core/planner.md
 
@@ -183,7 +183,7 @@ Use workflow-patterns skill as template.
 ```javascript
 Task({
   task_id: 'task-5',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Generate initial track',
   prompt: `You are the PLANNER agent. Read .claude/agents/core/planner.md
 
@@ -220,7 +220,7 @@ Create the first development track.
 ```javascript
 Task({
   task_id: 'task-6',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Finalize setup',
   prompt: `You are the DEVELOPER agent. Read .claude/agents/core/developer.md
 

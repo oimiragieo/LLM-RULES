@@ -1,22 +1,3 @@
-## 8-Framework Analysis Pipeline Pattern (2026-03-17) [Tasks 4-7, batch reflection]
-
-**[WORKFLOW] Multi-Framework Research → Synthesis → Multi-LLM Review → Architect GO**
-
-- Pipeline: clone/read 8 frameworks → deep-dive researchers (parallel) → synthesizer → Codex+Gemini review → architect review → implementation plan
-- This pattern extracts 51 raw features that compress to 47 verified features after multi-LLM review
-- Feature count discrepancy detection: Codex found 61 vs claimed 51 — root cause was Codex counting sub-items as features. Resolution: re-count from primary source, confirm with Gemini
-- Architecture contradiction detection: H1 (skill invocation via Skill() tool) conflicts with "auto-discovery" concept from frameworks; resolution: preserve mandatory Skill() invocation, deprecate auto-discovery
-- Multi-LLM review gate is highly effective — both Gemini and Codex independently read actual repo files before commenting (not hallucinated), producing concrete actionable feedback
-- Key Gemini+Codex consensus items from 2026-03-17 session: (1) add repo map generation, (2) use token-budget gate not file count, (3) need synthesis agent for cross-cutting concerns
-
-**[WORKFLOW] Feature Planning: 5-Phase Over 47 Features**
-
-- Architect GO at 47 features / 5 phases — plan at `.claude/context/plans/framework-upgrade-plan-2026-03-17.md`
-- Phase buffer: timeline +30-50% vs initial estimate (multi-LLM review identified scope underestimation)
-- Priority adjustments from review: D1 P0→P1, C1 P0→P1, A2 P1→P0, D8 P1→P0
-
----
-
 ## Closed-Loop Evolution Trigger Implementation (2026-03-17) [Task 11, commit a681c4df]
 
 **[FRAMEWORK] reflection-agent Step 5.7: Score-Triggered Agent Evolution**
@@ -38,6 +19,19 @@
 - Skill created at `.claude/skills/codebase-exploration/SKILL.md` (7-phase protocol)
 - Phase progression: (1) token budget assessment, (2) repo map, (3) entry point identification, (4) dependency graph, (5) hot module identification, (6) targeted deep reads, (7) synthesis
 - Key LLM-agent codebase exploration research (task 12): synthesized 12+ sources incl. SWE-bench, LocAgent, Complexity Trap, Aider, Cursor, OpenHands → 6-phase protocol with token budgets
+
+---
+
+## Spawn Protocol Enforcement Batch (2026-03-20) [Tasks 15-18, commit fe75e181]
+
+**[WORKFLOW] TaskList-first + TaskUpdate atomicity + token visibility hardening**
+
+- **Task 15** (spawn protocol fixes): TaskList-first enforcement added to routing-guard.cjs; TaskUpdate contract injection ensures in_progress → work → completed; agent role clarity in CLAUDE.md Section 2. Passive enforcement (no immediate validation until next router run)
+- **Task 16** (token reporting): ccusage status injected into planner/orchestrator spawn prompts at creation time; router displays `[tokens] X today (in: Y / out: Z) | Cost: W` on every prompt; auto-updated via ccusage-statusline.cjs hook. Improves context pressure visibility
+- **Task 17** (multi-LLM reviews): Gemini + Codex external review completed; unused variable fixed; findings not yet consolidated to learnings.md (visibility gap)
+- **Task 18** (atomic commit): All three changes bundled into fe75e181 (spawn protocol + token reporting + cleanup); proper co-authored-by; pushed to main
+- **Batch pattern**: Protocol enforcement should include regression tests before commit (Task 15 missing test evidence); multi-LLM findings should auto-persist to memory (Task 17 gap)
+- **Lessons**: (1) Atomic commits for related protocol changes improve auditability; (2) Token visibility at spawn time (not post-hoc) is more useful; (3) External LLM reviews catch edge cases but need consolidation
 - Post-Gemini/Codex review upgrades: repo map generation added, token-budget gate replaces file-count gate, synthesis agent for cross-cutting concerns
 - Researcher + artifact-integrator agents updated to use smart exploration integration (commits 3c01f782, 1f5e6583)
 - Pattern: research (task 12) → multi-LLM review (task 13) → implementation (task 14) is a proven 3-step creator flow
@@ -461,3 +455,119 @@ safeParseJSON returns Object.create(null) — safe for `typeof x.prop` checks, b
 - Updated workflow: evolution-workflow (2026-03-20)
 
 - Updated workflow: missing-workflow-xyz (2026-03-20)
+
+## [2026-03-20] Ecosystem Audit Research: 2026 Industry Best Practices
+
+**TDD for AI Agents**:
+
+- Traditional unit tests insufficient for agentic systems; trajectory evaluation required (tool call sequences, state transitions)
+- LLM-as-judge + ensemble scoring reduces evaluation bias (single judge has >50% error rate)
+- Meta Engineering (Feb 2026): JiT Testing generates tests via LLM just-in-time before code lands
+- agent-studio gap: no property-based tests for agent lifecycle invariants (TaskUpdate protocol)
+
+**Memory Persistence**:
+
+- A-MEM (arXiv:2502.12110): Zettelkasten-inspired dynamic linking beats all SOTA baselines
+- Memory Admission Control (arXiv:2603.04549): 5-dimension scoring (utility, confidence, novelty, recency, type) before LTM writes
+- Multi-Agent Memory (arXiv:2603.10062): concurrent write consistency is the #1 open problem
+- agent-studio WAL protocol is documented but NOT enforced at runtime — P0 gap
+
+**LSP Integration**:
+
+- Anthropic shipped native LSP in Claude Code v2.0.74 (Dec 2025) — automatic diagnostics after every edit
+- 50ms LSP vs tens of seconds for text search — changes agent exploration behavior
+- Agent Client Protocol (ACP) emerging as "LSP for AI agents" standard — monitor for adoption
+
+## 2026-03-20: Tiered Skill-Updater Staleness Thresholds (Multi-LLM Validated)
+
+**Pattern**: Uniform staleness thresholds for skill-updater do not account for blast radius differences between core and domain-specific skills. Tiered approach recommended:
+
+- Tier 1 (Core/Security/TDD): 10% threshold
+- Tier 2 (Orchestration/Router): 20% threshold
+- Tier 3 (Domain/Specialized): 35% threshold
+
+Usage-frequency weighting should augment thresholds in future iteration.
+
+**Validated by**: Gemini (gemini-2.5-flash) + Claude Sonnet synthesis, Task #15
+
+---
+
+## 2026-03-20: MCP Tool Coverage Gap — Hook Architecture Pattern
+
+**Pattern**: Hook systems that intercept tool names must explicitly enumerate MCP tool prefixes (`mcp__*`) because MCP tools operate via a separate protocol (JSON-RPC over stdio/HTTP) and do not route through the same tool dispatch path as native tools (Bash, Write, Edit, etc.).
+
+**Implication**: Any framework using both native tools and MCP tools needs two separate enforcement paths unless a unified hook layer intercepts at the pre-dispatch level before protocol routing.
+
+**Source**: Task #15 multi-LLM review, 2026-03-20
+
+---
+
+## 2026-03-20: "Search Inequality" Risk for Partial Agent Compliance
+
+**Pattern**: In multi-agent frameworks where search capability varies across agents, agents missing the recommended search tool reference produce inconsistently lower quality outputs when working on the same codebase. The 24 non-compliant agents in agent-studio create "search inequality" — some agents find code others miss.
+
+**Source**: Gemini review framing, Task #15, 2026-03-20
+
+- Created new agent: qa-guardian (2026-03-21)
+
+- Created new agent: contract-check (2026-03-21)
+
+- Created new agent: bool-action (2026-03-21)
+
+- Created new agent: repo-onboarder (2026-03-21)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-21)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-21)
+
+- Updated workflow: evolution-workflow (2026-03-21)
+
+- Updated workflow: missing-workflow-xyz (2026-03-21)
+
+- Created new agent: qa-guardian (2026-03-21)
+
+- Created new agent: contract-check (2026-03-21)
+
+- Created new agent: bool-action (2026-03-21)
+
+- Created new agent: repo-onboarder (2026-03-21)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-21)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-21)
+
+- Updated workflow: evolution-workflow (2026-03-21)
+
+- Updated workflow: missing-workflow-xyz (2026-03-21)
+
+- Created new agent: qa-guardian (2026-03-21)
+
+- Created new agent: contract-check (2026-03-21)
+
+- Created new agent: bool-action (2026-03-21)
+
+- Created new agent: repo-onboarder (2026-03-21)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-21)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-21)
+
+- Updated workflow: evolution-workflow (2026-03-21)
+
+- Updated workflow: missing-workflow-xyz (2026-03-21)
+
+- Created new agent: qa-guardian (2026-03-21)
+
+- Created new agent: contract-check (2026-03-21)
+
+- Created new agent: bool-action (2026-03-21)
+
+- Created new agent: repo-onboarder (2026-03-21)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-21)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-21)
+
+- Updated workflow: evolution-workflow (2026-03-21)
+
+- Updated workflow: missing-workflow-xyz (2026-03-21)

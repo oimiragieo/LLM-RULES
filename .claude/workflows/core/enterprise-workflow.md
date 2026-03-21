@@ -262,7 +262,7 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 4. **Spawn creator** (via appropriate creator skill):
 
    ```
-   Agent: general-purpose
+   Agent: developer
    Skills: research-synthesis -> {agent-creator|skill-creator|workflow-creator}
    Output: .claude/agents/{category}/{new-agent}.md (or equivalent)
    ```

@@ -79,7 +79,7 @@ This workflow coordinates multiple agents to deliver:
 ```javascript
 Task({
   task_id: 'task-1',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Database requirements analysis',
   prompt: `You are the PLANNER agent.
 
@@ -118,7 +118,7 @@ Analyze data requirements for: $PROJECT_NAME
 ```javascript
 Task({
   task_id: 'task-2',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Existing schema analysis',
   prompt: `You are the DATABASE-ARCHITECT agent.
 
@@ -167,7 +167,7 @@ Analyze existing database schema for: $PROJECT_NAME
 // Database Architect - Schema Design
 Task({
   task_id: 'task-3',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Logical data model design',
   prompt: `You are the DATABASE-ARCHITECT agent.
 
@@ -203,7 +203,7 @@ Design logical data model for: $PROJECT_NAME
 // Security Architect - Data Security Review
 Task({
   task_id: 'task-4',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   model: 'opus',
   description: 'Data security and compliance review',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -248,7 +248,7 @@ Review data security requirements for: $PROJECT_NAME
 ```javascript
 Task({
   task_id: 'task-5',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Physical schema implementation',
   prompt: `You are the DATABASE-ARCHITECT agent.
 
@@ -303,7 +303,7 @@ Implement physical database schema for: $PROJECT_NAME
 ```javascript
 Task({
   task_id: 'task-6',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Query pattern analysis and optimization',
   prompt: `You are the DATABASE-ARCHITECT agent.
 
@@ -351,7 +351,7 @@ Analyze and optimize query patterns for: $PROJECT_NAME
 ```javascript
 Task({
   task_id: 'task-7',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Performance benchmarking setup',
   prompt: `You are the DEVELOPER agent.
 
@@ -402,7 +402,7 @@ Set up database performance benchmarks for: $PROJECT_NAME
 ```javascript
 Task({
   task_id: 'task-8',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Migration script generation',
   prompt: `You are the DATABASE-ARCHITECT agent.
 
@@ -457,7 +457,7 @@ Generate migration scripts for: $PROJECT_NAME
 // Database Architect - Rollback Scripts
 Task({
   task_id: 'task-9',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Rollback procedure documentation',
   prompt: `You are the DATABASE-ARCHITECT agent.
 
@@ -494,7 +494,7 @@ Document rollback procedures for: $PROJECT_NAME
 // DevOps - Deployment Pipeline
 Task({
   task_id: 'task-10',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Migration deployment pipeline',
   prompt: `You are the DEVOPS agent.
 
@@ -546,7 +546,7 @@ Set up migration deployment pipeline for: $PROJECT_NAME
 ```javascript
 Task({
   task_id: 'task-11',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Database schema validation tests',
   prompt: `You are the QA agent.
 
@@ -591,7 +591,7 @@ Create database validation tests for: $PROJECT_NAME
 ```javascript
 Task({
   task_id: 'task-12',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Test data generation',
   prompt: `You are the DEVELOPER agent.
 
@@ -635,7 +635,7 @@ Generate test data for: $PROJECT_NAME
 ```javascript
 Task({
   task_id: 'task-13',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Migration testing and validation',
   prompt: `You are the QA agent.
 
@@ -802,7 +802,7 @@ recovery_target_time = '2026-01-25 14:30:00'
 // Router spawning workflow orchestrator
 Task({
   task_id: 'task-14',
-  subagent_type: 'general-purpose',
+  subagent_type: 'developer',
   description: 'Orchestrating database design workflow',
   prompt: `Execute database architect workflow.
 
