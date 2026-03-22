@@ -93,6 +93,15 @@
         ]
       },
       {
+        "matcher": "Bash|Write|Edit|WebFetch|WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/dlp-pretool.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "Bash|mcp__shell__|mcp__exec__|mcp__terminal__",
         "hooks": [
           {

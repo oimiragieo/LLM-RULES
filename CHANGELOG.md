@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **DLP PreToolUse hook** (`dlp-pretool.cjs`): Scans tool args recursively for secrets (AWS keys, GitHub tokens, OpenAI keys, Stripe keys, private keys, JWTs, connection string passwords) before execution. Blocks or warns based on `DLP_PRETOOL_ENFORCEMENT` env var. Inspired by node9-proxy DLP scanner patterns
+- **Secret redaction utility** (`redact-secrets.cjs`): 11-pattern deep redaction for text and nested objects. Used by hook-trace logger to prevent secrets from appearing in any log file
+- **Hook trace logger** (`hook-trace.cjs`): Structured NDJSON logger with `checkedBy` field support. Every hook decision now records WHICH specific check/rule fired, enabling "which rules fire most?" analytics. Writes to `.claude/context/runtime/hook-trace.jsonl` with automatic rotation at 5000 lines
+- 33 new unit tests covering redact-secrets (12), hook-trace (7), dlp-pretool (8), plus formatted/linted
+
 ### Fixed
 
 - Agent count documentation drift corrected: updated all references from stale "74 agents" / "72 agents" to the actual registry count of 102 agents across `CLAUDE.md`, `.claude/rules/agents.md`, and `.claude/docs/@AGENT_ROUTING_TABLE.md`
