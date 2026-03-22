@@ -13,11 +13,26 @@ const settings = require(path.join(PROJECT_ROOT, '.claude', 'settings.json'));
 
 function findHookBlock(eventName, matcher) {
   const blocks = settings?.hooks?.[eventName] || [];
-  return blocks.find(b => b.matcher === matcher) || null;
+  // Exact match first, then prefix/substring match for extended matchers
+  return (
+    blocks.find(b => b.matcher === matcher) ||
+    blocks.find(b => b.matcher && b.matcher.startsWith(matcher)) ||
+    null
+  );
 }
 
 function listCommands(block) {
-  return (block?.hooks || []).map(h => h.command).filter(Boolean);
+  // Handle both formats:
+  // 1. "node .claude/hooks/foo.cjs"
+  // 2. 'cd "C:/dev/..." && node .claude/hooks/foo.cjs'
+  return (block?.hooks || [])
+    .map(h => {
+      if (!h.command) return null;
+      const nodeMatch = h.command.match(/node\s+([^\s"]+\.(?:cjs|mjs|js))/);
+      if (nodeMatch) return 'node ' + nodeMatch[1];
+      return h.command;
+    })
+    .filter(Boolean);
 }
 
 test('PreToolUse Edit|Write|NotebookEdit includes write-pretool-bundle', () => {

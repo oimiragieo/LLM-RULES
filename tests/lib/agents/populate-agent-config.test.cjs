@@ -39,7 +39,7 @@ function loadAgentRegistry() {
 const agentConfig = JSON.parse(fs.readFileSync(AGENT_CONFIG_PATH, 'utf8'));
 const agentRegistry = loadAgentRegistry();
 
-test('agent-config.json should have ALL 59 agents from registry', () => {
+test('agent-config.json should have ALL agents from registry', () => {
   const configAgents = Object.keys(agentConfig.agents || {});
   const registryAgents = Object.keys(agentRegistry.agents || {});
 

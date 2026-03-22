@@ -2,30 +2,7 @@
   "$schema": "../schemas/agent-config.schema.json",
   "version": "1.0.0",
   "agents": {
-    "planner": {
-      "tools": [
-        "AskUserQuestion",
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "Task",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6",
-      "phase": "planning"
-    },
-    "developer": {
+    "accessibility-tester": {
       "tools": [
         "Bash",
         "Edit",
@@ -41,49 +18,122 @@
         "TaskUpdate",
         "WebFetch",
         "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6",
-      "phase": "coding"
-    },
-    "qa": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6",
-      "phase": "qa"
-    },
-    "code-reviewer": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "Task",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
         "Write"
       ],
       "model": "claude-sonnet-4-6"
+    },
+    "advanced-debugging": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "ai-ml-specialist": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "android-pro": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "angular-pro": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "api-designer": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "app-generator-agent": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-opus-4-6",
+      "phase": "execution"
     },
     "architect": {
       "tools": [
@@ -106,7 +156,26 @@
       "model": "claude-opus-4-6",
       "phase": "planning"
     },
-    "researcher": {
+    "artifact-integrator": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "Task",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "aso-specialist": {
       "tools": [
         "Bash",
         "Edit",
@@ -125,24 +194,25 @@
       ],
       "model": "claude-sonnet-4-6"
     },
-    "reflection-agent": {
+    "azure-infra-pro": {
       "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
         "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
         "Skill",
+        "TaskUpdate",
+        "TaskList",
         "TaskCreate",
         "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "Write"
+        "MemoryRecord"
       ],
-      "model": "claude-sonnet-4-6"
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
     },
-    "context-compressor": {
+    "brand-guardian": {
       "tools": [
         "Bash",
         "Edit",
@@ -151,63 +221,6 @@
         "MemoryRecord",
         "Read",
         "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "Write"
-      ],
-      "model": "claude-haiku-4-5-20251001"
-    },
-    "pm": {
-      "tools": [
-        "AskUserQuestion",
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "technical-program-manager": {
-      "tools": [
-        "AskUserQuestion",
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "Task",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "technical-writer": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "Task",
         "TaskCreate",
         "TaskGet",
         "TaskList",
@@ -217,6 +230,24 @@
         "Write"
       ],
       "model": "claude-sonnet-4-6"
+    },
+    "business-analyst": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
     },
     "c4-code": {
       "tools": [
@@ -286,6 +317,44 @@
       ],
       "model": "claude-sonnet-4-6"
     },
+    "chaos-engineer": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "code-reviewer": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "Task",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
     "code-simplifier": {
       "tools": [
         "Bash",
@@ -302,6 +371,25 @@
         "Write"
       ],
       "model": "claude-opus-4-6"
+    },
+    "compliance-checker": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
     },
     "conductor-validator": {
       "tools": [
@@ -320,6 +408,78 @@
       ],
       "model": "claude-opus-4-6"
     },
+    "context-compressor": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "Write"
+      ],
+      "model": "claude-haiku-4-5-20251001"
+    },
+    "context-manager": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-haiku-4-5-20251001",
+      "phase": "execution"
+    },
+    "data-engineer": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "data-scientist": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
     "database-architect": {
       "tools": [
         "Bash",
@@ -337,7 +497,7 @@
       ],
       "model": "claude-opus-4-6"
     },
-    "devops-troubleshooter": {
+    "developer": {
       "tools": [
         "Bash",
         "Edit",
@@ -349,10 +509,14 @@
         "TaskCreate",
         "TaskGet",
         "TaskList",
+        "TaskOutput",
         "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-6"
+      "model": "claude-sonnet-4-6",
+      "phase": "coding"
     },
     "devops": {
       "tools": [
@@ -373,7 +537,7 @@
       ],
       "model": "claude-sonnet-4-6"
     },
-    "incident-responder": {
+    "devops-troubleshooter": {
       "tools": [
         "Bash",
         "Edit",
@@ -386,48 +550,47 @@
         "TaskGet",
         "TaskList",
         "TaskUpdate",
-        "WebFetch",
         "Write"
       ],
       "model": "claude-sonnet-4-6"
     },
-    "reverse-engineer": {
+    "django-developer": {
       "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
         "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
         "Skill",
+        "TaskUpdate",
+        "TaskList",
         "TaskCreate",
         "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "Write"
+        "MemoryRecord"
       ],
-      "model": "claude-opus-4-6"
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
     },
-    "security-architect": {
+    "dotnet-pro": {
       "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
         "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
         "Skill",
+        "TaskUpdate",
+        "TaskList",
         "TaskCreate",
         "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
+        "MemoryRecord"
       ],
-      "model": "claude-opus-4-6"
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
     },
-    "ai-ml-specialist": {
+    "ecosystem-auditor": {
       "tools": [
         "Bash",
         "Edit",
@@ -440,32 +603,11 @@
         "TaskGet",
         "TaskList",
         "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "android-pro": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
         "Write"
       ],
       "model": "claude-sonnet-4-6"
     },
-    "data-engineer": {
+    "evolution-orchestrator": {
       "tools": [
         "Bash",
         "Edit",
@@ -474,6 +616,7 @@
         "MemoryRecord",
         "Read",
         "Skill",
+        "Task",
         "TaskCreate",
         "TaskGet",
         "TaskList",
@@ -482,7 +625,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-6"
+      "model": "claude-opus-4-6"
     },
     "expo-mobile-developer": {
       "tools": [
@@ -522,6 +665,43 @@
       ],
       "model": "claude-opus-4-6"
     },
+    "feedback-synthesizer": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "forum-monitor-agent": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
     "frontend-pro": {
       "tools": [
         "Bash",
@@ -555,6 +735,25 @@
         "WebFetch",
         "WebSearch",
         "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "general-assistant": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write",
+        "Grep",
+        "Glob"
       ],
       "model": "claude-opus-4-6"
     },
@@ -596,6 +795,45 @@
       ],
       "model": "claude-sonnet-4-6"
     },
+    "heartbeat-orchestrator": {
+      "tools": [
+        "CronCreate",
+        "CronList",
+        "CronDelete",
+        "Read",
+        "Write",
+        "Bash",
+        "Task",
+        "TaskCreate",
+        "TaskUpdate",
+        "TaskList",
+        "TaskGet",
+        "Skill",
+        "MemoryRecord",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "model": "claude-haiku-4-5-20251001"
+    },
+    "incident-responder": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
     "ios-pro": {
       "tools": [
         "Bash",
@@ -614,6 +852,24 @@
         "Write"
       ],
       "model": "claude-sonnet-4-6"
+    },
+    "iot-engineer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
     },
     "java-pro": {
       "tools": [
@@ -634,6 +890,266 @@
       ],
       "model": "claude-sonnet-4-6"
     },
+    "kotlin-pro": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "kubernetes-specialist": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "legacy-modernizer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "legal-advisor": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "llm-architect": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "m365-admin": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "marketing-strategist": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "master-orchestrator": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "Task",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "mcp-developer": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "medical-research-triage": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "memory-manager": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskUpdate",
+        "Write",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet"
+      ],
+      "thinkingDefault": "none",
+      "model": "claude-haiku-4-5-20251001"
+    },
+    "microservices-architect": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "ml-researcher": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-opus-4-6",
+      "phase": "execution"
+    },
+    "mlops-engineer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
     "mobile-ux-reviewer": {
       "tools": [
         "Bash",
@@ -649,6 +1165,41 @@
         "TaskUpdate",
         "WebFetch",
         "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "model-benchmarker-agent": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "multi-llm-consultant": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
         "Write"
       ],
       "model": "claude-sonnet-4-6"
@@ -672,6 +1223,24 @@
       ],
       "model": "claude-sonnet-4-6"
     },
+    "nlp-engineer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
     "nodejs-pro": {
       "tools": [
         "Bash",
@@ -691,7 +1260,200 @@
       ],
       "model": "claude-sonnet-4-6"
     },
+    "party-orchestrator": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "Task",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "penetration-tester": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "performance-engineer": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
     "php-pro": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "planner": {
+      "tools": [
+        "AskUserQuestion",
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "Task",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6",
+      "phase": "planning"
+    },
+    "pm": {
+      "tools": [
+        "AskUserQuestion",
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "pm-coordinator": {
+      "tools": [
+        "AskUserQuestion",
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "post-analyzer-agent": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "postgres-pro": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "product-manager": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "prompt-engineer": {
       "tools": [
         "Bash",
         "Edit",
@@ -725,6 +1487,116 @@
         "TaskUpdate",
         "WebFetch",
         "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6"
+    },
+    "qa": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-6",
+      "phase": "qa"
+    },
+    "quant-analyst": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "rails-pro": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "reflection-agent": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "researcher": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "reverse-engineer": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
         "Write"
       ],
       "model": "claude-opus-4-6"
@@ -767,45 +1639,7 @@
       ],
       "model": "claude-opus-4-6"
     },
-    "sveltekit-expert": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "tauri-desktop-developer": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "typescript-pro": {
+    "security-architect": {
       "tools": [
         "Bash",
         "Edit",
@@ -824,177 +1658,41 @@
       ],
       "model": "claude-opus-4-6"
     },
-    "multi-llm-consultant": {
+    "spring-boot-pro": {
       "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
         "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
         "Skill",
+        "TaskUpdate",
+        "TaskList",
         "TaskCreate",
         "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "Write"
+        "MemoryRecord"
       ],
-      "model": "claude-sonnet-4-6"
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
     },
-    "web3-blockchain-expert": {
+    "sql-pro": {
       "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
         "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
         "Skill",
+        "TaskUpdate",
+        "TaskList",
         "TaskCreate",
         "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
+        "MemoryRecord"
       ],
-      "model": "claude-opus-4-6"
-    },
-    "evolution-orchestrator": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "Task",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "master-orchestrator": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "Task",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "swarm-coordinator": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "Task",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "accessibility-tester": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "chaos-engineer": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "penetration-tester": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "performance-engineer": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
     },
     "sre-engineer": {
       "tools": [
@@ -1016,46 +1714,7 @@
       ],
       "model": "claude-sonnet-4-6"
     },
-    "api-designer": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "llm-architect": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "mcp-developer": {
+    "sveltekit-expert": {
       "tools": [
         "Bash",
         "Edit",
@@ -1074,46 +1733,7 @@
       ],
       "model": "claude-sonnet-4-6"
     },
-    "microservices-architect": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "prompt-engineer": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "party-orchestrator": {
+    "swarm-coordinator": {
       "tools": [
         "Bash",
         "Edit",
@@ -1131,7 +1751,43 @@
       ],
       "model": "claude-opus-4-6"
     },
-    "advanced-debugging": {
+    "swift-pro": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "task-manager": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-haiku-4-5-20251001",
+      "phase": "execution"
+    },
+    "tauri-desktop-developer": {
       "tools": [
         "Bash",
         "Edit",
@@ -1148,67 +1804,9 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-6"
+      "model": "claude-sonnet-4-6"
     },
-    "artifact-integrator": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "Task",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "kubernetes-specialist": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "medical-research-triage": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskOutput",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-opus-4-6"
-    },
-    "pm-coordinator": {
+    "technical-program-manager": {
       "tools": [
         "AskUserQuestion",
         "Bash",
@@ -1218,6 +1816,26 @@
         "MemoryRecord",
         "Read",
         "Skill",
+        "Task",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "technical-writer": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "Task",
         "TaskCreate",
         "TaskGet",
         "TaskList",
@@ -1228,10 +1846,48 @@
       ],
       "model": "claude-sonnet-4-6"
     },
-    "general-assistant": {
+    "terraform-engineer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "terragrunt-pro": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "typescript-pro": {
       "tools": [
         "Bash",
         "Edit",
+        "Glob",
+        "Grep",
         "MemoryRecord",
         "Read",
         "Skill",
@@ -1244,101 +1900,6 @@
         "Write"
       ],
       "model": "claude-opus-4-6"
-    },
-    "aso-specialist": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "brand-guardian": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "compliance-checker": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "feedback-synthesizer": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
-    },
-    "marketing-strategist": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
-        "Read",
-        "Skill",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "WebFetch",
-        "WebSearch",
-        "Write"
-      ],
-      "model": "claude-sonnet-4-6"
     },
     "ux-researcher": {
       "tools": [
@@ -1359,28 +1920,25 @@
       ],
       "model": "claude-sonnet-4-6"
     },
-    "heartbeat-orchestrator": {
+    "voice-replicator-agent": {
       "tools": [
-        "CronCreate",
-        "CronList",
-        "CronDelete",
         "Read",
         "Write",
+        "Edit",
         "Bash",
-        "Task",
-        "TaskCreate",
+        "Grep",
+        "Glob",
+        "Skill",
         "TaskUpdate",
         "TaskList",
+        "TaskCreate",
         "TaskGet",
-        "Skill",
-        "MemoryRecord",
-        "Edit",
-        "Glob",
-        "Grep"
+        "MemoryRecord"
       ],
-      "model": "claude-haiku-4-5-20251001"
+      "model": "claude-opus-4-6",
+      "phase": "execution"
     },
-    "ecosystem-auditor": {
+    "web3-blockchain-expert": {
       "tools": [
         "Bash",
         "Edit",
@@ -1393,24 +1951,47 @@
         "TaskGet",
         "TaskList",
         "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-6"
+      "model": "claude-opus-4-6"
     },
-    "memory-manager": {
+    "windows-infra-pro": {
       "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "MemoryRecord",
         "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
         "Skill",
         "TaskUpdate",
-        "Write"
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
       ],
-      "thinkingDefault": "none",
-      "model": "claude-haiku-4-5"
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
+    },
+    "wordpress-master": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Skill",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "MemoryRecord"
+      ],
+      "model": "claude-sonnet-4-6",
+      "phase": "execution"
     }
   },
   "thinkingBudgetMap": {

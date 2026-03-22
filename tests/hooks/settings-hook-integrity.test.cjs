@@ -19,8 +19,16 @@ test('Hook Integrity: all hooks in settings.json exist on disk', () => {
       hookGroup.hooks.forEach(hook => {
         if (!hook.command) return;
 
-        // Extract file path from command (remove "node " prefix and args)
-        const file = hook.command.replace(/^node\s+/, '').split(/\s+/)[0];
+        // Extract file path from command - handle both formats:
+        // 1. "node .claude/hooks/foo.cjs"
+        // 2. 'cd "C:/dev/..." && node .claude/hooks/foo.cjs'
+        let file;
+        const nodeMatch = hook.command.match(/node\s+([^\s"]+\.(?:cjs|mjs|js))/);
+        if (nodeMatch) {
+          file = nodeMatch[1];
+        } else {
+          file = hook.command.replace(/^node\s+/, '').split(/\s+/)[0];
+        }
         const fullPath = path.join(process.cwd(), file);
 
         if (!fs.existsSync(fullPath)) {
