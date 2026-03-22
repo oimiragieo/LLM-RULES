@@ -222,10 +222,10 @@ A single agent signaling "done" can produce incomplete results -- the agent may 
 
 ```yaml
 completion_gate:
-  min_completions: 2        # minimum agents that must signal done
-  window_seconds: 60        # time window for completion consensus
-  nudge_after_seconds: 30   # send nudge to remaining agents after first completion
-  fallback_timeout: 120     # accept single completion after this timeout (with warning)
+  min_completions: 2 # minimum agents that must signal done
+  window_seconds: 60 # time window for completion consensus
+  nudge_after_seconds: 30 # send nudge to remaining agents after first completion
+  fallback_timeout: 120 # accept single completion after this timeout (with warning)
 ```
 
 ### Pseudocode
@@ -265,14 +265,14 @@ The dual-completion gate is invoked by the llm-council skill before closing a co
 
 ### Voting Protocols Table Update
 
-| Protocol | Use Case | Threshold | Quorum |
-|----------|----------|-----------|--------|
-| Simple Majority | Routine decisions | >50% | 50% |
-| Supermajority | Significant changes | >=66% | 75% |
-| Unanimous | Critical/irreversible decisions | 100% | 100% |
-| Weighted | Specialized expertise required | Variable | 66% |
-| Ranked Choice | Multiple alternatives | Runoff | 75% |
-| **Dual Completion** | **Council task closure** | **2 agents confirm** | **100%** |
+| Protocol            | Use Case                        | Threshold            | Quorum   |
+| ------------------- | ------------------------------- | -------------------- | -------- |
+| Simple Majority     | Routine decisions               | >50%                 | 50%      |
+| Supermajority       | Significant changes             | >=66%                | 75%      |
+| Unanimous           | Critical/irreversible decisions | 100%                 | 100%     |
+| Weighted            | Specialized expertise required  | Variable             | 66%      |
+| Ranked Choice       | Multiple alternatives           | Runoff               | 75%      |
+| **Dual Completion** | **Council task closure**        | **2 agents confirm** | **100%** |
 
 ## Rules
 

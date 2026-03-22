@@ -190,33 +190,33 @@ Templates constrain each model's focus during council sessions, producing higher
 
 #### Review Template
 
-| Field | Value |
-|-------|-------|
-| **Agents** | 2-3 (minimum 2) |
-| **Focus** | Each agent reviews from their model's strengths (correctness, security, performance) |
-| **Synthesis** | Chairman merges non-overlapping findings, deduplicates shared findings |
+| Field         | Value                                                                                |
+| ------------- | ------------------------------------------------------------------------------------ |
+| **Agents**    | 2-3 (minimum 2)                                                                      |
+| **Focus**     | Each agent reviews from their model's strengths (correctness, security, performance) |
+| **Synthesis** | Chairman merges non-overlapping findings, deduplicates shared findings               |
 
 **Roles:**
 
 ```yaml
 roles:
   - name: correctness-reviewer
-    focus: "Review for logic errors, edge cases, off-by-one bugs, and correctness"
+    focus: 'Review for logic errors, edge cases, off-by-one bugs, and correctness'
   - name: performance-reviewer
-    focus: "Review for performance bottlenecks, algorithmic complexity, and scalability"
+    focus: 'Review for performance bottlenecks, algorithmic complexity, and scalability'
   - name: security-reviewer
-    focus: "Review for security vulnerabilities, injection vectors, and data exposure"
-synthesis_strategy: "merge-by-category"
+    focus: 'Review for security vulnerabilities, injection vectors, and data exposure'
+synthesis_strategy: 'merge-by-category'
 ```
 
 **When to use:** Code reviews, PR reviews, audit passes where multiple review dimensions matter.
 
 #### Implementation Template
 
-| Field | Value |
-|-------|-------|
-| **Agents** | 2-4 (minimum 2) |
-| **Focus** | Plan, execute, verify staged workflow with sequential handoff |
+| Field         | Value                                                                    |
+| ------------- | ------------------------------------------------------------------------ |
+| **Agents**    | 2-4 (minimum 2)                                                          |
+| **Focus**     | Plan, execute, verify staged workflow with sequential handoff            |
 | **Synthesis** | Sequential -- architect output feeds implementer, verifier checks result |
 
 **Roles:**
@@ -224,22 +224,22 @@ synthesis_strategy: "merge-by-category"
 ```yaml
 roles:
   - name: architect
-    focus: "Design the approach, define interfaces, data flow, and module boundaries"
+    focus: 'Design the approach, define interfaces, data flow, and module boundaries'
   - name: implementer
     focus: "Write the implementation following the architect's design exactly"
   - name: verifier
-    focus: "Verify the implementation matches the design and passes acceptance criteria"
-synthesis_strategy: "sequential"
+    focus: 'Verify the implementation matches the design and passes acceptance criteria'
+synthesis_strategy: 'sequential'
 ```
 
 **When to use:** Feature implementation where design and coding benefit from separation of concerns.
 
 #### Research Template
 
-| Field | Value |
-|-------|-------|
-| **Agents** | 2-3 (minimum 2) |
-| **Focus** | Independent investigation of the same topic, then cross-compare findings |
+| Field         | Value                                                                     |
+| ------------- | ------------------------------------------------------------------------- |
+| **Agents**    | 2-3 (minimum 2)                                                           |
+| **Focus**     | Independent investigation of the same topic, then cross-compare findings  |
 | **Synthesis** | Side-by-side comparison matrix highlighting contradictions and agreements |
 
 **Roles:**
@@ -247,20 +247,20 @@ synthesis_strategy: "sequential"
 ```yaml
 roles:
   - name: researcher-a
-    focus: "Research the topic independently, cite sources, provide evidence-backed findings"
+    focus: 'Research the topic independently, cite sources, provide evidence-backed findings'
   - name: researcher-b
-    focus: "Research the same topic independently from a different angle, cite sources"
-synthesis_strategy: "compare-and-converge"
+    focus: 'Research the same topic independently from a different angle, cite sources'
+synthesis_strategy: 'compare-and-converge'
 ```
 
 **When to use:** Technology evaluation, best-practice research, exploring solution spaces.
 
 #### Debug Template
 
-| Field | Value |
-|-------|-------|
-| **Agents** | 2-3 (minimum 2) |
-| **Focus** | Each agent independently diagnoses the same bug and proposes a fix |
+| Field         | Value                                                                     |
+| ------------- | ------------------------------------------------------------------------- |
+| **Agents**    | 2-3 (minimum 2)                                                           |
+| **Focus**     | Each agent independently diagnoses the same bug and proposes a fix        |
 | **Synthesis** | Convergence analysis -- if 2+ agents agree on root cause, high confidence |
 
 **Roles:**
@@ -268,10 +268,10 @@ synthesis_strategy: "compare-and-converge"
 ```yaml
 roles:
   - name: diagnostician-a
-    focus: "Independently reproduce and diagnose the bug, propose root cause and fix"
+    focus: 'Independently reproduce and diagnose the bug, propose root cause and fix'
   - name: diagnostician-b
-    focus: "Independently reproduce and diagnose the bug, propose root cause and fix"
-synthesis_strategy: "convergence"
+    focus: 'Independently reproduce and diagnose the bug, propose root cause and fix'
+synthesis_strategy: 'convergence'
 ```
 
 **When to use:** Hard-to-diagnose bugs where independent analysis reduces bias.
@@ -306,9 +306,9 @@ Per-model idle monitoring with two-tier thresholds to detect hung or stalled mod
 
 ### Two-Tier Monitoring
 
-| Tier | Threshold | Action |
-|------|-----------|--------|
-| **Idle Warning** | 90 seconds of no output | Log warning, optionally send nudge prompt |
+| Tier              | Threshold                | Action                                        |
+| ----------------- | ------------------------ | --------------------------------------------- |
+| **Idle Warning**  | 90 seconds of no output  | Log warning, optionally send nudge prompt     |
 | **Stall Timeout** | 180 seconds of no output | Terminate model process, exclude from results |
 
 ### Configuration
@@ -317,14 +317,14 @@ Per-model idle monitoring with two-tier thresholds to detect hung or stalled mod
 watchdog:
   idle_warning_seconds: 90
   stall_timeout_seconds: 180
-  nudge_prompt: "Please continue with your analysis."
-  action_on_stall: "exclude"  # exclude | retry | fail
+  nudge_prompt: 'Please continue with your analysis.'
+  action_on_stall: 'exclude' # exclude | retry | fail
 ```
 
-| Env Var | Default | Purpose |
-|---------|---------|---------|
-| `LLM_COUNCIL_IDLE_WARNING_S` | 90 | Seconds before idle warning |
-| `LLM_COUNCIL_STALL_TIMEOUT_S` | 180 | Seconds before stall auto-exclude |
+| Env Var                       | Default | Purpose                           |
+| ----------------------------- | ------- | --------------------------------- |
+| `LLM_COUNCIL_IDLE_WARNING_S`  | 90      | Seconds before idle warning       |
+| `LLM_COUNCIL_STALL_TIMEOUT_S` | 180     | Seconds before stall auto-exclude |
 
 ### Integration with Stage 1
 
@@ -385,12 +385,12 @@ Enable with `--enable-messaging` flag. Without this flag, no message directory i
 
 **Message Types:**
 
-| Type | Purpose | When Sent |
-|------|---------|-----------|
-| `partial_output` | Share an intermediate finding or observation | During Stage 1, when a model has a partial result |
-| `question` | Ask the team a clarifying question | During Stage 1, when a model needs input |
-| `agreement` | Signal agreement with another model's finding | During Stage 2, after reading peer outputs |
-| `disagreement` | Signal disagreement with reasoning | During Stage 2, after reading peer outputs |
+| Type             | Purpose                                       | When Sent                                         |
+| ---------------- | --------------------------------------------- | ------------------------------------------------- |
+| `partial_output` | Share an intermediate finding or observation  | During Stage 1, when a model has a partial result |
+| `question`       | Ask the team a clarifying question            | During Stage 1, when a model needs input          |
+| `agreement`      | Signal agreement with another model's finding | During Stage 2, after reading peer outputs        |
+| `disagreement`   | Signal disagreement with reasoning            | During Stage 2, after reading peer outputs        |
 
 ### Read/Write Protocol
 
@@ -412,12 +412,12 @@ Optional per-agent git worktree isolation for council sessions where agents modi
 
 Worktree isolation is relevant only for templates that modify code:
 
-| Template | Worktree Applicable? | Reason |
-|----------|---------------------|--------|
-| Review | No | Read-only analysis |
-| Implementation | Yes | Agents write code that may conflict |
-| Research | No | Read-only research |
-| Debug | Yes | Agents may apply experimental fixes |
+| Template       | Worktree Applicable? | Reason                              |
+| -------------- | -------------------- | ----------------------------------- |
+| Review         | No                   | Read-only analysis                  |
+| Implementation | Yes                  | Agents write code that may conflict |
+| Research       | No                   | Read-only research                  |
+| Debug          | Yes                  | Agents may apply experimental fixes |
 
 ### Opt-In
 
@@ -426,6 +426,7 @@ Enable with `--use-worktrees` flag. Only takes effect when combined with `--temp
 ### Worktree Lifecycle
 
 1. **Create**: For each participating agent, create a worktree:
+
    ```bash
    git worktree add .claude/context/tmp/council-<session-id>/<agent-name> -b council/<session-id>/<agent-name>
    ```
@@ -435,6 +436,7 @@ Enable with `--use-worktrees` flag. Only takes effect when combined with `--temp
 3. **Merge**: After council completes, the chairman reviews diffs from each worktree branch and merges non-conflicting changes back to the source branch.
 
 4. **Cleanup**: Remove worktrees and branches:
+
    ```bash
    git worktree remove .claude/context/tmp/council-<session-id>/<agent-name>
    git branch -D council/<session-id>/<agent-name>
@@ -503,19 +505,21 @@ When `--resume SESSION_ID` is used:
 1. Load `session.json` from the session directory
 2. Verify session is not expired (24-hour TTL from `last_active`)
 3. Include previous turns' synthesis and user feedback in the next Stage 1 prompt:
+
    ```
    Previous council synthesis: [Stage 3 output from last turn]
    User feedback: [feedback text]
    Continue the analysis with this additional context.
    ```
+
 4. Models receive full conversation history for context continuity
 5. Increment `turn_count` and update `last_active`
 
 ### Configuration
 
-| Env Var | Default | Purpose |
-|---------|---------|---------|
-| `LLM_COUNCIL_MAX_TURNS` | 5 | Maximum turns per session before forced closure |
+| Env Var                 | Default | Purpose                                         |
+| ----------------------- | ------- | ----------------------------------------------- |
+| `LLM_COUNCIL_MAX_TURNS` | 5       | Maximum turns per session before forced closure |
 
 ### Session Expiry
 
@@ -524,6 +528,7 @@ Sessions older than 24 hours are considered expired. Attempting to `--resume` an
 ### Cleanup
 
 Session directories are cleaned up when:
+
 - The session reaches `max_turns`
 - The user does not resume within 24 hours
 - The user explicitly closes the session (no `--resume` after final turn)
