@@ -28,8 +28,6 @@ tools:
 skills:
   - style-analyzer
   - voice-clone-generator
-  - prompt-engineer
-  - nlp-engineer
   - ripgrep
   - code-semantic-search
   - context-compressor

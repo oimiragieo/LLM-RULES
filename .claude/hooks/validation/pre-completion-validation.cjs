@@ -77,8 +77,6 @@ const ENFORCED_CREATOR_SKILLS = [
   'workflow-creator',
 ];
 
-const _VALID_STATUSES = VALID_TASK_STATUSES;
-
 /**
  * Read current task status from file
  * @param {string} taskId - Task ID to look up
@@ -472,7 +470,7 @@ function enforceReflectionScore(toolParams) {
       '[pre-completion-validation] Reflection score emitted without dataQuality field — cannot verify score was not fabricated. Add metadata.dataQuality: "full"|"partial"|"insufficient"';
     if (reflectionMode === 'block') {
       console.log(formatHookResult('block', reflectionMsg));
-      process.exit(0);
+      process.exit(2);
     } else if (reflectionMode !== 'off') {
       process.stderr.write(reflectionMsg + '\n');
     }
@@ -510,7 +508,7 @@ function enforceRequiredOutputs(completionTaskId, toolParams) {
     console.warn(`[WARN] ${validationMessage}`);
   } else {
     console.log(formatHookResult('block', validationMessage));
-    process.exit(0);
+    process.exit(2);
   }
 }
 
@@ -558,7 +556,7 @@ async function main() {
             const msg = getTransitionError(taskId, currentStatus, newStatus);
             if (taskStatusMode === 'block') {
               console.log(formatHookResult('block', msg));
-              process.exit(0);
+              process.exit(2);
             } else {
               console.warn(`[WARN] ${msg}`);
             }
@@ -581,7 +579,7 @@ async function main() {
           'TaskUpdate(completed) requires metadata.summary. Set PRE_COMPLETION_SUMMARY_ENFORCEMENT=warn to downgrade.';
         if (summaryMode === 'block') {
           console.log(formatHookResult('block', summaryMsg));
-          process.exit(0);
+          process.exit(2);
         } else {
           process.stderr.write(
             `[pre-completion-validation] WARNING: TaskUpdate(completed) missing metadata.summary — reflection will be blind\n`
@@ -607,7 +605,7 @@ async function main() {
         const summaryRequiredMsg = `TaskUpdate blocked: summary metadata is required (50+ chars, not the fallback string). Reason: ${blockReason}. Set SUMMARY_REQUIRED_ENFORCEMENT=warn to downgrade.`;
         if (summaryRequiredMode === 'block') {
           console.log(formatHookResult('block', summaryRequiredMsg));
-          process.exit(0);
+          process.exit(2);
         } else {
           process.stderr.write(
             `[pre-completion-validation] SUMMARY_REQUIRED_ENFORCEMENT WARNING: ${blockReason}\n`
@@ -645,7 +643,7 @@ async function main() {
             const gitMsg = `GIT COMMIT VERIFICATION FAILED: TaskUpdate(completed) claims commit/push but ${dirtyFiles.length} file(s) have uncommitted changes:\n${dirtyFiles.slice(0, 5).join('\n')}${dirtyFiles.length > 5 ? `\n... and ${dirtyFiles.length - 5} more` : ''}\nFix: stage and commit remaining changes before marking task complete. Set GIT_COMMIT_VERIFICATION=off to disable.`;
             if (commitVerifyMode === 'block') {
               console.log(formatHookResult('block', gitMsg));
-              process.exit(0);
+              process.exit(2);
             } else {
               process.stderr.write(`[pre-completion-validation] WARNING: ${gitMsg}\n`);
             }
@@ -667,7 +665,7 @@ async function main() {
       if (!ecosystem.passed) {
         const msg = ['CREATOR ECOSYSTEM ALIGNMENT FAILED', ...ecosystem.issues].join('\n');
         console.log(formatHookResult('block', msg));
-        process.exit(0);
+        process.exit(2);
       }
     }
 

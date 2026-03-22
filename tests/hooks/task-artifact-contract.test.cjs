@@ -224,7 +224,7 @@ test('pre-completion blocks completed status when required output file is missin
     });
     assert.equal(
       result.status,
-      0,
+      2,
       `expected block exit code 2, got ${result.status}: ${result.stdout}`
     );
     assert.match(result.stdout, /REQUIRED OUTPUT VALIDATION FAILED|Missing required outputs/i);
@@ -295,7 +295,7 @@ test('pre-completion blocks when required output points to read-safety placehold
     });
     assert.equal(
       result.status,
-      0,
+      2,
       `expected block exit code 2, got ${result.status}: ${result.stdout}`
     );
     assert.match(result.stdout, /Invalid placeholder outputs|REQUIRED OUTPUT VALIDATION FAILED/i);
