@@ -155,8 +155,41 @@ function createPostTaskCompletionHelpers(deps) {
     }
   }
 
+  // Issue 4 fix: Track retry counts per taskId to prevent infinite retry loops.
+  // After MAX_TASK_RETRIES (default 2), escalate to user instead of retrying.
+  const MAX_TASK_RETRIES = Number(process.env.MAX_TASK_RETRIES || 2);
+  const _retryCountsByTaskId = new Map();
+
   function synthesizeRecoveryTaskUpdate(taskId, reason, retryHint, details = {}) {
     try {
+      // Issue 4 fix: Check retry count before queuing another recovery attempt
+      if (taskId) {
+        const key = String(taskId);
+        const currentCount = _retryCountsByTaskId.get(key) || 0;
+        if (currentCount >= MAX_TASK_RETRIES) {
+          // Max retries reached — escalate to user instead of looping
+          const escalationRecord = {
+            timestamp: new Date().toISOString(),
+            sessionId: process.env.CLAUDE_SESSION_ID || null,
+            taskId: taskId,
+            status: 'escalated',
+            synthetic: true,
+            reason: `max_retries_exceeded (${MAX_TASK_RETRIES} attempts)`,
+            retryHint: `Task ${taskId} failed ${MAX_TASK_RETRIES} times for reason: ${reason}. Escalate to user via AskUserQuestion.`,
+            details: { ...details, retryCount: currentCount, originalReason: reason },
+          };
+          const dir = path.dirname(TASKUPDATE_RECOVERY_QUEUE_PATH);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.appendFileSync(
+            TASKUPDATE_RECOVERY_QUEUE_PATH,
+            `${JSON.stringify(escalationRecord)}\n`,
+            'utf8'
+          );
+          return false; // Signal that retry was NOT queued — escalation instead
+        }
+        _retryCountsByTaskId.set(key, currentCount + 1);
+      }
+
       const dir = path.dirname(TASKUPDATE_RECOVERY_QUEUE_PATH);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
@@ -168,7 +201,7 @@ function createPostTaskCompletionHelpers(deps) {
         synthetic: true,
         reason,
         retryHint,
-        details,
+        details: { ...details, retryCount: taskId ? _retryCountsByTaskId.get(String(taskId)) : 0 },
       };
 
       fs.appendFileSync(TASKUPDATE_RECOVERY_QUEUE_PATH, `${JSON.stringify(record)}\n`, 'utf8');

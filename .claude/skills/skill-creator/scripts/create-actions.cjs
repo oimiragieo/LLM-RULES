@@ -195,6 +195,20 @@ function createActions(ctx) {
 
     preValidateSkill(config);
 
+    // Pre-write manifest validation: verify parent directories and critical framework files exist
+    const manifestChecks = [
+      { path: SKILLS_DIR, label: 'skills directory' },
+      { path: path.join(CLAUDE_DIR, 'CLAUDE.md'), label: 'CLAUDE.md' },
+    ];
+    for (const check of manifestChecks) {
+      if (!fs.existsSync(check.path)) {
+        console.error(
+          `ERROR: Pre-write manifest check failed — ${check.label} not found at ${check.path}`
+        );
+        process.exit(1);
+      }
+    }
+
     const enterpriseEnabled = config.enterprise !== false && !config.noEnterprise;
     const flags = {
       refs: !!(refs || enterpriseEnabled),

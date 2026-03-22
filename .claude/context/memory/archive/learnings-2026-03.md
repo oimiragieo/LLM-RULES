@@ -1061,3 +1061,31 @@ Pattern reuse: MEDIUM — document in spawn templates, recommend non-worktree fo
 - Skill created at `.claude/skills/codebase-exploration/SKILL.md` (7-phase protocol)
 - Phase progression: (1) token budget assessment, (2) repo map, (3) entry point identification, (4) dependency graph, (5) hot module identification, (6) targeted deep reads, (7) synthesis
 - Key LLM-agent codebase exploration research (task 12): synthesized 12+ sources incl. SWE-bench, LocAgent, Complexity Trap, Aider, Cursor, OpenHands → 6-phase protocol with token budgets
+
+---
+
+## Spawn Protocol Enforcement Batch (2026-03-20) [Tasks 15-18, commit fe75e181]
+
+**[WORKFLOW] TaskList-first + TaskUpdate atomicity + token visibility hardening**
+
+- **Task 15** (spawn protocol fixes): TaskList-first enforcement added to routing-guard.cjs; TaskUpdate contract injection ensures in_progress → work → completed; agent role clarity in CLAUDE.md Section 2. Passive enforcement (no immediate validation until next router run)
+- **Task 16** (token reporting): ccusage status injected into planner/orchestrator spawn prompts at creation time; router displays `[tokens] X today (in: Y / out: Z) | Cost: W` on every prompt; auto-updated via ccusage-statusline.cjs hook. Improves context pressure visibility
+- **Task 17** (multi-LLM reviews): Gemini + Codex external review completed; unused variable fixed; findings not yet consolidated to learnings.md (visibility gap)
+- **Task 18** (atomic commit): All three changes bundled into fe75e181 (spawn protocol + token reporting + cleanup); proper co-authored-by; pushed to main
+- **Batch pattern**: Protocol enforcement should include regression tests before commit (Task 15 missing test evidence); multi-LLM findings should auto-persist to memory (Task 17 gap)
+- **Lessons**: (1) Atomic commits for related protocol changes improve auditability; (2) Token visibility at spawn time (not post-hoc) is more useful; (3) External LLM reviews catch edge cases but need consolidation
+- Post-Gemini/Codex review upgrades: repo map generation added, token-budget gate replaces file-count gate, synthesis agent for cross-cutting concerns
+- Researcher + artifact-integrator agents updated to use smart exploration integration (commits 3c01f782, 1f5e6583)
+- Pattern: research (task 12) → multi-LLM review (task 13) → implementation (task 14) is a proven 3-step creator flow
+
+---
+
+## Worktree Hook MODULE_NOT_FOUND — SYSTEMIC Pattern (2026-03-17) [Multiple tasks]
+
+**[INFRA] Stop/Pre/PostToolUse hooks fail with MODULE_NOT_FOUND after worktree deletion**
+
+- Root cause: Claude Code caches CWD at session start; worktree deletion breaks relative path resolution
+- Pattern: appears in EVERY task reflection in 2026-03-17 session (tasks 11, 12, 13, 14) — confirmed systemic
+- Non-blocking (hooks error, don't crash the session) but noisy
+- Fix: start fresh session after worktree cleanup; do not rely on hook registration in worktree-aware sessions
+- Source agent: router (agent-a3ba653c worktree cleanup context)
