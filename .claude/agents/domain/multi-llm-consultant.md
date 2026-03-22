@@ -22,6 +22,8 @@ skills:
   - omega-claude-cli
   - omega-codex-cli
   - omega-gemini-cli
+  - llm-council
+  - consensus-voting
   - ripgrep
   - task-management-protocol
   - context-compressor
@@ -41,10 +43,17 @@ triggerPhrases:
   - ask Cursor
   - council debate
   - multi-model
+  - review template
+  - debug council
+  - implementation council
+  - research council
+  - resume council
 description: >
   Orchestrates multi-LLM consultation workflows by detecting available external LLM CLIs, dispatching prompts in
-  parallel, and synthesizing results. Supports single-model queries (e.g., "ask Gemini about X") and full council
-  deliberations (3-stage: independent responses, anonymized peer review, chairman synthesis).
+  parallel, and synthesizing results. Supports single-model queries (e.g., "ask Gemini about X"), full council
+  deliberations (3-stage: independent responses, anonymized peer review, chairman synthesis), collaboration
+  templates (review, implementation, research, debug), idle watchdog monitoring, inter-agent messaging,
+  worktree isolation for code-modifying councils, and multi-turn persistent sessions.
 ---
 
 # Multi-LLM Consultant Agent
@@ -70,6 +79,16 @@ results into a comprehensive response.
    - "Run an LLM council on this architectural decision"
    - "I need consensus from multiple models on this approach"
 
+4. **Collaboration templates:** Role-constrained council sessions
+   - Review: multi-perspective code review (correctness, performance, security)
+   - Implementation: plan-execute-verify staged workflow
+   - Research: independent investigation with cross-comparison
+   - Debug: independent diagnosis with convergence analysis
+
+5. **Multi-turn sessions:** Persistent council deliberations
+   - Resume previous council sessions with user feedback
+   - Iterative refinement across multiple rounds
+
 ## Workflow
 
 ### For Single-Model Queries
@@ -92,6 +111,20 @@ results into a comprehensive response.
 1. Invoke `Skill({ skill: 'llm-council' })`
 2. Follow the 3-stage council protocol
 3. Present structured output with all stages
+
+### For Template-Based Council
+
+1. Invoke `Skill({ skill: 'llm-council', args: '--template review' })` (or implementation/research/debug)
+2. Each model receives role-specific focus prompts from the template
+3. Chairman uses template-specific synthesis strategy
+4. Dual-completion gate verifies consensus before closing
+
+### For Multi-Turn Sessions
+
+1. Invoke `Skill({ skill: 'llm-council', args: '--multi-turn' })` for first turn
+2. Present synthesis to user, collect feedback
+3. Invoke `Skill({ skill: 'llm-council', args: '--resume SESSION_ID' })` with user feedback
+4. Repeat until user is satisfied or max turns (5) reached
 
 ## Routing Triggers
 
@@ -118,7 +151,8 @@ This agent should be spawned when user requests contain:
 - `omega-codex-cli` -- Codex CLI headless wrapper
 - `omega-cursor-cli` -- Cursor Agent CLI headless wrapper
 - `omega-claude-cli` -- Claude Code CLI headless wrapper
-- `llm-council` -- Multi-LLM council orchestration protocol
+- `llm-council` -- Multi-LLM council orchestration (templates, watchdog, messaging, worktrees, multi-turn)
+- `consensus-voting` -- Consensus protocols including dual-completion gate
 - `verification-before-completion` -- Evidence-based task completion
 
 ## Code Search Protocol

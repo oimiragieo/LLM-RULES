@@ -203,11 +203,83 @@ to address developer's maintainability concerns.
 </usage_example>
 </examples>
 
+## Dual-Completion Gate Protocol
+
+Prevents premature closure of council or multi-agent tasks by requiring 2+ agents to independently confirm task completion before the session closes.
+
+### Problem
+
+A single agent signaling "done" can produce incomplete results -- the agent may have finished its own subtask but the overall task is not complete. The dual-completion gate requires consensus on completion itself.
+
+### Protocol
+
+1. Track completion signals per agent: `{ agent_id, timestamp, signal: "complete" }`
+2. Require `min_completions` (default: 2) signals within a `window_seconds` time window (default: 60s)
+3. If only 1 agent signals completion, send a "verification nudge" to remaining agents after `nudge_after_seconds` (default: 30s)
+4. After `fallback_timeout` (default: 120s) with only 1 completion, accept single-agent completion with a `warning: "single_agent_completion"` flag
+
+### Configuration
+
+```yaml
+completion_gate:
+  min_completions: 2        # minimum agents that must signal done
+  window_seconds: 60        # time window for completion consensus
+  nudge_after_seconds: 30   # send nudge to remaining agents after first completion
+  fallback_timeout: 120     # accept single completion after this timeout (with warning)
+```
+
+### Pseudocode
+
+```
+completions = []
+
+on_agent_complete(agent_id):
+  completions.push({ agent_id, timestamp: now() })
+
+  if completions.length >= min_completions:
+    window_start = completions[0].timestamp
+    window_end = completions[-1].timestamp
+    if (window_end - window_start) <= window_seconds:
+      return CLOSE_SESSION(status: "consensus_complete")
+
+  if completions.length == 1:
+    schedule_nudge(nudge_after_seconds)
+    schedule_fallback(fallback_timeout)
+
+on_nudge_timeout():
+  send_to_remaining_agents("A team member has signaled completion. Please confirm if the task is done.")
+
+on_fallback_timeout():
+  if completions.length < min_completions:
+    return CLOSE_SESSION(status: "single_agent_complete", warning: "single_agent_completion")
+```
+
+### Integration with LLM Council
+
+The dual-completion gate is invoked by the llm-council skill before closing a council session:
+
+1. After Stage 3 synthesis, each model is asked: "Is this synthesis complete and accurate?"
+2. Models respond with "complete" or "needs_revision"
+3. The gate requires `min_completions` "complete" signals before closing
+4. If gate fails (insufficient completions), chairman reviews and decides
+
+### Voting Protocols Table Update
+
+| Protocol | Use Case | Threshold | Quorum |
+|----------|----------|-----------|--------|
+| Simple Majority | Routine decisions | >50% | 50% |
+| Supermajority | Significant changes | >=66% | 75% |
+| Unanimous | Critical/irreversible decisions | 100% | 100% |
+| Weighted | Specialized expertise required | Variable | 66% |
+| Ranked Choice | Multiple alternatives | Runoff | 75% |
+| **Dual Completion** | **Council task closure** | **2 agents confirm** | **100%** |
+
 ## Rules
 
 - Always require quorum before deciding
 - Weight votes by domain expertise
 - Document dissenting opinions for future reference
+- Require dual-agent completion consensus before closing council sessions
 
 ## Related Workflow
 

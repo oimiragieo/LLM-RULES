@@ -104,6 +104,18 @@ When automated consensus fails:
 
 **3f+1 rule**: System tolerates up to `f` faulty agents if total agents ≥ 3f+1.
 
+## Dual-Completion Gate
+
+Before closing any council or multi-agent task session, require dual-agent completion consensus:
+
+- **Minimum 2 agents** must independently signal "complete" within a 60-second window
+- If only 1 agent signals, send a verification nudge to remaining agents after 30 seconds
+- If fallback timeout (120s) expires with only 1 completion, accept with a `single_agent_completion` warning flag
+- The dual-completion gate applies to all council sessions and multi-agent decision workflows
+- Configuration is in the `consensus-voting` SKILL.md under `## Dual-Completion Gate Protocol`
+
+**Anti-Pattern:** Closing a council session after a single model signals "done" -- this produces incomplete results when other models have unfinished analysis.
+
 ## Integration Points
 
 ### Master Orchestrator
