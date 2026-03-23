@@ -1,4 +1,3 @@
-
 function process1(data) {
   // Process function 1
   console.log('Processing:', data);
@@ -14,4 +13,3 @@ class Handler1 {
     return process1([input]);
   }
 }
-          
