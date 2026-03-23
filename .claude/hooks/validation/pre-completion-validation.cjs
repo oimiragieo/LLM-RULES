@@ -654,6 +654,83 @@ async function main() {
       }
     }
 
+    // Shared heuristic: detect pipeline-level completions from summary text
+    const completionSummary = (toolParams.metadata && toolParams.metadata.summary) || '';
+    const completionSummaryLower = completionSummary.toLowerCase();
+    const isPipelineCompletion =
+      completionSummaryLower.includes('pipeline') ||
+      completionSummaryLower.includes('phase') ||
+      completionSummaryLower.includes('milestone') ||
+      completionSummaryLower.includes('all tasks') ||
+      completionSummaryLower.includes('wired') ||
+      completionSummaryLower.includes('integration complete') ||
+      completionSummaryLower.includes('pushed to main');
+
+    // MILESTONE_SELF_REVIEW_ENFORCEMENT: require self-review trace entry before pipeline completion.
+    // Agents must emit a hook-trace entry with checkedBy containing "self-review" before completing
+    // pipeline-level tasks. This prevents the pattern of rushing to completion without reflection.
+    const selfReviewMode = getEnforcementMode('MILESTONE_SELF_REVIEW_ENFORCEMENT', 'warn');
+    if (selfReviewMode !== 'off' && isPipelineCompletion) {
+      // Check for self-review trace in hook-trace.jsonl (last 50 lines)
+      let hasSelfReview = false;
+      try {
+        const traceFile = path.join(PROJECT_ROOT, '.claude/context/runtime/hook-trace.jsonl');
+        if (fs.existsSync(traceFile)) {
+          const content = fs.readFileSync(traceFile, 'utf8');
+          const lines = content.trim().split('\n').slice(-50);
+          hasSelfReview = lines.some(line => {
+            try {
+              const entry = JSON.parse(line);
+              return entry.checkedBy && String(entry.checkedBy).includes('self-review');
+            } catch (_e) {
+              return false;
+            }
+          });
+        }
+      } catch (_e) {
+        // Best effort
+      }
+      // Also accept metadata flag as alternative
+      if (toolParams.metadata && toolParams.metadata.selfReviewCompleted) {
+        hasSelfReview = true;
+      }
+      if (!hasSelfReview) {
+        const selfReviewMsg =
+          'MILESTONE SELF-REVIEW REQUIRED: Pipeline/phase completion detected but no self-review trace found. ' +
+          'Before completing, ask "Can I improve this?" and either (a) emit a hook-trace entry with checkedBy:"self-review:milestone" ' +
+          'or (b) include metadata.selfReviewCompleted:true. Set MILESTONE_SELF_REVIEW_ENFORCEMENT=off to disable.';
+        if (selfReviewMode === 'block') {
+          console.log(formatHookResult('block', selfReviewMsg));
+          process.exit(2);
+        } else {
+          process.stderr.write(`[pre-completion-validation] WARNING: ${selfReviewMsg}\n`);
+        }
+      }
+    }
+
+    // CCUSAGE_REPORT_ENFORCEMENT: require token usage reporting on pipeline completions.
+    // Ensures agents report cost/token data at milestone boundaries.
+    const ccusageMode = getEnforcementMode('CCUSAGE_REPORT_ENFORCEMENT', 'warn');
+    if (ccusageMode !== 'off' && isPipelineCompletion) {
+      const hasTokenReport =
+        (toolParams.metadata && toolParams.metadata.tokenUsage) ||
+        (toolParams.metadata && toolParams.metadata.costUsd) ||
+        completionSummaryLower.includes('token') ||
+        completionSummaryLower.includes('cost') ||
+        completionSummaryLower.includes('ccusage');
+      if (!hasTokenReport) {
+        const ccusageMsg =
+          'CCUSAGE REPORT REQUIRED: Pipeline completion detected but no token/cost data found. ' +
+          'Run ccusage and include token stats in metadata or summary. Set CCUSAGE_REPORT_ENFORCEMENT=off to disable.';
+        if (ccusageMode === 'block') {
+          console.log(formatHookResult('block', ccusageMsg));
+          process.exit(2);
+        } else {
+          process.stderr.write(`[pre-completion-validation] WARNING: ${ccusageMsg}\n`);
+        }
+      }
+    }
+
     // REFLECTION_SCORE_ENFORCEMENT: detect reflection agent fabricating scores without dataQuality.
     enforceReflectionScore(toolParams);
 

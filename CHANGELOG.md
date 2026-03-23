@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Secret redaction utility** (`redact-secrets.cjs`): 11-pattern deep redaction for text and nested objects. Used by hook-trace logger to prevent secrets from appearing in any log file
 - **Hook trace logger** (`hook-trace.cjs`): Structured NDJSON logger with `checkedBy` field support. Every hook decision now records WHICH specific check/rule fired, enabling "which rules fire most?" analytics. Writes to `.claude/context/runtime/hook-trace.jsonl` with automatic rotation at 5000 lines
 - 33 new unit tests covering redact-secrets (12), hook-trace (7), dlp-pretool (8), plus formatted/linted
+- **Milestone self-review enforcement** in `pre-completion-validation.cjs`: pipeline completions now require a self-review trace entry or `metadata.selfReviewCompleted` flag. Controlled by `MILESTONE_SELF_REVIEW_ENFORCEMENT` env var (default: warn)
+- **ccusage token reporting enforcement** in `pre-completion-validation.cjs`: pipeline completions now warn when no token/cost data is included. Controlled by `CCUSAGE_REPORT_ENFORCEMENT` env var (default: warn)
 
 ### Fixed
 
