@@ -10,6 +10,7 @@
 
 Before committing to a significant technical decision where multiple viable options exist.
 Trigger conditions:
+
 - Architecture choices (microservices vs monolith, SQL vs NoSQL, etc.)
 - Technology stack decisions
 - Security trade-offs (strict vs permissive controls)
@@ -50,16 +51,19 @@ node .claude/skills/adversarial-debate/scripts/main.cjs \
 For each round 1..N:
 
 **PRO agent turn:**
+
 > Present the strongest evidence for `{{PRO_STANCE}}` in context of `{{TOPIC}}`.
 > Reference: specific examples, metrics, or proven patterns.
 > Rebut the previous CON argument if this is round 2+.
 
 **CON agent turn:**
+
 > Present the strongest evidence for `{{CON_STANCE}}` in context of `{{TOPIC}}`.
 > Reference: specific examples, metrics, or proven patterns.
 > Rebut the previous PRO argument directly.
 
 **Score each round** on four dimensions (1–5 each):
+
 - Specificity (generic → concrete examples)
 - Evidence quality (assertion → data/precedent)
 - Rebuttal quality (ignored → directly addressed)
@@ -73,25 +77,30 @@ After all rounds complete, the moderator agent synthesizes:
 ## Synthesis: {{TOPIC}}
 
 ### Score Summary
-| Round | PRO | CON |
-|-------|-----|-----|
-| 1     | {{P1}} | {{C1}} |
-| ...   | ...  | ...  |
+
+| Round | PRO        | CON        |
+| ----- | ---------- | ---------- |
+| 1     | {{P1}}     | {{C1}}     |
+| ...   | ...        | ...        |
 | Total | {{PTOTAL}} | {{CTOTAL}} |
 
 ### Key Arguments That Held Up Under Scrutiny
+
 - PRO: [strongest surviving argument]
 - CON: [strongest surviving argument]
 
 ### Decision Factors That Were Not Adequately Addressed
+
 - [Any gaps that remain unresolved]
 
 ### Recommendation
+
 **{{OPTION}}** with {{confidence}}% confidence.
 
 Rationale: [1–2 sentences citing specific debate evidence]
 
 ### Conditions Under Which This Recommendation Changes
+
 - [Condition 1]
 - [Condition 2]
 ```
@@ -102,6 +111,7 @@ Rationale: [1–2 sentences citing specific debate evidence]
 <!-- Append to .claude/context/memory/decisions.md -->
 
 ## ADR-XXX: {{TOPIC}}
+
 **Date:** {{DATE}}
 **Decision:** {{CHOSEN_OPTION}}
 **Confidence:** {{CONFIDENCE}}%
@@ -114,13 +124,14 @@ Rationale: [1–2 sentences citing specific debate evidence]
 
 ## Scoring Reference
 
-| Score | Specificity | Evidence | Rebuttal | Relevance |
-|-------|-------------|----------|----------|-----------|
-| 5 | Named components, metrics | Cited data/precedents | Directly dismantled | Core constraint addressed |
-| 3 | Moderately specific | Anecdotal support | Partially addressed | Tangentially relevant |
-| 1 | Generic claim | No support | Ignored | Off-topic |
+| Score | Specificity               | Evidence              | Rebuttal            | Relevance                 |
+| ----- | ------------------------- | --------------------- | ------------------- | ------------------------- |
+| 5     | Named components, metrics | Cited data/precedents | Directly dismantled | Core constraint addressed |
+| 3     | Moderately specific       | Anecdotal support     | Partially addressed | Tangentially relevant     |
+| 1     | Generic claim             | No support            | Ignored             | Off-topic                 |
 
 **Flag for re-run** if:
+
 - Any round score differential > 8 (debate too one-sided)
 - Both agents argue from the same evidence (stances have drifted)
 - Confidence < 60% after N rounds (consider adding rounds)
@@ -129,12 +140,12 @@ Rationale: [1–2 sentences citing specific debate evidence]
 
 ## Integration Points
 
-| Component | Role |
-|-----------|------|
-| `architect` agent | Primary invoker for architecture decisions |
-| `planner` agent | Invokes before plan finalization |
-| `security-architect` agent | Invokes for security trade-off analysis |
-| `decisions.md` | Receives ADR records from Phase 5 |
+| Component                  | Role                                       |
+| -------------------------- | ------------------------------------------ |
+| `architect` agent          | Primary invoker for architecture decisions |
+| `planner` agent            | Invokes before plan finalization           |
+| `security-architect` agent | Invokes for security trade-off analysis    |
+| `decisions.md`             | Receives ADR records from Phase 5          |
 
 ---
 

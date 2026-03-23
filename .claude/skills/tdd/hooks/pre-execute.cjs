@@ -7,13 +7,14 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const MAX_PROFILE_BYTES = 16 * 1024;
 
 function parseInput() {
   const raw = process.argv.length > 2 ? process.argv.slice(2).join(' ') : '{}';
   try {
-    return JSON.parse(raw);
+    return safeParseJSON(raw);
   } catch (_err) {
     return {};
   }
@@ -78,7 +79,7 @@ function loadMemoryWarnings() {
       return warnings;
     }
 
-    const profile = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
+    const profile = safeParseJSON(fs.readFileSync(profilePath, 'utf8'));
     const commandHints = profile.commandHints || {};
     if (typeof commandHints.testCommand === 'string' && commandHints.testCommand.trim()) {
       warnings.push(`memory hint: test command -> ${commandHints.testCommand}`);

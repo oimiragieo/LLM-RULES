@@ -155,9 +155,7 @@ function main() {
   }
 
   if (scriptArgs.length === 0) {
-    process.stderr.write(
-      'ERROR: No arguments provided. Run with --help for usage.\n'
-    );
+    process.stderr.write('ERROR: No arguments provided. Run with --help for usage.\n');
     process.exit(1);
   }
 

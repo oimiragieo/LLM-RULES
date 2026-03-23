@@ -22,6 +22,7 @@ const {
   readSpawnRequestsFile,
 } = require('../../lib/reflection/spawn-request-contract.cjs');
 const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
@@ -41,7 +42,7 @@ function deduplicateProcessedIds(verifiedIds) {
     const alreadyProcessed = new Set();
     for (const line of logContent.split('\n').filter(Boolean)) {
       try {
-        const entry = JSON.parse(line);
+        const entry = safeParseJSON(line);
         if (Array.isArray(entry.processedReflectionIds)) {
           entry.processedReflectionIds.forEach(id => alreadyProcessed.add(id));
         }

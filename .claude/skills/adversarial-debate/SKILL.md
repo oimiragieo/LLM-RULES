@@ -97,12 +97,12 @@ CON agent responds with:
 
 Score each round immediately using this rubric (0–10 per dimension):
 
-| Dimension     | Description                                              |
-|---------------|----------------------------------------------------------|
-| Specificity   | Arguments use concrete examples, not vague claims        |
-| Evidence      | Claims backed by data, precedent, or first principles    |
+| Dimension        | Description                                           |
+| ---------------- | ----------------------------------------------------- |
+| Specificity      | Arguments use concrete examples, not vague claims     |
+| Evidence         | Claims backed by data, precedent, or first principles |
 | Rebuttal Quality | Directly addresses opposing argument, no deflection   |
-| Relevance     | Arguments stay on the stated topic                       |
+| Relevance        | Arguments stay on the stated topic                    |
 
 **Round Score = mean(Specificity, Evidence, Rebuttal Quality, Relevance)**
 
@@ -128,6 +128,7 @@ After all rounds, the moderator agent produces a structured synthesis:
 ## Decision Factors
 
 List 3-5 factors that should determine which stance wins in context:
+
 1. Factor: [e.g., team expertise] → Favors: [PRO/CON/neutral]
 2. ...
 

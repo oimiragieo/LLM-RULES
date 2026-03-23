@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const CREATOR_NAME = 'workflow-creator';
 
@@ -25,7 +26,7 @@ const CREATOR_NAME = 'workflow-creator';
 const DEFAULT_TTL_MS = Number(process.env.CREATOR_STATE_TTL_MS) || 3 * 60 * 1000;
 
 // Parse hook input
-const input = JSON.parse(process.argv[2] || '{}');
+const input = safeParseJSON(process.argv[2] || '{}');
 
 console.log(`[${CREATOR_NAME.toUpperCase()}] Pre-execute: Marking ${CREATOR_NAME} as active...`);
 
@@ -67,7 +68,7 @@ function markCreatorActive() {
     let state = {};
     if (fs.existsSync(STATE_FILE)) {
       try {
-        state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+        state = safeParseJSON(fs.readFileSync(STATE_FILE, 'utf8'));
       } catch (_e) {
         // If file is corrupted, start fresh
         state = {};

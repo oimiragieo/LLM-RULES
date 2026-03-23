@@ -7,9 +7,10 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 // Parse hook input
-const result = JSON.parse(process.argv[2] || '{}');
+const result = safeParseJSON(process.argv[2] || '{}');
 
 console.log('📝 [TERRAFORM-INFRA] Post-execute processing...');
 

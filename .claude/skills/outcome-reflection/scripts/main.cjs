@@ -127,9 +127,7 @@ function generateNotes(estimation, decisionScore, actuals = {}) {
             `${key} underestimated by ${Math.round((ratio - 1) * 100)}%. Consider ${Math.round(ratio * 10) / 10}x buffer.`
           );
         } else if (ratio < 0.7) {
-          notes.push(
-            `${key} overestimated by ${Math.round((1 - ratio) * 100)}%. Reduce buffer.`
-          );
+          notes.push(`${key} overestimated by ${Math.round((1 - ratio) * 100)}%. Reduce buffer.`);
         }
       }
     }
@@ -170,11 +168,7 @@ function reflect(args) {
   // Default to null unless --predictionScore is provided
   const predictionScore = args.predictionScore ? parseFloat(args.predictionScore) : null;
 
-  const overall = computeOverallScore(
-    estimation.score,
-    predictionScore,
-    decisionScore
-  );
+  const overall = computeOverallScore(estimation.score, predictionScore, decisionScore);
 
   const scores = {
     estimationAccuracy: estimation.score,

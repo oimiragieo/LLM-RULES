@@ -8,6 +8,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function validateVoiceProfileDimension(voiceProfile, dim) {
   if (!(dim in voiceProfile)) return;
@@ -30,7 +31,7 @@ function preExecute(input = {}) {
       return { continue: true };
     }
 
-    const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+    const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf8'));
 
     // Validate required fields manually (lightweight, no ajv dependency required)
     const required = schema.required || [];
@@ -84,7 +85,7 @@ if (require.main === module) {
   });
   process.stdin.on('end', () => {
     try {
-      const input = data ? JSON.parse(data) : {};
+      const input = data ? safeParseJSON(data) : {};
       preExecute(input);
       process.stdout.write(JSON.stringify({ allow: true }) + '\n');
       process.exit(0);

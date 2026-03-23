@@ -9,14 +9,17 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const SCHEMA_PATH = path.join(__dirname, '..', 'schemas', 'input.schema.json');
 
 function loadSchema() {
   try {
-    return JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
+    return safeParseJSON(fs.readFileSync(SCHEMA_PATH, 'utf8'));
   } catch (err) {
-    process.stderr.write(`[outcome-reflection/pre-execute] Could not load schema: ${err.message}\n`);
+    process.stderr.write(
+      `[outcome-reflection/pre-execute] Could not load schema: ${err.message}\n`
+    );
     return null;
   }
 }
@@ -24,7 +27,7 @@ function loadSchema() {
 function parseInput() {
   const raw = process.argv.length > 2 ? process.argv.slice(2).join(' ') : '{}';
   try {
-    return JSON.parse(raw);
+    return safeParseJSON(raw);
   } catch (_err) {
     return {};
   }

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 'use strict';
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
-const result = JSON.parse(process.argv[2] || '{}');
+const result = safeParseJSON(process.argv[2] || '{}');
 const checkpoints = Array.isArray(result.checkpoints) ? result.checkpoints.length : 0;
 
 process.stdout.write(

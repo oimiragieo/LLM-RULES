@@ -43,10 +43,10 @@ node .claude/skills/outcome-reflection/scripts/main.cjs \
 
 Append the calibration record to `.claude/context/memory/learnings.md`:
 
-```bash
+````bash
 # Add under ## Calibration Records section
 # Format: ```json { ...calibration record... } ```
-```
+````
 
 ### Phase 4: Handle Flags
 
@@ -96,6 +96,7 @@ node .claude/skills/outcome-reflection/scripts/main.cjs \
 ```
 
 Review output for:
+
 - Consistent underestimation patterns → adjust multipliers
 - Recurring `excessive-rework` flag → improve planning process
 - Declining `predictionQuality` → review prediction methodology
@@ -104,12 +105,12 @@ Review output for:
 
 ## Integration Points
 
-| Component | Role |
-|-----------|------|
-| `plan-generator` | Records `predictions` in task metadata at creation |
-| `developer` agent | Calls outcome-reflection after task completion |
-| `planner` agent | Calls outcome-reflection after planning tasks |
-| `reflection-agent` | Processes `reflectionQueued: true` signals |
+| Component           | Role                                                |
+| ------------------- | --------------------------------------------------- |
+| `plan-generator`    | Records `predictions` in task metadata at creation  |
+| `developer` agent   | Calls outcome-reflection after task completion      |
+| `planner` agent     | Calls outcome-reflection after planning tasks       |
+| `reflection-agent`  | Processes `reflectionQueued: true` signals          |
 | `instinct-learning` | Receives calibration insights for pattern recording |
 
 ---

@@ -1,5 +1,6 @@
 'use strict';
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 // Pre-execution hook for feedback-analysis skill
 // Validates input against schemas/input.schema.json before execution
@@ -73,7 +74,7 @@ if (require.main === module) {
   });
   process.stdin.on('end', () => {
     try {
-      const input = inputData.trim() ? JSON.parse(inputData) : {};
+      const input = inputData.trim() ? safeParseJSON(inputData) : {};
       const result = preExecute(input);
       process.stdout.write(JSON.stringify(result) + '\n');
     } catch (e) {

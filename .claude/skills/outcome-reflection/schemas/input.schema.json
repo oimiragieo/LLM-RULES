@@ -18,7 +18,16 @@
     },
     "taskType": {
       "type": "string",
-      "enum": ["implementation", "planning", "estimation", "architecture", "security", "documentation", "review", "other"],
+      "enum": [
+        "implementation",
+        "planning",
+        "estimation",
+        "architecture",
+        "security",
+        "documentation",
+        "review",
+        "other"
+      ],
       "description": "Category of task for trend analysis grouping"
     },
     "predictions": {

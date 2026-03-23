@@ -7,6 +7,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const VALID_PHASES = ['plan', 'design', 'implement', 'review', 'test', 'deploy'];
 const PHASE_ORDER = { plan: 0, design: 1, implement: 2, review: 3, test: 4, deploy: 5 };
@@ -60,7 +61,7 @@ if (require.main === module) {
   process.stdin.on('end', () => {
     let input = {};
     try {
-      input = JSON.parse(raw);
+      input = safeParseJSON(raw);
     } catch (_err) {
       /* non-JSON stdin ignored */
     }

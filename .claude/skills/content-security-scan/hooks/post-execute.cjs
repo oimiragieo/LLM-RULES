@@ -7,9 +7,10 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 try {
-  const input = JSON.parse(fs.readFileSync('/dev/stdin', 'utf8'));
+  const input = safeParseJSON(fs.readFileSync('/dev/stdin', 'utf8'));
   const { tool_name, tool_input, tool_output } = input || {};
 
   if (tool_name !== 'Skill' || (tool_input && tool_input.skill !== 'content-security-scan')) {

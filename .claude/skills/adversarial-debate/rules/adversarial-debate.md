@@ -19,6 +19,7 @@ Maximum 5 rounds. After round 3, evaluate whether new arguments are emerging. If
 ## Recommendation Quality Gate
 
 A recommendation is INVALID if it:
+
 - Says "it depends" without listing specific conditions
 - Does not reference round evidence
 - Is not phrased as a clear decision (prefer X over Y)

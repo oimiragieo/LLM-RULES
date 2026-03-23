@@ -7,11 +7,12 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function parseInput() {
   const raw = process.argv.length > 2 ? process.argv.slice(2).join(' ') : '{}';
   try {
-    return JSON.parse(raw);
+    return safeParseJSON(raw);
   } catch {
     return {};
   }
@@ -43,7 +44,7 @@ function validateInput(input) {
       errors.push(`Plan file not found: ${resolved}`);
     } else {
       try {
-        const content = JSON.parse(fs.readFileSync(resolved, 'utf8'));
+        const content = safeParseJSON(fs.readFileSync(resolved, 'utf8'));
         if (!content.waves || !Array.isArray(content.waves)) {
           errors.push('Plan file must contain a "waves" array');
         } else if (content.waves.length === 0) {

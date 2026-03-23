@@ -20,11 +20,12 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const CREATOR_NAME = 'agent-creator';
 
 // Parse hook input (result from skill execution)
-const result = JSON.parse(process.argv[2] || '{}');
+const result = safeParseJSON(process.argv[2] || '{}');
 
 console.log(`[${CREATOR_NAME.toUpperCase()}] Post-execute: Cleaning up state...`);
 
@@ -64,7 +65,7 @@ function clearCreatorActive() {
     // Read existing state
     let state = {};
     try {
-      state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+      state = safeParseJSON(fs.readFileSync(STATE_FILE, 'utf8'));
     } catch (_e) {
       // If file is corrupted, start fresh
       state = {};

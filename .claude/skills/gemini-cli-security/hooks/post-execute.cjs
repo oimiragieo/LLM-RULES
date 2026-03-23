@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 /**
  * PostToolUse hook entry point (stdin/stdout JSON protocol)
@@ -25,7 +26,7 @@ function postExecute(input) {
 
     if (result.output && args.json) {
       try {
-        const parsed = JSON.parse(result.output);
+        const parsed = safeParseJSON(result.output);
         if (parsed.summary) {
           findingsCount =
             (parsed.summary.critical || 0) +
@@ -78,7 +79,7 @@ if (require.main === module) {
   });
   process.stdin.on('end', () => {
     try {
-      const parsed = input.trim() ? JSON.parse(input) : {};
+      const parsed = input.trim() ? safeParseJSON(input) : {};
       const result = postExecute(parsed);
       process.stdout.write(JSON.stringify(result) + '\n');
     } catch {

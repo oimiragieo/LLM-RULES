@@ -51,33 +51,33 @@ score = max(0, 1 - abs(predicted - actual) / max(predicted, actual))
 estimationAccuracy = mean(all pair scores)
 ```
 
-| Ratio (actual/predicted) | Interpretation |
-|--------------------------|----------------|
-| 0.7 – 1.3                | Well-calibrated (±30%) |
-| > 1.3                    | Underestimated — add buffer next time |
+| Ratio (actual/predicted) | Interpretation                          |
+| ------------------------ | --------------------------------------- |
+| 0.7 – 1.3                | Well-calibrated (±30%)                  |
+| > 1.3                    | Underestimated — add buffer next time   |
 | < 0.7                    | Overestimated — reduce buffer next time |
 
 ### Decision Quality (Rework Loops)
 
-| reworkLoops | decisionQuality | Interpretation |
-|-------------|----------------|----------------|
-| 0           | 1.00           | Smooth execution, no pivots |
-| 1           | 0.75           | Minor course correction |
-| 2           | 0.50           | Significant rework needed |
-| 3           | 0.25           | Major rework — investigate root cause |
-| 4+          | 0.00           | Excessive rework — process failure |
+| reworkLoops | decisionQuality | Interpretation                        |
+| ----------- | --------------- | ------------------------------------- |
+| 0           | 1.00            | Smooth execution, no pivots           |
+| 1           | 0.75            | Minor course correction               |
+| 2           | 0.50            | Significant rework needed             |
+| 3           | 0.25            | Major rework — investigate root cause |
+| 4+          | 0.00            | Excessive rework — process failure    |
 
 ### Prediction Quality (Qualitative, 0–1)
 
 Assess how accurately qualitative predictions matched reality:
 
-| Score | Meaning |
-|-------|---------|
+| Score | Meaning                                                      |
+| ----- | ------------------------------------------------------------ |
 | 1.00  | Outcome exactly as predicted, blockers correctly anticipated |
-| 0.75  | Minor deviations from prediction |
-| 0.50  | Some predictions correct, some missed |
-| 0.25  | Predictions largely incorrect |
-| 0.00  | Predictions completely wrong |
+| 0.75  | Minor deviations from prediction                             |
+| 0.50  | Some predictions correct, some missed                        |
+| 0.25  | Predictions largely incorrect                                |
+| 0.00  | Predictions completely wrong                                 |
 
 ### Overall Score
 
@@ -91,11 +91,11 @@ Dimensions with `null` values (not provided) are excluded from the mean.
 
 ## Flags Reference
 
-| Flag | Trigger | Action |
-|------|---------|--------|
-| `high-miss` | overall < 0.6 | Queue for reflection-agent root cause analysis |
-| `estimation-miss` | estimationAccuracy < 0.5 | Adjust estimation heuristics |
-| `excessive-rework` | reworkLoops >= 3 | Investigate planning/decision process |
+| Flag               | Trigger                  | Action                                         |
+| ------------------ | ------------------------ | ---------------------------------------------- |
+| `high-miss`        | overall < 0.6            | Queue for reflection-agent root cause analysis |
+| `estimation-miss`  | estimationAccuracy < 0.5 | Adjust estimation heuristics                   |
+| `excessive-rework` | reworkLoops >= 3         | Investigate planning/decision process          |
 
 ---
 
@@ -147,6 +147,7 @@ node .claude/skills/outcome-reflection/scripts/main.cjs \
 ```
 
 Look for:
+
 - Consistent underestimation of `estimatedTokens` → apply multiplier to future estimates
 - Pattern of `reworkLoops >= 2` → improve upfront planning or decomposition
 - `predictionQuality` consistently < 0.5 → review prediction methodology

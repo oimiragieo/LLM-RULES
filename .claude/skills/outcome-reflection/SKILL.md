@@ -8,7 +8,17 @@ user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep, Skill, MemoryRecord, TaskGet]
 agents: [planner, reflection-agent, architect, general-assistant]
 category: Memory & Context
-tags: [reflection, calibration, memory, accuracy, prediction, estimation, decision-quality, feedback-loop]
+tags:
+  [
+    reflection,
+    calibration,
+    memory,
+    accuracy,
+    prediction,
+    estimation,
+    decision-quality,
+    feedback-loop,
+  ]
 best_practices:
   - Run outcome-reflection immediately after a task completes — delay degrades accuracy
   - Include predicted outcome in task metadata at task creation time (so comparison is possible)
@@ -17,7 +27,8 @@ best_practices:
   - Flag high-miss tasks for reflection-agent followup to identify root cause
 error_handling: graceful
 streaming: supported
-related_skills: [reflection-agent, plan-generator, verification-before-completion, instinct-learning]
+related_skills:
+  [reflection-agent, plan-generator, verification-before-completion, instinct-learning]
 verified: false
 lastVerifiedAt: 2026-03-23T00:00:00.000Z
 ---
@@ -121,7 +132,7 @@ Each outcome-reflection run produces one calibration record:
   "scores": {
     "estimationAccuracy": 0.72,
     "predictionQuality": 0.85,
-    "decisionQuality": 0.80,
+    "decisionQuality": 0.8,
     "overall": 0.79
   },
   "flags": [],
@@ -177,13 +188,13 @@ node .claude/skills/outcome-reflection/scripts/main.cjs \
 
 Read task creation metadata (what was predicted qualitatively) and task completion metadata (what actually happened). Score on 0.0–1.0:
 
-| Outcome Match | Score |
-|---------------|-------|
-| Exact match | 1.0 |
-| Minor deviations | 0.8–0.9 |
-| Moderate deviations | 0.6–0.7 |
+| Outcome Match           | Score   |
+| ----------------------- | ------- |
+| Exact match             | 1.0     |
+| Minor deviations        | 0.8–0.9 |
+| Moderate deviations     | 0.6–0.7 |
 | Significant differences | 0.3–0.5 |
-| Completely wrong | 0.0–0.2 |
+| Completely wrong        | 0.0–0.2 |
 
 ### Step 4: Score Decision Quality
 

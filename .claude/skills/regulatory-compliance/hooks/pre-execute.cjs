@@ -8,6 +8,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function preExecute(input = {}) {
   try {
@@ -21,7 +22,7 @@ function preExecute(input = {}) {
       return { continue: true };
     }
 
-    const _schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+    const _schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf8'));
 
     // Validate required fields
     if (!input.subject || typeof input.subject !== 'string' || input.subject.trim() === '') {

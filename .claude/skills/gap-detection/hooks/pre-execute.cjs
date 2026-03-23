@@ -7,6 +7,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function preExecute(input = {}) {
   const schemaPath = path.resolve(__dirname, '../schemas/input.schema.json');
@@ -17,7 +18,7 @@ function preExecute(input = {}) {
     return { continue: true };
   }
 
-  const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+  const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf8'));
   const errors = [];
 
   // Validate targetDir if provided
@@ -58,7 +59,7 @@ if (require.main === module) {
   process.stdin.on('data', d => (raw += d));
   process.stdin.on('end', () => {
     try {
-      input = JSON.parse(raw);
+      input = safeParseJSON(raw);
     } catch (_) {
       // empty input is fine
     }

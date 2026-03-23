@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 'use strict';
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
-const input = JSON.parse(process.argv[2] || '{}');
+const input = safeParseJSON(process.argv[2] || '{}');
 const repos = Array.isArray(input.repos)
   ? input.repos
   : typeof input.repos === 'string'

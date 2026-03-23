@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 /**
  * PreToolUse hook entry point (stdin/stdout JSON protocol)
@@ -63,7 +64,7 @@ if (require.main === module) {
   });
   process.stdin.on('end', () => {
     try {
-      const parsed = input.trim() ? JSON.parse(input) : {};
+      const parsed = input.trim() ? safeParseJSON(input) : {};
       const result = preExecute(parsed);
       process.stdout.write(JSON.stringify(result) + '\n');
     } catch {

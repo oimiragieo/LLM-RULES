@@ -5,6 +5,7 @@
  */
 
 'use strict';
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 let input = '';
 process.stdin.on('data', chunk => {
@@ -13,7 +14,7 @@ process.stdin.on('data', chunk => {
 
 process.stdin.on('end', () => {
   try {
-    const parsed = JSON.parse(input || '{}');
+    const parsed = safeParseJSON(input || '{}');
     const toolName = parsed.tool_name || '';
 
     // Allow all tool calls through; just emit advisory if context looks thin

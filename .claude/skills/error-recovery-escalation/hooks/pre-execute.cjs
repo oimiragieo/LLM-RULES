@@ -13,7 +13,14 @@ try {
 } catch {
   safeParseJSON = (str, fallback = {}) => {
     try {
-      return { success: true, data: JSON.parse(str) };
+      const parsed = JSON.parse(str);
+      // Strip prototype pollution keys when real safeParseJSON is unavailable
+      if (parsed && typeof parsed === 'object') {
+        delete parsed.__proto__;
+        delete parsed.constructor;
+        delete parsed.prototype;
+      }
+      return { success: true, data: parsed };
     } catch (e) {
       return { success: false, data: fallback, error: e.message };
     }

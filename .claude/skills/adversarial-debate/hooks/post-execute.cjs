@@ -8,6 +8,7 @@
  */
 
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function findProjectRoot(start) {
   const fs = require('fs');
@@ -56,7 +57,7 @@ if (require.main === module) {
   const context = {};
   try {
     const raw = process.argv.slice(2).join(' ');
-    if (raw) Object.assign(context, JSON.parse(raw));
+    if (raw) Object.assign(context, safeParseJSON(raw));
   } catch (_e) {
     // ignore parse errors
   }

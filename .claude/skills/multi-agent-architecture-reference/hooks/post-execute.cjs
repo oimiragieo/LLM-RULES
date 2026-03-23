@@ -8,6 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 let input = '';
 process.stdin.on('data', chunk => {
@@ -16,7 +17,7 @@ process.stdin.on('data', chunk => {
 
 process.stdin.on('end', () => {
   try {
-    const parsed = JSON.parse(input || '{}');
+    const parsed = safeParseJSON(input || '{}');
     const toolName = parsed.tool_name || '';
 
     if (toolName === 'Skill') {

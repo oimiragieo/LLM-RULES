@@ -8,6 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function preExecute(input = {}) {
   const schemaPath = path.resolve(__dirname, '..', 'schemas', 'input.schema.json');
@@ -21,7 +22,7 @@ function preExecute(input = {}) {
   }
 
   // Basic validation without Ajv dependency
-  const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
+  const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf-8'));
   const errors = [];
 
   // Check required fields

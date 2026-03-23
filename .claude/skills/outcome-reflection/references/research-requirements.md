@@ -20,11 +20,13 @@ Searched `VoltAgent/awesome-agent-skills` for skills matching: `outcome`, `refle
 **Source:** "Language Models (Mostly) Know What They Know" (Kadavath et al., 2022, arXiv:2207.05221)
 
 **Key findings:**
+
 - LLMs exhibit systematic overconfidence, particularly on multi-step tasks
 - Calibration improves when models are asked to self-assess confidence after generating output (not before)
 - Calibration scores degrade with task complexity — simple factual tasks show better calibration than multi-step reasoning
 
 **Design constraint derived:**
+
 > Calibration records should be generated post-task (actuals first), not during task execution. The `outcome-reflection` skill is invoked after completion, not during.
 
 ---
@@ -34,11 +36,13 @@ Searched `VoltAgent/awesome-agent-skills` for skills matching: `outcome`, `refle
 **Source:** "Software Project Estimation Accuracy" meta-analysis (Jørgensen & Shepperd, 2007, IEEE TSE)
 
 **Key findings:**
+
 - Median software estimation error is approximately 33% (actual vs estimate)
 - Estimation accuracy improves with explicit post-mortem feedback loops
 - Simple formula-based scoring (like Winkler scores) outperforms qualitative self-assessment
 
 **Design constraint derived:**
+
 > The estimation accuracy formula `max(0, 1 - abs(pred - actual) / max(pred, actual))` is grounded in normalized absolute error — same family as Mean Absolute Percentage Error but capped at 0 to avoid negative scores for extreme overruns.
 
 ---
@@ -48,11 +52,13 @@ Searched `VoltAgent/awesome-agent-skills` for skills matching: `outcome`, `refle
 **Source:** "Self-Modeling in Autonomous Agents" (survey context from NeurIPS workshops 2023–2024)
 
 **Key findings:**
+
 - Agents that maintain running calibration history show measurable improvement in prediction accuracy over 10–20 task cycles
 - Rework loops are the most reliable proxy for decision quality in code generation tasks (better than human ratings)
 - Threshold-based flagging (flag tasks below 0.6 overall) captures ~80% of genuinely problematic executions while limiting false positives
 
 **Design constraint derived:**
+
 > `high-miss` flag threshold at 0.6 overall and `estimation-miss` at 0.5 are evidence-backed. The `excessive-rework` flag at reworkLoops >= 3 corresponds to the empirical cutoff where task duration doubles vs. smooth execution.
 
 ---

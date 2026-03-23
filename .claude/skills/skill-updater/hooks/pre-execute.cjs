@@ -3,8 +3,9 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
-const input = JSON.parse(process.argv[2] || '{}');
+const input = safeParseJSON(process.argv[2] || '{}');
 const rawSkill = String(input.skill || input.name || '').trim();
 const trigger = String(input.trigger || 'manual').trim();
 

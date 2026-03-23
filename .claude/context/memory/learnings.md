@@ -1,32 +1,3 @@
-## Telegram UX EPIC Waves 1-2 (2026-03-16) [Task #13, commits 4529e28a + 4752d04a]
-
-**Agent:** nodejs-pro | **Status:** Waves 1-2 complete, Waves 3-5 in fresh session
-
-### [CODE] Async Telegram Outbox Pattern
-
-- `invokeClaude()` (spawnSync) → `invokeClaudeAsync()` (spawn + SIGTERM guard) is a clean 1-file refactor in `.claude/tools/cli/telegram-claude-bridge.cjs`
-- Pattern: async spawn writes result atomically to `telegram-outbox.json`; `processOutbox()` delivers on next poll tick
-- Keep sync version for backward-compat and `resolveClaude` use; only the `handleAsk` path goes async
-- Fire-and-forget + immediate "Processing…" ACK keeps polling loop unblocked
-- Apply when any CLI tool needs to background Claude invocations
-
-### [CODE] InlineKeyboardMarkup Without grammy
-
-- Telegram `reply_markup` JSON works via raw HTTPS `sendMessage` with `JSON.stringify({ inline_keyboard: [...] })`
-- No grammy dependency needed for cron-polled scripts; saves runtime overhead
-- `callback_data` format: `cmd_{command}_{args}` (max 64 bytes — enforce byte-length in builder, not just string length)
-- `answerCallbackQuery(callbackQueryId)` is required by Telegram API (acknowledgment within 10s or warning shown to user)
-- Benchmarked against OpenClaw's `TelegramInlineButtons` pattern in `.claude.archive/.tmp/openclaw-main/src/telegram/`
-- Reference: `.claude/tools/cli/telegram-poll.cjs` (commit 4752d04a)
-
-### [WORKFLOW] Module Consolidation vs Plan — Pragmatic Deviation
-
-- Plan specified 3 new modules: `telegram-async-worker.cjs`, `telegram-keyboards.cjs`, `telegram-callback-handler.cjs`
-- Implementation consolidated into existing files: `telegram-claude-bridge.cjs` (async) and `telegram-poll.cjs` (keyboards + callbacks)
-- This is acceptable for a cron script with 621 LOC — separate modules add overhead without benefit at this scale
-- For Waves 3-5: voice handler and file handler SHOULD be separate modules (different concerns, testable independently)
-- Pattern: Planner creates modular designs; implementer consolidates when the total is under ~800 LOC. Document deviation in commit message.
-
 ### [WORKFLOW] Plan File Staleness — Recurring Pattern
 
 - Executing agent committed Waves 1-2 but left ALL plan tasks marked `- [ ]` in `.claude/context/plans/telegram-ux-epic-plan-2026-03-16.md`
@@ -753,3 +724,73 @@ Report: `.claude/context/artifacts/research-reports/openclaw-research-2026-03-21
 - Created `outcome-reflection` skill (Memory & Context): scores predicted vs actual task outcomes (tokens, files, steps, rework loops). Estimation accuracy formula: `max(0, 1 - abs(pred - actual) / max(pred, actual))`. Decision quality from rework loops (0→1.0, 1→0.75, 2→0.50, 3→0.25, 4+→0.0). Flags: `high-miss` (<0.6 overall), `estimation-miss` (<0.5 estimation), `excessive-rework` (>=3 loops). Assigned to: planner, reflection-agent, architect, general-assistant. Companion tool at `.claude/tools/outcome-reflection/outcome-reflection.cjs`.
 - Both skills: full enterprise bundle (SKILL.md, schemas, hooks, scripts, templates, rules, commands, references, companion tool, workflow). Iron Law I/II/III compliant.
 - Catalog updated: `.claude/docs/@SKILL_CATALOG_TABLE.md` rows added for both skills. Total count 264 → 266.
+
+## Batch Skill Creation Reflection — 2026-03-23 [Tasks 15, 17, 20]
+
+### [PATTERN] Circuit Breaker for Iterative Agents (loop-operator)
+
+- loop-operator implements triple-gate circuit breaker: max 10 iterations, 300s time budget, quality floor 0.4
+- ALL three conditions checked per cycle — prevents runaway search/improve loops
+- Apply this pattern for any bounded iterative agent (code-improver, content-refiner, test-runner loops)
+
+### [PATTERN] Adversarial Debate Round Scoring
+
+- Score each debate round IMMEDIATELY before proceeding — prevents recency bias in moderator synthesis
+- 4 scoring dimensions: specificity, evidence quality, rebuttal directness, relevance
+- Moderator MUST cite specific debate evidence (not consensus); 3–5 rounds optimal (diminishing returns above 3)
+- Generalizable to: arch decisions, tech choices, security trade-offs, design reviews
+
+### [PATTERN] Outcome-Reflection Calibration Dimensions
+
+- 3 independent dimensions: estimation quality, prediction quality, decision quality — never aggregate prematurely
+- Predicted outcome MUST be stored at task creation time; retrospective prediction is invalid
+- High-miss threshold: overall < 0.6 or estimation < 0.5 or rework loops >= 3 → triggers reflection-agent followup
+- Decision quality formula: rework loops 0→1.0, 1→0.75, 2→0.50, 3→0.25, 4+→0.0
+
+### [PATTERN] Instinct Learning Confidence Bounds
+
+- instinct-learning uses 0.3–0.9 confidence range (not 0.0–1.0)
+- 0.3 = minimum useful signal (below this is noise); 0.9 = max to avoid overconfidence
+- Project-scoped storage prevents cross-project contamination
+- Instincts inform routing suggestions but NEVER override explicit routing rules
+
+### [PATTERN] Team Orchestration 6-Phase Pipeline
+
+- Phases: Discover → Plan → Assign → Execute → Review → Integrate
+- Each phase requires the prior phase's artifact before proceeding (phase gates)
+- Assignment maps tasks to agents by capability matching, not just availability
+- Handoff artifacts required at each phase boundary (not just status updates)
+
+### [PATTERN] De-sloppify Two-Agent Separation
+
+- Two-agent pattern: identifier agent finds slop, separate deletion agent decides what to delete
+- Prevents accidental deletion: the agent that identifies is NOT the agent that deletes
+- Only tracked files (git ls-files non-empty) are auto-deletable; untracked `??` files require explicit confirmation
+- Common slop signatures: debug*\*.txt, temp*_.json, UUID-named files, _-output.txt in project root
+
+### [WORKFLOW] High-Velocity Skill Batch Pattern (3 per commit)
+
+- 3 skill batches per session is sustainable; each batch = themed cluster (orchestration, cognition, enterprise)
+- Batch commits enable atomic rollback per theme without affecting other batches
+- Total count milestone: 264 → 266 skills, 108 agents after this session
+- All new skills include: SKILL.md frontmatter, companion tool reference, related_skills cross-refs
+
+## 2026-03-23: Multi-Model Review of Ecosystem Audit Findings
+
+### New HIGH Security Findings (not in original audit)
+
+- `pre-task-unified-helpers.cjs` L326/350: task prompt text directly modifies `allowed_files` and `ALLOW_GIT_COMMIT` session policy — ACTIVE prompt-injection-to-authorization vector
+- `mcp-allowlist-checker.cjs`: fail-open defaults mean MCP matcher gaps are FULL bypasses (empty `tools_allowed` = full server access)
+- `session-end-memory-promotion.cjs`: memory poisoning is durable across sessions via STM→MTM promotion
+
+### TDD Patterns Confirmed by Multi-Model Consensus
+
+- Stryker mutation testing mandatory for security hooks: >= 85% threshold with CI ratchet
+- fast-check fail-closed property: `fc.anything()` must never produce `allow` from security hook
+- Revert-and-verify-red step: after Green, revert implementation — if tests still pass, test is meaningless
+
+### Architectural Fixes Confirmed by Multi-Model Consensus
+
+- `secure-hook-runner.cjs` pattern: ANY exit code except 0 or 2 must become exit 2 (block) for security hooks
+- WAL protocol for memory already designed in `memory-protocol.md` — needs runtime enforcement hook
+- DAG cycle detection at `TaskCreate` with max spawn depth 4

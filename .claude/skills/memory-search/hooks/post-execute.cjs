@@ -2,11 +2,12 @@
 
 'use strict';
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 const { sendEvent } = require(
-  path.resolve(__dirname, '../../../../.claude/tools/observability/send-event.cjs')
+  path.resolve(__dirname, '../../../../tools/observability/send-event.cjs')
 );
 
-const context = JSON.parse(process.argv[2] || '{}');
+const context = safeParseJSON(process.argv[2] || '{}');
 const success = context.outcome === 'success' || !context.error;
 
 sendEvent({

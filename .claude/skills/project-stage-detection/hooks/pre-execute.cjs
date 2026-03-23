@@ -7,6 +7,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function preExecute(input = {}) {
   const errors = [];
@@ -53,7 +54,7 @@ if (require.main === module) {
   process.stdin.on('end', () => {
     let input = {};
     try {
-      input = JSON.parse(raw);
+      input = safeParseJSON(raw);
     } catch (_err) {
       /* non-JSON stdin ignored */
     }

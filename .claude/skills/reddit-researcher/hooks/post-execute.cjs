@@ -8,11 +8,12 @@
  */
 
 try {
-  const result = JSON.parse(process.argv[2] || '{}');
+  const result = safeParseJSON(process.argv[2] || '{}');
   const outcome = result && result.success === false ? 'failure' : 'success';
 
   // Resolve send-event.cjs relative to this hook's location
   const path = require('path');
+  const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
   const sendEventPath = path.resolve(__dirname, '../../../../tools/observability/send-event.cjs');
 
   let sendEvent;

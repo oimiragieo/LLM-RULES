@@ -7,6 +7,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const MAX_PROFILE_BYTES = 16 * 1024;
 const MAX_ENTRIES_PER_BUCKET = 20;
@@ -15,7 +16,7 @@ const MAX_VALUE_LEN = 180;
 function parseResult() {
   const raw = process.argv.length > 2 ? process.argv.slice(2).join(' ') : '{}';
   try {
-    return JSON.parse(raw);
+    return safeParseJSON(raw);
   } catch (_err) {
     return {};
   }
@@ -71,7 +72,7 @@ function loadProfile(profilePath) {
 
   try {
     const data = fs.readFileSync(profilePath, 'utf8');
-    const parsed = JSON.parse(data);
+    const parsed = safeParseJSON(data);
     return {
       ...baseProfile(),
       ...parsed,

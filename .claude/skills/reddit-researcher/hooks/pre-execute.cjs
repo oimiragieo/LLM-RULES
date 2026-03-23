@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 /**
  * reddit-researcher pre-execute hook
@@ -108,7 +109,7 @@ try {
   const rawInput = process.argv[2] || '{}';
   let input;
   try {
-    input = JSON.parse(rawInput);
+    input = safeParseJSON(rawInput);
   } catch {
     process.stderr.write('[reddit-researcher/pre-execute] Invalid JSON input\n');
     process.exit(2);

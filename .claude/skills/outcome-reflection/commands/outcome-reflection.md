@@ -54,17 +54,17 @@ node .claude/skills/outcome-reflection/scripts/main.cjs \
 
 ## Options
 
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `--taskId` | string | Yes (reflect mode) | Task ID to score (e.g., `task-42`) |
-| `--predicted` | JSON string | No | Predictions object (tokens, files, steps) |
-| `--actual` | JSON string | No | Actuals object (tokens, files, steps, reworkLoops) |
-| `--predictionScore` | float 0–1 | No | Qualitative prediction quality score |
-| `--analyze` | flag | No | Run trend analysis mode |
-| `--trend` | flag | No | Same as `--analyze` |
-| `--agentType` | string | No | Filter trend by agent type |
-| `--taskType` | string | No | Filter trend by task type |
-| `--last` | integer | No | Number of recent records to include (default: 10) |
+| Option              | Type        | Required           | Description                                        |
+| ------------------- | ----------- | ------------------ | -------------------------------------------------- |
+| `--taskId`          | string      | Yes (reflect mode) | Task ID to score (e.g., `task-42`)                 |
+| `--predicted`       | JSON string | No                 | Predictions object (tokens, files, steps)          |
+| `--actual`          | JSON string | No                 | Actuals object (tokens, files, steps, reworkLoops) |
+| `--predictionScore` | float 0–1   | No                 | Qualitative prediction quality score               |
+| `--analyze`         | flag        | No                 | Run trend analysis mode                            |
+| `--trend`           | flag        | No                 | Same as `--analyze`                                |
+| `--agentType`       | string      | No                 | Filter trend by agent type                         |
+| `--taskType`        | string      | No                 | Filter trend by task type                          |
+| `--last`            | integer     | No                 | Number of recent records to include (default: 10)  |
 
 ## Predictions Object Fields
 
@@ -103,8 +103,8 @@ node .claude/skills/outcome-reflection/scripts/main.cjs \
   },
   "estimationDetails": {
     "estimatedTokens": { "predicted": 5000, "actual": 7200, "score": 0.69 },
-    "estimatedFiles":  { "predicted": 3, "actual": 5, "score": 0.6 },
-    "estimatedSteps":  { "predicted": 5, "actual": 8, "score": 0.63 }
+    "estimatedFiles": { "predicted": 3, "actual": 5, "score": 0.6 },
+    "estimatedSteps": { "predicted": 5, "actual": 8, "score": 0.63 }
   },
   "flags": [],
   "notes": "estimatedTokens underestimated by 44%. Consider 1.5x buffer.",
@@ -114,16 +114,18 @@ node .claude/skills/outcome-reflection/scripts/main.cjs \
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success — calibration record produced |
-| 1 | Error — invalid arguments or JSON parse failure |
-| 2 | Validation failure — missing required fields (from pre-execute hook) |
+| Code | Meaning                                                              |
+| ---- | -------------------------------------------------------------------- |
+| 0    | Success — calibration record produced                                |
+| 1    | Error — invalid arguments or JSON parse failure                      |
+| 2    | Validation failure — missing required fields (from pre-execute hook) |
 
 ## Integration with Task Lifecycle
 
 ### At Task Creation (Planner)
+
 Record predictions in task metadata:
+
 ```javascript
 TaskCreate({
   subject: 'Implement feature X',
@@ -132,13 +134,14 @@ TaskCreate({
       estimatedTokens: 4000,
       estimatedFiles: 2,
       estimatedSteps: 4,
-      confidence: 'Medium'
-    }
-  }
-})
+      confidence: 'Medium',
+    },
+  },
+});
 ```
 
 ### At Task Completion (Agent)
+
 1. Read predictions from task metadata
 2. Run outcome-reflection with actuals
 3. Append JSON record to `.claude/context/memory/learnings.md`
@@ -147,10 +150,10 @@ TaskCreate({
 
 ## Use Cases
 
-| Scenario | Command Pattern |
-|----------|----------------|
-| Post-implementation calibration | `--taskId --predicted --actual` |
-| Architecture decision calibration | `--taskId --actual --predictionScore 0.8` |
-| Agent-level trend analysis | `--analyze --agentType developer --last 20` |
-| Task-type trend analysis | `--analyze --taskType implementation --last 15` |
-| Quick decision quality check | `--taskId --actual '{"reworkLoops":2}'` |
+| Scenario                          | Command Pattern                                 |
+| --------------------------------- | ----------------------------------------------- |
+| Post-implementation calibration   | `--taskId --predicted --actual`                 |
+| Architecture decision calibration | `--taskId --actual --predictionScore 0.8`       |
+| Agent-level trend analysis        | `--analyze --agentType developer --last 20`     |
+| Task-type trend analysis          | `--analyze --taskType implementation --last 15` |
+| Quick decision quality check      | `--taskId --actual '{"reworkLoops":2}'`         |

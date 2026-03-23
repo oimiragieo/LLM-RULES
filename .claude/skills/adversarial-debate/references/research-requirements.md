@@ -6,6 +6,7 @@
 ## Search Summary
 
 Searched for prior art in:
+
 1. VoltAgent/awesome-agent-skills — no matching "adversarial-debate" or "structured-debate" skill found
 2. Exa web search — not available in current execution context; recorded fallback sources below
 3. arXiv — adversarial debate for LLM reasoning is an active research area (2024-2025)
@@ -13,23 +14,27 @@ Searched for prior art in:
 ## Prior Art Found
 
 ### Related framework skill: `llm-council`
+
 - Location: `.claude/skills/llm-council/SKILL.md`
 - Pattern: Parallel multi-LLM synthesis (dispatch to omega CLIs, collect, synthesize)
 - Differentiation: `adversarial-debate` is sequential (PRO then CON per round), not parallel
 - `llm-council` optimizes for consensus; `adversarial-debate` optimizes for surfacing trade-offs
 
 ### Related framework skill: `advanced-elicitation`
+
 - Pattern: Meta-cognitive reasoning for single-agent improvement
 - Differentiation: `advanced-elicitation` operates on one agent; `adversarial-debate` uses two opposing agents
 
 ## Academic Research Context
 
 Adversarial debate for LLM reasoning is grounded in:
+
 - "Constitutional AI: Harmlessness from AI Feedback" (Anthropic, 2022) — adversarial critique improves alignment
 - "Debate as a Method for Scalable Oversight" (Irving & Askell, 2019) — foundational debate-as-verification
 - Society of Mind / multi-agent reasoning literature — separate cognitive roles improve decision quality
 
 Key findings applicable to this skill:
+
 1. **Explicit stance assignment reduces sycophancy** — agents without forced stances tend toward agreement
 2. **Round scoring anchors the moderator** — unscored debates allow moderator to ignore weak arguments
 3. **3 rounds is the empirical sweet spot** — new evidence rarely emerges in rounds 4-5

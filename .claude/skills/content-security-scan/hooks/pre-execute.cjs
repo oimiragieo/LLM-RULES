@@ -5,7 +5,9 @@
  * Agent: developer | Task: #9 | Session: 2026-02-20
  */
 
-const input = JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8'));
+const input = safeParseJSON(require('fs').readFileSync('/dev/stdin', 'utf8'));
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
+// Note: safeParseJSON import is above, used for stdin parsing on line 8
 
 const { tool_name, tool_input } = input || {};
 

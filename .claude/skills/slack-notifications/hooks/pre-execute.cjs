@@ -7,9 +7,10 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 // Parse hook input
-const input = JSON.parse(process.argv[2] || '{}');
+const input = safeParseJSON(process.argv[2] || '{}');
 
 console.log('🔍 [SLACK-NOTIFICATIONS] Pre-execute validation...');
 

@@ -7,6 +7,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function postExecute(context = {}) {
   const eventLogPath = path.resolve(__dirname, '../../../../context/runtime/tool-events.jsonl');
@@ -40,7 +41,7 @@ if (require.main === module) {
   process.stdin.on('end', () => {
     let ctx = {};
     try {
-      ctx = JSON.parse(raw);
+      ctx = safeParseJSON(raw);
     } catch (_err) {
       /* non-JSON stdin ignored */
     }

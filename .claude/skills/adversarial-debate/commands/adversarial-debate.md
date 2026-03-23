@@ -18,14 +18,14 @@ node .claude/skills/adversarial-debate/scripts/main.cjs \
 
 ## Arguments
 
-| Argument    | Required | Default | Description                                    |
-|-------------|----------|---------|------------------------------------------------|
-| `--topic`   | YES      | —       | The decision question (10-500 chars)           |
-| `--pro`     | YES      | —       | PRO stance (what the PRO agent advocates)      |
-| `--con`     | YES      | —       | CON stance (the alternative/opposing view)     |
-| `--rounds`  | No       | 3       | Number of debate rounds (1-5)                  |
-| `--context` | No       | ""      | Background context about system or constraints |
-| `--criteria`| No       | ""      | Success criteria for the recommendation        |
+| Argument     | Required | Default | Description                                    |
+| ------------ | -------- | ------- | ---------------------------------------------- |
+| `--topic`    | YES      | —       | The decision question (10-500 chars)           |
+| `--pro`      | YES      | —       | PRO stance (what the PRO agent advocates)      |
+| `--con`      | YES      | —       | CON stance (the alternative/opposing view)     |
+| `--rounds`   | No       | 3       | Number of debate rounds (1-5)                  |
+| `--context`  | No       | ""      | Background context about system or constraints |
+| `--criteria` | No       | ""      | Success criteria for the recommendation        |
 
 ## Validation
 

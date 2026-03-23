@@ -7,6 +7,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function findProjectRoot() {
   let dir = __dirname;
@@ -21,7 +22,7 @@ function findProjectRoot() {
 function parseInput() {
   const raw = process.argv.length > 2 ? process.argv.slice(2).join(' ') : '{}';
   try {
-    return JSON.parse(raw);
+    return safeParseJSON(raw);
   } catch {
     return {};
   }

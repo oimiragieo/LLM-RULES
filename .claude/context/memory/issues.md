@@ -1,51 +1,3 @@
-## P1: Rule-Creator Gaps — Missing Fallback Logic
-
-**Issue**: When rule file doesn't exist, skill-creator fails silently. No manifest validation before writing.
-
-**Impact**: Partial skill registrations; skill-updater can't detect incomplete writes.
-
-**Fix**: Added pre-write manifest validation in create-actions.cjs createSkill() -- checks SKILLS_DIR and CLAUDE.md exist before writing any files.
-
-**Status**: FIXED (2026-03-22)
-
----
-
-## P1: Skill Registration Gaps — Index Staleness
-
-**Issue**: `.claude/context/agent-registry.json` reflected old agent count (72 agents, should be 107).
-
-**Impact**: Routing table out-of-sync; health check tests fail.
-
-**Action**: Regenerate registry via `pnpm agents:registry`; validate count assertion in CI.
-
-**Status**: RESOLVED (2026-03-22 — registry now has 107 agents)
-
----
-
-## P1: Reflection-Agent TaskUpdate Failures
-
-**Issue**: reflection-agent calls `TaskUpdate(completed)` but processedReflectionIds not persisted if hook fails silently.
-
-**Impact**: Stale reflections in queue; re-process same items on next session.
-
-**Fix**: Added ACK verification in reflection-cleanup.cjs -- verifies IDs exist in spawn request file before removing, preventing silent data loss on stale batches.
-
-**Status**: FIXED (2026-03-22)
-
----
-
-## P1: Router — Missing Task Summary Metadata
-
-**Issue**: Some completed tasks lack `metadata.summary`. Router completion report is incomplete without summaries.
-
-**Impact**: Drain gate can't validate work quality; orchestrators lose context.
-
-**Fix**: Add mandatory summary validation in pre-completion-validation.cjs.
-
-**Status**: RESOLVED (2026-03-22 — P0 fix added exit(2) for summary enforcement)
-
----
-
 ## P1: Router — Duplicate Trigger Fallback
 
 **Issue**: Session handoff can trigger both via env var AND reflection queue; may spawn 2x reflection-agent instances.
@@ -55,6 +7,30 @@
 **Fix**: Make reflection queue authoritative; remove env var trigger.
 
 **Status**: OPEN
+
+---
+
+## P2: post-tool-metrics-unified.cjs — ESLint max-lines Violation (2026-03-23)
+
+**Issue**: `post-tool-metrics-unified.cjs` exceeds ESLint `max-lines` rule. Pre-commit hook blocks commits touching this file.
+
+**Impact**: Any future edits to this file require reverting or splitting to enable commits. Workaround (reverting to committed version) was used in Task #21.
+
+**Fix**: Split file into smaller focused modules following existing patterns (e.g., routing-table.cjs → routing-table-data.cjs).
+
+**Status**: OPEN (P2 — non-blocking but accumulating debt)
+
+---
+
+## P2: Missing Summary Metadata — Task #22 (2026-03-23)
+
+**Issue**: Task #22 completed without summary metadata in TaskUpdate. Reflection score withheld due to insufficient data.
+
+**Impact**: Cannot assess quality or extract learnings from this task.
+
+**Fix**: Enforce pre-completion-validation.cjs summary requirement; agents must include summary in all TaskUpdate(completed) calls.
+
+**Status**: OPEN (systemic — pre-completion-validation should catch this)
 
 ---
 
@@ -660,3 +636,27 @@
 - [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-23T03:24:44.477Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-23T03:24:44.516Z
+
+## 2026-03-23: Critical Security Issues Found by Multi-Model Review
+
+### ISSUE-SEC-001: Task metadata is parsed as authorization policy (CRITICAL)
+
+- File: `.claude/hooks/routing/pre-task-unified-helpers.cjs` L326/350
+- File: `.claude/hooks/routing/pre-task-unified-core.cjs` L405
+- Problem: `allowed_files` and `ALLOW_GIT_COMMIT` are read from freeform task prompt text and persisted as session policy
+- Impact: Any agent or user can inject authorization escalation through task description text
+- Fix: Accept guardrail-affecting fields from signed/structured system metadata only
+
+### ISSUE-SEC-002: MCP allowlist is fail-open (CRITICAL)
+
+- File: `.claude/lib/routing/mcp-allowlist-checker.cjs` L78/88/97/111
+- Problem: `isToolAllowed()` returns allow for unknown agents; empty `tools_allowed` grants full server access
+- Impact: All MCP matcher coverage gaps are FULL bypasses, not partial misses
+- Fix: Flip default to fail-closed; deny unknown agents and unlisted servers
+
+### ISSUE-SEC-003: safeParseJSON migration incomplete — live runtime code still uses JSON.parse
+
+- File: `.claude/lib/tools/mcp-tool-resolver.cjs` L26/94/162
+- File: `.claude/lib/routing/mcp-allowlist-checker.cjs` L135
+- Problem: Raw JSON.parse() in MCP config/manifest loading paths
+- Fix: Complete migration beyond skill hooks to all shared runtime code

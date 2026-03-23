@@ -2,6 +2,7 @@
 'use strict';
 
 const { ALLOWED_TRIGGERS } = require('../scripts/main.cjs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function validateInput(input) {
   const errors = [];
@@ -32,7 +33,7 @@ function main(rawInput) {
 }
 
 if (require.main === module) {
-  const input = JSON.parse(process.argv[2] || '{}');
+  const input = safeParseJSON(process.argv[2] || '{}');
   const outcome = main(input);
   if (!outcome.ok) {
     console.error(JSON.stringify(outcome, null, 2));

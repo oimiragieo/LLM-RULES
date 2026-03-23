@@ -7,6 +7,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 function postExecute(context = {}) {
   try {
@@ -55,7 +56,7 @@ if (require.main === module) {
   });
   process.stdin.on('end', () => {
     try {
-      const context = data ? JSON.parse(data) : {};
+      const context = data ? safeParseJSON(data) : {};
       postExecute(context);
       process.stdout.write(JSON.stringify({ allow: true }) + '\n');
       process.exit(0);

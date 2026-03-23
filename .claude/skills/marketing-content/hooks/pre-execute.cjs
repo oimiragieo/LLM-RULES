@@ -7,6 +7,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const SKILL_DIR = path.resolve(__dirname, '..');
 
@@ -21,7 +22,7 @@ function preExecute(input = {}) {
       return { continue: true };
     }
 
-    const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+    const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf8'));
 
     // Validate required fields
     const required = schema.required || [];
@@ -71,7 +72,7 @@ if (require.main === module) {
   let input = {};
   try {
     const raw = fs.readFileSync('/dev/stdin', 'utf8');
-    input = JSON.parse(raw);
+    input = safeParseJSON(raw);
   } catch (_) {
     // No stdin input; proceed with empty
   }
