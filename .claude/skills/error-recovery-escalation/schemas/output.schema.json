@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "ErrorRecoveryEscalation Output",
+  "description": "Output contract for error-recovery-escalation",
+  "type": "object",
+  "required": ["taskId", "level", "action", "errorType", "instructions", "taskUpdateMetadata"],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "The task ID being recovered"
+    },
+    "level": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Escalation level (1=retry, 2=nudge, 3=replan, 4=fallback, 5=force-done)"
+    },
+    "action": {
+      "type": "string",
+      "enum": ["retry", "nudge", "replan", "fallback", "force-done"],
+      "description": "Recovery action to take"
+    },
+    "errorType": {
+      "type": "string",
+      "description": "Classified error type"
+    },
+    "errorMessage": {
+      "type": "string",
+      "description": "Original error message"
+    },
+    "previousLevels": {
+      "type": "array",
+      "items": { "type": "integer" },
+      "description": "Escalation levels already attempted"
+    },
+    "timeoutMs": {
+      "type": "integer",
+      "description": "Timeout in milliseconds before escalating to next level (0 = no timeout)"
+    },
+    "instructions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Step-by-step instructions for the recovery action"
+    },
+    "taskUpdateMetadata": {
+      "type": "object",
+      "description": "Metadata to include in TaskUpdate call",
+      "required": ["recoveryLevel", "recoveryAction", "errorType"],
+      "properties": {
+        "recoveryLevel": { "type": "integer" },
+        "recoveryAction": { "type": "string" },
+        "errorType": { "type": "string" },
+        "previousLevels": { "type": "array", "items": { "type": "integer" } },
+        "enteredAt": { "type": "string", "format": "date-time" },
+        "partial": { "type": "boolean" },
+        "escalationPath": { "type": "array", "items": { "type": "integer" } },
+        "completedSteps": { "type": "array", "items": { "type": "string" } },
+        "failedAt": { "type": "string" },
+        "recommendation": { "type": "string" },
+        "summary": { "type": "string" }
+      }
+    },
+    "partial": {
+      "type": "boolean",
+      "description": "True when force-done (level 5) emits partial results"
+    },
+    "completedSteps": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Steps completed before failure (level 5 only)"
+    },
+    "failedAt": {
+      "type": "string",
+      "description": "The step that failed (level 5 only)"
+    },
+    "failureReason": {
+      "type": "string",
+      "description": "Specific failure reason (level 5 only)"
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "Human-facing recommendation for resolution (level 5 only)"
+    }
+  },
+  "additionalProperties": false
+}

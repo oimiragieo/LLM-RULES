@@ -80,7 +80,7 @@ Agent Studio natively supports integrating with other headless LLM Code CLIs (Ge
 ## Current Footprint
 
 - Agents: 102 files (includes 12 isolated worktree variants)
-- Skills: 552 `SKILL.md` definitions
+- Skills: 630 `SKILL.md` definitions
 - Rules: 113 docs
 - Schemas: 319 `*.schema.json`
 - Commands: 263 `.claude/commands/*.md`
@@ -966,18 +966,21 @@ The `debug-log-analysis` skill (`Skill({ skill: 'debug-log-analysis' })`) docume
 
 ### Validation & Quality
 
-| Skill                                                                                            | Description                                      |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| [checklist-generator](.claude/skills/checklist-generator/SKILL.md)                               | Quality checklist generation                     |
-| [proactive-audit](.claude/skills/proactive-audit/SKILL.md)                                       | Proactive framework audit after pipeline changes |
-| [response-rater](.claude/skills/response-rater/SKILL.md)                                         | Agent response quality rating                    |
-| [test-generator](.claude/skills/test-generator/SKILL.md)                                         | Automated test code generation                   |
-| [accessibility](.claude/skills/accessibility/SKILL.md)                                           | Accessibility audit and fixes                    |
-| [eval-harness-updater](.claude/skills/eval-harness-updater/SKILL.md)                             | Evaluation harness maintenance                   |
-| [qa-workflow](.claude/skills/qa-workflow/SKILL.md)                                               | Systematic QA validation with fix loops          |
-| [agent-evaluation](.claude/skills/agent-evaluation/SKILL.md)                                     | Agent capability evaluation                      |
-| [strict-user-requirements-adherence](.claude/skills/strict-user-requirements-adherence/SKILL.md) | Requirements traceability                        |
-| [property-based-testing](.claude/skills/property-based-testing/SKILL.md)                         | Property-based test generation                   |
+| Skill                                                                                            | Description                                                                       |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| [checklist-generator](.claude/skills/checklist-generator/SKILL.md)                               | Quality checklist generation                                                      |
+| [proactive-audit](.claude/skills/proactive-audit/SKILL.md)                                       | Proactive framework audit after pipeline changes                                  |
+| [response-rater](.claude/skills/response-rater/SKILL.md)                                         | Agent response quality rating                                                     |
+| [test-generator](.claude/skills/test-generator/SKILL.md)                                         | Automated test code generation                                                    |
+| [accessibility](.claude/skills/accessibility/SKILL.md)                                           | Accessibility audit and fixes                                                     |
+| [eval-harness-updater](.claude/skills/eval-harness-updater/SKILL.md)                             | Evaluation harness maintenance                                                    |
+| [qa-workflow](.claude/skills/qa-workflow/SKILL.md)                                               | Systematic QA validation with fix loops                                           |
+| [agent-evaluation](.claude/skills/agent-evaluation/SKILL.md)                                     | Agent capability evaluation                                                       |
+| [strict-user-requirements-adherence](.claude/skills/strict-user-requirements-adherence/SKILL.md) | Requirements traceability                                                         |
+| [property-based-testing](.claude/skills/property-based-testing/SKILL.md)                         | Property-based test generation                                                    |
+| [behavioral-loop-detection](.claude/skills/behavioral-loop-detection/SKILL.md)                   | Detect agent behavioral loops via Jaccard similarity scoring                      |
+| [judge-verification](.claude/skills/judge-verification/SKILL.md)                                 | Independent LLM judge evaluation with 4-dimension scoring                         |
+| [error-recovery-escalation](.claude/skills/error-recovery-escalation/SKILL.md)                   | 5-level structured error recovery: retry → nudge → replan → fallback → force-done |
 
 ### Specialized Patterns
 

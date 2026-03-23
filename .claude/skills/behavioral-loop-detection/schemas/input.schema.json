@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "BehavioralLoopDetection Input",
+  "description": "Validated inputs for behavioral-loop-detection execution",
+  "type": "object",
+  "required": ["taskId"],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "The task ID of the agent being monitored"
+    },
+    "actions": {
+      "type": "array",
+      "description": "Optional batch of actions to analyze for loops",
+      "items": {
+        "type": "object",
+        "properties": {
+          "toolName": { "type": "string", "description": "Name of the tool called" },
+          "args": { "description": "Arguments passed to the tool" }
+        },
+        "required": ["toolName"]
+      }
+    },
+    "windowSize": {
+      "type": "integer",
+      "description": "Override for the rolling window size (default: 20)",
+      "minimum": 5,
+      "maximum": 50,
+      "default": 20
+    },
+    "similarityThreshold": {
+      "type": "number",
+      "description": "Jaccard similarity threshold for 'similar' classification (default: 0.75)",
+      "minimum": 0.5,
+      "maximum": 1.0,
+      "default": 0.75
+    }
+  },
+  "additionalProperties": false
+}

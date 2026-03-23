@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "JudgeVerification Output",
+  "description": "Output contract for judge-verification",
+  "type": "object",
+  "required": ["verdict", "confidence", "totalScore", "dimensions", "reasoning"],
+  "properties": {
+    "taskId": { "type": "string" },
+    "verdict": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "CONDITIONAL"],
+      "description": "Judge verdict"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence score 0..1"
+    },
+    "totalScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Combined score from all 4 dimensions"
+    },
+    "dimensions": {
+      "type": "object",
+      "required": [
+        "goalAlignment",
+        "actionCompleteness",
+        "evidenceOfCompletion",
+        "finalStateCoherence"
+      ],
+      "properties": {
+        "goalAlignment": { "type": "integer", "minimum": 0, "maximum": 25 },
+        "actionCompleteness": { "type": "integer", "minimum": 0, "maximum": 25 },
+        "evidenceOfCompletion": { "type": "integer", "minimum": 0, "maximum": 25 },
+        "finalStateCoherence": { "type": "integer", "minimum": 0, "maximum": 25 }
+      }
+    },
+    "reasoning": { "type": "string", "description": "Judge reasoning narrative" },
+    "failureReasons": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Specific reasons for FAIL verdict"
+    },
+    "recommendations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Recommendations for the executing agent"
+    },
+    "judgedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

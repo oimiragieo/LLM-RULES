@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "BehavioralLoopDetection Output",
+  "description": "Output contract for behavioral-loop-detection",
+  "type": "object",
+  "required": ["level", "action"],
+  "properties": {
+    "level": {
+      "type": "integer",
+      "description": "Escalation level: 0=continue, 1=replan, 2=explore, 3=force-done",
+      "enum": [0, 1, 2, 3]
+    },
+    "action": {
+      "type": "string",
+      "description": "Action to take",
+      "enum": ["continue", "replan", "explore", "force-done"]
+    },
+    "message": {
+      "type": ["string", "null"],
+      "description": "Human-readable message to inject into agent context"
+    },
+    "runLength": {
+      "type": "integer",
+      "description": "Current streak of similar actions"
+    },
+    "score": {
+      "type": "number",
+      "description": "Jaccard similarity score of last comparison (0..1)"
+    }
+  },
+  "additionalProperties": false
+}

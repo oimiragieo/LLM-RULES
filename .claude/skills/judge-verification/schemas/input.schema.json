@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "JudgeVerification Input",
+  "description": "Validated inputs for judge-verification execution",
+  "type": "object",
+  "required": ["taskId", "taskGoal"],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "The task ID to verify"
+    },
+    "taskGoal": {
+      "type": "string",
+      "description": "The original task goal/description — what the agent was asked to do"
+    },
+    "filesModified": {
+      "type": "array",
+      "description": "Files the agent claimed to modify",
+      "items": { "type": "string" }
+    },
+    "summary": {
+      "type": "string",
+      "description": "The agent's completion summary"
+    },
+    "enforceEvidenceGate": {
+      "type": "boolean",
+      "description": "Whether to enforce the dim3>=15 evidence gate (default: true)",
+      "default": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-23T05:14:22.395Z",
+  "generatedAt": "2026-03-23T05:37:44.078Z",
   "metadata": {
-    "totalSkills": 329,
+    "totalSkills": 332,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-23T05:14:22.396Z",
+    "lastValidated": "2026-03-23T05:37:44.080Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7147,6 +7147,29 @@
       "priority": 3,
       "aliasOf": null
     },
+    "behavioral-loop-detection": {
+      "name": "behavioral-loop-detection",
+      "displayName": "Behavioral Loop Detection",
+      "category": "Other",
+      "domain": "other",
+      "description": "Detect when agents are stuck in repetitive action loops using a rolling 20-action window with escalating nudges — replan after 3 similar actions, explore after 5, force-done after 8.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "TaskUpdate"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "behavioral-loop-detection"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "brand-compliance": {
       "name": "brand-compliance",
       "displayName": "Brand Compliance",
@@ -7548,6 +7571,32 @@
       "priority": 3,
       "aliasOf": null
     },
+    "error-recovery-escalation": {
+      "name": "error-recovery-escalation",
+      "displayName": "Error Recovery Escalation",
+      "category": "Other",
+      "domain": "other",
+      "description": "5-level error recovery escalation: retry, nudge, replan, fallback, force-done — each with entry criteria and timeout before escalating",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "TaskUpdate",
+        "TaskList",
+        "TaskGet"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "error-recovery-escalation"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "exa-monitor": {
       "name": "exa-monitor",
       "displayName": "Exa Monitor",
@@ -7899,6 +7948,30 @@
       "tags": [
         "other",
         "instinct-learning"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "judge-verification": {
+      "name": "judge-verification",
+      "displayName": "Judge Verification",
+      "category": "Other",
+      "domain": "other",
+      "description": "Independent LLM judge evaluates task completion separately from the executing agent, catching false success claims by reviewing task goal, actions taken, final state, and evidence. Produces PASS/FAIL with confidence score and reasoning.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "TaskUpdate",
+        "TaskGet"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "judge-verification"
       ],
       "priority": 3,
       "aliasOf": null
@@ -8913,6 +8986,7 @@
         "atlassian-integration",
         "auto-recall",
         "azure-devops",
+        "behavioral-loop-detection",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -8930,6 +9004,7 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
+        "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -8945,6 +9020,7 @@
         "implementation-readiness",
         "init",
         "instinct-learning",
+        "judge-verification",
         "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
@@ -9348,6 +9424,7 @@
         "atlassian-integration",
         "auto-recall",
         "azure-devops",
+        "behavioral-loop-detection",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -9365,6 +9442,7 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
+        "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -9380,6 +9458,7 @@
         "implementation-readiness",
         "init",
         "instinct-learning",
+        "judge-verification",
         "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
@@ -9766,6 +9845,7 @@
         "atlassian-integration",
         "auto-recall",
         "azure-devops",
+        "behavioral-loop-detection",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -9783,6 +9863,7 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
+        "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -9798,6 +9879,7 @@
         "implementation-readiness",
         "init",
         "instinct-learning",
+        "judge-verification",
         "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
@@ -10049,6 +10131,7 @@
         "atlassian-integration",
         "auto-recall",
         "azure-devops",
+        "behavioral-loop-detection",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -10065,6 +10148,7 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
+        "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -10076,6 +10160,7 @@
         "imagen-generation",
         "init",
         "instinct-learning",
+        "judge-verification",
         "knowledge-graph",
         "marketing-content",
         "markitdown-converter",
@@ -10290,6 +10375,7 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
+        "error-recovery-escalation",
         "fintech-engineer",
         "frontend-design",
         "google-workspace",
@@ -10474,6 +10560,7 @@
         "adversarial-review",
         "api-testing",
         "arxiv-monitor",
+        "behavioral-loop-detection",
         "browser-automation",
         "claude-api",
         "cloud-run",
@@ -10485,6 +10572,7 @@
         "de-sloppify",
         "deep-research",
         "electron-pro",
+        "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -10494,6 +10582,7 @@
         "goal-backward-verification",
         "heartbeat",
         "instinct-learning",
+        "judge-verification",
         "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
@@ -10917,6 +11006,7 @@
       ],
       "TaskList": [
         "task-management-protocol",
+        "error-recovery-escalation",
         "heartbeat",
         "scheduled-tasks",
         "team-orchestration",
@@ -10925,6 +11015,8 @@
       "TaskGet": [
         "task-management-protocol",
         "adversarial-debate",
+        "error-recovery-escalation",
+        "judge-verification",
         "outcome-reflection",
         "team-orchestration",
         "telegram-polling"
@@ -10932,7 +11024,10 @@
       "TaskUpdate": [
         "task-management-protocol",
         "adversarial-debate",
+        "behavioral-loop-detection",
+        "error-recovery-escalation",
         "heartbeat",
+        "judge-verification",
         "memory-audit",
         "scheduled-tasks",
         "team-orchestration",
@@ -11147,6 +11242,7 @@
         "atlassian-integration",
         "auto-recall",
         "azure-devops",
+        "behavioral-loop-detection",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -11164,6 +11260,7 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
+        "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -11177,6 +11274,7 @@
         "implementation-readiness",
         "init",
         "instinct-learning",
+        "judge-verification",
         "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
@@ -12477,6 +12575,7 @@
         "atlassian-integration",
         "auto-recall",
         "azure-devops",
+        "behavioral-loop-detection",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -12494,6 +12593,7 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
+        "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -12507,6 +12607,7 @@
         "implementation-readiness",
         "init",
         "instinct-learning",
+        "judge-verification",
         "knowledge-graph",
         "lsp-navigator",
         "marketing-content",

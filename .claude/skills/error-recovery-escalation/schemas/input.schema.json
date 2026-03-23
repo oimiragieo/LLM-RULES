@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "ErrorRecoveryEscalation Input",
+  "description": "Validated inputs for error-recovery-escalation execution",
+  "type": "object",
+  "required": ["taskId", "errorMessage"],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "The task ID experiencing the error"
+    },
+    "errorMessage": {
+      "type": "string",
+      "description": "The error message or description of what failed"
+    },
+    "errorType": {
+      "type": "string",
+      "description": "Optional explicit error type classification (auto-detected from errorMessage if omitted)",
+      "enum": [
+        "network-timeout",
+        "rate-limit",
+        "enoent",
+        "eperm",
+        "eacces",
+        "wrong-output",
+        "goal-misalignment",
+        "judge-fail",
+        "capability-mismatch",
+        "external-service-down",
+        "missing-credentials",
+        "loop-detected",
+        "unknown"
+      ]
+    },
+    "previousLevels": {
+      "type": "array",
+      "description": "Escalation levels already attempted for this error",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+      },
+      "maxItems": 5
+    },
+    "completedSteps": {
+      "type": "array",
+      "description": "Steps completed before the error (used for force-done output)",
+      "items": { "type": "string" }
+    },
+    "failedAt": {
+      "type": "string",
+      "description": "The step or action that failed (used for force-done output)"
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "Optional human-facing recommendation for force-done output"
+    },
+    "forceLevel": {
+      "type": "integer",
+      "description": "Force entry at a specific escalation level (overrides auto-classification)",
+      "minimum": 1,
+      "maximum": 5
+    }
+  },
+  "additionalProperties": false
+}
