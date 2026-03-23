@@ -10,8 +10,8 @@
 
 | Metric        | Count |
 | ------------- | ----- |
-| Total Skills  | 264   |
-| Active Skills | 264   |
+| Total Skills  | 266   |
+| Active Skills | 266   |
 | Aliases       | 0     |
 | Domains       | 22    |
 | Categories    | 25    |
@@ -104,6 +104,7 @@
 | `cron-decision`                                | infrastructure | Infrastructure       | Decision framework for choosing between CronCreate, OS cron, GitHub Actions, or Task() for scheduling. Quick checklist, decision matrix, and heartbeat integration guidance.                                                                                                  |
 | `system-health-check`                          | infrastructure | Infrastructure       | Per-mission ecosystem validation. Validates MCP servers, verifies database readiness, validates environment variables, and confirms core LLM connectivity before launching workflows.                                                                                         |
 | `instinct-learning`                            | memory         | Memory               | Records atomic learned behaviors with confidence scores (0.3–0.9). Project-scoped isolation with auto-promotion to global scope at threshold 0.8. Stores instincts in `.claude/context/memory/instincts.jsonl`.                                                               |
+| `outcome-reflection`                           | memory         | Memory & Context     | Feed actual task results back into agent memory for calibration. Compares predicted vs actual outcomes (tokens, files, steps, rework loops) and scores estimation accuracy, prediction quality, and decision quality. Flags high-miss tasks for reflection-agent follow-up.   |
 | `context-compressor`                           | memory         | Memory               | Context compression and summarization methodology. Techniques for reducing token usage while preserving decision-critica...                                                                                                                                                   |
 | `context-driven-development`                   | memory         | Other                | Context-Driven Development methodology - treating project context as managed artifacts alongside code for consistent AI ...                                                                                                                                                   |
 | `framework-context`                            | memory         | Memory               | Load and synthesize framework architecture context for reflection and planning tasks.                                                                                                                                                                                         |
@@ -252,6 +253,7 @@
 | `webmcp-browser-tools`                         | other          | Other                | WebMCP — browser-side API that lets web applications expose their own functionality as MCP tools TO AI agents. Use when ...                                                                                                                                                   |
 | `workflow-updater`                             | other          | Other                | Research-backed workflow to refresh existing workflow files with phase-gate regression checks, idempotency validation, a...                                                                                                                                                   |
 | `writing`                                      | other          | Other                | Deprecated alias for writing-skills skill                                                                                                                                                                                                                                     |
+| `adversarial-debate`                           | other          | Specialized Patterns | N-round opposing-stance debate for trade-off analysis. PRO and CON agents argue for N rounds (default 3) with 4-dimension scoring. Moderator synthesizes with confidence-rated recommendation. Use for architecture decisions, tech choices, security trade-offs.             |
 | `windows-terminal`                             | other          | Specialized Patterns | Spawn and manage Windows Terminal (wt.exe) from Node.js. App Execution Alias resolution, full WT CLI syntax, detached spawn patterns, anti-patterns. Used by shift-change Phase 4 spawn-new-session.cjs.                                                                      |
 | `yara-authoring`                               | other          | Other                | YARA-X detection rule authoring with expert judgment, linting, atom analysis, and best practices. Teaches how to think l...                                                                                                                                                   |
 | `complexity-assessment`                        | planning       | Other                | AI-based complexity assessment for task analysis. Use when determining the appropriate workflow, phases, and validation ...                                                                                                                                                   |

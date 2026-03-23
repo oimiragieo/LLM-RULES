@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "OutcomeReflection Output",
+  "description": "Output contract for outcome-reflection skill execution",
+  "type": "object",
+  "required": ["taskId", "scores", "mode"],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "The task ID that was reflected on"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["reflect", "analyze", "trend"],
+      "description": "Operation mode that was executed"
+    },
+    "scores": {
+      "type": "object",
+      "required": ["overall"],
+      "properties": {
+        "estimationAccuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Accuracy of quantitative predictions (0-1)"
+        },
+        "predictionQuality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Quality of qualitative predictions (0-1)"
+        },
+        "decisionQuality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Quality of decisions made during execution (0-1)"
+        },
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Overall calibration score (0-1)"
+        }
+      }
+    },
+    "flags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Flags raised during calibration (e.g., 'high-miss', 'token-overrun')"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Human-readable calibration notes and improvement suggestions"
+    },
+    "reflectionQueued": {
+      "type": "boolean",
+      "description": "Whether a reflection-agent request was queued for root cause analysis"
+    },
+    "trend": {
+      "type": "object",
+      "description": "Trend data (only present in 'trend' mode)",
+      "properties": {
+        "sampleCount": { "type": "integer" },
+        "meanOverall": { "type": "number" },
+        "direction": {
+          "type": "string",
+          "enum": ["improving", "degrading", "stable", "insufficient-data"]
+        },
+        "topMissPatterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 3
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "AdversarialDebate Output",
+  "description": "Output contract for adversarial-debate skill execution",
+  "type": "object",
+  "required": ["topic", "rounds", "proScore", "conScore", "recommendation", "confidence"],
+  "properties": {
+    "topic": {
+      "type": "string",
+      "description": "The original debate topic"
+    },
+    "rounds": {
+      "type": "array",
+      "description": "Array of completed debate rounds",
+      "items": {
+        "type": "object",
+        "required": ["roundNumber", "proArgument", "conRebuttal", "score"],
+        "properties": {
+          "roundNumber": {
+            "type": "integer",
+            "description": "1-based round number"
+          },
+          "proArgument": {
+            "type": "string",
+            "description": "PRO agent's argument for this round"
+          },
+          "conRebuttal": {
+            "type": "string",
+            "description": "CON agent's rebuttal for this round"
+          },
+          "score": {
+            "type": "object",
+            "required": ["pro", "con"],
+            "properties": {
+              "pro": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10,
+                "description": "PRO score for this round (0-10)"
+              },
+              "con": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10,
+                "description": "CON score for this round (0-10)"
+              }
+            }
+          }
+        }
+      }
+    },
+    "proScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Cumulative PRO score across all rounds"
+    },
+    "conScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Cumulative CON score across all rounds"
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "Clear recommendation from the moderator (not 'it depends' without conditions)"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["High", "Medium", "Low"],
+      "description": "Moderator's confidence in the recommendation"
+    },
+    "rationale": {
+      "type": "string",
+      "description": "2-3 sentence rationale citing specific debate evidence"
+    },
+    "caveats": {
+      "type": "string",
+      "description": "Conditions under which the recommendation should be revisited"
+    }
+  },
+  "additionalProperties": false
+}

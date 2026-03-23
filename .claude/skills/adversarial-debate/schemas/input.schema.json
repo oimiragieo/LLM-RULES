@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "AdversarialDebate Input",
+  "description": "Validated inputs for adversarial-debate skill execution",
+  "type": "object",
+  "required": ["topic", "proStance", "conStance"],
+  "properties": {
+    "topic": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 500,
+      "description": "The decision question being debated — must be a clear, answerable question"
+    },
+    "proStance": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 300,
+      "description": "The position the PRO agent will advocate for"
+    },
+    "conStance": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 300,
+      "description": "The position the CON agent will argue for (the alternative or opposing view)"
+    },
+    "rounds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "default": 3,
+      "description": "Number of debate rounds to run (1-5, default 3)"
+    },
+    "context": {
+      "type": "string",
+      "maxLength": 2000,
+      "description": "Optional background context about the system, team, or constraints relevant to the decision"
+    },
+    "successCriteria": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Optional description of what a good recommendation looks like for this specific decision"
+    }
+  },
+  "additionalProperties": false
+}

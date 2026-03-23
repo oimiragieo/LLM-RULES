@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "OutcomeReflection Input",
+  "description": "Validated inputs for outcome-reflection skill execution",
+  "type": "object",
+  "required": ["taskId"],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "The task ID to reflect on (must correspond to a completed task)"
+    },
+    "agentType": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "The agent type that executed the task (e.g., developer, planner, architect)"
+    },
+    "taskType": {
+      "type": "string",
+      "enum": ["implementation", "planning", "estimation", "architecture", "security", "documentation", "review", "other"],
+      "description": "Category of task for trend analysis grouping"
+    },
+    "predictions": {
+      "type": "object",
+      "description": "Predicted outcomes recorded at task creation time",
+      "properties": {
+        "estimatedTokens": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated token count for the task"
+        },
+        "estimatedFiles": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Estimated number of files to be modified"
+        },
+        "estimatedSteps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Estimated number of implementation steps"
+        },
+        "predictedOutcome": {
+          "type": "string",
+          "description": "Qualitative description of expected task outcome"
+        },
+        "predictedBlockers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Anticipated blockers at planning time"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["High", "Medium", "Low"],
+          "description": "Planner's confidence in the predictions"
+        }
+      }
+    },
+    "actuals": {
+      "type": "object",
+      "description": "Actual outcomes observed after task completion",
+      "properties": {
+        "actualTokens": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Actual token count used"
+        },
+        "actualFiles": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Actual number of files modified"
+        },
+        "actualSteps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Actual number of steps taken"
+        },
+        "actualOutcome": {
+          "type": "string",
+          "description": "Qualitative description of actual task outcome"
+        },
+        "actualBlockers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Blockers that actually occurred during execution"
+        },
+        "reworkLoops": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of rework loops required (0 = smooth execution)"
+        }
+      }
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["reflect", "analyze", "trend"],
+      "default": "reflect",
+      "description": "Operation mode: reflect (single task), analyze (compute scores), trend (multi-task trend)"
+    }
+  },
+  "additionalProperties": false
+}

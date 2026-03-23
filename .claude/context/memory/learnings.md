@@ -744,3 +744,12 @@ Report: `.claude/context/artifacts/research-reports/openclaw-research-2026-03-21
 - Created `de-sloppify` skill: conservative two-agent cleanup pattern. Scanner CLI (`main.cjs`) detects unused imports (word-boundary heuristic), console.logs (skips console.error in catch), commented-out code (preserves JSDoc/TODOs/it.skip). Iron Law: never changes behavior. Assigned to: developer, qa, code-simplifier, code-reviewer.
 - Created `loop-operator` orchestrator agent: circuit breaker (max iterations=10, max time=300s, quality floor=0.4), stall detection (3 consecutive similar outputs at >80% similarity), escalation reports, post-loop de-sloppify cleanup, loop state checkpoints in `.claude/context/tmp/loop-state-{id}.json`. Uses instinct-learning + de-sloppify skills.
 - Routing: `loop-operator` added to `@AGENT_ROUTING_TABLE.md` and `routing-table-intent-keywords-data.cjs` + `routing-table-intent-agents.cjs`. Keywords: loop, iterate, circuit breaker, max iterations, loop stall.
+
+## Skill Creation: adversarial-debate + outcome-reflection (2026-03-23) [Task #20]
+
+**Agent:** skill-creator workflow | **Status:** Complete
+
+- Created `adversarial-debate` skill (Specialized Patterns): N-round PRO/CON debate for trade-off analysis. Scoring on 4 dimensions (specificity, evidence, rebuttal quality, relevance). Moderator synthesizes with confidence-rated recommendation. Assigned to: architect, planner, security-architect, general-assistant. Companion tool at `.claude/tools/adversarial-debate/adversarial-debate.cjs`.
+- Created `outcome-reflection` skill (Memory & Context): scores predicted vs actual task outcomes (tokens, files, steps, rework loops). Estimation accuracy formula: `max(0, 1 - abs(pred - actual) / max(pred, actual))`. Decision quality from rework loops (0→1.0, 1→0.75, 2→0.50, 3→0.25, 4+→0.0). Flags: `high-miss` (<0.6 overall), `estimation-miss` (<0.5 estimation), `excessive-rework` (>=3 loops). Assigned to: planner, reflection-agent, architect, general-assistant. Companion tool at `.claude/tools/outcome-reflection/outcome-reflection.cjs`.
+- Both skills: full enterprise bundle (SKILL.md, schemas, hooks, scripts, templates, rules, commands, references, companion tool, workflow). Iron Law I/II/III compliant.
+- Catalog updated: `.claude/docs/@SKILL_CATALOG_TABLE.md` rows added for both skills. Total count 264 → 266.

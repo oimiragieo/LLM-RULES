@@ -58,9 +58,15 @@
           "sequential-thinking",
           "complexity-assessment",
           "multi-agent-architecture-reference",
-          "ask-questions-if-underspecified"
+          "ask-questions-if-underspecified",
+          "outcome-reflection"
         ],
-        "secondary": ["context-compressor", "spec-gathering", "context-degradation"],
+        "secondary": [
+          "context-compressor",
+          "spec-gathering",
+          "context-degradation",
+          "adversarial-debate"
+        ],
         "contextual": {
           "large_project": ["brainstorming", "diagram-generator"],
           "multi_agent": ["dispatching-parallel-agents", "swarm-coordination"]
@@ -81,13 +87,15 @@
           "diagram-generator",
           "database-architect",
           "agent-tool-design",
-          "multi-agent-architecture-reference"
+          "multi-agent-architecture-reference",
+          "adversarial-debate"
         ],
         "secondary": [
           "security-architect",
           "project-analyzer",
           "brainstorming",
-          "dynamic-api-integration"
+          "dynamic-api-integration",
+          "outcome-reflection"
         ],
         "contextual": {
           "distributed_system": ["swarm-coordination", "consensus-voting"],
