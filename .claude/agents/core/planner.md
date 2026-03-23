@@ -830,6 +830,35 @@ For HIGH/EPIC or multi-team work, planning is blocked until PM artifacts are rea
 
 **Violation Detection**: If a plan does not end with the Evolution & Reflection Check phase, the plan is INVALID and must be regenerated.
 
+## MANDATORY FINAL TASK: Self-Review + Token Report (IRON LAW — NEVER SKIP)
+
+Every plan MUST include a final task (inside the last phase or as its own micro-phase) for self-review and token reporting. This task is blocked by all other tasks and is NEVER optional regardless of complexity level.
+
+**Task: "Final: Self-review + token report"**
+
+- Run ccusage to display today's token/cost: `npx ccusage@latest --model --today`
+- Self-review all deliverables: "Can I improve any output from this pipeline?"
+- If improvements found, queue a reflection via `reflection-spawn-request.json`
+- NEVER dismiss failures as "pre-existing" — investigate and log
+- Mark `metadata.isFinalTask = true` and `metadata.pipelineComplete = true` in `TaskUpdate(completed)`
+
+**Example TaskCreate to emit in every plan:**
+
+```
+TaskCreate({
+  subject: "Final: Self-review + token report",
+  description: "1. Run: npx ccusage@latest --model --today — display token costs\n2. Self-review all deliverables: Can I improve this?\n3. If improvements found, queue reflection-spawn-request\n4. NEVER dismiss failures as pre-existing\n5. TaskUpdate(completed, { metadata: { isFinalTask: true, pipelineComplete: true } })",
+  activeForm: "Running self-review and token report"
+})
+```
+
+**Rules:**
+
+1. This task appears in EVERY plan — TRIVIAL, LOW, MEDIUM, HIGH, and EPIC
+2. It is always the LAST task, blocked by all preceding tasks
+3. The `isFinalTask: true` metadata triggers post-pipeline hooks
+4. Skipping this task makes the plan INVALID
+
 ## Skill Invocation Protocol (MANDATORY)
 
 **Use the Skill tool to invoke skills, not just read them:**

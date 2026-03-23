@@ -439,6 +439,27 @@ Skill({
 3. **ALWAYS** include a verification gate between every phase — proceeding without verification means failures in Phase N are discovered in Phase N+3, making rollback exponentially more complex.
 4. **NEVER** generate a plan without explicit rollback commands for destructive operations — a plan without rollback paths is unrecoverable; rollback must be specified before the operation is attempted.
 5. **ALWAYS** coordinate specialist input (Analyst, PM, Architect) before finalizing a plan — plans generated without domain expert review routinely miss implicit requirements, producing incomplete execution paths.
+6. **ALWAYS** include a mandatory "Final: Self-review + token report" task as the LAST task in every plan — without this task, pipelines complete without cost visibility or quality self-assessment, and post-pipeline hooks never trigger.
+
+## MANDATORY FINAL TASK (IRON LAW — NEVER SKIP)
+
+Every plan MUST include this as the LAST task, blocked by all other tasks:
+
+**Task: "Final: Self-review + token report"**
+
+- Description: "Run ccusage to display today's token/cost (npx ccusage@latest --model --today). Then self-review: Can I improve any deliverable from this pipeline? If yes, create a reflection via reflection-spawn-request.json. NEVER dismiss failures as pre-existing. Mark metadata.isFinalTask = true and metadata.pipelineComplete = true in TaskUpdate(completed)."
+- This task is NEVER optional. It is part of every plan regardless of complexity.
+- The task must set metadata.isFinalTask = true so post-pipeline hooks trigger.
+
+**Example TaskCreate for planners to emit:**
+
+```
+TaskCreate({
+  subject: "Final: Self-review + token report",
+  description: "1. Run: npx ccusage@latest --model --today — display token costs\n2. Self-review all deliverables: Can I improve this?\n3. If improvements found, queue reflection-spawn-request\n4. NEVER dismiss failures as pre-existing\n5. TaskUpdate(completed, { metadata: { isFinalTask: true, pipelineComplete: true } })",
+  activeForm: "Running self-review and token report"
+})
+```
 
 ## Rules
 

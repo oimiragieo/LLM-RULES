@@ -22,6 +22,7 @@ Skill({ skill: 'behavioral-loop-detection' });
 ### Phase 2: Per-Action Monitoring (during task execution)
 
 Before each tool call:
+
 1. Normalize tool args (strip paths, UUIDs, timestamps)
 2. Record action in buffer (FIFO, drop oldest when full)
 3. Compute Jaccard similarity vs. last action
@@ -34,6 +35,7 @@ Before each tool call:
 ### Phase 3: Completion
 
 On force-done (level 3):
+
 - Task is marked completed with partial metadata
 - Loop details appended to `learnings.md` if root cause is clear
 

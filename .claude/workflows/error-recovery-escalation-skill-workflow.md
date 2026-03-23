@@ -13,6 +13,7 @@ Skill({ skill: 'error-recovery-escalation' });
 ```
 
 Invoke after:
+
 - Any unhandled error in agent execution that wasn't resolved inline
 - `judge-verification` returns `verdict: "FAIL"`
 - `behavioral-loop-detection` returns `loopDetected: true`
@@ -25,12 +26,14 @@ Invoke after:
 **Goal:** Determine the correct entry level to avoid wasting resources.
 
 **Command:**
+
 ```bash
 echo '{"taskId":"<task-id>","errorMessage":"<error-text>"}' \
   | node .claude/skills/error-recovery-escalation/scripts/main.cjs --classify
 ```
 
 **Expected output:**
+
 ```json
 { "errorType": "network-timeout", "entryLevel": 1, "action": "retry" }
 ```
@@ -44,12 +47,14 @@ echo '{"taskId":"<task-id>","errorMessage":"<error-text>"}' \
 **Goal:** Get the complete recovery plan with instructions and TaskUpdate metadata.
 
 **Command:**
+
 ```bash
 echo '{"taskId":"<task-id>","errorMessage":"<error-text>"}' \
   | node .claude/skills/error-recovery-escalation/scripts/main.cjs
 ```
 
 **Expected output shape:**
+
 ```json
 {
   "taskId": "<task-id>",
@@ -130,15 +135,17 @@ echo '{"taskId":"<task-id>","errorMessage":"<error-text>"}' \
 **Goal:** Ensure every level transition is visible to reflection scoring.
 
 **Command (call after entering any level):**
+
 ```javascript
 TaskUpdate({
   taskId: result.taskId,
   status: 'in_progress',
-  metadata: result.taskUpdateMetadata
+  metadata: result.taskUpdateMetadata,
 });
 ```
 
 **For force-done:**
+
 ```javascript
 TaskUpdate({
   taskId: result.taskId,
@@ -146,8 +153,8 @@ TaskUpdate({
   metadata: {
     ...result.taskUpdateMetadata,
     partial: true,
-    summary: 'Task force-completed with partial results. See recommendation for next steps.'
-  }
+    summary: 'Task force-completed with partial results. See recommendation for next steps.',
+  },
 });
 ```
 
@@ -157,14 +164,14 @@ TaskUpdate({
 
 ## Integration Map
 
-| Trigger Source | Skill to Invoke | Entry Point |
-|----------------|-----------------|-------------|
-| judge-verification FAIL | error-recovery-escalation | `errorType: "judge-fail"` |
-| behavioral-loop-detection trigger | error-recovery-escalation | `errorType: "loop-detected"` |
-| ENOENT / file not found | error-recovery-escalation | `errorType: "enoent"` (auto-classified) |
-| API rate limit | error-recovery-escalation | `errorType: "rate-limit"` (auto-classified) |
-| Service unavailable | error-recovery-escalation | `errorType: "external-service-down"` |
-| L3 replan needed | plan-generator | From L3 instructions |
+| Trigger Source                    | Skill to Invoke           | Entry Point                                 |
+| --------------------------------- | ------------------------- | ------------------------------------------- |
+| judge-verification FAIL           | error-recovery-escalation | `errorType: "judge-fail"`                   |
+| behavioral-loop-detection trigger | error-recovery-escalation | `errorType: "loop-detected"`                |
+| ENOENT / file not found           | error-recovery-escalation | `errorType: "enoent"` (auto-classified)     |
+| API rate limit                    | error-recovery-escalation | `errorType: "rate-limit"` (auto-classified) |
+| Service unavailable               | error-recovery-escalation | `errorType: "external-service-down"`        |
+| L3 replan needed                  | plan-generator            | From L3 instructions                        |
 
 ---
 

@@ -295,6 +295,15 @@
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/cleanup/worktree-auto-cleanup.cjs",
             "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/post-pipeline-token-report.cjs",
+            "timeout": 35000
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/post-pipeline-self-review.cjs"
           }
         ]
       },

@@ -11,6 +11,7 @@
 Invoke after any high-stakes task completes, or when completion metadata seems inconsistent. The judge is independent — it never sees the executing agent's chain-of-thought.
 
 **Triggers:**
+
 - Agent reports `TaskUpdate(completed)` on a HIGH/EPIC task
 - Completion summary lacks file diffs or test output
 - A previous judge verdict was CONDITIONAL and you want to re-evaluate
@@ -61,18 +62,21 @@ node -e "const fs=require('fs');console.log(fs.existsSync('<path>') ? 'EXISTS' :
 Score each dimension independently based on evidence gathered in Phase 1. Do NOT use the executing agent's self-report as evidence.
 
 ### goalAlignment (0-25)
+
 - 22-25: Output precisely matches every requirement
 - 15-21: Core requirements met, minor gaps
 - 8-14: Partial match, significant gaps
 - 0-7: Misses or contradicts goal
 
 ### actionCompleteness (0-25)
+
 - 22-25: All required actions taken
 - 15-21: Most actions taken
 - 8-14: Key actions taken, several gaps
 - 0-7: Actions insufficient
 
 ### evidenceOfCompletion (0-25) — GATE DIMENSION
+
 - 22-25: git diff + passing tests + file content examined
 - 15-21: At least one concrete artifact examined
 - 8-14: Indirect evidence only
@@ -81,6 +85,7 @@ Score each dimension independently based on evidence gathered in Phase 1. Do NOT
 **IRON LAW: If evidenceOfCompletion < 15, verdict is FAIL regardless of total.**
 
 ### finalStateCoherence (0-25)
+
 - 22-25: System fully consistent
 - 15-21: Minor inconsistencies
 - 8-14: Notable inconsistencies
@@ -167,12 +172,12 @@ TaskUpdate({
 
 ## Integration Map
 
-| Skill | Relationship |
-|-------|-------------|
-| `verification-before-completion` | Pre-completion gate (runs before judge) |
-| `behavioral-loop-detection` | Fires FORCE-DONE → judge evaluates partial output |
-| `error-recovery-escalation` | Handles FAIL verdicts with structured recovery |
-| `qa-workflow` | Provides test evidence that raises evidenceOfCompletion score |
+| Skill                            | Relationship                                                  |
+| -------------------------------- | ------------------------------------------------------------- |
+| `verification-before-completion` | Pre-completion gate (runs before judge)                       |
+| `behavioral-loop-detection`      | Fires FORCE-DONE → judge evaluates partial output             |
+| `error-recovery-escalation`      | Handles FAIL verdicts with structured recovery                |
+| `qa-workflow`                    | Provides test evidence that raises evidenceOfCompletion score |
 
 ---
 
