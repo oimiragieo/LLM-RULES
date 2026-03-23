@@ -115,7 +115,7 @@
       "line_count": 70
     },
     {
-      "path": ".claude/rules/astro-rules.md",
+      "path": ".claude/rules/frameworks/astro-rules.md",
       "name": "astro-rules",
       "description": "",
       "globs": "",
@@ -423,7 +423,7 @@
       "line_count": 63
     },
     {
-      "path": ".claude/rules/docker-development.md",
+      "path": ".claude/rules/frameworks/docker-development.md",
       "name": "docker-development",
       "description": "",
       "globs": "",
@@ -456,7 +456,7 @@
       "line_count": 247
     },
     {
-      "path": ".claude/rules/erlang-rules.md",
+      "path": ".claude/rules/frameworks/erlang-rules.md",
       "name": "erlang-rules",
       "description": "",
       "globs": "",
@@ -478,7 +478,7 @@
       "line_count": 74
     },
     {
-      "path": ".claude/rules/fastapi-rules.md",
+      "path": ".claude/rules/frameworks/fastapi-rules.md",
       "name": "fastapi-rules",
       "description": "",
       "globs": "",
@@ -555,7 +555,7 @@
       "line_count": 108
     },
     {
-      "path": ".claude/rules/go-development.md",
+      "path": ".claude/rules/frameworks/go-development.md",
       "name": "go-development",
       "description": "",
       "globs": "",
@@ -687,7 +687,7 @@
       "line_count": 64
     },
     {
-      "path": ".claude/rules/lancedb-rules.md",
+      "path": ".claude/rules/frameworks/lancedb-rules.md",
       "name": "lancedb-rules",
       "description": "",
       "globs": "",
@@ -720,7 +720,7 @@
       "line_count": 112
     },
     {
-      "path": ".claude/rules/ml-experiment-standards.md",
+      "path": ".claude/rules/frameworks/ml-experiment-standards.md",
       "name": "ml-experiment-standards",
       "description": "",
       "globs": "",
@@ -742,7 +742,7 @@
       "line_count": 74
     },
     {
-      "path": ".claude/rules/modern-python.md",
+      "path": ".claude/rules/frameworks/modern-python.md",
       "name": "modern-python",
       "description": "",
       "globs": "",
@@ -753,7 +753,7 @@
       "line_count": 34
     },
     {
-      "path": ".claude/rules/nextjs-app-router-rules.md",
+      "path": ".claude/rules/frameworks/nextjs-app-router-rules.md",
       "name": "nextjs-app-router-rules",
       "description": "",
       "globs": "",
@@ -873,7 +873,7 @@
       "line_count": 135
     },
     {
-      "path": ".claude/rules/playwright-testing-rules.md",
+      "path": ".claude/rules/frameworks/playwright-testing-rules.md",
       "name": "playwright-testing-rules",
       "description": "",
       "globs": "",
@@ -960,7 +960,7 @@
       "line_count": 65
     },
     {
-      "path": ".claude/rules/qwik-rules.md",
+      "path": ".claude/rules/frameworks/qwik-rules.md",
       "name": "qwik-rules",
       "description": "",
       "globs": "",
@@ -1037,7 +1037,7 @@
       "line_count": 337
     },
     {
-      "path": ".claude/rules/rust-development.md",
+      "path": ".claude/rules/frameworks/rust-development.md",
       "name": "rust-development",
       "description": "",
       "globs": "",
@@ -1147,7 +1147,7 @@
       "line_count": 69
     },
     {
-      "path": ".claude/rules/shadcn-ui-rules.md",
+      "path": ".claude/rules/frameworks/shadcn-ui-rules.md",
       "name": "shadcn-ui-rules",
       "description": "",
       "globs": "",
@@ -1191,7 +1191,7 @@
       "line_count": 86
     },
     {
-      "path": ".claude/rules/solidjs-rules.md",
+      "path": ".claude/rules/frameworks/solidjs-rules.md",
       "name": "solidjs-rules",
       "description": "",
       "globs": "",
@@ -1257,7 +1257,7 @@
       "line_count": 324
     },
     {
-      "path": ".claude/rules/supabase-rules.md",
+      "path": ".claude/rules/frameworks/supabase-rules.md",
       "name": "supabase-rules",
       "description": "",
       "globs": "",
@@ -1356,7 +1356,7 @@
       "line_count": 57
     },
     {
-      "path": ".claude/rules/terraform-rules.md",
+      "path": ".claude/rules/frameworks/terraform-rules.md",
       "name": "terraform-rules",
       "description": "",
       "globs": "",
@@ -1422,7 +1422,7 @@
       "line_count": 55
     },
     {
-      "path": ".claude/rules/trpc-rules.md",
+      "path": ".claude/rules/frameworks/trpc-rules.md",
       "name": "trpc-rules",
       "description": "",
       "globs": "",
@@ -1477,7 +1477,7 @@
       "line_count": 119
     },
     {
-      "path": ".claude/rules/vue-nuxt-rules.md",
+      "path": ".claude/rules/frameworks/vue-nuxt-rules.md",
       "name": "vue-nuxt-rules",
       "description": "",
       "globs": "",
@@ -1565,7 +1565,7 @@
       "line_count": 23
     },
     {
-      "path": ".claude/rules/yara-authoring.md",
+      "path": ".claude/rules/frameworks/yara-authoring.md",
       "name": "yara-authoring",
       "description": "",
       "globs": "",
@@ -1576,7 +1576,7 @@
       "line_count": 37
     },
     {
-      "path": ".claude/rules/zig-rules.md",
+      "path": ".claude/rules/frameworks/zig-rules.md",
       "name": "zig-rules",
       "description": "",
       "globs": "",
