@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "GapDetection Output",
+  "description": "Structured output from gap-detection skill execution",
+  "type": "object",
+  "required": ["summary", "reportPath", "timestamp"],
+  "properties": {
+    "summary": {
+      "type": "object",
+      "description": "Counts of detected gaps per category",
+      "properties": {
+        "noReadme": { "type": "integer", "description": "Number of source files in dirs without README" },
+        "noTest": { "type": "integer", "description": "Number of source files without corresponding test files" },
+        "todos": { "type": "integer", "description": "Total TODO/FIXME/HACK/XXX markers found" },
+        "noDoc": { "type": "integer", "description": "Number of exported symbols without documentation comments" }
+      }
+    },
+    "reportPath": {
+      "type": "string",
+      "description": "Absolute path where the full report was written"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the scan was executed"
+    },
+    "priorityGaps": {
+      "type": "array",
+      "description": "Top priority gaps ranked by blast radius",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": { "type": "string" },
+          "category": { "type": "string", "enum": ["no-readme", "no-test", "todo", "no-doc"] },
+          "detail": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

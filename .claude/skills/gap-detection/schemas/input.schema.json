@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "GapDetection Input",
+  "description": "Validated inputs for gap-detection skill execution",
+  "type": "object",
+  "properties": {
+    "targetDir": {
+      "type": "string",
+      "description": "Absolute or relative path to the directory to scan. Defaults to current working directory."
+    },
+    "checks": {
+      "type": "array",
+      "description": "List of check categories to run. Defaults to all.",
+      "items": {
+        "type": "string",
+        "enum": ["no-readme", "no-test", "todos", "no-doc"]
+      },
+      "uniqueItems": true
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "Optional path to write the report. Defaults to .claude/context/tmp/gap-detection-report-YYYY-MM-DD.md"
+    },
+    "maxResults": {
+      "type": "integer",
+      "description": "Maximum number of gaps to list per category in the report.",
+      "minimum": 1,
+      "maximum": 500,
+      "default": 50
+    }
+  },
+  "additionalProperties": false
+}

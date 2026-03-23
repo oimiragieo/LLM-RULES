@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "TeamOrchestration Input",
+  "description": "Validated inputs for team-orchestration skill execution",
+  "type": "object",
+  "required": ["phase"],
+  "properties": {
+    "phase": {
+      "type": "string",
+      "enum": ["plan", "design", "implement", "review", "test", "deploy"],
+      "description": "The pipeline phase to execute"
+    },
+    "taskId": {
+      "type": "string",
+      "description": "Unique task identifier for state tracking. Used as filename for snapshot.json."
+    },
+    "taskDescription": {
+      "type": "string",
+      "description": "Human-readable description of the task being orchestrated"
+    },
+    "skipApprovalGate": {
+      "type": "boolean",
+      "description": "Skip the approval gate for this phase transition (requires justification in metadata)",
+      "default": false
+    },
+    "approvalJustification": {
+      "type": "string",
+      "description": "Required when skipApprovalGate is true. Documents why the gate was skipped."
+    }
+  },
+  "additionalProperties": false,
+  "if": {
+    "properties": { "skipApprovalGate": { "const": true } }
+  },
+  "then": {
+    "required": ["approvalJustification"]
+  }
+}

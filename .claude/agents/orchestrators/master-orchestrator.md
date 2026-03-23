@@ -24,9 +24,12 @@ tools:
   - TaskUpdate
   - MemoryRecord
 skills:
+  - gap-detection
   - memory-search
   - plan-generator
+  - project-stage-detection
   - response-rater
+  - team-orchestration
   - ripgrep
   - code-semantic-search
   - code-structural-search

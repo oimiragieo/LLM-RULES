@@ -37,9 +37,12 @@ skills:
   - framework-context
   - memory-search
   - multi-agent-architecture-reference
+  - gap-detection
   - plan-generator
   - plan-quality-verifier
+  - project-stage-detection
   - recommend-evolution
+  - team-orchestration
   - ripgrep
   - sequential-thinking
   - task-management-protocol

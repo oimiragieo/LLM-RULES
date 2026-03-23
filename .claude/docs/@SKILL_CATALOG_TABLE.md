@@ -10,8 +10,8 @@
 
 | Metric        | Count |
 | ------------- | ----- |
-| Total Skills  | 261   |
-| Active Skills | 261   |
+| Total Skills  | 264   |
+| Active Skills | 264   |
 | Aliases       | 0     |
 | Domains       | 22    |
 | Categories    | 25    |
@@ -259,6 +259,9 @@
 | `response-rater`                               | quality        | Other                | Rates responses and plans against quality rubrics. Used for plan validation, response quality audits, and multi-agent co...                                                                                                                                                   |
 | `verification-before-completion`               | quality        | Quality              | Gate function preventing unverified completion claims. Use before claiming any task is done.                                                                                                                                                                                  |
 | `plan-quality-verifier`                        | quality        | Validation & Quality | Verifies implementation plan quality across 8 dimensions (requirement-coverage, task-completeness, dependency-validity, scope-sanity, artifact-wiring, risk-assessment, testability, estimation-quality). Returns pass/fail with per-dimension scores. Gate before execution. |
+| `gap-detection`                                | quality        | Validation & Quality | Detect missing docs, undocumented files, TODO/FIXME counts, and project health gaps. Scans project root and surfaces findings by severity. Run on session start for unfamiliar codebases.                                                                                     |
+| `team-orchestration`                           | quality        | Validation & Quality | 6-phase multi-agent pipeline (Plan→Design→Implement→Review→Test→Deploy) with entry/exit criteria, approval gates, and snapshot-based state persistence across sessions.                                                                                                       |
+| `project-stage-detection`                      | quality        | Validation & Quality | Detect project maturity (new/early/mid/mature) from file structure using a weighted 9-indicator scoring system. Routes to appropriate downstream skill (onboarding, gap-detection, proactive-audit).                                                                          |
 | `interactive-requirements-gathering`           | requirements   | Other                | Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice pat...                                                                                                                                                   |
 | `spec-gathering`                               | requirements   | Requirements         | Requirements gathering workflow for specification creation. Use when starting a new feature, task, or project that needs...                                                                                                                                                   |
 | `arxiv-mcp`                                    | research       | Research             | Search and retrieve academic papers from arXiv.org using WebFetch and Exa. No MCP server required - uses existing tools ...                                                                                                                                                   |
@@ -358,9 +361,9 @@
 
 `complexity-assessment`, `plan-generator`
 
-### quality (4 skills)
+### quality (7 skills)
 
-`checklist-generator`, `plan-quality-verifier`, `response-rater`, `verification-before-completion`
+`checklist-generator`, `gap-detection`, `plan-quality-verifier`, `project-stage-detection`, `response-rater`, `team-orchestration`, `verification-before-completion`
 
 ### requirements (2 skills)
 

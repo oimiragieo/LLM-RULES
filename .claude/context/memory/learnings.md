@@ -680,3 +680,60 @@ Report: `.claude/context/artifacts/research-reports/openclaw-research-2026-03-21
 - Updated workflow: missing-workflow-xyz (2026-03-23)
 
 - Created new agent: repo-onboarder (2026-03-23)
+
+## [RESEARCH] Microservices Migration Patterns 2025-2026 (2026-03-22)
+
+**Source:** researcher agent, task-2, external web research via WebSearch
+**Key Findings:**
+
+- 42% of orgs that adopted microservices are consolidating back to larger units (Java Code Geeks, Dec 2025)
+- Service mesh adoption dropped from 18% (Q3 2023) to 8% (Q3 2025) — ops complexity not worth it for smaller teams
+- Modular monolith → selective microservices is the canonical 2025 migration path
+- Istio Ambient Mode (GA 2024) reduces sidecar overhead; Linkerd still fastest per LiveWyer 2024 benchmark
+- mTLS latency increase: Istio sidecar +166%, Istio Ambient +8%, Linkerd +33%, Cilium +99%
+- Redpanda: 10x lower latency than Kafka, 3-6x fewer nodes, no Zookeeper — but performance is workload-sensitive
+- OpenTelemetry: all signals (traces/metrics/logs) now GA in 2025; LGTM stack (Loki+Grafana+Tempo+Mimir) recommended for OSS
+- IDP threshold: ~30-50+ engineers is when Backstage/Port/Cortex becomes necessary for microservices governance
+- Backstage has high TCO — needs 2 dedicated platform engineers; Port offers lower-TCO managed alternative
+  **Report:** `.claude/context/artifacts/research-reports/microservices-migration-patterns-research-2026-03-22.md`
+
+## Task-15 Skills Created: gap-detection, team-orchestration, project-stage-detection (2026-03-22)
+
+**Agent:** skill-creator (via session continuation) | **Task:** #15
+
+### [SKILLS] 3 New Enterprise Skills Created
+
+**gap-detection** (`.claude/skills/gap-detection/`)
+
+- Scans project for missing docs, undocumented files, TODO/FIXME counts, test coverage gaps
+- CLI: `node .claude/skills/gap-detection/scripts/main.cjs --dir <path> --check all`
+- Output: JSON report at `.claude/context/tmp/gap-detection-<ts>.json`
+- Agents: planner, architect, developer, qa, master-orchestrator
+
+**team-orchestration** (`.claude/skills/team-orchestration/`)
+
+- 6-phase pipeline: Plan→Design→Implement→Review→Test→Deploy
+- Phase state persisted at `.claude/context/plans/<taskId>.snapshot.json`
+- Approval gates: HUMAN/AUTOMATED/CONSENSUS per phase
+- CLI: `node .claude/skills/team-orchestration/scripts/main.cjs --phase <phase> --task <id>`
+- Agents: master-orchestrator, planner
+
+**project-stage-detection** (`.claude/skills/project-stage-detection/`)
+
+- Detects project maturity (new/early/mid/mature) from 9 file-presence indicators
+- Weighted scoring: source_dir=3, tests=3, ci_cd=2, package_json=1, readme=1, changelog=1, lockfile=1
+- Stage thresholds: 0-2=new, 3-5=early, 6-7=mid, 8+=mature
+- Mature requires ALL three HIGH-weight indicators
+- CLI: `node .claude/skills/project-stage-detection/scripts/main.cjs --dir <path> --json`
+- Agents: planner, architect, developer, master-orchestrator
+
+### [INTEGRATION] Post-creation steps completed
+
+- Skill catalog updated: `.claude/docs/@SKILL_CATALOG_TABLE.md` (264 total)
+- Agent-skill matrix updated: `agent-skill-matrix.json` (planner + master-orchestrator)
+- Skill index regenerated: all 3 skills have `agentPrimary: ["planner","master-orchestrator"]`
+- Workflow files created for all 3 skills in `.claude/workflows/`
+
+### [PATTERN] Enterprise Bundle Completion
+
+- Each skill has: SKILL.md, scripts/main.cjs, hooks/(pre/post)-execute.cjs, schemas/(input/output).schema.json, rules/, commands/, templates/, references/, companion tool in .claude/tools/<name>/

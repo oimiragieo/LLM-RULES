@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "TeamOrchestration Output",
+  "description": "Structured output from team-orchestration phase execution",
+  "type": "object",
+  "required": ["taskId", "phase", "status", "timestamp"],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "Task identifier"
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["plan", "design", "implement", "review", "test", "deploy"],
+      "description": "The phase that was executed"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["completed", "blocked", "awaiting-approval", "failed"],
+      "description": "Phase execution result"
+    },
+    "exitCriteriaVerified": {
+      "type": "boolean",
+      "description": "Whether all exit criteria were verified before advancing"
+    },
+    "approvalRequired": {
+      "type": "boolean",
+      "description": "Whether this phase requires human approval before the next phase can start"
+    },
+    "nextPhase": {
+      "type": "string",
+      "enum": ["design", "implement", "review", "test", "deploy", null],
+      "description": "The next phase to execute, or null if pipeline is complete"
+    },
+    "snapshotPath": {
+      "type": "string",
+      "description": "Path to the phase state snapshot JSON"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of phase completion"
+    }
+  },
+  "additionalProperties": false
+}

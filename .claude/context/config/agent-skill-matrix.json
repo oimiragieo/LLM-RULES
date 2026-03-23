@@ -52,6 +52,9 @@
       "planner": {
         "primary": [
           "plan-generator",
+          "project-stage-detection",
+          "gap-detection",
+          "team-orchestration",
           "sequential-thinking",
           "complexity-assessment",
           "multi-agent-architecture-reference",
@@ -1217,7 +1220,14 @@
     },
     "orchestrators": {
       "master-orchestrator": {
-        "primary": ["plan-generator", "task-management-protocol", "response-rater"],
+        "primary": [
+          "plan-generator",
+          "project-stage-detection",
+          "gap-detection",
+          "team-orchestration",
+          "task-management-protocol",
+          "response-rater"
+        ],
         "secondary": ["recovery", "swarm-coordination"],
         "contextual": {
           "parallel_execution": ["dispatching-parallel-agents"],

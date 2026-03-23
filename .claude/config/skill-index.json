@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-22T17:24:12.408Z",
+  "generatedAt": "2026-03-23T04:10:51.797Z",
   "metadata": {
-    "totalSkills": 322,
+    "totalSkills": 325,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-22T17:24:12.409Z",
+    "lastValidated": "2026-03-23T04:10:51.798Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7637,6 +7637,30 @@
       "priority": 3,
       "aliasOf": null
     },
+    "gap-detection": {
+      "name": "gap-detection",
+      "displayName": "Gap Detection",
+      "category": "Other",
+      "domain": "other",
+      "description": "Detect missing docs, undocumented files, project health issues, and coverage gaps on session start or on-demand. Scans for README gaps, TODO/FIXME counts, and test coverage holes.",
+      "requiredTools": [
+        "Read",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "planner",
+        "master-orchestrator"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "gap-detection"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
     "goal-backward-verification": {
       "name": "goal-backward-verification",
       "displayName": "Goal Backward Verification",
@@ -8091,6 +8115,30 @@
       "priority": 3,
       "aliasOf": null
     },
+    "project-stage-detection": {
+      "name": "project-stage-detection",
+      "displayName": "Project Stage Detection",
+      "category": "Other",
+      "domain": "other",
+      "description": "Detect project maturity stage (new/early/mid/mature) from file structure and route to appropriate onboarding workflow",
+      "requiredTools": [
+        "Read",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "planner",
+        "master-orchestrator"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "project-stage-detection"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
     "reddit-researcher": {
       "name": "reddit-researcher",
       "displayName": "Reddit Researcher",
@@ -8310,6 +8358,35 @@
         "task-delegation"
       ],
       "priority": 3,
+      "aliasOf": null
+    },
+    "team-orchestration": {
+      "name": "team-orchestration",
+      "displayName": "Team Orchestration",
+      "category": "Other",
+      "domain": "other",
+      "description": "6-phase multi-agent pipeline with approval gates. Orchestrates Plan→Design→Implement→Review→Test→Deploy phases with explicit entry/exit criteria, phase-level agent assignment, and human-in-the-loop approval checkpoints.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ],
+      "agentPrimary": [
+        "planner",
+        "master-orchestrator"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "team-orchestration"
+      ],
+      "priority": 1,
       "aliasOf": null
     },
     "telegram-polling": {
@@ -8746,6 +8823,7 @@
         "fintech-engineer",
         "forum-monitor",
         "frontend-design",
+        "gap-detection",
         "goal-backward-verification",
         "google-workspace",
         "heartbeat",
@@ -8766,6 +8844,7 @@
         "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
+        "project-stage-detection",
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -8774,6 +8853,7 @@
         "slack-expert",
         "style-analyzer",
         "task-delegation",
+        "team-orchestration",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -9174,6 +9254,7 @@
         "fintech-engineer",
         "forum-monitor",
         "frontend-design",
+        "gap-detection",
         "goal-backward-verification",
         "google-workspace",
         "heartbeat",
@@ -9194,6 +9275,7 @@
         "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
+        "project-stage-detection",
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -9202,6 +9284,7 @@
         "slack-expert",
         "style-analyzer",
         "task-delegation",
+        "team-orchestration",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -9585,6 +9668,7 @@
         "fintech-engineer",
         "forum-monitor",
         "frontend-design",
+        "gap-detection",
         "goal-backward-verification",
         "google-workspace",
         "heartbeat",
@@ -9605,6 +9689,7 @@
         "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
+        "project-stage-detection",
         "regulatory-compliance",
         "scheduled-tasks",
         "scientific-skills",
@@ -9613,6 +9698,7 @@
         "slack-expert",
         "style-analyzer",
         "task-delegation",
+        "team-orchestration",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -9881,6 +9967,7 @@
         "slack-expert",
         "style-analyzer",
         "task-delegation",
+        "team-orchestration",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -10094,6 +10181,7 @@
         "slack-expert",
         "style-analyzer",
         "task-delegation",
+        "team-orchestration",
         "uat-verify",
         "user-research",
         "voice-clone-generator",
@@ -10269,6 +10357,7 @@
         "figma",
         "fintech-engineer",
         "forum-monitor",
+        "gap-detection",
         "goal-backward-verification",
         "heartbeat",
         "knowledge-graph",
@@ -10279,9 +10368,11 @@
         "ml-experiment-loop",
         "plan-quality-verifier",
         "pptx",
+        "project-stage-detection",
         "scheduled-tasks",
         "scientific-skills",
         "slack-expert",
+        "team-orchestration",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -10415,11 +10506,13 @@
         "claude-api",
         "content-analyzer",
         "deep-research",
+        "gap-detection",
         "goal-backward-verification",
         "implementation-readiness",
         "knowledge-graph",
         "memory-audit",
         "ml-experiment-loop",
+        "project-stage-detection",
         "regulatory-compliance",
         "scientific-skills",
         "user-research"
@@ -10554,11 +10647,13 @@
         "commit-security-scan",
         "content-analyzer",
         "deep-research",
+        "gap-detection",
         "goal-backward-verification",
         "implementation-readiness",
         "knowledge-graph",
         "memory-audit",
         "ml-experiment-loop",
+        "project-stage-detection",
         "regulatory-compliance",
         "scientific-skills",
         "user-flow-validator",
@@ -10588,6 +10683,7 @@
         "arxiv-monitor",
         "exa-monitor",
         "regulatory-compliance",
+        "team-orchestration",
         "telegram-polling",
         "user-research"
       ],
@@ -10669,16 +10765,19 @@
         "cron-decision",
         "heartbeat",
         "scheduled-tasks",
+        "team-orchestration",
         "telegram-polling"
       ],
       "TaskList": [
         "task-management-protocol",
         "heartbeat",
         "scheduled-tasks",
+        "team-orchestration",
         "telegram-polling"
       ],
       "TaskGet": [
         "task-management-protocol",
+        "team-orchestration",
         "telegram-polling"
       ],
       "TaskUpdate": [
@@ -10686,6 +10785,7 @@
         "heartbeat",
         "memory-audit",
         "scheduled-tasks",
+        "team-orchestration",
         "telegram-polling",
         "user-research"
       ],
@@ -10958,6 +11058,9 @@
       ],
       "planner": [
         "plan-generator",
+        "project-stage-detection",
+        "gap-detection",
+        "team-orchestration",
         "sequential-thinking",
         "complexity-assessment",
         "multi-agent-architecture-reference",
@@ -11975,6 +12078,9 @@
       ],
       "master-orchestrator": [
         "plan-generator",
+        "project-stage-detection",
+        "gap-detection",
+        "team-orchestration",
         "task-management-protocol",
         "response-rater",
         "verification-before-completion",
@@ -12276,6 +12382,9 @@
       ],
       "planner": [
         "plan-generator",
+        "project-stage-detection",
+        "gap-detection",
+        "team-orchestration",
         "sequential-thinking",
         "complexity-assessment",
         "multi-agent-architecture-reference",
@@ -13293,6 +13402,9 @@
       ],
       "master-orchestrator": [
         "plan-generator",
+        "project-stage-detection",
+        "gap-detection",
+        "team-orchestration",
         "task-management-protocol",
         "response-rater",
         "verification-before-completion",
