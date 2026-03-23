@@ -731,6 +731,72 @@ async function main() {
       }
     }
 
+    // DRAIN_GATE_ENFORCEMENT: verify no open tasks remain before pipeline completion.
+    // Prevents "all done" claims while tasks sit pending/in_progress.
+    const drainGateMode = getEnforcementMode('DRAIN_GATE_ENFORCEMENT', 'warn');
+    if (drainGateMode !== 'off' && isPipelineCompletion) {
+      try {
+        const taskStatusFile = path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.json');
+        if (fs.existsSync(taskStatusFile)) {
+          const { safeParseJSON: parseJSON } = require('../../lib/utils/safe-json.cjs');
+          const taskStates = parseJSON(fs.readFileSync(taskStatusFile, 'utf8'));
+          const openTasks = [];
+          for (const [taskId, status] of Object.entries(taskStates)) {
+            if (status === 'pending' || status === 'in_progress') {
+              openTasks.push(`${taskId}:${status}`);
+            }
+          }
+          // Exclude the current task being completed from the count
+          const currentTaskId = parsedParams.normalized.taskId;
+          const otherOpenTasks = openTasks.filter(t => !t.startsWith(`${currentTaskId}:`));
+          if (otherOpenTasks.length > 0) {
+            const drainMsg =
+              `DRAIN GATE FAILED: Pipeline completion claimed but ${otherOpenTasks.length} task(s) still open: ` +
+              `${otherOpenTasks.slice(0, 5).join(', ')}${otherOpenTasks.length > 5 ? '...' : ''}. ` +
+              `Close all tasks before claiming pipeline complete. Set DRAIN_GATE_ENFORCEMENT=off to disable.`;
+            if (drainGateMode === 'block') {
+              console.log(formatHookResult('block', drainMsg));
+              process.exit(2);
+            } else {
+              process.stderr.write(`[pre-completion-validation] WARNING: ${drainMsg}\n`);
+            }
+          }
+        }
+      } catch (_e) {
+        // Best effort — don't block on state file read failure
+      }
+    }
+
+    // PLANNER_TOKEN_ESTIMATION_ENFORCEMENT: verify planner tasks include token estimates.
+    // Prevents agents from dying mid-task due to context overflow from underestimated workloads.
+    const plannerEstMode = getEnforcementMode('PLANNER_TOKEN_ESTIMATION_ENFORCEMENT', 'warn');
+    if (plannerEstMode !== 'off') {
+      const isPlannerCompletion =
+        completionSummaryLower.includes('plan') &&
+        (completionSummaryLower.includes('created') ||
+          completionSummaryLower.includes('generated') ||
+          completionSummaryLower.includes('complete'));
+      if (isPlannerCompletion) {
+        const hasTokenEstimate =
+          (toolParams.metadata && toolParams.metadata.estimatedTokens) ||
+          (toolParams.metadata && toolParams.metadata.estimated_tokens) ||
+          completionSummaryLower.includes('estimated') ||
+          completionSummaryLower.includes('token budget');
+        if (!hasTokenEstimate) {
+          const plannerMsg =
+            'PLANNER TOKEN ESTIMATION REQUIRED: Plan completion detected but no token estimates found. ' +
+            'Include metadata.estimatedTokens with per-task estimates to prevent agent context overflow. ' +
+            'Set PLANNER_TOKEN_ESTIMATION_ENFORCEMENT=off to disable.';
+          if (plannerEstMode === 'block') {
+            console.log(formatHookResult('block', plannerMsg));
+            process.exit(2);
+          } else {
+            process.stderr.write(`[pre-completion-validation] WARNING: ${plannerMsg}\n`);
+          }
+        }
+      }
+    }
+
     // REFLECTION_SCORE_ENFORCEMENT: detect reflection agent fabricating scores without dataQuality.
     enforceReflectionScore(toolParams);
 

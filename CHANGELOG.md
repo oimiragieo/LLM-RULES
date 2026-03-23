@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 33 new unit tests covering redact-secrets (12), hook-trace (7), dlp-pretool (8), plus formatted/linted
 - **Milestone self-review enforcement** in `pre-completion-validation.cjs`: pipeline completions now require a self-review trace entry or `metadata.selfReviewCompleted` flag. Controlled by `MILESTONE_SELF_REVIEW_ENFORCEMENT` env var (default: warn)
 - **ccusage token reporting enforcement** in `pre-completion-validation.cjs`: pipeline completions now warn when no token/cost data is included. Controlled by `CCUSAGE_REPORT_ENFORCEMENT` env var (default: warn)
+- **Drain gate enforcement** in `pre-completion-validation.cjs`: pipeline completions now check task-status.json for open tasks. Catches worktree agents that skip TaskUpdate and "all done" claims with pending work. Controlled by `DRAIN_GATE_ENFORCEMENT` env var (default: warn)
+- **Planner token estimation enforcement** in `pre-completion-validation.cjs`: plan completions now warn when no estimated_tokens metadata is included. Prevents agent context overflow from underestimated workloads. Controlled by `PLANNER_TOKEN_ESTIMATION_ENFORCEMENT` env var (default: warn)
 
 ### Fixed
 
