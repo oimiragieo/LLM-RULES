@@ -49,10 +49,14 @@ module.exports = { preExecute };
 
 if (require.main === module) {
   let raw = '';
-  process.stdin.on('data', (d) => (raw += d));
+  process.stdin.on('data', d => (raw += d));
   process.stdin.on('end', () => {
     let input = {};
-    try { input = JSON.parse(raw); } catch (_err) { /* non-JSON stdin ignored */ }
+    try {
+      input = JSON.parse(raw);
+    } catch (_err) {
+      /* non-JSON stdin ignored */
+    }
     preExecute(input);
     process.exit(0);
   });

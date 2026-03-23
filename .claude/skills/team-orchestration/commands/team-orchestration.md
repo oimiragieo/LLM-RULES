@@ -18,12 +18,12 @@ node .claude/skills/team-orchestration/scripts/main.cjs \
 
 ## Arguments
 
-| Argument              | Type    | Required | Description                                          |
-| --------------------- | ------- | -------- | ---------------------------------------------------- |
-| `--phase`             | string  | YES      | One of: plan, design, implement, review, test, deploy |
-| `--task`              | string  | NO       | Task ID for snapshot tracking (auto-generated if omitted) |
-| `--skip-approval-gate` | flag   | NO       | Skip the human approval gate for this phase          |
-| `--justification`     | string  | NO*      | Required when `--skip-approval-gate` is set          |
+| Argument               | Type   | Required | Description                                               |
+| ---------------------- | ------ | -------- | --------------------------------------------------------- |
+| `--phase`              | string | YES      | One of: plan, design, implement, review, test, deploy     |
+| `--task`               | string | NO       | Task ID for snapshot tracking (auto-generated if omitted) |
+| `--skip-approval-gate` | flag   | NO       | Skip the human approval gate for this phase               |
+| `--justification`      | string | NO\*     | Required when `--skip-approval-gate` is set               |
 
 ## Examples
 

@@ -683,6 +683,24 @@ const INTENT_KEYWORDS = {
     'decisions.md size',
     'memory stats',
   ],
+  'loop-operator': [
+    'loop-operator',
+    'loop operator',
+    'autonomous loop',
+    'loop governance',
+    'loop safety',
+    'circuit breaker',
+    'max iterations',
+    'loop stall',
+    'quality floor',
+    'loop guardrails',
+    'loop escalation',
+    'break loop',
+    'stop loop',
+    'iteration limit',
+    'loop iteration',
+    'loop rails',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

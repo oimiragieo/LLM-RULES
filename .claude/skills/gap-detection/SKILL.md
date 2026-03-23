@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Bash, Glob, Grep]
 agents: [developer, qa, architect, planner]
-category: "Validation & Quality"
+category: 'Validation & Quality'
 tags: [gap-detection, health-check, documentation, coverage, onboarding]
 best_practices:
   - Always run on session start for unfamiliar repositories
@@ -150,12 +150,12 @@ After running Steps 1–4, produce a structured report with:
 ### Priority Gaps
 
 1. {{file:line}} — {{reason}}
-...
+   ...
 
 ### Recommended Actions
 
 - [ ] {{action}}
-...
+      ...
 ```
 
 **Verify:** Report written to `.claude/context/tmp/gap-detection-report-{{date}}.md`.

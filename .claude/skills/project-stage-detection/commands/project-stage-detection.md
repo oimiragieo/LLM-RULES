@@ -14,10 +14,10 @@ node .claude/skills/project-stage-detection/scripts/main.cjs [--dir <path>] [--j
 
 ## Arguments
 
-| Argument  | Type   | Required | Description                                              |
-| --------- | ------ | -------- | -------------------------------------------------------- |
-| `--dir`   | string | NO       | Project root to analyze (defaults to current directory)  |
-| `--json`  | flag   | NO       | Output compact JSON (default is pretty-printed JSON)     |
+| Argument | Type   | Required | Description                                             |
+| -------- | ------ | -------- | ------------------------------------------------------- |
+| `--dir`  | string | NO       | Project root to analyze (defaults to current directory) |
+| `--json` | flag   | NO       | Output compact JSON (default is pretty-printed JSON)    |
 
 ## Examples
 
@@ -63,16 +63,16 @@ node .claude/skills/project-stage-detection/scripts/main.cjs --dir . --json | no
 
 ## Stage Values
 
-| Stage    | Score Range | Description                                    |
-| -------- | ----------- | ---------------------------------------------- |
-| `new`    | 0–2         | Empty or freshly initialized project           |
-| `early`  | 3–5         | Has core structure but missing infrastructure  |
-| `mid`    | 6–7         | Functional codebase, quality gaps remain       |
-| `mature` | 8+          | Full quality infrastructure in place           |
+| Stage    | Score Range | Description                                   |
+| -------- | ----------- | --------------------------------------------- |
+| `new`    | 0–2         | Empty or freshly initialized project          |
+| `early`  | 3–5         | Has core structure but missing infrastructure |
+| `mid`    | 6–7         | Functional codebase, quality gaps remain      |
+| `mature` | 8+          | Full quality infrastructure in place          |
 
 ## Exit Codes
 
-| Code | Meaning                               |
-| ---- | ------------------------------------- |
-| 0    | Success — detection complete          |
+| Code | Meaning                                   |
+| ---- | ----------------------------------------- |
+| 0    | Success — detection complete              |
 | 1    | Error — directory not found or unreadable |

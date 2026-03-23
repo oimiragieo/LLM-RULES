@@ -47,8 +47,7 @@ function scanNoReadme(dir) {
     if (seen.has(d)) continue;
     seen.add(d);
     const hasReadme =
-      fs.existsSync(path.join(dir, d, 'README.md')) ||
-      fs.existsSync(path.join(dir, d, 'index.md'));
+      fs.existsSync(path.join(dir, d, 'README.md')) || fs.existsSync(path.join(dir, d, 'index.md'));
     if (!hasReadme) gaps.push(`NO_README: ${f}`);
   }
   return gaps;

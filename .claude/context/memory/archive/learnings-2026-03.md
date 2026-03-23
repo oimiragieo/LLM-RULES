@@ -1089,3 +1089,38 @@ Pattern reuse: MEDIUM — document in spawn templates, recommend non-worktree fo
 - Non-blocking (hooks error, don't crash the session) but noisy
 - Fix: start fresh session after worktree cleanup; do not rely on hook registration in worktree-aware sessions
 - Source agent: router (agent-a3ba653c worktree cleanup context)
+
+---
+
+## Hook Logging Architecture Gaps (2026-03-22) [Task #5]
+
+**Agent:** architect | **Status:** Analysis complete, plan written
+
+### [ARCHITECTURE] Agent Identity Missing from All Monitoring Hooks
+
+- `post-tool-metrics-unified.cjs` and `metrics-collector.cjs` do not read `AGENT_TYPE` env var
+- All tool call metrics are anonymous -- cannot determine which agent performed an action
+- Fix: Add `agentType` and `taskId` fields to all metric entries (IMP-1, LOW complexity)
+
+### [ARCHITECTURE] No Structured Reflection Data Pipeline
+
+- Reflection-agent receives unstructured prose from router, no automatic metric aggregation
+- Need a PostToolUse(TaskUpdate) hook that aggregates per-task metrics into a reflection data file
+- See IMP-2 in hook-logging-improvements-plan-2026-03-22.md
+
+### [ARCHITECTURE] Error Body Discarded
+
+- `error-tracker.cjs` captures message + 3 stack lines but discards actual stderr/stdout content
+- Bash errors lose the command output; Edit errors lose the conflicting content
+- Fix: Capture up to 2KB of error body in `errorBody` field (IMP-3)
+
+### [DISCOVERY] hook-trace.cjs Does Not Exist
+
+- Referenced in task prompts but there is no NDJSON tracer hook in the monitoring directory
+- `flight-recorder.jsonl` exists but only captures event-bus emissions (MEMORY_SAVED/QUERIED), not tool calls
+- The unified action trace (IMP-6) would fill this gap
+
+### [DISCOVERY] session-gap-log.jsonl May Not Exist
+
+- CLAUDE.md Gap Protocol requires router to append to this file, but it is created on-demand
+- If no gaps have been observed, the file does not exist and reflection-agent reads nothing

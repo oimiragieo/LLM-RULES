@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "InstinctLearning Output",
+  "description": "Output contract for instinct-learning skill execution",
+  "oneOf": [
+    {
+      "title": "Record/Update Result",
+      "type": "object",
+      "required": ["ok", "id"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "id": { "type": "string" },
+        "scope": { "type": "string", "enum": ["project", "global"] },
+        "promoted": { "type": "boolean" },
+        "confidence": { "type": "number" }
+      }
+    },
+    {
+      "title": "Query/List Result",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "timestamp", "scope", "text", "confidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "scope": { "type": "string", "enum": ["project", "global"] },
+          "project": { "type": ["string", "null"] },
+          "text": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0.3, "maximum": 0.9 },
+          "source_context": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "promoted_at": { "type": ["string", "null"] },
+          "promoted_confidence": { "type": ["number", "null"] }
+        }
+      }
+    }
+  ]
+}

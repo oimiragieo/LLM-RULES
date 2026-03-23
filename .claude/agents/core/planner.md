@@ -35,6 +35,7 @@ skills:
   - code-structural-search
   - complexity-assessment
   - framework-context
+  - instinct-learning
   - memory-search
   - multi-agent-architecture-reference
   - gap-detection

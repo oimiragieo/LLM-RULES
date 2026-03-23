@@ -159,11 +159,11 @@ For caching, the result should be stored in task metadata (see Phase 6) or appen
 
 ## Error Handling
 
-| Error | Behavior |
-|-------|----------|
-| Directory does not exist | Exit code 1; surface error to user |
-| Directory is not readable | Exit code 1; surface error to user |
-| Empty directory | Returns `stage: "new"` with score 0 |
+| Error                               | Behavior                                                           |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| Directory does not exist            | Exit code 1; surface error to user                                 |
+| Directory is not readable           | Exit code 1; surface error to user                                 |
+| Empty directory                     | Returns `stage: "new"` with score 0                                |
 | `.claude/` directory passed as root | Will detect `.claude/` infrastructure as project code — avoid this |
 
 ## Related Skills

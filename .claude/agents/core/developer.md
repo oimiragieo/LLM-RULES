@@ -59,6 +59,7 @@ skills:
   - convex-development-general
   - cpp
   - creation-feasibility-gate
+  - de-sloppify
   - debug-log-analysis
   - debugging
   - dependency-analyzer
@@ -71,6 +72,7 @@ skills:
   - dto-conventions
   - dynamic-api-integration
   - ecosystem-integrity-scanner
+  - instinct-learning
   - elixir-expert
   - enhance-prompt
   - eval-harness-updater

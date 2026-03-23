@@ -178,6 +178,13 @@ const INTENT_TO_AGENT = {
   'ecosystem-auditor': 'ecosystem-auditor',
   'task-manager': 'task-manager',
   'memory-manager': 'memory-manager',
+
+  // Loop governance
+  'loop-operator': 'loop-operator',
+  'circuit-breaker': 'loop-operator',
+  'autonomous-loop': 'loop-operator',
+  'loop-governance': 'loop-operator',
+  'iteration-limit': 'loop-operator',
 };
 
 module.exports = { INTENT_TO_AGENT };

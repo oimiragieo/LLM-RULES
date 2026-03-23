@@ -1,13 +1,13 @@
 ---
 name: project-stage-detection
-description: "Detect project maturity stage (new/early/mid/mature) from file structure and route to appropriate onboarding workflow"
+description: 'Detect project maturity stage (new/early/mid/mature) from file structure and route to appropriate onboarding workflow'
 version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Bash, Glob, Grep]
 agents: [planner, architect, developer, master-orchestrator]
-category: "Validation & Quality"
+category: 'Validation & Quality'
 tags: [project-health, onboarding, maturity, detection, routing]
 ---
 
@@ -33,12 +33,12 @@ Invoke when:
 
 ## Stage Definitions
 
-| Stage   | Description                                          | Indicators                              |
-| ------- | ---------------------------------------------------- | --------------------------------------- |
-| `new`   | Freshly initialized, no meaningful content           | Only boilerplate files, no src/         |
-| `early` | Has core structure but missing key components        | src/ exists, no tests or CI             |
-| `mid`   | Functional codebase, gaps in quality infrastructure  | Tests exist, no CI/CD or sparse docs    |
-| `mature` | Full-featured with CI/CD, tests, docs, linting      | All quality gates present               |
+| Stage    | Description                                         | Indicators                           |
+| -------- | --------------------------------------------------- | ------------------------------------ |
+| `new`    | Freshly initialized, no meaningful content          | Only boilerplate files, no src/      |
+| `early`  | Has core structure but missing key components       | src/ exists, no tests or CI          |
+| `mid`    | Functional codebase, gaps in quality infrastructure | Tests exist, no CI/CD or sparse docs |
+| `mature` | Full-featured with CI/CD, tests, docs, linting      | All quality gates present            |
 
 ## Workflow
 
@@ -58,17 +58,17 @@ node .claude/skills/project-stage-detection/scripts/main.cjs --dir <project_root
 
 The script checks for these indicators, scoring each:
 
-| Indicator                       | Weight | Checked Path(s)                         |
-| ------------------------------- | ------ | --------------------------------------- |
-| Source directory exists         | HIGH   | `src/`, `lib/`, `app/`                  |
-| Tests exist                     | HIGH   | `tests/`, `test/`, `spec/`, `__tests__/` |
-| CI/CD pipeline configured       | HIGH   | `.github/workflows/`, `.gitlab-ci.yml`  |
-| Package.json / pyproject.toml   | MED    | `package.json`, `pyproject.toml`        |
-| README exists and non-trivial   | MED    | `README.md` (>500 bytes)               |
-| Linting configured              | MED    | `.eslintrc*`, `.ruff.toml`, `pylintrc`  |
-| Documentation directory         | LOW    | `docs/`, `.claude/docs/`               |
-| Changelog present               | LOW    | `CHANGELOG.md`, `CHANGELOG.rst`         |
-| Dependencies locked             | LOW    | `package-lock.json`, `pnpm-lock.yaml`   |
+| Indicator                     | Weight | Checked Path(s)                          |
+| ----------------------------- | ------ | ---------------------------------------- |
+| Source directory exists       | HIGH   | `src/`, `lib/`, `app/`                   |
+| Tests exist                   | HIGH   | `tests/`, `test/`, `spec/`, `__tests__/` |
+| CI/CD pipeline configured     | HIGH   | `.github/workflows/`, `.gitlab-ci.yml`   |
+| Package.json / pyproject.toml | MED    | `package.json`, `pyproject.toml`         |
+| README exists and non-trivial | MED    | `README.md` (>500 bytes)                 |
+| Linting configured            | MED    | `.eslintrc*`, `.ruff.toml`, `pylintrc`   |
+| Documentation directory       | LOW    | `docs/`, `.claude/docs/`                 |
+| Changelog present             | LOW    | `CHANGELOG.md`, `CHANGELOG.rst`          |
+| Dependencies locked           | LOW    | `package-lock.json`, `pnpm-lock.yaml`    |
 
 ### Step 3: Compute Stage Score
 
@@ -158,6 +158,7 @@ Append to `.claude/context/memory/learnings.md`:
 
 ```markdown
 ## Project Stage Detection — {{date}}
+
 - Project: {{project_root}}
 - Stage: {{stage}} (confidence: {{confidence}}%)
 - Key gaps: {{gap_summary}}

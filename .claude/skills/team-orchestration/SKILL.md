@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 agents: [master-orchestrator, planner, architect, developer, qa, devops, code-reviewer]
-category: "Planning & Architecture"
+category: 'Planning & Architecture'
 tags: [orchestration, pipeline, multi-agent, approval-gates, phases, team, workflow]
 best_practices:
   - Always define entry/exit criteria for each phase before spawning agents

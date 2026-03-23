@@ -10,19 +10,21 @@ const { execFileSync } = require('child_process');
 
 const args = process.argv.slice(2);
 if (args.includes('--help') || args.includes('-h')) {
-  process.stdout.write([
-    'gap-detection — Project health and documentation gap scanner',
-    '',
-    'Usage:',
-    '  node .claude/tools/gap-detection/gap-detection.cjs [options]',
-    '',
-    'Options:',
-    '  --dir <path>     Directory to scan (default: cwd)',
-    '  --output <path>  Report output path',
-    '  --help, -h       Show this help',
-    '',
-    'Invokes: .claude/skills/gap-detection/scripts/main.cjs',
-  ].join('\n') + '\n');
+  process.stdout.write(
+    [
+      'gap-detection — Project health and documentation gap scanner',
+      '',
+      'Usage:',
+      '  node .claude/tools/gap-detection/gap-detection.cjs [options]',
+      '',
+      'Options:',
+      '  --dir <path>     Directory to scan (default: cwd)',
+      '  --output <path>  Report output path',
+      '  --help, -h       Show this help',
+      '',
+      'Invokes: .claude/skills/gap-detection/scripts/main.cjs',
+    ].join('\n') + '\n'
+  );
   process.exit(0);
 }
 

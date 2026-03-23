@@ -737,3 +737,10 @@ Report: `.claude/context/artifacts/research-reports/openclaw-research-2026-03-21
 ### [PATTERN] Enterprise Bundle Completion
 
 - Each skill has: SKILL.md, scripts/main.cjs, hooks/(pre/post)-execute.cjs, schemas/(input/output).schema.json, rules/, commands/, templates/, references/, companion tool in .claude/tools/<name>/
+
+## 2026-03-23 — Task-17: instinct-learning + de-sloppify skills + loop-operator agent created
+
+- Created `instinct-learning` skill: records atomic behaviors with confidence scores 0.3–0.9, JSONL storage at `.claude/context/memory/instincts.jsonl`, auto-promotes to global scope at ≥0.8 confidence. Assigned to: developer, qa, architect, planner.
+- Created `de-sloppify` skill: conservative two-agent cleanup pattern. Scanner CLI (`main.cjs`) detects unused imports (word-boundary heuristic), console.logs (skips console.error in catch), commented-out code (preserves JSDoc/TODOs/it.skip). Iron Law: never changes behavior. Assigned to: developer, qa, code-simplifier, code-reviewer.
+- Created `loop-operator` orchestrator agent: circuit breaker (max iterations=10, max time=300s, quality floor=0.4), stall detection (3 consecutive similar outputs at >80% similarity), escalation reports, post-loop de-sloppify cleanup, loop state checkpoints in `.claude/context/tmp/loop-state-{id}.json`. Uses instinct-learning + de-sloppify skills.
+- Routing: `loop-operator` added to `@AGENT_ROUTING_TABLE.md` and `routing-table-intent-keywords-data.cjs` + `routing-table-intent-agents.cjs`. Keywords: loop, iterate, circuit breaker, max iterations, loop stall.

@@ -11,10 +11,7 @@
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const scriptPath = path.resolve(
-  __dirname,
-  '../../skills/team-orchestration/scripts/main.cjs'
-);
+const scriptPath = path.resolve(__dirname, '../../skills/team-orchestration/scripts/main.cjs');
 
 try {
   const result = execFileSync(process.execPath, [scriptPath, ...process.argv.slice(2)], {

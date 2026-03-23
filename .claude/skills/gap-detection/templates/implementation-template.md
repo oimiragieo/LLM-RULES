@@ -25,10 +25,10 @@ node .claude/skills/gap-detection/scripts/main.cjs --dir {{project_dir}}
 
 | Category   | Count | Priority |
 | ---------- | ----- | -------- |
-| NO_README  | {{n}} | {{p}} |
-| NO_TEST    | {{n}} | {{p}} |
-| TODO/FIXME | {{n}} | {{p}} |
-| NO_DOC     | {{n}} | {{p}} |
+| NO_README  | {{n}} | {{p}}    |
+| NO_TEST    | {{n}} | {{p}}    |
+| TODO/FIXME | {{n}} | {{p}}    |
+| NO_DOC     | {{n}} | {{p}}    |
 
 ### Action Plan
 

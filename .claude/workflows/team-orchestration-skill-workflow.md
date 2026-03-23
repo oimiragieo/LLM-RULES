@@ -39,12 +39,14 @@ node .claude/skills/team-orchestration/scripts/main.cjs \
 **Purpose:** Decompose the task and define work packages.
 
 **Entry criteria:**
+
 - Task scope and requirements are clear
 - `task_id` is set in `TaskCreate` or exists in `TaskList`
 
 **Agent:** `planner` (sonnet model)
 
 **Exit criteria checklist:**
+
 - [ ] Requirements captured in `.claude/context/plans/<task_id>-plan.md`
 - [ ] Sub-tasks created in `TaskCreate` with dependencies declared
 - [ ] Risk items identified and documented
@@ -68,12 +70,14 @@ node .claude/skills/team-orchestration/scripts/main.cjs \
 **Purpose:** Define architecture and API contracts.
 
 **Entry criteria:**
+
 - Phase 1 (plan) complete and approved
 - Plan file exists at `.claude/context/plans/<task_id>-plan.md`
 
 **Agent:** `architect` (sonnet model)
 
 **Exit criteria checklist:**
+
 - [ ] Architecture decision documented in `decisions.md`
 - [ ] API contracts / interface definitions created
 - [ ] Data flow diagrams completed (if applicable)
@@ -95,12 +99,14 @@ node .claude/skills/team-orchestration/scripts/main.cjs \
 **Purpose:** Write code following TDD.
 
 **Entry criteria:**
+
 - Phase 2 (design) complete and approved
 - Interface contracts exist
 
 **Agent:** `developer` (sonnet model)
 
 **Exit criteria checklist:**
+
 - [ ] All failing tests written first (Red phase)
 - [ ] Minimal code written to pass tests (Green phase)
 - [ ] Code refactored (Refactor phase)
@@ -124,12 +130,14 @@ node .claude/skills/team-orchestration/scripts/main.cjs \
 **Purpose:** Code review for quality, security, and standards.
 
 **Entry criteria:**
+
 - Phase 3 (implement) complete
 - All automated gates passing
 
 **Agent:** `code-reviewer` (sonnet model)
 
 **Exit criteria checklist:**
+
 - [ ] Code review report generated
 - [ ] All HIGH severity findings addressed
 - [ ] Security review completed (if applicable)
@@ -151,12 +159,14 @@ node .claude/skills/team-orchestration/scripts/main.cjs \
 **Purpose:** QA validation and end-to-end testing.
 
 **Entry criteria:**
+
 - Phase 4 (review) complete and approved
 - All code review findings resolved
 
 **Agent:** `qa` (sonnet model)
 
 **Exit criteria checklist:**
+
 - [ ] Integration tests pass
 - [ ] Edge cases covered
 - [ ] No P0/P1 bugs open
@@ -178,6 +188,7 @@ node .claude/skills/team-orchestration/scripts/main.cjs \
 **Purpose:** Ship to production.
 
 **Entry criteria:**
+
 - Phase 5 (test) complete
 - All tests passing
 - CHANGELOG.md updated
@@ -185,6 +196,7 @@ node .claude/skills/team-orchestration/scripts/main.cjs \
 **Agent:** `devops` (sonnet model)
 
 **Exit criteria checklist:**
+
 - [ ] Changelog updated
 - [ ] Version bumped (if applicable)
 - [ ] Deployment artifact built
@@ -210,6 +222,7 @@ The pipeline state is persisted to:
 ```
 
 This file contains:
+
 - `currentPhase` — the active phase
 - `completedPhases` — array of completed phases
 - `approvalLog` — record of approval gate outcomes
@@ -233,12 +246,12 @@ Bypass events are logged to the snapshot with `{ gate, reason, timestamp, approv
 
 ## Error Handling
 
-| Error | Behavior |
-|-------|----------|
-| Snapshot missing on resume | Create new snapshot from current phase |
-| Invalid phase transition | Block with warning; show current phase |
-| Agent failure | Mark phase `failed`; halt pipeline; require manual intervention |
-| Approval gate rejected | Mark phase `rejected`; pause pipeline; notify user |
+| Error                      | Behavior                                                        |
+| -------------------------- | --------------------------------------------------------------- |
+| Snapshot missing on resume | Create new snapshot from current phase                          |
+| Invalid phase transition   | Block with warning; show current phase                          |
+| Agent failure              | Mark phase `failed`; halt pipeline; require manual intervention |
+| Approval gate rejected     | Mark phase `rejected`; pause pipeline; notify user              |
 
 ## Related Skills
 

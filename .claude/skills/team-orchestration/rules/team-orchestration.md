@@ -17,11 +17,11 @@
 
 ## Approval Gate Behavior
 
-| Gate Type  | Who Approves         | Can Skip?            |
-| ---------- | -------------------- | -------------------- |
-| HUMAN      | Human user           | Yes, with written justification |
-| AUTOMATED  | CI/CD system         | No — system must pass |
-| CONSENSUS  | 2+ agents agree      | No — quorum required |
+| Gate Type | Who Approves    | Can Skip?                       |
+| --------- | --------------- | ------------------------------- |
+| HUMAN     | Human user      | Yes, with written justification |
+| AUTOMATED | CI/CD system    | No — system must pass           |
+| CONSENSUS | 2+ agents agree | No — quorum required            |
 
 ## Anti-Patterns
 

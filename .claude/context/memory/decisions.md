@@ -1,6 +1,25 @@
-## ADR-2026-03-21: Monolith-to-Microservices Migration Architecture Decisions (2026-03-21)
+## ADR-2026-03-22: Monolith-to-Microservices v4.0 Architecture Update (2026-03-22)
 
 **Status:** Proposed
+**Date:** 2026-03-22
+**Source:** Architect agent, general-purpose migration blueprint v4.0
+
+**New in v4.0 (supersedes v3.0.0 from 2026-03-21):**
+
+1. **ADR-007: Team Topology -- Stream-Aligned Teams by Bounded Context** -- Teams organized as stream-aligned (1-3 services each), with platform team and enabling teams (SRE, security). Functional teams rejected (violates Conway's Law).
+2. **New Section 7: Organizational and Process Considerations** -- Team topology alignment, cognitive load management, migration milestones with phase gates, risk matrix with rollback flowchart, stakeholder communication plan.
+3. **New Section 11: Success Metrics and KPIs** -- Technical KPIs (DORA metrics, SLO compliance), migration progress KPIs (monolith traffic %, services extracted), organizational KPIs (team autonomy score, developer satisfaction).
+4. **Enhanced Anti-Patterns** -- Added nanoservices (10.2) and synchronous dependency chains (10.4) as explicit anti-patterns with prevention heuristics.
+5. **Service boundary heuristics** -- 6 heuristics for validating whether a proposed boundary is correctly sized.
+6. **Communication selection flowchart** -- Mermaid decision tree for choosing sync vs async, gRPC vs REST vs GraphQL vs events vs CDC.
+
+**Artifact:** `.claude/context/artifacts/analysis/monolith-to-microservices-architecture-2026-03-22.md`
+
+---
+
+## ADR-2026-03-21: Monolith-to-Microservices Migration Architecture Decisions (2026-03-21)
+
+**Status:** Superseded by v4.0 (2026-03-22)
 **Date:** 2026-03-21
 **Source:** Microservices Architect agent, general-purpose migration blueprint
 

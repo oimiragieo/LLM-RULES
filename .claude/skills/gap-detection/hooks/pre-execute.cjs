@@ -11,7 +11,9 @@ const fs = require('fs');
 function preExecute(input = {}) {
   const schemaPath = path.resolve(__dirname, '../schemas/input.schema.json');
   if (!fs.existsSync(schemaPath)) {
-    process.stderr.write('[gap-detection/pre-execute] Schema file not found, skipping validation\n');
+    process.stderr.write(
+      '[gap-detection/pre-execute] Schema file not found, skipping validation\n'
+    );
     return { continue: true };
   }
 
@@ -53,7 +55,7 @@ module.exports = { preExecute };
 if (require.main === module) {
   let input = {};
   let raw = '';
-  process.stdin.on('data', (d) => (raw += d));
+  process.stdin.on('data', d => (raw += d));
   process.stdin.on('end', () => {
     try {
       input = JSON.parse(raw);

@@ -93,25 +93,31 @@ TaskUpdate({ taskId: '{{task_id}}-{{phase_name}}', status: 'completed', metadata
 ## Phase-Specific Templates
 
 ### plan phase
+
 - Deliverable: `.claude/context/plans/{{task_id}}-plan.md` with task breakdown
 - Exit: Plan reviewed and approved by stakeholder
 
 ### design phase
+
 - Deliverable: Architecture decision record or design doc
 - Exit: Technical design approved by architect
 
 ### implement phase
+
 - Deliverable: Code changes with tests
 - Exit: All tests pass, lint/format clean
 
 ### review phase
+
 - Deliverable: Code review report
 - Exit: No critical findings; minor findings tracked
 
 ### test phase
+
 - Deliverable: Test report with pass/fail counts
 - Exit: All tests pass, coverage meets threshold
 
 ### deploy phase
+
 - Deliverable: Deployment confirmation with rollback plan
 - Exit: Health checks pass in target environment

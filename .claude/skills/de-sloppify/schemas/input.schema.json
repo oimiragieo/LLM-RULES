@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "De-Sloppify Input",
+  "description": "Validated inputs for de-sloppify scan actions",
+  "type": "object",
+  "required": ["action", "files"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["find-unused-imports", "find-console-logs", "find-commented-code"],
+      "description": "The scan action to perform"
+    },
+    "files": {
+      "type": ["string", "array"],
+      "description": "Comma-separated file paths (string) or array of file paths to scan",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

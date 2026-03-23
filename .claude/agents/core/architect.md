@@ -34,6 +34,7 @@ skills:
   - code-structural-search
   - database-architect
   - diagram-generator
+  - instinct-learning
   - lsp-navigator
   - memory-search
   - multi-agent-architecture-reference

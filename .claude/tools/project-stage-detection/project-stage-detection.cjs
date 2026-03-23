@@ -49,10 +49,7 @@ if (args.includes('--help') || args.includes('-h')) {
   process.exit(0);
 }
 
-const scriptPath = path.resolve(
-  __dirname,
-  '../../skills/project-stage-detection/scripts/main.cjs'
-);
+const scriptPath = path.resolve(__dirname, '../../skills/project-stage-detection/scripts/main.cjs');
 
 try {
   const result = execFileSync('node', [scriptPath, ...args], {

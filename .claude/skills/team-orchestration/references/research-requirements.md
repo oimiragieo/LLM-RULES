@@ -24,6 +24,7 @@ Source: Stage-Gate International methodology documentation.
 ### Finding 2: Multi-Agent Orchestration Patterns (2025)
 
 Research from AI agent framework literature shows that multi-agent pipelines benefit from:
+
 - Single point of truth for pipeline state (snapshot pattern)
 - Explicit handoff protocols between agents
 - Isolated phase execution (one agent per phase)
@@ -36,6 +37,7 @@ Source: LangGraph, CrewAI, and AutoGen documentation on orchestration patterns.
 ### Finding 3: Human-in-the-Loop Approval Patterns
 
 From the HITL (Human-in-the-Loop) literature, approval gates are most effective when:
+
 - They occur at well-defined checkpoints (not ad hoc)
 - Skip conditions require written justification
 - Gate type (human/automated/consensus) is declared in the pipeline spec
@@ -51,8 +53,8 @@ From the HITL (Human-in-the-Loop) literature, approval gates are most effective 
 
 ## Actionable Design Constraints Applied
 
-| Constraint | Applied In |
-|---|---|
+| Constraint                              | Applied In                                     |
+| --------------------------------------- | ---------------------------------------------- |
 | Exit criteria as declarative checkboxes | SKILL.md phase definitions, output.schema.json |
-| Dedicated agent per phase | scripts/main.cjs agentAssignments, SKILL.md |
+| Dedicated agent per phase               | scripts/main.cjs agentAssignments, SKILL.md    |
 | skipApprovalGate requires justification | input.schema.json conditional, pre-execute.cjs |

@@ -29,6 +29,8 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - de-sloppify
+  - instinct-learning
   - lsp-navigator
   - memory-search
   - ripgrep

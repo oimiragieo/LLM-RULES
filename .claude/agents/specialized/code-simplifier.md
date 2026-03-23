@@ -31,6 +31,7 @@ skills:
   - code-semantic-search
   - code-structural-search
   - code-style-validator
+  - de-sloppify
   - lsp-navigator
   - memory-search
   - ripgrep

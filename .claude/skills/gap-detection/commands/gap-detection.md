@@ -12,11 +12,11 @@ Scans a directory for documentation gaps, test coverage holes, and quality issue
 
 ## Arguments
 
-| Argument | Type | Description | Default |
-| -------- | ---- | ----------- | ------- |
-| `--dir` | string | Directory to scan | Current working directory |
-| `--checks` | list | Checks to run: `no-readme,no-test,todos,no-doc` | All checks |
-| `--output` | string | Report output path | `.claude/context/tmp/gap-detection-report-YYYY-MM-DD.md` |
+| Argument   | Type   | Description                                     | Default                                                  |
+| ---------- | ------ | ----------------------------------------------- | -------------------------------------------------------- |
+| `--dir`    | string | Directory to scan                               | Current working directory                                |
+| `--checks` | list   | Checks to run: `no-readme,no-test,todos,no-doc` | All checks                                               |
+| `--output` | string | Report output path                              | `.claude/context/tmp/gap-detection-report-YYYY-MM-DD.md` |
 
 ## Examples
 
@@ -34,6 +34,7 @@ node .claude/skills/gap-detection/scripts/main.cjs --checks todos,no-readme
 ## Output
 
 A markdown report written to `.claude/context/tmp/` containing:
+
 - Summary table with gap counts per category
 - Top 20 priority gaps with file paths
 - Recommended next actions

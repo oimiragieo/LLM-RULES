@@ -18,6 +18,7 @@
 **Query 1:** "project maturity model file structure indicators automated detection 2025"
 
 **Findings:**
+
 - The Software Engineering Institute (SEI) CMMI model defines 5 maturity levels but is process-oriented, not file-system detectable.
 - GitHub's "Repo Maturity" heuristic (used in dependency scanning tools) checks for: `README.md`, `CHANGELOG.md`, `.github/workflows/`, `LICENSE`, `package.json`, test directories (`test/`, `tests/`, `__tests__/`).
 - npm's package quality scoring (`packagequality.com`) weights: README presence, test coverage, CI pipeline, version stability, dependencies freshness.
@@ -26,6 +27,7 @@
 **Query 2:** "project health scoring open source indicators weighted score 2024 2025"
 
 **Findings:**
+
 - OpenSSF Scorecard (https://scorecard.dev) uses 18 checks across security, CI, code review, dependency management. Weights range from 1-10.
 - CHAOSS Project metrics define: "Project Activity", "Community Growth", "Code Development Activity" as primary dimensions.
 - PyPI and npm both display project health badges based on: test coverage badge, CI status badge, README existence, last publish date.
@@ -34,6 +36,7 @@
 **Query 3:** "monorepo vs single-package project detection heuristic node.js 2025"
 
 **Findings:**
+
 - `package.json` at root with `"workspaces"` key reliably indicates a monorepo/npm workspace.
 - Presence of `lerna.json`, `nx.json`, `pnpm-workspace.yaml`, or `rush.json` are additional monorepo signals.
 - For detection purposes, the presence of ANY `package.json` (not just monorepo) is a sufficient signal of "initialized project" (score point for `lockfile`).
@@ -48,6 +51,7 @@
 **Result:** No directly applicable academic papers found on automated file-system-based project maturity detection. The closest relevant work is on technical debt measurement (e.g., "Measuring Technical Debt Using Software Quality Metrics", arXiv:2309.XXXXX) but focuses on code metrics rather than structural presence indicators.
 
 **Design decision:** Chose file-presence heuristics rather than code-quality metrics because:
+
 1. Code metrics require parsing/compilation — not appropriate for a lightweight pre-task scan
 2. File presence is language-agnostic and works on any project type
 3. Results are fully deterministic and reproducible

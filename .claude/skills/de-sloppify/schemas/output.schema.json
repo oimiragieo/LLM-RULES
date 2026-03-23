@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "De-Sloppify Output",
+  "description": "Output from de-sloppify scan actions",
+  "oneOf": [
+    {
+      "title": "find-unused-imports result",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "line", "import"],
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Absolute or relative path to the scanned file"
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "1-based line number of the unused import"
+          },
+          "import": {
+            "type": "string",
+            "description": "The unused identifier name"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "title": "find-console-logs result",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "line", "statement"],
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Absolute or relative path to the scanned file"
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "1-based line number of the console call"
+          },
+          "statement": {
+            "type": "string",
+            "description": "The console call statement (truncated to 120 chars)"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "title": "find-commented-code result",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "line", "content"],
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Absolute or relative path to the scanned file"
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "1-based line number of the commented-out code"
+          },
+          "content": {
+            "type": "string",
+            "description": "The commented-out code content (truncated to 120 chars)"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ]
+}

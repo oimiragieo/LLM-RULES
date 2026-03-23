@@ -76,25 +76,29 @@ switch (result.stage) {
 
 Include this block at the top of any planning task that operates on an unfamiliar repository:
 
-```markdown
+````markdown
 ### Step 0: Detect Project Stage
 
 Before decomposing tasks, detect the project's current maturity stage:
 
 **Command:**
+
 ```bash
 node .claude/skills/project-stage-detection/scripts/main.cjs \
   --dir {{project_root}} --json
 ```
+````
 
 **Expected output:** JSON with `stage`, `score`, `confidence`, `missingIndicators`, `recommendations`.
 
 **Verify:** Exit code 0 and valid JSON with `stage` field in ["new","early","mid","mature"].
 
 **Use result to:**
+
 - Adjust task granularity (new/early = more scaffolding tasks, mature = refinement tasks)
 - Flag missing infrastructure (`missingIndicators`) as prerequisite tasks
 - Include `recommendations` as advisory items in the plan output
+
 ```
 
 ## Agent Spawn Prompt Snippet
@@ -102,15 +106,17 @@ node .claude/skills/project-stage-detection/scripts/main.cjs \
 When spawning a subagent that should be aware of project stage:
 
 ```
+
 Before beginning your task, run project stage detection:
 
-  node .claude/skills/project-stage-detection/scripts/main.cjs \
-    --dir {{project_root}} --json
+node .claude/skills/project-stage-detection/scripts/main.cjs \
+ --dir {{project_root}} --json
 
 Parse the result. If stage is "new" or "early", assume minimal existing infrastructure
 and plan accordingly. If stage is "mid" or "mature", assume CI/CD, tests, and source
 structure exist — verify before adding them.
-```
+
+````
 
 ## Caching Pattern
 
@@ -132,7 +138,7 @@ TaskUpdate({
 // In subsequent spawned agents, read from task metadata
 const task = TaskGet({ taskId: '{{task_id}}' });
 const { projectStage } = task.metadata;
-```
+````
 
 ## Recommendations Display Template
 
@@ -145,13 +151,15 @@ When surfacing results to the user:
 
 **Missing Indicators:**
 {{#each missingIndicators}}
+
 - {{this}}
-{{/each}}
+  {{/each}}
 
 **Recommendations:**
 {{#each recommendations}}
+
 - {{this}}
-{{/each}}
+  {{/each}}
 ```
 
 ## Anti-Patterns

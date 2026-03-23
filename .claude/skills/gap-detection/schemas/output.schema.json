@@ -9,10 +9,19 @@
       "type": "object",
       "description": "Counts of detected gaps per category",
       "properties": {
-        "noReadme": { "type": "integer", "description": "Number of source files in dirs without README" },
-        "noTest": { "type": "integer", "description": "Number of source files without corresponding test files" },
+        "noReadme": {
+          "type": "integer",
+          "description": "Number of source files in dirs without README"
+        },
+        "noTest": {
+          "type": "integer",
+          "description": "Number of source files without corresponding test files"
+        },
         "todos": { "type": "integer", "description": "Total TODO/FIXME/HACK/XXX markers found" },
-        "noDoc": { "type": "integer", "description": "Number of exported symbols without documentation comments" }
+        "noDoc": {
+          "type": "integer",
+          "description": "Number of exported symbols without documentation comments"
+        }
       }
     },
     "reportPath": {

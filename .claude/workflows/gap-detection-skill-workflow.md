@@ -30,14 +30,17 @@ node .claude/skills/gap-detection/scripts/main.cjs \
 ## Phase 1: Input Preparation
 
 **Pre-conditions:**
+
 - Target project directory is known and accessible
 - `project-stage-detection` has been run (recommended but not required)
 
 **Inputs:**
+
 - `targetDir` — absolute path to the project root (default: cwd)
 - `checks` — array of check types: `["docs", "tests", "todos", "coverage"]`
 
 **Validation:**
+
 - Confirm `targetDir` exists with `fs.existsSync(targetDir)`
 - Confirm checks array contains valid enum values
 
@@ -81,13 +84,14 @@ console.log(`Found ${gaps.length} gaps across ${summary.totalFilesScanned} files
 
 Prioritize findings by severity:
 
-| Severity | Action |
-|----------|--------|
-| HIGH | Create task immediately; block planning until resolved |
-| MEDIUM | Include as prerequisite task in the plan |
-| LOW | Add as advisory items; address in polish phase |
+| Severity | Action                                                 |
+| -------- | ------------------------------------------------------ |
+| HIGH     | Create task immediately; block planning until resolved |
+| MEDIUM   | Include as prerequisite task in the plan               |
+| LOW      | Add as advisory items; address in polish phase         |
 
 **Decision rule:**
+
 - If `gaps.filter(g => g.severity === 'high').length > 0` → spawn `developer` to address high gaps before continuing
 - If only MEDIUM/LOW gaps → include `recommendations` in the plan as advisory items
 
@@ -95,12 +99,12 @@ Prioritize findings by severity:
 
 After gap-detection completes:
 
-| Condition | Next Skill |
-|-----------|-----------|
-| High-severity gaps found | Spawn `developer` to address gaps |
-| No high-severity gaps, stage is `mid` | Invoke `proactive-audit` |
-| Stage is `early`, foundational gaps | Invoke `project-onboarding` |
-| Stage is `mature`, minor gaps | Continue with original task |
+| Condition                             | Next Skill                        |
+| ------------------------------------- | --------------------------------- |
+| High-severity gaps found              | Spawn `developer` to address gaps |
+| No high-severity gaps, stage is `mid` | Invoke `proactive-audit`          |
+| Stage is `early`, foundational gaps   | Invoke `project-onboarding`       |
+| Stage is `mature`, minor gaps         | Continue with original task       |
 
 ## Integration with project-stage-detection
 
@@ -125,11 +129,11 @@ if (['early', 'mid'].includes(result.stage)) {
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| `targetDir` does not exist | Exit with code 1; report to user |
-| No readable files found | Emit empty report; log warning |
-| Check type unsupported | Warn and skip; continue with supported checks |
+| Error                      | Action                                        |
+| -------------------------- | --------------------------------------------- |
+| `targetDir` does not exist | Exit with code 1; report to user              |
+| No readable files found    | Emit empty report; log warning                |
+| Check type unsupported     | Warn and skip; continue with supported checks |
 
 ## Related Skills
 

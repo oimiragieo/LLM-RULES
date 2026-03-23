@@ -21,21 +21,20 @@ const INDICATORS = [
     id: 'source_dir',
     label: 'Source directory exists (src/, lib/, or app/)',
     weight: 2,
-    check: (root) =>
-      ['src', 'lib', 'app'].some((d) => fs.existsSync(path.join(root, d))),
+    check: root => ['src', 'lib', 'app'].some(d => fs.existsSync(path.join(root, d))),
   },
   {
     id: 'tests_exist',
     label: 'Test directory exists (tests/, test/, spec/, __tests__/)',
     weight: 2,
-    check: (root) =>
-      ['tests', 'test', 'spec', '__tests__'].some((d) => fs.existsSync(path.join(root, d))),
+    check: root =>
+      ['tests', 'test', 'spec', '__tests__'].some(d => fs.existsSync(path.join(root, d))),
   },
   {
     id: 'ci_pipeline',
     label: 'CI/CD pipeline configured',
     weight: 2,
-    check: (root) =>
+    check: root =>
       fs.existsSync(path.join(root, '.github', 'workflows')) ||
       fs.existsSync(path.join(root, '.gitlab-ci.yml')) ||
       fs.existsSync(path.join(root, '.circleci', 'config.yml')),
@@ -44,7 +43,7 @@ const INDICATORS = [
     id: 'package_manifest',
     label: 'Package manifest exists (package.json or pyproject.toml)',
     weight: 1,
-    check: (root) =>
+    check: root =>
       fs.existsSync(path.join(root, 'package.json')) ||
       fs.existsSync(path.join(root, 'pyproject.toml')) ||
       fs.existsSync(path.join(root, 'setup.py')) ||
@@ -54,7 +53,7 @@ const INDICATORS = [
     id: 'readme_nontrivial',
     label: 'README.md exists and is non-trivial (>500 bytes)',
     weight: 1,
-    check: (root) => {
+    check: root => {
       const p = path.join(root, 'README.md');
       if (!fs.existsSync(p)) return false;
       return fs.statSync(p).size > 500;
@@ -64,27 +63,32 @@ const INDICATORS = [
     id: 'linting_configured',
     label: 'Linting configured (.eslintrc*, .ruff.toml, .pylintrc)',
     weight: 1,
-    check: (root) => {
+    check: root => {
       const lintFiles = [
-        '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json',
-        '.ruff.toml', '.pylintrc', '.flake8', 'biome.json',
+        '.eslintrc',
+        '.eslintrc.js',
+        '.eslintrc.cjs',
+        '.eslintrc.json',
+        '.ruff.toml',
+        '.pylintrc',
+        '.flake8',
+        'biome.json',
       ];
-      return lintFiles.some((f) => fs.existsSync(path.join(root, f)));
+      return lintFiles.some(f => fs.existsSync(path.join(root, f)));
     },
   },
   {
     id: 'docs_dir',
     label: 'Documentation directory exists (docs/)',
     weight: 1,
-    check: (root) =>
-      fs.existsSync(path.join(root, 'docs')) ||
-      fs.existsSync(path.join(root, 'documentation')),
+    check: root =>
+      fs.existsSync(path.join(root, 'docs')) || fs.existsSync(path.join(root, 'documentation')),
   },
   {
     id: 'changelog',
     label: 'CHANGELOG.md present',
     weight: 1,
-    check: (root) =>
+    check: root =>
       fs.existsSync(path.join(root, 'CHANGELOG.md')) ||
       fs.existsSync(path.join(root, 'CHANGELOG.rst')),
   },
@@ -92,7 +96,7 @@ const INDICATORS = [
     id: 'lockfile',
     label: 'Dependency lockfile present',
     weight: 1,
-    check: (root) =>
+    check: root =>
       fs.existsSync(path.join(root, 'package-lock.json')) ||
       fs.existsSync(path.join(root, 'pnpm-lock.yaml')) ||
       fs.existsSync(path.join(root, 'yarn.lock')) ||
@@ -107,7 +111,7 @@ function detectStage(root) {
     process.exit(1);
   }
 
-  const results = INDICATORS.map((indicator) => {
+  const results = INDICATORS.map(indicator => {
     let present = false;
     try {
       present = indicator.check(root);
@@ -127,7 +131,7 @@ function detectStage(root) {
   else if (score <= 7) stage = 'mid';
   else stage = 'mature';
 
-  const missingIndicators = results.filter((r) => !r.present).map((r) => r.label);
+  const missingIndicators = results.filter(r => !r.present).map(r => r.label);
 
   const recommendations = [];
   if (stage === 'new') {
@@ -152,7 +156,12 @@ function detectStage(root) {
     maxScore,
     confidence,
     projectRoot: root,
-    indicators: results.map((r) => ({ id: r.id, label: r.label, present: r.present, weight: r.weight })),
+    indicators: results.map(r => ({
+      id: r.id,
+      label: r.label,
+      present: r.present,
+      weight: r.weight,
+    })),
     missingIndicators,
     recommendations,
     timestamp: new Date().toISOString(),
@@ -164,7 +173,5 @@ const result = detectStage(projectRoot);
 if (jsonFlag) {
   process.stdout.write(JSON.stringify(result) + '\n');
 } else {
-  process.stdout.write(
-    JSON.stringify(result, null, 2) + '\n'
-  );
+  process.stdout.write(JSON.stringify(result, null, 2) + '\n');
 }

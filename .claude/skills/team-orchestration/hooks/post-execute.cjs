@@ -9,10 +9,7 @@ const path = require('path');
 const fs = require('fs');
 
 function postExecute(context = {}) {
-  const eventLogPath = path.resolve(
-    __dirname,
-    '../../../../context/runtime/tool-events.jsonl'
-  );
+  const eventLogPath = path.resolve(__dirname, '../../../../context/runtime/tool-events.jsonl');
   const event = {
     timestamp: new Date().toISOString(),
     tool_name: 'team-orchestration',
@@ -39,10 +36,14 @@ module.exports = { postExecute };
 
 if (require.main === module) {
   let raw = '';
-  process.stdin.on('data', (d) => (raw += d));
+  process.stdin.on('data', d => (raw += d));
   process.stdin.on('end', () => {
     let ctx = {};
-    try { ctx = JSON.parse(raw); } catch (_err) { /* non-JSON stdin ignored */ }
+    try {
+      ctx = JSON.parse(raw);
+    } catch (_err) {
+      /* non-JSON stdin ignored */
+    }
     postExecute(ctx);
     process.exit(0);
   });
