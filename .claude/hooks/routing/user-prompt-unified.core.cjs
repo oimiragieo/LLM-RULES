@@ -1757,6 +1757,29 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     } catch (_readErr) {
       // best-effort
     }
+    // Count stale worktrees (older than 2 hours)
+    let worktreeWarning = '';
+    try {
+      const wtDir = path.join(PROJECT_ROOT, '.claude', 'worktrees');
+      if (fs.existsSync(wtDir)) {
+        const dirs = fs.readdirSync(wtDir).filter(d => d.startsWith('agent-'));
+        const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
+        const stale = dirs.filter(d => {
+          try {
+            return fs.statSync(path.join(wtDir, d)).mtimeMs < twoHoursAgo;
+          } catch { return false; }
+        });
+        if (stale.length > 0) {
+          worktreeWarning = '\n4. WORKTREE CLEANUP (MANDATORY): ' + stale.length +
+            ' stale worktree(s) older than 2 hours detected in .claude/worktrees/.' +
+            '\n   Run: git worktree prune && remove stale dirs.' +
+            '\n   Stale: ' + stale.slice(0, 5).join(', ') + (stale.length > 5 ? '...' : '') +
+            '\n   NEVER leave orphaned worktrees — they waste disk and cause branch conflicts.';
+        }
+      }
+    } catch (_wtErr) {
+      // best-effort
+    }
     const obligationsContent = [
       'PIPELINE OBLIGATIONS (MANDATORY — DO NOT SKIP — EVERY RESPONSE THAT COMPLETES WORK):',
       '',
@@ -1772,6 +1795,7 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
       '3. Before claiming ANY pipeline/task complete:',
       '   - Displayed token data from ccusage-status.txt to the user',
       '   - Self-reviewed and either improved or documented why not',
+      worktreeWarning,
       '',
       'These apply to EVERY response completing work — not just "final" tasks.',
     ].join('\n');
