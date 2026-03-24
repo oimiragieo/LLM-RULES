@@ -1679,6 +1679,47 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     // best-effort; ignore
   }
 
+  // Pipeline Obligations Reminder: ccusage + self-review at every milestone.
+  // IRON LAW: Router MUST run ccusage and self-review. Written on EVERY prompt.
+  try {
+    const obligationsPath = path.join(RUNTIME_DIR, 'pipeline-obligations-reminder.txt');
+    // Read live token data from ccusage-statusline hook output
+    const ccStatusPath = path.join(RUNTIME_DIR, 'ccusage-status.txt');
+    let liveTokens =
+      '(ccusage-status.txt not found — ccusage-statusline hook may not have fired yet)';
+    try {
+      if (fs.existsSync(ccStatusPath)) {
+        liveTokens = fs.readFileSync(ccStatusPath, 'utf8').trim();
+      }
+    } catch (_readErr) {
+      // best-effort
+    }
+    const obligationsContent = [
+      'PIPELINE OBLIGATIONS (MANDATORY — DO NOT SKIP — EVERY RESPONSE THAT COMPLETES WORK):',
+      '',
+      '1. TOKEN REPORTING: At EVERY milestone/phase end, READ this file and display to user:',
+      '   File: .claude/context/runtime/ccusage-status.txt',
+      '   (Already populated by ccusage-statusline.cjs hook on every prompt — do NOT run npx ccusage)',
+      '   Current data: ' + liveTokens,
+      '',
+      '2. MILESTONE SELF-REVIEW: At EVERY milestone, ask:',
+      '   "Can I improve what I just delivered?" If YES → create a reflection.',
+      '   NEVER dismiss failures as "pre-existing". NEVER skip this.',
+      '',
+      '3. Before claiming ANY pipeline/task complete:',
+      '   - Displayed token data from ccusage-status.txt to the user',
+      '   - Self-reviewed and either improved or documented why not',
+      '',
+      'These apply to EVERY response completing work — not just "final" tasks.',
+    ].join('\n');
+    if (!fs.existsSync(RUNTIME_DIR)) {
+      fs.mkdirSync(RUNTIME_DIR, { recursive: true });
+    }
+    fs.writeFileSync(obligationsPath, obligationsContent, 'utf8');
+  } catch (_e) {
+    // best-effort; never block prompt
+  }
+
   // Evolution Step 0.8: derive pending auto-evolution requests from recurring critical entries.
   try {
     syncEvolutionSpawnReminder();

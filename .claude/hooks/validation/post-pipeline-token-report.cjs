@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 'use strict';
 
-// PostToolUse hook: Auto-run ccusage when pipeline drains
-// Triggers on TaskUpdate — when the last task completes, reports token usage
+// PostToolUse hook: Report token usage when pipeline drains
+// Triggers on TaskUpdate — when the last task completes, reads ccusage-status.txt
 // Advisory hook — always exits 0, never blocks
 
-const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 let input = '';
 process.stdin.on('data', chunk => {
@@ -45,18 +46,28 @@ process.stdin.on('end', () => {
       process.exit(0);
     }
 
-    // Pipeline appears complete — run ccusage
+    // Pipeline appears complete — read ccusage-status.txt (written by ccusage-statusline.cjs hook)
     process.stderr.write('\n=== TOKEN USAGE REPORT (auto-triggered by post-pipeline hook) ===\n');
     try {
-      const output = execSync('npx ccusage@latest --model --today 2>&1', {
-        timeout: 30000,
-        encoding: 'utf-8',
-        shell: true,
-        cwd: process.env.HOME || process.env.USERPROFILE || '.',
-      });
-      process.stderr.write(output + '\n');
-    } catch (ccErr) {
-      process.stderr.write('ccusage failed: ' + (ccErr.message || 'unknown error') + '\n');
+      const statusPath = path.join(
+        process.cwd(),
+        '.claude',
+        'context',
+        'runtime',
+        'ccusage-status.txt'
+      );
+      if (fs.existsSync(statusPath)) {
+        const status = fs.readFileSync(statusPath, 'utf8').trim();
+        process.stderr.write(status + '\n');
+      } else {
+        process.stderr.write(
+          'ccusage-status.txt not found (ccusage-statusline hook may not have fired)\n'
+        );
+      }
+    } catch (readErr) {
+      process.stderr.write(
+        'Failed to read ccusage-status.txt: ' + (readErr.message || 'unknown error') + '\n'
+      );
     }
     process.stderr.write('=== END TOKEN USAGE REPORT ===\n');
   } catch (_e) {

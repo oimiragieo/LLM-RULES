@@ -32,6 +32,7 @@ Router MUST check this table before defaulting to developer. Developer is ALWAYS
 | "start mission" / "mission mode" / "ceo"            | developer  | **master-orchestrator**               |
 | "task audit" / "clean up stale tasks"               | developer  | **task-manager**                      |
 | "loop / iterate / circuit breaker / max iterations" | developer  | **loop-operator**                     |
+| "audit CLAUDE.md / check docs accuracy"             | developer  | **claude-md-auditor**                 |
 
 ---
 
@@ -57,6 +58,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | Infrastructure                                                | `devops`                     | `.claude/agents/specialized/devops.md`                   |
 | Debugging                                                     | `devops-troubleshooter`      | `.claude/agents/specialized/devops-troubleshooter.md`    |
 | Incidents                                                     | `incident-responder`         | `.claude/agents/specialized/incident-responder.md`       |
+| Audit CLAUDE.md, rules, reference docs against codebase state | `claude-md-auditor`          | `.claude/agents/specialized/claude-md-auditor.md`        |
 | C4 System Context                                             | `c4-context`                 | `.claude/agents/specialized/c4-context.md`               |
 | C4 Containers                                                 | `c4-container`               | `.claude/agents/specialized/c4-container.md`             |
 | C4 Components                                                 | `c4-component`               | `.claude/agents/specialized/c4-component.md`             |

@@ -701,6 +701,18 @@ const INTENT_KEYWORDS = {
     'loop iteration',
     'loop rails',
   ],
+  'claude-md-audit': [
+    'claude-md-auditor',
+    'audit claude.md',
+    'audit CLAUDE.md',
+    'documentation drift',
+    'stale references',
+    'stale file paths',
+    'verify docs',
+    'check claude.md',
+    'doc integrity',
+    'reference audit',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

@@ -185,6 +185,10 @@ const INTENT_TO_AGENT = {
   'autonomous-loop': 'loop-operator',
   'loop-governance': 'loop-operator',
   'iteration-limit': 'loop-operator',
+  'claude-md-audit': 'claude-md-auditor',
+  'documentation-drift': 'claude-md-auditor',
+  'stale-references': 'claude-md-auditor',
+  'verify-docs': 'claude-md-auditor',
 };
 
 module.exports = { INTENT_TO_AGENT };

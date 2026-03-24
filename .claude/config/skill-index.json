@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-23T22:13:52.416Z",
+  "generatedAt": "2026-03-24T01:07:39.264Z",
   "metadata": {
-    "totalSkills": 332,
+    "totalSkills": 336,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-23T22:13:52.417Z",
+    "lastValidated": "2026-03-24T01:07:39.266Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7380,6 +7380,29 @@
       "priority": 3,
       "aliasOf": null
     },
+    "compaction-detector": {
+      "name": "compaction-detector",
+      "displayName": "Compaction Detector",
+      "category": "Other",
+      "domain": "other",
+      "description": "Detect Claude Code context compaction events in session JSONL logs. Identifies compaction boundaries, measures token delta before/after, reports compaction events with timestamps and token impact.",
+      "requiredTools": [
+        "Read",
+        "Bash",
+        "Grep",
+        "TaskUpdate"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "compaction-detector"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "content-analyzer": {
       "name": "content-analyzer",
       "displayName": "Content Analyzer",
@@ -7402,6 +7425,29 @@
       "tags": [
         "other",
         "content-analyzer"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "context-attribution": {
+      "name": "context-attribution",
+      "displayName": "Context Attribution",
+      "category": "Other",
+      "domain": "other",
+      "description": "Estimate per-turn token attribution across 6 categories in Claude Code sessions to show where context budget is spent",
+      "requiredTools": [
+        "Read",
+        "Bash",
+        "Grep",
+        "TaskUpdate"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "context-attribution"
       ],
       "priority": 3,
       "aliasOf": null
@@ -8181,6 +8227,30 @@
       "priority": 3,
       "aliasOf": null
     },
+    "notification-triggers": {
+      "name": "notification-triggers",
+      "displayName": "Notification Triggers",
+      "category": "Other",
+      "domain": "other",
+      "description": "Configurable regex-based alert system for detecting patterns in tool calls and session activity. Supports error triggers, content regex matching, token threshold triggers, and pattern detection with configurable actions.",
+      "requiredTools": [
+        "Read",
+        "Bash",
+        "Grep",
+        "Write",
+        "TaskUpdate"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "notification-triggers"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "outcome-reflection": {
       "name": "outcome-reflection",
       "displayName": "Outcome Reflection",
@@ -8472,6 +8542,30 @@
       "tags": [
         "other",
         "seo-optimization"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "session-log-analyzer": {
+      "name": "session-log-analyzer",
+      "displayName": "Session Log Analyzer",
+      "category": "Other",
+      "domain": "other",
+      "description": "Parse Claude Code JSONL session logs from ~/.claude/projects/ for tool call inventory, token costs, error detection, subagent traces, and compaction detection",
+      "requiredTools": [
+        "Read",
+        "Bash",
+        "Grep",
+        "Glob",
+        "TaskUpdate"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "session-log-analyzer"
       ],
       "priority": 3,
       "aliasOf": null
@@ -8996,7 +9090,9 @@
         "codebase-cleaner",
         "codebase-exploration",
         "commit-security-scan",
+        "compaction-detector",
         "content-analyzer",
+        "context-attribution",
         "cron-decision",
         "cron-runner",
         "de-sloppify",
@@ -9030,6 +9126,7 @@
         "memory-audit",
         "ml-experiment-loop",
         "model-benchmark",
+        "notification-triggers",
         "outcome-reflection",
         "perpetual-memory",
         "pipeline-evaluator",
@@ -9041,6 +9138,7 @@
         "scheduled-tasks",
         "security-scanning",
         "seo-optimization",
+        "session-log-analyzer",
         "slack-expert",
         "style-analyzer",
         "task-delegation",
@@ -9434,7 +9532,9 @@
         "codebase-cleaner",
         "codebase-exploration",
         "commit-security-scan",
+        "compaction-detector",
         "content-analyzer",
+        "context-attribution",
         "cron-decision",
         "cron-runner",
         "de-sloppify",
@@ -9468,6 +9568,7 @@
         "memory-audit",
         "ml-experiment-loop",
         "model-benchmark",
+        "notification-triggers",
         "outcome-reflection",
         "perpetual-memory",
         "pipeline-evaluator",
@@ -9479,6 +9580,7 @@
         "scheduled-tasks",
         "security-scanning",
         "seo-optimization",
+        "session-log-analyzer",
         "slack-expert",
         "style-analyzer",
         "task-delegation",
@@ -9855,7 +9957,9 @@
         "codebase-cleaner",
         "codebase-exploration",
         "commit-security-scan",
+        "compaction-detector",
         "content-analyzer",
+        "context-attribution",
         "cron-decision",
         "cron-runner",
         "de-sloppify",
@@ -9889,6 +9993,7 @@
         "memory-audit",
         "ml-experiment-loop",
         "model-benchmark",
+        "notification-triggers",
         "outcome-reflection",
         "perpetual-memory",
         "pipeline-evaluator",
@@ -9900,6 +10005,7 @@
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
+        "session-log-analyzer",
         "slack-expert",
         "style-analyzer",
         "task-delegation",
@@ -10168,6 +10274,7 @@
         "mcp-catalog",
         "ml-experiment-loop",
         "model-benchmark",
+        "notification-triggers",
         "outcome-reflection",
         "perpetual-memory",
         "pipeline-evaluator",
@@ -10567,7 +10674,9 @@
         "cloudflare-workers",
         "codebase-cleaner",
         "commit-security-scan",
+        "compaction-detector",
         "content-analyzer",
+        "context-attribution",
         "cron-decision",
         "de-sloppify",
         "deep-research",
@@ -10589,12 +10698,14 @@
         "markitdown-converter",
         "memory-audit",
         "ml-experiment-loop",
+        "notification-triggers",
         "outcome-reflection",
         "plan-quality-verifier",
         "pptx",
         "project-stage-detection",
         "scheduled-tasks",
         "scientific-skills",
+        "session-log-analyzer",
         "slack-expert",
         "team-orchestration",
         "telegram-polling",
@@ -10743,6 +10854,7 @@
         "project-stage-detection",
         "regulatory-compliance",
         "scientific-skills",
+        "session-log-analyzer",
         "user-research"
       ],
       "Grep": [
@@ -10874,7 +10986,9 @@
         "cloud-run",
         "codebase-cleaner",
         "commit-security-scan",
+        "compaction-detector",
         "content-analyzer",
+        "context-attribution",
         "de-sloppify",
         "deep-research",
         "gap-detection",
@@ -10884,10 +10998,12 @@
         "knowledge-graph",
         "memory-audit",
         "ml-experiment-loop",
+        "notification-triggers",
         "outcome-reflection",
         "project-stage-detection",
         "regulatory-compliance",
         "scientific-skills",
+        "session-log-analyzer",
         "user-flow-validator",
         "user-research"
       ],
@@ -11025,11 +11141,15 @@
         "task-management-protocol",
         "adversarial-debate",
         "behavioral-loop-detection",
+        "compaction-detector",
+        "context-attribution",
         "error-recovery-escalation",
         "heartbeat",
         "judge-verification",
         "memory-audit",
+        "notification-triggers",
         "scheduled-tasks",
+        "session-log-analyzer",
         "team-orchestration",
         "telegram-polling",
         "user-research"
@@ -11252,7 +11372,9 @@
         "codebase-cleaner",
         "codebase-exploration",
         "commit-security-scan",
+        "compaction-detector",
         "content-analyzer",
+        "context-attribution",
         "cron-decision",
         "cron-runner",
         "de-sloppify",
@@ -11284,6 +11406,7 @@
         "memory-audit",
         "ml-experiment-loop",
         "model-benchmark",
+        "notification-triggers",
         "perpetual-memory",
         "pipeline-evaluator",
         "plan-quality-verifier",
@@ -11291,6 +11414,7 @@
         "reddit-researcher",
         "regulatory-compliance",
         "seo-optimization",
+        "session-log-analyzer",
         "slack-expert",
         "style-analyzer",
         "task-delegation",
@@ -12585,7 +12709,9 @@
         "codebase-cleaner",
         "codebase-exploration",
         "commit-security-scan",
+        "compaction-detector",
         "content-analyzer",
+        "context-attribution",
         "cron-decision",
         "cron-runner",
         "de-sloppify",
@@ -12617,6 +12743,7 @@
         "memory-audit",
         "ml-experiment-loop",
         "model-benchmark",
+        "notification-triggers",
         "perpetual-memory",
         "pipeline-evaluator",
         "plan-quality-verifier",
@@ -12624,6 +12751,7 @@
         "reddit-researcher",
         "regulatory-compliance",
         "seo-optimization",
+        "session-log-analyzer",
         "slack-expert",
         "style-analyzer",
         "task-delegation",

@@ -32,6 +32,7 @@ Router may use ONLY:
   - `.claude/context/runtime/reflection-spawn-request.json` (step 0 check)
   - `.claude/context/runtime/integration-queue.jsonl` (step 0.5 check)
   - `.claude/context/runtime/heartbeat-reminder.txt` (step 0.5 check)
+  - `.claude/context/runtime/pipeline-obligations-reminder.txt` (ccusage + self-review obligations)
   - For large reads: use `offset/limit`; require prior search evidence for unwindowed reads
 - `AskUserQuestion` — clarifying with user
 - `Bash` — ONLY these two exceptions:

@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 let input = '';
-process.stdin.on('data', (chunk) => {
+process.stdin.on('data', chunk => {
   input += chunk;
 });
 process.stdin.on('end', () => {
@@ -101,13 +101,15 @@ process.stdin.on('end', () => {
     fs.writeFileSync(spawnFile, JSON.stringify(requests, null, 2));
 
     // Write reminder
-    const reminderCount = requests.filter((r) => r.status === 'pending' || !r.status).length;
+    const reminderCount = requests.filter(r => r.status === 'pending' || !r.status).length;
     fs.writeFileSync(
       reminderFile,
       `STEP 0: You have ${reminderCount} pending reflection spawn request(s) including a MILESTONE SELF-REVIEW. Read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent for each request. After spawning, clear/trim the spawn request file and delete this reminder. Then announce "Step 0 complete" before TaskList().\n`
     );
 
-    process.stderr.write(`[post-pipeline-self-review] Queued milestone self-review reflection: ${id}\n`);
+    process.stderr.write(
+      `[post-pipeline-self-review] Queued milestone self-review reflection: ${id}\n`
+    );
   } catch {
     // Advisory hook — fail open
   }
