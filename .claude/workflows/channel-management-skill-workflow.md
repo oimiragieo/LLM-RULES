@@ -15,11 +15,11 @@ This workflow documents the multi-step execution path for the `channel-managemen
 
 ## Agents Involved
 
-| Agent | Role |
-|-------|------|
+| Agent                    | Role                                         |
+| ------------------------ | -------------------------------------------- |
 | `heartbeat-orchestrator` | Invokes on boot if `CHANNEL_AUTO_START=true` |
-| `devops` | Manual lifecycle operations |
-| `developer` | Debugging channel startup failures |
+| `devops`                 | Manual lifecycle operations                  |
+| `developer`              | Debugging channel startup failures           |
 
 ## Standard Lifecycle Flow
 
@@ -99,6 +99,7 @@ fs.appendFileSync('.claude/context/memory/learnings.md', entry, 'utf8');
 All lifecycle actions emit events to `.claude/context/runtime/tool-events.jsonl` via `hooks/post-execute.cjs`.
 
 Inspect recent events:
+
 ```bash
 node -e "
 const fs = require('fs');
