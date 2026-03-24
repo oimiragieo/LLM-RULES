@@ -72,7 +72,9 @@ function preExecute(input = {}) {
 // If run directly from CLI
 if (require.main === module) {
   let rawInput = '';
-  process.stdin.on('data', chunk => { rawInput += chunk; });
+  process.stdin.on('data', chunk => {
+    rawInput += chunk;
+  });
   process.stdin.on('end', () => {
     try {
       const input = rawInput.trim() ? JSON.parse(rawInput) : {};

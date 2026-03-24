@@ -33,11 +33,11 @@ All actions emit JSON to stdout:
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0`  | Success (session OK or action completed cleanly) |
+| Code | Meaning                                                           |
+| ---- | ----------------------------------------------------------------- |
+| `0`  | Success (session OK or action completed cleanly)                  |
 | `1`  | Non-fatal: session not running, degraded health, or token missing |
-| `2`  | Fatal error: invalid action, manager not found |
+| `2`  | Fatal error: invalid action, manager not found                    |
 
 ## Skill Invocation
 
@@ -47,9 +47,9 @@ Skill({ skill: 'channel-management' });
 
 ## Quick Reference
 
-| Action   | When to Use |
-|----------|-------------|
-| `status` | Check if the session is running (safe, no side effects) |
+| Action   | When to Use                                                      |
+| -------- | ---------------------------------------------------------------- |
+| `status` | Check if the session is running (safe, no side effects)          |
 | `start`  | Start the session (idempotent — safe to call if already running) |
-| `stop`   | Gracefully stop the session |
-| `health` | Full health probe — prunes orphans, verifies PID liveness |
+| `stop`   | Gracefully stop the session                                      |
+| `health` | Full health probe — prunes orphans, verifies PID liveness        |

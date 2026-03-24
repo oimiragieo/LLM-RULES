@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Bash, TaskUpdate]
 agents: [developer, devops, heartbeat-orchestrator]
-category: "External Integrations"
+category: 'External Integrations'
 tags: [channels, telegram, session, lifecycle, pid, terminal, health]
 best_practices:
   - Always call isChannelRunning() before startChannel() to avoid duplicate sessions
@@ -87,6 +87,7 @@ console.log(JSON.stringify({ running, pid }));
 **Verify:** Exit code 0 and valid JSON printed to stdout.
 
 **Decision gate:**
+
 - `running: true` → Skip Step 2 (already running), proceed to Step 4 (health check)
 - `running: false` → Continue to Step 2
 
@@ -224,12 +225,12 @@ The skill is idempotent — calling it when the session is already running is a 
 
 ## Environment Variables
 
-| Variable             | Required | Default                               | Purpose                              |
-|----------------------|----------|---------------------------------------|--------------------------------------|
-| `TELEGRAM_BOT_TOKEN` | YES      | —                                     | Telegram bot credentials             |
-| `CHANNEL_AUTO_START` | NO       | `false`                               | Auto-start on agent boot             |
-| `CHANNEL_PLUGINS`    | NO       | `plugin:telegram@claude-plugins-official` | Space-separated plugin list      |
-| `CHANNEL_PERMISSIONS`| NO       | —                                     | Extra claude flags (e.g. `--dangerously-skip-permissions`) |
+| Variable              | Required | Default                                   | Purpose                                                    |
+| --------------------- | -------- | ----------------------------------------- | ---------------------------------------------------------- |
+| `TELEGRAM_BOT_TOKEN`  | YES      | —                                         | Telegram bot credentials                                   |
+| `CHANNEL_AUTO_START`  | NO       | `false`                                   | Auto-start on agent boot                                   |
+| `CHANNEL_PLUGINS`     | NO       | `plugin:telegram@claude-plugins-official` | Space-separated plugin list                                |
+| `CHANNEL_PERMISSIONS` | NO       | —                                         | Extra claude flags (e.g. `--dangerously-skip-permissions`) |
 
 ---
 

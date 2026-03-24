@@ -13,10 +13,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const EVENTS_FILE = path.resolve(
-  __dirname,
-  '../../../../context/runtime/tool-events.jsonl'
-);
+const EVENTS_FILE = path.resolve(__dirname, '../../../../context/runtime/tool-events.jsonl');
 
 function postExecute(context = {}) {
   const event = {
@@ -48,7 +45,9 @@ function postExecute(context = {}) {
 // If run directly from CLI
 if (require.main === module) {
   let rawInput = '';
-  process.stdin.on('data', chunk => { rawInput += chunk; });
+  process.stdin.on('data', chunk => {
+    rawInput += chunk;
+  });
   process.stdin.on('end', () => {
     try {
       const context = rawInput.trim() ? JSON.parse(rawInput) : {};

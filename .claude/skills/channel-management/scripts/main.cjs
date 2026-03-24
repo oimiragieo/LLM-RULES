@@ -38,7 +38,9 @@ try {
       if (!process.env[key]) process.env[key] = val;
     }
   }
-} catch (_) { /* ignore */ }
+} catch (_) {
+  /* ignore */
+}
 
 // ── Input validation ─────────────────────────────────────────────────────────
 const VALID_ACTIONS = ['start', 'stop', 'status', 'health'];
@@ -46,7 +48,10 @@ const action = process.argv[2] || 'status';
 const jsonMode = process.argv.includes('--json');
 
 if (!VALID_ACTIONS.includes(action)) {
-  const err = { ok: false, error: `Unknown action: "${action}". Valid: ${VALID_ACTIONS.join(', ')}` };
+  const err = {
+    ok: false,
+    error: `Unknown action: "${action}". Valid: ${VALID_ACTIONS.join(', ')}`,
+  };
   if (jsonMode) {
     process.stdout.write(JSON.stringify(err) + '\n');
   } else {
@@ -74,7 +79,12 @@ let result;
 switch (action) {
   case 'start': {
     if (!process.env.TELEGRAM_BOT_TOKEN) {
-      result = { ok: false, action: 'start', reason: 'TELEGRAM_BOT_TOKEN not set — skipped', health: 'SKIPPED' };
+      result = {
+        ok: false,
+        action: 'start',
+        reason: 'TELEGRAM_BOT_TOKEN not set — skipped',
+        health: 'SKIPPED',
+      };
       process.stdout.write(JSON.stringify(result) + '\n');
       process.exit(1);
     }
@@ -110,7 +120,9 @@ switch (action) {
     killOrphaned(); // prune dead entries first
     const running = isChannelRunning();
     const pid = getChannelPid();
-    const tracked = listTracked().find(s => s.purpose === 'channel-session' && s.status === 'active');
+    const tracked = listTracked().find(
+      s => s.purpose === 'channel-session' && s.status === 'active'
+    );
     result = {
       ok: running,
       action: 'health',

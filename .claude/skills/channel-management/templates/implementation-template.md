@@ -10,14 +10,14 @@ Skill({ skill: 'channel-management' });
 
 // Step 1: Check status
 const statusResult = await Bash({
-  command: 'node .claude/skills/channel-management/scripts/main.cjs status'
+  command: 'node .claude/skills/channel-management/scripts/main.cjs status',
 });
 const status = JSON.parse(statusResult.stdout);
 
 // Step 2: Start if not running
 if (!status.running) {
   const startResult = await Bash({
-    command: 'node .claude/skills/channel-management/scripts/main.cjs start'
+    command: 'node .claude/skills/channel-management/scripts/main.cjs start',
   });
   const started = JSON.parse(startResult.stdout);
   if (!started.ok && started.health !== 'SKIPPED') {
@@ -28,7 +28,7 @@ if (!status.running) {
 
 // Step 3: Health check
 const healthResult = await Bash({
-  command: 'node .claude/skills/channel-management/scripts/main.cjs health'
+  command: 'node .claude/skills/channel-management/scripts/main.cjs health',
 });
 const health = JSON.parse(healthResult.stdout);
 if (health.health !== 'OK' && health.health !== 'SKIPPED') {
@@ -48,8 +48,14 @@ Skill({ skill: 'channel-management' });
 
 ```javascript
 // When health check returns DEGRADED
-const stop = await Bash({ command: 'node .claude/skills/channel-management/scripts/main.cjs stop' });
+const stop = await Bash({
+  command: 'node .claude/skills/channel-management/scripts/main.cjs stop',
+});
 // killOrphaned() is called automatically by 'health' and 'stop' actions
-const restart = await Bash({ command: 'node .claude/skills/channel-management/scripts/main.cjs start' });
-const healthCheck = await Bash({ command: 'node .claude/skills/channel-management/scripts/main.cjs health' });
+const restart = await Bash({
+  command: 'node .claude/skills/channel-management/scripts/main.cjs start',
+});
+const healthCheck = await Bash({
+  command: 'node .claude/skills/channel-management/scripts/main.cjs health',
+});
 ```

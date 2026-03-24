@@ -1767,13 +1767,19 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
         const stale = dirs.filter(d => {
           try {
             return fs.statSync(path.join(wtDir, d)).mtimeMs < twoHoursAgo;
-          } catch { return false; }
+          } catch {
+            return false;
+          }
         });
         if (stale.length > 0) {
-          worktreeWarning = '\n4. WORKTREE CLEANUP (MANDATORY): ' + stale.length +
+          worktreeWarning =
+            '\n4. WORKTREE CLEANUP (MANDATORY): ' +
+            stale.length +
             ' stale worktree(s) older than 2 hours detected in .claude/worktrees/.' +
             '\n   Run: git worktree prune && remove stale dirs.' +
-            '\n   Stale: ' + stale.slice(0, 5).join(', ') + (stale.length > 5 ? '...' : '') +
+            '\n   Stale: ' +
+            stale.slice(0, 5).join(', ') +
+            (stale.length > 5 ? '...' : '') +
             '\n   NEVER leave orphaned worktrees — they waste disk and cause branch conflicts.';
         }
       }

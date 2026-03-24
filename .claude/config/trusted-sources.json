@@ -3,11 +3,7 @@
   "version": "1.0.0",
   "description": "Allowlist of trusted external sources for skill content ingestion (SEC-EXT-001)",
   "lastUpdated": "2026-02-20",
-  "trusted_organizations": [
-    "VoltAgent",
-    "anthropics",
-    "affaan-m"
-  ],
+  "trusted_organizations": ["VoltAgent", "anthropics", "affaan-m"],
   "trusted_repositories": [
     {
       "repo": "VoltAgent/awesome-agent-skills",
@@ -43,7 +39,5 @@
     "on_size_exceeded": "block_and_log"
   },
   "notes": "Even trusted sources MUST pass the 7-step Security Review Gate. Trust level only affects response to FAIL results (escalate vs block).",
-  "allowedDomains": [
-    "code.claude.com"
-  ]
+  "allowedDomains": ["code.claude.com"]
 }

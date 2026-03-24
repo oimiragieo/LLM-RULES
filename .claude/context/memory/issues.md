@@ -940,6 +940,7 @@
 **Fix:** Extract canonical search-policy module; remove all fallback-path logic from test files.
 
 ### P1: Omega CLI Prompt Truncation (2026-03-24)
+
 **Symptom**: External model feedback via omega-codex-cli and omega-claude-cli returned empty/truncated responses ("I don't see the 6 questions"). Both Codex and Claude CLI dispatch attempts failed.
 **Root cause**: The omega CLI scripts pipe prompts via stdin but large prompts (>2KB) get truncated by the shell pipe buffer or the CLI's stdin reader truncates at a boundary.
 **Impact**: Multi-model review gate was effectively bypassed this session. Planner + architect reviews provided coverage but no external perspective.
@@ -947,6 +948,7 @@
 **Workaround**: Use shorter, focused prompts (<1KB) or write to file first.
 
 ### P2: CLAUDE.md Context Inflation Blocks Developer Agents (2026-03-24)
+
 **Symptom**: 7 developer/nodejs-pro agent spawns failed with "Prompt is too long" across haiku, sonnet, and worktree-isolated modes. Only general-purpose agents with worktree isolation succeeded.
 **Root cause**: CLAUDE.md (~15K tokens) + 20+ rule files (~30K+ tokens) auto-loaded into every agent context. Combined with the agent prompt and file reads, exceeds model prompt limit.
 **Impact**: 26% agent spawn failure rate. Implementation tasks require multiple retry attempts.
