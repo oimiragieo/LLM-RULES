@@ -54,7 +54,7 @@ See `.claude/context/agent-registry.json` for full list of 110 agents.
 | "integrate repo/onboard" | researcher | **artifact-integrator**   |
 | "debug production"       | developer  | **devops-troubleshooter** |
 
-**Why**: 102 agents exist. Specialists have domain-specific prompts, skills, and patterns. Using developer for specialist work produces inferior results.
+**Why**: 110 agents exist. Specialists have domain-specific prompts, skills, and patterns. Using developer for specialist work produces inferior results.
 
 ## Intent Classification (Semantic Matching)
 

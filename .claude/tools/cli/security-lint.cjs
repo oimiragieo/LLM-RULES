@@ -96,6 +96,7 @@ const CONFIG = {
     { pathSubstring: 'context-compressor/scripts/main.cjs', ruleId: 'SEC-030' }, // CLI token/stats output, not credentials
     { pathSubstring: 'hybrid-search.cjs', ruleId: 'SEC-030' }, // CLI token stats and help output, not credentials
     { pathSubstring: 'token-saver-stats.cjs', ruleId: 'SEC-030' }, // CLI token/stats output, not credentials
+    { pathSubstring: 'setup.cjs', ruleId: 'SEC-030' }, // Interactive setup wizard — displays masked key status (last 4 chars only via maskKey()), not raw secrets
     { pathSubstring: 'agent-registry.json', ruleId: 'SEC-031' }, // generated; "debugger" in capability text, not statement
     { pathSubstring: 'agent-registry-domain.json', ruleId: 'SEC-031' }, // generated; "debugger" in capability text
     { pathSubstring: 'post-task-unified.cjs', ruleId: 'SEC-011' }, // execSync node with project path (controlled)

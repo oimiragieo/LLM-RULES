@@ -273,6 +273,7 @@ The hook chain (currently 6 consolidated hooks) must stay bounded. Each new hook
 ## Session Learning: 2026-03-24 — Ecosystem Audit Self-Review
 
 ### L1: Worktree agents with large CLAUDE.md hit "Prompt is too long"
+
 - 4/6 developer agents failed immediately with 0 tool calls
 - Root cause: agent-studio's CLAUDE.md + rules inject ~150K+ tokens into every worktree agent context
 - **Fix**: For trivial edits (3-line changes), do them directly in router session instead of spawning agents
@@ -280,17 +281,73 @@ The hook chain (currently 6 consolidated hooks) must stay bounded. Each new hook
 - **Fix**: Consider non-worktree agents for small edits (no CLAUDE.md re-injection)
 
 ### L2: ccusage MUST be run and WAITED for — no "it's slow, skip it"
+
 - Violated mandatory pipeline rule by attempting ccusage once, seeing it was slow, and moving on
 - The rule exists precisely because costs need tracking at EVERY milestone
 - **Fix**: Always use timeout: 120000 and block:true for ccusage. If it fails, log the failure — never silently skip
 
 ### L3: Background bash tasks with pipe chains produce empty output files
+
 - `pnpm test 2>&1 | tail -20` as background task never wrote to output file
 - Likely a pipe buffering issue on Windows
 - **Fix**: For long-running test commands, run foreground with explicit timeout, or redirect to file first
 
 ### L4: Don't spawn agents for work you can do in 3 lines
+
 - Spawning 4 parallel developer agents for trivial edits was wasteful
 - Each agent creates a worktree, injects full context, opens a Claude window
 - Cost: ~50K+ tokens wasted on failed spawns + 6 blank windows confusing the user
 - **Fix**: Threshold rule — if the fix is <10 lines across <3 files, do it directly
+
+- Created new agent: qa-guardian (2026-03-24)
+
+- Created new agent: contract-check (2026-03-24)
+
+- Created new agent: bool-action (2026-03-24)
+
+- Created new agent: repo-onboarder (2026-03-24)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-24)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-24)
+
+- Updated workflow: evolution-workflow (2026-03-24)
+
+- Updated workflow: missing-workflow-xyz (2026-03-24)
+
+- Created new agent: qa-guardian (2026-03-24)
+
+- Created new agent: contract-check (2026-03-24)
+
+- Created new agent: bool-action (2026-03-24)
+
+- Created new agent: repo-onboarder (2026-03-24)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-24)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-24)
+
+- Updated workflow: evolution-workflow (2026-03-24)
+
+- Updated workflow: missing-workflow-xyz (2026-03-24)
+
+## 2026-03-24: Multi-Model Architecture Review Findings (Task #4)
+
+### NEW Architectural Gaps (Codex live inspection)
+
+- CX-2: agent-config.json:4 grants broad tool bundles to many agents simultaneously (Bash+Edit+Write+WebFetch+WebSearch+MemoryRecord). router-tool-lockdown.cjs:3 passes all subagents through. Weak least-privilege post-routing.
+- CX-3: spawn-prompt-assembler.memory.cjs:13 uses narrow line-stripper; memory-sanitizer.cjs:25 (stronger) exists but NOT wired to spawn path. Quick fix available.
+- CX-4: intent-classifier.cjs:219 uses first-match heuristic on generic token substrings. Degrades with agent count growth.
+- CX-5: swarm-coordination.cjs:7 single JSON file, no locking. Concurrent updates race.
+
+### Claude CLI + Cursor CLI Background Task Limitation
+
+- omega-claude-cli and omega-cursor-cli produce no output when invoked via run_in_background:true Bash tool
+- Codex CLI works correctly via background invocation
+- For multi-model reviews: run omega-claude-cli and omega-cursor-cli sequentially (not backgrounded) or use separate direct Bash calls
+
+### Lint Warnings (non-blocking)
+
+- perpetual-memory/main.cjs: complexity 21 (max 20)
+- tools/cli/post-analyzer.cjs: 652 lines (max 500)
+- scripts/setup.cjs: nesting depth 5 (max 4)

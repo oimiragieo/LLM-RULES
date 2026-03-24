@@ -5,7 +5,10 @@
  * Note: Uses NO external dependencies so it can run immediately after git clone.
  */
 
-const { execFileSync, spawn } = require('child_process');
+const { execFileSync, spawnSync, spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const readline = require('readline');
 
 // ANSI Escapes for pretty UI
 const c = {
@@ -61,6 +64,67 @@ try {
   }
 }
 
+// Optional Tool Detection
+console.log(`\n${c.bold}${c.blue}>> Optional Tool Detection${c.reset}`);
+
+/**
+ * Probe for a CLI tool by running it with a version flag.
+ * Returns { found: boolean, version?: string }.
+ */
+function detectTool(cmd, args) {
+  try {
+    const result = spawnSync(cmd, args, { shell: false, stdio: 'pipe', timeout: 5000 });
+    if (result.status === 0 && result.stdout) {
+      const ver = result.stdout.toString().trim().split('\n')[0];
+      return { found: true, version: ver };
+    }
+    return { found: false };
+  } catch (_e) {
+    return { found: false };
+  }
+}
+
+const optionalTools = [
+  { name: 'pyright', cmd: 'pyright', args: ['--version'], hint: 'pip install pyright' },
+  {
+    name: 'gopls',
+    cmd: 'gopls',
+    args: ['version'],
+    hint: 'go install golang.org/x/tools/gopls@latest',
+  },
+  {
+    name: 'rust-analyzer',
+    cmd: 'rust-analyzer',
+    args: ['--version'],
+    hint: 'rustup component add rust-analyzer',
+  },
+];
+
+// External LLM CLIs — detect by checking sibling project directories
+const projectRoot = path.resolve(__dirname, '..', '..');
+const externalClis = [
+  { name: 'gemini-cli', dir: path.join(projectRoot, 'omega-gemini-cli') },
+  { name: 'codex-cli', dir: path.join(projectRoot, 'omega-codex-cli') },
+  { name: 'cursor-cli', dir: path.join(projectRoot, 'omega-cursor-cli') },
+];
+
+for (const tool of optionalTools) {
+  const result = detectTool(tool.cmd, tool.args);
+  if (result.found) {
+    console.log(` ${c.green}✔ ${tool.name} found (${result.version})${c.reset}`);
+  } else {
+    console.log(` ${c.gray}○ ${tool.name} not found — install with: ${tool.hint}${c.reset}`);
+  }
+}
+
+for (const cli of externalClis) {
+  if (fs.existsSync(cli.dir)) {
+    console.log(` ${c.green}✔ ${cli.name} project found${c.reset}`);
+  } else {
+    console.log(` ${c.gray}○ ${cli.name} not found at ${cli.dir}${c.reset}`);
+  }
+}
+
 console.log('');
 console.log(
   `${c.gray}WSL / Windows: Agent Studio runs seamlessly on Windows PowerShell or WSL.${c.reset}`
@@ -69,7 +133,134 @@ console.log(
   `${c.gray}CUDA / GPUs: Nvidia CUDA Toolkit 13.x is OPTIONAL but recommended for ~40% faster code indexing.${c.reset}\n`
 );
 
-// 2. Setup Pipeline Definition
+// 2. Environment Configuration (.env wizard)
+const envPath = path.join(__dirname, '..', '.env');
+const envExamplePath = path.join(__dirname, '..', '.env.example');
+const skipEnv = process.argv.includes('--skip-env') || process.env.CI === 'true';
+
+/**
+ * Interactive .env setup wizard.
+ * Copies .env.example and prompts for user-facing API keys.
+ * Uses Node.js readline (zero external deps).
+ */
+async function runEnvWizard() {
+  if (skipEnv) {
+    console.log(` ${c.gray}○ .env wizard skipped (--skip-env or CI mode)${c.reset}`);
+    return;
+  }
+
+  if (fs.existsSync(envPath)) {
+    console.log(` ${c.green}✔ .env file already exists — skipping wizard${c.reset}`);
+    return;
+  }
+
+  if (!fs.existsSync(envExamplePath)) {
+    console.log(` ${c.yellow}⚠ .env.example not found — cannot create .env${c.reset}`);
+    return;
+  }
+
+  console.log(`\n${c.bold}${c.blue}>> Phase 2: Environment Configuration${c.reset}`);
+  console.log(` ${c.cyan}Creating .env from .env.example...${c.reset}`);
+
+  // Copy the example file as the base
+  let envContent = fs.readFileSync(envExamplePath, 'utf8');
+
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+  function ask(question) {
+    return new Promise(resolve => {
+      rl.question(question, answer => resolve(answer.trim()));
+    });
+  }
+
+  /**
+   * Replace a commented-out env var line with an uncommented, populated one.
+   * Handles both "# VAR=value" and "# VAR=" forms.
+   */
+  function setEnvVar(content, varName, value) {
+    if (!value) return content;
+    // Match commented or uncommented forms
+    const patterns = [new RegExp(`^#\\s*${varName}=.*$`, 'm'), new RegExp(`^${varName}=.*$`, 'm')];
+    for (const pattern of patterns) {
+      if (pattern.test(content)) {
+        return content.replace(pattern, `${varName}=${value}`);
+      }
+    }
+    // If not found at all, append
+    return content + `\n${varName}=${value}\n`;
+  }
+
+  function maskKey(key) {
+    if (!key || key.length < 8) return '****';
+    return '****' + key.slice(-4);
+  }
+
+  try {
+    // Required: Anthropic API Key
+    // security-lint-disable SEC-030 — setup wizard UX messages, values are masked via maskKey()
+    console.log(`\n${c.bold}Required API Keys:${c.reset}`);
+    const anthropicKey = await ask(
+      ` ${c.cyan}Anthropic API key (starts with sk-ant-, press Enter to skip): ${c.reset}`
+    );
+    if (anthropicKey) {
+      if (!anthropicKey.startsWith('sk-ant-')) {
+        console.log(` ${c.yellow}⚠ Key does not start with sk-ant- — saving anyway${c.reset}`);
+      }
+      envContent = setEnvVar(envContent, 'ANTHROPIC_API_KEY', anthropicKey);
+      console.log(` ${c.green}✔ ANTHROPIC_API_KEY set (${maskKey(anthropicKey)})${c.reset}`);
+    }
+
+    // Optional integrations
+    const configExtras = await ask(
+      `\n ${c.cyan}Configure optional integrations? (y/N): ${c.reset}`
+    );
+
+    if (configExtras.toLowerCase() === 'y') {
+      const optionalKeys = [
+        {
+          name: 'OPENAI_API_KEY',
+          prompt: 'OpenAI API key (for Codex integration, optional)',
+          prefix: 'sk-',
+        },
+        { name: 'EXA_API_KEY', prompt: 'Exa API key (for research/search, optional)' },
+        { name: 'HF_TOKEN', prompt: 'HuggingFace token (for embeddings, optional)', prefix: 'hf_' },
+        { name: 'ELEVENLABS_API_KEY', prompt: 'ElevenLabs key (for voice, optional)' },
+        { name: 'GEMINI_API_KEY', prompt: 'Gemini API key (optional)' },
+      ];
+
+      console.log(`\n${c.bold}Optional Integration Keys:${c.reset}`);
+      for (const keyDef of optionalKeys) {
+        const value = await ask(` ${c.cyan}${keyDef.prompt} (Enter to skip): ${c.reset}`);
+        if (!value) continue;
+        const hasBadPrefix = keyDef.prefix && !value.startsWith(keyDef.prefix);
+        if (hasBadPrefix) {
+          console.log(` ${c.yellow}⚠ Expected prefix "${keyDef.prefix}" — saving anyway${c.reset}`);
+        }
+        envContent = setEnvVar(envContent, keyDef.name, value);
+        console.log(` ${c.green}✔ ${keyDef.name} set (${maskKey(value)})${c.reset}`);
+      }
+    }
+
+    // Telegram channel
+    const configTelegram = await ask(`\n ${c.cyan}Configure Telegram channel? (y/N): ${c.reset}`);
+
+    if (configTelegram.toLowerCase() === 'y') {
+      const botToken = await ask(` ${c.cyan}Telegram bot token: ${c.reset}`);
+      if (botToken) {
+        envContent = setEnvVar(envContent, 'TELEGRAM_BOT_TOKEN', botToken);
+        console.log(` ${c.green}✔ TELEGRAM_BOT_TOKEN set (${maskKey(botToken)})${c.reset}`);
+      }
+    }
+
+    // Write the .env file
+    fs.writeFileSync(envPath, envContent, 'utf8');
+    console.log(`\n ${c.green}✔ .env file created successfully${c.reset}`);
+  } finally {
+    rl.close();
+  }
+}
+
+// 3. Setup Pipeline Definition
 // Each step has either cmd+args (array form, shell:false) or cmds (sequential commands, no &&)
 const steps = [
   {
@@ -92,9 +283,10 @@ const steps = [
     args: ['code:index:reindex'],
     est: '12-17m',
   },
+  { name: 'Validate Framework Health', cmd: 'pnpm', args: ['validate'], est: '5-10s' },
 ];
 
-console.log(`${c.bold}${c.blue}>> Phase 2: Orchestrated Setup Workflow${c.reset}`);
+console.log(`${c.bold}${c.blue}>> Phase 3: Orchestrated Setup Workflow${c.reset}`);
 
 function runStep(step, index) {
   console.log(
@@ -139,6 +331,10 @@ function runStep(step, index) {
 
 async function runAll() {
   const startTime = Date.now();
+
+  // Run the .env wizard before the pipeline steps
+  await runEnvWizard();
+
   for (let i = 0; i < steps.length; i++) {
     try {
       await runStep(steps[i], i);

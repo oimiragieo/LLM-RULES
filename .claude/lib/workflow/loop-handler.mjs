@@ -255,7 +255,15 @@ if (isMainModule) {
   const handler = new LoopHandler();
 
   // Read from stdin or command line args
-  const input = process.argv[2] ? JSON.parse(process.argv[2]) : null;
+  let input = null;
+  if (process.argv[2]) {
+    try {
+      input = JSON.parse(process.argv[2]);
+    } catch (_e) {
+      console.error('Error: invalid JSON input argument');
+      process.exit(1);
+    }
+  }
 
   if (input) {
     handler
