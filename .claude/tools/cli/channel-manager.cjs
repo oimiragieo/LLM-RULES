@@ -38,7 +38,9 @@ try {
       if (!process.env[key]) process.env[key] = val;
     }
   }
-} catch (_) { /* ignore */ }
+} catch (_) {
+  /* ignore */
+}
 
 // ── Configuration ──────────────────────────────────────────────────────────────
 
@@ -48,7 +50,8 @@ function getConfig() {
   return {
     botToken: process.env.TELEGRAM_BOT_TOKEN || '',
     plugins: (process.env.CHANNEL_PLUGINS || 'plugin:telegram@claude-plugins-official')
-      .split(/\s+/).filter(Boolean),
+      .split(/\s+/)
+      .filter(Boolean),
     permissions: process.env.CHANNEL_PERMISSIONS || '',
   };
 }
@@ -65,21 +68,31 @@ function isPidAlive(pid) {
   try {
     const out = execFileSync(
       'powershell',
-      ['-NoProfile', '-NonInteractive', '-Command',
-        `Get-Process -Id ${pid} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id`],
+      [
+        '-NoProfile',
+        '-NonInteractive',
+        '-Command',
+        `Get-Process -Id ${pid} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id`,
+      ],
       { shell: false, encoding: 'utf8', timeout: 8000 }
     ).trim();
     return out === String(pid);
-  } catch (_) { return false; }
+  } catch (_) {
+    return false;
+  }
 }
 
 /** Sleep synchronously via PowerShell (shell:false). */
 function sleepMs(ms) {
   try {
-    execFileSync('powershell',
+    execFileSync(
+      'powershell',
       ['-NoProfile', '-NonInteractive', '-Command', `Start-Sleep -Milliseconds ${ms}`],
-      { shell: false, timeout: ms + 3000 });
-  } catch (_) { /* ignore */ }
+      { shell: false, timeout: ms + 3000 }
+    );
+  } catch (_) {
+    /* ignore */
+  }
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────────
@@ -93,7 +106,7 @@ function isChannelRunning() {
 /** Returns the PID of the running channel session, or null. */
 function getChannelPid() {
   const s = getChannelSession();
-  return s ? (s.pid || null) : null;
+  return s ? s.pid || null : null;
 }
 
 /**
@@ -121,7 +134,12 @@ function startChannel() {
   const afterSpawn = registerSpawn(PURPOSE_TAG, 'channel-manager');
 
   try {
-    spawn('wt', wtArgs, { shell: false, detached: true, stdio: 'ignore', windowsHide: false }).unref();
+    spawn('wt', wtArgs, {
+      shell: false,
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: false,
+    }).unref();
   } catch (e) {
     return { ok: false, pid: null, reason: `spawn failed: ${e.message}` };
   }
@@ -145,11 +163,19 @@ function stopChannel() {
   if (pid === null) return { ok: true, pid: null, reason: 'not-running' };
 
   try {
-    execFileSync('powershell',
-      ['-NoProfile', '-NonInteractive', '-Command',
-        `Stop-Process -Id ${pid} -Force -ErrorAction SilentlyContinue`],
-      { shell: false, timeout: 10000 });
-  } catch (_) { /* already exited */ }
+    execFileSync(
+      'powershell',
+      [
+        '-NoProfile',
+        '-NonInteractive',
+        '-Command',
+        `Stop-Process -Id ${pid} -Force -ErrorAction SilentlyContinue`,
+      ],
+      { shell: false, timeout: 10000 }
+    );
+  } catch (_) {
+    /* already exited */
+  }
 
   return { ok: true, pid, reason: 'stopped' };
 }
@@ -166,14 +192,16 @@ if (require.main === module) {
     const r = stopChannel();
     process.stdout.write(JSON.stringify(r, null, 2) + '\n');
   } else if (cmd === 'status') {
-    process.stdout.write(JSON.stringify({ running: isChannelRunning(), pid: getChannelPid() }, null, 2) + '\n');
+    process.stdout.write(
+      JSON.stringify({ running: isChannelRunning(), pid: getChannelPid() }, null, 2) + '\n'
+    );
   } else {
     process.stderr.write(
       'Usage: node channel-manager.cjs [start|stop|status]\n\n' +
-      '  start   Spawn channel session (idempotent)\n' +
-      '  stop    Kill the running channel session\n' +
-      '  status  Print running status and PID\n\n' +
-      'Env: TELEGRAM_BOT_TOKEN, CHANNEL_AUTO_START, CHANNEL_PLUGINS, CHANNEL_PERMISSIONS\n'
+        '  start   Spawn channel session (idempotent)\n' +
+        '  stop    Kill the running channel session\n' +
+        '  status  Print running status and PID\n\n' +
+        'Env: TELEGRAM_BOT_TOKEN, CHANNEL_AUTO_START, CHANNEL_PLUGINS, CHANNEL_PERMISSIONS\n'
     );
   }
 }

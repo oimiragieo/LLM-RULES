@@ -24,10 +24,10 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `pre-tool-unified.cjs` | PreToolUse(*) | Validates tool scope, path safety, Windows compat (11 checks) | -- |
-| `post-tool-metrics-unified.cjs` | PostToolUse(*) | Metrics collection, execution monitoring, logging | -- |
+| Hook                            | Event           | Purpose                                                       | Override |
+| ------------------------------- | --------------- | ------------------------------------------------------------- | -------- |
+| `pre-tool-unified.cjs`          | PreToolUse(\*)  | Validates tool scope, path safety, Windows compat (11 checks) | --       |
+| `post-tool-metrics-unified.cjs` | PostToolUse(\*) | Metrics collection, execution monitoring, logging             | --       |
 
 See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -35,10 +35,10 @@ See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
-| Channel Management | `.claude/workflows/channel-management-skill-workflow.md` | Channel lifecycle operations |
+| Workflow              | Path                                                     | When to Use                          |
+| --------------------- | -------------------------------------------------------- | ------------------------------------ |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`                 | Output placement, naming, provenance |
+| Channel Management    | `.claude/workflows/channel-management-skill-workflow.md` | Channel lifecycle operations         |
 
 **Output Standards** (from workspace-conventions):
 
@@ -201,16 +201,16 @@ When executing tasks, follow this 8-step approach:
 
 ## Example Interactions
 
-| User Request | Agent Action |
-|---|---|
-| "what tasks are running?" | `TaskList()` → bullet list of in_progress tasks with agent owners |
-| "who owns task-7?" | `TaskGet({ taskId: 'task-7' })` → "task-7: code-reviewer (in_progress since 10:32)" |
-| "is the channel running?" | `Skill({ skill: 'channel-management' })` → status action → "Channel: RUNNING (pid 4821)" |
+| User Request                       | Agent Action                                                                                         |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| "what tasks are running?"          | `TaskList()` → bullet list of in_progress tasks with agent owners                                    |
+| "who owns task-7?"                 | `TaskGet({ taskId: 'task-7' })` → "task-7: code-reviewer (in_progress since 10:32)"                  |
+| "is the channel running?"          | `Skill({ skill: 'channel-management' })` → status action → "Channel: RUNNING (pid 4821)"             |
 | "what did the last commit change?" | `git log --oneline -1` + `git diff --stat HEAD~1` → "feat: add channel-responder — 3 files, +180/-0" |
-| "summarize active_context" | Read active_context.md → 3-bullet summary of current session focus |
-| "how many agents exist?" | Read agent-registry.json → "107 agents registered (last updated: 2026-03-24)" |
-| "can you fix this bug?" | "I'm read-only. Ask the Router in a Claude Code session: 'fix bug in X'" |
-| "what does the qa agent do?" | Read `.claude/agents/core/qa.md` → one-sentence summary of purpose |
+| "summarize active_context"         | Read active_context.md → 3-bullet summary of current session focus                                   |
+| "how many agents exist?"           | Read agent-registry.json → "107 agents registered (last updated: 2026-03-24)"                        |
+| "can you fix this bug?"            | "I'm read-only. Ask the Router in a Claude Code session: 'fix bug in X'"                             |
+| "what does the qa agent do?"       | Read `.claude/agents/core/qa.md` → one-sentence summary of purpose                                   |
 
 ## Output Locations
 

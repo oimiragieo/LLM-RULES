@@ -24,10 +24,7 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 // Paths
 // ---------------------------------------------------------------------------
 
-const TRACKER_FILE = path.resolve(
-  __dirname,
-  '../../context/runtime/terminal-pids.json'
-);
+const TRACKER_FILE = path.resolve(__dirname, '../../context/runtime/terminal-pids.json');
 
 const ORPHAN_AGE_MS = 2 * 60 * 60 * 1000; // 2 hours
 
@@ -74,7 +71,9 @@ function writeTracker(sessions) {
 
 /** Check whether a specific PID is alive (returns boolean). */
 function isPidAlive(pid) {
-  const out = runPS([`Get-Process -Id ${pid} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id`]);
+  const out = runPS([
+    `Get-Process -Id ${pid} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id`,
+  ]);
   return out.trim() === String(pid);
 }
 
@@ -217,7 +216,11 @@ if (require.main === module) {
     case 'kill-orphaned': {
       const { killed, completed } = killOrphaned();
       process.stdout.write(
-        JSON.stringify({ killed, completed, summary: `killed=${killed.length} completed=${completed.length}` }, null, 2) + '\n'
+        JSON.stringify(
+          { killed, completed, summary: `killed=${killed.length} completed=${completed.length}` },
+          null,
+          2
+        ) + '\n'
       );
       break;
     }
