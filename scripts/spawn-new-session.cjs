@@ -217,13 +217,13 @@ function main() {
   // an interactive TUI with that prompt pre-loaded as the initial message.
   const activeCtxPath = path.join(process.cwd(), '.claude/context/memory/active_context.md');
   let seedPrompt =
-    'Read .claude/context/memory/active_context.md and continue from the handoff. Execute the NEXT ACTION (IMMEDIATE) at the top.';
+    'auto dream. Read .claude/context/memory/active_context.md and continue from the handoff. Execute the NEXT ACTION (IMMEDIATE) at the top.';
   try {
     if (fs.existsSync(activeCtxPath)) {
       const ctx = fs.readFileSync(activeCtxPath, 'utf8');
       const nextActionMatch = ctx.match(/\*\*NEXT ACTION \(IMMEDIATE\):\*\*\s*(.+?)(?:\n|$)/);
       if (nextActionMatch) {
-        seedPrompt = `Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top. Process Step 0 reflections FIRST if reflection-reminder.txt exists, THEN execute the action. Here is the action: ${nextActionMatch[1].trim().slice(0, 500)}`;
+        seedPrompt = `auto dream. Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top. Process Step 0 reflections FIRST if reflection-reminder.txt exists, THEN execute the action. Here is the action: ${nextActionMatch[1].trim().slice(0, 500)}`;
       }
     }
   } catch {
