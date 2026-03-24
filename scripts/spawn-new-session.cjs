@@ -223,7 +223,7 @@ function main() {
       const ctx = fs.readFileSync(activeCtxPath, 'utf8');
       const nextActionMatch = ctx.match(/\*\*NEXT ACTION \(IMMEDIATE\):\*\*\s*(.+?)(?:\n|$)/);
       if (nextActionMatch) {
-        seedPrompt = `Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top. Skip reflections — go straight to implementation. Here is the action: ${nextActionMatch[1].trim().slice(0, 500)}`;
+        seedPrompt = `Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top. Process Step 0 reflections FIRST if reflection-reminder.txt exists, THEN execute the action. Here is the action: ${nextActionMatch[1].trim().slice(0, 500)}`;
       }
     }
   } catch {
