@@ -17,10 +17,10 @@ const { spawnSync } = require('child_process');
 const SKILL_MAIN = path.resolve(__dirname, '../../skills/channel-management/scripts/main.cjs');
 const action = process.argv[2] || 'status';
 
-const result = spawnSync(
-  process.execPath,
-  [SKILL_MAIN, action, '--json'],
-  { shell: false, encoding: 'utf8', stdio: 'inherit' }
-);
+const result = spawnSync(process.execPath, [SKILL_MAIN, action, '--json'], {
+  shell: false,
+  encoding: 'utf8',
+  stdio: 'inherit',
+});
 
 process.exit(result.status || 0);
