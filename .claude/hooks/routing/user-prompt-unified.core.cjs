@@ -1679,6 +1679,69 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     // best-effort; ignore
   }
 
+  // Stale Plan Detector (Step 0.3): Scan for plans with uncompleted tasks older than 3 days.
+  try {
+    const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+    const plansDir = path.join(PROJECT_ROOT, '.claude', 'context', 'plans');
+    const stalePlansReminderPath = path.join(runtimeDir, 'stale-plans-reminder.txt');
+    const threeDaysAgoMs = Date.now() - 3 * 24 * 60 * 60 * 1000;
+
+    if (!fs.existsSync(plansDir)) {
+      // No plans directory yet, remove reminder if it exists
+      if (fs.existsSync(stalePlansReminderPath)) {
+        fs.unlinkSync(stalePlansReminderPath);
+      }
+    } else {
+      const planFiles = fs
+        .readdirSync(plansDir, { withFileTypes: true })
+        .filter(dirent => dirent.isFile() && dirent.name.endsWith('.md'))
+        .map(dirent => dirent.name);
+
+      const stalePlans = [];
+
+      for (const fileName of planFiles) {
+        const filePath = path.join(plansDir, fileName);
+        const stats = fs.statSync(filePath);
+
+        // Check if file is older than 3 days
+        if (stats.mtimeMs < threeDaysAgoMs) {
+          const content = fs.readFileSync(filePath, 'utf8');
+          // Count uncompleted tasks: lines matching "- [ ]"
+          const uncompletedCount = (content.match(/^\s*-\s*\[\s*\]\s/gm) || []).length;
+
+          if (uncompletedCount > 0) {
+            const modifiedDate = new Date(stats.mtimeMs).toISOString().split('T')[0];
+            stalePlans.push({
+              fileName,
+              modifiedDate,
+              uncompletedCount,
+            });
+          }
+        }
+      }
+
+      if (stalePlans.length > 0) {
+        if (!fs.existsSync(runtimeDir)) {
+          fs.mkdirSync(runtimeDir, { recursive: true });
+        }
+        const reminderContent = [
+          `STEP 0.3: ${stalePlans.length} stale plan(s) with uncompleted tasks:`,
+          ...stalePlans.map(
+            plan =>
+              `- ${plan.fileName} (modified: ${plan.modifiedDate}, ${plan.uncompletedCount} uncompleted task${plan.uncompletedCount !== 1 ? 's' : ''})`
+          ),
+          '',
+        ].join('\n');
+        fs.writeFileSync(stalePlansReminderPath, reminderContent, 'utf8');
+      } else if (fs.existsSync(stalePlansReminderPath)) {
+        // No stale plans found, clean up reminder
+        fs.unlinkSync(stalePlansReminderPath);
+      }
+    }
+  } catch (_e) {
+    // best-effort; ignore
+  }
+
   // Pipeline Obligations Reminder: ccusage + self-review at every milestone.
   // IRON LAW: Router MUST run ccusage and self-review. Written on EVERY prompt.
   try {
