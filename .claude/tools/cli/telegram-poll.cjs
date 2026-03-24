@@ -200,19 +200,117 @@ function httpsGet(url) {
   });
 }
 
+// ── Wave 4: MarkdownV2 utilities ─────────────────────────────────────────────
+
+/**
+ * Escape all 18 special characters required by Telegram MarkdownV2.
+ * Must NOT be applied to the formatting markup itself (backticks, asterisks
+ * used as delimiters) — only to plain-text segments between markup.
+ *
+ * Special chars per Telegram docs: _ * [ ] ( ) ~ ` > # + - = | { } . ! \
+ *
+ * @param {string} text - Raw plain text to escape
+ * @returns {string} Escaped text safe for MarkdownV2
+ */
+function escapeMarkdownV2(text) {
+  if (typeof text !== 'string') return '';
+  // Backslash must be escaped first to avoid double-escaping
+  return text.replace(/[\\]/g, '\\\\').replace(/[_*[\]()~`>#+\-=|{}.!]/g, c => '\\' + c);
+}
+
+/**
+ * Convert a Claude response containing markdown code blocks into
+ * Telegram MarkdownV2 format.
+ *
+ * Strategy:
+ *   1. Split the text on triple-backtick fences.
+ *   2. Even-indexed segments are plain text → escape for MarkdownV2.
+ *   3. Odd-indexed segments are code block content → preserve as-is.
+ *
+ * @param {string} text - Claude response potentially containing ```lang\n...\n``` blocks
+ * @returns {string} MarkdownV2-formatted string
+ */
+function _formatClaudeResponse(text) {
+  if (typeof text !== 'string') return '';
+  // Split on triple-backtick boundaries (captures the delimiter via group)
+  const parts = text.split(/(```[\s\S]*?```)/g);
+  return parts
+    .map((part, i) => {
+      if (i % 2 === 0) {
+        // Plain-text segment — escape for MarkdownV2
+        return escapeMarkdownV2(part);
+      }
+      // Code block segment — pass through unchanged (Telegram renders ``` natively)
+      return part;
+    })
+    .join('');
+}
+
+/**
+ * Send a message to a Telegram chat.
+ * Returns the Telegram API response (including message_id on success).
+ */
 async function sendMessage(chatId, text, useMarkdown = false) {
   const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
   const safeText = text.slice(0, 4096);
   try {
     const body = { chat_id: chatId, text: safeText };
-    if (useMarkdown) body.parse_mode = 'Markdown';
+    if (useMarkdown) body.parse_mode = 'MarkdownV2';
     const result = await httpsPost(url, body);
     if (!result.ok && useMarkdown) {
-      // Markdown parse failed — retry as plain text
-      await httpsPost(url, { chat_id: chatId, text: safeText });
+      // MarkdownV2 parse failed — retry as plain text (fail-open)
+      return await httpsPost(url, { chat_id: chatId, text: safeText });
     }
+    return result;
   } catch (e) {
     process.stderr.write(`sendMessage error: ${e.message}\n`);
+    return { ok: false };
+  }
+}
+
+/**
+ * Edit an existing message in-place using Telegram's editMessageText endpoint.
+ * Falls back to sending a new message if edit fails (e.g., message too old).
+ *
+ * @param {number|string} chatId
+ * @param {number} messageId - The message_id returned by sendMessage
+ * @param {string} text      - New text content (max 4096 chars)
+ * @param {boolean} useMarkdown
+ * @returns {Promise<object>} Telegram API response
+ */
+async function editMessage(chatId, messageId, text, useMarkdown = false) {
+  const url = `https://api.telegram.org/bot${TOKEN}/editMessageText`;
+  const safeText = text.slice(0, 4096);
+  try {
+    const body = { chat_id: chatId, message_id: messageId, text: safeText };
+    if (useMarkdown) body.parse_mode = 'MarkdownV2';
+    const result = await httpsPost(url, body);
+    if (!result.ok) {
+      if (useMarkdown) {
+        // MarkdownV2 parse failed — retry plain text
+        const plainResult = await httpsPost(url, {
+          chat_id: chatId,
+          message_id: messageId,
+          text: safeText,
+        });
+        if (!plainResult.ok) {
+          // Edit failed entirely (e.g., message too old) — fall back to new message
+          return await sendMessage(chatId, safeText, false);
+        }
+        return plainResult;
+      }
+      // Edit failed (message too old, deleted, etc.) — send new message as fallback
+      return await sendMessage(chatId, safeText, false);
+    }
+    return result;
+  } catch (e) {
+    process.stderr.write(`editMessage error: ${e.message}\n`);
+    // Fallback to new message on error
+    try {
+      return await sendMessage(chatId, safeText, false);
+    } catch (_) {
+      return { ok: false };
+    }
   }
 }
 
@@ -223,12 +321,11 @@ async function sendMessageWithKeyboard(chatId, text, keyboard, useMarkdown = fal
     text: text.slice(0, 4096),
     reply_markup: JSON.stringify({ inline_keyboard: keyboard }),
   };
-  if (useMarkdown) body.parse_mode = 'Markdown';
+  if (useMarkdown) body.parse_mode = 'MarkdownV2';
   try {
     const result = await httpsPost(url, body);
     if (!result.ok && useMarkdown) {
-      // Markdown parse failed — retry as plain text without keyboard
-      body.parse_mode = undefined;
+      // MarkdownV2 parse failed — retry as plain text without keyboard
       delete body.parse_mode;
       await httpsPost(url, body);
     }
@@ -258,10 +355,21 @@ async function processOutbox() {
   for (const entry of entries) {
     const age = now - new Date(entry.createdAt).getTime();
     if (entry.text) {
-      await sendMessage(entry.chatId, entry.text);
+      // Wave 3: use editMessage to replace ACK message in-place when editMessageId is present
+      if (entry.editMessageId) {
+        await editMessage(entry.chatId, entry.editMessageId, entry.text);
+      } else {
+        await sendMessage(entry.chatId, entry.text);
+      }
       auditLog({ type: 'outbox_delivered', chatId: entry.chatId, agentTaskId: entry.agentTaskId });
     } else if (age > TIMEOUT_MS) {
-      await sendMessage(entry.chatId, '⏱ Agent task timed out after 5 minutes. Please try again.');
+      // Timeout: edit the ACK if possible, else send new message
+      const timeoutText = '⏱ Agent task timed out after 5 minutes. Please try again.';
+      if (entry.editMessageId) {
+        await editMessage(entry.chatId, entry.editMessageId, timeoutText);
+      } else {
+        await sendMessage(entry.chatId, timeoutText);
+      }
       auditLog({ type: 'outbox_timeout', chatId: entry.chatId, agentTaskId: entry.agentTaskId });
     } else {
       remaining.push(entry);
@@ -609,6 +717,10 @@ if (typeof module !== 'undefined' && module.exports) {
     sendMessageWithKeyboard,
     handleHelp,
     handleStatus,
+    // Wave 3: progress editing
+    editMessage,
+    sendMessage,
+    processOutbox,
   };
 }
 

@@ -77,16 +77,24 @@ function invokeClaude(bin, prompt, timeoutMs) {
  * JSON file once Claude exits. The polling loop's processOutbox() will pick
  * it up on the next tick and deliver it to the user.
  *
+ * Wave 3: Accepts optional editMessageId. When present, the outbox entry
+ * includes editMessageId so processOutbox() can edit the ACK in-place rather
+ * than sending a new message. Also runs a typing indicator loop every 4s.
+ *
  * On Windows, claude is an npm `.cmd` script that must be run via cmd.exe
  * with shell:false (prevents shell injection — security rule).
  * CLAUDECODE is unset to prevent the nested-session guard from blocking.
  *
- * @param {string} bin         - Full path or name of claude binary (from resolveClaude)
- * @param {string} prompt      - Prompt text to send
+ * @param {string} bin           - Full path or name of claude binary (from resolveClaude)
+ * @param {string} prompt        - Prompt text to send
  * @param {number|string} chatId - Telegram chat ID (for outbox entry)
- * @param {string} outboxPath  - Absolute path to telegram-outbox.json
+ * @param {string} outboxPath    - Absolute path to telegram-outbox.json
+ * @param {object} [opts]        - Optional config
+ * @param {number} [opts.editMessageId]  - message_id of the ACK to edit in-place
+ * @param {string} [opts.token]          - Telegram bot token (for typing indicator)
+ * @param {Function} [opts.httpsPost]    - httpsPost function (for typing indicator)
  */
-function invokeClaudeAsync(bin, prompt, chatId, outboxPath) {
+function invokeClaudeAsync(bin, prompt, chatId, outboxPath, opts) {
   const fs = require('fs');
   const isWin = process.platform === 'win32';
   const exe = isWin ? 'cmd.exe' : bin;
@@ -100,6 +108,20 @@ function invokeClaudeAsync(bin, prompt, chatId, outboxPath) {
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: false,
   });
+
+  // Wave 3: typing indicator loop — fire every 4s while Claude is working
+  const editMessageId = opts && opts.editMessageId ? opts.editMessageId : null;
+  const token = opts && opts.token ? opts.token : null;
+  const httpsPost = opts && opts.httpsPost ? opts.httpsPost : null;
+  let typingInterval = null;
+  if (token && httpsPost) {
+    typingInterval = setInterval(() => {
+      httpsPost(`https://api.telegram.org/bot${token}/sendChatAction`, {
+        chat_id: chatId,
+        action: 'typing',
+      }).catch(() => {});
+    }, 4000);
+  }
 
   let stdout = '';
   let stderr = '';
@@ -117,6 +139,7 @@ function invokeClaudeAsync(bin, prompt, chatId, outboxPath) {
 
   child.on('close', code => {
     clearTimeout(timer);
+    if (typingInterval) clearInterval(typingInterval);
     const response = stdout.trim() || `(Claude exited ${code}: ${stderr.slice(0, 200)})`;
     // Append to outbox atomically so next poll tick delivers the response
     const outbox = [];
@@ -127,7 +150,10 @@ function invokeClaudeAsync(bin, prompt, chatId, outboxPath) {
     } catch (_) {
       // outbox may not exist yet — that is fine
     }
-    outbox.push({ chatId, text: response, createdAt: new Date().toISOString() });
+    const entry = { chatId, text: response, createdAt: new Date().toISOString() };
+    // Wave 3: include editMessageId so processOutbox() edits in-place
+    if (editMessageId) entry.editMessageId = editMessageId;
+    outbox.push(entry);
     const tmp = outboxPath + '.tmp.' + process.pid;
     // Ensure the directory exists before writing
     const path = require('path');
@@ -139,6 +165,7 @@ function invokeClaudeAsync(bin, prompt, chatId, outboxPath) {
 
   child.on('error', err => {
     clearTimeout(timer);
+    if (typingInterval) clearInterval(typingInterval);
     process.stderr.write(`invokeClaudeAsync spawn error: ${err.message}\n`);
     // Write error to outbox so the user is not left waiting forever
     try {
@@ -151,11 +178,13 @@ function invokeClaudeAsync(bin, prompt, chatId, outboxPath) {
       } catch (readErr) {
         process.stderr.write(`invokeClaudeAsync outbox read error: ${readErr.message}\n`);
       }
-      outbox.push({
+      const errorEntry = {
         chatId,
         text: `(Error starting Claude: ${err.message.slice(0, 200)})`,
         createdAt: new Date().toISOString(),
-      });
+      };
+      if (editMessageId) errorEntry.editMessageId = editMessageId;
+      outbox.push(errorEntry);
       const tmp = outboxPath + '.tmp.' + process.pid;
       fs2.writeFileSync(tmp, JSON.stringify(outbox, null, 2));
       fs2.renameSync(tmp, outboxPath);
@@ -184,13 +213,16 @@ function sendTyping(token, chatId, httpsPost) {
  * invokeClaudeAsync and returns immediately. Claude's response is written
  * to the outbox file; processOutbox() delivers it on the next poll tick.
  *
+ * Wave 3: Sends "Processing..." ACK, captures message_id, and passes it to
+ * invokeClaudeAsync so processOutbox() can edit the ACK in-place rather than
+ * sending a second message. Also starts a typing indicator loop while Claude runs.
+ *
  * @param {{ bin: string, token: string, httpsPost: Function, sendMessage: Function, auditLog: Function, outboxPath: string }} ctx
  * @param {number|string} chatId
  * @param {string} text  - User's message text
  */
 async function handleAsk(ctx, chatId, text) {
   const { bin, token, httpsPost, sendMessage, auditLog, outboxPath } = ctx;
-  sendTyping(token, chatId, httpsPost);
 
   const path = require('path');
   // Resolve outbox path: use ctx.outboxPath if provided, else derive from __dirname
@@ -204,11 +236,29 @@ async function handleAsk(ctx, chatId, text) {
       'telegram-outbox.json'
     );
 
-  // Fire and forget — response delivered via outbox on next poll tick
-  invokeClaudeAsync(bin, text, chatId, resolvedOutboxPath);
+  // Wave 3: send ACK and capture message_id for in-place editing
+  let editMessageId = null;
+  try {
+    const ackResult = await sendMessage(
+      chatId,
+      "\u23f3 Processing your request\u2026 I'll reply when ready."
+    );
+    // Telegram returns { ok: true, result: { message_id: N, ... } }
+    if (ackResult && ackResult.ok && ackResult.result && ackResult.result.message_id) {
+      editMessageId = ackResult.result.message_id;
+    }
+  } catch (_) {
+    // sendMessage failure is non-fatal — proceed without edit capability
+  }
 
-  await sendMessage(chatId, "\u23f3 Processing your request... I'll reply when ready.");
-  auditLog({ type: 'ask_queued', chatId, promptLength: text.length });
+  // Fire Claude async — typing indicator runs inside invokeClaudeAsync every 4s
+  invokeClaudeAsync(bin, text, chatId, resolvedOutboxPath, {
+    editMessageId,
+    token,
+    httpsPost,
+  });
+
+  auditLog({ type: 'ask_queued', chatId, promptLength: text.length, editMessageId });
 }
 
 module.exports = { resolveClaude, invokeClaude, invokeClaudeAsync, sendTyping, handleAsk };
