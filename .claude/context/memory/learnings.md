@@ -1000,3 +1000,10 @@ The hook chain (currently 6 consolidated hooks) must stay bounded. Each new hook
 - Updated workflow: evolution-workflow (2026-03-24)
 
 - Updated workflow: missing-workflow-xyz (2026-03-24)
+
+### [MIGRATION] Telegram: Custom → Native Channels (2026-03-24)
+**Context**: Claude Code v2.1.80+ introduced native Channels — MCP plugins that push events into running sessions. Official Telegram and Discord plugins replace our custom telegram-poll.cjs polling approach.
+**Migration**: Primary = native `plugin:telegram@claude-plugins-official` via `--channels` flag. Backup = custom telegram-poll.cjs + telegram-notify.cjs + telegram-claude-bridge.cjs.
+**Advantages of native**: Two-way chat bridge, permission relay (approve tool use from phone), no polling overhead, official security model with pairing + allowlists.
+**When to use custom**: When channels are unavailable (older Claude Code versions, API-key auth, no Bun installed).
+**Setup**: `/plugin install telegram@claude-plugins-official` → `/telegram:configure <token>` → restart with `claude --channels plugin:telegram@claude-plugins-official` → pair via `/telegram:access pair <code>`.

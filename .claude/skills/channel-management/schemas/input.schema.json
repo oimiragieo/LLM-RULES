@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "ChannelManagement Input",
+  "description": "Validated inputs for channel-management skill execution",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["start", "stop", "status", "health"],
+      "description": "Lifecycle action to perform on the Claude Code --channels session"
+    },
+    "force": {
+      "type": "boolean",
+      "description": "If true, force restart even when session appears running (stop then start)",
+      "default": false
+    },
+    "pruneOrphans": {
+      "type": "boolean",
+      "description": "If true, call killOrphaned() before the action to clean up stale PID entries",
+      "default": true
+    }
+  },
+  "additionalProperties": false
+}

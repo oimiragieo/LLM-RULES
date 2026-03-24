@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "ChannelManagement Output",
+  "description": "Structured output from channel-management skill execution",
+  "type": "object",
+  "required": ["ok", "action", "health"],
+  "properties": {
+    "ok": {
+      "type": "boolean",
+      "description": "True if the action completed without error"
+    },
+    "action": {
+      "type": "string",
+      "enum": ["start", "stop", "status", "health"],
+      "description": "The action that was executed"
+    },
+    "running": {
+      "type": "boolean",
+      "description": "Whether the channel session is currently running"
+    },
+    "pid": {
+      "type": ["integer", "null"],
+      "description": "PID of the running channel session, or null if not running"
+    },
+    "health": {
+      "type": "string",
+      "enum": ["OK", "DEGRADED", "NOT_RUNNING", "STOPPED", "SKIPPED"],
+      "description": "Health status of the channel session after the action"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Human-readable explanation of the result (e.g. 'already-running', 'started', 'TELEGRAM_BOT_TOKEN not set')"
+    },
+    "trackerEntry": {
+      "type": ["object", "null"],
+      "description": "The matching entry from terminal-pids.json for this session, or null"
+    },
+    "sessions": {
+      "type": "array",
+      "description": "All tracked channel sessions (populated for status action)",
+      "items": {
+        "type": "object"
+      }
+    },
+    "checkedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the health check was performed"
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if ok is false"
+    }
+  },
+  "additionalProperties": false
+}

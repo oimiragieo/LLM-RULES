@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Channel management system**: `channel-manager.cjs`, `terminal-tracker.cjs`, `telegram-notify.cjs` — modular channel lifecycle and notification infrastructure
+- **Native Telegram channels integration**: `plugin:telegram` support for Claude Code v2.1.80+ via `--channels` flag
+- **Stale-plan detector** in Step 0.3 preflight (`user-prompt-unified.core.cjs`): flags plans older than the current session to prevent executing against outdated context
+- **Worktree cleanup obligation #4** in `pipeline-obligations-reminder`: explicit reminder to prune orphaned worktrees at pipeline end
+- **Terminal process tracker** (`terminal-tracker.cjs`): detects and reports orphaned terminal processes after a 2-hour inactivity threshold
+
+### Fixed
+
+- `safeParseJSON` migration in `post-pipeline-self-review.cjs` and `post-pipeline-token-report.cjs`: replaced raw `JSON.parse` with safe wrapper to prevent hook crashes on malformed input
+- **TDD skill v1.4.0**: added PBT Step 5.5 (property-based testing gate), mutation testing gate, and CJS LSP warning note
+- Cleaned 40+ orphaned worktrees accumulated over 9 days
+
+### Changed
+
+- **`CHANNEL_PERMISSIONS`**: removed `--dangerously-skip-permissions` as a default flag following security review; use `PermissionRequest` hooks for selective auto-approval instead
+- **Agent registry regenerated**: now reflects 109 agents
+
 - **DLP PreToolUse hook** (`dlp-pretool.cjs`): Scans tool args recursively for secrets (AWS keys, GitHub tokens, OpenAI keys, Stripe keys, private keys, JWTs, connection string passwords) before execution. Blocks or warns based on `DLP_PRETOOL_ENFORCEMENT` env var. Inspired by node9-proxy DLP scanner patterns
 - **Secret redaction utility** (`redact-secrets.cjs`): 11-pattern deep redaction for text and nested objects. Used by hook-trace logger to prevent secrets from appearing in any log file
 - **Hook trace logger** (`hook-trace.cjs`): Structured NDJSON logger with `checkedBy` field support. Every hook decision now records WHICH specific check/rule fired, enabling "which rules fire most?" analytics. Writes to `.claude/context/runtime/hook-trace.jsonl` with automatic rotation at 5000 lines

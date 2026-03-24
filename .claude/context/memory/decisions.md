@@ -81,6 +81,26 @@
 
 ---
 
+## ADR: Channel System Architecture (2026-03-24)
+
+**Status:** Accepted
+**Date:** 2026-03-24
+**Source:** Channel system implementation session
+
+**Decisions:**
+
+1. **Native channels (`plugin:telegram`) is primary for Telegram integration** — use the Claude Code v2.1.80+ `--channels` flag with `plugin:telegram` as the preferred path. Produces cleaner session separation and avoids polling overhead.
+
+2. **Custom `telegram-poll.cjs` retained as backup** — kept for environments where `--channels` support is unavailable or the native plugin cannot authenticate. Not to be used when native support is confirmed working.
+
+3. **Channel session must be READ-ONLY** — channel sessions must not be granted `Write` or `Edit` tool access. Granting write access risks repo conflicts and unintended file mutations from notification traffic.
+
+4. **`heartbeat-orchestrator` owns channel lifecycle management** — channel start, stop, and health monitoring are delegated to the heartbeat-orchestrator cron loop. No other agent should directly manage channel process state.
+
+5. **`--dangerously-skip-permissions` REJECTED as default** — removed from `CHANNEL_PERMISSIONS` default after security review. Auto-approval for specific tool categories must be implemented via `PermissionRequest` hooks with explicit allowlists, not a blanket permission bypass.
+
+---
+
 ## ADR-2026-03-20-071: Infrastructure-First Over Workarounds for Template System (2026-03-20)
 
 **Status:** Accepted (Multi-LLM consensus)
