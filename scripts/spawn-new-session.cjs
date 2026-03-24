@@ -216,19 +216,43 @@ function main() {
   // The seed prompt is passed as a positional argument to `claude`, which opens
   // an interactive TUI with that prompt pre-loaded as the initial message.
   const activeCtxPath = path.join(process.cwd(), '.claude/context/memory/active_context.md');
-  let seedPrompt =
-    'auto dream. Read .claude/context/memory/active_context.md and continue from the handoff. Execute the NEXT ACTION (IMMEDIATE) at the top.';
+
+  // Build the seed prompt from parts — this is the LAST LINE OF DEFENSE when hooks fail.
+  // Every recurring violation that slips past hooks should have a reminder here.
+  const promptParts = [
+    // Phase 0: Memory consolidation
+    'auto dream.',
+
+    // Phase 1: Reflection processing (BEFORE any work)
+    'Process Step 0 reflections FIRST if .claude/context/runtime/reflection-reminder.txt exists.',
+
+    // Phase 2: Read handoff context
+    'Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top.',
+
+    // Iron Laws — backstop reminders for rules that keep getting violated:
+    'IRON LAWS: (1) NEVER use Edit/Write on .claude/skills/ .claude/agents/ .claude/hooks/ — use creator skills.',
+    '(2) Run ccusage at EVERY milestone end — never skip.',
+    '(3) TaskList + close ALL tasks before claiming done.',
+    '(4) Commit + push all changes before session end.',
+    '(5) Self-review findings go to reflection-spawn-request.json — never just chat.',
+    '(6) Do NOT spawn worktree agents for <10 line edits — do them directly.',
+    '(7) NEVER use mcp__filesystem tools — they bypass hook enforcement.',
+  ];
+
+  // Phase 3: Inject the specific NEXT ACTION if found
   try {
     if (fs.existsSync(activeCtxPath)) {
       const ctx = fs.readFileSync(activeCtxPath, 'utf8');
       const nextActionMatch = ctx.match(/\*\*NEXT ACTION \(IMMEDIATE\):\*\*\s*(.+?)(?:\n|$)/);
       if (nextActionMatch) {
-        seedPrompt = `auto dream. Read .claude/context/memory/active_context.md and execute the NEXT ACTION (IMMEDIATE) at the top. Process Step 0 reflections FIRST if reflection-reminder.txt exists, THEN execute the action. Here is the action: ${nextActionMatch[1].trim().slice(0, 500)}`;
+        promptParts.push(`Here is the action: ${nextActionMatch[1].trim().slice(0, 400)}`);
       }
     }
   } catch {
     // Fall back to generic continue prompt
   }
+
+  const seedPrompt = promptParts.join(' ');
   // Escape double quotes for shell embedding
   const escapedPrompt = seedPrompt.replace(/"/g, '\\"');
   if (process.platform === 'win32') {
