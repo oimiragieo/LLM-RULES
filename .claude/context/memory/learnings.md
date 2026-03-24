@@ -1002,8 +1002,25 @@ The hook chain (currently 6 consolidated hooks) must stay bounded. Each new hook
 - Updated workflow: missing-workflow-xyz (2026-03-24)
 
 ### [MIGRATION] Telegram: Custom → Native Channels (2026-03-24)
+
 **Context**: Claude Code v2.1.80+ introduced native Channels — MCP plugins that push events into running sessions. Official Telegram and Discord plugins replace our custom telegram-poll.cjs polling approach.
 **Migration**: Primary = native `plugin:telegram@claude-plugins-official` via `--channels` flag. Backup = custom telegram-poll.cjs + telegram-notify.cjs + telegram-claude-bridge.cjs.
 **Advantages of native**: Two-way chat bridge, permission relay (approve tool use from phone), no polling overhead, official security model with pairing + allowlists.
 **When to use custom**: When channels are unavailable (older Claude Code versions, API-key auth, no Bun installed).
 **Setup**: `/plugin install telegram@claude-plugins-official` → `/telegram:configure <token>` → restart with `claude --channels plugin:telegram@claude-plugins-official` → pair via `/telegram:access pair <code>`.
+
+## 2026-03-24: omega-cli multiline prompt delivery fails on Windows (cmd.exe arg truncation)
+
+**Context:** Running multi-model consultation via omega-claude-cli and omega-codex-cli on Windows.
+
+**Issue:** Both `ask-claude.mjs` and `ask-codex.mjs` pass the prompt as a CLI argument via `cmd.exe /d /s /c TOOL -p "PROMPT"`. When the prompt contains newlines (multi-paragraph text), cmd.exe truncates after the first newline. The model receives only the first paragraph, not the full prompt.
+
+**Symptom:** Model responds "I see the context but where are the questions?" — only the context preamble arrived, not the Q&A section.
+
+**Root cause:** `buildClaudeArgs()` / `buildCodexArgs()` embed the entire prompt text as a single string argument. On Windows, `cmd.exe` processes embedded newlines in quoted arguments differently from Unix shells.
+
+**Workaround:** For multi-line prompts on Windows, write prompt to a temp file and pass the path, OR restructure the prompt as a single line (no embedded newlines).
+
+**Fix needed:** Both omega-cli wrappers should detect multi-line prompts and write them to a temp file, then pass `--file path` (if supported) or use stdin redirection via a pipe wrapper that doesn't go through cmd.exe argument expansion.
+
+**Also:** Claude CLI when invoked from within the agent-studio directory loads CLAUDE.md and behaves as the Router, not as a general assistant. Run from a neutral directory (e.g., /tmp) when using as a consultant.
