@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Session handoff blank window**: replaced broken two-phase `claude -p "seed" && claude -c` spawn with single interactive `claude "prompt"` — the old approach used print mode which produced a blank terminal window every time. Now spawns a fully interactive TUI with the handoff prompt pre-loaded
 - `safeParseJSON` migration in `post-pipeline-self-review.cjs` and `post-pipeline-token-report.cjs`: replaced raw `JSON.parse` with safe wrapper to prevent hook crashes on malformed input
 - **TDD skill v1.4.0**: added PBT Step 5.5 (property-based testing gate), mutation testing gate, and CJS LSP warning note
 - Cleaned 40+ orphaned worktrees accumulated over 9 days

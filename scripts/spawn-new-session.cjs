@@ -195,30 +195,28 @@ function main() {
     console.log(`[spawn-new-session] Session ${sessionId} entered DRAIN mode.`);
   }
 
-  // 4. Spawn the new terminal — two-phase auto-start:
-  //   Phase A (seed): claude -p continue  — NO -d flag so output shows in the WT window.
-  //     -d redirects stdout to a debug log file, making the window appear blank.
-  //     The UserPromptSubmit hook fires on the -p prompt, claims the baton, and
-  //     injects the full handover context. Claude processes it and responds.
-  //   Phase B (interactive): claude -c  — resumes the same session WITHOUT -d so the
-  //     TUI renders visibly in the new window. -d redirects stdout to a debug file,
-  //     making the window appear blank just like the seed phase.
+  // 4. Spawn the new terminal with a single interactive claude session.
+  //
+  // Previous approach used two-phase: `claude -p "seed" && claude -c`
+  // This NEVER worked — `-p` (print mode) is non-interactive, produces output
+  // that may not render in the new terminal, and if it fails the `&&` chain
+  // prevents `claude -c` from running → blank black window.
+  //
+  // Fix: spawn a single interactive session directly. The new session reads
+  // active_context.md on first user prompt (type "continue").
+  //
   // We unset CLAUDECODE so the child process doesn't see a nested-session error.
-  // Strip -d from BOTH phases: -d redirects output to debug file → blank WT window.
-  const seedFlags = claudeFlags.replace(/\s*-d\b/g, '').trim();
-  const interactiveFlags = seedFlags; // same: no -d so TUI is visible
+  // Strip -d flag: -d redirects output to debug file → blank window.
+  const interactiveFlags = claudeFlags.replace(/\s*-d\b/g, '').trim();
   let cleanCommand;
   // CLAUDE_FRESH_SPAWN=1 tells handover-detector that this window was spawned by a
   // handoff. The detector uses it to safely clear the inherited session-id.json
-  // (which belongs to the old session) without a race condition — the old session
-  // never has this env var set, so it cannot mistakenly re-claim the handover log.
+  // (which belongs to the old session) without a race condition.
   //
-  // CRITICAL FIX (2026-03-18): Instead of `-p continue` (too vague — new session
-  // sat idle 10min processing reflections), extract the NEXT ACTION from
-  // active_context.md and pass it as an explicit seed prompt. This ensures the
-  // new session starts working immediately instead of burning context on pre-flight.
+  // The seed prompt is passed as a positional argument to `claude`, which opens
+  // an interactive TUI with that prompt pre-loaded as the initial message.
   const activeCtxPath = path.join(process.cwd(), '.claude/context/memory/active_context.md');
-  let seedPrompt = 'continue';
+  let seedPrompt = 'Read .claude/context/memory/active_context.md and continue from the handoff. Execute the NEXT ACTION (IMMEDIATE) at the top.';
   try {
     if (fs.existsSync(activeCtxPath)) {
       const ctx = fs.readFileSync(activeCtxPath, 'utf8');
@@ -228,14 +226,14 @@ function main() {
       }
     }
   } catch {
-    // Fall back to 'continue' if active_context.md can't be read
+    // Fall back to generic continue prompt
   }
   // Escape double quotes for shell embedding
   const escapedPrompt = seedPrompt.replace(/"/g, '\\"');
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p "${escapedPrompt}" && claude ${interactiveFlags} -c`;
+    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags} "${escapedPrompt}"`;
   } else {
-    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p "${escapedPrompt}" && claude ${interactiveFlags} -c`;
+    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags} "${escapedPrompt}"`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
