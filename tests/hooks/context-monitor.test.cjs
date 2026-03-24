@@ -37,13 +37,13 @@ describe('context-monitor hook', () => {
     );
   });
 
-  test('hook implements debounce logic', () => {
+  test('hook implements threshold-based warning logic', () => {
     const content = fs.readFileSync(HOOK_PATH, 'utf8');
     assert.ok(
-      content.includes('debounce') ||
-        content.includes('DEBOUNCE') ||
-        content.includes('lastWarning'),
-      'Hook should implement debounce'
+      content.includes('WARNING_THRESHOLD') ||
+        content.includes('CRITICAL_THRESHOLD') ||
+        content.includes('remainingPercent'),
+      'Hook should implement threshold-based monitoring'
     );
   });
 

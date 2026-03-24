@@ -216,7 +216,8 @@ function main() {
   // The seed prompt is passed as a positional argument to `claude`, which opens
   // an interactive TUI with that prompt pre-loaded as the initial message.
   const activeCtxPath = path.join(process.cwd(), '.claude/context/memory/active_context.md');
-  let seedPrompt = 'Read .claude/context/memory/active_context.md and continue from the handoff. Execute the NEXT ACTION (IMMEDIATE) at the top.';
+  let seedPrompt =
+    'Read .claude/context/memory/active_context.md and continue from the handoff. Execute the NEXT ACTION (IMMEDIATE) at the top.';
   try {
     if (fs.existsSync(activeCtxPath)) {
       const ctx = fs.readFileSync(activeCtxPath, 'utf8');

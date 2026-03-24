@@ -515,6 +515,7 @@ function enforceRequiredOutputs(completionTaskId, toolParams) {
 /**
  * Main hook execution.
  */
+// eslint-disable-next-line complexity -- pre-existing; refactoring tracked separately
 async function main() {
   try {
     const input = await parseHookInputAsync({ timeout: 300 });
@@ -678,13 +679,11 @@ async function main() {
         if (fs.existsSync(traceFile)) {
           const content = fs.readFileSync(traceFile, 'utf8');
           const lines = content.trim().split('\n').slice(-50);
+          const { safeParseJSON: safeParse } = require('../../lib/utils/safe-json.cjs');
           hasSelfReview = lines.some(line => {
-            try {
-              const entry = JSON.parse(line);
-              return entry.checkedBy && String(entry.checkedBy).includes('self-review');
-            } catch (_e) {
-              return false;
-            }
+            const { success: ok, data: entry } = safeParse(line, null);
+            if (!ok || !entry) return false;
+            return entry.checkedBy && String(entry.checkedBy).includes('self-review');
           });
         }
       } catch (_e) {

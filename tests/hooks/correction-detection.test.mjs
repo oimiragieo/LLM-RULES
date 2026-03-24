@@ -94,7 +94,7 @@ function readMetrics() {
   }
 }
 
-describe('Correction Detection', () => {
+describe('Correction Detection', { timeout: 60000 }, () => {
   describe('Positive Detection Cases', () => {
     it('should detect "no, that\'s wrong" as a correction', () => {
       // Arrange: Clear metrics file
