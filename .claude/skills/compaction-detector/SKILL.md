@@ -103,6 +103,7 @@ grep '"input_tokens"' "$SESSION_LOG" \
 ```
 
 **Expected output:**
+
 ```
 COMPACTION at line 47: 98234 -> 8102 tokens (8.2% retained)
 COMPACTION at line 203: 112450 -> 9341 tokens (8.3% retained)
@@ -124,6 +125,7 @@ sed -n "${COMPACTION_LINE}p" "$SESSION_LOG" \
 ```
 
 **Alternative with jq:**
+
 ```bash
 sed -n "${COMPACTION_LINE}p" "$SESSION_LOG" | jq -r '.timestamp // "unknown"'
 ```
@@ -133,10 +135,11 @@ sed -n "${COMPACTION_LINE}p" "$SESSION_LOG" | jq -r '.timestamp // "unknown"'
 ### Step 5: Compute Token Delta Per Compaction Event
 
 For each compaction boundary, calculate:
+
 - `tokens_before`: input_tokens on the line immediately before the drop
 - `tokens_after`: input_tokens on the compaction line
 - `delta`: tokens_before - tokens_after
-- `retention_pct`: (tokens_after / tokens_before) * 100
+- `retention_pct`: (tokens_after / tokens_before) \* 100
 
 **Full pipeline — produces structured TSV:**
 
@@ -162,6 +165,7 @@ paste \
 ```
 
 **Expected output:**
+
 ```
 BOUNDARY_LINE  COMPACTION_LINE  TOKENS_BEFORE  TOKENS_AFTER  RETENTION_PCT
 46             47               98234          8102          8.2
@@ -226,6 +230,7 @@ PYEOF
 ```
 
 **Expected output (stdout + file):**
+
 ```json
 {
   "session_log": "/home/user/.claude/projects/abc123/logs/session.jsonl",
@@ -293,6 +298,7 @@ Skill({ skill: 'compaction-detector' })
 node .claude/skills/compaction-detector/scripts/main.cjs --log "$SESSION_LOG" \
   | jq '{count: .compaction_count, events: [.events[] | {ts: .timestamp, delta: .delta}]}'
 ```
+
 </usage_example>
 </examples>
 
@@ -313,6 +319,7 @@ cat .claude/context/memory/decisions.md
 \`\`\`
 
 **After completing:**
+
 - New pattern -> \`.claude/context/memory/learnings.md\`
 - Issue found -> \`.claude/context/memory/issues.md\`
 - Decision made -> \`.claude/context/memory/decisions.md\`

@@ -838,3 +838,103 @@
 - [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-24T01:04:38.093Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-24T01:04:38.146Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-24T01:07:02.207Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-24T01:07:02.294Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-24T01:07:02.344Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "design the system" suggests specialist "architect". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.149Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "break down this" suggests specialist "planner". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.228Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "user stories" suggests specialist "pm". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.350Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "review the pr" suggests specialist "code-reviewer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.445Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.509Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "security audit" suggests specialist "security-architect". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.530Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "deploy to production" suggests specialist "devops". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.550Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "database schema" suggests specialist "database-architect". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.592Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "troubleshoot the" suggests specialist "devops-troubleshooter". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.667Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "production incident" suggests specialist "incident-responder". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.734Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "api documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.791Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "ux review" suggests specialist "mobile-ux-reviewer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.826Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.844Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "research" suggests specialist "researcher". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:42.951Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "reverse engineer" suggests specialist "reverse-engineer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.074Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "c4 context diagram" suggests specialist "c4-context". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.094Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "c4 container diagram" suggests specialist "c4-container". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.118Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "c4 component diagram" suggests specialist "c4-component". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.152Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "c4 code documentation" suggests specialist "c4-code". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.201Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "data pipeline" suggests specialist "data-engineer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.297Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "train the" suggests specialist "ai-ml-specialist". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.349Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "smart contract" suggests specialist "web3-blockchain-expert". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.383Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "genomic analysis" suggests specialist "scientific-research-expert". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.403Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "game physics" suggests specialist "gamedev-pro". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.486Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.600Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:43.646Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:44.438Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "simplify the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:44.549Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "review code" suggests specialist "code-reviewer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:44.627Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:44.682Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "set up docker" suggests specialist "devops". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:44.764Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "database schema" suggests specialist "database-architect". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:44.817Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "research" suggests specialist "researcher". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:44.836Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:44.862Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "data pipeline" suggests specialist "data-engineer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:45.022Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-24T01:09:45.120Z
+
+## 2026-03-24: Hook Wiring Drift — Unregistered and Ghost Hooks (P1)
+
+**Source:** Codex live inspection during M3.4 multi-model council
+
+**Issue 1:** `research-enforcement.cjs` is a fully implemented CLI hook (with `main()` and `require.main` guard) but has NO registration in `settings.json`. This hook NEVER fires. Any security policy it enforces is silently unenforced.
+
+**Issue 2:** `force-step0-execution.cjs` is a ghost — the `settings.json` registration points to `reflection-step0-guard.cjs` (not this file). Dead code.
+
+**Fix:** Add a test that asserts every `.cjs` in `.claude/hooks/` either:
+(a) has a `settings.json` entry, OR
+(b) is explicitly listed in a `hooks/LIBRARY_MODULES` allowlist
+
+**Priority:** P1 — Unregistered security hooks provide zero protection
+
+## 2026-03-24: Test Suite Fallback to Nonexistent Matrix Path (P2)
+
+**Source:** Codex live inspection, M3.4
+
+`tests/agents/agent-search-tool-compliance.test.cjs` (line 8) falls back to `.claude/config/agent-skill-matrix.json` which does not exist. Tests that silently skip are worse than failing tests.
+
+**Fix:** Extract canonical search-policy module; remove all fallback-path logic from test files.

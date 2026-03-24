@@ -7,6 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 let input = '';
 process.stdin.on('data', chunk => {
@@ -14,7 +15,10 @@ process.stdin.on('data', chunk => {
 });
 process.stdin.on('end', () => {
   try {
-    const data = JSON.parse(input);
+    const { success: parseSuccess, data } = safeParseJSON(input, {});
+    if (!parseSuccess) {
+      process.exit(0);
+    }
 
     // Only fire on TaskUpdate completions
     const toolName = data?.tool_name || data?.tool || '';

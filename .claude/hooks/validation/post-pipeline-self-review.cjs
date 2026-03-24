@@ -4,6 +4,7 @@
 // PostToolUse hook: Auto-trigger milestone self-review when pipeline drains
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 let input = '';
 process.stdin.on('data', chunk => {
@@ -11,7 +12,10 @@ process.stdin.on('data', chunk => {
 });
 process.stdin.on('end', () => {
   try {
-    const data = JSON.parse(input);
+    const { success: parseSuccess, data } = safeParseJSON(input, {});
+    if (!parseSuccess) {
+      process.exit(0);
+    }
 
     const toolName = data?.tool_name || data?.tool || '';
     if (!toolName.includes('TaskUpdate')) {
@@ -62,8 +66,8 @@ process.stdin.on('end', () => {
     let requests = [];
     try {
       const content = fs.readFileSync(spawnFile, 'utf-8');
-      requests = JSON.parse(content);
-      if (!Array.isArray(requests)) requests = [];
+      const { success: parseSuccess, data: parsedData } = safeParseJSON(content, []);
+      requests = parseSuccess && Array.isArray(parsedData) ? parsedData : [];
     } catch {
       requests = [];
     }

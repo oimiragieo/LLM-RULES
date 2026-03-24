@@ -1,17 +1,16 @@
 ---
-name: "claude-md-auditor"
+name: 'claude-md-auditor'
 version: 1.0.0
-description: "Systematically audit CLAUDE.md files, rules, and reference docs against actual codebase state. Detects stale file paths, missing entries, incorrect claims, and count mismatches. Uses parallel Glob/Read for verification."
-model: "sonnet"
-temperature: "0.3"
+description: 'Systematically audit CLAUDE.md files, rules, and reference docs against actual codebase state. Detects stale file paths, missing entries, incorrect claims, and count mismatches. Uses parallel Glob/Read for verification.'
+model: 'sonnet'
+temperature: '0.3'
 context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
 priority: high
 verified: true
-lastVerifiedAt: "2026-03-23T23:31:59.902Z"
-tools:
-  [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+lastVerifiedAt: '2026-03-23T23:31:59.902Z'
+tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills: |
   - task-management-protocol
   - ripgrep
@@ -96,6 +95,7 @@ For every path referenced in the target doc(s):
 ### Phase 4: Cross-Reference Consistency
 
 Check that the same agent/skill/hook name appears consistently across:
+
 - `.claude/CLAUDE.md`
 - `.claude/docs/@AGENT_ROUTING_TABLE.md`
 - `.claude/context/agent-registry.json`
@@ -153,40 +153,40 @@ Call `TaskUpdate({ status: 'completed', metadata: { summary, filesModified, find
 
 ## Summary
 
-| Category       | Claimed | Actual | Delta | Status |
-|----------------|---------|--------|-------|--------|
-| Agents         | N       | N      | 0     | OK / FAIL |
-| Skills         | N       | N      | 0     | OK / FAIL |
-| Hooks          | N       | N      | 0     | OK / FAIL |
-| Schemas        | N       | N      | 0     | OK / FAIL |
+| Category | Claimed | Actual | Delta | Status    |
+| -------- | ------- | ------ | ----- | --------- |
+| Agents   | N       | N      | 0     | OK / FAIL |
+| Skills   | N       | N      | 0     | OK / FAIL |
+| Hooks    | N       | N      | 0     | OK / FAIL |
+| Schemas  | N       | N      | 0     | OK / FAIL |
 
-**Total findings:** N  (P0: N, P1: N, P2: N, P3: N)
+**Total findings:** N (P0: N, P1: N, P2: N, P3: N)
 
 ## Findings
 
 ### [P0] Critical — Blocks agent spawning
 
-| # | File | Line | Claim | Reality | Fix |
-|---|------|------|-------|---------|-----|
-| 1 | CLAUDE.md | ~174 | "102 agents exist" | 107 agents on disk | Update count |
+| #   | File      | Line | Claim              | Reality            | Fix          |
+| --- | --------- | ---- | ------------------ | ------------------ | ------------ |
+| 1   | CLAUDE.md | ~174 | "102 agents exist" | 107 agents on disk | Update count |
 
 ### [P1] High — Broken references
 
-| # | File | Claim | Reality | Fix |
-|---|------|-------|---------|-----|
-| 1 | @AGENT_ROUTING_TABLE.md | `.claude/agents/core/foo.md` | File does not exist | Remove entry or create agent |
+| #   | File                    | Claim                        | Reality             | Fix                          |
+| --- | ----------------------- | ---------------------------- | ------------------- | ---------------------------- |
+| 1   | @AGENT_ROUTING_TABLE.md | `.claude/agents/core/foo.md` | File does not exist | Remove entry or create agent |
 
 ### [P2] Medium — Inconsistencies
 
-| # | File | Issue | Details |
-|---|------|-------|---------|
-| 1 | agent-registry.json | Agent listed but no routing keyword | Add to routing-table.cjs |
+| #   | File                | Issue                               | Details                  |
+| --- | ------------------- | ----------------------------------- | ------------------------ |
+| 1   | agent-registry.json | Agent listed but no routing keyword | Add to routing-table.cjs |
 
 ### [P3] Low — Style / minor drift
 
-| # | File | Issue | Details |
-|---|------|-------|---------|
-| 1 | developer.md | Missing context_strategy field | Add context_strategy: lazy_load |
+| #   | File         | Issue                          | Details                         |
+| --- | ------------ | ------------------------------ | ------------------------------- |
+| 1   | developer.md | Missing context_strategy field | Add context_strategy: lazy_load |
 
 ## Recommended Actions
 
@@ -197,18 +197,18 @@ Call `TaskUpdate({ status: 'completed', metadata: { summary, filesModified, find
 
 ## Example Interactions
 
-| User Request | Agent Action |
-|---|---|
-| "Audit CLAUDE.md for stale agent counts" | Globs all agent dirs in parallel, counts files, compares to every count claim in CLAUDE.md, emits finding table |
-| "Check if all skills referenced in agent frontmatter exist on disk" | Extracts `skills:` arrays from all agent .md files via Grep, Globs each skill path, lists broken references |
-| "Verify the routing table is consistent with actual agent files" | Cross-references @AGENT_ROUTING_TABLE.md entries against `.claude/agents/**/*.md` file list, flags orphaned entries both ways |
-| "Find broken file paths in the docs" | Uses ripgrep skill to extract all `.claude/` path strings from target docs, verifies each via Glob, reports missing |
-| "Are all hooks referenced in agent docs actually present?" | Greps Enforcement Hooks tables across all agent .md files, verifies each hook .cjs exists under `.claude/hooks/` |
-| "Run a quick count-only audit" | Runs 4 parallel Globs (agents, skills, hooks, schemas), reports count vs. claimed in under 10 tool calls |
-| "Audit the agent-registry.json for completeness" | Reads registry, extracts all agent names, verifies each has a .md file and routing-table.cjs keyword entry |
-| "Check schema consistency for all specialized agents" | Reads each `.claude/agents/specialized/*.md`, checks required frontmatter fields against schema contract, lists violations |
-| "Which agents are in routing-table.cjs but have no .md file?" | Greps routing-table.cjs for all agent names, Globs for matching .md files, reports the diff |
-| "Generate a full framework health report" | Runs all 6 audit phases in sequence, produces the full structured report to `.claude/context/reports/backend/` |
+| User Request                                                        | Agent Action                                                                                                                  |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| "Audit CLAUDE.md for stale agent counts"                            | Globs all agent dirs in parallel, counts files, compares to every count claim in CLAUDE.md, emits finding table               |
+| "Check if all skills referenced in agent frontmatter exist on disk" | Extracts `skills:` arrays from all agent .md files via Grep, Globs each skill path, lists broken references                   |
+| "Verify the routing table is consistent with actual agent files"    | Cross-references @AGENT_ROUTING_TABLE.md entries against `.claude/agents/**/*.md` file list, flags orphaned entries both ways |
+| "Find broken file paths in the docs"                                | Uses ripgrep skill to extract all `.claude/` path strings from target docs, verifies each via Glob, reports missing           |
+| "Are all hooks referenced in agent docs actually present?"          | Greps Enforcement Hooks tables across all agent .md files, verifies each hook .cjs exists under `.claude/hooks/`              |
+| "Run a quick count-only audit"                                      | Runs 4 parallel Globs (agents, skills, hooks, schemas), reports count vs. claimed in under 10 tool calls                      |
+| "Audit the agent-registry.json for completeness"                    | Reads registry, extracts all agent names, verifies each has a .md file and routing-table.cjs keyword entry                    |
+| "Check schema consistency for all specialized agents"               | Reads each `.claude/agents/specialized/*.md`, checks required frontmatter fields against schema contract, lists violations    |
+| "Which agents are in routing-table.cjs but have no .md file?"       | Greps routing-table.cjs for all agent names, Globs for matching .md files, reports the diff                                   |
+| "Generate a full framework health report"                           | Runs all 6 audit phases in sequence, produces the full structured report to `.claude/context/reports/backend/`                |
 
 ## Search Protocol
 
@@ -234,6 +234,7 @@ Do NOT invoke for normal small audits (under 5 files, targeted checks).
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
+
 ```bash
 cat .claude/context/memory/learnings.md
 cat .claude/context/memory/decisions.md

@@ -103,12 +103,14 @@ Notification triggers are defined in `.claude/context/runtime/notification-trigg
 ```
 
 **Condition Fields:**
+
 - `pattern` — JavaScript RegExp (error/regex triggers)
 - `minTokens` — Token threshold for alert (token_threshold trigger)
 - `minOccurrences` — Pattern match count before triggering (pattern trigger)
 - `scope` — Where to evaluate: current session, task, or cumulative
 
 **Action Types:**
+
 - `log` — Write to `.claude/context/runtime/notifications.jsonl`
 - `alert` — Display alert in session output
 - `spawn_agent` — Create Task() to handle the notification
@@ -117,12 +119,14 @@ Notification triggers are defined in `.claude/context/runtime/notification-trigg
 ## Trigger Evaluation Workflow
 
 **Step 1: Load Configuration**
+
 1. Read `.claude/context/runtime/notification-triggers.json`
 2. Validate schema against notification-triggers.schema.json
 3. Filter to enabled triggers only
 
 **Step 2: Evaluate Conditions**
 For each enabled trigger:
+
 - **Error triggers**: Check tool output for exception patterns
 - **Regex triggers**: Match `pattern` against tool stdout/stderr
 - **Token threshold**: Sum session tokens, compare to `minTokens`
@@ -130,11 +134,13 @@ For each enabled trigger:
 
 **Step 3: Execute Matched Actions**
 If condition is true:
+
 1. Process action in order (log → alert → spawn → interrupt)
 2. Render message templates with context variables
 3. Record trigger fire in `.claude/context/runtime/notification-log.jsonl`
 
 **Step 4: Record Event**
+
 ```json
 {
   "timestamp": "ISO-8601",
@@ -152,37 +158,44 @@ If condition is true:
 ## Action Execution Logic
 
 **Log Action**
+
 ```javascript
 // Append to notifications.jsonl
-fs.appendFileSync(notificationsPath, JSON.stringify({
-  timestamp: new Date().toISOString(),
-  triggerId: trigger.id,
-  message: renderTemplate(action.message, context),
-  severity: 'info|warn|error'
-}) + '\n');
+fs.appendFileSync(
+  notificationsPath,
+  JSON.stringify({
+    timestamp: new Date().toISOString(),
+    triggerId: trigger.id,
+    message: renderTemplate(action.message, context),
+    severity: 'info|warn|error',
+  }) + '\n'
+);
 ```
 
 **Alert Action**
+
 ```javascript
 // Write to stdout with standard format
 console.log(`\n🔔 NOTIFICATION [${trigger.name}]\n${renderedMessage}\n`);
 ```
 
 **Spawn Agent Action**
+
 ```javascript
 // Create async task to handle notification
 Task({
   task_id: `notify-${trigger.id}-${Date.now()}`,
   subagent_type: action.target,
-  prompt: `Handle notification: ${trigger.description}\nContext: ${JSON.stringify(context)}`
+  prompt: `Handle notification: ${trigger.description}\nContext: ${JSON.stringify(context)}`,
 });
 ```
 
 **Interrupt Action**
+
 ```javascript
 // Pause and ask user
 const response = await AskUserQuestion({
-  question: `${trigger.name}: ${action.message}\n\nContinue? [y/n]`
+  question: `${trigger.name}: ${action.message}\n\nContinue? [y/n]`,
 });
 if (response.toLowerCase() !== 'y') {
   process.exit(0);
@@ -192,6 +205,7 @@ if (response.toLowerCase() !== 'y') {
 ## Example Configurations
 
 ### Example 1: High Token Usage Alert
+
 ```json
 {
   "id": "token-threshold-warning",
@@ -222,6 +236,7 @@ if (response.toLowerCase() !== 'y') {
 ```
 
 ### Example 2: Error Pattern Detection
+
 ```json
 {
   "id": "hook-error-pattern",
@@ -248,6 +263,7 @@ if (response.toLowerCase() !== 'y') {
 ```
 
 ### Example 3: Security Pattern Alert
+
 ```json
 {
   "id": "security-violation-detect",
@@ -288,12 +304,14 @@ For code discovery, follow this priority order:
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
+
 ```bash
 cat .claude/context/memory/learnings.md
 cat .claude/context/memory/decisions.md
 ```
 
 **After completing:**
+
 - New pattern → `.claude/context/memory/learnings.md`
 - Issue found → `.claude/context/memory/issues.md`
 - Decision made → `.claude/context/memory/decisions.md`

@@ -1,9 +1,9 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-12T00:00:00.000Z
+lastVerifiedAt: 2026-03-24T00:00:00.000Z
 name: tdd
-description: Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing minimal GREEN, and refactoring safely. 2026 edition adds TDP, flakiness gate, ralph-loop integration, and memory-search in Step 0.
-version: 1.3.0
+description: Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing minimal GREEN, and refactoring safely. 2026 edition adds TDP, flakiness gate, ralph-loop integration, memory-search in Step 0, PBT as Step 5.5, mutation testing gate in Step 4, and CJS LSP warning.
+version: 1.4.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -111,10 +111,62 @@ node --test tests/hooks/routing-guard.test.cjs
 
 A test that passes once and fails on the second run is RED, not GREEN. Do not advance to Step 5 until 3 consecutive passes are confirmed.
 
+**Mutation Testing Gate (security-critical code only):**
+
+For security hooks, routing validators, auth logic, and any code path that controls access or trust decisions, run Stryker mutation testing after achieving GREEN to verify that tests genuinely catch faults and are not vacuously passing.
+
+```bash
+# Run Stryker mutation testing (threshold: 85%)
+npx stryker run
+# Require mutationScore >= 85 in stryker.config.json
+```
+
+For fast-check-based property tests on security hooks, the fail-closed property is the mutation-equivalent gate:
+
+```javascript
+// fast-check fail-closed property — must hold for any input
+fc.assert(
+  fc.property(fc.anything(), input => {
+    const result = securityHook(input);
+    // Hook must NEVER return allow=true for malformed/unexpected input
+    expect(result.allow).not.toBe(true);
+  })
+);
+```
+
+Skip this gate for non-security application code (Step 4 → Step 5 directly).
+
 ### Step 5: Optional refactor
 
 - Refactor only with green tests.
 - Re-run the same test set after refactor.
+
+### Step 5.5: Property-Based Testing (recommended for utility functions and security hooks)
+
+After refactor (or after Step 4 for security-critical code), consider supplementing example-based tests with property-based tests. PBT achieves 23.1–37.3% pass@1 improvement over example-based TDD alone for LLM code generation (arXiv:2506.18315) by breaking the self-deception cycle.
+
+**When to invoke:**
+
+- Utility functions (encode/decode, parsers, serializers, calculators)
+- Security hooks (input validators, sanitizers, access control logic)
+- Any function where invariants, round-trip properties, or mathematical properties can be stated
+
+**Invocation:**
+
+```javascript
+Skill({ skill: 'property-based-testing' });
+```
+
+**Key property patterns to identify:**
+
+| Pattern                | Example                                                                 |
+| ---------------------- | ----------------------------------------------------------------------- |
+| Round-trip             | `decode(encode(x)) === x`                                               |
+| Idempotence            | `normalize(normalize(x)) === normalize(x)`                              |
+| Invariant              | `sort(arr).length === arr.length`                                       |
+| Fail-closed (security) | `securityHook(anyInput).allow !== true` (unless explicitly whitelisted) |
+
+PBT is a supplement to Canon TDD, not a replacement. Canon RED/GREEN/REFACTOR completes first; PBT runs after GREEN is confirmed.
 
 ### Step 6: Repeat until backlog empty
 

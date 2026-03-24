@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-24T01:07:39.264Z",
+  "generatedAt": "2026-03-24T01:40:46.494Z",
   "metadata": {
     "totalSkills": 336,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-24T01:07:39.266Z",
+    "lastValidated": "2026-03-24T01:40:46.496Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -15,7 +15,7 @@
       "displayName": "Tdd",
       "category": "Testing",
       "domain": "development",
-      "description": "Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing minimal GREEN, and refactoring safely. 2026 edition adds TDP, flakiness gate, ralph-loop integration, and memory-search in Step 0.",
+      "description": "Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing minimal GREEN, and refactoring safely. 2026 edition adds TDP, flakiness gate, ralph-loop integration, memory-search in Step 0, PBT as Step 5.5, mutation testing gate in Step 4, and CJS LSP warning.",
       "requiredTools": [
         "Read",
         "Write",

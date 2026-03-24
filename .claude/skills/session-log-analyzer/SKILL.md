@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Bash, Grep, Glob, TaskUpdate]
 agents: [developer, qa, architect]
-category: "Memory & Context"
+category: 'Memory & Context'
 tags: [session-analysis, observability, debugging, token-usage, jsonl-parsing]
 best_practices:
   - Always use line-by-line streaming for large JSONL files
@@ -122,6 +122,7 @@ cat .claude/context/memory/decisions.md
 \`\`\`
 
 **After completing:**
+
 - New pattern -> \`.claude/context/memory/learnings.md\`
 - Issue found -> \`.claude/context/memory/issues.md\`
 - Decision made -> \`.claude/context/memory/decisions.md\`

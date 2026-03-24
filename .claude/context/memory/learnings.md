@@ -1,6 +1,7 @@
 ## ECC Assimilation Learnings (2026-03-24)
 
 ### [PATTERN] Instinct-Based Continuous Learning (from everything-claude-code)
+
 - Atomic instincts: one trigger, one action, confidence 0.3-0.9
 - Confidence increases on pattern repetition/acceptance, decreases on contradiction/staleness
 - Project-scoped isolation prevents cross-project pattern contamination
@@ -8,6 +9,7 @@
 - Our memory system could benefit from automatic pattern extraction from session hooks
 
 ### [PATTERN] Strategic Compaction Timing (from ECC)
+
 - Compact AFTER exploration phases (not during)
 - Compact BETWEEN unrelated tasks (at logical boundaries)
 - Compact POST-MILESTONE (before starting new phases)
@@ -15,6 +17,7 @@
 - Our context-compressor should document when to compress, not just threshold triggers
 
 ### [PATTERN] Eval Harness Metrics (from ECC)
+
 - pass@k: at least one success in k attempts (practical success)
 - pass^k: all k attempts succeed (stability measure)
 - Thresholds: pass@3 >= 0.90 for capabilities, pass^3 = 1.00 for release-critical
@@ -22,6 +25,7 @@
 - Could enhance our qa-workflow and agent-evaluation skills
 
 ### [SECURITY] Agent-Specific Threat Vectors (from ECC security guide)
+
 - Hook injection: project-controlled hooks execute before trust confirmation (CVE-2025-59536)
 - Env var poisoning: ANTHROPIC_BASE_URL redirect attacks (CVE-2026-21852)
 - MCP auto-approval chains: consent abuse via repo-controlled configs
@@ -31,12 +35,14 @@
 - Process-group kill: heartbeat dead-man switch with SIGKILL to entire process group
 
 ### [PATTERN] Search-First Decision Matrix (from ECC)
+
 - Before writing new code: adopt > extend/wrap > compose > build custom
 - Parallel search: npm/PyPI + MCP servers + GitHub simultaneously
 - Evaluate: functionality, maintenance, community, docs, licensing, dependencies
 - Our research-synthesis skill should incorporate this structured decision framework
 
 ### [PATTERN] Skill Stocktake Methodology (from ECC)
+
 - Five verdicts: Keep, Improve, Update, Retire, Merge
 - Retire requires: (1) specific defect found, (2) what covers the need instead
 - Quick scan mode: re-evaluate only changed skills since last run
@@ -918,3 +924,79 @@ Report: `.claude/context/artifacts/research-reports/openclaw-research-2026-03-21
 - **ralph-loop is well-designed** — tdd-state.json with completedScenarios array enables true resumability; no changes needed
 - **AI test characteristics**: higher assertion density, simpler linear logic, coverage comparable to human tests (arXiv:2603.13724)
 - **Research report**: `.claude/context/artifacts/research-reports/tdd-best-practices-research-2026-03-24.md`
+
+- Created new agent: qa-guardian (2026-03-24)
+
+- Created new agent: contract-check (2026-03-24)
+
+- Created new agent: bool-action (2026-03-24)
+
+- Created new agent: repo-onboarder (2026-03-24)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-24)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-24)
+
+- Updated workflow: evolution-workflow (2026-03-24)
+
+- Updated workflow: missing-workflow-xyz (2026-03-24)
+
+## 2026-03-24: Multi-Model Council M3.4 — Key Learnings
+
+**Source:** Codex (codex-mini-latest) live codebase inspection, Chairman synthesis
+
+### safeParseJSON is the right fix for hook JSON parsing (CONFIRMED)
+
+ADR-115 decision is correct. Zod/Joi/Ajv are wrong for CommonJS hooks: higher latency, ESM compatibility friction, over-engineered for narrow 2-5 field inputs. safeParseJSON handles the specific threat (prototype pollution) with near-zero overhead.
+
+### Property-based testing should be deferred for hooks
+
+Prior hook failures were caused by exit code bugs and wiring drift — not by edge-case inputs. Mutation testing (Stryker on allow/block paths) has higher ROI for security hooks than property-based testing (fast-check). Defer property-based testing.
+
+### Hook WIRING completeness is more important than hook IMPLEMENTATION quality
+
+An audit that scores implementation quality (safeParseJSON, exit codes, error handling) but not registration completeness will miss dead hooks. Always audit: does every implemented hook file have a settings.json entry?
+
+### Audit re-baselining is mandatory before executing a multi-phase plan
+
+Codex found that several M3 audit findings were already resolved (ux-researcher tools, dual matrix drift). Executing fixes for stale findings wastes effort. Re-run the audit from the live tree before starting Phase 2 work.
+
+### omega-claude-cli fails in nested worktree contexts
+
+When invoked from inside a worktree, the Claude CLI omega skill produces double-nested paths like `.claude/worktrees/A/.claude/worktrees/B/.claude/skills/...`. Use absolute paths from project root when invoking omega skills from any context.
+
+### Router-first architecture's main scale risk is hook proliferation
+
+The hook chain (currently 6 consolidated hooks) must stay bounded. Each new hook adds latency. The consolidation from 2026-02-08 (6 wildcard → 2 hooks) was the right move. Protect that consolidation — establish a hook count budget.
+
+- Created new agent: qa-guardian (2026-03-24)
+
+- Created new agent: contract-check (2026-03-24)
+
+- Created new agent: bool-action (2026-03-24)
+
+- Created new agent: repo-onboarder (2026-03-24)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-24)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-24)
+
+- Updated workflow: evolution-workflow (2026-03-24)
+
+- Updated workflow: missing-workflow-xyz (2026-03-24)
+
+- Created new agent: qa-guardian (2026-03-24)
+
+- Created new agent: contract-check (2026-03-24)
+
+- Created new agent: bool-action (2026-03-24)
+
+- Created new agent: repo-onboarder (2026-03-24)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-24)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-24)
+
+- Updated workflow: evolution-workflow (2026-03-24)
+
+- Updated workflow: missing-workflow-xyz (2026-03-24)

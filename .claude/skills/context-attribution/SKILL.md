@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Bash, Grep, TaskUpdate]
 agents: [developer, architect]
-category: "Memory & Context"
+category: 'Memory & Context'
 tags: [context-analysis, token-attribution, observability, cost-optimization]
 best_practices:
   - Classify every message into exactly one of the 6 categories
@@ -31,14 +31,14 @@ Use when: context pressure is high, optimizing CLAUDE.md sizes, understanding wh
 
 ## The 6 Categories
 
-| Category | Detection Pattern | Typical % |
-|----------|------------------|-----------|
-| CLAUDE.md files | System messages with `claudeMd` or CLAUDE.md content | 20-40% |
-| @-mentioned files | Read tool results triggered by user file references | 10-20% |
-| Tool outputs | All tool_result content blocks | 15-30% |
-| AI thinking/text | Assistant message content (text + thinking blocks) | 10-25% |
-| Team coordination | Messages containing `<teammate-message>` XML | 0-15% |
-| User messages | User role messages (prompts, follow-ups) | 5-15% |
+| Category          | Detection Pattern                                    | Typical % |
+| ----------------- | ---------------------------------------------------- | --------- |
+| CLAUDE.md files   | System messages with `claudeMd` or CLAUDE.md content | 20-40%    |
+| @-mentioned files | Read tool results triggered by user file references  | 10-20%    |
+| Tool outputs      | All tool_result content blocks                       | 15-30%    |
+| AI thinking/text  | Assistant message content (text + thinking blocks)   | 10-25%    |
+| Team coordination | Messages containing `<teammate-message>` XML         | 0-15%     |
+| User messages     | User role messages (prompts, follow-ups)             | 5-15%     |
 
 ## Workflow
 
@@ -94,6 +94,7 @@ cat .claude/context/memory/decisions.md
 \`\`\`
 
 **After completing:**
+
 - New pattern -> \`.claude/context/memory/learnings.md\`
 - Issue found -> \`.claude/context/memory/issues.md\`
 - Decision made -> \`.claude/context/memory/decisions.md\`
