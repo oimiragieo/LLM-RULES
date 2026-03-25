@@ -12,8 +12,8 @@ skills:
   - channel-management
   - task-management-protocol
 context_files:
-  - @.claude/context/memory/learnings.md
-  - @.claude/context/memory/active_context.md
+  - '@.claude/context/memory/learnings.md'
+  - '@.claude/context/memory/active_context.md'
 ---
 
 # Channel Responder

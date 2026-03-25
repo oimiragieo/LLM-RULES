@@ -1,6 +1,10 @@
 {
   "disabledMcpServers": [],
   "mcpServers": {
+    "telegram-relay": {
+      "command": "node",
+      "args": ["scripts/channels/telegram-relay.mjs"]
+    },
     "filesystem": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-filesystem@0", "C:\\dev\\projects\\agent-studio"]

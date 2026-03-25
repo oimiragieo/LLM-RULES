@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "setup": "node scripts/setup.cjs",
+    "start:telegram": "node scripts/start-with-channels.cjs",
     "postinstall": "node .claude/scripts/ensure-routing-prototypes.cjs",
     "format": "node scripts/format-tracked.mjs --write",
     "format:check": "node scripts/format-tracked.mjs --check",
@@ -209,6 +210,7 @@
     "@ast-grep/cli": "^0.40.5",
     "@jest/globals": "^30.3.0",
     "@lancedb/lancedb": "^0.24.1",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@xenova/transformers": "^2.17.2",
     "ajv": "^8.18.0",
     "ajv-formats": "^3.0.1",
@@ -228,7 +230,8 @@
     "tree-sitter-javascript": "^0.25.0",
     "tree-sitter-python": "^0.25.0",
     "tree-sitter-rust": "^0.24.0",
-    "tree-sitter-typescript": "^0.23.2"
+    "tree-sitter-typescript": "^0.23.2",
+    "zod": "^4.3.6"
   },
   "optionalDependencies": {
     "onnxruntime-node-gpu": "^1.14.0"

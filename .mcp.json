@@ -1,0 +1,9 @@
+{
+  "disabledMcpServers": [],
+  "mcpServers": {
+    "telegram-relay": {
+      "command": "node",
+      "args": ["scripts/channels/telegram-relay.mjs"]
+    }
+  }
+}

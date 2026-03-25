@@ -106,4 +106,15 @@ module.exports = {
     'detecting',
     'patterns',
   ],
+  'telegram-voice-pipeline': [
+    'telegram-voice-pipeline',
+    'telegram',
+    'voice',
+    'pipeline',
+    'message',
+    'download',
+    'attachment',
+    'transcribe',
+    'whisper',
+  ],
 };
