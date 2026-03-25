@@ -144,7 +144,10 @@ function startChannel() {
   // VBScript SendKeys works at a lower level than .NET and handles
   // Ink's raw terminal input. Writes a temp .vbs, runs it, deletes it.
   if (process.platform === 'win32') {
-    const vbsPath = path.join(ROOT, '.claude', 'context', 'tmp', '_auto-accept.vbs');
+    // Use path.resolve for absolute path, then normalize to Windows backslashes
+    // so wscript can find the file (forward slashes fail on some Windows configs).
+    const vbsPath = path.resolve(ROOT, '.claude', 'context', 'tmp', '_auto-accept.vbs')
+      .replace(/\//g, '\\');
     const vbsContent = [
       'WScript.Sleep 6000',
       'Set WshShell = WScript.CreateObject("WScript.Shell")',
@@ -162,6 +165,7 @@ function startChannel() {
         shell: false,
         detached: true,
         stdio: 'ignore',
+        cwd: ROOT,
       }).unref();
     } catch (_) {
       /* best-effort */

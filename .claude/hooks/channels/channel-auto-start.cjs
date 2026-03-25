@@ -4,8 +4,12 @@
 /**
  * channel-auto-start.cjs — UserPromptSubmit hook
  *
- * Spawns channel-manager.cjs start as a DETACHED background process
- * so it doesn't block the hook timeout. Returns immediately.
+ * On session start, spawns channel-manager.cjs start ONCE.
+ * Uses a cooldown lockfile to prevent infinite spawn loops
+ * (if claude exits before accepting the confirmation prompt,
+ * isChannelRunning() returns false and the hook would re-fire).
+ *
+ * Cooldown: 120 seconds between spawn attempts.
  */
 
 const path = require('path');
@@ -13,11 +17,25 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
+const LOCKFILE = path.join(ROOT, '.claude', 'context', 'runtime', 'channel-autostart-cooldown.lock');
+const COOLDOWN_MS = 120000; // 2 minutes
 
 let _input = '';
 process.stdin.on('data', (chunk) => { _input += chunk; });
 process.stdin.on('end', () => {
   try {
+    // Cooldown check — don't retry within 2 minutes
+    if (fs.existsSync(LOCKFILE)) {
+      try {
+        const lockTime = parseInt(fs.readFileSync(LOCKFILE, 'utf8').trim(), 10);
+        if (Date.now() - lockTime < COOLDOWN_MS) {
+          process.exit(0);
+        }
+      } catch (_e) {
+        // Corrupt lockfile — proceed
+      }
+    }
+
     // Load .env
     const envPath = path.join(ROOT, '.env');
     if (fs.existsSync(envPath)) {
@@ -49,7 +67,10 @@ process.stdin.on('end', () => {
       process.exit(0);
     }
 
-    // Fire-and-forget: spawn as detached background process to avoid hook timeout
+    // Write cooldown lockfile BEFORE spawning — prevents loop even if spawn fails
+    fs.writeFileSync(LOCKFILE, String(Date.now()), 'utf8');
+
+    // Fire-and-forget
     const child = spawn('node', [channelManager, 'start'], {
       shell: false,
       detached: true,
@@ -58,7 +79,7 @@ process.stdin.on('end', () => {
     });
     child.unref();
 
-    process.stderr.write('[channel-auto-start] Spawned channel-manager start (background)\n');
+    process.stderr.write('[channel-auto-start] Spawned channel-manager (cooldown: 2min)\n');
   } catch (err) {
     process.stderr.write(`[channel-auto-start] Error: ${err.message}\n`);
   }
