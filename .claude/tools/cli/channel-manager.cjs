@@ -245,6 +245,17 @@ function stopChannel() {
   return { ok: true, pid, reason: 'stopped' };
 }
 
+/**
+ * Restart: force-kill then re-spawn. Use when the channel session is
+ * alive but unresponsive (e.g. after system sleep).
+ * @returns {{ ok: boolean, pid: number|null, reason: string }}
+ */
+function restartChannel() {
+  stopChannel();
+  sleepMs(2000);
+  return startChannel();
+}
+
 // ── CLI mode ───────────────────────────────────────────────────────────────────
 
 if (require.main === module) {
@@ -256,15 +267,20 @@ if (require.main === module) {
   } else if (cmd === 'stop') {
     const r = stopChannel();
     process.stdout.write(JSON.stringify(r, null, 2) + '\n');
+  } else if (cmd === 'restart') {
+    const r = restartChannel();
+    process.stdout.write(JSON.stringify(r, null, 2) + '\n');
+    process.exitCode = r.ok ? 0 : 1;
   } else if (cmd === 'status') {
     process.stdout.write(
       JSON.stringify({ running: isChannelRunning(), pid: getChannelPid() }, null, 2) + '\n'
     );
   } else {
     process.stderr.write(
-      'Usage: node channel-manager.cjs [start|stop|status]\n\n' +
+      'Usage: node channel-manager.cjs [start|stop|restart|status]\n\n' +
         '  start   Spawn channel session (idempotent)\n' +
         '  stop    Kill the running channel session\n' +
+        '  restart Force-kill and re-spawn (use after system sleep)\n' +
         '  status  Print running status and PID\n\n' +
         'Env: TELEGRAM_BOT_TOKEN, CHANNEL_AUTO_START, CHANNEL_PLUGINS, CHANNEL_PERMISSIONS\n'
     );
