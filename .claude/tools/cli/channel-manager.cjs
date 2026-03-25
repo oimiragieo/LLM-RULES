@@ -49,9 +49,7 @@ const PURPOSE_TAG = 'channel-session';
 function getConfig() {
   return {
     botToken: process.env.TELEGRAM_BOT_TOKEN || '',
-    plugins: (process.env.CHANNEL_PLUGINS || 'server:telegram-relay')
-      .split(/\s+/)
-      .filter(Boolean),
+    plugins: (process.env.CHANNEL_PLUGINS || 'server:telegram-relay').split(/\s+/).filter(Boolean),
     permissions: process.env.CHANNEL_PERMISSIONS || '',
   };
 }
@@ -131,21 +129,14 @@ function startChannel() {
   const permParts = cfg.permissions ? cfg.permissions.split(/\s+/).filter(Boolean) : [];
   channelArgs.unshift(...permParts);
 
-
   // --dangerously-load-development-channels shows a confirmation prompt.
   // We auto-accept by spawning a background PowerShell that sends Enter
   // to the foreground window after a short delay. This avoids piping stdin
   // (which breaks Ink's raw mode) while keeping launch fully hands-free.
-  // Build the full command string with seed prompt (same pattern as spawn-new-session.cjs).
-  // Uses `cmd /k` so the window stays open after claude exits (for debugging).
-  const claudeFlags = channelArgs.join(' ');
-  const seedPrompt = 'Initialize: read ~/.claude/telegram-plugin/access.json for the owner chat_id then send Channel session online via Telegram reply tool. Then wait for inbound channel messages.';
-  const promptFile = path.join(ROOT, '.claude', 'context', 'telegram-channel-prompt.md');
-  const promptFlag = fs.existsSync(promptFile)
-    ? ` --append-system-prompt-file "${promptFile}"`
-    : '';
-  const fullCmd = `claude ${claudeFlags}${promptFlag} "${seedPrompt.replace(/"/g, '\\"')}"`;
-  const wtArgs = ['new-tab', '-d', ROOT, '--', 'cmd', '/k', fullCmd];
+  // Simple seed prompt — no special chars, no file paths, no nested quotes.
+  // The telegram-channel-prompt.md is picked up via CLAUDE.md auto-discovery.
+  const seedPrompt = 'Send Channel session online to Telegram owner then wait for messages';
+  const wtArgs = ['new-tab', '-d', ROOT, '--', 'cmd', '/c', 'claude', ...channelArgs, seedPrompt];
 
   // Auto-accept: VBScript keystroke sender (Windows only)
   // VBScript SendKeys works at a lower level than .NET and handles
@@ -166,21 +157,39 @@ function startChannel() {
     try {
       fs.writeFileSync(vbsPath, vbsContent, 'utf8');
       spawn('wscript', [vbsPath], {
-        shell: false, detached: true, stdio: 'ignore',
+        shell: false,
+        detached: true,
+        stdio: 'ignore',
       }).unref();
-    } catch (_) { /* best-effort */ }
+    } catch (_) {
+      /* best-effort */
+    }
   }
 
   // Snapshot before launch so afterSpawn() can diff new PIDs
   const afterSpawn = registerSpawn(PURPOSE_TAG, 'channel-manager');
 
   try {
-    spawn('wt', wtArgs, {
+    const child = spawn('wt', wtArgs, {
       shell: false,
       detached: true,
       stdio: 'ignore',
       windowsHide: false,
-    }).unref();
+    });
+    child.on('error', (e) => {
+      if (e.code === 'ENOENT') {
+        // Fallback: wt not found, try start cmd directly
+        const fallbackArgs = ['cmd', '/c', 'claude', ...channelArgs, seedPrompt];
+        spawn('cmd', ['/c', 'start', '', ...fallbackArgs], {
+          shell: false,
+          detached: true,
+          stdio: 'ignore',
+          windowsHide: false,
+          cwd: ROOT,
+        }).unref();
+      }
+    });
+    child.unref();
   } catch (e) {
     return { ok: false, pid: null, reason: `spawn failed: ${e.message}` };
   }
