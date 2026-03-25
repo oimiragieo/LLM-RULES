@@ -138,39 +138,11 @@ function startChannel() {
   // cmd /k keeps the window open if claude exits unexpectedly (e.g. confirmation prompt timeout).
   // No seed prompt — it interferes with the confirmation prompt selection.
   // The channel session picks up telegram-channel-prompt.md via CLAUDE.md.
-  const wtArgs = ['new-tab', '-d', ROOT, '--', 'cmd', '/k', 'claude', ...channelArgs];
-
-  // Auto-accept: VBScript keystroke sender (Windows only)
-  // VBScript SendKeys works at a lower level than .NET and handles
-  // Ink's raw terminal input. Writes a temp .vbs, runs it, deletes it.
-  if (process.platform === 'win32') {
-    // Use path.resolve for absolute path, then normalize to Windows backslashes
-    // so wscript can find the file (forward slashes fail on some Windows configs).
-    const vbsPath = path.resolve(ROOT, '.claude', 'context', 'tmp', '_auto-accept.vbs')
-      .replace(/\//g, '\\');
-    const vbsContent = [
-      'WScript.Sleep 6000',
-      'Set WshShell = WScript.CreateObject("WScript.Shell")',
-      'WshShell.AppActivate "Claude"',
-      'WScript.Sleep 500',
-      'WshShell.SendKeys "{ENTER}"',
-      'WScript.Sleep 1000',
-      // Cleanup self
-      'Dim fso: Set fso = CreateObject("Scripting.FileSystemObject")',
-      'fso.DeleteFile WScript.ScriptFullName, True',
-    ].join('\r\n');
-    try {
-      fs.writeFileSync(vbsPath, vbsContent, 'utf8');
-      spawn('wscript', [vbsPath], {
-        shell: false,
-        detached: true,
-        stdio: 'ignore',
-        cwd: ROOT,
-      }).unref();
-    } catch (_) {
-      /* best-effort */
-    }
-  }
+  // Open as a tab in the CURRENT terminal window.
+  // -w 0 only works when called from within a WT process (not detached hooks).
+  // When called directly by the router via Bash, it opens in the same window.
+  const TAB_TITLE = 'TelegramChannel';
+  const wtArgs = ['-w', '0', 'new-tab', '--title', TAB_TITLE, '-d', ROOT, '--', 'cmd', '/k', 'claude', ...channelArgs];
 
   // Snapshot before launch so afterSpawn() can diff new PIDs
   const afterSpawn = registerSpawn(PURPOSE_TAG, 'channel-manager');
@@ -184,9 +156,11 @@ function startChannel() {
     });
     child.on('error', (e) => {
       if (e.code === 'ENOENT') {
-        // Fallback: wt not found, try start cmd directly
-        const fallbackArgs = ['cmd', '/k', 'claude', ...channelArgs];
-        spawn('cmd', ['/c', 'start', '', ...fallbackArgs], {
+        // Fallback: wt not found, use a robust .bat file to avoid Windows escaping bugs
+        const batPath = path.join(ROOT, '.claude', 'context', 'tmp', '_fallback_launch.bat');
+        const batContent = `@echo off\r\ncd /d "${ROOT}"\r\nclaude ${channelArgs.join(' ')}\r\npause\r\ndel "%~f0"`;
+        try { require('fs').writeFileSync(batPath, batContent, 'utf8'); } catch (_) { /* fallback write failed */ }
+        spawn('cmd', ['/c', 'start', '"Agent Studio Channel"', batPath], {
           shell: false,
           detached: true,
           stdio: 'ignore',
@@ -205,6 +179,41 @@ function startChannel() {
 
   // Diff PIDs once and record in tracker
   const newPid = afterSpawn();
+
+  // Auto-accept confirmation prompt via VBScript (Windows only).
+  // Uses AppActivate with the resolved PID to target the exact window —
+  // avoids the "wrong window" problem when multiple Claude instances exist.
+  if (process.platform === 'win32') {
+    const vbsPath = path.resolve(ROOT, '.claude', 'context', 'tmp', '_auto-accept.vbs')
+      .replace(/\//g, '\\');
+    // If we have a PID, target by PID. Otherwise fall back to window title.
+    const activateExpr = newPid
+      ? `WshShell.AppActivate(${newPid})`
+      : 'WshShell.AppActivate("claude")';
+    const vbsContent = [
+      'WScript.Sleep 4000',
+      'Set WshShell = WScript.CreateObject("WScript.Shell")',
+      activateExpr,
+      'WScript.Sleep 500',
+      'WshShell.SendKeys "{ENTER}"',
+      'WScript.Sleep 8000',
+      // Type the seed prompt after Claude finishes loading
+      activateExpr,
+      'WScript.Sleep 500',
+      'WshShell.SendKeys "Send Channel session online to Telegram owner then wait for messages"',
+      'WScript.Sleep 500',
+      'WshShell.SendKeys "{ENTER}"',
+      'WScript.Sleep 500',
+      'Dim fso: Set fso = CreateObject("Scripting.FileSystemObject")',
+      'fso.DeleteFile WScript.ScriptFullName, True',
+    ].join('\r\n');
+    try {
+      fs.writeFileSync(vbsPath, vbsContent, 'utf8');
+      spawn('wscript', [vbsPath], {
+        shell: false, detached: true, stdio: 'ignore', cwd: ROOT,
+      }).unref();
+    } catch (_) { /* best-effort */ }
+  }
 
   const reason = newPid !== null ? 'started' : 'started-pid-unresolved';
   return { ok: true, pid: newPid, reason };
