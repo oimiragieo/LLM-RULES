@@ -135,8 +135,10 @@ function startChannel() {
   // (which breaks Ink's raw mode) while keeping launch fully hands-free.
   // Simple seed prompt — no special chars, no file paths, no nested quotes.
   // The telegram-channel-prompt.md is picked up via CLAUDE.md auto-discovery.
-  const seedPrompt = 'Send Channel session online to Telegram owner then wait for messages';
-  const wtArgs = ['new-tab', '-d', ROOT, '--', 'cmd', '/c', 'claude', ...channelArgs, seedPrompt];
+  // cmd /k keeps the window open if claude exits unexpectedly (e.g. confirmation prompt timeout).
+  // No seed prompt — it interferes with the confirmation prompt selection.
+  // The channel session picks up telegram-channel-prompt.md via CLAUDE.md.
+  const wtArgs = ['new-tab', '-d', ROOT, '--', 'cmd', '/k', 'claude', ...channelArgs];
 
   // Auto-accept: VBScript keystroke sender (Windows only)
   // VBScript SendKeys works at a lower level than .NET and handles
@@ -179,7 +181,7 @@ function startChannel() {
     child.on('error', (e) => {
       if (e.code === 'ENOENT') {
         // Fallback: wt not found, try start cmd directly
-        const fallbackArgs = ['cmd', '/c', 'claude', ...channelArgs, seedPrompt];
+        const fallbackArgs = ['cmd', '/k', 'claude', ...channelArgs];
         spawn('cmd', ['/c', 'start', '', ...fallbackArgs], {
           shell: false,
           detached: true,
