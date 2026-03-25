@@ -196,13 +196,6 @@ function startChannel() {
       activateExpr,
       'WScript.Sleep 500',
       'WshShell.SendKeys "{ENTER}"',
-      'WScript.Sleep 8000',
-      // Type the seed prompt after Claude finishes loading
-      activateExpr,
-      'WScript.Sleep 500',
-      'WshShell.SendKeys "Send Channel session online to Telegram owner then wait for messages"',
-      'WScript.Sleep 500',
-      'WshShell.SendKeys "{ENTER}"',
       'WScript.Sleep 500',
       'Dim fso: Set fso = CreateObject("Scripting.FileSystemObject")',
       'fso.DeleteFile WScript.ScriptFullName, True',
