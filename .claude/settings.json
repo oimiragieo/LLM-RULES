@@ -68,15 +68,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/channels/channel-auto-start.cjs"
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/drift-detector.cjs"
           }
         ]
@@ -87,6 +78,15 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/stale-task-detector.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/channels/channel-auto-start.cjs"
           }
         ]
       }
