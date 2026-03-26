@@ -17,14 +17,23 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
-const LOCKFILE = path.join(ROOT, '.claude', 'context', 'runtime', 'channel-autostart-cooldown.lock');
+const LOCKFILE = path.join(
+  ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'channel-autostart-cooldown.lock'
+);
 const COOLDOWN_MS = 120000; // 2 minutes
 
 let _input = '';
-process.stdin.on('data', (chunk) => { _input += chunk; });
+process.stdin.on('data', chunk => {
+  _input += chunk;
+});
 process.stdin.on('end', () => {
   try {
-    // Cooldown check — don't retry within 2 minutes
+    // Atomic cooldown — use exclusive file flag to prevent parallel hooks
+    // from all spawning simultaneously on the same prompt
     if (fs.existsSync(LOCKFILE)) {
       try {
         const lockTime = parseInt(fs.readFileSync(LOCKFILE, 'utf8').trim(), 10);
@@ -45,7 +54,10 @@ process.stdin.on('end', () => {
         const eq = t.indexOf('=');
         if (eq === -1) continue;
         const key = t.slice(0, eq).trim();
-        const val = t.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
+        const val = t
+          .slice(eq + 1)
+          .trim()
+          .replace(/^["']|["']$/g, '');
         if (!process.env[key]) process.env[key] = val;
       }
     }

@@ -141,8 +141,19 @@ function startChannel() {
   // Open as a tab in the CURRENT terminal window.
   // -w 0 only works when called from within a WT process (not detached hooks).
   // When called directly by the router via Bash, it opens in the same window.
+  // Write a .bat launcher so wt executes a single file — avoids argument
+  // splitting issues when spawned from detached hook processes.
+  const batPath = path.join(ROOT, '.claude', 'context', 'tmp', '_channel-launch.bat');
+  const batContent = [
+    '@echo off',
+    `cd /d "${ROOT}"`,
+    `claude ${channelArgs.join(' ')}`,
+    'pause',
+  ].join('\r\n');
+  fs.writeFileSync(batPath, batContent, 'utf8');
+
   const TAB_TITLE = 'TelegramChannel';
-  const wtArgs = ['-w', '0', 'new-tab', '--title', TAB_TITLE, '-d', ROOT, '--', 'cmd', '/k', 'claude', ...channelArgs];
+  const wtArgs = ['new-tab', '--title', TAB_TITLE, '-d', ROOT, '--', batPath];
 
   // Snapshot before launch so afterSpawn() can diff new PIDs
   const afterSpawn = registerSpawn(PURPOSE_TAG, 'channel-manager');
@@ -154,12 +165,16 @@ function startChannel() {
       stdio: 'ignore',
       windowsHide: false,
     });
-    child.on('error', (e) => {
+    child.on('error', e => {
       if (e.code === 'ENOENT') {
         // Fallback: wt not found, use a robust .bat file to avoid Windows escaping bugs
         const batPath = path.join(ROOT, '.claude', 'context', 'tmp', '_fallback_launch.bat');
         const batContent = `@echo off\r\ncd /d "${ROOT}"\r\nclaude ${channelArgs.join(' ')}\r\npause\r\ndel "%~f0"`;
-        try { require('fs').writeFileSync(batPath, batContent, 'utf8'); } catch (_) { /* fallback write failed */ }
+        try {
+          require('fs').writeFileSync(batPath, batContent, 'utf8');
+        } catch (_) {
+          /* fallback write failed */
+        }
         spawn('cmd', ['/c', 'start', '"Agent Studio Channel"', batPath], {
           shell: false,
           detached: true,
@@ -184,7 +199,8 @@ function startChannel() {
   // Uses AppActivate with the resolved PID to target the exact window —
   // avoids the "wrong window" problem when multiple Claude instances exist.
   if (process.platform === 'win32') {
-    const vbsPath = path.resolve(ROOT, '.claude', 'context', 'tmp', '_auto-accept.vbs')
+    const vbsPath = path
+      .resolve(ROOT, '.claude', 'context', 'tmp', '_auto-accept.vbs')
       .replace(/\//g, '\\');
     // If we have a PID, target by PID. Otherwise fall back to window title.
     const activateExpr = newPid
@@ -203,9 +219,14 @@ function startChannel() {
     try {
       fs.writeFileSync(vbsPath, vbsContent, 'utf8');
       spawn('wscript', [vbsPath], {
-        shell: false, detached: true, stdio: 'ignore', cwd: ROOT,
+        shell: false,
+        detached: true,
+        stdio: 'ignore',
+        cwd: ROOT,
       }).unref();
-    } catch (_) { /* best-effort */ }
+    } catch (_) {
+      /* best-effort */
+    }
   }
 
   const reason = newPid !== null ? 'started' : 'started-pid-unresolved';
