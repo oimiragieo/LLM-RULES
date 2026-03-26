@@ -123,15 +123,27 @@ try {
   const vbsPath = path.join(tmpDir, '_auto-accept.vbs').replace(/\//g, '\\');
   const batPath = path.join(tmpDir, '_channel-autostart.bat').replace(/\//g, '\\');
 
-  // VBScript: wait for claude to show the confirmation prompt, then press Enter
+  // VBScript: wait for the channel window to show the confirmation prompt,
+  // then press Enter. Targets "TelegramChannel" window title (set by the
+  // `start` command in the bat file) to avoid hitting the user's main session.
+  // Retries AppActivate 3 times in case the window hasn't appeared yet.
   fs.writeFileSync(
     vbsPath,
     [
-      'WScript.Sleep 5000',
       'Set WshShell = WScript.CreateObject("WScript.Shell")',
-      'WshShell.AppActivate "claude"',
-      'WScript.Sleep 500',
-      'WshShell.SendKeys "{ENTER}"',
+      'Dim activated: activated = False',
+      'Dim i',
+      'For i = 1 To 6',
+      '  WScript.Sleep 2000',
+      '  If WshShell.AppActivate("TelegramChannel") Then',
+      '    activated = True',
+      '    Exit For',
+      '  End If',
+      'Next',
+      'If activated Then',
+      '  WScript.Sleep 500',
+      '  WshShell.SendKeys "{ENTER}"',
+      'End If',
     ].join('\r\n'),
     'utf8'
   );
@@ -150,16 +162,23 @@ try {
     'utf8'
   );
 
-  // ── 7. Execute the bat synchronously ──────────────────────────────────────
+  // ── 7. Execute the bat ─────────────────────────────────────────────────────
   // cmd /c runs the bat which uses `start` to create an independent window,
   // then returns immediately. The `start` command breaks out of the process
   // tree — the new cmd window is NOT a child of this hook.
-  execFileSync('cmd', ['/c', batPath], {
-    shell: false,
-    timeout: 5000,
-    stdio: 'ignore',
-    cwd: ROOT,
-  });
+  // Note: execFileSync may throw if cmd returns non-zero (e.g., the bat
+  // self-delete fails). Catch and continue since the `start` already fired.
+  try {
+    execFileSync('cmd', ['/c', batPath], {
+      shell: false,
+      timeout: 5000,
+      stdio: 'ignore',
+      cwd: ROOT,
+    });
+  } catch (_) {
+    // The `start` inside the bat already launched the window —
+    // errors here are typically from the self-delete line, which is harmless.
+  }
 
   process.stderr.write('[channel-auto-start] Launched claude channel session directly (cooldown: 2min)\n');
 } catch (err) {
