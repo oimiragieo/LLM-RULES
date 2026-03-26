@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 function getOrCreateSessionId(
   runtimeDir = path.join(process.cwd(), '.claude/context/runtime'),
@@ -20,7 +21,7 @@ function getOrCreateSessionId(
 
   if (!force && fs.existsSync(sessionPath)) {
     try {
-      const data = JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+      const data = safeParseJSON(fs.readFileSync(sessionPath, 'utf8'));
       if (data.sessionId) return data.sessionId;
     } catch (_e) {
       // fallback to generation if corrupt

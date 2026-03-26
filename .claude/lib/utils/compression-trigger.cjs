@@ -231,7 +231,7 @@ function getCompressionStats() {
     const entries = lines
       .map(line => {
         try {
-          return JSON.parse(line);
+          return safeParseJSON(line);
         } catch (_e) {
           return null;
         }
@@ -274,6 +274,7 @@ function resetCompressionCounters() {
 // Track 1.1: Re-export checkContextPressure from context-pressure module.
 // Allows consumers to use a single import for compression-related pressure logic.
 const { checkContextPressure } = require('./context-pressure.cjs');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 module.exports = {
   checkCompressionNeeded,

@@ -18,6 +18,7 @@
  */
 
 const crypto = require('crypto');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // Zombie task watchdog: transitions tasks stuck in active states for too long
 const ZOMBIE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
@@ -160,7 +161,7 @@ class TaskStateMachine {
       for (const row of rows) {
         let params = {};
         try {
-          params = JSON.parse(row.params || '{}');
+          params = safeParseJSON(row.params || '{}');
         } catch (_) {
           // ignore malformed params
         }

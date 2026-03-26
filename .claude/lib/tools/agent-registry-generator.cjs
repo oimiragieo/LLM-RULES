@@ -36,6 +36,7 @@ const {
   getAssignedSkillsForAgent,
   getAlwaysSkillsForAgent,
 } = require('./agent-registry-generator-skills.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // Try to load optional dependencies
 let yaml;
@@ -374,7 +375,7 @@ class AgentRegistryGenerator {
       return { valid: true, errors: [], message: 'AJV not available, skipping validation' };
     }
 
-    const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
+    const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf-8'));
     const ajv = new Ajv({ allErrors: true, strict: false });
     addFormats(ajv);
 

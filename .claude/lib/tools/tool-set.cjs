@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const MANIFEST_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'tool-manifest.json');
 const EXTRA_READONLY_EXCLUSIONS = new Set(['TaskStop']);
@@ -13,7 +14,7 @@ let manifestCache = null;
 function getManifest() {
   if (manifestCache) return manifestCache;
   try {
-    manifestCache = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+    manifestCache = safeParseJSON(fs.readFileSync(MANIFEST_PATH, 'utf8'));
   } catch (err) {
     console.warn(`[tool-set] Failed to load tool manifest: ${err.message}`);
     manifestCache = {

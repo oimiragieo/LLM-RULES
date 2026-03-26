@@ -18,6 +18,7 @@
 const path = require('path');
 const fs = require('fs');
 const { execFileSync } = require('child_process');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Drain stdin passively (prevent EPIPE) — never gate logic on it
 process.stdin.resume();
@@ -89,7 +90,7 @@ try {
   if (fs.existsSync(trackerPath)) {
     try {
       const raw = fs.readFileSync(trackerPath, 'utf8');
-      const tracker = JSON.parse(raw);
+      const tracker = safeParseJSON(raw);
       const session = (tracker.sessions || []).find(
         s => s.purpose === 'channel-session' && s.status === 'active'
       );
@@ -131,7 +132,7 @@ try {
     [
       'WScript.Sleep 4000',
       'Set wmi = GetObject("winmgmts:\\\\.\\root\\cimv2")',
-      'Set procs = wmi.ExecQuery("SELECT ProcessId FROM Win32_Process WHERE Name=\'cmd.exe\' AND CommandLine LIKE \'%TelegramChannel%\'")',
+      "Set procs = wmi.ExecQuery(\"SELECT ProcessId FROM Win32_Process WHERE Name='cmd.exe' AND CommandLine LIKE '%TelegramChannel%'\")",
       'Dim targetPid: targetPid = 0',
       'For Each proc In procs',
       '  targetPid = proc.ProcessId',
@@ -191,7 +192,9 @@ try {
     // errors here are typically from the self-delete line, which is harmless.
   }
 
-  process.stderr.write('[channel-auto-start] Launched claude channel session directly (cooldown: 2min)\n');
+  process.stderr.write(
+    '[channel-auto-start] Launched claude channel session directly (cooldown: 2min)\n'
+  );
 } catch (err) {
   process.stderr.write(`[channel-auto-start] Error: ${err.message}\n`);
 }

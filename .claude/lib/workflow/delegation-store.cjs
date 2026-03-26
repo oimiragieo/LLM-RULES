@@ -5,6 +5,7 @@ const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
 const { withFileLock } = require('../memory/memory-tiers-lock.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const DELEGATIONS_FILE = path.join(
   PROJECT_ROOT,
@@ -32,7 +33,7 @@ class DelegationStore {
       if (!fs.existsSync(this.filePath)) return {};
       try {
         const content = fs.readFileSync(this.filePath, 'utf8');
-        return JSON.parse(content) || {};
+        return safeParseJSON(content) || {};
       } catch (err) {
         console.error(`[DelegationStore] Failed to load delegations: ${err.message}`);
         return {};
@@ -61,7 +62,7 @@ class DelegationStore {
     if (!fs.existsSync(this.filePath)) return {};
     try {
       const content = fs.readFileSync(this.filePath, 'utf8');
-      return JSON.parse(content) || {};
+      return safeParseJSON(content) || {};
     } catch (_err) {
       return {};
     }

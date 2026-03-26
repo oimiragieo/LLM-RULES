@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const DATA_PATH = path.resolve(__dirname, '..', '..', 'context', 'memory', 'velocity-data.json');
 
@@ -15,7 +16,7 @@ function loadData() {
       return { agents: {} };
     }
     const raw = fs.readFileSync(DATA_PATH, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw);
     if (!parsed || typeof parsed !== 'object' || !parsed.agents) {
       return { agents: {} };
     }

@@ -4,12 +4,13 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 function loadAgentRegistry(projectRoot = PROJECT_ROOT) {
   const registryPath = path.join(projectRoot, '.claude', 'context', 'agent-registry.json');
   if (!fs.existsSync(registryPath)) return null;
   try {
-    return JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+    return safeParseJSON(fs.readFileSync(registryPath, 'utf8'));
   } catch (_e) {
     return null;
   }

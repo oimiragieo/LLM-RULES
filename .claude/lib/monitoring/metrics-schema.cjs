@@ -184,6 +184,7 @@ function validateMetricRow(row) {
 
 function validateJsonlFile(filePath, options = {}) {
   const fs = require('fs');
+  const { safeParseJSON } = require('../utils/safe-json.cjs');
   const lines = fs.existsSync(filePath)
     ? fs.readFileSync(filePath, 'utf8').split('\n').filter(Boolean)
     : [];
@@ -200,7 +201,7 @@ function validateJsonlFile(filePath, options = {}) {
     const line = lines[index];
     let parsed;
     try {
-      parsed = JSON.parse(line);
+      parsed = safeParseJSON(line);
     } catch (err) {
       result.parseErrors++;
       if (result.errors.length < maxErrors) {

@@ -17,6 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const OUTPUTS_FILE = path.join(__dirname, '..', '..', 'context', 'runtime', 'task-outputs.json');
 
@@ -27,7 +28,7 @@ const OUTPUTS_FILE = path.join(__dirname, '..', '..', 'context', 'runtime', 'tas
 function loadOutputs() {
   try {
     const raw = fs.readFileSync(OUTPUTS_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw);
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       return parsed;
     }

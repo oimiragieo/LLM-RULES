@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const AGENT_SKILL_MATRIX_PATH = path.join(
   PROJECT_ROOT,
@@ -23,14 +24,14 @@ function loadAgentSkillMatrixAndSkillIndex() {
   let skillIndex = { skills: {} };
   try {
     if (fs.existsSync(AGENT_SKILL_MATRIX_PATH)) {
-      matrix = JSON.parse(fs.readFileSync(AGENT_SKILL_MATRIX_PATH, 'utf8'));
+      matrix = safeParseJSON(fs.readFileSync(AGENT_SKILL_MATRIX_PATH, 'utf8'));
     }
   } catch (_error) {
     // ignore bad/partial matrix file
   }
   try {
     if (fs.existsSync(SKILL_INDEX_PATH)) {
-      skillIndex = JSON.parse(fs.readFileSync(SKILL_INDEX_PATH, 'utf8'));
+      skillIndex = safeParseJSON(fs.readFileSync(SKILL_INDEX_PATH, 'utf8'));
     }
   } catch (_error) {
     // ignore bad/partial index file

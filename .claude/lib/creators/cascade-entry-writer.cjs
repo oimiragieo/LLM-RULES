@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const QUEUE_RELATIVE_PATH = path.join('.claude', 'context', 'runtime', 'evolution-requests.jsonl');
 
@@ -23,7 +24,7 @@ function readExistingEntries(queuePath) {
     .filter(Boolean)
     .map(line => {
       try {
-        return JSON.parse(line);
+        return safeParseJSON(line);
       } catch {
         return null;
       }

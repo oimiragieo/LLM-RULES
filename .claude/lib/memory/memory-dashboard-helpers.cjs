@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 function getMemoryDir(projectRoot) {
   return path.join(projectRoot, '.claude', 'context', 'memory');
@@ -29,7 +30,7 @@ function getFileSizeKB(filePath, logger = null) {
 function getJsonEntryCount(filePath, logger = null) {
   try {
     if (fs.existsSync(filePath)) {
-      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const data = safeParseJSON(fs.readFileSync(filePath, 'utf8'));
       if (Array.isArray(data)) return data.length;
       if (data.discovered_files) return Object.keys(data.discovered_files).length;
     }

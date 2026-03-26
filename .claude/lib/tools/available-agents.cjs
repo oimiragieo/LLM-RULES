@@ -20,6 +20,7 @@ const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { parseAgentFrontmatter } = require('./agent-registry-generator.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const DEFAULT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
 const DEFAULT_AGENTS_DIR = path.join(PROJECT_ROOT, '.claude/agents');
@@ -110,7 +111,7 @@ class AvailableAgentsQuery {
 
     try {
       const content = fs.readFileSync(this.registryPath, 'utf-8');
-      this.registry = JSON.parse(content);
+      this.registry = safeParseJSON(content);
       this.registryMtimeMs = currentMtimeMs;
       this.cache.clear();
       this.cacheTimeouts.clear();

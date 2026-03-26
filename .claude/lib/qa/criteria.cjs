@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 const { validatePathWithinProject, PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const IMPLEMENTATION_PLAN_FILENAME = 'implementation_plan.json';
 const MAX_QA_ITERATIONS = 50;
@@ -19,7 +20,7 @@ function loadImplementationPlan(planDir) {
   const filePath = resolvePlanPath(planDir);
   if (!filePath || !fs.existsSync(filePath)) return null;
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return safeParseJSON(fs.readFileSync(filePath, 'utf8'));
   } catch (_e) {
     return null;
   }

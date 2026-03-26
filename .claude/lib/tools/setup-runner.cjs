@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 /**
  * Check whether a single external tool is available and meets a minimum version.
@@ -75,7 +76,7 @@ function runSetupCheck(skillDir) {
   let manifest;
   try {
     const raw = fs.readFileSync(manifestPath, 'utf-8');
-    manifest = JSON.parse(raw);
+    manifest = safeParseJSON(raw);
   } catch (err) {
     return {
       ready: false,

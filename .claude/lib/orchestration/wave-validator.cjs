@@ -25,6 +25,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const CONTRACTS_FILE = path.join(
   __dirname,
@@ -225,7 +226,7 @@ function clearContracts() {
 function loadContracts() {
   try {
     const raw = fs.readFileSync(CONTRACTS_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];

@@ -11,6 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 /**
  * Framework detection patterns
@@ -81,7 +82,7 @@ async function detect(projectPath) {
   if (fs.existsSync(packageJsonPath)) {
     signals.packageJson = 1;
     try {
-      const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+      const pkg = safeParseJSON(fs.readFileSync(packageJsonPath, 'utf8'));
       const allDeps = {
         ...pkg.dependencies,
         ...pkg.devDependencies,

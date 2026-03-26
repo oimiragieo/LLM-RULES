@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const { getRecorderPath } = require('./flight-recorder.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 function replay(filePath = getRecorderPath()) {
   const result = {
@@ -16,7 +17,7 @@ function replay(filePath = getRecorderPath()) {
   const lines = fs.readFileSync(filePath, 'utf8').split('\n').filter(Boolean);
   for (const line of lines) {
     try {
-      result.entries.push(JSON.parse(line));
+      result.entries.push(safeParseJSON(line));
     } catch (_err) {
       result.skipped += 1;
     }

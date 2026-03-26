@@ -11,6 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 class PatternLibrary {
   constructor(config = {}) {
@@ -332,7 +333,7 @@ class PatternLibrary {
     try {
       if (fs.existsSync(this.config.storagePath)) {
         const data = fs.readFileSync(this.config.storagePath, 'utf8');
-        const parsed = JSON.parse(data);
+        const parsed = safeParseJSON(data);
 
         for (const pattern of parsed.patterns || []) {
           this.patterns.set(pattern.id, pattern);

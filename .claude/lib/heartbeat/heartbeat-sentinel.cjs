@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // Attempt to load proper-lockfile for atomic writes; fall back to tmp-rename.
 let lockfile = null;
@@ -119,7 +120,7 @@ function checkSentinel(expectedLoops = 8) {
   let data;
   try {
     const raw = fs.readFileSync(sentinelPath, 'utf8');
-    data = JSON.parse(raw);
+    data = safeParseJSON(raw);
   } catch (_parseErr) {
     return { valid: false, reason: 'corrupt', data: null };
   }
@@ -187,7 +188,7 @@ function checkSessionPing() {
   if (!fs.existsSync(pingPath)) return { valid: false, reason: 'missing', data: null };
   let data;
   try {
-    data = JSON.parse(fs.readFileSync(pingPath, 'utf8'));
+    data = safeParseJSON(fs.readFileSync(pingPath, 'utf8'));
   } catch (_) {
     return { valid: false, reason: 'corrupt', data: null };
   }

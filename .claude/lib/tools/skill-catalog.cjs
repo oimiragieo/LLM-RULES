@@ -19,6 +19,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const CORE_AGENT_RECOMMENDATIONS = Object.freeze({
   developer: ['tdd', 'debugging', 'code-quality-expert'],
@@ -51,7 +52,7 @@ class SkillCatalogQuery {
 
     try {
       const content = fs.readFileSync(this.skillIndexPath, 'utf-8');
-      this.skillIndex = JSON.parse(content);
+      this.skillIndex = safeParseJSON(content);
       return this.skillIndex;
     } catch (error) {
       throw new Error(`Failed to load skill index: ${error.message}`);

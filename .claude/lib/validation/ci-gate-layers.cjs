@@ -11,6 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 /**
  * Extract .cjs file paths from settings.json hook entries.
@@ -62,7 +63,7 @@ async function validateExistence(projectRoot, options = {}) {
   }
 
   try {
-    const registryData = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+    const registryData = safeParseJSON(fs.readFileSync(registryPath, 'utf8'));
 
     // Validate agent paths
     if (registryData.agents && typeof registryData.agents === 'object') {
@@ -149,7 +150,7 @@ async function validateForwardRefs(projectRoot, options = {}) {
   // Validate hook references in settings.json
   if (fs.existsSync(settingsPath)) {
     try {
-      const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+      const settings = safeParseJSON(fs.readFileSync(settingsPath, 'utf8'));
 
       if (settings.hooks) {
         for (const hookRelPath of extractHookPaths(settings)) {
@@ -239,7 +240,7 @@ async function validateBackwardRefs(projectRoot, options = {}) {
   const settingsPath = options.settingsPath || path.join(projectRoot, '.claude/settings.json');
   if (fs.existsSync(settingsPath)) {
     try {
-      const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+      const settings = safeParseJSON(fs.readFileSync(settingsPath, 'utf8'));
 
       if (settings.hooks) {
         for (const hookRelPath of extractHookPaths(settings)) {

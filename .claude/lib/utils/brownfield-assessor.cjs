@@ -15,6 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 /**
  * Assess project maturity
@@ -298,7 +299,7 @@ async function suggestAgents(projectPath) {
   const packageJsonPath = path.join(projectPath, 'package.json');
   if (fs.existsSync(packageJsonPath)) {
     try {
-      const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+      const pkg = safeParseJSON(fs.readFileSync(packageJsonPath, 'utf8'));
       const allDeps = { ...pkg.dependencies, ...pkg.devDependencies };
 
       if (allDeps['typescript']) {

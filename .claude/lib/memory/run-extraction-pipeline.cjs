@@ -8,6 +8,7 @@ const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-ro
 const { extractMemoriesFromSession } = require('./memory-extractor.cjs');
 const { writeExtractedMemories } = require('./memory-extraction-writer.cjs');
 const memoryTiers = require('./memory-tiers.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const logger = createLogger('memory-extraction-pipeline');
 
@@ -25,7 +26,7 @@ function readSessionFile(projectRoot, filename) {
   const sessionPath = path.join(mtmDir, filename);
   if (!fs.existsSync(sessionPath)) return null;
   try {
-    return JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+    return safeParseJSON(fs.readFileSync(sessionPath, 'utf8'));
   } catch (_err) {
     return null;
   }

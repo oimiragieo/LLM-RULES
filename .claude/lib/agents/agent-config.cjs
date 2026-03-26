@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // Lazy-load schema validator (graceful if missing)
 let _validateData = null;
@@ -43,7 +44,7 @@ function load() {
       if (_cache && _isSameMeta(_cacheMeta, nextMeta)) {
         return _cache;
       }
-      _cache = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      _cache = safeParseJSON(fs.readFileSync(CONFIG_PATH, 'utf8'));
       _cacheMeta = nextMeta;
       return _cache;
     }

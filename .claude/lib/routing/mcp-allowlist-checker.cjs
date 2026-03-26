@@ -14,6 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const ALLOWLIST_FILE = path.join(
   __dirname,
@@ -133,7 +134,7 @@ function registerMcpAllowlist(config) {
 function loadCustomConfig() {
   try {
     const raw = fs.readFileSync(ALLOWLIST_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw);
     return typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   } catch {
     return {};

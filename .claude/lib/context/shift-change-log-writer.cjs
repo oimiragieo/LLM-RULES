@@ -3,6 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const SCHEMA_VERSION = '1.0.0';
 
@@ -12,7 +13,7 @@ function validateHandoverLog(data) {
     throw new Error('Schema file not found at ' + schemaPath);
   }
 
-  const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+  const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf8'));
   const ajv = new Ajv();
   addFormats(ajv);
   const validate = ajv.compile(schema);

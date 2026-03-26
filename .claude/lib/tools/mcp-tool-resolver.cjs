@@ -13,6 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const MCP_CONFIG_PATH = path.join(PROJECT_ROOT, '.mcp.json');
 const TOOL_MANIFEST_PATH = path.join(PROJECT_ROOT, '.claude/config/tool-manifest.json');
@@ -27,7 +28,7 @@ function loadMcpConfig() {
       return { mcpServers: {} };
     }
     const content = fs.readFileSync(MCP_CONFIG_PATH, 'utf-8');
-    return JSON.parse(content);
+    return safeParseJSON(content);
   } catch (err) {
     console.error('[mcp-resolver] Error loading MCP config:', err.message);
     return { mcpServers: {} };
@@ -98,7 +99,7 @@ function updateToolManifestMcpStatus() {
       return false;
     }
 
-    const manifest = JSON.parse(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf-8'));
+    const manifest = safeParseJSON(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf-8'));
     const config = loadMcpConfig();
     const configuredServers = Object.keys(config.mcpServers || {});
 
@@ -143,7 +144,7 @@ function updateToolManifestMcpStatus() {
  */
 function getAvailableMcpTools() {
   try {
-    const manifest = JSON.parse(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf-8'));
+    const manifest = safeParseJSON(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf-8'));
     const config = loadMcpConfig();
     const configuredServers = Object.keys(config.mcpServers || {});
 
@@ -161,7 +162,7 @@ function getAvailableMcpTools() {
  */
 function getMcpToolFallback(toolName) {
   try {
-    const manifest = JSON.parse(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf-8'));
+    const manifest = safeParseJSON(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf-8'));
     const tool = (manifest.tools?.mcp || []).find(t => t.name === toolName);
     return tool?.fallback || null;
   } catch (_err) {

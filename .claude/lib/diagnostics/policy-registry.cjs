@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const REGISTRY_FILE = path.join(
   __dirname,
@@ -90,7 +91,7 @@ const DEFAULT_POLICIES = {
 function loadRegistry() {
   try {
     const raw = fs.readFileSync(REGISTRY_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw);
     return typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   } catch {
     return {};

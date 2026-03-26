@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 const REFLECTION_LOG_PATH = path.resolve(__dirname, '../../context/memory/reflection-log.jsonl');
 const ROLLING_WINDOW = 10;
@@ -23,7 +24,7 @@ function readReflectionLog(logPath) {
 
   for (const line of lines) {
     try {
-      const entry = JSON.parse(line);
+      const entry = safeParseJSON(line);
       if (entry && entry.agentId && entry.scores) {
         entries.push(entry);
       }
@@ -143,7 +144,7 @@ function isEvolutionEligible(agentId, logPath) {
   );
   if (fs.existsSync(spawnRequestPath)) {
     try {
-      const requests = JSON.parse(fs.readFileSync(spawnRequestPath, 'utf8'));
+      const requests = safeParseJSON(fs.readFileSync(spawnRequestPath, 'utf8'));
       const recentEvolution = requests.find(
         r =>
           r.trigger === 'low-score-evolution' &&

@@ -17,6 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const DEBUG_DIR = path.join(__dirname, '..', '..', 'context', 'tmp', 'debug');
 
@@ -204,7 +205,7 @@ function listSessions() {
   return files
     .map(f => {
       try {
-        const session = JSON.parse(fs.readFileSync(path.join(DEBUG_DIR, f), 'utf8'));
+        const session = safeParseJSON(fs.readFileSync(path.join(DEBUG_DIR, f), 'utf8'));
         return {
           id: session.id,
           bug_id: session.bug_id,
@@ -222,7 +223,7 @@ function loadSession(sessionId) {
   const fp = sessionPath(sessionId);
   if (!fs.existsSync(fp)) return null;
   try {
-    return JSON.parse(fs.readFileSync(fp, 'utf8'));
+    return safeParseJSON(fs.readFileSync(fp, 'utf8'));
   } catch {
     return null;
   }

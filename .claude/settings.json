@@ -165,6 +165,10 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/flight-recorder-schema-gate.cjs"
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/unified-creator-guard.cjs"
           }
         ]
       },

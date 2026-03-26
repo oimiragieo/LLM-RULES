@@ -17,6 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const SKILL_INDEX_FILE = path.join(
   __dirname,
@@ -226,7 +227,7 @@ function extractKeywords(text) {
 function loadOrBuildIndex() {
   try {
     const raw = fs.readFileSync(SKILL_INDEX_FILE, 'utf8');
-    const index = JSON.parse(raw);
+    const index = safeParseJSON(raw);
     if (Array.isArray(index) && index.length > 0) return index;
   } catch {
     // Build fresh

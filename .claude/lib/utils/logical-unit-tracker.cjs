@@ -8,6 +8,7 @@
  */
 
 const { execFileSync } = require('node:child_process');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 function runGit(repoPath, args, options = {}) {
   return execFileSync('git', args, {
@@ -29,7 +30,7 @@ function extractTaskId(note) {
 
   // Try JSON format first (git-notes-audit hook output)
   try {
-    const parsed = JSON.parse(note);
+    const parsed = safeParseJSON(note);
     if (parsed.taskId) {
       return String(parsed.taskId).replace(/^#/, '');
     }
@@ -88,7 +89,7 @@ async function getCommits(repoPath, range) {
 
         // Try to parse JSON metadata
         try {
-          const parsed = JSON.parse(note);
+          const parsed = safeParseJSON(note);
           commit.metadata = parsed.metadata || {};
         } catch (_err) {
           // Not JSON, no metadata

@@ -15,6 +15,7 @@ const lockfile = require('proper-lockfile');
 const { spawn } = require('child_process');
 const { PROJECT_ROOT: _PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { assembleSpawnPrompt, assembleSpawnPromptAsync } = require('../spawn/prompt-assembler.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 function cleanupSharedStores() {
   try {
@@ -80,7 +81,7 @@ function spawnSubagentProcess({
 
       let parsed = null;
       try {
-        parsed = stdout ? JSON.parse(stdout) : null;
+        parsed = stdout ? safeParseJSON(stdout) : null;
       } catch (parseErr) {
         reject(new Error(`Task tool failed to parse subagent output: ${parseErr.message}`));
         return;
@@ -229,7 +230,7 @@ function loadTaskStore() {
   try {
     if (fs.existsSync(storePath)) {
       const raw = fs.readFileSync(storePath, 'utf8');
-      return JSON.parse(raw);
+      return safeParseJSON(raw);
     }
   } catch (_e) {
     /* ignore */
@@ -279,7 +280,7 @@ async function withTaskStoreLock(fn) {
     let store = { tasks: [] };
     try {
       const raw = fs.readFileSync(storePath, 'utf8');
-      store = JSON.parse(raw);
+      store = safeParseJSON(raw);
     } catch (parseErr) {
       console.warn(
         `[TaskStore] Failed to read or parse tasks.json: ${parseErr.message}, starting fresh`
