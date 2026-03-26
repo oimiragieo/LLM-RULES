@@ -123,24 +123,33 @@ try {
   const vbsPath = path.join(tmpDir, '_auto-accept.vbs').replace(/\//g, '\\');
   const batPath = path.join(tmpDir, '_channel-autostart.bat').replace(/\//g, '\\');
 
-  // VBScript: wait for the channel window to show the confirmation prompt,
-  // then press Enter. Targets "TelegramChannel" window title (set by the
-  // `start` command in the bat file) to avoid hitting the user's main session.
-  // Retries AppActivate 3 times in case the window hasn't appeared yet.
+  // VBScript: find the newest cmd.exe process (our channel window), activate
+  // it by PID, and press Enter to accept the development-channels confirmation.
+  // Cannot use window title because WT overrides it with the running process.
   fs.writeFileSync(
     vbsPath,
     [
-      'Set WshShell = WScript.CreateObject("WScript.Shell")',
-      'Dim activated: activated = False',
-      'Dim i',
-      'For i = 1 To 6',
-      '  WScript.Sleep 2000',
-      '  If WshShell.AppActivate("TelegramChannel") Then',
-      '    activated = True',
-      '    Exit For',
-      '  End If',
+      'WScript.Sleep 4000',
+      'Set wmi = GetObject("winmgmts:\\\\.\\root\\cimv2")',
+      'Set procs = wmi.ExecQuery("SELECT ProcessId FROM Win32_Process WHERE Name=\'cmd.exe\' AND CommandLine LIKE \'%TelegramChannel%\'")',
+      'Dim targetPid: targetPid = 0',
+      'For Each proc In procs',
+      '  targetPid = proc.ProcessId',
+      '  Exit For',
       'Next',
-      'If activated Then',
+      'If targetPid = 0 Then',
+      '  Set procs2 = wmi.ExecQuery("SELECT ProcessId, CreationDate FROM Win32_Process WHERE Name=\'cmd.exe\'")',
+      '  Dim newest: newest = ""',
+      '  For Each proc In procs2',
+      '    If newest = "" Or proc.CreationDate > newest Then',
+      '      newest = proc.CreationDate',
+      '      targetPid = proc.ProcessId',
+      '    End If',
+      '  Next',
+      'End If',
+      'If targetPid > 0 Then',
+      '  Set WshShell = WScript.CreateObject("WScript.Shell")',
+      '  WshShell.AppActivate CLng(targetPid)',
       '  WScript.Sleep 500',
       '  WshShell.SendKeys "{ENTER}"',
       'End If',
@@ -150,12 +159,14 @@ try {
 
   // Bat: start claude directly in a new cmd window (like start-telegram.bat),
   // then start VBS for auto-accept, then self-delete.
-  // Using /D to set working directory and cmd /k to keep window open.
+  // Uses `title TelegramChannel` inside `cmd /k` so the window title is set
+  // BEFORE claude runs — Windows Terminal uses the cmd title for its tab.
+  // VBScript targets this title to auto-accept the confirmation prompt.
   fs.writeFileSync(
     batPath,
     [
       '@echo off',
-      `start "TelegramChannel" /D "${rootWin}" cmd /k claude ${perms} ${channelFlags}`,
+      `start "" /D "${rootWin}" cmd /k "title TelegramChannel & claude ${perms} ${channelFlags}"`,
       `start "" wscript "${vbsPath}"`,
       `del "%~f0" 2>nul`,
     ].join('\r\n'),
