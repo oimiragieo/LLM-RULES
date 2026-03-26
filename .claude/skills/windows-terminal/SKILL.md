@@ -337,27 +337,236 @@ spawn('wt.exe', ['-w', 'new', 'new-tab', 'cmd', '/k', 'claude'], { shell: false 
 spawn('cmd.exe', ['/c', 'wt', '-w', 'new', 'new-tab', 'cmd', '/k', 'claude'], { shell: false });
 
 // ❌ Missing 'set CLAUDECODE=' — claude refuses to start inside another Claude Code session
-//    ("Nested sessions share runtime resources and will crash all active sessions")
 spawn('cmd.exe', ['/c', 'start', '', 'wt', '-w', 'new', 'new-tab', 'cmd', '/k', 'claude']);
-
-// ❌ new-tab without -w new — opens TAB in user's existing WT session (confusing UX)
-spawn('cmd.exe', ['/c', 'wt', 'new-tab', '--title', 'Claude', 'cmd', '/k', 'claude']);
 
 // ❌ shell: true — exposes shell metacharacter injection attack surface
 spawn('cmd.exe', ['/c', 'wt', '-w', 'new', 'new-tab', userInput], { shell: true });
 
-// ❌ Direct string concatenation into PowerShell — injection risk
-spawn('powershell.exe', ['-Command', `wt -w new new-tab ${userTitle}`]);
-// → if userTitle = '"; rm -rf /' ... you get the idea
+// ❌ spawn({detached:true}) in hooks — Windows kills child when hook exits
+spawn('node', ['my-script.js'], { detached: true, stdio: 'ignore' }).unref();
+// The hook runner's job object kills ALL descendants — detached does NOT escape it
 
-// ❌ execSync — blocks Node.js event loop, hangs hooks
-const { execSync } = require('child_process');
-execSync('wt -w new new-tab cmd /k claude'); // BLOCKS until WT closes
+// ❌ AppActivate("title") — hits wrong window when multiple instances exist
+// WshShell.AppActivate "claude"  ← matches user's main session, not the new one
+
+// ❌ .join('\n') for bat files — cmd.exe fails or garbles output
+fs.writeFileSync(batPath, lines.join('\n'), 'utf8'); // MUST use '\r\n'
+
+// ❌ title command in cmd — WT overrides with the running process name
+// start "MyTitle" cmd /k "title MyTitle & claude"  ← WT ignores both titles
 
 // ❌ Not calling child.unref() — Node.js waits for child to exit, keeps process alive
 const child = spawn('cmd.exe', [...]);
 // Missing: child.unref()
 ```
+
+---
+
+## CRITICAL: Hook Process Tree Escape (discovered 2026-03-25)
+
+Claude Code hooks run in a subprocess with a Windows job object. `spawn({ detached: true })`
+does **NOT** escape the job object — Windows kills ALL descendants when the hook exits.
+
+### The ONLY reliable escape pattern
+
+Write a `.bat` file, then `execFileSync('cmd', ['/c', batPath])`. Inside the bat,
+use `wt` or `start` to create processes in an INDEPENDENT process tree.
+
+```javascript
+const { execFileSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const batPath = path.join(tmpDir, '_launcher.bat').replace(/\//g, '\\');
+fs.writeFileSync(batPath, [
+  '@echo off',
+  `wt -w 0 new-tab --title "MySession" -- cmd /k "cd /d "${rootWin}" && my-command"`,
+  `del "%~f0" 2>nul`,
+].join('\r\n'), 'utf8');  // MUST be \r\n for bat files
+
+try {
+  execFileSync('cmd', ['/c', batPath], {
+    shell: false,
+    timeout: 5000,
+    stdio: 'ignore',
+    cwd: ROOT,
+  });
+} catch (_) {
+  // bat self-delete can cause non-zero exit — harmless
+  // wt/start already fired before the delete ran
+}
+```
+
+Why this works:
+1. `cmd.exe /c bat` runs the bat synchronously
+2. `wt` or `start` inside the bat creates a process in a NEW process tree
+3. The bat returns immediately after `wt`/`start` fires
+4. The new process is NOT in the hook's job object — it survives
+5. `del "%~f0" 2>nul` self-cleans the bat file
+
+### Tab vs Window from hooks
+
+```bat
+@rem Opens a TAB in the most recent WT window:
+wt -w 0 new-tab --title "MyTab" -- cmd /k "my-command"
+
+@rem Opens a new WINDOW (use when you don't want to intrude on user's WT):
+start "" /D "C:\mydir" cmd /k "my-command"
+```
+
+---
+
+## VBScript Window Targeting by PID (discovered 2026-03-25)
+
+When sending keystrokes to a specific window (e.g., auto-accepting a confirmation
+prompt), you MUST target by PID. Window titles are unreliable because:
+- WT overrides `title` command and `start` title with the running process name
+- Multiple windows may have the same title (e.g., two "claude" sessions)
+
+### WMI query to find exact process, then AppActivate by PID
+
+```vbs
+WScript.Sleep 4000
+Set wmi = GetObject("winmgmts:\\.\root\cimv2")
+
+' Find cmd.exe with a unique marker in command line
+Set procs = wmi.ExecQuery( _
+  "SELECT ProcessId FROM Win32_Process " & _
+  "WHERE Name='cmd.exe' AND CommandLine LIKE '%MyUniqueMarker%'")
+Dim targetPid: targetPid = 0
+For Each proc In procs
+    targetPid = proc.ProcessId
+    Exit For
+Next
+
+' Fallback: newest cmd.exe
+If targetPid = 0 Then
+    Set procs2 = wmi.ExecQuery( _
+      "SELECT ProcessId, CreationDate FROM Win32_Process WHERE Name='cmd.exe'")
+    Dim newest: newest = ""
+    For Each proc In procs2
+        If newest = "" Or proc.CreationDate > newest Then
+            newest = proc.CreationDate
+            targetPid = proc.ProcessId
+        End If
+    Next
+End If
+
+If targetPid > 0 Then
+    Set WshShell = WScript.CreateObject("WScript.Shell")
+    WshShell.AppActivate CLng(targetPid)
+    WScript.Sleep 500
+    WshShell.SendKeys "{ENTER}"
+End If
+```
+
+Launch the VBScript from the same bat that spawns the terminal:
+
+```bat
+@echo off
+wt -w 0 new-tab --title "MySession" -- cmd /k "my-command"
+start "" wscript "C:\path\to\_auto-accept.vbs"
+del "%~f0" 2>nul
+```
+
+---
+
+## Lockfile Deduplication for Hooks
+
+Hooks fire on every UserPromptSubmit. Use atomic O_EXCL lockfile to prevent
+spawning multiple windows:
+
+```javascript
+const LOCKFILE = path.join(runtimeDir, 'my-cooldown.lock');
+const COOLDOWN_MS = 120000; // 2 minutes
+
+let alreadyLocked = false;
+try {
+  // wx = O_CREAT | O_EXCL — fails atomically if file exists
+  fs.writeFileSync(LOCKFILE, String(Date.now()), { flag: 'wx' });
+} catch (e) {
+  if (e.code === 'EEXIST') {
+    try {
+      const lockTime = parseInt(fs.readFileSync(LOCKFILE, 'utf8').trim(), 10);
+      if (!isNaN(lockTime) && Date.now() - lockTime < COOLDOWN_MS) {
+        alreadyLocked = true;
+      } else {
+        fs.writeFileSync(LOCKFILE, String(Date.now()), 'utf8'); // Expired
+      }
+    } catch (_) {
+      fs.writeFileSync(LOCKFILE, String(Date.now()), 'utf8'); // Corrupt
+    }
+  }
+}
+if (alreadyLocked) process.exit(0);
+```
+
+---
+
+## PID Alive Check (cross-platform)
+
+```javascript
+function isPidAlive(pid) {
+  try {
+    process.kill(pid, 0); // signal 0 = existence check only, no kill
+    return true;
+  } catch (_) {
+    return false; // ESRCH = no such process
+  }
+}
+```
+
+---
+
+## Bat File Requirements
+
+### CRLF line endings are MANDATORY
+
+```javascript
+// WRONG — cmd.exe fails silently or produces bizarre errors with LF
+fs.writeFileSync(batPath, lines.join('\n'), 'utf8');
+
+// RIGHT — CRLF required for all .bat and .cmd files
+fs.writeFileSync(batPath, lines.join('\r\n'), 'utf8');
+```
+
+### Bash vs cmd escaping trap
+
+When testing from Git Bash (Claude Code's default shell on Windows),
+`cmd /c path\to\file.bat` fails because bash interprets `\t` as tab, `\n` as
+newline, etc.
+
+```bash
+# WRONG from Git Bash — bash eats backslashes
+cmd /c C:\path\to\file.bat
+
+# RIGHT — use forward slashes or run from Node.js
+cmd /c "C:/path/to/file.bat"
+```
+
+Best practice: Always use `execFileSync('cmd', ['/c', batPath])` from Node.js.
+Node handles backslash paths correctly.
+
+---
+
+## Quick Reference: Anti-Pattern Table
+
+| Pattern | Problem | Fix |
+|---------|---------|-----|
+| `spawn({detached:true})` in hooks | Windows kills child on hook exit | Write bat + `execFileSync` |
+| `AppActivate("title")` | Multiple windows match | Target by PID via WMI |
+| `start "Title" cmd /k` from hook | Opens new window, not tab | `wt -w 0 new-tab --` in bat |
+| `.join('\n')` for bat files | cmd.exe fails | `.join('\r\n')` (CRLF) |
+| `cmd /c path\file.bat` from bash | Bash eats backslashes | Use Node.js `execFileSync` |
+| `title MyTitle` in cmd | WT overrides with process name | Don't rely on titles, use PID |
+| `process.exit(1)` to block hook | Exit 1 = error, NOT block | Use `process.exit(2)` |
+
+## Related Files (agent-studio)
+
+- `.claude/hooks/channels/channel-auto-start.cjs` — Production hook using all patterns above
+- `.claude/tools/cli/channel-manager.cjs` — Channel session lifecycle management
+- `.claude/tools/cli/terminal-tracker.cjs` — PID tracking for spawned sessions
+- `scripts/channels/start-telegram.bat` — Simple one-line launcher reference
 
 ---
 
