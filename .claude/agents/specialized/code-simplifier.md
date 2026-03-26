@@ -5,7 +5,7 @@ description: >-
   Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Focuses
   on recently modified code unless instructed otherwise. Use for code cleanup, refactoring for readability, eliminating
   complexity, and applying project standards.
-model: opus
+model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18
@@ -38,6 +38,7 @@ skills:
   - task-management-protocol
   - context-compressor
   - verification-before-completion
+  - codebase-cleaner
 context_files: null
 ---
 

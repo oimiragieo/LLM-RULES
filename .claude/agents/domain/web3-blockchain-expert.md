@@ -5,7 +5,7 @@ description: >-
   Web3, blockchain, and smart contract development expert. Specializes in Solidity, DeFi protocols, security auditing,
   gas optimization, and multi-chain development. Use PROACTIVELY for smart contract development, DeFi architecture,
   security review, or blockchain integration. Handles OWASP Smart Contract Top 10 vulnerabilities.
-model: opus
+model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18

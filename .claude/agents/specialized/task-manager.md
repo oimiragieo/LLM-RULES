@@ -2,7 +2,7 @@
 name: task-manager
 version: 1.1.0
 description: Post-pipeline task hygiene agent that audits task state, verifies framework health invariants, creates fix tasks for violations, and closes orphaned stale tasks
-model: haiku
+model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 20

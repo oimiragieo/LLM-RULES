@@ -6,7 +6,7 @@ description: >-
   spawns disposable sub-agents for Claude-dependent actions. Prevents context pollution in the router.
 category: orchestrators
 type: orchestrator
-model: haiku
+model: sonnet
 skills:
   - heartbeat
   - scheduled-tasks
@@ -17,6 +17,8 @@ skills:
   - code-structural-search
   - context-compressor
   - verification-before-completion
+  - cron-decision
+  - cron-runner
 tools:
   - CronCreate
   - CronList

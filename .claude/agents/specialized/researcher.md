@@ -46,6 +46,10 @@ skills:
   - task-management-protocol
   - context-compressor
   - verification-before-completion
+  - arxiv-monitor
+  - exa-monitor
+  - knowledge-graph
+  - reddit-researcher
 context_files: null
 ---
 

@@ -35,6 +35,7 @@ skills:
   - context-compressor
   - verification-before-completion
   - writing-skills
+  - writing
 context_files: null
 ---
 

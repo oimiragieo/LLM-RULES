@@ -5,7 +5,7 @@ description: >-
   Auto-draft requirements and generate code from identified pain points.
   Use for rapid prototyping, MVP scaffolding, and turning forum-discovered
   opportunities into working application code with tests.
-model: opus
+model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 25
@@ -277,5 +277,9 @@ Read `.claude/context/memory/decisions.md`
 - New pattern/solution -> Append to `.claude/context/memory/learnings.md`
 - Roadblock/issue -> Append to `.claude/context/memory/issues.md`
 - Architecture change -> Update `.claude/context/memory/decisions.md`
+
+## Token Saver Invocation Rule
+
+Before generating outputs >2000 tokens, invoke `Skill({ skill: 'context-compressor' })` to compress context. Monitor context window and compress proactively at 80K tokens.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.

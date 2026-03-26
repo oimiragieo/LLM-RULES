@@ -43,6 +43,7 @@ skills:
   - task-management-protocol
   - context-compressor
   - verification-before-completion
+  - commit-security-scan
 context_files: null
 ---
 

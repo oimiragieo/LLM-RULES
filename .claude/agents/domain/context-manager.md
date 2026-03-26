@@ -2,9 +2,13 @@
 name: context-manager
 type: domain
 version: 1.0.0
-description: Context window optimization specialist for Claude Code agents. Manages token budget, applies progressive compression strategies, deduplicates memory, prunes stale entries, and coordinates session handoffs. Use when context pressure exceeds 80K tokens, when memory files are bloated, when agent session is approaching limits, or when context quality degradation is detected.
+description: >-
+  Context window optimization specialist for Claude Code agents. Manages token budget, applies progressive compression
+  strategies, deduplicates memory, prunes stale entries, and coordinates session handoffs. Use when context pressure
+  exceeds 80K tokens, when memory files are bloated, when agent session is approaching limits, or when context quality
+  degradation is detected.
 author: agent-studio
-model: haiku
+model: sonnet
 temperature: 0.2
 context_strategy: aggressive_compress
 maxTurns: 10
@@ -31,6 +35,7 @@ skills:
   - memory-search
   - task-management-protocol
   - verification-before-completion
+  - context-attribution
 context_files: null
 ---
 

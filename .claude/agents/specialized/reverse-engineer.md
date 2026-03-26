@@ -6,7 +6,7 @@ description: >-
   IDA Pro, Ghidra, radare2, x64dbg, and modern RE toolchains. Handles executable analysis, library inspection, protocol
   extraction, and vulnerability research. Uses ripgrep for fast codebase analysis. Use PROACTIVELY for binary analysis,
   CTF challenges, security research, or understanding undocumented software.
-model: opus
+model: sonnet
 temperature: 0.3
 context_strategy: full
 maxTurns: 18

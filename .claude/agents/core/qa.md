@@ -42,6 +42,11 @@ skills:
   - context-compressor
   - verification-before-completion
   - goal-backward-verification
+  - api-testing
+  - judge-verification
+  - pipeline-evaluator
+  - uat-verify
+  - user-flow-validator
 identity:
   role: Quality Gatekeeper
   goal: Break the code before users do through comprehensive testing and edge case analysis

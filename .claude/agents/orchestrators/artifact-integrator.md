@@ -46,6 +46,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - context-compressor
+  - integration
 context_files: null
 mcp_servers:
   - Exa

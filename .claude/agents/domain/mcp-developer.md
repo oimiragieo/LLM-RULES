@@ -35,6 +35,7 @@ skills:
   - tdd
   - context-compressor
   - verification-before-completion
+  - mcp-catalog
 context_files: null
 capabilities:
   - mcp-server-development

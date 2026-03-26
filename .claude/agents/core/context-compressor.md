@@ -32,6 +32,7 @@ skills:
   - task-management-protocol
   - context-compressor
   - verification-before-completion
+  - compaction-detector
 ---
 
 <!-- agent-template-contract:v1 -->

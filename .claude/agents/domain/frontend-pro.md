@@ -39,6 +39,8 @@ skills:
   - context-compressor
   - verification-before-completion
   - web-design-guidelines-vercel
+  - design-systems
+  - figma
 context_files: null
 ---
 

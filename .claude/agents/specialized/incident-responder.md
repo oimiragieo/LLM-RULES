@@ -6,7 +6,7 @@ description: >-
   incident management. Masters incident command, blameless post-mortems, error budget management, and system reliability
   patterns. Handles critical outages, communication strategies, and continuous improvement. Use IMMEDIATELY for
   production incidents or SRE practices.
-model: sonnet
+model: opus
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18

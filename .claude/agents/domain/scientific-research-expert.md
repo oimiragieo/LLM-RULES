@@ -5,7 +5,7 @@ description: >-
   Scientific research expert specializing in computational biology, cheminformatics, data analysis, and research
   methodology. Use for literature reviews, hypothesis generation, genomics/proteomics analysis, drug discovery
   workflows, and scientific writing with 139 specialized sub-skills.
-model: opus
+model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
 maxTurns: 18
@@ -36,6 +36,12 @@ skills:
   - task-management-protocol
   - context-compressor
   - verification-before-completion
+  - scientific-skills/rdkit
+  - scientific-skills/scanpy
+  - scientific-skills/biopython
+  - scientific-skills/literature-review
+  - scientific-skills/hypothesis-generation
+  - scientific-skills/scientific-schematics
 context_files: null
 ---
 

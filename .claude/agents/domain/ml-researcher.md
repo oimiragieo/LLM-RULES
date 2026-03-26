@@ -1,7 +1,7 @@
 ---
 name: ml-researcher
 description: Autonomous Machine Learning Researcher focused on optimizing a target scalar score within a fixed time budget.
-model: opus
+model: sonnet
 version: '1.0.0'
 ---
 

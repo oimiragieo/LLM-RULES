@@ -227,4 +227,8 @@ Read `.claude/context/memory/decisions.md`
 - Model evaluation decision -> Update `.claude/context/memory/decisions.md`
 - Benchmark issue found -> Append to `.claude/context/memory/issues.md`
 
+## Token Saver Invocation Rule
+
+Before generating outputs >2000 tokens, invoke `Skill({ skill: 'context-compressor' })` to compress context. Monitor context window and compress proactively at 80K tokens.
+
 > ASSUME INTERRUPTION: Your context may reset. If it is not in memory, it did not happen.

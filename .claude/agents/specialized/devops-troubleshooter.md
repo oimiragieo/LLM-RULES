@@ -36,6 +36,7 @@ skills:
   - task-management-protocol
   - context-compressor
   - verification-before-completion
+  - session-log-analyzer
 ---
 
 <!-- agent-template-contract:v1 -->

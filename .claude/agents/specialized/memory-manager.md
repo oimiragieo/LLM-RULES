@@ -1,8 +1,10 @@
 ---
 name: memory-manager
 version: 1.0.0
-description: Orchestrates memory health audits and cleanup — use when memory files are bloated, stale, or need rotation/deduplication.
-model: haiku
+description: >-
+  Orchestrates memory health audits and cleanup — use when memory files are bloated, stale, or need
+  rotation/deduplication.
+model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18
@@ -10,7 +12,16 @@ permissionMode: default
 priority: high
 verified: true
 lastVerifiedAt: '2026-03-19T00:00:00.000Z'
-tools: [Read, Write, Edit, Bash, Grep, Glob, MemoryRecord, TaskUpdate, Skill]
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
+  - MemoryRecord
+  - TaskUpdate
+  - Skill
 skills:
   - memory-audit
   - context-compressor
@@ -19,6 +30,8 @@ skills:
   - ripgrep
   - code-semantic-search
   - code-structural-search
+  - auto-recall
+  - perpetual-memory
 context_files:
   - '@.claude/context/memory/learnings.md'
   - '@.claude/context/memory/decisions.md'

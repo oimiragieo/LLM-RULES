@@ -39,6 +39,9 @@ skills:
   - wave-executor
   - context-compressor
   - system-health-check
+  - init
+  - task-delegation
+  - skill-discovery
 ---
 
 <!-- agent-template-contract:v1 -->

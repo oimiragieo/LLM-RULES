@@ -5,7 +5,7 @@ description: >-
   Master game development across Unity, Unreal Engine, and Godot with expertise in ECS architecture, game loops,
   shaders, physics, and cross-platform optimization. Use PROACTIVELY for game mechanics, engine-specific patterns,
   performance optimization, or game AI implementation.
-model: opus
+model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18

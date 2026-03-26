@@ -42,6 +42,7 @@ skills:
   - context-compressor
   - verification-before-completion
   - artifact-integrator
+  - outcome-reflection
 context_files:
   - '@.claude/context/memory/patterns.json'
   - '@.claude/context/memory/gotchas.json'

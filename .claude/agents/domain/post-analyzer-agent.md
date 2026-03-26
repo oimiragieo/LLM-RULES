@@ -264,4 +264,8 @@ Read `.claude/context/memory/decisions.md`
 
 **During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 
+## Token Saver Invocation Rule
+
+Before generating outputs >2000 tokens, invoke `Skill({ skill: 'context-compressor' })` to compress context. Monitor context window and compress proactively at 80K tokens.
+
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.

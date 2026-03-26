@@ -5,7 +5,7 @@ version: 1.0.0
 description: >-
   Conversational assistant for Q&A, explanations, brainstorming, and general interaction. Uses a soul.md personality
   file for consistent identity across sessions and a soul-memory.md for behavioral evolution.
-model: opus
+model: sonnet
 temperature: 0.7
 compression: lazy_load
 maxTurns: 25

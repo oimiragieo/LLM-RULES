@@ -5,7 +5,7 @@ description: >-
   Ingest user content samples, analyze writing style patterns, and generate new content that mimics the user's
   tone, vocabulary, and structural habits. Use for personalized content generation, ghostwriting assistance,
   brand voice consistency, and style transfer tasks.
-model: opus
+model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
 maxTurns: 18
@@ -233,5 +233,9 @@ Read `.claude/context/memory/decisions.md`
 - Architecture change -> Update `.claude/context/memory/decisions.md`
 
 **During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
+
+## Token Saver Invocation Rule
+
+Before generating outputs >2000 tokens, invoke `Skill({ skill: 'context-compressor' })` to compress context. Monitor context window and compress proactively at 80K tokens.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.

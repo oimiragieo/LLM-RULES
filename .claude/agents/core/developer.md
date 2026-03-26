@@ -197,6 +197,17 @@ skills:
   - workflow-creator
   - workflow-updater
   - writing-skills
+  - electron-pro
+  - google-workspace
+  - markitdown-converter
+  - pptx
+  - slack-expert
+  - telegram-polling
+  - telegram-voice-pipeline
+  - transcription
+  - tts-generation
+  - websocket-engineer
+  - xlsx
 capabilities:
   - code-generation
   - refactoring

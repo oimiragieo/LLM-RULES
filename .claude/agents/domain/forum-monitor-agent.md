@@ -2,9 +2,8 @@
 name: forum-monitor-agent
 version: 1.0.0
 description: >-
-  Monitor Reddit, HN, ProductHunt, and other community forums for recurring
-  user pain points, feature requests, and unmet needs. Use for market research,
-  pain-point discovery, trend detection, and competitive intelligence gathering.
+  Monitor Reddit, HN, ProductHunt, and other community forums for recurring user pain points, feature requests, and
+  unmet needs. Use for market research, pain-point discovery, trend detection, and competitive intelligence gathering.
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
@@ -33,6 +32,7 @@ skills:
   - task-management-protocol
   - context-compressor
   - verification-before-completion
+  - forum-monitor
 context_files: null
 tags:
   - forum-monitoring
@@ -245,5 +245,9 @@ Read `.claude/context/memory/decisions.md`
 - New pattern/solution -> Append to `.claude/context/memory/learnings.md`
 - Roadblock/issue -> Append to `.claude/context/memory/issues.md`
 - Architecture change -> Update `.claude/context/memory/decisions.md`
+
+## Token Saver Invocation Rule
+
+Before generating outputs >2000 tokens, invoke `Skill({ skill: 'context-compressor' })` to compress context. Monitor context window and compress proactively at 80K tokens.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.

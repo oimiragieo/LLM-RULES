@@ -61,7 +61,7 @@ monitoring:
     errorRatePerHour: 10 # Alert if more than 10 errors per hour
     tokenBudgetPerDay: 100000 # Daily token budget
   retention:
-    metricsdays: 30 # Keep metrics for 30 days
+    metricsDays: 30 # Keep metrics for 30 days
     errorsDays: 90 # Keep error logs for 90 days
   dashboard:
     refreshIntervalMs: 5000 # Refresh every 5 seconds in live mode
@@ -350,3 +350,144 @@ agents:
   artifact-integrator:
     path: .claude/agents/orchestrators/artifact-integrator.md
     model: opus
+
+  # Additional core agents
+  general-assistant:
+    path: .claude/agents/core/general-assistant.md
+    model: sonnet
+  task-manager:
+    path: .claude/agents/specialized/task-manager.md
+    model: sonnet
+  memory-manager:
+    path: .claude/agents/specialized/memory-manager.md
+    model: sonnet
+  channel-responder:
+    path: .claude/agents/specialized/channel-responder.md
+    model: sonnet
+  claude-md-auditor:
+    path: .claude/agents/specialized/claude-md-auditor.md
+    model: sonnet
+  ecosystem-auditor:
+    path: .claude/agents/specialized/ecosystem-auditor.md
+    model: sonnet
+
+  # Additional orchestrators
+  heartbeat-orchestrator:
+    path: .claude/agents/orchestrators/heartbeat-orchestrator.md
+    model: sonnet
+  loop-operator:
+    path: .claude/agents/orchestrators/loop-operator.md
+    model: sonnet
+
+  # Additional domain specialists
+  angular-pro:
+    path: .claude/agents/domain/angular-pro.md
+    model: sonnet
+  app-generator-agent:
+    path: .claude/agents/domain/app-generator-agent.md
+    model: sonnet
+  aso-specialist:
+    path: .claude/agents/domain/aso-specialist.md
+    model: sonnet
+  azure-infra-pro:
+    path: .claude/agents/domain/azure-infra-pro.md
+    model: sonnet
+  brand-guardian:
+    path: .claude/agents/domain/brand-guardian.md
+    model: sonnet
+  business-analyst:
+    path: .claude/agents/domain/business-analyst.md
+    model: sonnet
+  compliance-checker:
+    path: .claude/agents/domain/compliance-checker.md
+    model: sonnet
+  context-manager:
+    path: .claude/agents/domain/context-manager.md
+    model: sonnet
+  data-scientist:
+    path: .claude/agents/domain/data-scientist.md
+    model: sonnet
+  django-developer:
+    path: .claude/agents/domain/django-developer.md
+    model: sonnet
+  dotnet-pro:
+    path: .claude/agents/domain/dotnet-pro.md
+    model: sonnet
+  feedback-synthesizer:
+    path: .claude/agents/domain/feedback-synthesizer.md
+    model: sonnet
+  forum-monitor-agent:
+    path: .claude/agents/domain/forum-monitor-agent.md
+    model: sonnet
+  iot-engineer:
+    path: .claude/agents/domain/iot-engineer.md
+    model: sonnet
+  kotlin-pro:
+    path: .claude/agents/domain/kotlin-pro.md
+    model: sonnet
+  legacy-modernizer:
+    path: .claude/agents/domain/legacy-modernizer.md
+    model: sonnet
+  legal-advisor:
+    path: .claude/agents/domain/legal-advisor.md
+    model: sonnet
+  m365-admin:
+    path: .claude/agents/domain/m365-admin.md
+    model: sonnet
+  marketing-strategist:
+    path: .claude/agents/domain/marketing-strategist.md
+    model: sonnet
+  ml-researcher:
+    path: .claude/agents/domain/ml-researcher.md
+    model: sonnet
+  mlops-engineer:
+    path: .claude/agents/domain/mlops-engineer.md
+    model: sonnet
+  model-benchmarker-agent:
+    path: .claude/agents/domain/model-benchmarker-agent.md
+    model: sonnet
+  nlp-engineer:
+    path: .claude/agents/domain/nlp-engineer.md
+    model: sonnet
+  post-analyzer-agent:
+    path: .claude/agents/domain/post-analyzer-agent.md
+    model: sonnet
+  postgres-pro:
+    path: .claude/agents/domain/postgres-pro.md
+    model: sonnet
+  product-manager:
+    path: .claude/agents/domain/product-manager.md
+    model: sonnet
+  quant-analyst:
+    path: .claude/agents/domain/quant-analyst.md
+    model: sonnet
+  rails-pro:
+    path: .claude/agents/domain/rails-pro.md
+    model: sonnet
+  spring-boot-pro:
+    path: .claude/agents/domain/spring-boot-pro.md
+    model: sonnet
+  sql-pro:
+    path: .claude/agents/domain/sql-pro.md
+    model: sonnet
+  swift-pro:
+    path: .claude/agents/domain/swift-pro.md
+    model: sonnet
+  terraform-engineer:
+    path: .claude/agents/domain/terraform-engineer.md
+    model: sonnet
+  terragrunt-pro:
+    path: .claude/agents/domain/terragrunt-pro.md
+    model: sonnet
+  ux-researcher:
+    path: .claude/agents/domain/ux-researcher.md
+    model: sonnet
+  voice-replicator-agent:
+    path: .claude/agents/domain/voice-replicator-agent.md
+    model: sonnet
+  windows-infra-pro:
+    path: .claude/agents/domain/windows-infra-pro.md
+    model: sonnet
+  wordpress-master:
+    path: .claude/agents/domain/wordpress-master.md
+    model: sonnet

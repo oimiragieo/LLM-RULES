@@ -4,7 +4,7 @@ version: 1.0.0
 description: >-
   AI/ML specialist for machine learning model development, deep learning, MLOps, experiment tracking, and model
   deployment. Use for PyTorch, TensorFlow, Hugging Face, scikit-learn projects, ML pipelines, and production ML systems.
-model: opus
+model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18
@@ -35,6 +35,8 @@ skills:
   - task-management-protocol
   - context-compressor
   - verification-before-completion
+  - huggingface
+  - imagen-generation
 context_files: null
 ---
 

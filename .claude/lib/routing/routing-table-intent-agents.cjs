@@ -189,7 +189,6 @@ const INTENT_TO_AGENT = {
   'documentation-drift': 'claude-md-auditor',
   'stale-references': 'claude-md-auditor',
   'verify-docs': 'claude-md-auditor',
-  'telegram-voice-pipeline': 'telegram-voice-pipeline',
 };
 
 module.exports = { INTENT_TO_AGENT };

@@ -47,6 +47,12 @@ skills:
   - terraform-infra
   - context-compressor
   - verification-before-completion
+  - atlassian-integration
+  - azure-devops
+  - cloud-run
+  - cloudflare-workers
+  - notification-triggers
+  - windows-terminal
 ---
 
 <!-- agent-template-contract:v1 -->

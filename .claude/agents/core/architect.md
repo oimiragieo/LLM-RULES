@@ -42,6 +42,8 @@ skills:
   - task-management-protocol
   - context-compressor
   - verification-before-completion
+  - adversarial-debate
+  - code-graph-context
 identity:
   role: Principal Software Architect
   goal: Design systems that scale gracefully and remain maintainable as requirements evolve

@@ -4,7 +4,7 @@ version: 1.0.0
 description: >-
   Build high-performance async APIs with FastAPI, SQLAlchemy 2.0, and Pydantic V2. Master microservices, WebSockets, and
   modern Python async patterns. Use PROACTIVELY for FastAPI development, async optimization, or API architecture.
-model: opus
+model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18
