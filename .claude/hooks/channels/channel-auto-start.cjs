@@ -4,23 +4,20 @@
 /**
  * channel-auto-start.cjs — UserPromptSubmit hook
  *
- * On session start, launches channel-manager.cjs via a .bat file using
- * `cmd /c start` to break completely out of the hook's process tree.
+ * On session start, directly launches `claude` with channel flags in a new
+ * cmd window using `start`. No channel-manager indirection — mirrors what
+ * scripts/channels/start-telegram.bat does (proven to work).
  *
- * Previous approach (spawn('node', [channelManager]) with detached:true)
- * failed because Windows kills the child when the hook process exits —
- * Node's detached flag doesn't escape the hook runner's job object.
+ * After launching, spawns a VBScript to auto-accept the development-channels
+ * confirmation prompt (AppActivate + SendKeys Enter).
  *
- * Lockfile uses O_EXCL (wx flag) for true atomic creation to prevent
- * parallel hook instances from all spawning simultaneously.
- *
- * All logic runs synchronously at module level — never gates on stdin.
+ * Lockfile uses O_EXCL (wx flag) for atomic creation to prevent races.
  * Cooldown: 120 seconds between spawn attempts.
  */
 
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
+const { execFileSync } = require('child_process');
 
 // Drain stdin passively (prevent EPIPE) — never gate logic on it
 process.stdin.resume();
@@ -33,38 +30,31 @@ const LOCKFILE = path.join(RUNTIME, 'channel-autostart-cooldown.lock');
 const COOLDOWN_MS = 120000; // 2 minutes
 
 try {
-  // 1. Atomic lockfile gate — try exclusive create first (wins the race)
+  // ── 1. Atomic lockfile gate ───────────────────────────────────────────────
   let alreadyLocked = false;
   try {
-    // wx = O_CREAT | O_EXCL — fails atomically if file exists
     fs.writeFileSync(LOCKFILE, String(Date.now()), { flag: 'wx' });
-    // We won the lock — proceed
   } catch (e) {
     if (e.code === 'EEXIST') {
-      // File exists — check if cooldown has expired
       try {
         const lockTime = parseInt(fs.readFileSync(LOCKFILE, 'utf8').trim(), 10);
         if (!isNaN(lockTime) && Date.now() - lockTime < COOLDOWN_MS) {
           alreadyLocked = true;
         } else {
-          // Expired — overwrite with new timestamp
           fs.writeFileSync(LOCKFILE, String(Date.now()), 'utf8');
         }
       } catch (_) {
-        // Corrupt lockfile — overwrite
         fs.writeFileSync(LOCKFILE, String(Date.now()), 'utf8');
       }
     } else {
-      // Some other error (permissions?) — try regular write
       fs.writeFileSync(LOCKFILE, String(Date.now()), 'utf8');
     }
   }
-
   if (alreadyLocked) {
     process.exit(0);
   }
 
-  // 2. Load .env
+  // ── 2. Load .env ──────────────────────────────────────────────────────────
   const envPath = path.join(ROOT, '.env');
   if (fs.existsSync(envPath)) {
     for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
@@ -81,7 +71,7 @@ try {
     }
   }
 
-  // 3. Check prerequisites
+  // ── 3. Check prerequisites ────────────────────────────────────────────────
   const botToken = (process.env.TELEGRAM_BOT_TOKEN || '').trim();
   const autoStart = (process.env.CHANNEL_AUTO_START || 'false').trim().toLowerCase();
   if (!botToken || autoStart !== 'true') {
@@ -94,59 +84,84 @@ try {
     process.exit(0);
   }
 
-  const channelManager = path.join(ROOT, '.claude', 'tools', 'cli', 'channel-manager.cjs');
-  if (!fs.existsSync(channelManager)) {
-    process.exit(0);
+  // ── 4. Check if a channel session is already alive ────────────────────────
+  const trackerPath = path.join(RUNTIME, 'terminal-pids.json');
+  if (fs.existsSync(trackerPath)) {
+    try {
+      const raw = fs.readFileSync(trackerPath, 'utf8');
+      const tracker = JSON.parse(raw);
+      const session = (tracker.sessions || []).find(
+        s => s.purpose === 'channel-session' && s.status === 'active'
+      );
+      if (session && session.pid) {
+        try {
+          process.kill(session.pid, 0); // signal 0 = just check if alive
+          process.exit(0); // already running — skip
+        } catch (_) {
+          // PID dead — continue to spawn
+        }
+      }
+    } catch (_) {
+      // corrupt tracker — continue
+    }
   }
 
-  // 4. Write a two-stage bat launcher:
-  //    Stage 1 (_channel-autostart.bat): uses `start` to launch stage 2 in
-  //    a new window, then deletes itself. Returns immediately.
-  //    Stage 2 (_channel-run.bat): runs channel-manager.cjs, pauses on
-  //    error for debugging, then deletes itself.
+  // ── 5. Build channel flags ────────────────────────────────────────────────
+  const plugins = (process.env.CHANNEL_PLUGINS || 'server:telegram-relay')
+    .split(/\s+/)
+    .filter(Boolean);
+  const channelFlags = plugins
+    .flatMap(p => ['--dangerously-load-development-channels', p])
+    .join(' ');
+  const perms = (process.env.CHANNEL_PERMISSIONS || '--dangerously-skip-permissions').trim();
+
+  // ── 6. Write launcher bat + auto-accept VBS ───────────────────────────────
   const tmpDir = path.join(ROOT, '.claude', 'context', 'tmp');
   fs.mkdirSync(tmpDir, { recursive: true });
 
-  const nodePath = process.execPath.replace(/\//g, '\\');
-  const mgrPath = channelManager.replace(/\//g, '\\');
+  const rootWin = ROOT.replace(/\//g, '\\');
+  const vbsPath = path.join(tmpDir, '_auto-accept.vbs').replace(/\//g, '\\');
+  const batPath = path.join(tmpDir, '_channel-autostart.bat').replace(/\//g, '\\');
 
-  // Stage 2: the actual work (self-deletes with 2>nul to suppress error)
-  const runBat = path.join(tmpDir, '_channel-run.bat').replace(/\//g, '\\');
+  // VBScript: wait for claude to show the confirmation prompt, then press Enter
   fs.writeFileSync(
-    runBat,
+    vbsPath,
+    [
+      'WScript.Sleep 5000',
+      'Set WshShell = WScript.CreateObject("WScript.Shell")',
+      'WshShell.AppActivate "claude"',
+      'WScript.Sleep 500',
+      'WshShell.SendKeys "{ENTER}"',
+    ].join('\r\n'),
+    'utf8'
+  );
+
+  // Bat: start claude directly in a new cmd window (like start-telegram.bat),
+  // then start VBS for auto-accept, then self-delete.
+  // Using /D to set working directory and cmd /k to keep window open.
+  fs.writeFileSync(
+    batPath,
     [
       '@echo off',
-      `cd /d "${ROOT.replace(/\//g, '\\')}"`,
-      `"${nodePath}" "${mgrPath}" start`,
-      'if errorlevel 1 pause',
+      `start "TelegramChannel" /D "${rootWin}" cmd /k claude ${perms} ${channelFlags}`,
+      `start "" wscript "${vbsPath}"`,
       `del "%~f0" 2>nul`,
     ].join('\r\n'),
     'utf8'
   );
 
-  // Stage 1: launches stage 2 in a new window, then exits
-  const launchBat = path.join(tmpDir, '_channel-autostart.bat').replace(/\//g, '\\');
-  fs.writeFileSync(
-    launchBat,
-    [
-      '@echo off',
-      `start "ChannelManager" "${runBat}"`,
-      `del "%~f0" 2>nul`,
-    ].join('\r\n'),
-    'utf8'
-  );
-
-  // Run stage 1 — it returns immediately after `start` opens a new window
-  const child = spawn('cmd', ['/c', launchBat], {
+  // ── 7. Execute the bat synchronously ──────────────────────────────────────
+  // cmd /c runs the bat which uses `start` to create an independent window,
+  // then returns immediately. The `start` command breaks out of the process
+  // tree — the new cmd window is NOT a child of this hook.
+  execFileSync('cmd', ['/c', batPath], {
     shell: false,
-    detached: true,
+    timeout: 5000,
     stdio: 'ignore',
-    windowsHide: true,
     cwd: ROOT,
   });
-  child.unref();
 
-  process.stderr.write('[channel-auto-start] Launched channel-manager via bat (cooldown: 2min)\n');
+  process.stderr.write('[channel-auto-start] Launched claude channel session directly (cooldown: 2min)\n');
 } catch (err) {
   process.stderr.write(`[channel-auto-start] Error: ${err.message}\n`);
 }
