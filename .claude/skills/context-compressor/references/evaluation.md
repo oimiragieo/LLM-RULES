@@ -28,9 +28,9 @@ The file `evals\evals.json` contains a small realistic set of prompts that exerc
 ## Useful commands
 
 ```bash
-python skills\token-saver-context-compression\scripts\profile_tokens.py --file tests\fixtures\skill_context_sample.txt --output-format auto
-python skills\token-saver-context-compression\scripts\run_skill_workflow.py --file tests\fixtures\skill_context_sample.txt --mode evidence_aware --query "what are the retry rules?" --output-format auto --fail-on-insufficient-evidence
-python skills\token-saver-context-compression\scripts\benchmark_toon_vs_json.py
+python .claude/skills/context-compressor/scripts/profile_tokens.py --file tests\fixtures\skill_context_sample.txt --output-format auto
+python .claude/skills/context-compressor/scripts/run_skill_workflow.py --file tests\fixtures\skill_context_sample.txt --mode evidence_aware --query "what are the retry rules?" --output-format auto --fail-on-insufficient-evidence
+python .claude/skills/context-compressor/scripts/benchmark_toon_vs_json.py
 ```
 
 ## Success criteria

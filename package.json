@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "setup": "node scripts/setup.cjs",
-    "start:telegram": "node scripts/start-with-channels.cjs",
+    "start:telegram": "node .claude/tools/cli/channel-manager.cjs start",
     "postinstall": "node .claude/scripts/ensure-routing-prototypes.cjs",
     "format": "node scripts/format-tracked.mjs --write",
     "format:check": "node scripts/format-tracked.mjs --check",

@@ -2174,18 +2174,30 @@ async function main() {
   try {
     const hookInput = await parseHookInputAsync();
 
-    await runAllChecks(hookInput, PROJECT_ROOT);
+    const result = await runAllChecks(hookInput, PROJECT_ROOT);
+
+    const outputPayload = { status: 'ok' };
+    if (result && result.autoCompression && result.autoCompression.needed) {
+      const reason = result.autoCompression.reason || 'Token budget/context limit approached';
+      outputPayload.message = `[SYSTEM URGENT]: Auto-compression triggered (${reason}). You MUST stop your current workflow and IMMEDIATELY invoke the \`context-compressor\` skill before proceeding to prevent a 400 Prompt Too Long fatal crash.`;
+    }
+
     try {
       eventBus.emit(EventTypes.TOOL_COMPLETED, {
         type: EventTypes.TOOL_COMPLETED,
         timestamp: new Date().toISOString(),
         toolName: 'UserPromptSubmit',
         duration: Date.now() - startTime,
-        output: { status: 'ok' },
+        output: outputPayload,
       });
     } catch (_err) {
       // Best-effort
     }
+
+    if (outputPayload.message) {
+      process.stdout.write(JSON.stringify(outputPayload) + '\n');
+    }
+
     process.exit(0);
   } catch (err) {
     try {

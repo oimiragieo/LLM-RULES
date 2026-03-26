@@ -5,21 +5,19 @@ version: 1.0.0
 description: Governs autonomous loops with safety rails. Monitors iteration count, time budget, and output quality. Escalates when loops stall or quality drops. Has automatic circuit breaker (max iterations, max time, quality floor). Use for any iterative agent workflow that needs guardrails.
 author: agent-studio
 tools:
-  [
-    Read,
-    Write,
-    Edit,
-    Bash,
-    Grep,
-    Glob,
-    Task,
-    TaskCreate,
-    TaskGet,
-    TaskList,
-    TaskUpdate,
-    Skill,
-    MemoryRecord,
-  ]
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
+  - Task
+  - TaskCreate
+  - TaskGet
+  - TaskList
+  - TaskUpdate
+  - Skill
+  - MemoryRecord
 tags: [orchestration, loops, safety, governance]
 model: sonnet
 temperature: 0.4

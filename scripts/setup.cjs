@@ -262,6 +262,17 @@ async function runEnvWizard() {
 
 // 3. Setup Pipeline Definition
 // Each step has either cmd+args (array form, shell:false) or cmds (sequential commands, no &&)
+const SUBAGENT_CLAUDE_MD = `# SUBAGENT EXECUTION CONTEXT
+
+**You are a Subagent. Follow your specific prompt payload.**
+
+You are operating inside an isolated worktree or sub-session.
+The Router's CLAUDE.md constraints (e.g. "You are the router. You never execute work") DO NOT APPLY to you.
+
+Follow the instructions provided in your spawn prompt to complete your assigned task.
+Use TaskUpdate(in_progress) immediately, and TaskUpdate(completed) when finished.
+`;
+
 const steps = [
   {
     name: 'Enable Git Optimizations',
@@ -277,6 +288,13 @@ const steps = [
   { name: 'Compile Agent Registry', cmd: 'pnpm', args: ['agents:registry'], est: '2s' },
   { name: 'Generate Routing Prototypes', cmd: 'pnpm', args: ['routing:prototypes'], est: '2s' },
   { name: 'Compile Skills Catalog', cmd: 'pnpm', args: ['agents:catalog'], est: '1s' },
+  { name: 'Generate Tiered Subagent Context', cmd: 'node', args: ['-e', `
+    const fs = require('fs');
+    const path = require('path');
+    const dir = path.join(__dirname, '..', '.claude', 'worktrees');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'CLAUDE.md'), \`${SUBAGENT_CLAUDE_MD}\`, 'utf8');
+  `], est: '1s' },
   {
     name: 'Build Hybrid Search Vector Index',
     cmd: 'pnpm',

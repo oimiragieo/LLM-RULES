@@ -15,7 +15,7 @@
 
 const path = require('path');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 let _input = '';
 process.stdin.on('data', chunk => {

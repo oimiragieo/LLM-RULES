@@ -19,7 +19,7 @@ const ROUTER_FILE = 'router.md';
 // Core agents that MUST have MemoryRecord
 const CORE_MEMORY_AGENTS = new Set(['developer', 'planner', 'architect', 'qa', 'reflection-agent']);
 
-// Heavy-context agents that should have token-saver-context-compression
+// Heavy-context agents that should have context-compressor
 const HEAVY_CONTEXT_AGENTS = new Set([
   'master-orchestrator',
   'evolution-orchestrator',
@@ -241,14 +241,14 @@ describe('Agent Tool Compliance', () => {
   });
 
   describe('3. Token-Saver: heavy-context agents should have token-saver skill', () => {
-    it('orchestrators and heavy-analysis agents should list token-saver-context-compression', () => {
+    it('orchestrators and heavy-analysis agents should list context-compressor', () => {
       const violations = [];
 
       for (const agent of agents) {
         if (!HEAVY_CONTEXT_AGENTS.has(agent.name)) continue;
-        if (!agent.skills.includes('token-saver-context-compression')) {
+        if (!agent.skills.includes('context-compressor')) {
           violations.push(
-            `${agent.subdir}/${agent.filename} (${agent.name}) missing token-saver-context-compression`
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing context-compressor`
           );
         }
       }
@@ -256,7 +256,7 @@ describe('Agent Tool Compliance', () => {
       // Advisory: log violations but do not fail (many agents not yet updated)
       if (violations.length > 0) {
         process.stderr.write(
-          `[advisory] Heavy-context agents missing token-saver-context-compression (${violations.length}):\n  ${violations.join('\n  ')}\n`
+          `[advisory] Heavy-context agents missing context-compressor (${violations.length}):\n  ${violations.join('\n  ')}\n`
         );
       }
     });
@@ -413,21 +413,21 @@ describe('Agent Tool Compliance', () => {
     });
   });
 
-  describe('11. token-saver-context-compression: all agents should have this skill', () => {
-    it('all agents should list token-saver-context-compression in frontmatter skills', () => {
+  describe('11. context-compressor: all agents should have this skill', () => {
+    it('all agents should list context-compressor in frontmatter skills', () => {
       const violations = [];
       for (const agent of agents) {
         if (agent.skills.length === 0) continue;
-        if (!agent.skills.includes('token-saver-context-compression')) {
+        if (!agent.skills.includes('context-compressor')) {
           violations.push(
-            `${agent.subdir}/${agent.filename} (${agent.name}) missing token-saver-context-compression`
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing context-compressor`
           );
         }
       }
       // Advisory: log violations but do not fail (many agents not yet updated)
       if (violations.length > 0) {
         process.stderr.write(
-          `[advisory] Agents missing token-saver-context-compression (${violations.length}):\n  ${violations.join('\n  ')}\n`
+          `[advisory] Agents missing context-compressor (${violations.length}):\n  ${violations.join('\n  ')}\n`
         );
       }
     });

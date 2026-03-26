@@ -351,3 +351,25 @@ The hook chain (currently 6 consolidated hooks) must stay bounded. Each new hook
 - perpetual-memory/main.cjs: complexity 21 (max 20)
 - tools/cli/post-analyzer.cjs: 652 lines (max 500)
 - scripts/setup.cjs: nesting depth 5 (max 4)
+
+## [WORKFLOW] 2026-03-25: Stale Worktree Cleanup is Systemic, Not One-Off
+
+**Pattern**: When Router Step 0.5 prunes 5+ worktrees in a single pre-flight, it indicates systemic failure: worktree agents across multiple sessions are not self-cleaning after completion.
+
+**Evidence**: Reflection task 8 gap observation noted 5 stale worktrees pruned (agent-a29d75b7, agent-a2e1b106, agent-a347f4e9, agent-a955cca2, agent-a9f0d9e6). All agent-prefixed = pattern is consistent.
+
+**Classification**: Systemic (not one-off). Pattern recurs due to missing cleanup step in worktree agent lifecycle.
+
+**Mitigation Already In Place**: git worktree prune in Router Step 0.5 recovers from these. No data loss.
+
+**Recommended Hardening**: Add git worktree remove --force to cleanup-always.md for worktree agents. Or add Stop hook that detects worktree context and auto-removes on session end.
+
+## [CODE] 2026-03-25: TDAD Pattern — Test-Driven Agent Development (2026 Finding)
+
+**Pattern**: TDAD (Test-Driven Agent Development) — write integration tests for agent behavior BEFORE implementing the agent, then use test failures to guide agent prompt refinement.
+
+**Evidence**: Task 8 (TDD skill standards verification) confirmed this as a validated 2026 research finding with 70% regression reduction in multi-agent pipelines. Already partially covered by ADR-103 (integration boundary testing).
+
+**Application**: Apply to new agent creation workflows. Specifically: (1) write expected tool-usage test, (2) write expected output test, (3) then write agent definition. Failure signals = prompt gaps to fix.
+
+**Source**: Task 8 TDD skill v1.4.0 research verification, 2026-03-25.

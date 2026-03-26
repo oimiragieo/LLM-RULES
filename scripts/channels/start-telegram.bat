@@ -1,0 +1,3 @@
+@echo off
+echo Starting Agent Studio Telegram Session...
+start cmd /k "claude --dangerously-skip-permissions -d --dangerously-load-development-channels server:telegram-relay"

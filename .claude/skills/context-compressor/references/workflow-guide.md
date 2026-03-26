@@ -34,19 +34,19 @@ When compressing JSON payloads from frameworks, prefer `--input-adapter auto` un
 ### Codebase or architecture review
 
 ```bash
-python skills\token-saver-context-compression\scripts\compress_context.py --file <path> --mode query_guided --query "what changed and why?" --output-format auto
+python .claude/skills/context-compressor\scripts\compress_context.py --file <path> --mode query_guided --query "what changed and why?" --output-format auto
 ```
 
 ### Correctness-sensitive question
 
 ```bash
-python skills\token-saver-context-compression\scripts\run_skill_workflow.py --file <path> --mode evidence_aware --query "<question>" --output-format auto --fail-on-insufficient-evidence
+python .claude/skills/context-compressor\scripts\run_skill_workflow.py --file <path> --mode evidence_aware --query "<question>" --output-format auto --fail-on-insufficient-evidence
 ```
 
 ### Framework payload cleanup
 
 ```bash
-python skills\token-saver-context-compression\scripts\compress_context.py --json-file <payload.json> --input-adapter auto --mode query_guided --query "<question>" --output-format auto
+python .claude/skills/context-compressor\scripts\compress_context.py --json-file <payload.json> --input-adapter auto --mode query_guided --query "<question>" --output-format auto
 ```
 
 ## Reporting pattern

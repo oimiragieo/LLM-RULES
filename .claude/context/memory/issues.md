@@ -546,3 +546,45 @@
 the CLIs produce no output. Codex CLI works correctly.
 **Workaround:** Run these CLIs synchronously (without run_in_background) or check task output files directly.
 **Status:** Open -- needs investigation of whether the CLI wrappers handle detached process properly.
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-25T06:54:06.848Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-25T06:54:06.871Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-25T06:54:06.889Z
+
+## 2026-03-25: Stale Worktree Accumulation — Systemic Pattern (P2)
+
+**Issue**: 5 stale git worktrees pruned during Router Step 0.5 pre-flight (agent-a29d75b7, agent-a2e1b106, agent-a347f4e9, agent-a955cca2, agent-a9f0d9e6). All carry agent- prefix from worktree agent pattern but were never cleaned up after session end.
+
+**Root Cause**: Worktree agents completing via TaskUpdate(completed) do NOT auto-run git worktree remove. Session boundaries leave worktrees dangling.
+
+**Workaround**: git worktree prune in Router Step 0.5 catches these. Already in pre-flight.
+
+**Systemic Signal**: Recurring pattern (also documented in user memory feedback_worktree_cleanup_selfharm.md). 5 at once = multiple sessions affected.
+
+**Recommended Fix**: Add git worktree remove to worktree agent cleanup-always sequence or Stop hook.
+
+**Priority**: P2
+
+## 2026-03-25: TDD Skill Report Writing Blocked by Hooks (P2)
+
+**Issue**: Task 8 TDD skill standards verification had report writing blocked by hooks. Hook enforcement blocked write to .claude/context/reports/.
+
+**Root Cause**: Verification agents writing to report paths may be incorrectly triggering creator guard or pre-write hooks. Reports at .claude/context/reports/backend/ should be writable by all agents.
+
+**Impact**: TDAD 2026 finding (70% regression reduction) captured in metadata only, no formal report artifact created.
+
+**Recommended Fix**: Verify pre-write hook allowlist includes .claude/context/reports/ for all agent types.
+
+**Priority**: P2
+
+## 2026-03-25: Hook Wiring Without Dedicated Commit (P2)
+
+**Issue**: Task 6 wired 6 enforcement hooks into settings.json but no dedicated commit exists for this wiring work. Only pre-spawn-hook-check.cjs appears as uncommitted. Hook wiring changes are security-critical and should be committed atomically.
+
+**Root Cause**: The hook wiring agent did not complete a commit step after settings.json modification. Security-critical changes must not linger as uncommitted dirty state.
+
+**Recommended Fix**: hook-creator skill should include an explicit devops commit step after wiring hooks into settings.json.
+
+**Priority**: P2

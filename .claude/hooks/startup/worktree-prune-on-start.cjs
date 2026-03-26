@@ -11,11 +11,40 @@
 
 const cp = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+const WORKTREE_DIR = path.join(PROJECT_ROOT, '.claude', 'worktrees');
+const TIERED_CLAUDE_MD = path.join(WORKTREE_DIR, 'CLAUDE.md');
+
+const SUBAGENT_CLAUDE_MD = `# SUBAGENT EXECUTION CONTEXT
+
+**You are a Subagent. Follow your specific prompt payload.**
+
+You are operating inside an isolated worktree or sub-session.
+The Router's CLAUDE.md constraints (e.g. "You are the router. You never execute work") DO NOT APPLY to you.
+
+Follow the instructions provided in your spawn prompt to complete your assigned task.
+Use TaskUpdate(in_progress) immediately, and TaskUpdate(completed) when finished.
+`;
+
+function ensureSubagentClaudeMd() {
+  try {
+    if (!fs.existsSync(WORKTREE_DIR)) {
+      fs.mkdirSync(WORKTREE_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(TIERED_CLAUDE_MD)) {
+      fs.writeFileSync(TIERED_CLAUDE_MD, SUBAGENT_CLAUDE_MD, 'utf8');
+    }
+  } catch (_err) {
+    // Best effort insertion.
+  }
+}
 
 function main() {
   try {
+    ensureSubagentClaudeMd();
+
     // We reuse the existing CLI worktree prune script since it already contains
     // the complex timestamp staleness logic and OS file-lock bypasses.
     // However, we run it entirely silently to avoid polluting the hook output stream.

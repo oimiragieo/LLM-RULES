@@ -38,7 +38,10 @@ function loadDotenv() {
       const key = trimmed.slice(0, eqIdx).trim();
       let val = trimmed.slice(eqIdx + 1).trim();
       // Strip surrounding quotes
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      if (
+        (val.startsWith('"') && val.endsWith('"')) ||
+        (val.startsWith("'") && val.endsWith("'"))
+      ) {
         val = val.slice(1, -1);
       }
       if (!(key in process.env)) {
@@ -69,9 +72,7 @@ let claudeArgs;
 
 if (shouldStartChannels) {
   // Build: claude [CHANNEL_PERMISSIONS flags...] --dangerously-load-development-channels <CHANNEL_PLUGINS>
-  const permissionsArgs = channelPermissions
-    ? channelPermissions.split(/\s+/).filter(Boolean)
-    : [];
+  const permissionsArgs = channelPermissions ? channelPermissions.split(/\s+/).filter(Boolean) : [];
   claudeArgs = [...permissionsArgs, '--dangerously-load-development-channels', channelPlugins];
   console.log('[start-with-channels] Channel mode enabled, launching with:', claudeArgs.join(' '));
 } else {
@@ -103,7 +104,7 @@ const child = spawn(claudeCmd, claudeArgs, {
   windowsHide: false,
 });
 
-child.on('error', (err) => {
+child.on('error', err => {
   console.error('[start-with-channels] Failed to spawn claude:', err.message);
   console.error('Ensure claude is installed and on your PATH: https://claude.ai/download');
   process.exit(1);

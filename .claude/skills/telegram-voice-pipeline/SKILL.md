@@ -67,7 +67,7 @@ Call the Telegram MCP download tool with the `file_id` from the channel tag:
 
 ```javascript
 // MCP tool call (agent uses this directly)
-mcp__plugin_telegram_telegram__download_attachment({ file_id: "<attachment_file_id>" })
+mcp__plugin_telegram_telegram__download_attachment({ file_id: '<attachment_file_id>' });
 // Returns: local file path, e.g. /tmp/voice_abc123.ogg
 ```
 
@@ -99,12 +99,12 @@ cat /tmp/tg_voice/voice_abc123.txt
 
 **Model selection** (trade-off between speed and accuracy):
 
-| Model | Speed | Accuracy | Use when |
-|-------|-------|----------|----------|
-| `tiny` | ~2s | Low | Rapid prototyping only |
-| `small` | ~5s | Medium | Short messages, speed priority |
-| `medium` | ~12s | High | Default — best balance |
-| `large-v3` | ~30s | Best | Long/complex messages |
+| Model      | Speed | Accuracy | Use when                       |
+| ---------- | ----- | -------- | ------------------------------ |
+| `tiny`     | ~2s   | Low      | Rapid prototyping only         |
+| `small`    | ~5s   | Medium   | Short messages, speed priority |
+| `medium`   | ~12s  | High     | Default — best balance         |
+| `large-v3` | ~30s  | Best     | Long/complex messages          |
 
 Override via env: `WHISPER_MODEL=small` (default: `medium`)
 
@@ -187,10 +187,10 @@ else:
 ```javascript
 // MCP tool call
 mcp__plugin_telegram_telegram__reply({
-  chat_id: "<chat_id from channel tag>",
-  text: response_text,   // Also send the transcript so user can read it
-  files: ["/tmp/tg_voice_response.mp3"]
-})
+  chat_id: '<chat_id from channel tag>',
+  text: response_text, // Also send the transcript so user can read it
+  files: ['/tmp/tg_voice_response.mp3'],
+});
 ```
 
 **Note:** Including `text` alongside the audio file gives the user both a readable transcript and the audio reply — useful for accessibility and noisy environments.
@@ -212,12 +212,12 @@ rm -rf /tmp/tg_voice/
 
 ## Environment Variables
 
-| Variable | Required | Default | Purpose |
-|----------|----------|---------|---------|
-| `ELEVENLABS_API_KEY` | NO (if OpenAI set) | — | ElevenLabs TTS API key |
-| `ELEVENLABS_VOICE_ID` | NO | `JBFqnCBsd6RMkjVDRZzb` | ElevenLabs voice (George) |
-| `OPENAI_API_KEY` | NO (if ElevenLabs set) | — | OpenAI TTS fallback key |
-| `WHISPER_MODEL` | NO | `medium` | Whisper model size |
+| Variable              | Required               | Default                | Purpose                   |
+| --------------------- | ---------------------- | ---------------------- | ------------------------- |
+| `ELEVENLABS_API_KEY`  | NO (if OpenAI set)     | —                      | ElevenLabs TTS API key    |
+| `ELEVENLABS_VOICE_ID` | NO                     | `JBFqnCBsd6RMkjVDRZzb` | ElevenLabs voice (George) |
+| `OPENAI_API_KEY`      | NO (if ElevenLabs set) | —                      | OpenAI TTS fallback key   |
+| `WHISPER_MODEL`       | NO                     | `medium`               | Whisper model size        |
 
 At least one of `ELEVENLABS_API_KEY` or `OPENAI_API_KEY` must be set for TTS to work.
 
