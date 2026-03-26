@@ -20,7 +20,7 @@
 
 const path = require('path');
 const fs = require('fs');
-const { execFileSync } = require('child_process');
+const { spawn } = require('child_process');
 
 // Drain stdin passively (prevent EPIPE) — never gate logic on it
 process.stdin.resume();
@@ -99,29 +99,52 @@ try {
     process.exit(0);
   }
 
-  // 4. Write a tiny .bat launcher and use `cmd /c start` to escape the
-  //    hook runner's process tree entirely. Node's detached:true doesn't
-  //    work here because Windows job objects still kill the child.
-  const batPath = path.join(ROOT, '.claude', 'context', 'tmp', '_channel-autostart.bat');
+  // 4. Write a two-stage bat launcher:
+  //    Stage 1 (_channel-autostart.bat): uses `start` to launch stage 2 in
+  //    a new window, then deletes itself. Returns immediately.
+  //    Stage 2 (_channel-run.bat): runs channel-manager.cjs, pauses on
+  //    error for debugging, then deletes itself.
+  const tmpDir = path.join(ROOT, '.claude', 'context', 'tmp');
+  fs.mkdirSync(tmpDir, { recursive: true });
+
   const nodePath = process.execPath.replace(/\//g, '\\');
   const mgrPath = channelManager.replace(/\//g, '\\');
-  const batContent = [
-    '@echo off',
-    `"${nodePath}" "${mgrPath}" start`,
-    `del "%~f0"`,
-  ].join('\r\n');
 
-  fs.mkdirSync(path.dirname(batPath), { recursive: true });
-  fs.writeFileSync(batPath, batContent, 'utf8');
+  // Stage 2: the actual work (self-deletes with 2>nul to suppress error)
+  const runBat = path.join(tmpDir, '_channel-run.bat').replace(/\//g, '\\');
+  fs.writeFileSync(
+    runBat,
+    [
+      '@echo off',
+      `cd /d "${ROOT.replace(/\//g, '\\')}"`,
+      `"${nodePath}" "${mgrPath}" start`,
+      'if errorlevel 1 pause',
+      `del "%~f0" 2>nul`,
+    ].join('\r\n'),
+    'utf8'
+  );
 
-  // `start "" /b` runs the bat in a new process group, completely detached.
-  // The bat file deletes itself after running.
-  execFileSync('cmd', ['/c', 'start', '""', '/b', batPath], {
+  // Stage 1: launches stage 2 in a new window, then exits
+  const launchBat = path.join(tmpDir, '_channel-autostart.bat').replace(/\//g, '\\');
+  fs.writeFileSync(
+    launchBat,
+    [
+      '@echo off',
+      `start "ChannelManager" "${runBat}"`,
+      `del "%~f0" 2>nul`,
+    ].join('\r\n'),
+    'utf8'
+  );
+
+  // Run stage 1 — it returns immediately after `start` opens a new window
+  const child = spawn('cmd', ['/c', launchBat], {
     shell: false,
+    detached: true,
+    stdio: 'ignore',
     windowsHide: true,
-    timeout: 5000,
     cwd: ROOT,
   });
+  child.unref();
 
   process.stderr.write('[channel-auto-start] Launched channel-manager via bat (cooldown: 2min)\n');
 } catch (err) {
