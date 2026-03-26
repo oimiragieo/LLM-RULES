@@ -242,9 +242,74 @@ function ensureSessionConfigured(state, sessionId, maybeLimits) {
   }
 }
 
+// spawnSync imported locally in getDynamicTokenCeiling branches
+let cachedTokenCeiling = null;
+function getDynamicTokenCeiling() {
+  if (cachedTokenCeiling !== null) return cachedTokenCeiling;
+
+  // Default cushion for 200k API constraint (Applies to all models on standard API tiers)
+  let ceiling = 180000;
+
+  // Only unlock 1M context for Opus IF the user's Anthropic API limits allow it
+  const isExtraUsageEnabled = process.env.EXTRA_USAGE_ENABLED === 'true';
+
+  if (isExtraUsageEnabled) {
+    if (process.cwd() === PROJECT_ROOT) {
+      // Router session uses Opus (1M limit) -> 950k cushion
+      ceiling = 950000;
+    } else {
+      // Detect subagent model via parent process command-line
+      try {
+        if (process.platform === 'win32') {
+          const ppid = String(Number(process.ppid) || 0);
+          const { spawnSync: spawnSyncWin } = require('child_process');
+          const psResult = spawnSyncWin('powershell', ['-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process -Filter "ProcessId=\'' + ppid + '\'" | Select-Object -ExpandProperty CommandLine'], { encoding: 'utf8', timeout: 2000 });
+          const out = (psResult.stdout || '').trim();
+          if (out.includes('claude-opus')) {
+            ceiling = 950000;
+          }
+        } else {
+          const ppidUnix = String(Number(process.ppid) || 0);
+          const { spawnSync: spawnSyncUnix } = require('child_process');
+          const psUnix = spawnSyncUnix('ps', ['-o', 'args=', '-p', ppidUnix], { encoding: 'utf8', timeout: 2000 });
+          const out = (psUnix.stdout || '').trim();
+          if (out.includes('claude-opus')) {
+            ceiling = 950000;
+          }
+        }
+      } catch (_e) {
+        // fallback silently to 180k
+      }
+    }
+  }
+
+  cachedTokenCeiling = ceiling;
+  return ceiling;
+}
+
 function checkExecutionLimit(hookInput, toolName, toolInput) {
   try {
     const sessionId = getSessionId(hookInput);
+    
+    // --- Phase 4b: Dynamic Token Limit Check to prevent API 429s ---
+    try {
+      const budgetTracker = require('../../lib/utils/token-budget-tracker.cjs');
+      const tokenStatus = budgetTracker.checkBudgetStatus(sessionId);
+      
+      const TOKEN_CEILING = getDynamicTokenCeiling();
+      if (tokenStatus && tokenStatus.used > TOKEN_CEILING) {
+        if (toolName !== 'TaskOutput' && toolName !== 'TaskUpdate' && toolName !== 'TaskList') {
+          return {
+            checked: true,
+            action: 'block',
+            message: `[SYSTEM URGENT] Context pressure > ${Math.floor(TOKEN_CEILING/1000)}k tokens (${tokenStatus.used} used). You MUST call TaskOutput() immediately to yield control or you will crash. Do not execute any more tools.`
+          };
+        }
+      }
+    } catch (_err) {
+      // Best effort check
+    }
+
     const state = readState();
 
     if (toolName === 'Task' && toolInput && toolInput.execution_limits) {

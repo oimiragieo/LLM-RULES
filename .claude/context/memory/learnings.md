@@ -373,3 +373,44 @@ The hook chain (currently 6 consolidated hooks) must stay bounded. Each new hook
 **Application**: Apply to new agent creation workflows. Specifically: (1) write expected tool-usage test, (2) write expected output test, (3) then write agent definition. Failure signals = prompt gaps to fix.
 
 **Source**: Task 8 TDD skill v1.4.0 research verification, 2026-03-25.
+
+## 2026-03-25: Multi-Model Ecosystem Audit Review Findings
+
+From Claude CLI + Codex council on ecosystem audit (185 orphans, 21 model mismatches, 20+ stale rename refs):
+
+**Remediation priority order (consensus):**
+1. Fix model mismatches (config.yaml → registry drift) — active runtime failure
+2. Fix stale token-saver → context-compressor refs — active breakage
+3. Build require() dependency graph before bulk orphan deletion
+4. Add rename-safety pre-commit hook (validate all skill refs resolve)
+5. Update skill-creator to auto-scaffold schema + workflow stubs
+6. Scaffold missing schemas/workflows retroactively
+
+**Systemic root causes identified:**
+- No referential integrity on artifact names (rename cascade root cause)
+- No lifecycle coupling in creator skills (schema/workflow gap root cause)
+- No dependency graph (orphan accumulation root cause)
+- Dual source of truth for model config (config.yaml vs registry)
+- Proactive audit is advisory not blocking
+- No stable ID primitive (names are contracts not labels)
+- No runtime telemetry (static analysis alone = false positives for dynamic invocations)
+
+**Codex architectural pattern:** Stable immutable skill IDs + mutable display names + alias layer = eliminates rename cascade class of failures permanently.
+
+**Source:** `.claude/context/reports/backend/multi-model-review-2026-03-25.md`
+
+- Created new agent: qa-guardian (2026-03-26)
+
+- Created new agent: contract-check (2026-03-26)
+
+- Created new agent: bool-action (2026-03-26)
+
+- Created new agent: repo-onboarder (2026-03-26)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-26)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-26)
+
+- Updated workflow: evolution-workflow (2026-03-26)
+
+- Updated workflow: missing-workflow-xyz (2026-03-26)
