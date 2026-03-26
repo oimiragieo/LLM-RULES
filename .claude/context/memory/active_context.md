@@ -1,53 +1,32 @@
-# Active Context — Session Handoff 2026-03-25
+# Active Context — Session Handoff 2026-03-25 (Late)
 
-**NEXT ACTION (IMMEDIATE):** Fix the channel-auto-start hook so Telegram starts automatically on session boot. The channel-manager.cjs start command works perfectly when called manually — the hook is the only broken piece.
+**NEXT ACTION (IMMEDIATE):** Two tasks — fix tab-vs-window issue, then create windows-terminal skill.
 
-## Bug: channel-auto-start.cjs hook doesn't fire properly
+## Task 1: Fix channel-auto-start to open as TAB not WINDOW
 
-### What works (proven this session):
+Hook currently uses `start "" cmd /k "..."` → opens new WINDOW. User wants a TAB.
 
-- `node .claude/tools/cli/channel-manager.cjs start` — opens a new terminal tab, VBScript auto-accepts confirmation, Claude starts with Telegram channel
-- `node .claude/tools/cli/channel-manager.cjs stop` — kills the session
-- `node .claude/tools/cli/channel-manager.cjs restart` — force-kill + re-spawn
-- Voice-to-voice pipeline: Whisper STT (local GPU) → Claude → ElevenLabs TTS → Telegram audio reply
-- VBScript AppActivate("claude") + SendKeys "{ENTER}" — auto-accepts the development channels confirmation prompt
+**Fix:** Replace `start` with `wt -w 0 new-tab -- cmd /k "..."` in the generated bat file. The `-w 0` flag targets the most recent WT window.
 
-### What's broken:
+**File:** `.claude/hooks/channels/channel-auto-start.cjs` line ~146
 
-- `.claude/hooks/channels/channel-auto-start.cjs` (UserPromptSubmit hook) doesn't reliably spawn the channel
-- When it DOES fire, it spawns multiple windows (one per prompt) because the cooldown lockfile isn't written fast enough
-- The hook uses `spawn('node', [channelManager, 'start'], {detached: true})` which creates timing issues
-- `wt new-tab` from a detached process opens a new WINDOW (not a tab) and sometimes opens PowerShell instead of cmd
+## Task 2: Create "windows-terminal" skill
 
-### Root causes to investigate:
+Document terminal management patterns learned this session:
+- `wt new-tab` vs `start` (tab vs window)
+- `-w 0` targeting current WT window
+- VBScript AppActivate by PID via WMI
+- Process tree escape from hooks (start in bat + execFileSync)
+- PID tracking via terminal-tracker.cjs
+- Hook process tree killing on Windows
 
-1. Claude's hook runner may kill the process before stdin 'end' event fires (the hook reads stdin but may not need to)
-2. Multiple hooks fire in parallel on same prompt — race condition on lockfile
-3. Detached spawn from hook subprocess has different wt behavior than interactive terminal
+## Task 3: Research + improve agent-studio
 
-### Possible fixes to try:
+User wants Exa research on multi-agent CLI framework best practices, Telegram bot patterns, channel architecture.
 
-1. Use `execFileSync` instead of `spawn` in the hook (but this blocked earlier due to hook timeout — the 20s channel-manager start was too slow)
-2. Write lockfile SYNCHRONOUSLY at the very top of the hook before any async operations
-3. Skip stdin reading entirely — UserPromptSubmit hooks may not need to drain stdin
-4. Use a simpler check: just try to write a PID file atomically with `wx` flag (exclusive create)
-
-### Key files:
-
-- `.claude/hooks/channels/channel-auto-start.cjs` — the broken hook
-- `.claude/tools/cli/channel-manager.cjs` — the working channel manager (bat launcher + VBScript auto-accept)
-- `.claude/context/tmp/_channel-launch.bat` — generated bat file for wt to execute
-- `.claude/context/tmp/_auto-accept.vbs` — generated VBScript for Enter keystroke
-
-## What was accomplished this session:
-
-- Ecosystem audit: agents.md 102→110, JSON.parse safety in 2 lib files
-- TDD v1.4.0 confirmed current
-- Setup script enhanced: tool detection, .env wizard, validation step (163→357 lines)
-- Telegram channel system built: channel-manager with VBScript auto-accept, voice pipeline skill, auto-start hook
-- Multi-model review via Codex CLI: 5 architecture findings
-- Dependabot CVE fixed (flatted >=3.4.2)
-- ElevenLabs API key configured
-- 10+ commits pushed to main
-
-## Token usage: ~$181 today (212M tokens as of last ccusage check)
+## Accomplished this session:
+- Fixed channel-auto-start: direct claude spawn, no channel-manager indirection
+- Fixed VBScript: WMI PID targeting instead of window title
+- Confirmed Telegram end-to-end working
+- Remaining: opens as window not tab
+- 3 commits pushed (55a3a132, 203f4515, b59bf798)
