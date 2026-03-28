@@ -714,7 +714,13 @@ const INTENT_KEYWORDS = {
     'doc integrity',
     'reference audit',
   ],
-  'tmp-routing-1774614986474': ['tmp-routing-1774614986474', 'tmp', 'routing', '1774614986474'],
+  'release-guardian': [
+    'release-guardian',
+    'release',
+    'guardian',
+    'safety',
+    'specialist',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.
@@ -724,6 +730,7 @@ const ALLOWED_INTENT_KEYWORD_OVERLAPS = {
   aria: ['accessibility_tester', 'web_design'],
   backlog: ['pm', 'pm_coordinator'],
   'bundle size': ['performance_engineer', 'react_performance'],
+  code: ['code-reviewer', 'developer'],
   'core web vitals': ['performance_engineer', 'react_performance'],
   etl: ['data_engineer', 'data_science'],
   k8s: ['devops', 'kubernetes_specialist'],
