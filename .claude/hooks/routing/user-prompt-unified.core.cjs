@@ -365,7 +365,12 @@ function syncEvolutionSpawnReminder(options = {}) {
  */ const COMPLEXITY_KEYWORDS = {
   trivial: ['hello', 'hi', 'thanks', 'thank you', 'bye', 'goodbye', 'what is', 'how are you'],
   low: ['typo', 'rename', 'fix typo', 'small fix', 'minor fix', 'quick fix'],
-  high: [
+  high: ['integrate', 'integration', 'migrate', 'migration', 'architecture', 'refactor'],
+  epic: ['rewrite', 'rebuild', 'new system', 'platform', 'framework', 'all hooks', 'all agents', 'system-wide'],
+  documentationTargets: ['readme', 'docs', 'documentation', 'guide', 'tutorial', 'changelog', 'api doc', 'markdown'],
+  narrowTargets: ['module', 'file', 'function', 'class', 'method', 'component', 'readme'],
+  broadTargets: ['system', 'platform', 'framework', 'codebase', 'repo', 'all hooks', 'all agents', 'entire'],
+  securityDomains: [
     'auth',
     'authentication',
     'authorization',
@@ -375,24 +380,15 @@ function syncEvolutionSpawnReminder(options = {}) {
     'token',
     'jwt',
     'oauth',
+    'oauth2',
+    'refresh token',
+    'credential',
     'payment',
-    'integrate',
-    'integration',
-    'migrate',
-    'migration',
-    'architecture',
-    'refactor',
+    'rbac',
   ],
-  epic: [
-    'rewrite',
-    'rebuild',
-    'new system',
-    'platform',
-    'framework',
-    'all hooks',
-    'all agents',
-    'system-wide',
-  ],
+  implementationVerbs: ['implement', 'build', 'create', 'add', 'integrate', 'migrate', 'design'],
+  reviewVerbs: ['review', 'audit', 'analyze', 'investigate', 'validate'],
+  rewriteVerbs: ['rewrite', 'rebuild', 'replace', 're-architect'],
 };
 /**
  * Creator intent patterns for artifact creation detection
@@ -845,56 +841,90 @@ function maybeAutoCompress(tokenStatus) {
   }
   return agents;
 }
+
+function promptHasAnySignal(promptLower, phrases) {
+  return Array.isArray(phrases) && phrases.some(phrase => promptLower.includes(String(phrase).toLowerCase()));
+}
+
+function countPromptSignals(promptLower, phrases) {
+  return Array.isArray(phrases)
+    ? phrases.filter(phrase => promptLower.includes(String(phrase).toLowerCase())).length
+    : 0;
+}
+
+function detectPrimaryAction(promptLower) {
+  const ACTION_PATTERNS = [
+    { action: 'trivial_fix', pattern: /\bfix\s+(a\s+)?(typo|spelling|copy|comment)\b/i },
+    { action: 'rename', pattern: /\brename\b/i },
+    { action: 'rewrite', pattern: /\b(rewrite|rebuild|replace|re-architect)\b/i },
+    { action: 'implement', pattern: /\b(implement|build|create|add|integrate|migrate)\b/i },
+    { action: 'review', pattern: /\b(review|audit|analyze|investigate|validate)\b/i },
+    { action: 'fix', pattern: /\bfix\b/i },
+    { action: 'update', pattern: /\bupdate\b/i },
+  ];
+
+  for (const entry of ACTION_PATTERNS) {
+    if (entry.pattern.test(promptLower)) {
+      return entry.action;
+    }
+  }
+
+  return 'general';
+}
 /**
  * Detect complexity level and planning requirements
  */ function detectPlanningRequirement(prompt) {
-  const promptLower = prompt.toLowerCase();
-  let complexity = 'trivial';
-  let requiresArchitectReview = false;
-  let requiresSecurityReview = false;
-  // Check for epic
-  const epicMatches = COMPLEXITY_KEYWORDS.epic.filter(k => promptLower.includes(k)).length;
-  if (epicMatches >= 1) {
+  const promptLower = String(prompt || '').toLowerCase();
+  const primaryAction = detectPrimaryAction(promptLower);
+  const trivialSignals = countPromptSignals(promptLower, COMPLEXITY_KEYWORDS.trivial);
+  const lowSignals = countPromptSignals(promptLower, COMPLEXITY_KEYWORDS.low);
+  const highSignals = countPromptSignals(promptLower, COMPLEXITY_KEYWORDS.high);
+  const epicSignals = countPromptSignals(promptLower, COMPLEXITY_KEYWORDS.epic);
+  const securitySignals = countPromptSignals(promptLower, COMPLEXITY_KEYWORDS.securityDomains);
+  const hasDocumentationTarget = promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.documentationTargets);
+  const hasBroadTarget = promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.broadTargets);
+  const hasNarrowTarget = promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.narrowTargets);
+  const hasImplementationVerb =
+    primaryAction === 'implement' ||
+    promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.implementationVerbs);
+  const hasReviewVerb =
+    primaryAction === 'review' || promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.reviewVerbs);
+  const hasRewriteVerb =
+    primaryAction === 'rewrite' || promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.rewriteVerbs);
+  const isTrivialFix =
+    primaryAction === 'trivial_fix' ||
+    (primaryAction === 'rename' && !hasBroadTarget) ||
+    lowSignals > 0;
+  const documentationOnly = hasDocumentationTarget && !hasImplementationVerb && securitySignals === 0;
+  const securityHeavy =
+    securitySignals >= 2 || promptHasAnySignal(promptLower, ['oauth2', 'jwt', 'rbac', 'refresh token']);
+
+  let complexity = trivialSignals > 0 ? 'trivial' : 'low';
+
+  if (isTrivialFix && !hasBroadTarget) {
+    complexity = hasNarrowTarget || securitySignals > 0 ? 'low' : 'trivial';
+  } else if (documentationOnly) {
+    complexity = hasRewriteVerb ? 'medium' : 'low';
+  } else if (hasRewriteVerb && hasBroadTarget) {
     complexity = 'epic';
-    requiresArchitectReview = true;
-  }
-  // Check for high
-  else {
-    const highMatches = COMPLEXITY_KEYWORDS.high.filter(k => promptLower.includes(k)).length;
-    if (highMatches >= 2) {
-      complexity = 'high';
-      requiresArchitectReview = true;
-    } else if (highMatches >= 1) {
-      complexity = 'medium';
-    }
-  }
-  // Security check
-  const securityKeywords = [
-    'auth',
-    'authentication',
-    'authorization',
-    'password',
-    'token',
-    'jwt',
-    'oauth',
-    'security',
-    'encrypt',
-    'credential',
-    'secret',
-    'payment',
-  ];
-  const securityMatches = securityKeywords.filter(k => promptLower.includes(k)).length;
-  if (securityMatches >= 1) {
-    requiresSecurityReview = true;
-  }
-  // Check for low/trivial override
-  const trivialMatches = COMPLEXITY_KEYWORDS.trivial.filter(k => promptLower.includes(k)).length;
-  const lowMatches = COMPLEXITY_KEYWORDS.low.filter(k => promptLower.includes(k)).length;
-  if (trivialMatches > 0 && complexity === 'trivial') {
+  } else if (hasImplementationVerb && (securityHeavy || hasBroadTarget || highSignals >= 2)) {
+    complexity = 'high';
+  } else if (hasRewriteVerb || highSignals > 0 || hasReviewVerb) {
+    complexity = securityHeavy && hasImplementationVerb ? 'high' : 'medium';
+  } else if (trivialSignals > 0) {
     complexity = 'trivial';
-  } else if (lowMatches > 0 && complexity === 'trivial') {
-    complexity = 'low';
   }
+
+  if (epicSignals > 0 && !documentationOnly && hasBroadTarget) {
+    complexity = 'epic';
+  }
+
+  const requiresArchitectReview = complexity === 'high' || complexity === 'epic';
+  const requiresSecurityReview =
+    securitySignals > 0 &&
+    !documentationOnly &&
+    !isTrivialFix &&
+    (hasImplementationVerb || hasReviewVerb || securityHeavy || hasBroadTarget);
 
   // PLATFORM AWARENESS INJECTION (Phase 4.3 Remediation)
   // Ensure all spawned agents are aware they are on Windows to prevent pathing loops.

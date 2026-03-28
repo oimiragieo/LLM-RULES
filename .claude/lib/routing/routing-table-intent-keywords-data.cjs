@@ -31,6 +31,7 @@ const INTENT_KEYWORDS = {
     'repo-ingestion',
     'github-repo-integration',
     'skill-mapping',
+    'integrate',
     'integrate repo',
     'github.com/',
     'https://',
@@ -713,6 +714,7 @@ const INTENT_KEYWORDS = {
     'doc integrity',
     'reference audit',
   ],
+  'tmp-routing-1774614986474': ['tmp-routing-1774614986474', 'tmp', 'routing', '1774614986474'],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

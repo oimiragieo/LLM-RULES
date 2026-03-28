@@ -109,6 +109,15 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
     assert.equal(result.pass, true);
   });
 
+  it('should defer to classifier precedence for refactor prompts with auth keywords', () => {
+    process.env.INTENT_AGENT_MATCH = 'block';
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'code-simplifier',
+      prompt: 'refactor the auth module',
+    });
+    assert.equal(result.pass, true);
+  });
+
   it('should allow explicit audit routing override for code-reviewer', () => {
     process.env.INTENT_AGENT_MATCH = 'block';
     const result = routingGuard.checkIntentAgentMatch('Task', {

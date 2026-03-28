@@ -11,6 +11,8 @@ const {
   shouldAutoReroute,
   getIntentAutoRerouteConfig,
 } = require('./routing-guard-core.shared.cjs');
+const { classifyIntent } = require('../../lib/routing/intent-classifier.cjs');
+const { getPreferredAgent } = require('../../lib/routing/routing-table.cjs');
 
 let eventBus;
 try {
@@ -20,108 +22,45 @@ try {
 }
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
-const INTENT_PATTERNS = {
-  security: {
-    keywords: [
-      'auth',
-      'credential',
-      'permission',
-      'vulnerability',
-      'OWASP',
-      'security',
-      'password',
-      'token',
-      'encrypt',
-      'decrypt',
-    ],
-    agents: ['security-architect'],
-    weight: 10,
-  },
-  testing: {
-    keywords: [
-      'test',
-      'coverage',
-      'regression',
-      'assertion',
-      'unit test',
-      'integration test',
-      'e2e',
-      'qa',
-    ],
-    agents: ['qa'],
-    weight: 8,
-  },
-  architecture: {
-    keywords: [
-      'design',
-      'schema',
-      'database',
-      'migration',
-      'scalability',
-      'architecture',
-      'system design',
-    ],
-    agents: ['architect'],
-    weight: 9,
-  },
-  documentation: {
-    keywords: ['docs', 'readme', 'guide', 'tutorial', 'API reference', 'documentation', 'API doc'],
-    agents: ['technical-writer'],
-    weight: 7,
-  },
-  deployment: {
-    keywords: ['deploy', 'CI/CD', 'pipeline', 'docker', 'kubernetes', 'k8s', 'deployment'],
-    agents: ['devops'],
-    weight: 8,
-  },
-  planning: {
-    keywords: ['plan', 'strategy', 'roadmap', 'breakdown', 'planning'],
-    agents: ['planner'],
-    weight: 9,
-  },
-  code_review: {
-    keywords: ['review code', 'code review', 'pr review', 'audit code', 'review pull request'],
-    agents: ['code-reviewer'],
-    weight: 10,
-  },
-  'artifact-integrator': {
-    keywords: [
-      'github.com',
-      'repository',
-      'repo',
-      'external data',
-      'integrate repo',
-      'from url',
-      'onboard repo',
-    ],
-    agents: ['artifact-integrator', 'security-architect', 'planner'],
-    weight: 10,
-    critical: true,
-  },
-};
-
 function detectIntent(text) {
-  const normalized = text.toLowerCase();
-  const detectedSignals = [];
-  const suggestedAgents = new Set();
-  let isCritical = false;
+  const normalized = String(text || '').trim();
+  if (!normalized) {
+    return { detectedSignals: [], suggestedAgents: [], isCritical: false, classification: null };
+  }
 
-  for (const [_intent, config] of Object.entries(INTENT_PATTERNS)) {
-    for (const keyword of config.keywords) {
-      if (normalized.includes(keyword.toLowerCase())) {
-        detectedSignals.push(keyword);
-        if (config.critical) isCritical = true;
-        for (const agent of config.agents) {
-          suggestedAgents.add(agent);
-        }
-      }
+  const classification = classifyIntent(normalized, {
+    includeAlternatives: true,
+    maxAlternatives: 3,
+  });
+  const nonEnforcingAgents = new Set(['developer', 'planner', 'general-assistant']);
+  const suggestedAgents = new Set();
+  const detectedSignals = [];
+
+  if (
+    classification?.intent &&
+    classification.intent !== 'general' &&
+    !nonEnforcingAgents.has(classification?.defaultAgent)
+  ) {
+    detectedSignals.push(classification.intent);
+  }
+  if (classification?.defaultAgent && !nonEnforcingAgents.has(classification.defaultAgent)) {
+    suggestedAgents.add(classification.defaultAgent);
+  }
+  for (const alternative of classification?.alternatives || []) {
+    const alternativeAgent = getPreferredAgent(alternative.intent);
+    if (alternativeAgent && !nonEnforcingAgents.has(alternativeAgent)) {
+      suggestedAgents.add(alternativeAgent);
+    }
+    if (alternative?.intent) {
+      detectedSignals.push(alternative.intent);
     }
   }
 
   return {
     detectedSignals: [...new Set(detectedSignals)],
     suggestedAgents: Array.from(suggestedAgents),
-    isCritical,
+    isCritical: classification?.defaultAgent === 'artifact-integrator',
+    classification,
   };
 }
 
@@ -440,7 +379,6 @@ function checkConfigModelValidator(toolName, toolInput = {}, _hookInput = null) 
 }
 
 module.exports = {
-  INTENT_PATTERNS,
   detectIntent,
   agentMatchesIntent,
   checkIntentAgentMatch,

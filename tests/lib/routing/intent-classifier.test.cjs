@@ -49,6 +49,24 @@ describe('intent-classifier', () => {
     assert.strictEqual(result.defaultAgent, 'code-simplifier');
   });
 
+  it('prefers routing-table matches over broader intent keywords', () => {
+    const result = classifyIntent('refactor the auth module');
+    assert.strictEqual(result.defaultAgent, 'code-simplifier');
+    assert.strictEqual(result.source, 'routing_table');
+  });
+
+  it('returns deterministic results for ambiguous prompts', () => {
+    const prompt = 'review the auth module';
+    const expected = classifyIntent(prompt, { includeAlternatives: true, maxAlternatives: 2 });
+
+    for (let i = 0; i < 5; i++) {
+      assert.deepStrictEqual(
+        classifyIntent(prompt, { includeAlternatives: true, maxAlternatives: 2 }),
+        expected
+      );
+    }
+  });
+
   it('routes party mode prompts to party-orchestrator', () => {
     const result = classifyIntent(
       'Use party mode for a structured multi-agent collaboration session.'

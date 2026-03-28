@@ -10,6 +10,7 @@ const {
   ROUTING_PREFIX_PATTERNS,
   ROUTING_PATTERNS,
   INTENT_KEYWORDS,
+  INTENT_TO_AGENT,
   DISAMBIGUATION_RULES,
   getPreferredAgent,
 } = require('./routing-table.cjs');
@@ -18,9 +19,77 @@ const { fuzzyMatchIntent, fuzzyMatchIntentAlternatives } = require('./fuzzy-inte
 const { loadCapabilityRouting } = require('./capability-routing-loader.cjs');
 
 const INTENT_FEEDBACK_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'intent-feedback.json');
+const AGENT_TO_CANONICAL_INTENT = Object.entries(INTENT_TO_AGENT || {}).reduce(
+  (acc, [intent, agent]) => {
+    if (agent && !acc[agent]) {
+      acc[agent] = intent;
+    }
+    return acc;
+  },
+  {}
+);
+const EXACT_INTENT_KEYWORD_MAP = Object.entries(INTENT_KEYWORDS || {}).reduce((acc, [intent, phrases]) => {
+  if (!Array.isArray(phrases)) return acc;
+  for (const phrase of phrases) {
+    const normalized = String(phrase || '').trim().toLowerCase();
+    if (normalized && !acc[normalized]) {
+      acc[normalized] = intent;
+    }
+  }
+  return acc;
+}, {});
 
 function loadCapabilityRoutingForClassifier() {
   return loadCapabilityRouting();
+}
+
+function matchesPromptKeyword(promptLower, keyword) {
+  const normalizedKeyword = String(keyword || '').trim().toLowerCase();
+  if (!promptLower || !normalizedKeyword) return false;
+
+  const isTechnical =
+    normalizedKeyword.includes('.') ||
+    normalizedKeyword.includes('/') ||
+    normalizedKeyword.includes('://') ||
+    normalizedKeyword.includes('_');
+
+  if (isTechnical) {
+    return promptLower.includes(normalizedKeyword);
+  }
+
+  const escaped = normalizedKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`\\b${escaped}\\b`);
+  return re.test(promptLower);
+}
+
+function getRoutingIntentMetadata(keyword, agent) {
+  const normalizedKeyword = String(keyword || '').trim().toLowerCase();
+  const publicIntent = EXACT_INTENT_KEYWORD_MAP[normalizedKeyword] || normalizedKeyword;
+  const ruleIntent = EXACT_INTENT_KEYWORD_MAP[normalizedKeyword] || AGENT_TO_CANONICAL_INTENT[agent] || publicIntent;
+
+  return {
+    intent: publicIntent || 'general',
+    ruleIntent: ruleIntent || publicIntent || 'general',
+  };
+}
+
+function applyDisambiguation(intent, promptLower, defaultAgent) {
+  const rules = DISAMBIGUATION_RULES?.[intent];
+  let resolvedAgent = defaultAgent;
+  let disambiguated = false;
+
+  if (!Array.isArray(rules)) {
+    return { defaultAgent: resolvedAgent, disambiguated };
+  }
+
+  for (const rule of rules) {
+    if (Array.isArray(rule?.condition) && rule.condition.some(cond => promptLower.includes(String(cond).toLowerCase()))) {
+      resolvedAgent = rule.prefer;
+      disambiguated = true;
+    }
+  }
+
+  return { defaultAgent: resolvedAgent, disambiguated };
 }
 
 function evaluateRoutingCondition(capability, prompt, conditions) {
@@ -53,17 +122,7 @@ function matchIntentFromKeywords(promptLower) {
       const kw = String(phrase || '').toLowerCase();
       if (!kw) continue;
 
-      const isTechnical = kw.includes('.') || kw.includes('/') || kw.includes('://');
-      let matched = false;
-      if (isTechnical) {
-        matched = promptLower.includes(kw);
-      } else {
-        const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const re = new RegExp(`\\b${escaped}\\b`);
-        matched = re.test(promptLower);
-      }
-
-      if (matched) {
+      if (matchesPromptKeyword(promptLower, kw)) {
         matchCount++;
         if (kw.length > longestMatchLen) {
           longestMatchLen = kw.length;
@@ -76,7 +135,7 @@ function matchIntentFromKeywords(promptLower) {
       const score = matchCount * 100 + longestMatchLen;
       if (score > bestScore) {
         bestScore = score;
-        bestMatch = { intent: intentKey, source: 'intent_keywords' };
+        bestMatch = { intent: intentKey, source: 'intent_keywords', score };
       }
     }
   }
@@ -85,15 +144,27 @@ function matchIntentFromKeywords(promptLower) {
 }
 
 function matchIntentFromRoutingTable(promptLower) {
-  for (const [keyword, _agent] of Object.entries(ROUTING_TABLE)) {
-    // Use word-boundary matching to prevent false positives
-    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(`\\b${escaped}\\b`);
-    if (re.test(promptLower)) {
-      return { intent: keyword, source: 'routing_table' };
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const [keyword, agent] of Object.entries(ROUTING_TABLE)) {
+    if (!matchesPromptKeyword(promptLower, keyword)) continue;
+
+    const keywordText = String(keyword || '').trim();
+    const score = keywordText.split(/\s+/).filter(Boolean).length * 100 + keywordText.length;
+    if (score > bestScore) {
+      const metadata = getRoutingIntentMetadata(keywordText, agent);
+      bestMatch = {
+        intent: metadata.intent,
+        ruleIntent: metadata.ruleIntent,
+        defaultAgent: agent,
+        source: 'routing_table',
+      };
+      bestScore = score;
     }
   }
-  return null;
+
+  return bestMatch;
 }
 
 function matchIntentFromPrefixPatterns(promptLower) {
@@ -104,7 +175,13 @@ function matchIntentFromPrefixPatterns(promptLower) {
     const pattern = String(entry.pattern).toLowerCase();
     const matched = words.some(word => word.startsWith(pattern)) || promptLower.includes(pattern);
     if (matched) {
-      return { intent: pattern, agent: entry.agent, source: 'prefix' };
+      const metadata = getRoutingIntentMetadata(pattern, entry.agent);
+      return {
+        intent: metadata.intent,
+        ruleIntent: metadata.ruleIntent,
+        defaultAgent: entry.agent,
+        source: 'prefix',
+      };
     }
   }
   return null;
@@ -142,6 +219,70 @@ function recordIntentFeedback(intentId, success, options = {}) {
   }
 }
 
+function resolvePrimaryIntent(promptLower) {
+  const routingMatch = matchIntentFromRoutingTable(promptLower);
+  if (routingMatch) {
+    return routingMatch;
+  }
+
+  const prefixMatch = matchIntentFromPrefixPatterns(promptLower);
+  if (prefixMatch) {
+    return prefixMatch;
+  }
+
+  const keywordMatch = matchIntentFromKeywords(promptLower);
+  const patternMatch = resolveByPattern(promptLower, ROUTING_PATTERNS);
+  if (patternMatch) {
+    const patternIntent = AGENT_TO_CANONICAL_INTENT[patternMatch.agent] || patternMatch.agent;
+    const patternAgent = getPreferredAgent(patternIntent) ?? patternMatch.agent;
+    const keywordAgent = keywordMatch ? getPreferredAgent(keywordMatch.intent) : null;
+    const preferKeywordOverPattern =
+      keywordMatch &&
+      ['developer', 'planner'].includes(patternAgent) &&
+      keywordAgent &&
+      !['developer', 'planner', 'general-assistant'].includes(keywordAgent) &&
+      (Number(keywordMatch.score || 0) >= 200 ||
+        ['artifact-integrator', 'framework_maintenance', 'researcher'].includes(
+          keywordMatch.intent
+        ));
+
+    if (!preferKeywordOverPattern) {
+      return {
+        intent: patternIntent,
+        ruleIntent: patternIntent,
+        source: 'pattern',
+        defaultAgent: patternAgent,
+      };
+    }
+  }
+
+  if (keywordMatch) {
+    return {
+      intent: keywordMatch.intent,
+      ruleIntent: keywordMatch.intent,
+      source: keywordMatch.source,
+      defaultAgent: getPreferredAgent(keywordMatch.intent),
+    };
+  }
+
+  const fuzzyMatch = fuzzyMatchIntent(promptLower, INTENT_KEYWORDS, { threshold: 0.6 });
+  if (fuzzyMatch) {
+    return {
+      intent: fuzzyMatch.intent,
+      ruleIntent: fuzzyMatch.intent,
+      source: 'fuzzy',
+      defaultAgent: getPreferredAgent(fuzzyMatch.intent),
+    };
+  }
+
+  return {
+    intent: 'general',
+    ruleIntent: 'general',
+    source: 'none',
+    defaultAgent: null,
+  };
+}
+
 function classifyIntent(prompt, options = {}) {
   const normalizedPrompt = String(prompt || '').trim();
   if (normalizedPrompt.length < 2) {
@@ -156,63 +297,25 @@ function classifyIntent(prompt, options = {}) {
   }
 
   const promptLower = normalizedPrompt.toLowerCase();
-  let intent = 'general';
-  let source = 'none';
-  let defaultAgent = null;
+  const primaryIntent = resolvePrimaryIntent(promptLower);
+  const intent = primaryIntent.intent;
+  let intentForRules = primaryIntent.ruleIntent || primaryIntent.intent;
+  let source = primaryIntent.source;
+  let defaultAgent = primaryIntent.defaultAgent;
 
-  const keywordMatch = matchIntentFromKeywords(promptLower);
-  if (keywordMatch) {
-    intent = keywordMatch.intent;
-    source = keywordMatch.source;
-
-    // Apply disambiguation rules for keyword matches
-    const rules = DISAMBIGUATION_RULES[intent];
-    if (Array.isArray(rules)) {
-      for (const rule of rules) {
-        if (rule.condition.some(cond => promptLower.includes(cond.toLowerCase()))) {
-          defaultAgent = rule.prefer;
-          source = 'disambiguation';
-          // No break here, allow later rules to further disambiguate if needed
-        }
-      }
-    }
-  } else {
-    const routingMatch = matchIntentFromRoutingTable(promptLower);
-    if (routingMatch) {
-      intent = routingMatch.intent;
-      source = routingMatch.source;
-    }
+  if (!intentForRules || intentForRules === 'general') {
+    intentForRules = intent;
   }
 
-  if (intent === 'general') {
-    const prefixMatch = matchIntentFromPrefixPatterns(promptLower);
-    if (prefixMatch) {
-      intent = prefixMatch.intent;
-      source = prefixMatch.source;
-      defaultAgent = prefixMatch.agent;
-    }
+  if (intent !== 'general' && !defaultAgent) {
+    defaultAgent = getPreferredAgent(intentForRules) || getPreferredAgent(intent);
   }
 
-  // Preserve explicit intent->agent mapping precedence over capability defaults.
-  if (!defaultAgent && intent !== 'general') {
-    defaultAgent = getPreferredAgent(intent);
-  }
-
-  if (!defaultAgent) {
-    const patternMatch = resolveByPattern(promptLower, ROUTING_PATTERNS);
-    if (patternMatch) {
-      intent = patternMatch.agent;
-      source = 'pattern';
-      defaultAgent = getPreferredAgent(patternMatch.agent) ?? patternMatch.agent;
-    }
-  }
-
-  if (!defaultAgent) {
-    const fuzzyMatch = fuzzyMatchIntent(promptLower, INTENT_KEYWORDS, { threshold: 0.6 });
-    if (fuzzyMatch) {
-      intent = fuzzyMatch.intent;
-      source = 'fuzzy';
-      defaultAgent = getPreferredAgent(fuzzyMatch.intent);
+  if (intent !== 'general') {
+    const disambiguation = applyDisambiguation(intentForRules, promptLower, defaultAgent);
+    defaultAgent = disambiguation.defaultAgent;
+    if (disambiguation.disambiguated) {
+      source = 'disambiguation';
     }
   }
 
@@ -224,9 +327,11 @@ function classifyIntent(prompt, options = {}) {
         matchingCapabilities.push(capabilityName);
       }
     }
-    const intentCapability = capRouting.capabilityMap[intent];
-    if (intentCapability && !matchingCapabilities.includes(intentCapability)) {
-      matchingCapabilities.push(intentCapability);
+    for (const intentCandidate of [intent, intentForRules]) {
+      const intentCapability = capRouting.capabilityMap[intentCandidate];
+      if (intentCapability && !matchingCapabilities.includes(intentCapability)) {
+        matchingCapabilities.push(intentCapability);
+      }
     }
   }
 
@@ -254,7 +359,7 @@ function classifyIntent(prompt, options = {}) {
     if (capability && capRouting?.defaultAgents) {
       defaultAgent = capRouting.defaultAgents[capability] || null;
     } else {
-      defaultAgent = getPreferredAgent(intent);
+      defaultAgent = getPreferredAgent(intentForRules) || getPreferredAgent(intent);
     }
   }
 
