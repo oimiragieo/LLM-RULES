@@ -44,13 +44,13 @@ Files under `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/wor
 
 ### Pre-flight Sequence (EVERY prompt)
 
-| Step | Action |
-|------|--------|
-| **0** | Read `reflection-reminder.txt` + `reflection-spawn-request.json`, spawn reflection-agent for pending requests |
-| **0.4** | Read `stale-tasks.json`, close stale tasks via TaskUpdate |
+| Step    | Action                                                                                                                                  |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **0**   | Read `reflection-reminder.txt` + `reflection-spawn-request.json`, spawn reflection-agent for pending requests                           |
+| **0.4** | Read `stale-tasks.json`, close stale tasks via TaskUpdate                                                                               |
 | **0.5** | If `heartbeat-reminder.txt` exists → spawn heartbeat-orchestrator. If `integration-queue.jsonl` has entries → spawn artifact-integrator |
-| **0.6** | Creation preflight → spawn planner for feasibility-gate |
-| **0.7** | Framework changes → spawn QA with proactive-audit skill |
+| **0.6** | Creation preflight → spawn planner for feasibility-gate                                                                                 |
+| **0.7** | Framework changes → spawn QA with proactive-audit skill                                                                                 |
 
 Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute requests.
 
@@ -68,17 +68,17 @@ Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute 
 
 **Developer is LAST RESORT.** Common misrouting:
 
-| Request | WRONG | CORRECT |
-|---------|-------|---------|
-| docs | developer | **technical-writer** |
-| refactor | developer | **code-simplifier** |
-| review | developer | **code-reviewer** |
-| tests | developer | **qa** |
-| deploy/CI | developer | **devops** |
-| database | developer | **database-architect** |
-| research | developer | **researcher** |
-| integrate repo | researcher | **artifact-integrator** |
-| debug prod | developer | **devops-troubleshooter** |
+| Request        | WRONG      | CORRECT                   |
+| -------------- | ---------- | ------------------------- |
+| docs           | developer  | **technical-writer**      |
+| refactor       | developer  | **code-simplifier**       |
+| review         | developer  | **code-reviewer**         |
+| tests          | developer  | **qa**                    |
+| deploy/CI      | developer  | **devops**                |
+| database       | developer  | **database-architect**    |
+| research       | developer  | **researcher**            |
+| integrate repo | researcher | **artifact-integrator**   |
+| debug prod     | developer  | **devops-troubleshooter** |
 
 110 agents exist. See **@AGENT_ROUTING_TABLE.md** for full matrix.
 
@@ -90,15 +90,15 @@ Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute 
 
 ## SELF-CHECK GATES (Section 1.2)
 
-| Gate | Trigger | Action |
-|------|---------|--------|
-| 0: Reflection | `reflection-reminder.txt` exists | Process reflections FIRST |
-| 1: Complexity | multi-step/multi-file/architecture | Spawn PLANNER first |
-| 2: Security | auth/credentials/PII | Include SECURITY-ARCHITECT |
-| 3: Tool | blacklisted tools needed | Spawn appropriate agent |
-| 4: Creator | writing to creator paths | Invoke creator skill |
-| 5: Architect | spawning code-simplifier/devops/chaos-engineer | Spawn ARCHITECT first |
-| 6: Audit | pipeline touched framework artifacts | Spawn QA with proactive-audit |
+| Gate          | Trigger                                        | Action                        |
+| ------------- | ---------------------------------------------- | ----------------------------- |
+| 0: Reflection | `reflection-reminder.txt` exists               | Process reflections FIRST     |
+| 1: Complexity | multi-step/multi-file/architecture             | Spawn PLANNER first           |
+| 2: Security   | auth/credentials/PII                           | Include SECURITY-ARCHITECT    |
+| 3: Tool       | blacklisted tools needed                       | Spawn appropriate agent       |
+| 4: Creator    | writing to creator paths                       | Invoke creator skill          |
+| 5: Architect  | spawning code-simplifier/devops/chaos-engineer | Spawn ARCHITECT first         |
+| 6: Audit      | pipeline touched framework artifacts           | Spawn QA with proactive-audit |
 
 ---
 
@@ -117,31 +117,54 @@ Task({ task_id: 'task-N', subagent_type, prompt, model? })
 ### Model Selection
 
 1. Explicit `model:` in Task() → 2. Agent frontmatter → 3. config.yaml → 4. Complexity default → 5. sonnet
+
 - haiku: simple/low | sonnet: standard | opus: complex/security/high
 
 ---
 
 ## ROUTING TABLE (Section 3)
 
+Default mode is flat routing (`HIERARCHICAL_ROUTING=off`, the safe default).
+When `HIERARCHICAL_ROUTING=on`, route to direct specialists or to a domain
+sub-router that selects the final specialist.
+
+### Direct routes in hierarchical mode
+
 | Task Type | Agent |
-|-----------|-------|
+| --------- | ----- |
 | Q&A / brainstorming | `general-assistant` |
 | Bug fixes / implementation | `developer` |
 | Documentation | `technical-writer` |
-| Refactor/simplify | `code-simplifier` |
+| Refactor / simplify | `code-simplifier` |
 | Code review | `code-reviewer` |
-| Testing/QA | `qa` |
-| Architecture | `architect` |
-| Integration/onboarding | `artifact-integrator` |
-| Security | `security-architect` |
-| Infra/CI/deploy | `devops` |
-| Planning/HIGH tasks | `planner` |
+| Testing / QA / validation | `qa` or `conductor-validator` |
+| Architecture / design | `architect` |
+| Planning / task hygiene | `planner` |
 | Research | `researcher` |
-| Heartbeat/cron | `heartbeat-orchestrator` |
-| Task hygiene | `task-manager` |
-| Memory health | `memory-manager` |
+| Context / compression | `context-compressor` |
+| Integration / onboarding | `artifact-integrator` |
+| Memory / reflection | `memory-manager` |
+| Multi-agent orchestration | `master-orchestrator` |
+| Swarm / parallel coordination | `swarm-coordinator` |
+| Consensus / debate | `party-orchestrator` |
 
-Full routing: **@AGENT_ROUTING_TABLE.md** | Source: `.claude/lib/routing/routing-table.cjs`
+### Domain routes when `HIERARCHICAL_ROUTING=on`
+
+| Domain | Primary keywords | Sub-router |
+| ------ | ---------------- | ---------- |
+| `web-frontend` | react, vue, css, html, next, svelte, angular | `domain-router-web-frontend` |
+| `backend-languages` | python, typescript, go, rust, java, php, node, django, fastapi | `domain-router-backend` |
+| `mobile-desktop` | ios, android, expo, mobile, tauri, desktop | `domain-router-mobile` |
+| `ai-ml` | ai, ml, llm, rag, prompt, mcp, embeddings | `domain-router-ai-ml` |
+| `infra-devops` | devops, deploy, docker, kubernetes, incident, sre | `domain-router-infra` |
+| `security-quality` | security, pentest, performance, accessibility, chaos | `domain-router-security` |
+| `architecture-data` | api, graphql, database, sql, postgres, c4 | `domain-router-arch-data` |
+| `product-business` | product, sprint, roadmap, agile, program, marketing | `domain-router-product` |
+| `specialized-niche` | web3, blockchain, game, medical, scientific | `domain-router-niche` |
+
+Full flat routing: **@AGENT_ROUTING_TABLE.md**  
+Flat source: `.claude/lib/routing/routing-table-core-map.cjs`  
+Hierarchical source: `.claude/lib/routing/routing-table-hierarchical.cjs`
 
 Creator skills: Use `Skill({ skill: 'name' })`, invoke `research-synthesis` BEFORE other creators. See **@CREATOR_SKILLS_TABLE.md**.
 
@@ -149,20 +172,20 @@ Creator skills: Use `Skill({ skill: 'name' })`, invoke `research-synthesis` BEFO
 
 ## KEY REFERENCES (load on demand via Read)
 
-| Topic | File |
-|-------|------|
+| Topic                                 | File                         |
+| ------------------------------------- | ---------------------------- |
 | Planning matrix, enterprise workflows | **@ENTERPRISE_WORKFLOWS.md** |
-| Agent routing (full 110-agent matrix) | **@AGENT_ROUTING_TABLE.md** |
-| Router operations, gap protocol | **@ROUTER_OPERATIONS.md** |
-| Memory protocol (STM/MTM/LTM) | **@MEMORY_PROTOCOL.md** |
-| Hook enforcement | **@ENFORCEMENT_HOOKS.md** |
-| Skill catalog | **@SKILL_CATALOG_TABLE.md** |
-| Model selection | **@MODEL_SELECTION.md** |
-| Tool reference | **@TOOL_REFERENCE.md** |
-| Environment config | **@ENVIRONMENT_CONFIG.md** |
-| Directory structure | **@DIRECTORY_STRUCTURE.md** |
-| Task tracking guide | **@TASK_TRACKING_GUIDE.md** |
-| Evolution workflow | **@EVOLUTION_WORKFLOW.md** |
+| Agent routing (full 110-agent matrix) | **@AGENT_ROUTING_TABLE.md**  |
+| Router operations, gap protocol       | **@ROUTER_OPERATIONS.md**    |
+| Memory protocol (STM/MTM/LTM)         | **@MEMORY_PROTOCOL.md**      |
+| Hook enforcement                      | **@ENFORCEMENT_HOOKS.md**    |
+| Skill catalog                         | **@SKILL_CATALOG_TABLE.md**  |
+| Model selection                       | **@MODEL_SELECTION.md**      |
+| Tool reference                        | **@TOOL_REFERENCE.md**       |
+| Environment config                    | **@ENVIRONMENT_CONFIG.md**   |
+| Directory structure                   | **@DIRECTORY_STRUCTURE.md**  |
+| Task tracking guide                   | **@TASK_TRACKING_GUIDE.md**  |
+| Evolution workflow                    | **@EVOLUTION_WORKFLOW.md**   |
 
 ---
 

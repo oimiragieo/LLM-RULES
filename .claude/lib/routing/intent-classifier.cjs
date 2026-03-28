@@ -14,6 +14,7 @@ const {
   DISAMBIGUATION_RULES,
   getPreferredAgent,
 } = require('./routing-table.cjs');
+const { DOMAIN_ROUTING_TABLE } = require('./routing-table-hierarchical.cjs');
 const { resolveByPattern } = require('./pattern-router.cjs');
 const { fuzzyMatchIntent, fuzzyMatchIntentAlternatives } = require('./fuzzy-intent-matcher.cjs');
 const { loadCapabilityRouting } = require('./capability-routing-loader.cjs');
@@ -159,6 +160,28 @@ function matchIntentFromRoutingTable(promptLower) {
         ruleIntent: metadata.ruleIntent,
         defaultAgent: agent,
         source: 'routing_table',
+      };
+      bestScore = score;
+    }
+  }
+
+  return bestMatch;
+}
+
+function matchDomainFromRoutingTable(promptLower) {
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const [keyword, entry] of Object.entries(DOMAIN_ROUTING_TABLE)) {
+    if (!matchesPromptKeyword(promptLower, keyword)) continue;
+
+    const keywordText = String(keyword || '').trim();
+    const score = keywordText.split(/\s+/).filter(Boolean).length * 100 + keywordText.length;
+    if (score > bestScore) {
+      bestMatch = {
+        ...entry,
+        keyword: keywordText,
+        source: 'hierarchical_table',
       };
       bestScore = score;
     }
@@ -395,9 +418,49 @@ function classifyIntent(prompt, options = {}) {
   };
 }
 
+function classifyDomain(prompt) {
+  const normalizedPrompt = String(prompt || '').trim();
+  if (normalizedPrompt.length < 2) {
+    return {
+      type: 'direct',
+      agent: 'developer',
+      source: 'default',
+      keyword: null,
+    };
+  }
+
+  const promptLower = normalizedPrompt.toLowerCase();
+  const domainMatch = matchDomainFromRoutingTable(promptLower);
+  if (domainMatch) {
+    return domainMatch;
+  }
+
+  return {
+    type: 'direct',
+    agent: 'developer',
+    source: 'default',
+    keyword: null,
+  };
+}
+
+function getHierarchicalRoutingMode(defaultMode = 'off') {
+  const normalized = String(process.env.HIERARCHICAL_ROUTING || defaultMode || 'off')
+    .trim()
+    .toLowerCase();
+
+  return normalized === 'on' ? 'on' : 'off';
+}
+
+function isHierarchicalRoutingEnabled(defaultMode = 'off') {
+  return getHierarchicalRoutingMode(defaultMode) === 'on';
+}
+
 module.exports = {
   classifyIntent,
+  classifyDomain,
   evaluateRoutingCondition,
+  getHierarchicalRoutingMode,
+  isHierarchicalRoutingEnabled,
   loadCapabilityRoutingForClassifier,
   recordIntentFeedback,
 };

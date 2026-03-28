@@ -38,7 +38,11 @@ const { createLogger: createLogger } = libRequire(path.join('utils', 'logger.cjs
 const { ROUTING_TABLE: ROUTING_TABLE, getPreferredAgent: getPreferredAgent } = libRequire(
   path.join('routing', 'routing-table.cjs')
 );
-const { classifyIntent: classifyIntent } = libRequire(
+const {
+  classifyIntent: classifyIntent,
+  classifyDomain: classifyDomain,
+  isHierarchicalRoutingEnabled: isHierarchicalRoutingEnabled,
+} = libRequire(
   path.join('routing', 'intent-classifier.cjs')
 );
 const { getAgentForCapability: getAgentForCapability } = libRequire(
@@ -1117,16 +1121,69 @@ function recordUserPromptResult(result) {
     result.reason = 'no_agents';
     return result;
   }
+  const planningReq = detectPlanningRequirement(userPrompt);
+  routerState.saveStateWithRetry(planningReq.stateUpdates);
+  result.planningReq = planningReq;
+
+  if (isHierarchicalRoutingEnabled()) {
+    const hierarchicalMatch = classifyDomain(userPrompt);
+    const hierarchicalTarget =
+      hierarchicalMatch.type === 'domain' ? hierarchicalMatch.router : hierarchicalMatch.agent;
+    const hierarchicalAgent = agents.find(agent => agent.name === hierarchicalTarget) || {
+      name: hierarchicalTarget,
+      description:
+        hierarchicalMatch.type === 'domain'
+          ? `${hierarchicalMatch.domain} domain sub-router`
+          : `Direct hierarchical route for ${hierarchicalTarget}`,
+      priority: 'high',
+    };
+
+    result.candidates = [
+      {
+        agent: hierarchicalAgent,
+        score: 10,
+        intent: hierarchicalMatch.domain || hierarchicalTarget,
+        source: 'hierarchical',
+      },
+    ];
+    result.intent = hierarchicalMatch.domain || hierarchicalTarget;
+    result.intentConfidence = 'high';
+    result.intentSource = 'hierarchical';
+    result.defaultAgentForCapability = hierarchicalTarget;
+    result.routingType = 'hierarchical';
+    if (hierarchicalMatch.type === 'domain') {
+      result.domain = hierarchicalMatch.domain;
+      result.subRouter = hierarchicalMatch.router;
+    } else {
+      result.directAgent = hierarchicalMatch.agent;
+    }
+
+    console.error('\n+--------------------------------------------------+');
+    console.error('| ROUTER ANALYSIS (HIERARCHICAL)                   |');
+    console.error('+--------------------------------------------------+');
+    console.error(`| Route type: ${hierarchicalMatch.type.padEnd(35)} |`);
+    if (hierarchicalMatch.type === 'domain') {
+      console.error(`| Domain: ${hierarchicalMatch.domain.padEnd(39)} |`);
+      console.error(`| Sub-router: ${hierarchicalMatch.router.padEnd(35)} |`);
+    } else {
+      console.error(`| Direct agent: ${hierarchicalMatch.agent.padEnd(35)} |`);
+    }
+    console.error(`| Complexity: ${planningReq.complexity.padEnd(36)} |`);
+    console.error('|                                                  |');
+    console.error(`| Use Task tool to spawn: ${hierarchicalTarget.padEnd(24)} |`);
+    console.error('+--------------------------------------------------+\n');
+
+    return result;
+  }
+
   const classification = classifyIntent(userPrompt);
   const { candidates: candidates, intent: intent } = scoreAgents(
     userPrompt,
     agents,
     classification
   );
-  const planningReq = detectPlanningRequirement(userPrompt);
-  routerState.saveStateWithRetry(planningReq.stateUpdates);
+
   result.candidates = candidates;
-  result.planningReq = planningReq;
   result.intent = classification.intent || intent;
   result.intentConfidence = classification.confidence;
   result.intentSource = classification.source;

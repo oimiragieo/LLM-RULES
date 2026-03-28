@@ -30,16 +30,43 @@ describe('validate-routing-consistency', () => {
   it('returns no issues for internally consistent maps', () => {
     const issues = validateRoutingConsistency({
       routingTable: { bug: 'developer', feature: 'planner' },
+      hierarchicalRoutingTable: {
+        bug: { type: 'direct', agent: 'developer' },
+        feature: { type: 'domain', domain: 'core', router: 'domain-router-core' },
+      },
       intentToAgent: { qa: 'qa', security: 'security-architect' },
       capabilityRouting: {
         capabilityMap: { fix: 'implementation' },
         defaultAgents: { implementation: 'developer' },
         domainFallbacks: { core: ['planner'] },
       },
-      agentIds: new Set(['developer', 'planner', 'qa', 'security-architect']),
+      agentIds: new Set([
+        'developer',
+        'planner',
+        'qa',
+        'security-architect',
+        'domain-router-core',
+      ]),
     });
 
     assert.deepStrictEqual(issues, []);
+  });
+
+  it('flags hierarchical routing gaps and invalid targets', () => {
+    const issues = validateRoutingConsistency({
+      routingTable: { bug: 'developer', feature: 'planner' },
+      hierarchicalRoutingTable: {
+        bug: { type: 'direct', agent: 'developer' },
+      },
+      intentToAgent: { qa: 'qa' },
+      capabilityRouting: { capabilityMap: {}, defaultAgents: {}, domainFallbacks: {} },
+      agentIds: new Set(['developer', 'planner', 'qa']),
+    });
+
+    assert.ok(
+      issues.some(issue => issue.includes('DOMAIN_ROUTING_TABLE missing flat keywords: feature')),
+      'expected missing flat keyword issue'
+    );
   });
 
   it('returns an array of issues for current repo state', () => {
