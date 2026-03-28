@@ -41,9 +41,9 @@ skills:
   - best-practices-guidelines
   - brainstorming
   - brand-compliance
+  - browser-automation
   - build-tools-expert
   - checklist-generator
-  - browser-automation
   - chrome-browser
   - ci-cd-implementation-rule
   - claude-api
@@ -56,6 +56,7 @@ skills:
   - comprehensive-type-annotations
   - comprehensive-unit-testing-with-pytest
   - configuration-management
+  - context-compressor
   - convex-development-general
   - cpp
   - creation-feasibility-gate
@@ -72,7 +73,7 @@ skills:
   - dto-conventions
   - dynamic-api-integration
   - ecosystem-integrity-scanner
-  - instinct-learning
+  - electron-pro
   - elixir-expert
   - enhance-prompt
   - eval-harness-updater
@@ -94,11 +95,13 @@ skills:
   - github-mcp
   - github-ops
   - gitops-workflow
+  - google-workspace
   - helm-chart-scaffolding
   - hook-creator
   - html-tailwind-css-and-javascript-expert-rule
   - htmx-expert
   - insecure-defaults
+  - instinct-learning
   - interactive-requirements-gathering
   - jira-pm
   - jupyter-notebook-best-practices
@@ -106,10 +109,11 @@ skills:
   - kafka-development-practices
   - large-data-with-dask
   - linear-pm
-  - lsp-navigator
   - llm-council
   - logging-module-usage
+  - lsp-navigator
   - marketing-content
+  - markitdown-converter
   - mcp-builder
   - medusa
   - medusa-security
@@ -127,6 +131,7 @@ skills:
   - planning-with-files
   - poetry-rye-dependency-management
   - powershell-expert
+  - pptx
   - prd-generator
   - prioritize-python-3-10-features
   - proactive-audit
@@ -153,6 +158,7 @@ skills:
   - shadcn-ui
   - sharp-edges
   - skill-updater
+  - slack-expert
   - slack-notifications
   - smart-debug
   - smart-revert
@@ -173,14 +179,18 @@ skills:
   - tauri-svelte-typescript-general
   - tauri-svelte-ui-components
   - tdd
+  - telegram-polling
+  - telegram-voice-pipeline
   - template-creator
   - template-renderer
   - thinking-tools
-  - context-compressor
+  - token-saver-context-compression
   - tool-creator
   - tool-search
+  - transcription
   - troubleshooting-regression
   - tsconfig-json-rules
+  - tts-generation
   - ui-components-expert
   - user-research
   - using-git-worktrees
@@ -194,19 +204,10 @@ skills:
   - web-perf
   - webapp-testing
   - webmcp-browser-tools
+  - websocket-engineer
   - workflow-creator
   - workflow-updater
   - writing-skills
-  - electron-pro
-  - google-workspace
-  - markitdown-converter
-  - pptx
-  - slack-expert
-  - telegram-polling
-  - telegram-voice-pipeline
-  - transcription
-  - tts-generation
-  - websocket-engineer
   - xlsx
 capabilities:
   - code-generation

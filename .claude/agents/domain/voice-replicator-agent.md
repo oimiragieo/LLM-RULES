@@ -26,14 +26,16 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - style-analyzer
-  - voice-clone-generator
-  - ripgrep
   - code-semantic-search
+  - code-structural-search
   - context-compressor
   - memory-search
+  - ripgrep
+  - style-analyzer
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
+  - voice-clone-generator
 tags:
   - content
   - nlp

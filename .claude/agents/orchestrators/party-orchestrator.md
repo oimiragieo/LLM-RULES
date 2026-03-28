@@ -21,15 +21,16 @@ tools:
   - TaskUpdate
   - MemoryRecord
 skills:
-  - memory-search
-  - consensus-voting
-  - ripgrep
   - code-semantic-search
   - code-structural-search
+  - consensus-voting
+  - context-compressor
+  - memory-search
+  - ripgrep
   - swarm-coordination
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
-  - context-compressor
 ---
 
 <!-- agent-template-contract:v1 -->

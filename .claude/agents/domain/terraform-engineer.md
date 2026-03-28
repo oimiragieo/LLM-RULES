@@ -22,17 +22,19 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - terraform-infra
-  - security-scanning
-  - k8s-manifest-generator
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - debugging
   - docker-compose
+  - k8s-manifest-generator
+  - memory-search
+  - ripgrep
+  - security-scanning
   - task-management-protocol
   - tdd
-  - debugging
-  - ripgrep
-  - code-semantic-search
-  - memory-search
-  - context-compressor
+  - terraform-infra
+  - token-saver-context-compression
   - verification-before-completion
 tags:
   - terraform

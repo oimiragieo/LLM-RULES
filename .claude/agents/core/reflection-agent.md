@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-26T02:30:52.613Z
+lastVerifiedAt: 2026-03-28T15:38:19.600Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -27,22 +27,23 @@ tools:
   - TaskUpdate
   - Write
 skills:
+  - artifact-integrator
   - code-analyzer
   - code-semantic-search
   - code-structural-search
-  - lsp-navigator
+  - context-compressor
   - framework-context
   - insight-extraction
+  - lsp-navigator
   - memory-search
+  - outcome-reflection
   - recommend-evolution
   - ripgrep
   - session-handoff
   - session-transcript-analyzer
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - artifact-integrator
-  - outcome-reflection
 context_files:
   - '@.claude/context/memory/patterns.json'
   - '@.claude/context/memory/gotchas.json'

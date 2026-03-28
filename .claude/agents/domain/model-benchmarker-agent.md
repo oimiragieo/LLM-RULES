@@ -25,13 +25,15 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - model-benchmark
-  - ml-experiment-loop
-  - ripgrep
   - code-semantic-search
+  - code-structural-search
   - context-compressor
   - memory-search
+  - ml-experiment-loop
+  - model-benchmark
+  - ripgrep
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 tags:

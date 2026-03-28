@@ -8,17 +8,18 @@ category: orchestrators
 type: orchestrator
 model: sonnet
 skills:
-  - heartbeat
-  - scheduled-tasks
-  - task-management-protocol
-  - ripgrep
-  - memory-search
   - code-semantic-search
   - code-structural-search
   - context-compressor
-  - verification-before-completion
   - cron-decision
   - cron-runner
+  - heartbeat
+  - memory-search
+  - ripgrep
+  - scheduled-tasks
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 tools:
   - CronCreate
   - CronList

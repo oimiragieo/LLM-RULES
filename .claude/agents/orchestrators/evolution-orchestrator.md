@@ -28,24 +28,25 @@ tools:
   - WebFetch
   - MemoryRecord
 skills:
-  - memory-search
   - agent-creator
+  - artifact-integrator
   - artifact-lifecycle
-  - command-creator
-  - hook-creator
-  - research-synthesis
-  - ripgrep
   - code-semantic-search
   - code-structural-search
+  - command-creator
+  - context-compressor
+  - hook-creator
+  - memory-search
+  - research-synthesis
+  - ripgrep
   - rule-creator
   - schema-creator
   - skill-creator
   - task-management-protocol
   - template-creator
+  - token-saver-context-compression
   - verification-before-completion
   - workflow-creator
-  - context-compressor
-  - artifact-integrator
 ---
 
 <!-- agent-template-contract:v1 -->

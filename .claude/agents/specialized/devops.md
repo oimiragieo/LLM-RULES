@@ -28,6 +28,10 @@ tools:
   - Skill
 skills:
   - architecture-review
+  - atlassian-integration
+  - azure-devops
+  - cloud-run
+  - cloudflare-workers
   - code-semantic-search
   - code-structural-search
   - consensus-voting
@@ -42,16 +46,12 @@ skills:
   - kubernetes-flux
   - lsp-navigator
   - memory-search
+  - notification-triggers
   - ripgrep
   - task-management-protocol
   - terraform-infra
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - atlassian-integration
-  - azure-devops
-  - cloud-run
-  - cloudflare-workers
-  - notification-triggers
   - windows-terminal
 ---
 

@@ -29,10 +29,11 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - memory-search
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
   - web3-expert
 context_files: null

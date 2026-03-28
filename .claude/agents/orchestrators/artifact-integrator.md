@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-26T02:30:53.193Z
+lastVerifiedAt: 2026-03-28T15:38:19.912Z
 name: artifact-integrator
 version: 1.0.0
 description: >-
@@ -37,16 +37,17 @@ tools:
   - Skill
   - WebFetch
 skills:
+  - artifact-integrator
+  - code-semantic-search
+  - code-structural-search
   - codebase-exploration
+  - context-compressor
   - memory-search
   - project-onboarding
   - ripgrep
-  - code-semantic-search
-  - code-structural-search
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
-  - context-compressor
-  - integration
 context_files: null
 mcp_servers:
   - Exa

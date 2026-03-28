@@ -23,11 +23,12 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - context-driven-development
   - memory-search
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - track-management
   - verification-before-completion
   - workflow-patterns

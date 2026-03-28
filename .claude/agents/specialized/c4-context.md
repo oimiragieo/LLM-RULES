@@ -28,11 +28,12 @@ skills:
   - architecture-review
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - diagram-generator
   - memory-search
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 ---

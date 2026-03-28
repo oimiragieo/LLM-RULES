@@ -27,26 +27,27 @@ tools:
   - TaskOutput
   - Skill
 skills:
+  - api-testing
+  - browser-automation
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - de-sloppify
+  - goal-backward-verification
   - instinct-learning
+  - judge-verification
   - lsp-navigator
   - memory-search
+  - pipeline-evaluator
+  - proactive-audit
   - ripgrep
   - task-management-protocol
-  - proactive-audit
-  - browser-automation
   - tdd
   - test-generator
-  - context-compressor
-  - verification-before-completion
-  - goal-backward-verification
-  - api-testing
-  - judge-verification
-  - pipeline-evaluator
+  - token-saver-context-compression
   - uat-verify
   - user-flow-validator
+  - verification-before-completion
 identity:
   role: Quality Gatekeeper
   goal: Break the code before users do through comprehensive testing and edge case analysis

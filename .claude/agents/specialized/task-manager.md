@@ -16,12 +16,16 @@ tags:
   - framework-health
   - post-pipeline
 skills:
-  - task-management-protocol
-  - ripgrep
   - code-semantic-search
+  - code-structural-search
   - context-compressor
-  - omega-gemini-cli
+  - memory-search
   - omega-codex-cli
+  - omega-gemini-cli
+  - ripgrep
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

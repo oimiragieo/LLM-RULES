@@ -26,6 +26,7 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - incident-runbook-templates
   - lsp-navigator
   - memory-search
@@ -33,7 +34,7 @@ skills:
   - postmortem-writing
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 ---
 

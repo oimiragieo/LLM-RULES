@@ -26,14 +26,16 @@ tools:
   - Skill
   - MemoryRecord
 skills:
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
   - database-expert
   - debugging
-  - code-semantic-search
+  - memory-search
   - ripgrep
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
-  - memory-search
-  - context-compressor
 context_files: null
 ---
 

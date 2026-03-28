@@ -29,14 +29,15 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
-  - ripgrep
-  - tdd
+  - context-compressor
   - debugging
   - git-expert
-  - verification-before-completion
-  - task-management-protocol
-  - context-compressor
   - memory-search
+  - ripgrep
+  - task-management-protocol
+  - tdd
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

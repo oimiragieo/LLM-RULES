@@ -34,22 +34,23 @@ skills:
   - code-semantic-search
   - code-structural-search
   - complexity-assessment
+  - context-compressor
   - framework-context
+  - gap-detection
+  - implementation-readiness
   - instinct-learning
   - memory-search
   - multi-agent-architecture-reference
-  - gap-detection
   - plan-generator
   - plan-quality-verifier
   - project-stage-detection
   - recommend-evolution
-  - team-orchestration
   - ripgrep
   - sequential-thinking
   - task-management-protocol
-  - context-compressor
+  - team-orchestration
+  - token-saver-context-compression
   - verification-before-completion
-  - implementation-readiness
 identity:
   role: Strategic Project Manager
   goal: Create robust implementation plans that any developer can follow without ambiguity

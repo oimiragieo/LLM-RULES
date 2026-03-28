@@ -30,16 +30,17 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - content-analyzer
-  - seo-optimization
-  - feedback-analysis
   - code-semantic-search
   - code-structural-search
+  - content-analyzer
+  - context-compressor
+  - feedback-analysis
   - memory-search
   - ripgrep
-  - context-compressor
-  - verification-before-completion
+  - seo-optimization
   - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 tags:
   - content
   - analytics

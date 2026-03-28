@@ -30,20 +30,21 @@ tools:
 skills:
   - audit-context-building
   - auth-security-expert
-  - fix-review
   - authentication-flow-rules
   - building-secure-contracts
   - code-semantic-search
   - code-structural-search
-  - lsp-navigator
+  - commit-security-scan
   - content-security-scan
+  - context-compressor
+  - fix-review
+  - lsp-navigator
   - memory-search
   - ripgrep
   - security-architect
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - commit-security-scan
 context_files: null
 ---
 

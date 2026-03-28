@@ -29,14 +29,15 @@ skills:
   - ai-ml-expert
   - code-semantic-search
   - code-structural-search
+  - context-compressor
+  - huggingface
+  - imagen-generation
   - memory-search
   - python-backend-expert
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - huggingface
-  - imagen-generation
 context_files: null
 ---
 

@@ -19,14 +19,16 @@ tools:
   - MemoryRecord
 skills:
   - ai-ml-expert
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
   - data-expert
   - database-expert
-  - scientific-skills
-  - ripgrep
-  - code-semantic-search
   - memory-search
-  - context-compressor
+  - ripgrep
+  - scientific-skills
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
 tags:
   - data-science

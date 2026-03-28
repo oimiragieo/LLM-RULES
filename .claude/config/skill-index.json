@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-28T04:52:28.757Z",
+  "generatedAt": "2026-03-28T15:50:18.321Z",
   "metadata": {
     "totalSkills": 339,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-28T04:52:28.758Z",
+    "lastValidated": "2026-03-28T15:50:18.322Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -43,6 +43,14 @@
         "graphql-pro",
         "android-pro",
         "mcp-developer",
+        "angular-pro",
+        "app-generator-agent",
+        "django-developer",
+        "dotnet-pro",
+        "kotlin-pro",
+        "rails-pro",
+        "spring-boot-pro",
+        "swift-pro",
         "code-reviewer",
         "chaos-engineer"
       ],
@@ -142,6 +150,22 @@
         "mlops-engineer",
         "legacy-modernizer",
         "nlp-engineer",
+        "angular-pro",
+        "azure-infra-pro",
+        "django-developer",
+        "dotnet-pro",
+        "iot-engineer",
+        "kotlin-pro",
+        "m365-admin",
+        "postgres-pro",
+        "quant-analyst",
+        "rails-pro",
+        "spring-boot-pro",
+        "sql-pro",
+        "swift-pro",
+        "terragrunt-pro",
+        "windows-infra-pro",
+        "wordpress-master",
         "devops-troubleshooter",
         "performance-engineer",
         "sre-engineer",
@@ -258,6 +282,32 @@
         "terraform-engineer",
         "legacy-modernizer",
         "nlp-engineer",
+        "angular-pro",
+        "app-generator-agent",
+        "azure-infra-pro",
+        "business-analyst",
+        "context-manager",
+        "django-developer",
+        "dotnet-pro",
+        "forum-monitor-agent",
+        "iot-engineer",
+        "kotlin-pro",
+        "legal-advisor",
+        "m365-admin",
+        "ml-researcher",
+        "model-benchmarker-agent",
+        "post-analyzer-agent",
+        "postgres-pro",
+        "product-manager",
+        "quant-analyst",
+        "rails-pro",
+        "spring-boot-pro",
+        "sql-pro",
+        "swift-pro",
+        "terragrunt-pro",
+        "voice-replicator-agent",
+        "windows-infra-pro",
+        "wordpress-master",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -279,6 +329,10 @@
         "advanced-debugging",
         "code-simplifier",
         "researcher",
+        "channel-responder",
+        "claude-md-auditor",
+        "memory-manager",
+        "task-manager",
         "master-orchestrator",
         "swarm-coordinator",
         "evolution-orchestrator",
@@ -292,7 +346,8 @@
         "domain-router-niche",
         "domain-router-product",
         "domain-router-security",
-        "domain-router-web-frontend"
+        "domain-router-web-frontend",
+        "loop-operator"
       ],
       "agentSupporting": [
         "multi-llm-consultant",
@@ -458,6 +513,32 @@
         "terraform-engineer",
         "legacy-modernizer",
         "nlp-engineer",
+        "angular-pro",
+        "app-generator-agent",
+        "azure-infra-pro",
+        "business-analyst",
+        "context-manager",
+        "django-developer",
+        "dotnet-pro",
+        "forum-monitor-agent",
+        "iot-engineer",
+        "kotlin-pro",
+        "legal-advisor",
+        "m365-admin",
+        "ml-researcher",
+        "model-benchmarker-agent",
+        "post-analyzer-agent",
+        "postgres-pro",
+        "product-manager",
+        "quant-analyst",
+        "rails-pro",
+        "spring-boot-pro",
+        "sql-pro",
+        "swift-pro",
+        "terragrunt-pro",
+        "voice-replicator-agent",
+        "windows-infra-pro",
+        "wordpress-master",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -474,6 +555,10 @@
         "sre-engineer",
         "advanced-debugging",
         "code-simplifier",
+        "channel-responder",
+        "claude-md-auditor",
+        "memory-manager",
+        "task-manager",
         "domain-router-ai-ml",
         "domain-router-arch-data",
         "domain-router-backend",
@@ -482,7 +567,8 @@
         "domain-router-niche",
         "domain-router-product",
         "domain-router-security",
-        "domain-router-web-frontend"
+        "domain-router-web-frontend",
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
@@ -542,6 +628,37 @@
         "marketing-strategist",
         "mcp-developer",
         "ux-researcher",
+        "data-scientist",
+        "mlops-engineer",
+        "terraform-engineer",
+        "legacy-modernizer",
+        "nlp-engineer",
+        "angular-pro",
+        "app-generator-agent",
+        "azure-infra-pro",
+        "business-analyst",
+        "context-manager",
+        "django-developer",
+        "dotnet-pro",
+        "forum-monitor-agent",
+        "iot-engineer",
+        "kotlin-pro",
+        "legal-advisor",
+        "m365-admin",
+        "ml-researcher",
+        "model-benchmarker-agent",
+        "post-analyzer-agent",
+        "postgres-pro",
+        "product-manager",
+        "quant-analyst",
+        "rails-pro",
+        "spring-boot-pro",
+        "sql-pro",
+        "swift-pro",
+        "terragrunt-pro",
+        "voice-replicator-agent",
+        "windows-infra-pro",
+        "wordpress-master",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -558,6 +675,10 @@
         "sre-engineer",
         "advanced-debugging",
         "code-simplifier",
+        "channel-responder",
+        "claude-md-auditor",
+        "memory-manager",
+        "task-manager",
         "domain-router-ai-ml",
         "domain-router-arch-data",
         "domain-router-backend",
@@ -566,7 +687,8 @@
         "domain-router-niche",
         "domain-router-product",
         "domain-router-security",
-        "domain-router-web-frontend"
+        "domain-router-web-frontend",
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
@@ -688,6 +810,32 @@
         "terraform-engineer",
         "legacy-modernizer",
         "nlp-engineer",
+        "angular-pro",
+        "app-generator-agent",
+        "azure-infra-pro",
+        "business-analyst",
+        "context-manager",
+        "django-developer",
+        "dotnet-pro",
+        "forum-monitor-agent",
+        "iot-engineer",
+        "kotlin-pro",
+        "legal-advisor",
+        "m365-admin",
+        "ml-researcher",
+        "model-benchmarker-agent",
+        "post-analyzer-agent",
+        "postgres-pro",
+        "product-manager",
+        "quant-analyst",
+        "rails-pro",
+        "spring-boot-pro",
+        "sql-pro",
+        "swift-pro",
+        "terragrunt-pro",
+        "voice-replicator-agent",
+        "windows-infra-pro",
+        "wordpress-master",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -709,6 +857,10 @@
         "advanced-debugging",
         "code-simplifier",
         "researcher",
+        "channel-responder",
+        "claude-md-auditor",
+        "memory-manager",
+        "task-manager",
         "master-orchestrator",
         "swarm-coordinator",
         "evolution-orchestrator",
@@ -722,7 +874,8 @@
         "domain-router-niche",
         "domain-router-product",
         "domain-router-security",
-        "domain-router-web-frontend"
+        "domain-router-web-frontend",
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
@@ -857,7 +1010,9 @@
         "Bash"
       ],
       "agentPrimary": [
-        "developer"
+        "business-analyst",
+        "legal-advisor",
+        "product-manager"
       ],
       "agentSupporting": [
         "planner",
@@ -869,7 +1024,7 @@
         "other",
         "brainstorming"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "plan-generator": {
@@ -892,6 +1047,7 @@
         "pm",
         "technical-program-manager",
         "pm-coordinator",
+        "app-generator-agent",
         "master-orchestrator"
       ],
       "agentSupporting": [],
@@ -914,14 +1070,15 @@
         "AskUserQuestion"
       ],
       "agentPrimary": [
-        "developer"
+        "business-analyst",
+        "product-manager"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "prd-generator"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "architecture-review": {
@@ -997,6 +1154,8 @@
       "agentPrimary": [
         "architect",
         "microservices-architect",
+        "business-analyst",
+        "product-manager",
         "c4-context",
         "c4-container",
         "c4-component",
@@ -1077,14 +1236,14 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "app-generator-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "spec-init"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "sparc-methodology": {
@@ -1703,6 +1862,8 @@
       ],
       "agentPrimary": [
         "terraform-engineer",
+        "azure-infra-pro",
+        "terragrunt-pro",
         "devops"
       ],
       "agentSupporting": [],
@@ -1923,7 +2084,9 @@
         "python-pro",
         "fastapi-pro",
         "data-engineer",
-        "ai-ml-specialist"
+        "ai-ml-specialist",
+        "django-developer",
+        "quant-analyst"
       ],
       "agentSupporting": [
         "developer",
@@ -2036,7 +2199,8 @@
         "Glob"
       ],
       "agentPrimary": [
-        "java-pro"
+        "java-pro",
+        "spring-boot-pro"
       ],
       "agentSupporting": [],
       "tags": [
@@ -2087,7 +2251,8 @@
         "Glob"
       ],
       "agentPrimary": [
-        "php-pro"
+        "php-pro",
+        "wordpress-master"
       ],
       "agentSupporting": [],
       "tags": [
@@ -2256,7 +2421,8 @@
         "WebFetch"
       ],
       "agentPrimary": [
-        "developer"
+        "m365-admin",
+        "windows-infra-pro"
       ],
       "agentSupporting": [
         "developer",
@@ -2267,7 +2433,7 @@
         "languages",
         "powershell-expert"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "react-expert": {
@@ -2520,14 +2686,14 @@
         "Glob"
       ],
       "agentPrimary": [
-        "developer"
+        "angular-pro"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "angular-expert"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "astro-expert": {
@@ -2835,7 +3001,8 @@
         "Glob"
       ],
       "agentPrimary": [
-        "ios-pro"
+        "ios-pro",
+        "swift-pro"
       ],
       "agentSupporting": [
         "mobile-ux-reviewer"
@@ -2862,7 +3029,8 @@
         "Glob"
       ],
       "agentPrimary": [
-        "android-pro"
+        "android-pro",
+        "kotlin-pro"
       ],
       "agentSupporting": [
         "mobile-ux-reviewer"
@@ -3039,6 +3207,10 @@
         "Glob"
       ],
       "agentPrimary": [
+        "django-developer",
+        "dotnet-pro",
+        "postgres-pro",
+        "sql-pro",
         "database-architect"
       ],
       "agentSupporting": [
@@ -3072,7 +3244,8 @@
       ],
       "agentPrimary": [
         "data-engineer",
-        "data-scientist"
+        "data-scientist",
+        "quant-analyst"
       ],
       "agentSupporting": [
         "python-pro",
@@ -3431,6 +3604,7 @@
       "agentPrimary": [
         "scientific-research-expert",
         "medical-research-triage",
+        "legal-advisor",
         "researcher",
         "evolution-orchestrator"
       ],
@@ -3849,6 +4023,37 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "data-scientist",
+        "mlops-engineer",
+        "terraform-engineer",
+        "legacy-modernizer",
+        "nlp-engineer",
+        "angular-pro",
+        "app-generator-agent",
+        "azure-infra-pro",
+        "business-analyst",
+        "context-manager",
+        "django-developer",
+        "dotnet-pro",
+        "forum-monitor-agent",
+        "iot-engineer",
+        "kotlin-pro",
+        "legal-advisor",
+        "m365-admin",
+        "ml-researcher",
+        "model-benchmarker-agent",
+        "post-analyzer-agent",
+        "postgres-pro",
+        "product-manager",
+        "quant-analyst",
+        "rails-pro",
+        "spring-boot-pro",
+        "sql-pro",
+        "swift-pro",
+        "terragrunt-pro",
+        "voice-replicator-agent",
+        "windows-infra-pro",
+        "wordpress-master",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -3870,6 +4075,10 @@
         "advanced-debugging",
         "code-simplifier",
         "researcher",
+        "channel-responder",
+        "claude-md-auditor",
+        "memory-manager",
+        "task-manager",
         "domain-router-ai-ml",
         "domain-router-arch-data",
         "domain-router-backend",
@@ -3878,7 +4087,8 @@
         "domain-router-niche",
         "domain-router-product",
         "domain-router-security",
-        "domain-router-web-frontend"
+        "domain-router-web-frontend",
+        "loop-operator"
       ],
       "agentSupporting": [
         "developer",
@@ -4020,6 +4230,32 @@
         "terraform-engineer",
         "legacy-modernizer",
         "nlp-engineer",
+        "angular-pro",
+        "app-generator-agent",
+        "azure-infra-pro",
+        "business-analyst",
+        "context-manager",
+        "django-developer",
+        "dotnet-pro",
+        "forum-monitor-agent",
+        "iot-engineer",
+        "kotlin-pro",
+        "legal-advisor",
+        "m365-admin",
+        "ml-researcher",
+        "model-benchmarker-agent",
+        "post-analyzer-agent",
+        "postgres-pro",
+        "product-manager",
+        "quant-analyst",
+        "rails-pro",
+        "spring-boot-pro",
+        "sql-pro",
+        "swift-pro",
+        "terragrunt-pro",
+        "voice-replicator-agent",
+        "windows-infra-pro",
+        "wordpress-master",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -4041,6 +4277,10 @@
         "advanced-debugging",
         "code-simplifier",
         "researcher",
+        "channel-responder",
+        "claude-md-auditor",
+        "memory-manager",
+        "task-manager",
         "master-orchestrator",
         "swarm-coordinator",
         "evolution-orchestrator",
@@ -4054,7 +4294,8 @@
         "domain-router-niche",
         "domain-router-product",
         "domain-router-security",
-        "domain-router-web-frontend"
+        "domain-router-web-frontend",
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
@@ -4355,6 +4596,37 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "data-scientist",
+        "mlops-engineer",
+        "terraform-engineer",
+        "legacy-modernizer",
+        "nlp-engineer",
+        "angular-pro",
+        "app-generator-agent",
+        "azure-infra-pro",
+        "business-analyst",
+        "context-manager",
+        "django-developer",
+        "dotnet-pro",
+        "forum-monitor-agent",
+        "iot-engineer",
+        "kotlin-pro",
+        "legal-advisor",
+        "m365-admin",
+        "ml-researcher",
+        "model-benchmarker-agent",
+        "post-analyzer-agent",
+        "postgres-pro",
+        "product-manager",
+        "quant-analyst",
+        "rails-pro",
+        "spring-boot-pro",
+        "sql-pro",
+        "swift-pro",
+        "terragrunt-pro",
+        "voice-replicator-agent",
+        "windows-infra-pro",
+        "wordpress-master",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -4376,6 +4648,10 @@
         "advanced-debugging",
         "code-simplifier",
         "researcher",
+        "channel-responder",
+        "claude-md-auditor",
+        "memory-manager",
+        "task-manager",
         "master-orchestrator",
         "swarm-coordinator",
         "evolution-orchestrator",
@@ -4389,7 +4665,8 @@
         "domain-router-niche",
         "domain-router-product",
         "domain-router-security",
-        "domain-router-web-frontend"
+        "domain-router-web-frontend",
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
@@ -4657,7 +4934,8 @@
         "Bash"
       ],
       "agentPrimary": [
-        "planner"
+        "planner",
+        "loop-operator"
       ],
       "agentSupporting": [
         "technical-program-manager"
@@ -5044,7 +5322,8 @@
         "Read"
       ],
       "agentPrimary": [
-        "multi-llm-consultant"
+        "multi-llm-consultant",
+        "task-manager"
       ],
       "agentSupporting": [],
       "tags": [
@@ -5086,7 +5365,8 @@
         "Read"
       ],
       "agentPrimary": [
-        "multi-llm-consultant"
+        "multi-llm-consultant",
+        "task-manager"
       ],
       "agentSupporting": [],
       "tags": [
@@ -6051,7 +6331,8 @@
         "Glob"
       ],
       "agentPrimary": [
-        "developer"
+        "azure-infra-pro",
+        "terragrunt-pro"
       ],
       "agentSupporting": [],
       "tags": [
@@ -6059,7 +6340,7 @@
         "other",
         "cloud-devops-expert"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "comprehensive-type-annotations": {
@@ -7187,14 +7468,14 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "memory-manager"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "auto-recall"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "azure-devops": {
@@ -7232,14 +7513,14 @@
         "TaskUpdate"
       ],
       "agentPrimary": [
-        "developer"
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "behavioral-loop-detection"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "brand-compliance": {
@@ -7280,14 +7561,14 @@
         "Grep"
       ],
       "agentPrimary": [
-        "developer"
+        "forum-monitor-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "browser-automation"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "channel-management": {
@@ -7302,14 +7583,14 @@
         "TaskUpdate"
       ],
       "agentPrimary": [
-        "developer"
+        "channel-responder"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "channel-management"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "claude-api": {
@@ -7513,14 +7794,14 @@
         "Glob"
       ],
       "agentPrimary": [
-        "developer"
+        "post-analyzer-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "content-analyzer"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "context-attribution": {
@@ -7536,14 +7817,14 @@
         "TaskUpdate"
       ],
       "agentPrimary": [
-        "developer"
+        "context-manager"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "context-attribution"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "cron-decision": {
@@ -7608,14 +7889,14 @@
         "Glob"
       ],
       "agentPrimary": [
-        "developer"
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "de-sloppify"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "deep-research": {
@@ -7634,14 +7915,14 @@
         "Glob"
       ],
       "agentPrimary": [
-        "developer"
+        "forum-monitor-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "deep-research"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "design-systems": {
@@ -7727,14 +8008,14 @@
         "TaskGet"
       ],
       "agentPrimary": [
-        "developer"
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "error-recovery-escalation"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "exa-monitor": {
@@ -7778,14 +8059,14 @@
         "WebFetch"
       ],
       "agentPrimary": [
-        "developer"
+        "post-analyzer-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "feedback-analysis"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "figma": {
@@ -7825,14 +8106,14 @@
         "WebFetch"
       ],
       "agentPrimary": [
-        "developer"
+        "quant-analyst"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "fintech-engineer"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "forum-monitor": {
@@ -7850,14 +8131,14 @@
         "MemoryRecord"
       ],
       "agentPrimary": [
-        "developer"
+        "forum-monitor-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "forum-monitor"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "frontend-design": {
@@ -8082,14 +8363,14 @@
         "Glob"
       ],
       "agentPrimary": [
-        "developer"
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "instinct-learning"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "judge-verification": {
@@ -8264,14 +8545,14 @@
         "TaskUpdate"
       ],
       "agentPrimary": [
-        "developer"
+        "memory-manager"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "memory-audit"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "ml-experiment-loop": {
@@ -8289,14 +8570,15 @@
         "Glob"
       ],
       "agentPrimary": [
-        "developer"
+        "ml-researcher",
+        "model-benchmarker-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "ml-experiment-loop"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "model-benchmark": {
@@ -8311,14 +8593,14 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "model-benchmarker-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "model-benchmark"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "notification-triggers": {
@@ -8387,14 +8669,14 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "memory-manager"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "perpetual-memory"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "pipeline-evaluator": {
@@ -8522,14 +8804,14 @@
         "Skill"
       ],
       "agentPrimary": [
-        "developer"
+        "legal-advisor"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "regulatory-compliance"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "scheduled-tasks": {
@@ -8630,14 +8912,14 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "post-analyzer-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "seo-optimization"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "session-log-analyzer": {
@@ -8700,14 +8982,14 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "voice-replicator-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "style-analyzer"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "task-delegation": {
@@ -8822,6 +9104,115 @@
         "Edit"
       ],
       "agentPrimary": [
+        "developer",
+        "planner",
+        "architect",
+        "qa",
+        "technical-writer",
+        "pm",
+        "context-compressor",
+        "reflection-agent",
+        "technical-program-manager",
+        "general-assistant",
+        "heartbeat-orchestrator",
+        "python-pro",
+        "rust-pro",
+        "golang-pro",
+        "typescript-pro",
+        "fastapi-pro",
+        "frontend-pro",
+        "nodejs-pro",
+        "ios-pro",
+        "java-pro",
+        "nextjs-pro",
+        "php-pro",
+        "sveltekit-expert",
+        "tauri-desktop-developer",
+        "expo-mobile-developer",
+        "data-engineer",
+        "graphql-pro",
+        "mobile-ux-reviewer",
+        "ai-ml-specialist",
+        "android-pro",
+        "gamedev-pro",
+        "scientific-research-expert",
+        "multi-llm-consultant",
+        "web3-blockchain-expert",
+        "api-designer",
+        "aso-specialist",
+        "brand-guardian",
+        "compliance-checker",
+        "feedback-synthesizer",
+        "marketing-strategist",
+        "llm-architect",
+        "mcp-developer",
+        "microservices-architect",
+        "prompt-engineer",
+        "pm-coordinator",
+        "kubernetes-specialist",
+        "medical-research-triage",
+        "ux-researcher",
+        "data-scientist",
+        "mlops-engineer",
+        "terraform-engineer",
+        "legacy-modernizer",
+        "nlp-engineer",
+        "angular-pro",
+        "app-generator-agent",
+        "azure-infra-pro",
+        "business-analyst",
+        "context-manager",
+        "django-developer",
+        "dotnet-pro",
+        "forum-monitor-agent",
+        "iot-engineer",
+        "kotlin-pro",
+        "legal-advisor",
+        "m365-admin",
+        "ml-researcher",
+        "model-benchmarker-agent",
+        "post-analyzer-agent",
+        "postgres-pro",
+        "product-manager",
+        "quant-analyst",
+        "rails-pro",
+        "spring-boot-pro",
+        "sql-pro",
+        "swift-pro",
+        "terragrunt-pro",
+        "voice-replicator-agent",
+        "windows-infra-pro",
+        "wordpress-master",
+        "ecosystem-auditor",
+        "code-reviewer",
+        "security-architect",
+        "devops",
+        "devops-troubleshooter",
+        "incident-responder",
+        "c4-context",
+        "c4-container",
+        "c4-component",
+        "c4-code",
+        "conductor-validator",
+        "reverse-engineer",
+        "database-architect",
+        "accessibility-tester",
+        "chaos-engineer",
+        "penetration-tester",
+        "performance-engineer",
+        "sre-engineer",
+        "advanced-debugging",
+        "code-simplifier",
+        "researcher",
+        "channel-responder",
+        "claude-md-auditor",
+        "memory-manager",
+        "task-manager",
+        "master-orchestrator",
+        "swarm-coordinator",
+        "evolution-orchestrator",
+        "party-orchestrator",
+        "artifact-integrator",
         "domain-router-ai-ml",
         "domain-router-arch-data",
         "domain-router-backend",
@@ -8830,7 +9221,8 @@
         "domain-router-niche",
         "domain-router-product",
         "domain-router-security",
-        "domain-router-web-frontend"
+        "domain-router-web-frontend",
+        "loop-operator"
       ],
       "agentSupporting": [],
       "tags": [
@@ -8970,14 +9362,14 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "voice-replicator-agent"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "voice-clone-generator"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "web-artifacts-builder": {
@@ -11355,6 +11747,7 @@
         "github-mcp",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11388,10 +11781,7 @@
         "dry-principle",
         "best-practices-guidelines",
         "session-transcript-analyzer",
-        "brainstorming",
-        "prd-generator",
         "planning-with-files",
-        "spec-init",
         "sparc-methodology",
         "ralph-loop",
         "spec-critique",
@@ -11410,7 +11800,6 @@
         "webmcp-browser-tools",
         "htmx-expert",
         "paraglide-js-internationalization-i18n",
-        "angular-expert",
         "astro-expert",
         "fiber-logging-and-project-structure",
         "fiber-routing-and-csrf-protection",
@@ -11487,7 +11876,6 @@
         "aws-cloud-ops",
         "chrome-browser",
         "ci-cd-implementation-rule",
-        "cloud-devops-expert",
         "comprehensive-type-annotations",
         "configuration-management",
         "cpp",
@@ -11521,12 +11909,8 @@
         "api-testing",
         "arxiv-monitor",
         "atlassian-integration",
-        "auto-recall",
         "azure-devops",
-        "behavioral-loop-detection",
         "brand-compliance",
-        "browser-automation",
-        "channel-management",
         "claude-api",
         "cloud-run",
         "cloudflare-workers",
@@ -11535,21 +11919,13 @@
         "codebase-exploration",
         "commit-security-scan",
         "compaction-detector",
-        "content-analyzer",
-        "context-attribution",
         "cron-decision",
         "cron-runner",
-        "de-sloppify",
-        "deep-research",
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "error-recovery-escalation",
         "exa-monitor",
-        "feedback-analysis",
         "figma",
-        "fintech-engineer",
-        "forum-monitor",
         "frontend-design",
         "goal-backward-verification",
         "google-workspace",
@@ -11557,7 +11933,6 @@
         "imagen-generation",
         "implementation-readiness",
         "init",
-        "instinct-learning",
         "judge-verification",
         "knowledge-graph",
         "lsp-navigator",
@@ -11565,20 +11940,13 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
-        "memory-audit",
-        "ml-experiment-loop",
-        "model-benchmark",
         "notification-triggers",
-        "perpetual-memory",
         "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
         "reddit-researcher",
-        "regulatory-compliance",
-        "seo-optimization",
         "session-log-analyzer",
         "slack-expert",
-        "style-analyzer",
         "task-delegation",
         "telegram-polling",
         "telegram-voice-pipeline",
@@ -11587,7 +11955,6 @@
         "uat-verify",
         "user-flow-validator",
         "user-research",
-        "voice-clone-generator",
         "web-artifacts-builder",
         "websocket-engineer",
         "windows-terminal",
@@ -11605,6 +11972,7 @@
         "outcome-reflection",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11631,6 +11999,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11651,6 +12020,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11674,6 +12044,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11688,6 +12059,7 @@
         "complexity-assessment",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11705,6 +12077,7 @@
         "context-degradation",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11714,6 +12087,7 @@
       "reflection-agent": [
         "insight-extraction",
         "session-handoff",
+        "token-saver-context-compression",
         "context-compressor",
         "summarize-changes",
         "agent-evaluation",
@@ -11727,6 +12101,7 @@
         "complexity-assessment",
         "verification-before-completion",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11739,6 +12114,7 @@
       "general-assistant": [
         "verification-before-completion",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11750,6 +12126,7 @@
         "scheduled-tasks",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11764,6 +12141,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11783,6 +12161,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11797,6 +12176,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11813,6 +12193,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11830,6 +12211,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11847,6 +12229,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11869,6 +12252,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11884,6 +12268,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11899,6 +12284,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11915,6 +12301,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11933,6 +12320,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11948,6 +12336,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11964,6 +12353,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11980,6 +12370,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -11995,6 +12386,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12012,6 +12404,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12027,6 +12420,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "design-and-user-experience-guidelines",
@@ -12042,6 +12436,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12056,6 +12451,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12068,6 +12464,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12081,6 +12478,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "python-backend-expert",
@@ -12093,6 +12491,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "llm-council"
@@ -12102,6 +12501,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12114,6 +12514,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12126,6 +12527,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -12135,6 +12537,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -12144,6 +12547,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -12153,6 +12557,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -12162,6 +12567,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -12172,6 +12578,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "architecture-review",
@@ -12183,6 +12590,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12196,6 +12604,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "container-expert",
@@ -12206,6 +12615,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "thinking-tools"
@@ -12216,6 +12626,7 @@
         "spec-gathering",
         "verification-before-completion",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "interactive-requirements-gathering",
@@ -12229,6 +12640,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "tdd",
@@ -12239,6 +12651,7 @@
         "scientific-skills",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "verification-before-completion",
@@ -12248,6 +12661,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -12257,8 +12671,12 @@
         "ai-ml-expert",
         "data-expert",
         "scientific-skills",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "database-expert",
@@ -12267,8 +12685,12 @@
       "mlops-engineer": [
         "ai-ml-expert",
         "debugging",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "sentry-monitoring",
@@ -12277,8 +12699,12 @@
       "terraform-engineer": [
         "terraform-infra",
         "security-scanning",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "k8s-manifest-generator",
@@ -12289,7 +12715,11 @@
       "legacy-modernizer": [
         "debugging",
         "code-semantic-search",
+        "token-saver-context-compression",
         "ripgrep",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "tdd"
@@ -12297,12 +12727,342 @@
       "nlp-engineer": [
         "ai-ml-expert",
         "debugging",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "scientific-skills",
         "modern-python"
+      ],
+      "angular-pro": [
+        "angular-expert",
+        "debugging",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "app-generator-agent": [
+        "plan-generator",
+        "spec-init",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "azure-infra-pro": [
+        "cloud-devops-expert",
+        "debugging",
+        "terraform-infra",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "business-analyst": [
+        "brainstorming",
+        "diagram-generator",
+        "prd-generator",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "context-manager": [
+        "context-attribution",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "django-developer": [
+        "database-expert",
+        "debugging",
+        "python-backend-expert",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "dotnet-pro": [
+        "database-expert",
+        "debugging",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "forum-monitor-agent": [
+        "browser-automation",
+        "deep-research",
+        "forum-monitor",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "iot-engineer": [
+        "debugging",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "kotlin-pro": [
+        "android-expert",
+        "debugging",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "legal-advisor": [
+        "brainstorming",
+        "regulatory-compliance",
+        "research-synthesis",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "m365-admin": [
+        "debugging",
+        "powershell-expert",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "ml-researcher": [
+        "ml-experiment-loop",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "model-benchmarker-agent": [
+        "ml-experiment-loop",
+        "model-benchmark",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "post-analyzer-agent": [
+        "content-analyzer",
+        "feedback-analysis",
+        "seo-optimization",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "postgres-pro": [
+        "database-expert",
+        "debugging",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "product-manager": [
+        "brainstorming",
+        "diagram-generator",
+        "prd-generator",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "quant-analyst": [
+        "data-expert",
+        "debugging",
+        "fintech-engineer",
+        "python-backend-expert",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "rails-pro": [
+        "debugging",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "spring-boot-pro": [
+        "debugging",
+        "java-expert",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "sql-pro": [
+        "database-expert",
+        "debugging",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "swift-pro": [
+        "debugging",
+        "ios-expert",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "terragrunt-pro": [
+        "cloud-devops-expert",
+        "debugging",
+        "terraform-infra",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "voice-replicator-agent": [
+        "style-analyzer",
+        "voice-clone-generator",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "windows-infra-pro": [
+        "debugging",
+        "powershell-expert",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "wordpress-master": [
+        "debugging",
+        "php-expert",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
       ],
       "ecosystem-auditor": [
         "rule-auditor",
@@ -12310,6 +13070,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12325,6 +13086,7 @@
         "requesting-code-review",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12347,6 +13109,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12375,6 +13138,7 @@
         "context-compressor",
         "kubernetes-flux",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12395,6 +13159,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12414,6 +13179,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12430,6 +13196,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "doc-generator",
@@ -12442,6 +13209,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "doc-generator",
@@ -12453,6 +13221,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "doc-generator",
@@ -12464,6 +13233,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "doc-generator"
@@ -12475,6 +13245,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12490,6 +13261,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12505,6 +13277,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12518,6 +13291,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12531,6 +13305,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12543,6 +13318,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12557,6 +13333,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12571,6 +13348,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12585,6 +13363,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12599,6 +13378,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12611,11 +13391,58 @@
         "insight-extraction",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "verification-before-completion",
         "scientific-skills",
         "arxiv-mcp"
+      ],
+      "channel-responder": [
+        "channel-management",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "claude-md-auditor": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "memory-manager": [
+        "auto-recall",
+        "memory-audit",
+        "perpetual-memory",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "task-manager": [
+        "omega-codex-cli",
+        "omega-gemini-cli",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
       ],
       "master-orchestrator": [
         "plan-generator",
@@ -12626,6 +13453,7 @@
         "response-rater",
         "verification-before-completion",
         "subagent-driven-development",
+        "token-saver-context-compression",
         "ripgrep",
         "memory-search",
         "recovery",
@@ -12640,6 +13468,7 @@
         "consensus-voting",
         "task-management-protocol",
         "verification-before-completion",
+        "token-saver-context-compression",
         "ripgrep",
         "memory-search",
         "dispatching-parallel-agents",
@@ -12652,6 +13481,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "artifact-lifecycle",
+        "token-saver-context-compression",
         "ripgrep",
         "memory-search",
         "workflow-creator",
@@ -12667,6 +13497,7 @@
         "swarm-coordination",
         "consensus-voting",
         "task-management-protocol",
+        "token-saver-context-compression",
         "ripgrep",
         "verification-before-completion",
         "memory-search",
@@ -12677,6 +13508,7 @@
         "ripgrep",
         "verification-before-completion",
         "task-management-protocol",
+        "token-saver-context-compression",
         "memory-search",
         "context-compressor"
       ],
@@ -12763,6 +13595,21 @@
       "domain-router-web-frontend": [
         "task-management-protocol",
         "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "loop-operator": [
+        "behavioral-loop-detection",
+        "de-sloppify",
+        "error-recovery-escalation",
+        "instinct-learning",
+        "sequential-thinking",
+        "verification-before-completion",
+        "task-management-protocol",
         "token-saver-context-compression",
         "ripgrep",
         "memory-search",
@@ -12784,6 +13631,7 @@
         "github-mcp",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -12817,10 +13665,7 @@
         "dry-principle",
         "best-practices-guidelines",
         "session-transcript-analyzer",
-        "brainstorming",
-        "prd-generator",
         "planning-with-files",
-        "spec-init",
         "sparc-methodology",
         "ralph-loop",
         "spec-critique",
@@ -12839,7 +13684,6 @@
         "webmcp-browser-tools",
         "htmx-expert",
         "paraglide-js-internationalization-i18n",
-        "angular-expert",
         "astro-expert",
         "fiber-logging-and-project-structure",
         "fiber-routing-and-csrf-protection",
@@ -12916,7 +13760,6 @@
         "aws-cloud-ops",
         "chrome-browser",
         "ci-cd-implementation-rule",
-        "cloud-devops-expert",
         "comprehensive-type-annotations",
         "configuration-management",
         "cpp",
@@ -12950,12 +13793,8 @@
         "api-testing",
         "arxiv-monitor",
         "atlassian-integration",
-        "auto-recall",
         "azure-devops",
-        "behavioral-loop-detection",
         "brand-compliance",
-        "browser-automation",
-        "channel-management",
         "claude-api",
         "cloud-run",
         "cloudflare-workers",
@@ -12964,21 +13803,13 @@
         "codebase-exploration",
         "commit-security-scan",
         "compaction-detector",
-        "content-analyzer",
-        "context-attribution",
         "cron-decision",
         "cron-runner",
-        "de-sloppify",
-        "deep-research",
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "error-recovery-escalation",
         "exa-monitor",
-        "feedback-analysis",
         "figma",
-        "fintech-engineer",
-        "forum-monitor",
         "frontend-design",
         "goal-backward-verification",
         "google-workspace",
@@ -12986,7 +13817,6 @@
         "imagen-generation",
         "implementation-readiness",
         "init",
-        "instinct-learning",
         "judge-verification",
         "knowledge-graph",
         "lsp-navigator",
@@ -12994,20 +13824,13 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
-        "memory-audit",
-        "ml-experiment-loop",
-        "model-benchmark",
         "notification-triggers",
-        "perpetual-memory",
         "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
         "reddit-researcher",
-        "regulatory-compliance",
-        "seo-optimization",
         "session-log-analyzer",
         "slack-expert",
-        "style-analyzer",
         "task-delegation",
         "telegram-polling",
         "telegram-voice-pipeline",
@@ -13016,7 +13839,6 @@
         "uat-verify",
         "user-flow-validator",
         "user-research",
-        "voice-clone-generator",
         "web-artifacts-builder",
         "websocket-engineer",
         "windows-terminal",
@@ -13034,6 +13856,7 @@
         "outcome-reflection",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13060,6 +13883,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13080,6 +13904,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13103,6 +13928,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13117,6 +13943,7 @@
         "complexity-assessment",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13134,6 +13961,7 @@
         "context-degradation",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13143,6 +13971,7 @@
       "reflection-agent": [
         "insight-extraction",
         "session-handoff",
+        "token-saver-context-compression",
         "context-compressor",
         "summarize-changes",
         "agent-evaluation",
@@ -13156,6 +13985,7 @@
         "complexity-assessment",
         "verification-before-completion",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13168,6 +13998,7 @@
       "general-assistant": [
         "verification-before-completion",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13179,6 +14010,7 @@
         "scheduled-tasks",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13193,6 +14025,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13212,6 +14045,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13226,6 +14060,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13242,6 +14077,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13259,6 +14095,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13276,6 +14113,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13298,6 +14136,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13313,6 +14152,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13328,6 +14168,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13344,6 +14185,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13362,6 +14204,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13377,6 +14220,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13393,6 +14237,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13409,6 +14254,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13424,6 +14270,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13441,6 +14288,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13456,6 +14304,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "design-and-user-experience-guidelines",
@@ -13471,6 +14320,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13485,6 +14335,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13497,6 +14348,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13510,6 +14362,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "python-backend-expert",
@@ -13522,6 +14375,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "llm-council"
@@ -13531,6 +14385,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13543,6 +14398,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13555,6 +14411,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -13564,6 +14421,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -13573,6 +14431,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -13582,6 +14441,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -13591,6 +14451,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -13601,6 +14462,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "architecture-review",
@@ -13612,6 +14474,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13625,6 +14488,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "container-expert",
@@ -13635,6 +14499,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "thinking-tools"
@@ -13645,6 +14510,7 @@
         "spec-gathering",
         "verification-before-completion",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "interactive-requirements-gathering",
@@ -13658,6 +14524,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "tdd",
@@ -13668,6 +14535,7 @@
         "scientific-skills",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "verification-before-completion",
@@ -13677,6 +14545,7 @@
         "code-semantic-search",
         "code-structural-search",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "task-management-protocol",
         "context-compressor",
@@ -13686,8 +14555,12 @@
         "ai-ml-expert",
         "data-expert",
         "scientific-skills",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "database-expert",
@@ -13696,8 +14569,12 @@
       "mlops-engineer": [
         "ai-ml-expert",
         "debugging",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "sentry-monitoring",
@@ -13706,8 +14583,12 @@
       "terraform-engineer": [
         "terraform-infra",
         "security-scanning",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "k8s-manifest-generator",
@@ -13718,7 +14599,11 @@
       "legacy-modernizer": [
         "debugging",
         "code-semantic-search",
+        "token-saver-context-compression",
         "ripgrep",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "tdd"
@@ -13726,12 +14611,342 @@
       "nlp-engineer": [
         "ai-ml-expert",
         "debugging",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
+        "code-structural-search",
+        "memory-search",
+        "context-compressor",
         "task-management-protocol",
         "verification-before-completion",
         "scientific-skills",
         "modern-python"
+      ],
+      "angular-pro": [
+        "angular-expert",
+        "debugging",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "app-generator-agent": [
+        "plan-generator",
+        "spec-init",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "azure-infra-pro": [
+        "cloud-devops-expert",
+        "debugging",
+        "terraform-infra",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "business-analyst": [
+        "brainstorming",
+        "diagram-generator",
+        "prd-generator",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "context-manager": [
+        "context-attribution",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "django-developer": [
+        "database-expert",
+        "debugging",
+        "python-backend-expert",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "dotnet-pro": [
+        "database-expert",
+        "debugging",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "forum-monitor-agent": [
+        "browser-automation",
+        "deep-research",
+        "forum-monitor",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "iot-engineer": [
+        "debugging",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "kotlin-pro": [
+        "android-expert",
+        "debugging",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "legal-advisor": [
+        "brainstorming",
+        "regulatory-compliance",
+        "research-synthesis",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "m365-admin": [
+        "debugging",
+        "powershell-expert",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "ml-researcher": [
+        "ml-experiment-loop",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "model-benchmarker-agent": [
+        "ml-experiment-loop",
+        "model-benchmark",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "post-analyzer-agent": [
+        "content-analyzer",
+        "feedback-analysis",
+        "seo-optimization",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "postgres-pro": [
+        "database-expert",
+        "debugging",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "product-manager": [
+        "brainstorming",
+        "diagram-generator",
+        "prd-generator",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "quant-analyst": [
+        "data-expert",
+        "debugging",
+        "fintech-engineer",
+        "python-backend-expert",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "rails-pro": [
+        "debugging",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "spring-boot-pro": [
+        "debugging",
+        "java-expert",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "sql-pro": [
+        "database-expert",
+        "debugging",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "swift-pro": [
+        "debugging",
+        "ios-expert",
+        "tdd",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "terragrunt-pro": [
+        "cloud-devops-expert",
+        "debugging",
+        "terraform-infra",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "voice-replicator-agent": [
+        "style-analyzer",
+        "voice-clone-generator",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "windows-infra-pro": [
+        "debugging",
+        "powershell-expert",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "wordpress-master": [
+        "debugging",
+        "php-expert",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
       ],
       "ecosystem-auditor": [
         "rule-auditor",
@@ -13739,6 +14954,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13754,6 +14970,7 @@
         "requesting-code-review",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13776,6 +14993,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13804,6 +15022,7 @@
         "context-compressor",
         "kubernetes-flux",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13824,6 +15043,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13843,6 +15063,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13859,6 +15080,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "doc-generator",
@@ -13871,6 +15093,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "doc-generator",
@@ -13882,6 +15105,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "doc-generator",
@@ -13893,6 +15117,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "doc-generator"
@@ -13904,6 +15129,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13919,6 +15145,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13934,6 +15161,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13947,6 +15175,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13960,6 +15189,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13972,6 +15202,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -13986,6 +15217,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -14000,6 +15232,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -14014,6 +15247,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -14028,6 +15262,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "code-semantic-search",
         "code-structural-search",
@@ -14040,11 +15275,58 @@
         "insight-extraction",
         "task-management-protocol",
         "memory-search",
+        "token-saver-context-compression",
         "ripgrep",
         "context-compressor",
         "verification-before-completion",
         "scientific-skills",
         "arxiv-mcp"
+      ],
+      "channel-responder": [
+        "channel-management",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "claude-md-auditor": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "memory-manager": [
+        "auto-recall",
+        "memory-audit",
+        "perpetual-memory",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "task-manager": [
+        "omega-codex-cli",
+        "omega-gemini-cli",
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
       ],
       "master-orchestrator": [
         "plan-generator",
@@ -14055,6 +15337,7 @@
         "response-rater",
         "verification-before-completion",
         "subagent-driven-development",
+        "token-saver-context-compression",
         "ripgrep",
         "memory-search",
         "recovery",
@@ -14069,6 +15352,7 @@
         "consensus-voting",
         "task-management-protocol",
         "verification-before-completion",
+        "token-saver-context-compression",
         "ripgrep",
         "memory-search",
         "dispatching-parallel-agents",
@@ -14081,6 +15365,7 @@
         "verification-before-completion",
         "task-management-protocol",
         "artifact-lifecycle",
+        "token-saver-context-compression",
         "ripgrep",
         "memory-search",
         "workflow-creator",
@@ -14096,6 +15381,7 @@
         "swarm-coordination",
         "consensus-voting",
         "task-management-protocol",
+        "token-saver-context-compression",
         "ripgrep",
         "verification-before-completion",
         "memory-search",
@@ -14106,6 +15392,7 @@
         "ripgrep",
         "verification-before-completion",
         "task-management-protocol",
+        "token-saver-context-compression",
         "memory-search",
         "context-compressor"
       ],
@@ -14192,6 +15479,21 @@
       "domain-router-web-frontend": [
         "task-management-protocol",
         "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "loop-operator": [
+        "behavioral-loop-detection",
+        "de-sloppify",
+        "error-recovery-escalation",
+        "instinct-learning",
+        "sequential-thinking",
+        "verification-before-completion",
+        "task-management-protocol",
         "token-saver-context-compression",
         "ripgrep",
         "memory-search",

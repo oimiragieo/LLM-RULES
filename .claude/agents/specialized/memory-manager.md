@@ -23,15 +23,17 @@ tools:
   - TaskUpdate
   - Skill
 skills:
-  - memory-audit
-  - context-compressor
-  - memory-search
-  - task-management-protocol
-  - ripgrep
+  - auto-recall
   - code-semantic-search
   - code-structural-search
-  - auto-recall
+  - context-compressor
+  - memory-audit
+  - memory-search
   - perpetual-memory
+  - ripgrep
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
   - '@.claude/context/memory/decisions.md'

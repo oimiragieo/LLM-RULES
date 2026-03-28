@@ -28,14 +28,15 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - debugging
+  - mcp-catalog
   - memory-search
   - ripgrep
   - task-management-protocol
   - tdd
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - mcp-catalog
 context_files: null
 capabilities:
   - mcp-server-development

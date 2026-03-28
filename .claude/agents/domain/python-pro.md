@@ -29,15 +29,16 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
-  - lsp-navigator
+  - context-compressor
   - debugging
+  - lsp-navigator
   - memory-search
   - modern-python
   - python-backend-expert
   - ripgrep
   - task-management-protocol
   - tdd
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 ---

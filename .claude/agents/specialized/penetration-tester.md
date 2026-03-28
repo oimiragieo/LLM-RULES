@@ -31,12 +31,13 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - lsp-navigator
   - memory-search
   - ripgrep
   - security-architect
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - variant-analysis
   - verification-before-completion
 context_files: null

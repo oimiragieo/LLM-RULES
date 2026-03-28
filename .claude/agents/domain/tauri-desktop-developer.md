@@ -29,12 +29,13 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - memory-search
   - ripgrep
   - svelte-expert
   - task-management-protocol
   - tdd
-  - context-compressor
+  - token-saver-context-compression
   - typescript-expert
   - verification-before-completion
 context_files: null

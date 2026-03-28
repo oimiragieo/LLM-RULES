@@ -28,19 +28,20 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
-  - lsp-navigator
+  - context-compressor
+  - design-systems
+  - figma
   - frontend-expert
+  - lsp-navigator
   - memory-search
   - react-best-practices-vercel
   - react-expert
   - ripgrep
   - styling-expert
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
   - web-design-guidelines-vercel
-  - design-systems
-  - figma
 context_files: null
 ---
 

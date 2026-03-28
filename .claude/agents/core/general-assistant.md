@@ -26,25 +26,25 @@ tools:
   - TaskCreate
   - TaskGet
 skills:
-  - sequential-thinking
+  - ask-questions-if-underspecified
   - brainstorming
-  - memory-search
   - code-semantic-search
-  - recovery
-  - ripgrep
-  - session-handoff
-  - task-management-protocol
+  - code-structural-search
   - context-compressor
-  - omega-gemini-cli
+  - insight-extraction
+  - interactive-requirements-gathering
+  - llm-council
+  - memory-search
   - omega-codex-cli
   - omega-cursor-cli
-  - llm-council
-  - ask-questions-if-underspecified
-  - insight-extraction
+  - omega-gemini-cli
+  - recovery
   - research-synthesis
-  - interactive-requirements-gathering
-  - context-compressor
-  - code-structural-search
+  - ripgrep
+  - sequential-thinking
+  - session-handoff
+  - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
 identity:
   role: Conversational Assistant and Thinking Partner

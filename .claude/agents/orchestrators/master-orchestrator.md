@@ -24,24 +24,25 @@ tools:
   - TaskUpdate
   - MemoryRecord
 skills:
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
   - gap-detection
+  - init
   - memory-search
   - plan-generator
   - project-stage-detection
   - response-rater
-  - team-orchestration
   - ripgrep
-  - code-semantic-search
-  - code-structural-search
+  - skill-discovery
   - subagent-driven-development
+  - system-health-check
+  - task-delegation
   - task-management-protocol
+  - team-orchestration
+  - token-saver-context-compression
   - verification-before-completion
   - wave-executor
-  - context-compressor
-  - system-health-check
-  - init
-  - task-delegation
-  - skill-discovery
 ---
 
 <!-- agent-template-contract:v1 -->

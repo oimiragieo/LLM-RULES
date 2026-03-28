@@ -24,14 +24,19 @@ temperature: 0.4
 context_strategy: lazy_load
 priority: medium
 skills:
-  - instinct-learning
-  - de-sloppify
-  - task-management-protocol
-  - sequential-thinking
-  - verification-before-completion
-  - context-compressor
   - behavioral-loop-detection
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - de-sloppify
   - error-recovery-escalation
+  - instinct-learning
+  - memory-search
+  - ripgrep
+  - sequential-thinking
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

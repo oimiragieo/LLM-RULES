@@ -27,16 +27,17 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - task-management-protocol
-  - ripgrep
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - ecosystem-integrity-scanner
   - lsp-navigator
-  - recommend-evolution
-  - context-compressor
-  - verification-before-completion
   - memory-search
+  - recommend-evolution
+  - ripgrep
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files: null
 ---
 

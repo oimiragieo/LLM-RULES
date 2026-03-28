@@ -26,11 +26,12 @@ priority: medium
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - memory-search
   - ripgrep
-  - context-compressor
-  - verification-before-completion
   - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files: null
 ---
 

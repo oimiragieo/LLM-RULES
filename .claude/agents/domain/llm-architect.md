@@ -29,10 +29,11 @@ skills:
   - ai-ml-expert
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - memory-search
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 capabilities:
   - llm-architecture

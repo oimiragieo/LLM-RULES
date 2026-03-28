@@ -26,14 +26,16 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - php-expert
-  - debugging
   - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - debugging
+  - memory-search
+  - php-expert
   - ripgrep
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
-  - memory-search
-  - context-compressor
 context_files: null
 ---
 

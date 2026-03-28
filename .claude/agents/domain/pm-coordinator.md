@@ -30,12 +30,13 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - memory-search
   - plan-generator
   - ripgrep
   - spec-gathering
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 ---

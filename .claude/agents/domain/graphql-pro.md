@@ -30,12 +30,13 @@ skills:
   - api-development-expert
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - graphql-expert
   - memory-search
   - ripgrep
   - task-management-protocol
   - tdd
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 ---

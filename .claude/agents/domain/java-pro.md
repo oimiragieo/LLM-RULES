@@ -29,14 +29,15 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
-  - lsp-navigator
+  - context-compressor
   - debugging
   - java-expert
+  - lsp-navigator
   - memory-search
   - ripgrep
   - task-management-protocol
   - tdd
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 ---

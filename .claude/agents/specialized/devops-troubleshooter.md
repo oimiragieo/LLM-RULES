@@ -27,16 +27,17 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
-  - lsp-navigator
+  - context-compressor
   - debugging
   - docker-compose
   - k8s-manifest-generator
+  - lsp-navigator
   - memory-search
   - ripgrep
-  - task-management-protocol
-  - context-compressor
-  - verification-before-completion
   - session-log-analyzer
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 ---
 
 <!-- agent-template-contract:v1 -->

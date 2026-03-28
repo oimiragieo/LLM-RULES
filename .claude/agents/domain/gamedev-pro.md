@@ -29,12 +29,13 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - debugging
   - gamedev-expert
   - memory-search
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 ---

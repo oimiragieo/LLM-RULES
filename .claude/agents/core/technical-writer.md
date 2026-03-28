@@ -27,15 +27,15 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - doc-generator
   - memory-search
   - readme
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
   - writing-skills
-  - writing
 context_files: null
 ---
 

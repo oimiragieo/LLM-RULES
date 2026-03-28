@@ -27,6 +27,7 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - database-architect
   - database-expert
   - lsp-navigator
@@ -34,7 +35,7 @@ skills:
   - ripgrep
   - task-management-protocol
   - text-to-sql
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 ---
 

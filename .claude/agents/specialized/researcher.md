@@ -34,22 +34,23 @@ tools:
   - Skill
 skills:
   - arxiv-mcp
-  - codebase-exploration
+  - arxiv-monitor
   - code-semantic-search
   - code-structural-search
+  - codebase-exploration
+  - context-compressor
   - deep-research
+  - exa-monitor
   - insight-extraction
+  - knowledge-graph
   - lsp-navigator
   - memory-search
+  - reddit-researcher
   - research-synthesis
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - arxiv-monitor
-  - exa-monitor
-  - knowledge-graph
-  - reddit-researcher
 context_files: null
 ---
 

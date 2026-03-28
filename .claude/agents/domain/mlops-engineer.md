@@ -23,14 +23,16 @@ tools:
   - MemoryRecord
 skills:
   - ai-ml-expert
-  - debugging
-  - sentry-monitoring
-  - security-scanning
   - code-semantic-search
-  - ripgrep
-  - memory-search
+  - code-structural-search
   - context-compressor
+  - debugging
+  - memory-search
+  - ripgrep
+  - security-scanning
+  - sentry-monitoring
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
 tags:
   - mlops

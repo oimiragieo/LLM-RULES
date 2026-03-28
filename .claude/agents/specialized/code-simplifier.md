@@ -31,14 +31,15 @@ skills:
   - code-semantic-search
   - code-structural-search
   - code-style-validator
+  - codebase-cleaner
+  - context-compressor
   - de-sloppify
   - lsp-navigator
   - memory-search
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - codebase-cleaner
 context_files: null
 ---
 

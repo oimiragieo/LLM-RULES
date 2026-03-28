@@ -26,16 +26,17 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - ios-expert
-  - tdd
-  - debugging
   - code-semantic-search
   - code-structural-search
+  - context-compressor
+  - debugging
+  - ios-expert
+  - memory-search
   - ripgrep
   - task-management-protocol
+  - tdd
+  - token-saver-context-compression
   - verification-before-completion
-  - memory-search
-  - context-compressor
 context_files: null
 ---
 

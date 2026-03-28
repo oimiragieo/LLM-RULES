@@ -29,13 +29,14 @@ tools:
   - MemoryRecord
 skills:
   - code-semantic-search
-  - ripgrep
-  - context-compressor
+  - code-structural-search
+  - context-attribution
   - context-compressor
   - memory-search
+  - ripgrep
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
-  - context-attribution
 context_files: null
 ---
 

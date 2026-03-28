@@ -27,14 +27,16 @@ tools:
   - MemoryRecord
 skills:
   - cloud-devops-expert
-  - terraform-infra
-  - debugging
   - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - debugging
+  - memory-search
   - ripgrep
   - task-management-protocol
+  - terraform-infra
+  - token-saver-context-compression
   - verification-before-completion
-  - memory-search
-  - context-compressor
 context_files: null
 ---
 

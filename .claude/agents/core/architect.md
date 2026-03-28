@@ -28,10 +28,13 @@ tools:
   - TaskOutput
   - Skill
 skills:
+  - adversarial-debate
   - agent-tool-design
   - architecture-review
+  - code-graph-context
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - database-architect
   - diagram-generator
   - instinct-learning
@@ -40,10 +43,8 @@ skills:
   - multi-agent-architecture-reference
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - adversarial-debate
-  - code-graph-context
 identity:
   role: Principal Software Architect
   goal: Design systems that scale gracefully and remain maintainable as requirements evolve

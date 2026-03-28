@@ -25,14 +25,16 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - tdd
-  - spec-init
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - memory-search
   - plan-generator
   - ripgrep
-  - code-semantic-search
-  - memory-search
+  - spec-init
   - task-management-protocol
-  - context-compressor
+  - tdd
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 tags:

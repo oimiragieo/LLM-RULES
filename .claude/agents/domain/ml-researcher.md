@@ -3,6 +3,31 @@ name: ml-researcher
 description: Autonomous Machine Learning Researcher focused on optimizing a target scalar score within a fixed time budget.
 model: sonnet
 version: '1.0.0'
+context_strategy: lazy_load
+priority: medium
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
+  - MemoryRecord
+skills:
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - memory-search
+  - ml-experiment-loop
+  - ripgrep
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 ---
 
 # Identity

@@ -28,10 +28,12 @@ tools:
   - TaskGet
   - Skill
 skills:
+  - adversarial-review
   - code-analyzer
   - code-quality-expert
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - de-sloppify
   - lsp-navigator
   - memory-search
@@ -40,8 +42,7 @@ skills:
   - ripgrep
   - task-management-protocol
   - tdd
-  - context-compressor
-  - adversarial-review
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 hooks: {}

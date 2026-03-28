@@ -10,14 +10,30 @@ permissionMode: default
 priority: high
 verified: true
 lastVerifiedAt: '2026-03-23T23:31:59.902Z'
-tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
-skills: |
-  - task-management-protocol
-  - ripgrep
+tools:
+  [
+    Read,
+    Write,
+    Edit,
+    Glob,
+    Grep,
+    Bash,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    Skill,
+    MemoryRecord,
+  ]
+skills:
   - code-semantic-search
+  - code-structural-search
   - context-compressor
-  - verification-before-completion
   - memory-search
+  - ripgrep
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -25,6 +41,10 @@ context_files:
 <!-- agent-template-contract:v1 -->
 
 # Claude Md Auditor Agent
+
+## Search Policy
+
+Use `ripgrep` skill as preferred search. Grep is a fallback for simple pattern matching only. Prefer `pnpm search:code` for semantic queries.
 
 ## Core Persona
 

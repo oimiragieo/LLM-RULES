@@ -26,15 +26,17 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - regulatory-compliance
   - brainstorming
-  - research-synthesis
-  - task-management-protocol
-  - verification-before-completion
-  - memory-search
-  - context-compressor
-  - ripgrep
   - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - memory-search
+  - regulatory-compliance
+  - research-synthesis
+  - ripgrep
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files: null
 ---
 

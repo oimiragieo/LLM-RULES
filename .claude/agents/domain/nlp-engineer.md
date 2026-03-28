@@ -27,16 +27,17 @@ tools:
   - Skill
   - MemoryRecord
 skills:
-  - python-backend-expert
   - ai-ml-expert
-  - deep-research
   - code-semantic-search
   - code-structural-search
+  - context-compressor
+  - deep-research
+  - memory-search
+  - python-backend-expert
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - memory-search
 context_files: null
 ---
 

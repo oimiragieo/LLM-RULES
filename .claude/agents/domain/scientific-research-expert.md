@@ -29,19 +29,14 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - memory-search
   - research-synthesis
   - ripgrep
   - scientific-skills
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - scientific-skills/rdkit
-  - scientific-skills/scanpy
-  - scientific-skills/biopython
-  - scientific-skills/literature-review
-  - scientific-skills/hypothesis-generation
-  - scientific-skills/scientific-schematics
 context_files: null
 ---
 

@@ -23,6 +23,7 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - compaction-detector
   - context-compressor
   - context-degradation
   - memory-search
@@ -30,9 +31,8 @@ skills:
   - session-handoff
   - summarize-changes
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
-  - compaction-detector
 ---
 
 <!-- agent-template-contract:v1 -->

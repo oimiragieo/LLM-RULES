@@ -29,13 +29,14 @@ skills:
   - binary-analysis-patterns
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - lsp-navigator
   - memory-forensics
   - memory-search
   - protocol-reverse-engineering
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
   - yara-authoring
 context_files: null

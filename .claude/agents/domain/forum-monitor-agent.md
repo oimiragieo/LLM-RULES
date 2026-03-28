@@ -25,14 +25,16 @@ tools:
   - MemoryRecord
 skills:
   - browser-automation
-  - deep-research
-  - ripgrep
   - code-semantic-search
-  - memory-search
-  - task-management-protocol
+  - code-structural-search
   - context-compressor
-  - verification-before-completion
+  - deep-research
   - forum-monitor
+  - memory-search
+  - ripgrep
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files: null
 tags:
   - forum-monitoring

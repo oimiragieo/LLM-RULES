@@ -29,12 +29,13 @@ skills:
   - accessibility
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - memory-search
   - mobile-first-design-rules
   - mobile-ui-development-rule
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 ---

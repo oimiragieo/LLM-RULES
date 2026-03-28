@@ -30,12 +30,13 @@ skills:
   - code-semantic-search
   - code-structural-search
   - container-expert
+  - context-compressor
   - debugging
   - lsp-navigator
   - memory-search
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 context_files: null
 capabilities:

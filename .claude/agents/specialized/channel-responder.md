@@ -3,14 +3,21 @@ name: channel-responder
 type: specialized
 version: 1.0.0
 description: Lightweight read-only agent for Telegram/Discord channel messages. Use for answering questions about codebase status, task progress, and framework health via messaging channels. Cannot modify files or push code.
-tools: [Read, Bash, Grep, Glob, TaskList, TaskGet, Skill]
+tools: [Read, Bash, Grep, Glob, TaskList, TaskGet, Skill, MemoryRecord]
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 priority: medium
 skills:
   - channel-management
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - memory-search
+  - ripgrep
   - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
   - '@.claude/context/memory/active_context.md'
@@ -19,6 +26,10 @@ context_files:
 # Channel Responder
 
 <!-- agent-creator-contract-v1 -->
+
+## Search Policy
+
+Use `ripgrep` skill as preferred search. Grep is a fallback for simple pattern matching only. Prefer `pnpm search:code` for semantic queries.
 
 ## Enforcement Hooks
 

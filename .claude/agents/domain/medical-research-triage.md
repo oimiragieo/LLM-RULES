@@ -31,12 +31,13 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - context-compressor
   - memory-search
   - research-synthesis
   - ripgrep
   - scientific-skills
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 context_files:
   - '@.claude/agent-memory/medical-research-triage/MEMORY.md'

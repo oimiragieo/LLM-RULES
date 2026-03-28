@@ -18,15 +18,16 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - consensus-voting
+  - context-compressor
+  - llm-council
   - memory-search
   - omega-claude-cli
   - omega-codex-cli
   - omega-gemini-cli
-  - llm-council
-  - consensus-voting
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 triggerPhrases:
   - multiple perspectives

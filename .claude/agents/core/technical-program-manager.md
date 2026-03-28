@@ -28,11 +28,12 @@ skills:
   - code-semantic-search
   - code-structural-search
   - complexity-assessment
+  - context-compressor
   - memory-search
   - plan-generator
   - ripgrep
   - task-management-protocol
-  - context-compressor
+  - token-saver-context-compression
   - verification-before-completion
 ---
 
