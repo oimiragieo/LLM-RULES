@@ -193,6 +193,13 @@ async function checkRoutingGuard(toolName, toolInput, hookInput = null) {
     return { pass: true };
   }
 
+  const taskCheckOwner = String(process.env.ROUTING_GUARD_TASK_CHECKS || 'delegate')
+    .trim()
+    .toLowerCase();
+  if (taskCheckOwner === 'force') {
+    return { pass: true };
+  }
+
   const stateSnapshot = routerState.getState();
 
   const plannerEnforcement = getEnforcementMode('PLANNER_FIRST_ENFORCEMENT', 'block');

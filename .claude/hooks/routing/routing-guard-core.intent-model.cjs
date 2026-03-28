@@ -188,7 +188,13 @@ function checkIntentAgentMatch(toolName, toolInput = {}) {
     const autoReroute = getIntentAutoRerouteConfig();
     if (
       !isCritical &&
-      shouldAutoReroute(enforcement, dedupe.count, autoReroute.threshold, autoReroute.enabledValue)
+      shouldAutoReroute(
+        'intent-agent-match',
+        enforcement,
+        dedupe.count,
+        autoReroute.threshold,
+        autoReroute.enabledValue
+      )
     ) {
       return {
         pass: true,

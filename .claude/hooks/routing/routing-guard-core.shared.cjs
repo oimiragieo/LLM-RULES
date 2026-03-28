@@ -132,9 +132,43 @@ function buildRouterSelfCheckMessage(toolName, dedupe) {
   return `[ROUTER-FIRST PROTOCOL VIOLATION][ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode. Spawn an agent via Task().`;
 }
 
-function shouldAutoReroute(enforcement, dedupeCount, threshold, enabledValue) {
+const SAFETY_CRITICAL_AUTO_REROUTE_CHECKS = new Set([
+  'checkplannerfirst',
+  'checksecurityreview',
+  'checkspecialistoverride',
+]);
+
+function shouldAutoReroute(
+  checkNameOrEnforcement,
+  enforcementOrDedupeCount,
+  dedupeCountOrThreshold,
+  thresholdOrEnabledValue,
+  enabledValue
+) {
+  let checkName = null;
+  let enforcement = checkNameOrEnforcement;
+  let dedupeCount = enforcementOrDedupeCount;
+  let threshold = dedupeCountOrThreshold;
+  let effectiveEnabledValue = thresholdOrEnabledValue;
+
+  if (arguments.length >= 5) {
+    checkName = String(checkNameOrEnforcement || '')
+      .trim()
+      .toLowerCase();
+    enforcement = enforcementOrDedupeCount;
+    dedupeCount = dedupeCountOrThreshold;
+    threshold = thresholdOrEnabledValue;
+    effectiveEnabledValue = enabledValue;
+  }
+
   if (enforcement !== 'block') return false;
-  if (String(enabledValue || '').toLowerCase() === 'off') return false;
+  if (
+    checkName &&
+    SAFETY_CRITICAL_AUTO_REROUTE_CHECKS.has(String(checkName).trim().toLowerCase())
+  ) {
+    return false;
+  }
+  if (String(effectiveEnabledValue || '').toLowerCase() === 'off') return false;
   const parsedThreshold = Number(threshold);
   const effectiveThreshold =
     Number.isFinite(parsedThreshold) && parsedThreshold > 1 ? parsedThreshold : 3;

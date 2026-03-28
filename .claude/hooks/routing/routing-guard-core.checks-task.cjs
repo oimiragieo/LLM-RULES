@@ -448,7 +448,13 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
     }
     const autoReroute = getTaskListAutoRerouteConfig();
     if (
-      shouldAutoReroute(enforcement, dedupe.count, autoReroute.threshold, autoReroute.enabledValue)
+      shouldAutoReroute(
+        'tasklist-first-gate',
+        enforcement,
+        dedupe.count,
+        autoReroute.threshold,
+        autoReroute.enabledValue
+      )
     ) {
       return {
         pass: true,

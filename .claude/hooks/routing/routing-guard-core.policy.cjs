@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 const ALL_WATCHED_TOOLS = [
   'Glob',
@@ -30,6 +31,21 @@ const ROUTER_BASH_WHITELIST = [
   /^git\s+log\s+--oneline\s+-\d{1,2}$/,
   /^git\s+diff\s+--name-only$/,
   /^git\s+branch$/,
+  /^echo\s+'[^']*'\s*>>\s*\.claude\/context\/runtime\/session-gap-log\.jsonl$/,
+];
+
+const ROUTER_READ_WHITELIST = [
+  /^\.claude\/agents\/.+\.md$/,
+  /^\.claude\/workflows\/core\/router-decision\.md$/,
+  /^\.claude\/docs\/[^/]+\.md$/,
+  /^\.claude\/context\/artifacts\/catalogs\/[^/]+$/,
+  /^\.claude\/context\/agent-registry\.json$/,
+  /^\.claude\/context\/memory\/[^/]+\.md$/,
+  /^\.claude\/context\/runtime\/reflection-[^/]+\.txt$/,
+  /^\.claude\/context\/runtime\/reflection-spawn-request\.json$/,
+  /^\.claude\/context\/runtime\/integration-queue\.jsonl$/,
+  /^\.claude\/context\/runtime\/heartbeat-reminder\.txt$/,
+  /^\.claude\/context\/runtime\/pipeline-obligations-reminder\.txt$/,
 ];
 
 const WHITELISTED_TOOLS = ['TaskUpdate', 'TaskList', 'TaskGet', 'Read', 'AskUserQuestion'];
@@ -423,6 +439,39 @@ function isWhitelistedBashCommand(command) {
   return ROUTER_BASH_WHITELIST.some(pattern => pattern.test(trimmed));
 }
 
+function normalizeRouterReadPath(filePath) {
+  if (!filePath || typeof filePath !== 'string') {
+    return '';
+  }
+
+  const trimmed = filePath.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  let normalized = trimmed.replace(/\\/g, '/');
+  if (normalized.startsWith('./')) {
+    normalized = normalized.slice(2);
+  }
+
+  if (path.isAbsolute(trimmed)) {
+    const relativePath = path.relative(PROJECT_ROOT, trimmed);
+    if (relativePath && !relativePath.startsWith('..') && !path.isAbsolute(relativePath)) {
+      normalized = relativePath.replace(/\\/g, '/');
+    }
+  }
+
+  return normalized.replace(/^\/+/, '');
+}
+
+function isWhitelistedRouterReadPath(filePath) {
+  const normalizedPath = normalizeRouterReadPath(filePath);
+  if (!normalizedPath) {
+    return false;
+  }
+  return ROUTER_READ_WHITELIST.some(pattern => pattern.test(normalizedPath));
+}
+
 function extractTaskIdFromPrompt(prompt) {
   if (!prompt || typeof prompt !== 'string') {
     return null;
@@ -435,6 +484,7 @@ module.exports = {
   ALL_WATCHED_TOOLS,
   BLACKLISTED_TOOLS,
   ROUTER_BASH_WHITELIST,
+  ROUTER_READ_WHITELIST,
   WHITELISTED_TOOLS,
   WRITE_TOOLS,
   IMPLEMENTATION_AGENTS,
@@ -449,5 +499,6 @@ module.exports = {
   isHighRiskSpecialistSpawn,
   isImplementationAgentSpawn,
   isWhitelistedBashCommand,
+  isWhitelistedRouterReadPath,
   extractTaskIdFromPrompt,
 };

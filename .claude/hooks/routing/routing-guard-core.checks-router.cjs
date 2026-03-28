@@ -14,6 +14,7 @@ const {
   WRITE_TOOLS,
   isAlwaysAllowedWrite,
   isWhitelistedBashCommand,
+  isWhitelistedRouterReadPath,
 } = require('./routing-guard-core.policy.cjs');
 const {
   getMemoryMonitor,
@@ -364,6 +365,10 @@ function checkRouterReadGovernance(toolName, toolInput = {}) {
 
   const state = getCachedRouterState();
   if (state.mode === 'agent' || state.taskSpawned) {
+    return { pass: true };
+  }
+
+  if (isWhitelistedRouterReadPath(extractFilePath(toolInput))) {
     return { pass: true };
   }
 

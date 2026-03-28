@@ -44,7 +44,11 @@ test('Routing Guard Integration - Checks 1, 5, 7', async t => {
 
   await t.test('Check 5: Architect-First enforcement for high-risk specialists', () => {
     resetState();
-    routerState.updateState({ architectSpawned: false });
+    routerState.updateState({
+      requiresPlannerFirst: false,
+      plannerSpawned: false,
+      architectSpawned: false,
+    });
 
     // Attempt architect-dependent specialist spawn (devops is in high-risk list)
     const toolInput = {
@@ -62,6 +66,10 @@ test('Routing Guard Integration - Checks 1, 5, 7', async t => {
 
   await t.test('Check 7: Specialist-First Routing Law (Specialist Override)', () => {
     resetState();
+    routerState.updateState({
+      requiresPlannerFirst: false,
+      plannerSpawned: false,
+    });
 
     // Attempt generic developer spawn for specialist work
     const toolInput = {
