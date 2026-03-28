@@ -28,19 +28,19 @@ diff <(grep "^## " .claude/skills/tdd/SKILL.md) <(grep "^## " .claude/skills/{sk
 
 This skill is part of the Creator Ecosystem. After creating a skill, consider if companion artifacts are needed:
 
-| Gap Discovered                           | Required Artifact | Action to Record                          | When                              |
-| ---------------------------------------- | ----------------- | ----------------------------------------- | --------------------------------- |
-| Domain knowledge needs a reusable skill  | skill             | Handle inside this flow                    | Gap is a full skill domain        |
-| Existing skill has incomplete coverage   | skill update      | Hand off to `skill-updater` if needed      | Close skill exists but incomplete |
-| Capability needs a dedicated agent       | agent             | Add a **Follow-Up** for `agent-creator`    | Agent should own the capability   |
-| Existing agent needs capability update   | agent update      | Add a follow-up for `agent-updater`        | Close agent exists but incomplete |
-| Domain needs code/project scaffolding    | template          | Add a follow-up for `template-creator`     | Reusable code patterns needed     |
-| Behavior needs pre/post execution guards | hook              | Add a follow-up for `hook-creator`         | Enforcement behavior required     |
-| Process needs multi-phase orchestration  | workflow          | Add a follow-up for `workflow-creator`     | Multi-step coordination needed    |
-| Artifact needs structured I/O validation | schema            | Add a follow-up for `schema-creator`       | JSON schema for artifact I/O      |
-| User interaction needs a slash command   | command           | Add a follow-up for `command-creator`      | User-facing shortcut needed       |
-| Repeated logic needs a reusable CLI tool | tool              | Add a follow-up for `tool-creator`         | CLI utility needed                |
-| Narrow/single-artifact capability only   | inline            | Document within this artifact only         | Too specific to generalize        |
+| Gap Discovered                           | Required Artifact | Action to Record                        | When                              |
+| ---------------------------------------- | ----------------- | --------------------------------------- | --------------------------------- |
+| Domain knowledge needs a reusable skill  | skill             | Handle inside this flow                 | Gap is a full skill domain        |
+| Existing skill has incomplete coverage   | skill update      | Hand off to `skill-updater` if needed   | Close skill exists but incomplete |
+| Capability needs a dedicated agent       | agent             | Add a **Follow-Up** for `agent-creator` | Agent should own the capability   |
+| Existing agent needs capability update   | agent update      | Add a follow-up for `agent-updater`     | Close agent exists but incomplete |
+| Domain needs code/project scaffolding    | template          | Add a follow-up for `template-creator`  | Reusable code patterns needed     |
+| Behavior needs pre/post execution guards | hook              | Add a follow-up for `hook-creator`      | Enforcement behavior required     |
+| Process needs multi-phase orchestration  | workflow          | Add a follow-up for `workflow-creator`  | Multi-step coordination needed    |
+| Artifact needs structured I/O validation | schema            | Add a follow-up for `schema-creator`    | JSON schema for artifact I/O      |
+| User interaction needs a slash command   | command           | Add a follow-up for `command-creator`   | User-facing shortcut needed       |
+| Repeated logic needs a reusable CLI tool | tool              | Add a follow-up for `tool-creator`      | CLI utility needed                |
+| Narrow/single-artifact capability only   | inline            | Document within this artifact only      | Too specific to generalize        |
 
 **Chain Example:**
 

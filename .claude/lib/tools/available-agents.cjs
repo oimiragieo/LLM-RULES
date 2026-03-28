@@ -111,7 +111,19 @@ class AvailableAgentsQuery {
 
     try {
       const content = fs.readFileSync(this.registryPath, 'utf-8');
-      this.registry = safeParseJSON(content);
+      const parsed = safeParseJSON(content);
+      const isValidRegistry =
+        parsed &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed) &&
+        parsed.agents &&
+        typeof parsed.agents === 'object' &&
+        parsed.index &&
+        typeof parsed.index === 'object';
+      if (!isValidRegistry) {
+        throw new Error('registry JSON is malformed or missing required sections');
+      }
+      this.registry = parsed;
       this.registryMtimeMs = currentMtimeMs;
       this.cache.clear();
       this.cacheTimeouts.clear();

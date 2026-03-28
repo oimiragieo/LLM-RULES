@@ -19,13 +19,7 @@ const ROUTERS = [
     file: 'domain-router-web-frontend.md',
     name: 'domain-router-web-frontend',
     defaultAgent: 'frontend-pro',
-    agents: [
-      'frontend-pro',
-      'nextjs-pro',
-      'angular-pro',
-      'sveltekit-expert',
-      'wordpress-master',
-    ],
+    agents: ['frontend-pro', 'nextjs-pro', 'angular-pro', 'sveltekit-expert', 'wordpress-master'],
   },
   {
     file: 'domain-router-backend.md',
@@ -205,10 +199,7 @@ describe('sub-router agent definitions', () => {
       .filter(name => /^domain-router-.*\.md$/.test(name))
       .sort();
 
-    assert.deepStrictEqual(
-      files,
-      ROUTERS.map(router => router.file).sort()
-    );
+    assert.deepStrictEqual(files, ROUTERS.map(router => router.file).sort());
   });
 
   for (const router of ROUTERS) {

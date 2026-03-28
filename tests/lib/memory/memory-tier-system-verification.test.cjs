@@ -92,7 +92,14 @@ describe('memory tier system verification', () => {
     };
 
     const result = tiers.writeSTMEntry(sessionData, projectRoot);
-    const stmPath = path.join(projectRoot, '.claude', 'context', 'memory', 'stm', 'session_current.json');
+    const stmPath = path.join(
+      projectRoot,
+      '.claude',
+      'context',
+      'memory',
+      'stm',
+      'session_current.json'
+    );
     const stored = tiers.readSTMEntry(projectRoot);
 
     assert.equal(result.success, true);
@@ -114,7 +121,14 @@ describe('memory tier system verification', () => {
     );
 
     const result = tiers.consolidateSession('mtm-consolidation', projectRoot);
-    const stmPath = path.join(projectRoot, '.claude', 'context', 'memory', 'stm', 'session_current.json');
+    const stmPath = path.join(
+      projectRoot,
+      '.claude',
+      'context',
+      'memory',
+      'stm',
+      'session_current.json'
+    );
     const mtmFiles = listJsonFiles(tiers.getTierPath('MTM', projectRoot));
 
     assert.equal(result.success, true);
@@ -197,7 +211,10 @@ describe('memory tier system verification', () => {
     const ltmFiles = listJsonFiles(tiers.getTierPath('LTM', projectRoot));
 
     assert.equal(result.success, true);
-    assert.ok(mtmSessions.length <= 10, `MTM should remain capped at 10, got ${mtmSessions.length}`);
+    assert.ok(
+      mtmSessions.length <= 10,
+      `MTM should remain capped at 10, got ${mtmSessions.length}`
+    );
     assert.ok(ltmFiles.length >= 1, 'Overflow should summarize at least one batch into LTM');
     assert.ok(
       ltmFiles.some(file => file.startsWith('summary_')),
@@ -226,17 +243,40 @@ describe('memory tier system verification', () => {
     const failedResults = results.filter(result => result && result.success === false);
     const mtmDir = tiers.getTierPath('MTM', projectRoot);
     const mtmFiles = listJsonFiles(mtmDir);
-    const stmPath = path.join(projectRoot, '.claude', 'context', 'memory', 'stm', 'session_current.json');
+    const stmPath = path.join(
+      projectRoot,
+      '.claude',
+      'context',
+      'memory',
+      'stm',
+      'session_current.json'
+    );
 
-    assert.equal(successfulResults.length, 1, `Expected exactly one successful consolidation, got ${successfulResults.length}`);
-    assert.equal(failedResults.length, 1, `Expected one serialized no-op result, got ${failedResults.length}`);
+    assert.equal(
+      successfulResults.length,
+      1,
+      `Expected exactly one successful consolidation, got ${successfulResults.length}`
+    );
+    assert.equal(
+      failedResults.length,
+      1,
+      `Expected one serialized no-op result, got ${failedResults.length}`
+    );
     assert.match(
       failedResults[0].error,
       /No STM session found/,
       'Second consolidation should observe the STM as already consumed'
     );
-    assert.equal(mtmFiles.length, 1, 'Exactly one MTM file should exist after concurrent consolidation');
-    assert.equal(fs.existsSync(stmPath), false, 'STM file should be cleared after serialized consolidation');
+    assert.equal(
+      mtmFiles.length,
+      1,
+      'Exactly one MTM file should exist after concurrent consolidation'
+    );
+    assert.equal(
+      fs.existsSync(stmPath),
+      false,
+      'STM file should be cleared after serialized consolidation'
+    );
 
     const mtmData = JSON.parse(fs.readFileSync(path.join(mtmDir, mtmFiles[0]), 'utf8'));
     assert.equal(mtmData.session_id, sessionId);

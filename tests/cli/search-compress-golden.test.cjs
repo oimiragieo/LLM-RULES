@@ -15,7 +15,7 @@ const os = require('node:os');
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
 const { main, computeAdaptiveRatio, deduplicateAgainstMemory, classifyMemoryTarget } = require(
-  path.join(PROJECT_ROOT, '.claude/skills/token-saver-context-compression/scripts/main.cjs')
+  path.join(PROJECT_ROOT, '.claude/skills/context-compressor/scripts/main.cjs')
 );
 
 // ---------------------------------------------------------------------------

@@ -10,6 +10,7 @@ NOTE: Startup and cleanup are handled by `worker-base`. This skill defines the W
 ## When to Use This Skill
 
 Features involving:
+
 - Reflection score tracker calibration and normalization
 - Hook registration in settings.json
 - Token reporting pipeline fixes
@@ -59,12 +60,14 @@ Features involving:
    - Add load() method that reads from disk
 
 8. **Run all reflection-related tests:**
+
    ```
    node --test tests/hooks/reflection-*.test.cjs
    node --test tests/lib/reflection-score-tracker.test.cjs
    ```
 
 9. **Run broader suites** for regression check:
+
    ```
    pnpm test:framework
    ```
@@ -80,18 +83,25 @@ Features involving:
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "node --test tests/lib/reflection-score-tracker.test.cjs", "exitCode": 0, "observation": "All tests pass including both scale normalization" },
+      {
+        "command": "node --test tests/lib/reflection-score-tracker.test.cjs",
+        "exitCode": 0,
+        "observation": "All tests pass including both scale normalization"
+      },
       { "command": "pnpm test:framework", "exitCode": 0, "observation": "0 failures" }
     ],
     "interactiveChecks": []
   },
   "tests": {
     "added": [
-      { "file": "tests/lib/reflection-score-tracker.test.cjs", "cases": [
-        {"name": "normalizes 0-1 scores to 1-10", "verifies": "CTO directive #2"},
-        {"name": "passes through 1-10 scores unchanged", "verifies": "1-10 scale handling"},
-        {"name": "handles mixed scale entries", "verifies": "defensive normalization"}
-      ]}
+      {
+        "file": "tests/lib/reflection-score-tracker.test.cjs",
+        "cases": [
+          { "name": "normalizes 0-1 scores to 1-10", "verifies": "CTO directive #2" },
+          { "name": "passes through 1-10 scores unchanged", "verifies": "1-10 scale handling" },
+          { "name": "handles mixed scale entries", "verifies": "defensive normalization" }
+        ]
+      }
     ],
     "coverage": "Score tracker, token report, and accountant persistence all covered"
   },

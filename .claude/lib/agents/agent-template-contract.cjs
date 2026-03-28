@@ -8,7 +8,13 @@ const yaml = require('js-yaml');
 const CONTRACT_MARKER = '<!-- agent-template-contract:v1 -->';
 const REQUIRED_HEADINGS = ['## Token Saver Invocation Rule'];
 const REQUIRED_SKILLS_BASE = ['task-management-protocol'];
-const REQUIRED_SKILLS_SEARCH_HEAVY = ['ripgrep', 'code-semantic-search', 'context-compressor'];
+const TOKEN_SAVER_SKILL = 'token-saver-context-compression';
+const REQUIRED_SKILLS_SEARCH_HEAVY = [
+  'ripgrep',
+  'code-semantic-search',
+  'context-compressor',
+  TOKEN_SAVER_SKILL,
+];
 const SEARCH_HEAVY_PATTERNS = [/code-semantic-search/, /ripgrep/, /pnpm search:code/];
 
 function isAgentFile(filePath) {
@@ -97,7 +103,11 @@ function validateAgentContent(content, { requireMarker = true } = {}) {
     }
   }
 
-  if (!/Use `Skill\(\{ skill: 'context-compressor' \}\)`/.test(content)) {
+  if (
+    !/Use `Skill\(\{ skill: '(?:context-compressor|token-saver-context-compression)' \}\)`/.test(
+      content
+    )
+  ) {
     warnings.push(
       'Token Saver Invocation Rule does not include explicit Skill() invocation example'
     );
@@ -163,6 +173,7 @@ function renderAgentTemplate({
     'ripgrep',
     'code-semantic-search',
     'context-compressor',
+    TOKEN_SAVER_SKILL,
     'verification-before-completion',
   ],
 }) {
@@ -203,7 +214,7 @@ Goal: Deliver correct outcomes with search-grounded context.
 
 ## Token Saver Invocation Rule
 
-Use \`Skill({ skill: 'context-compressor' })\` only when context pressure is high and normal search+read would over-expand tokens.
+Use \`Skill({ skill: '${TOKEN_SAVER_SKILL}' })\` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 - You need to synthesize across many search hits (typically 10+ candidates).

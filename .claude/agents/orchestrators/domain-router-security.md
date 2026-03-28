@@ -40,16 +40,16 @@ accessibility validation, and compliance work.
 
 ## Agent Roster
 
-| Agent | Use when | Key signals |
-| --- | --- | --- |
-| `security-architect` | Security architecture and threat modeling | architecture, threat model, auth hardening |
-| `penetration-tester` | Offensive security testing | pentest, exploit, OWASP, vuln validation |
-| `chaos-engineer` | Resilience and chaos testing | chaos, failure injection, resilience |
-| `reverse-engineer` | Binary and reverse engineering work | decompile, binary, malware-style analysis |
-| `advanced-debugging` | Deep debugging work | trace, root cause, low-level debugging |
-| `performance-engineer` | Performance profiling and load work | profiling, throughput, latency, load |
-| `accessibility-tester` | Accessibility and WCAG validation | WCAG, accessibility, screen reader, a11y |
-| `compliance-checker` | Regulatory and compliance work | GDPR, policy, controls, audit checklist |
+| Agent                  | Use when                                  | Key signals                                |
+| ---------------------- | ----------------------------------------- | ------------------------------------------ |
+| `security-architect`   | Security architecture and threat modeling | architecture, threat model, auth hardening |
+| `penetration-tester`   | Offensive security testing                | pentest, exploit, OWASP, vuln validation   |
+| `chaos-engineer`       | Resilience and chaos testing              | chaos, failure injection, resilience       |
+| `reverse-engineer`     | Binary and reverse engineering work       | decompile, binary, malware-style analysis  |
+| `advanced-debugging`   | Deep debugging work                       | trace, root cause, low-level debugging     |
+| `performance-engineer` | Performance profiling and load work       | profiling, throughput, latency, load       |
+| `accessibility-tester` | Accessibility and WCAG validation         | WCAG, accessibility, screen reader, a11y   |
+| `compliance-checker`   | Regulatory and compliance work            | GDPR, policy, controls, audit checklist    |
 
 ## Default Gateway Agent
 
@@ -82,6 +82,7 @@ clearly point to a narrower security-quality specialty.
 Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
+
 - You need to compare several security-quality specialties before routing.
 - Retrieved context is too large to keep directly in working memory.
 - You are preparing an evidence-heavy routing handoff.

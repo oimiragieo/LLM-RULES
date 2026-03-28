@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { getOrCreateSessionId } = require('../../lib/context/session-id-manager.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const {
@@ -101,7 +102,7 @@ function run() {
       return;
     }
 
-    const runtimeDir = path.join(process.cwd(), '.claude/context/runtime');
+    const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
     const sessionPath = path.join(runtimeDir, 'session-id.json');
 
     const logPath = path.join(runtimeDir, 'shift-change-log.json');
@@ -172,7 +173,7 @@ function run() {
     }
 
     if (log.pendingMemoryWrites && log.pendingMemoryWrites.length > 0) {
-      const memoryDir = path.join(process.cwd(), '.claude/context/memory');
+      const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
       if (!fs.existsSync(memoryDir)) fs.mkdirSync(memoryDir, { recursive: true });
       const inboxPath = path.join(memoryDir, 'handoff_inbox.md');
 

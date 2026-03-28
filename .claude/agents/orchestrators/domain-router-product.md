@@ -40,23 +40,23 @@ quant analysis, ASO, voice matching, forum monitoring, and post analysis.
 
 ## Agent Roster
 
-| Agent | Use when | Key signals |
-| --- | --- | --- |
-| `pm` | Product management execution | backlog, sprint, stories, prioritization |
-| `pm-coordinator` | Agile and project coordination | coordination, planning cadence, dependencies |
-| `product-manager` | Product strategy and roadmap | roadmap, strategy, positioning |
-| `business-analyst` | Business requirements analysis | requirements, process, stakeholder needs |
-| `technical-program-manager` | Cross-functional program delivery | milestones, RAID, multi-team planning |
-| `marketing-strategist` | Growth and marketing strategy | campaigns, growth, go-to-market |
-| `ux-researcher` | Research and discovery | interviews, usability study, discovery |
-| `brand-guardian` | Brand consistency work | brand voice, consistency, standards |
-| `feedback-synthesizer` | User feedback synthesis | survey synthesis, feedback themes |
-| `legal-advisor` | Legal or policy review | legal constraints, terms, policy |
-| `quant-analyst` | Quantitative and market analysis | quant, modeling, financial analysis |
-| `aso-specialist` | App Store optimization | ASO, keywords, store listing |
-| `voice-replicator-agent` | Voice and tone matching | tone match, style match, voice replication |
-| `forum-monitor-agent` | Community and forum monitoring | forums, sentiment, community monitoring |
-| `post-analyzer-agent` | Content/post performance analysis | post analysis, content performance |
+| Agent                       | Use when                          | Key signals                                  |
+| --------------------------- | --------------------------------- | -------------------------------------------- |
+| `pm`                        | Product management execution      | backlog, sprint, stories, prioritization     |
+| `pm-coordinator`            | Agile and project coordination    | coordination, planning cadence, dependencies |
+| `product-manager`           | Product strategy and roadmap      | roadmap, strategy, positioning               |
+| `business-analyst`          | Business requirements analysis    | requirements, process, stakeholder needs     |
+| `technical-program-manager` | Cross-functional program delivery | milestones, RAID, multi-team planning        |
+| `marketing-strategist`      | Growth and marketing strategy     | campaigns, growth, go-to-market              |
+| `ux-researcher`             | Research and discovery            | interviews, usability study, discovery       |
+| `brand-guardian`            | Brand consistency work            | brand voice, consistency, standards          |
+| `feedback-synthesizer`      | User feedback synthesis           | survey synthesis, feedback themes            |
+| `legal-advisor`             | Legal or policy review            | legal constraints, terms, policy             |
+| `quant-analyst`             | Quantitative and market analysis  | quant, modeling, financial analysis          |
+| `aso-specialist`            | App Store optimization            | ASO, keywords, store listing                 |
+| `voice-replicator-agent`    | Voice and tone matching           | tone match, style match, voice replication   |
+| `forum-monitor-agent`       | Community and forum monitoring    | forums, sentiment, community monitoring      |
+| `post-analyzer-agent`       | Content/post performance analysis | post analysis, content performance           |
 
 ## Default Gateway Agent
 
@@ -86,6 +86,7 @@ lacks a stronger product, UX, marketing, or legal signal.
 Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
+
 - You need to compare several product-business specialties before routing.
 - Retrieved context is too large to keep directly in working memory.
 - You are preparing an evidence-heavy routing handoff.

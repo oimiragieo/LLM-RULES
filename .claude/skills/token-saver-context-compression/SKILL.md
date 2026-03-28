@@ -9,6 +9,10 @@ Alias for `context-compressor`. Provides context window optimization by compress
 - Multi-agent pipelines with context handoff
 - Any scenario where `context-compressor` would be used
 
+## Activation
+
+Activate this skill when `compression-reminder.txt` appears or when the active context is approaching the 80K token pressure threshold.
+
 ## Usage
 
 ```javascript

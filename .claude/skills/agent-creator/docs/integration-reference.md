@@ -6,21 +6,22 @@ This file preserves sections extracted from the pre-refactor `SKILL.md` so the c
 
 **Before writing agent file, verify ALL required fields are present.**
 
-| Field | Required | Default | Notes |
-|-------|----------|---------|-------|
-| `name` | YES | - | lowercase-with-hyphens |
-| `description` | YES | - | Single line, include trigger conditions |
-| `model` | YES | sonnet | sonnet, opus, or haiku |
-| `context_strategy` | YES | lazy_load | minimal, lazy_load, or full |
-| `tools` | YES | [] | At least [Read] required |
-| `skills` | YES | [] | List relevant skills |
-| `context_files` | YES | [learnings.md] | Memory files to load |
-| `temperature` | NO | 0.4 | 0.0-1.0 |
-| `priority` | NO | medium | low, medium, high |
+| Field              | Required | Default        | Notes                                   |
+| ------------------ | -------- | -------------- | --------------------------------------- |
+| `name`             | YES      | -              | lowercase-with-hyphens                  |
+| `description`      | YES      | -              | Single line, include trigger conditions |
+| `model`            | YES      | sonnet         | sonnet, opus, or haiku                  |
+| `context_strategy` | YES      | lazy_load      | minimal, lazy_load, or full             |
+| `tools`            | YES      | []             | At least [Read] required                |
+| `skills`           | YES      | []             | List relevant skills                    |
+| `context_files`    | YES      | [learnings.md] | Memory files to load                    |
+| `temperature`      | NO       | 0.4            | 0.0-1.0                                 |
+| `priority`         | NO       | medium         | low, medium, high                       |
 
 **BLOCKING**: Do not write agent file if any required field is missing.
 
 **Validation checklist before writing:**
+
 ```
 
 [ ] name: defined and kebab-case
@@ -34,24 +35,27 @@ This file preserves sections extracted from the pre-refactor `SKILL.md` so the c
 [ ] Behavioral Traits section present with 10+ traits
 [ ] Example Interactions section present with 8+ examples
 
-````
+```
 
 **Model Validation (CRITICAL):**
+
 - model field MUST be base name only: `haiku`, `sonnet`, or `opus`
 - DO NOT use dated versions like `claude-opus-4-5-20251101`
 - DO NOT use full version strings like `claude-3-sonnet-20240229`
 - The orchestration layer handles model resolution automatically
 
 **Extended Thinking (NOT STANDARD):**
+
 - `extended_thinking: true` is NOT documented in CLAUDE.md
 - DO NOT add this field unless explicitly documented and requested
 - If used, must have documented justification in the agent definition
 - This field may cause unexpected behavior in agent spawning
 
 **Tools Array Validation:**
+
 - Standard tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
-- DO NOT add MCP tools (mcp__*) unless whitelisted in routing-table.cjs
-- MCP tools (mcp__Exa__*, mcp__GitHub__*, etc.) cause router enforcement failures
+- DO NOT add MCP tools (mcp\_\_\*) unless whitelisted in routing-table.cjs
+- MCP tools (mcp**Exa**_, mcp**GitHub**_, etc.) cause router enforcement failures
 - If MCP integration is needed, document it explicitly and verify hook compatibility
 
 After writing, validate file was saved:
@@ -71,7 +75,9 @@ After agent file is written, you MUST update `@AGENT_ROUTING_TABLE.md` (the cano
 2. **Generate routing entry**:
    ```markdown
    | {request_type} | `{agent_name}` | `.claude/agents/{category}/{agent_name}.md` |
-````
+   ```
+
+`````
 
 1. **Find correct insertion point** (alphabetical within category, or at end of relevant section)
 2. **Insert using Edit tool**
@@ -263,7 +269,7 @@ Invoke your assigned skills using the Skill tool:
 ```javascript
 Skill({ skill: 'diagram-generator' });
 Skill({ skill: 'doc-generator' });
-````
+`````
 
 > **CRITICAL**: Use `Skill()` tool, not `Read()`. Skill() loads AND applies the workflow.
 
@@ -729,4 +735,3 @@ After all registries are updated, refresh the agent count in README.md so the Cu
    ```
 
 ---
-

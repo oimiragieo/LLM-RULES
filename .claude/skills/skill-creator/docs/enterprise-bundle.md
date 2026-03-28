@@ -1,8 +1,13 @@
 # Preserved Reference Content
+
 This file preserves sections extracted from the pre-refactor `SKILL.md` so the core workflow can stay concise.
+
 ## Actions
+
 ### `create` - Create a New Skill
+
 Create a skill from scratch with proper structure.
+
 ```bash
 node .claude/skills/skill-creator/scripts/create.cjs \
   --name "my-skill" \
@@ -21,14 +26,17 @@ node .claude/skills/skill-creator/scripts/create.cjs \
   [--create-tool]       # Force creation of companion CLI tool
   [--no-tool]           # Skip companion tool even if complex
 ```
+
 **Automatic Tool Creation:**
 Complex skills automatically get a companion tool in `.claude/tools/`. A skill is considered complex when it has 2+ of:
+
 - Pre/post execution hooks
 - Input/output schemas
 - 6+ tools specified
 - Command-line arguments
 - Description with complex keywords (orchestration, pipeline, workflow, etc.)
-**Examples:**
+  **Examples:**
+
 ```bash
 # Basic skill
 node .claude/skills/skill-creator/scripts/create.cjs \
@@ -56,14 +64,18 @@ node .claude/skills/skill-creator/scripts/create.cjs \
   --description "Complex integration without external CLI" \
   --hooks --schemas --no-tool
 ```
+
 ### `convert` - Convert MCP Server to Skill
+
 Convert an MCP server (npm, PyPI, or Docker) into a Claude Code skill.
 **IMPORTANT: Auto-Registration Enabled**
 When converting MCP servers, the skill-creator automatically:
+
 1. Creates the skill definition (SKILL.md)
 2. **Registers the MCP server in settings.json** (no user action needed)
 3. Assigns skill to relevant agents
 4. Updates CLAUDE.md and skill catalog
+
 ```bash
 node .claude/skills/skill-creator/scripts/convert.cjs \
   --server "server-name" \
@@ -71,20 +83,22 @@ node .claude/skills/skill-creator/scripts/convert.cjs \
   [--test]  # Test the converted skill
   [--no-register]  # Skip auto-registration in settings.json
 ```
+
 **Known MCP Servers (Auto-detected):**
-| Server                                  | Source | Description                 |
+| Server | Source | Description |
 | --------------------------------------- | ------ | --------------------------- |
-| @anthropic/mcp-shell                    | npm    | Shell command execution     |
-| @modelcontextprotocol/server-filesystem | npm    | File system operations      |
-| @modelcontextprotocol/server-memory     | npm    | Knowledge graph memory      |
-| @modelcontextprotocol/server-github     | npm    | GitHub API integration      |
-| @modelcontextprotocol/server-slack      | npm    | Slack messaging             |
-| mcp-server-git                          | pypi   | Git operations              |
-| mcp-server-time                         | pypi   | Time and timezone utilities |
-| mcp-server-sentry                       | pypi   | Sentry error tracking       |
-| mcp/github                              | docker | Official GitHub MCP         |
-| mcp/playwright                          | docker | Browser automation          |
+| @anthropic/mcp-shell | npm | Shell command execution |
+| @modelcontextprotocol/server-filesystem | npm | File system operations |
+| @modelcontextprotocol/server-memory | npm | Knowledge graph memory |
+| @modelcontextprotocol/server-github | npm | GitHub API integration |
+| @modelcontextprotocol/server-slack | npm | Slack messaging |
+| mcp-server-git | pypi | Git operations |
+| mcp-server-time | pypi | Time and timezone utilities |
+| mcp-server-sentry | pypi | Sentry error tracking |
+| mcp/github | docker | Official GitHub MCP |
+| mcp/playwright | docker | Browser automation |
 **Example:**
+
 ```bash
 # Convert npm MCP server
 node .claude/skills/skill-creator/scripts/convert.cjs \
@@ -96,16 +110,19 @@ node .claude/skills/skill-creator/scripts/convert.cjs \
 node .claude/skills/skill-creator/scripts/convert.cjs \
   --server "https://github.com/owner/mcp-server" --source github
 ```
+
 ### MCP-to-Skill Conversion (PREFERRED APPROACH)
+
 **BEFORE adding an MCP server, check if existing tools can do the same job!**
 Many MCP servers are just API wrappers. Using existing tools (WebFetch, Exa) is **preferred** because:
-| MCP Server Approach                  | Skill with Existing Tools |
+| MCP Server Approach | Skill with Existing Tools |
 | ------------------------------------ | ------------------------- |
-| ❌ Requires uvx/npm/pip installation | ✅ Works immediately      |
-| ❌ Requires session restart          | ✅ No restart needed      |
-| ❌ External dependency failures      | ✅ Self-contained         |
-| ❌ Platform-specific issues          | ✅ Cross-platform         |
+| ❌ Requires uvx/npm/pip installation | ✅ Works immediately |
+| ❌ Requires session restart | ✅ No restart needed |
+| ❌ External dependency failures | ✅ Self-contained |
+| ❌ Platform-specific issues | ✅ Cross-platform |
 **Example: arXiv - Use WebFetch instead of mcp-arxiv server**
+
 ```javascript
 // INSTEAD of requiring mcp-arxiv server, use WebFetch directly:
 WebFetch({
@@ -118,25 +135,32 @@ mcp__Exa__web_search_exa({
   numResults: 10,
 });
 ```
+
 **When to use existing tools (PREFERRED):**
+
 - MCP server wraps a public REST API
 - No authentication required
 - Simple request/response patterns
-**When MCP server is actually needed:**
+  **When MCP server is actually needed:**
 - Complex state management required
 - Streaming/websocket connections
 - Local file system access needed
 - OAuth/authentication flows required
+
 ### MCP Server Auto-Registration (ONLY IF NECESSARY)
+
 **If existing tools won't work and MCP server is truly required, you MUST register it.**
 This ensures users don't need to manually configure MCP servers - skills "just work".
+
 #### Step 10: Register MCP Server in settings.json (BLOCKING for MCP skills)
+
 If your skill uses tools prefixed with `mcp__<server>__*`, add the server to `.claude/settings.json`:
+
 1. **Determine the MCP server config** based on source:
-   | Source | Config Template                                             |
+   | Source | Config Template |
    | ------ | ----------------------------------------------------------- |
-   | npm    | `{ "command": "npx", "args": ["-y", "<package-name>"] }`    |
-   | PyPI   | `{ "command": "uvx", "args": ["<package-name>"] }`          |
+   | npm | `{ "command": "npx", "args": ["-y", "<package-name>"] }` |
+   | PyPI | `{ "command": "uvx", "args": ["<package-name>"] }` |
    | Docker | `{ "command": "docker", "args": ["run", "-i", "<image>"] }` |
 2. **Read current settings.json:**
    Use `Read` on `.claude/settings.json` (preferred), or Node if needed:
@@ -158,7 +182,9 @@ If your skill uses tools prefixed with `mcp__<server>__*`, add the server to `.c
    ```bash
    grep "<server-name>" .claude/settings.json || echo "ERROR: MCP not registered!"
    ```
+
 #### Known MCP Server Configurations
+
 | Server Name | Package                                 | Source | Config                                                                            |
 | ----------- | --------------------------------------- | ------ | --------------------------------------------------------------------------------- |
 | arxiv       | mcp-arxiv                               | PyPI   | `{ "command": "uvx", "args": ["mcp-arxiv"] }`                                     |
@@ -169,7 +195,9 @@ If your skill uses tools prefixed with `mcp__<server>__*`, add the server to `.c
 | git         | mcp-server-git                          | PyPI   | `{ "command": "uvx", "args": ["mcp-server-git"] }`                                |
 | time        | mcp-server-time                         | PyPI   | `{ "command": "uvx", "args": ["mcp-server-time"] }`                               |
 | sentry      | mcp-server-sentry                       | PyPI   | `{ "command": "uvx", "args": ["mcp-server-sentry"] }`                             |
+
 #### Iron Law: NO MCP SKILL WITHOUT SERVER REGISTRATION
+
 ```
 +======================================================================+
 |  ⛔ MCP REGISTRATION IRON LAW - VIOLATION = BROKEN SKILL             |
@@ -187,14 +215,20 @@ If your skill uses tools prefixed with `mcp__<server>__*`, add the server to `.c
 |                                                                      |
 +======================================================================+
 ```
+
 ### `validate` - Validate Skill Definition
+
 Check a skill's SKILL.md for correctness.
+
 ```bash
 node .claude/skills/skill-creator/scripts/create.cjs \
   --validate ".claude/skills/my-skill"
 ```
+
 ### `generate-openai-yaml` - Onboard Skills for UI Discovery
+
 Generate canonical `agents/openai.yaml` metadata so skills are discoverable in agent runtimes.
+
 ```bash
 # Generate for a single skill
 node .claude/skills/skill-creator/scripts/generate-openai-yaml.cjs \
@@ -203,8 +237,11 @@ node .claude/skills/skill-creator/scripts/generate-openai-yaml.cjs \
 node .claude/skills/skill-creator/scripts/generate-openai-yaml.cjs \
   --all
 ```
+
 ## TDD Execution Plan (MANDATORY FOR FIXES)
+
 For every skill fix or restore, run this exact plan:
+
 1. **Plan tests first**
    - Define failing behavior and target files.
    - Add/update focused tests before code changes.
@@ -228,27 +265,36 @@ For every skill fix or restore, run this exact plan:
      - Commit A: tooling/scripts
      - Commit B: generated artifacts (for example `agents/openai.yaml`)
      - Commit C: docs/policy updates
+
 ### `install` - Install Skill from GitHub
+
 Clone and install a skill from a GitHub repository.
+
 ```bash
 node .claude/skills/skill-creator/scripts/create.cjs \
   --install "https://github.com/owner/claude-skill-name"
 ```
+
 ### `convert-codebase` - Convert External Codebase to Skill
+
 Convert any external codebase to a standardized skill structure.
+
 ```bash
 node .claude/skills/skill-creator/scripts/create.cjs \
   --convert-codebase "/path/to/codebase" \
   --name "new-skill-name"
 ```
+
 **What it does:**
+
 1. Analyzes codebase structure (package.json, README, src/, lib/)
 2. Extracts description from package.json or README
 3. Finds entry points (index.js, main.js, cli.js)
 4. Creates standardized skill structure
 5. Copies original files to references/ for integration
 6. Runs `pnpm format` on all created files
-**Example:**
+   **Example:**
+
 ```bash
 # Convert a local tool to a skill
 node .claude/skills/skill-creator/scripts/create.cjs \
@@ -263,8 +309,11 @@ node .claude/skills/skill-creator/scripts/create.cjs \
 #     ├── original-entry.js
 #     └── original-README.md
 ```
+
 ### `consolidate` - Consolidate Skills into Domain Experts
+
 Consolidate granular skills into domain-based expert skills to reduce context overhead.
+
 ```bash
 # Analyze consolidation opportunities
 node .claude/skills/skill-creator/scripts/consolidate.cjs
@@ -277,23 +326,28 @@ node .claude/skills/skill-creator/scripts/consolidate.cjs --execute --remove
 # List all domain buckets
 node .claude/skills/skill-creator/scripts/consolidate.cjs --list-buckets
 ```
+
 **What it does:**
+
 1. Groups skills by technology domain (react, python, go, etc.)
 2. Creates consolidated "expert" skills with merged guidelines
 3. Preserves source skill references in `references/source-skills.json`
 4. Optionally removes source skills after consolidation
 5. Updates memory with consolidation summary
-**Domain Buckets:**
-| Bucket                   | Description                           |
-| ------------------------ | ------------------------------------- |
-| `react-expert`           | React, Shadcn, Radix                  |
-| `python-backend-expert`  | Django, FastAPI, Flask                |
-| `nextjs-expert`          | Next.js App Router, Server Components |
-| `typescript-expert`      | TypeScript, JavaScript                |
-| `general-best-practices` | Naming, error handling, docs          |
-| ...                      | 40+ total buckets                     |
+   **Domain Buckets:**
+   | Bucket | Description |
+   | ------------------------ | ------------------------------------- |
+   | `react-expert` | React, Shadcn, Radix |
+   | `python-backend-expert` | Django, FastAPI, Flask |
+   | `nextjs-expert` | Next.js App Router, Server Components |
+   | `typescript-expert` | TypeScript, JavaScript |
+   | `general-best-practices` | Naming, error handling, docs |
+   | ... | 40+ total buckets |
+
 ### `convert-rules` - Convert Legacy Rules to Skills
+
 Convert old rule files (.mdc, .md) from legacy rule libraries into standardized skills.
+
 ```bash
 # Convert a single rule file
 node .claude/skills/skill-creator/scripts/create.cjs \
@@ -305,21 +359,27 @@ node .claude/skills/skill-creator/scripts/create.cjs \
 node .claude/skills/skill-creator/scripts/create.cjs \
   --convert-rules "/path/to/rules" --force
 ```
+
 **What it does:**
+
 1. Parses `.mdc` or `.md` rule files with YAML frontmatter
 2. Extracts description and globs from frontmatter
 3. Creates a skill with embedded guidelines in `<instructions>` block
 4. Copies original rule file to `references/`
 5. Creates `scripts/main.cjs` for CLI access
 6. Updates memory with conversion summary
-**Example:**
+   **Example:**
+
 ```bash
 # Convert legacy cursorrules to skills
 node .claude/skills/skill-creator/scripts/create.cjs \
   --convert-rules ".claude.archive/rules-library"
 ```
+
 ### `assign` - Assign Skill to Agent
+
 Add a skill to an existing or new agent's configuration.
+
 ```bash
 # Assign to existing agent
 node .claude/skills/skill-creator/scripts/create.cjs \
@@ -330,25 +390,37 @@ node .claude/tools/agent-creator/create-agent.mjs \
   --description "PDF processing expert" \
   --skills "pdf-extractor,doc-generator"
 ```
+
 ### `register-hooks` - Register Existing Skill's Hooks
+
 Register a skill's hooks in settings.json for an existing skill.
+
 ```bash
 node .claude/skills/skill-creator/scripts/create.cjs \
   --register-hooks "skill-name"
 ```
+
 This adds the skill's pre-execute and post-execute hooks to `.claude/settings.json`.
+
 ### `register-schemas` - Register Existing Skill's Schemas
+
 Register a skill's schemas globally for an existing skill.
+
 ```bash
 node .claude/skills/skill-creator/scripts/create.cjs \
   --register-schemas "skill-name"
 ```
+
 This copies the skill's input/output schemas to `.claude/schemas/` for global access.
+
 ### `show-structure` - View Standardized Structure
+
 Display the required skill structure documentation.
+
 ```bash
 node .claude/skills/skill-creator/scripts/create.cjs --show-structure
 ```
+
 ## Workflow: User Requests New Capability
 
 When a user requests a capability that doesn't exist:
@@ -648,4 +720,3 @@ Check for:
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
 
 ---
-

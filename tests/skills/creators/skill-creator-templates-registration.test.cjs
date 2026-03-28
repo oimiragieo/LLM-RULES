@@ -8,7 +8,9 @@ const os = require('node:os');
 const yaml = require('js-yaml');
 
 const templates = require('../../../.claude/skills/skill-creator/scripts/create-templates.cjs');
-const { createActions } = require('../../../.claude/skills/skill-creator/scripts/create-actions.cjs');
+const {
+  createActions,
+} = require('../../../.claude/skills/skill-creator/scripts/create-actions.cjs');
 
 function parseFrontmatter(content) {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
@@ -51,21 +53,15 @@ function createTempProject({
   );
   writeFile(
     path.join(claudeDir, 'lib', 'routing', 'routing-table-intent-keywords.cjs'),
-    ['const INTENT_KEYWORDS = {', '};', '', 'module.exports = { INTENT_KEYWORDS };', ''].join(
-      '\n'
-    )
+    ['const INTENT_KEYWORDS = {', '};', '', 'module.exports = { INTENT_KEYWORDS };', ''].join('\n')
   );
   writeFile(
     path.join(claudeDir, 'lib', 'routing', 'routing-table-intent-agents.cjs'),
     breakRoutingAgents
       ? ['const INTENT_TO_AGENT = {', '};', '', '// broken on purpose', ''].join('\n')
-      : [
-          'const INTENT_TO_AGENT = {',
-          '};',
-          '',
-          'module.exports = { INTENT_TO_AGENT };',
-          '',
-        ].join('\n')
+      : ['const INTENT_TO_AGENT = {', '};', '', 'module.exports = { INTENT_TO_AGENT };', ''].join(
+          '\n'
+        )
   );
   writeFile(
     path.join(claudeDir, 'tools', 'cli', 'generate-skill-index.cjs'),
@@ -76,7 +72,7 @@ function createTempProject({
       "const path = require('node:path');",
       "const projectRoot = path.resolve(__dirname, '..', '..', '..');",
       "const indexPath = path.join(projectRoot, '.claude', 'config', 'skill-index.json');",
-      "fs.mkdirSync(path.dirname(indexPath), { recursive: true });",
+      'fs.mkdirSync(path.dirname(indexPath), { recursive: true });',
       "fs.writeFileSync(indexPath, JSON.stringify({ generated: true }, null, 2), 'utf8');",
       '',
     ].join('\n')
@@ -116,10 +112,7 @@ test('generateSkillContent populates required skill frontmatter fields', () => {
 
   const frontmatter = parseFrontmatter(content);
   assert.equal(frontmatter.name, 'quality-sentinel');
-  assert.equal(
-    frontmatter.description,
-    'Ensures creator artifacts pass strict validation gates.'
-  );
+  assert.equal(frontmatter.description, 'Ensures creator artifacts pass strict validation gates.');
   assert.equal(frontmatter.version, '2.3.4');
   assert.deepEqual(frontmatter.agents, ['developer', 'qa']);
   assert.equal(frontmatter.category, 'quality');

@@ -16,12 +16,14 @@ test('settings.json wires PostToolUseFailure hooks for metrics and reflection', 
     .map(h => h.command)
     .filter(Boolean);
 
+  const normalizedCommands = commands.map(command => command.replace(/^cd\s+"[^"]+"\s+&&\s+/, ''));
+
   assert.ok(
-    commands.includes('node .claude/hooks/metrics/post-tool-metrics-unified.cjs'),
+    normalizedCommands.includes('node .claude/hooks/metrics/post-tool-metrics-unified.cjs'),
     'PostToolUseFailure should invoke metrics hook'
   );
   assert.ok(
-    commands.includes('node .claude/hooks/reflection/unified-reflection-handler.cjs'),
+    normalizedCommands.includes('node .claude/hooks/reflection/unified-reflection-handler.cjs'),
     'PostToolUseFailure should invoke reflection hook for task/bash failures'
   );
 });

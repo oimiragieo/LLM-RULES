@@ -10,13 +10,14 @@ const {
   CONTRACT_MARKER,
   REQUIRED_SKILLS_BASE,
   REQUIRED_SKILLS_SEARCH_HEAVY,
+  TOKEN_SAVER_SKILL,
   isSearchHeavyAgent,
   scanAgentFiles,
 } = require('../../lib/agents/agent-template-contract.cjs');
 
 const TOKEN_SAVER_SECTION = `## Token Saver Invocation Rule
 
-Use \`Skill({ skill: 'context-compressor' })\` only when context pressure is high and normal search+read would over-expand tokens.
+Use \`Skill({ skill: '${TOKEN_SAVER_SKILL}' })\` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 - You need to synthesize across many search hits (typically 10+ candidates).

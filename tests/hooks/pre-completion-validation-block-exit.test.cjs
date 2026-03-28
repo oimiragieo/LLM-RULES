@@ -105,6 +105,8 @@ test('hook subprocess exits with code 2 when artifact validation fails (regressi
   // Use a temp dir path that we can assert doesn't exist as a real agent
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pre-completion-regression-'));
   fs.rmdirSync(tmpDir); // remove it so the path is guaranteed nonexistent
+  const creatorValidatorPath = path.join(os.tmpdir(), 'creator-ecosystem-pass.cjs');
+  fs.writeFileSync(creatorValidatorPath, 'process.exit(0);\n', 'utf8');
 
   // Craft a hook input where filesModified contains a fake agent path
   // detectArtifacts will pick it up because it contains /.claude/agents/
@@ -126,7 +128,9 @@ test('hook subprocess exits with code 2 when artifact validation fails (regressi
     },
   };
 
-  const result = runHook(hookInput);
+  const result = runHook(hookInput, {
+    CREATOR_ECOSYSTEM_VALIDATOR_PATH: creatorValidatorPath,
+  });
 
   // The critical assertion: must exit 2, not 0
   // Before fix: process.exit(0) appeared before process.exit(2), making exit(2) unreachable
@@ -144,6 +148,8 @@ test('hook subprocess exits with code 2 when artifact validation fails (regressi
     result.stdout.includes('PRE-COMPLETION VALIDATION FAILED'),
     'Block message must appear in hook stdout'
   );
+
+  fs.rmSync(creatorValidatorPath, { force: true });
 });
 
 // ---------------------------------------------------------------------------

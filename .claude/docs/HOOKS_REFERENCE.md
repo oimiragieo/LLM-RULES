@@ -43,14 +43,17 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `startup-failopen-audit.cjs`: Audits startup fail-open state.
 - `session-budget-watchdog.cjs`: Monitors session token budget and limits.
 - `ccusage-statusline.cjs`: Displays real-time token usage and cost from ccusage CLI on each prompt. Fail-open (advisory).
+- `channel-auto-start.cjs`: Starts configured channel infrastructure on prompt submit when needed.
 
 ### PreToolUse
 
 - `pre-tool-unified.cjs`: Global tool usage policy and execution limits.
 - `bash-pretool-bundle.cjs`: Bundle for Bash validation (includes command validator, injection validator, null sanitizer).
+- `dlp-pretool.cjs`: Applies DLP screening to Bash, Write/Edit, WebFetch, and WebSearch payloads before execution.
 - `hybrid-search-enforcer.cjs`: Enforces hybrid search rules for Grep.
 - `routing-guard.cjs`: Core router enforcement (Planner-first, specialist-first).
 - `write-pretool-bundle.cjs`: Consolidated bundle for Write/Edit tools (includes creator guard, contract validator, etc.).
+- `flight-recorder-schema-gate.cjs`: Validates write/edit payloads against the flight-recorder schema gate before mutation.
 - `conflict-detector.cjs`: Detects Write conflicts.
 - `evolution-state-guard.cjs`: Enforces valid EVOLVE workflow state machine transitions (blocks invalid Write transitions to evolution-state.json).
 - `research-enforcement.cjs`: Enforces research phase completion before artifact creation (Write/Edit to agent/skill/workflow paths blocked without 3+ research entries).
@@ -58,6 +61,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `reflection-step0-guard.cjs`: Blocks TaskList if reflections are pending.
 - `heartbeat-step05-check.cjs`: Enforces TaskList check after Step 0.5 heartbeat check.
 - `spawn-prompt-validator.cjs`: Validates Task spawn prompts.
+- `pre-spawn-hook-check.cjs`: Verifies Agent-tool hook files remain loadable before agent execution.
 - `taskupdate-contract-validator.cjs`: Validates TaskUpdate inputs.
 - `pre-completion-validation.cjs`: Validates task completion quality.
 - `creator-compliance-validator.cjs`: Validates post-creation compliance.
@@ -70,11 +74,14 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 
 - `hook-error-detector.cjs`: Detects hook validation and execution errors.
 - `post-tool-metrics-unified.cjs`: Collects metrics, tracks errors, detects anomalies.
+- `recurring-issue-detector.cjs`: Correlates repeated hook and tool failures to surface recurring operational issues.
 - `post-task-unified.cjs`: Task completion tracking, learning extraction, trend snapshots, and worktree garbage collection.
 - `post-completion-chain.cjs`: Runs after task completion.
 - `reflection-cleanup.cjs`: Performs cleanup after reflections.
 - `artifact-scoring-ledger-hook.cjs`: Updates artifact scores.
 - `post-creation-integration.cjs`: Validates post-creation integration.
+- `post-pipeline-token-report.cjs`: Emits a token usage report when a pipeline-final TaskUpdate drains the session.
+- `post-pipeline-self-review.cjs`: Queues milestone self-review reflections when a pipeline-final TaskUpdate completes.
 - `subagent-citation-guard.cjs`: Validates subagent citations in task outputs.
 - `sync-memory-index.cjs`: Syncs memory indices after edits.
 - `agent-registry-auto-refresh.cjs`: Refreshes registry when agents are modified.

@@ -26,10 +26,10 @@ test('tokens command contains getTodayTotals reference', () => {
   assert.ok(content.includes('getTodayTotals'), 'Expected tokens.md to reference "getTodayTotals"');
 });
 
-test('tokens command is valid markdown starting with #', () => {
+test('tokens command includes a markdown heading', () => {
   const content = fs.readFileSync(COMMAND_PATH, 'utf8');
   assert.ok(
-    content.trimStart().startsWith('#'),
-    'Expected tokens.md to start with a # heading (valid markdown)'
+    /^#\s+/m.test(content),
+    'Expected tokens.md to contain a # heading after any optional frontmatter'
   );
 });

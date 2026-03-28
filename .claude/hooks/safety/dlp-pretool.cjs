@@ -18,7 +18,7 @@
 'use strict';
 
 const {
-  parseHookInputSync,
+  parseHookInputAsync,
   getToolName,
   getToolInput,
   formatResult,
@@ -109,14 +109,13 @@ function scanValue(value, fieldPath, depth) {
   return matches;
 }
 
-// --- Main ---
-try {
+async function main() {
   const mode = getEnforcementMode('DLP_PRETOOL_ENFORCEMENT', 'warn');
   if (mode === 'off') {
     process.exit(0);
   }
 
-  const input = parseHookInputSync();
+  const input = await parseHookInputAsync();
   if (!input) {
     process.exit(0);
   }
@@ -173,7 +172,10 @@ try {
   );
 
   process.exit(0);
-} catch (err) {
+}
+
+// --- Main ---
+main().catch(err => {
   // Fail-closed for security hooks
   process.stderr.write(
     JSON.stringify({
@@ -186,4 +188,4 @@ try {
   // In warn mode, fail-open on errors to not block workflow
   const mode = process.env.DLP_PRETOOL_ENFORCEMENT || 'warn';
   process.exit(mode === 'block' ? 2 : 0);
-}
+});

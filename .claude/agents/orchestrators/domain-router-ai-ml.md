@@ -39,19 +39,19 @@ design, NLP, benchmarking, MCP, and model operations.
 
 ## Agent Roster
 
-| Agent | Use when | Key signals |
-| --- | --- | --- |
-| `ai-ml-specialist` | General machine learning work | model training, PyTorch, TensorFlow |
-| `llm-architect` | LLM systems and RAG architecture | RAG, LangChain, serving, orchestration |
-| `data-engineer` | Data pipelines and ETL | ETL, ingestion, warehouses, data movement |
-| `data-scientist` | Analysis and statistics | analysis, metrics, notebooks, visualization |
-| `ml-researcher` | Research-heavy ML work | papers, experiments, novel techniques |
-| `mlops-engineer` | Deployment and ML operations | MLflow, model registry, deployment, monitoring |
-| `nlp-engineer` | Natural language processing tasks | NLP, tokenization, NER, sentiment |
-| `prompt-engineer` | Prompt design and optimization | prompts, few-shot, eval prompts |
-| `mcp-developer` | Model Context Protocol work | MCP, server/client protocol integrations |
-| `multi-llm-consultant` | Comparing or coordinating multiple LLMs | compare models, LLM council, model selection |
-| `model-benchmarker-agent` | Benchmarking and evaluation | benchmark, evaluate model, scorecards |
+| Agent                     | Use when                                | Key signals                                    |
+| ------------------------- | --------------------------------------- | ---------------------------------------------- |
+| `ai-ml-specialist`        | General machine learning work           | model training, PyTorch, TensorFlow            |
+| `llm-architect`           | LLM systems and RAG architecture        | RAG, LangChain, serving, orchestration         |
+| `data-engineer`           | Data pipelines and ETL                  | ETL, ingestion, warehouses, data movement      |
+| `data-scientist`          | Analysis and statistics                 | analysis, metrics, notebooks, visualization    |
+| `ml-researcher`           | Research-heavy ML work                  | papers, experiments, novel techniques          |
+| `mlops-engineer`          | Deployment and ML operations            | MLflow, model registry, deployment, monitoring |
+| `nlp-engineer`            | Natural language processing tasks       | NLP, tokenization, NER, sentiment              |
+| `prompt-engineer`         | Prompt design and optimization          | prompts, few-shot, eval prompts                |
+| `mcp-developer`           | Model Context Protocol work             | MCP, server/client protocol integrations       |
+| `multi-llm-consultant`    | Comparing or coordinating multiple LLMs | compare models, LLM council, model selection   |
+| `model-benchmarker-agent` | Benchmarking and evaluation             | benchmark, evaluate model, scorecards          |
 
 ## Default Gateway Agent
 
@@ -80,6 +80,7 @@ point to a narrower specialist.
 Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
+
 - You need to compare several AI/ML subdomains before routing.
 - Retrieved context is too large to keep directly in working memory.
 - You are preparing an evidence-heavy routing handoff.

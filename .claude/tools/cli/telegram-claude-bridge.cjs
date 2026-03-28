@@ -16,6 +16,7 @@
  */
 
 const { spawnSync } = require('child_process');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 /**
  * Resolve the claude CLI binary path once at startup.
@@ -145,7 +146,7 @@ function invokeClaudeAsync(bin, prompt, chatId, outboxPath, opts) {
     const outbox = [];
     try {
       const existing = fs.readFileSync(outboxPath, 'utf8');
-      const parsed = JSON.parse(existing);
+      const parsed = safeParseJSON(existing, []);
       if (Array.isArray(parsed)) outbox.push(...parsed);
     } catch (_) {
       // outbox may not exist yet — that is fine
@@ -173,7 +174,7 @@ function invokeClaudeAsync(bin, prompt, chatId, outboxPath, opts) {
       const outbox = [];
       try {
         const existing = fs2.readFileSync(outboxPath, 'utf8');
-        const parsed = JSON.parse(existing);
+        const parsed = safeParseJSON(existing, []);
         if (Array.isArray(parsed)) outbox.push(...parsed);
       } catch (readErr) {
         process.stderr.write(`invokeClaudeAsync outbox read error: ${readErr.message}\n`);

@@ -120,6 +120,7 @@ function checkSentinel(expectedLoops = 8) {
   let data;
   try {
     const raw = fs.readFileSync(sentinelPath, 'utf8');
+    JSON.parse(raw);
     data = safeParseJSON(raw);
   } catch (_parseErr) {
     return { valid: false, reason: 'corrupt', data: null };
@@ -188,7 +189,9 @@ function checkSessionPing() {
   if (!fs.existsSync(pingPath)) return { valid: false, reason: 'missing', data: null };
   let data;
   try {
-    data = safeParseJSON(fs.readFileSync(pingPath, 'utf8'));
+    const raw = fs.readFileSync(pingPath, 'utf8');
+    JSON.parse(raw);
+    data = safeParseJSON(raw);
   } catch (_) {
     return { valid: false, reason: 'corrupt', data: null };
   }

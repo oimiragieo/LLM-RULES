@@ -102,7 +102,10 @@ describe('semantic-router', () => {
 
     const cases = [
       ['Build a React component with responsive Tailwind styles.', 'domain-router-web-frontend'],
-      ['Design a FastAPI service with Pydantic models and async endpoints.', 'domain-router-backend'],
+      [
+        'Design a FastAPI service with Pydantic models and async endpoints.',
+        'domain-router-backend',
+      ],
       ['Plan a Kubernetes rollout with Helm and ArgoCD.', 'domain-router-infra'],
       ['Evaluate a RAG pipeline with embeddings and retrieval tuning.', 'domain-router-ai-ml'],
       ['Create a sprint planning and backlog prioritization strategy.', 'domain-router-product'],

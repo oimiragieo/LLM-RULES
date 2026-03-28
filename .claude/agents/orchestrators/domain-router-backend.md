@@ -39,22 +39,22 @@ Swift server work, Node.js, Rails, Spring Boot, Django, and FastAPI requests.
 
 ## Agent Roster
 
-| Agent | Use when | Key signals |
-| --- | --- | --- |
-| `python-pro` | General Python backend work | Python, pytest, packaging, typing |
-| `typescript-pro` | General TypeScript backend work | TypeScript, types, decorators, tsconfig |
-| `golang-pro` | Go services and tooling | Go, goroutines, go.mod, interfaces |
-| `rust-pro` | Rust backend or systems work | Rust, Cargo, ownership, lifetimes |
-| `java-pro` | General Java backend work | Java, JVM, Maven, Gradle |
-| `kotlin-pro` | Kotlin backend work | Kotlin, coroutines, Ktor |
-| `php-pro` | PHP frameworks and services | PHP, Composer, Laravel, Symfony |
-| `dotnet-pro` | .NET and C# services | .NET, C#, ASP.NET, csproj |
-| `swift-pro` | Swift outside the iOS domain | Swift Package Manager, server-side Swift |
-| `nodejs-pro` | Node.js framework work | Node.js, Express, NestJS, package scripts |
-| `rails-pro` | Ruby on Rails work | Rails, ActiveRecord, Gemfile |
-| `spring-boot-pro` | Spring Boot and Spring Framework work | Spring Boot, Spring MVC, application.yml |
-| `django-developer` | Django and DRF work | Django, manage.py, urls.py, DRF |
-| `fastapi-pro` | FastAPI and Starlette work | FastAPI, Pydantic, ASGI |
+| Agent              | Use when                              | Key signals                               |
+| ------------------ | ------------------------------------- | ----------------------------------------- |
+| `python-pro`       | General Python backend work           | Python, pytest, packaging, typing         |
+| `typescript-pro`   | General TypeScript backend work       | TypeScript, types, decorators, tsconfig   |
+| `golang-pro`       | Go services and tooling               | Go, goroutines, go.mod, interfaces        |
+| `rust-pro`         | Rust backend or systems work          | Rust, Cargo, ownership, lifetimes         |
+| `java-pro`         | General Java backend work             | Java, JVM, Maven, Gradle                  |
+| `kotlin-pro`       | Kotlin backend work                   | Kotlin, coroutines, Ktor                  |
+| `php-pro`          | PHP frameworks and services           | PHP, Composer, Laravel, Symfony           |
+| `dotnet-pro`       | .NET and C# services                  | .NET, C#, ASP.NET, csproj                 |
+| `swift-pro`        | Swift outside the iOS domain          | Swift Package Manager, server-side Swift  |
+| `nodejs-pro`       | Node.js framework work                | Node.js, Express, NestJS, package scripts |
+| `rails-pro`        | Ruby on Rails work                    | Rails, ActiveRecord, Gemfile              |
+| `spring-boot-pro`  | Spring Boot and Spring Framework work | Spring Boot, Spring MVC, application.yml  |
+| `django-developer` | Django and DRF work                   | Django, manage.py, urls.py, DRF           |
+| `fastapi-pro`      | FastAPI and Starlette work            | FastAPI, Pydantic, ASGI                   |
 
 ## Default Gateway Agent
 
@@ -88,6 +88,7 @@ contain a stronger language or framework signal.
 Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
+
 - You need to compare multiple backend ecosystems before routing.
 - Retrieved context is too large to keep directly in working memory.
 - You are preparing an evidence-heavy routing handoff.

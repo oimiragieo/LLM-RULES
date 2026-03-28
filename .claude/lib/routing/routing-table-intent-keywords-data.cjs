@@ -714,13 +714,7 @@ const INTENT_KEYWORDS = {
     'doc integrity',
     'reference audit',
   ],
-  'release-guardian': [
-    'release-guardian',
-    'release',
-    'guardian',
-    'safety',
-    'specialist',
-  ],
+  'release-guardian': ['release-guardian', 'release', 'guardian', 'safety', 'specialist'],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

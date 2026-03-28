@@ -24,6 +24,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -590,7 +591,10 @@ function loadAnalyticsStore() {
   try {
     if (fs.existsSync(ANALYTICS_PATH)) {
       const raw = fs.readFileSync(ANALYTICS_PATH, 'utf-8');
-      return JSON.parse(raw);
+      const parsed = safeParseJSON(raw, null);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed;
+      }
     }
   } catch {
     // Fall through to default

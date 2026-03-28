@@ -112,6 +112,18 @@ Based on autonomous loop governance patterns:
 | Stall threshold   | 3 consecutive similar outputs | `stallThreshold`   |
 | Similarity cutoff | 0.80 (80% content overlap)    | `similarityCutoff` |
 
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when loop evidence or search results become too large to keep directly in working context.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to compare many iteration outputs or diagnostics at once.
+- Search results, logs, or review artifacts are too large to read directly without blowing the budget.
+- You are preparing an evidence-heavy escalation or completion summary that needs compact grounding.
+
+Do NOT invoke token-saver for normal short loops or small file sets; use direct reads and the standard search flow first.
+
 ## Workflow
 
 ### Step 0: Load Skills (FIRST)

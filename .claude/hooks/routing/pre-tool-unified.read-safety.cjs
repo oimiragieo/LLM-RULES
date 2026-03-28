@@ -76,10 +76,7 @@ const SEARCH_EVIDENCE_PATTERNS = [
   /\bhybrid-search\b/i,
   /\bsemantic-search\b/i,
 ];
-const TOKEN_SAVER_SKILL_NAMES = new Set([
-  'context-compressor',
-  'token-saver-context-compression',
-]);
+const TOKEN_SAVER_SKILL_NAMES = new Set(['context-compressor', 'token-saver-context-compression']);
 const CORE_MEMORY_FILES = new Set([
   path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'patterns.json'),
   path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'gotchas.json'),

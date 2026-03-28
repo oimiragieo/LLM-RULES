@@ -12,12 +12,13 @@
 const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const SETTINGS_PATH = path.resolve(__dirname, '..', '..', 'settings.json');
 
 function getPostToolUseHooks() {
   try {
-    const settings = JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf8'));
+    const settings = safeParseJSON(fs.readFileSync(SETTINGS_PATH, 'utf8'), {});
     const hooks = settings.hooks || {};
     const postHooks = hooks.PostToolUse || [];
     const result = [];

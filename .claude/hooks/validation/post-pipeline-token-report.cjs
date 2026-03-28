@@ -7,6 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 let input = '';
@@ -54,7 +55,7 @@ process.stdin.on('end', () => {
     process.stderr.write('\n=== TOKEN USAGE REPORT (auto-triggered by post-pipeline hook) ===\n');
     try {
       const statusPath = path.join(
-        process.cwd(),
+        PROJECT_ROOT,
         '.claude',
         'context',
         'runtime',

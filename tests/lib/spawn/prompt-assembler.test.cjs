@@ -437,13 +437,19 @@ describe('prompt-assembler', () => {
         basePrompt: SAMPLE_BASE_PROMPT,
       });
 
-      // AVAILABLE_TOOLS should appear after warning box, before PROJECT CONTEXT
+      // AVAILABLE_TOOLS (Static) should appear before warning box and PROJECT CONTEXT (Volatile)
       const toolsIndex = enhanced.indexOf('AVAILABLE_TOOLS');
       const contextIndex = enhanced.indexOf('PROJECT CONTEXT');
       const warningIndex = enhanced.indexOf('WARNING');
 
-      assert.ok(toolsIndex > warningIndex, 'AVAILABLE_TOOLS should be after warning box');
-      assert.ok(toolsIndex < contextIndex, 'AVAILABLE_TOOLS should be before PROJECT CONTEXT');
+      assert.ok(
+        toolsIndex < warningIndex,
+        'AVAILABLE_TOOLS should be before warning box (caching optimization)'
+      );
+      assert.ok(
+        toolsIndex < contextIndex,
+        'AVAILABLE_TOOLS should be before PROJECT CONTEXT (caching optimization)'
+      );
     });
 
     it('should include dynamic behaviour rules when present', () => {

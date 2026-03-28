@@ -12,37 +12,113 @@ const {
 } = require('../../../.claude/lib/routing/sub-router-selection.cjs');
 
 const CANONICAL_CASES = [
-  ['domain-router-web-frontend', 'Build a React dashboard component with Tailwind CSS.', 'frontend-pro'],
-  ['domain-router-web-frontend', 'Migrate our Next.js app router page to use server components.', 'nextjs-pro'],
-  ['domain-router-web-frontend', 'Fix our Angular standalone component and NgRx selector wiring.', 'angular-pro'],
-  ['domain-router-web-frontend', 'Debug the SvelteKit load function for this route.', 'sveltekit-expert'],
-  ['domain-router-web-frontend', 'Customize the WordPress Gutenberg block for our marketing site.', 'wordpress-master'],
+  [
+    'domain-router-web-frontend',
+    'Build a React dashboard component with Tailwind CSS.',
+    'frontend-pro',
+  ],
+  [
+    'domain-router-web-frontend',
+    'Migrate our Next.js app router page to use server components.',
+    'nextjs-pro',
+  ],
+  [
+    'domain-router-web-frontend',
+    'Fix our Angular standalone component and NgRx selector wiring.',
+    'angular-pro',
+  ],
+  [
+    'domain-router-web-frontend',
+    'Debug the SvelteKit load function for this route.',
+    'sveltekit-expert',
+  ],
+  [
+    'domain-router-web-frontend',
+    'Customize the WordPress Gutenberg block for our marketing site.',
+    'wordpress-master',
+  ],
 
-  ['domain-router-backend', 'Implement a FastAPI service with Pydantic request validation.', 'fastapi-pro'],
-  ['domain-router-backend', 'Fix the Django REST Framework viewset and manage.py command.', 'django-developer'],
-  ['domain-router-backend', 'Add a Spring Boot controller and application.yml profile.', 'spring-boot-pro'],
-  ['domain-router-backend', 'Refactor our NestJS module and Express middleware chain.', 'nodejs-pro'],
+  [
+    'domain-router-backend',
+    'Implement a FastAPI service with Pydantic request validation.',
+    'fastapi-pro',
+  ],
+  [
+    'domain-router-backend',
+    'Fix the Django REST Framework viewset and manage.py command.',
+    'django-developer',
+  ],
+  [
+    'domain-router-backend',
+    'Add a Spring Boot controller and application.yml profile.',
+    'spring-boot-pro',
+  ],
+  [
+    'domain-router-backend',
+    'Refactor our NestJS module and Express middleware chain.',
+    'nodejs-pro',
+  ],
   ['domain-router-backend', 'Optimize this Rust service that uses Cargo workspaces.', 'rust-pro'],
 
   ['domain-router-mobile', 'Build an iOS SwiftUI settings screen in Xcode.', 'ios-pro'],
   ['domain-router-mobile', 'Fix the Android Jetpack Compose navigation graph.', 'android-pro'],
   ['domain-router-mobile', 'Add a new Expo React Native onboarding flow.', 'expo-mobile-developer'],
 
-  ['domain-router-ai-ml', 'Design a RAG pipeline with LangChain and a vector store.', 'llm-architect'],
-  ['domain-router-ai-ml', 'Optimize our few-shot system prompt for better answers.', 'prompt-engineer'],
+  [
+    'domain-router-ai-ml',
+    'Design a RAG pipeline with LangChain and a vector store.',
+    'llm-architect',
+  ],
+  [
+    'domain-router-ai-ml',
+    'Optimize our few-shot system prompt for better answers.',
+    'prompt-engineer',
+  ],
   ['domain-router-ai-ml', 'Deploy the model with MLflow and a model registry.', 'mlops-engineer'],
-  ['domain-router-ai-ml', 'Improve named entity recognition and tokenization for this NLP pipeline.', 'nlp-engineer'],
+  [
+    'domain-router-ai-ml',
+    'Improve named entity recognition and tokenization for this NLP pipeline.',
+    'nlp-engineer',
+  ],
 
-  ['domain-router-infra', 'Debug our Kubernetes Helm release in the cluster.', 'kubernetes-specialist'],
-  ['domain-router-infra', 'Refactor the Terraform IaC module for this environment.', 'terraform-engineer'],
-  ['domain-router-infra', 'Handle the PagerDuty outage mitigation plan for this service.', 'incident-responder'],
+  [
+    'domain-router-infra',
+    'Debug our Kubernetes Helm release in the cluster.',
+    'kubernetes-specialist',
+  ],
+  [
+    'domain-router-infra',
+    'Refactor the Terraform IaC module for this environment.',
+    'terraform-engineer',
+  ],
+  [
+    'domain-router-infra',
+    'Handle the PagerDuty outage mitigation plan for this service.',
+    'incident-responder',
+  ],
 
-  ['domain-router-security', 'Run an OWASP penetration test for XSS and SQL injection.', 'penetration-tester'],
-  ['domain-router-security', 'Profile latency regressions with a load test.', 'performance-engineer'],
+  [
+    'domain-router-security',
+    'Run an OWASP penetration test for XSS and SQL injection.',
+    'penetration-tester',
+  ],
+  [
+    'domain-router-security',
+    'Profile latency regressions with a load test.',
+    'performance-engineer',
+  ],
 
   ['domain-router-arch-data', 'Design a GraphQL federation boundary for this API.', 'graphql-pro'],
-  ['domain-router-product', 'Synthesize the user interview findings into research insights.', 'ux-researcher'],
-  ['domain-router-niche', 'Audit the Solidity smart contract for this DeFi protocol.', 'web3-blockchain-expert'],
+  [
+    'domain-router-product',
+    'Synthesize the user interview findings into research insights.',
+    'ux-researcher',
+  ],
+  [
+    'domain-router-niche',
+    'Audit the Solidity smart contract for this DeFi protocol.',
+    'web3-blockchain-expert',
+  ],
 ];
 
 const AMBIGUOUS_CASES = [

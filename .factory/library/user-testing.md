@@ -12,6 +12,7 @@ Primary surface: CLI test commands and validation scripts.
 No browser-based UI to test.
 
 ### Available Test Commands
+
 - `pnpm test` — Unit/integration tests (~9000 tests, ~2-3 min)
 - `pnpm test:framework` — Framework tests (~3250 tests, ~2-3 min)
 - `pnpm test:all` — Combined (runs both in parallel)

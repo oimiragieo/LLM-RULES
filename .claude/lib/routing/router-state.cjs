@@ -327,9 +327,7 @@ function saveStateWithRetry(updates, maxRetries = MAX_RETRIES) {
 
       // Step 3: Resolve updates, supporting updater callbacks for session-aware resets.
       const resolvedUpdates =
-        typeof updates === 'function'
-          ? updates({ ...getDefaultState(), ...current })
-          : updates;
+        typeof updates === 'function' ? updates({ ...getDefaultState(), ...current }) : updates;
 
       if (
         resolvedUpdates == null ||

@@ -1,0 +1,13 @@
+{
+  "milestone": "router-fixes",
+  "overridden": true,
+  "justification": "All 4 scrutiny failures are confirmed pre-existing and unrelated to M1 routing fixes: (1) BM25Indexer 'Search fallback resilience' TypeError - code-indexing untouched by M1, (2) tokens.md command file missing - commands untouched by M1, (3) skill-index.json/agent-registry.json formatting - dirty from pre-existing auto-regeneration, not M1 changes, (4) validate-full-sequential.cjs MODULE_NOT_FOUND - pre-existing path errors in validation script. All M1 feature-specific tests pass: 105 routing lib tests, 150+ routing-guard hook tests, validate:routing green. Subagent investigation confirmed zero overlap between M1 changed files and failure locations.",
+  "appliedUpdates": [],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Added pre-existing failure documentation for BM25, tokens.md, format:check, and validate-full-sequential",
+      "applied": true
+    }
+  ]
+}

@@ -367,13 +367,44 @@ class BM25Indexer {
    * @returns {BM25Indexer} Restored indexer instance
    */
   static fromJSON(json) {
-    const indexer = new BM25Indexer({ k1: json.k1, b: json.b });
-    indexer.documents = json.documents;
-    indexer.idf = json.idf;
-    indexer.avgDocLength = json.avgDocLength;
-    indexer.N = json.N;
-    indexer.docMetadata = json.docMetadata || {};
-    indexer._idfDirty = false; // IDF already calculated in serialized data
+    const source = json && typeof json === 'object' && !Array.isArray(json) ? json : {};
+    const indexer = new BM25Indexer({
+      k1: Number.isFinite(source.k1) ? source.k1 : undefined,
+      b: Number.isFinite(source.b) ? source.b : undefined,
+    });
+
+    indexer.documents = Array.isArray(source.documents)
+      ? source.documents
+          .filter(doc => doc && typeof doc === 'object' && typeof doc.id === 'string')
+          .map(doc => ({
+            id: doc.id,
+            length: Number.isFinite(doc.length) ? doc.length : 0,
+            termFreqs:
+              doc.termFreqs && typeof doc.termFreqs === 'object' && !Array.isArray(doc.termFreqs)
+                ? doc.termFreqs
+                : {},
+          }))
+      : [];
+
+    indexer.idf =
+      source.idf && typeof source.idf === 'object' && !Array.isArray(source.idf) ? source.idf : {};
+
+    const computedAvgDocLength =
+      indexer.documents.length > 0
+        ? indexer.documents.reduce((sum, doc) => sum + doc.length, 0) / indexer.documents.length
+        : 0;
+
+    indexer.avgDocLength = Number.isFinite(source.avgDocLength)
+      ? source.avgDocLength
+      : computedAvgDocLength;
+    indexer.N = Number.isInteger(source.N) && source.N >= 0 ? source.N : indexer.documents.length;
+    indexer.docMetadata =
+      source.docMetadata &&
+      typeof source.docMetadata === 'object' &&
+      !Array.isArray(source.docMetadata)
+        ? source.docMetadata
+        : {};
+    indexer._idfDirty = Object.keys(indexer.idf).length === 0;
     return indexer;
   }
 }

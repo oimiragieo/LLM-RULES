@@ -13,6 +13,7 @@ Hook currently uses `start "" cmd /k "..."` → opens new WINDOW. User wants a T
 ## Task 2: Create "windows-terminal" skill
 
 Document terminal management patterns learned this session:
+
 - `wt new-tab` vs `start` (tab vs window)
 - `-w 0` targeting current WT window
 - VBScript AppActivate by PID via WMI
@@ -25,6 +26,7 @@ Document terminal management patterns learned this session:
 User wants Exa research on multi-agent CLI framework best practices, Telegram bot patterns, channel architecture.
 
 ## Accomplished this session:
+
 - Fixed channel-auto-start: direct claude spawn, no channel-manager indirection
 - Fixed VBScript: WMI PID targeting instead of window title
 - Confirmed Telegram end-to-end working

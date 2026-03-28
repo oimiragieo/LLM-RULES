@@ -62,11 +62,9 @@ function deriveSkillTags({ tags, name, description, category }) {
 
   const derived = [
     ...normalizeListInput(name, []).flatMap(item => item.split('-')),
-    ...(
-      String(description || '')
-        .toLowerCase()
-        .match(/\b[a-z0-9-]{4,}\b/g) || []
-    ),
+    ...(String(description || '')
+      .toLowerCase()
+      .match(/\b[a-z0-9-]{4,}\b/g) || []),
     ...normalizeListInput(category, []).flatMap(item => item.split(/\s+/)),
   ]
     .map(slugifyToken)

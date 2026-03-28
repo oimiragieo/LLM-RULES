@@ -10,6 +10,7 @@ NOTE: Startup and cleanup are handled by `worker-base`. This skill defines the W
 ## When to Use This Skill
 
 Features involving:
+
 - A2A server auto-start hook creation
 - A2A client library development
 - Router-to-A2A integration
@@ -62,6 +63,7 @@ Features involving:
    - Handle task results and failures
 
 8. **Run tests:**
+
    ```
    node --test tests/lib/a2a/*.test.cjs
    ```
@@ -82,19 +84,30 @@ Features involving:
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "node --test tests/lib/a2a/a2a-server.test.cjs", "exitCode": 0, "observation": "All server tests pass" },
-      { "command": "node --test tests/lib/a2a/a2a-client.test.cjs", "exitCode": 0, "observation": "All client tests pass" },
+      {
+        "command": "node --test tests/lib/a2a/a2a-server.test.cjs",
+        "exitCode": 0,
+        "observation": "All server tests pass"
+      },
+      {
+        "command": "node --test tests/lib/a2a/a2a-client.test.cjs",
+        "exitCode": 0,
+        "observation": "All client tests pass"
+      },
       { "command": "pnpm test:framework", "exitCode": 0, "observation": "No regressions" }
     ],
     "interactiveChecks": []
   },
   "tests": {
     "added": [
-      { "file": "tests/lib/a2a/a2a-client.test.cjs", "cases": [
-        {"name": "discovers remote agent card", "verifies": "client discovery"},
-        {"name": "sends task via JSON-RPC", "verifies": "task creation"},
-        {"name": "polls task status", "verifies": "status retrieval"}
-      ]}
+      {
+        "file": "tests/lib/a2a/a2a-client.test.cjs",
+        "cases": [
+          { "name": "discovers remote agent card", "verifies": "client discovery" },
+          { "name": "sends task via JSON-RPC", "verifies": "task creation" },
+          { "name": "polls task status", "verifies": "status retrieval" }
+        ]
+      }
     ],
     "coverage": "A2A server, client, and autostart hook covered"
   },

@@ -588,4 +588,3 @@ This skill is part of the unified artifact lifecycle. For complete multi-agent o
 - Security review and validation phases
 
 ---
-

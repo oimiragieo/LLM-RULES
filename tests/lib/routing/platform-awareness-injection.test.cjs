@@ -5,7 +5,10 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const ROUTER_STATE_MODULE = path.resolve(__dirname, '../../../.claude/lib/routing/router-state.cjs');
+const ROUTER_STATE_MODULE = path.resolve(
+  __dirname,
+  '../../../.claude/lib/routing/router-state.cjs'
+);
 const HOOK_MODULE = path.resolve(
   __dirname,
   '../../../.claude/hooks/routing/user-prompt-unified.core.cjs'
@@ -46,20 +49,26 @@ test('Platform Awareness Rule Injection', async t => {
     }
   });
 
-  await t.test('should save platform awareness rule to state when planning is detected', async () => {
-    const prompt = 'Please integrate this github repo: https://github.com/test/repo';
-    const routerState = loadRouterState();
-    const { checkRouterEnforcement } = loadHook();
+  await t.test(
+    'should save platform awareness rule to state when planning is detected',
+    async () => {
+      const prompt = 'Please integrate this github repo: https://github.com/test/repo';
+      const routerState = loadRouterState();
+      const { checkRouterEnforcement } = loadHook();
 
-    routerState.resetToRouterMode();
-    await checkRouterEnforcement({ prompt });
+      routerState.resetToRouterMode();
+      await checkRouterEnforcement({ prompt });
 
-    const state = routerState.getState();
-    assert.ok(state.platformAwarenessRule, 'platformAwarenessRule should exist in state');
-    assert.ok(state.platformAwarenessRule.includes('YOU ARE ON WINDOWS'), 'Should mention Windows');
-    assert.ok(
-      state.platformAwarenessRule.includes('USE NATIVE PATHS'),
-      'Should mention native paths'
-    );
-  });
+      const state = routerState.getState();
+      assert.ok(state.platformAwarenessRule, 'platformAwarenessRule should exist in state');
+      assert.ok(
+        state.platformAwarenessRule.includes('YOU ARE ON WINDOWS'),
+        'Should mention Windows'
+      );
+      assert.ok(
+        state.platformAwarenessRule.includes('USE NATIVE PATHS'),
+        'Should mention native paths'
+      );
+    }
+  );
 });

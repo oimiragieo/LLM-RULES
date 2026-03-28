@@ -39,13 +39,13 @@ and mobile UX evaluation.
 
 ## Agent Roster
 
-| Agent | Use when | Key signals |
-| --- | --- | --- |
-| `ios-pro` | iOS and SwiftUI work | iOS, Xcode, SwiftUI, UIKit |
-| `android-pro` | Android and Jetpack work | Android, Kotlin, Compose, Gradle |
-| `expo-mobile-developer` | React Native and Expo work | Expo, React Native, Metro, EAS |
-| `tauri-desktop-developer` | Tauri desktop applications | Tauri, desktop shell, Rust + web UI |
-| `mobile-ux-reviewer` | Mobile product UX review | mobile UX, app flows, usability review |
+| Agent                     | Use when                   | Key signals                            |
+| ------------------------- | -------------------------- | -------------------------------------- |
+| `ios-pro`                 | iOS and SwiftUI work       | iOS, Xcode, SwiftUI, UIKit             |
+| `android-pro`             | Android and Jetpack work   | Android, Kotlin, Compose, Gradle       |
+| `expo-mobile-developer`   | React Native and Expo work | Expo, React Native, Metro, EAS         |
+| `tauri-desktop-developer` | Tauri desktop applications | Tauri, desktop shell, Rust + web UI    |
+| `mobile-ux-reviewer`      | Mobile product UX review   | mobile UX, app flows, usability review |
 
 ## Default Gateway Agent
 
@@ -76,6 +76,7 @@ native-platform or desktop signal.
 Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
+
 - You need to compare several platform signals before routing.
 - Retrieved context is too large to keep directly in working memory.
 - You are preparing an evidence-heavy routing handoff.

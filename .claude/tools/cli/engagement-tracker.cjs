@@ -22,6 +22,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // --- Constants ---
 
@@ -101,7 +102,10 @@ Examples:
 function loadBaselines() {
   try {
     if (fs.existsSync(BASELINES_PATH)) {
-      return JSON.parse(fs.readFileSync(BASELINES_PATH, 'utf8'));
+      const parsed = safeParseJSON(fs.readFileSync(BASELINES_PATH, 'utf8'), {});
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed;
+      }
     }
   } catch {
     // Corrupted file; start fresh
@@ -120,7 +124,7 @@ function saveBaselines(baselines) {
 function loadConfig() {
   try {
     if (fs.existsSync(CONFIG_PATH)) {
-      return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      return safeParseJSON(fs.readFileSync(CONFIG_PATH, 'utf8'), null);
     }
   } catch {
     // Missing or corrupted config

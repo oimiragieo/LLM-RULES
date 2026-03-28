@@ -39,13 +39,13 @@ responsive design, component systems, SPA, SSR, and general frontend requests.
 
 ## Agent Roster
 
-| Agent | Use when | Key signals |
-| --- | --- | --- |
-| `frontend-pro` | General frontend and UI work | React, Vue, CSS, HTML, components, responsive UI |
-| `nextjs-pro` | Next.js and Vercel-specific work | Next.js, App Router, RSC, Vercel |
-| `angular-pro` | Angular application work | Angular, RxJS, NgModules, standalone components |
-| `sveltekit-expert` | Svelte and SvelteKit work | Svelte, SvelteKit, load functions, actions |
-| `wordpress-master` | WordPress and CMS work | WordPress, themes, plugins, CMS customization |
+| Agent              | Use when                         | Key signals                                      |
+| ------------------ | -------------------------------- | ------------------------------------------------ |
+| `frontend-pro`     | General frontend and UI work     | React, Vue, CSS, HTML, components, responsive UI |
+| `nextjs-pro`       | Next.js and Vercel-specific work | Next.js, App Router, RSC, Vercel                 |
+| `angular-pro`      | Angular application work         | Angular, RxJS, NgModules, standalone components  |
+| `sveltekit-expert` | Svelte and SvelteKit work        | Svelte, SvelteKit, load functions, actions       |
+| `wordpress-master` | WordPress and CMS work           | WordPress, themes, plugins, CMS customization    |
 
 ## Default Gateway Agent
 
@@ -75,6 +75,7 @@ signal a framework-specific specialist.
 Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
+
 - You need to synthesize across many frontend constraints or examples.
 - Retrieved context is too large to keep directly in working memory.
 - You are preparing an evidence-heavy routing handoff.

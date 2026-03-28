@@ -4,6 +4,7 @@
 // PostToolUse hook: Auto-trigger milestone self-review when pipeline drains
 const fs = require('fs');
 const path = require('path');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 let input = '';
@@ -121,12 +122,5 @@ process.stdin.on('end', () => {
 });
 
 function findProjectRoot() {
-  let dir = process.cwd();
-  for (let i = 0; i < 10; i++) {
-    if (fs.existsSync(path.join(dir, '.claude'))) return dir;
-    const parent = path.dirname(dir);
-    if (parent === dir) break;
-    dir = parent;
-  }
-  return null;
+  return fs.existsSync(path.join(PROJECT_ROOT, '.claude')) ? PROJECT_ROOT : null;
 }

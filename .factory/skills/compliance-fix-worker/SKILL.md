@@ -10,6 +10,7 @@ NOTE: Startup and cleanup are handled by `worker-base`. This skill defines the W
 ## When to Use This Skill
 
 Features that involve:
+
 - Fixing test failures (unit, framework, integration, audit)
 - Updating configuration files (agent-skill-matrix.json, routing tables, settings.json)
 - Resolving validation failures (validate:full, metrics:ci, format:check)
@@ -21,9 +22,11 @@ Features that involve:
 1. **Read the feature description carefully.** Identify every file that needs changing and every test that must pass.
 
 2. **Run the SPECIFIC failing tests first** to capture exact error messages:
+
    ```
    node --test <specific-test-file>
    ```
+
    Record the exact assertion failures.
 
 3. **Write or update tests BEFORE fixing** (TDD red-green):
@@ -37,18 +40,22 @@ Features that involve:
    - Use `safeParseJSON` for all JSON parsing
 
 5. **Run targeted tests** to confirm your fix works:
+
    ```
    node --test <specific-test-file>
    ```
 
 6. **Run broader test suites** to check for regressions:
+
    ```
    pnpm test
    pnpm test:framework
    ```
+
    If either shows new failures, debug and fix before proceeding.
 
 7. **Run validators** relevant to your changes:
+
    ```
    pnpm validate:full
    pnpm validate:routing
@@ -67,8 +74,16 @@ Features that involve:
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "node --test tests/hooks/pre-tool-unified-read-safety.test.cjs", "exitCode": 0, "observation": "All 18 tests pass including both compressor name cases" },
-      { "command": "node --test tests/audit/agent-search-compliance.test.cjs", "exitCode": 0, "observation": "Agent count matches 119, all compliance checks pass" },
+      {
+        "command": "node --test tests/hooks/pre-tool-unified-read-safety.test.cjs",
+        "exitCode": 0,
+        "observation": "All 18 tests pass including both compressor name cases"
+      },
+      {
+        "command": "node --test tests/audit/agent-search-compliance.test.cjs",
+        "exitCode": 0,
+        "observation": "Agent count matches 119, all compliance checks pass"
+      },
       { "command": "pnpm test", "exitCode": 0, "observation": "9000+ tests, 0 failures" },
       { "command": "pnpm test:framework", "exitCode": 0, "observation": "3250+ tests, 0 failures" },
       { "command": "pnpm validate:full", "exitCode": 0, "observation": "All validators pass" }
@@ -77,7 +92,12 @@ Features that involve:
   },
   "tests": {
     "added": [
-      { "file": "tests/hooks/pre-tool-unified-read-safety.test.cjs", "cases": [{"name": "accepts token-saver-context-compression", "verifies": "backward compat"}] }
+      {
+        "file": "tests/hooks/pre-tool-unified-read-safety.test.cjs",
+        "cases": [
+          { "name": "accepts token-saver-context-compression", "verifies": "backward compat" }
+        ]
+      }
     ],
     "coverage": "All read-safety, compliance, and routing tests pass"
   },

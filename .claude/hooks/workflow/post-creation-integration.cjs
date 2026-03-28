@@ -78,7 +78,9 @@ function findQualityPlaceholders(content) {
   lines.forEach((line, index) => {
     QUALITY_PLACEHOLDER_PATTERNS.forEach(pattern => {
       if (pattern.test(line)) {
-        issues.push(`Placeholder "${pattern.source.replace(/\\b/g, '')}" found on line ${index + 1}`);
+        issues.push(
+          `Placeholder "${pattern.source.replace(/\\b/g, '')}" found on line ${index + 1}`
+        );
       }
     });
   });
@@ -681,9 +683,7 @@ async function processCreatorCompletion(hookData) {
     messageParts.push(`Artifact ${artifactId} appears fully integrated.`);
   }
   if (hasQualityIssues) {
-    messageParts.push(
-      `Quality validation failed: ${qualityValidation.issues.join(' | ')}`
-    );
+    messageParts.push(`Quality validation failed: ${qualityValidation.issues.join(' | ')}`);
   }
   const message = `${hasMustHaveGaps || hasQualityIssues ? '⚠️' : '✅'} ${messageParts.join(' ')}`;
   const hookPayload = {

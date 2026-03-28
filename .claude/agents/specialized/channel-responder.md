@@ -31,6 +31,18 @@ context_files:
 
 Use `ripgrep` skill as preferred search. Grep is a fallback for simple pattern matching only. Prefer `pnpm search:code` for semantic queries.
 
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets or logs are too large to keep directly in working context.
+- You are preparing an evidence-heavy status summary and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks; use regular search plus direct reads instead.
+
 ## Enforcement Hooks
 
 The following hooks govern this agent's behavior at runtime:

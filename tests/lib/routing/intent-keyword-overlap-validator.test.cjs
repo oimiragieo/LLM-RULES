@@ -12,16 +12,14 @@ const validatorPath = path.join(
   'validation',
   'validate-intent-keyword-overlap.cjs'
 );
-const { INTENT_KEYWORDS } = require(path.join(
-  projectRoot,
-  '.claude',
-  'lib',
-  'routing',
-  'routing-table-intent-keywords-data.cjs'
-));
+const { INTENT_KEYWORDS } = require(
+  path.join(projectRoot, '.claude', 'lib', 'routing', 'routing-table-intent-keywords-data.cjs')
+);
 
 test('routing intent keywords do not include tmp-routing ghost agents', () => {
-  const ghostAgentIds = Object.keys(INTENT_KEYWORDS).filter(agentId => agentId.startsWith('tmp-routing-'));
+  const ghostAgentIds = Object.keys(INTENT_KEYWORDS).filter(agentId =>
+    agentId.startsWith('tmp-routing-')
+  );
   assert.deepStrictEqual(ghostAgentIds, []);
 });
 

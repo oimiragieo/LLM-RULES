@@ -73,7 +73,7 @@ function checkFileExists(id, filePath, severity) {
  */
 function checkTestPasses(id, command, severity) {
   try {
-    execSync(command, { stdio: 'pipe', timeout: 30000, shell: false });
+    execSync(command, { stdio: 'pipe', timeout: 30000, shell: false, windowsHide: true });
     return { id, passed: true, severity };
   } catch (err) {
     return {

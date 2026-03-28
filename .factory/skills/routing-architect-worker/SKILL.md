@@ -51,22 +51,46 @@ Use for features that build the hierarchical routing architecture: creating sub-
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "node --test tests/lib/routing/sub-router-agents.test.cjs", "exitCode": 0, "observation": "15 tests passing: 9 frontmatter checks, 9 roster completeness checks, 5 disambiguation checks" },
-      { "command": "pnpm validate:routing", "exitCode": 0, "observation": "Routing consistency validated with sub-routers included" },
-      { "command": "HIERARCHICAL_ROUTING=off pnpm test:framework", "exitCode": 0, "observation": "All framework tests pass with flag off, no regressions" }
+      {
+        "command": "node --test tests/lib/routing/sub-router-agents.test.cjs",
+        "exitCode": 0,
+        "observation": "15 tests passing: 9 frontmatter checks, 9 roster completeness checks, 5 disambiguation checks"
+      },
+      {
+        "command": "pnpm validate:routing",
+        "exitCode": 0,
+        "observation": "Routing consistency validated with sub-routers included"
+      },
+      {
+        "command": "HIERARCHICAL_ROUTING=off pnpm test:framework",
+        "exitCode": 0,
+        "observation": "All framework tests pass with flag off, no regressions"
+      }
     ],
     "interactiveChecks": [
-      { "action": "Verified all 109 agents reachable: union of direct routes + meta-orchestration + sub-router rosters", "observed": "109/109 agents covered. No orphaned agents." },
-      { "action": "Verified no agent in multiple sub-routers", "observed": "All pairwise intersections empty." }
+      {
+        "action": "Verified all 109 agents reachable: union of direct routes + meta-orchestration + sub-router rosters",
+        "observed": "109/109 agents covered. No orphaned agents."
+      },
+      {
+        "action": "Verified no agent in multiple sub-routers",
+        "observed": "All pairwise intersections empty."
+      }
     ]
   },
   "tests": {
     "added": [
-      { "file": "tests/lib/routing/sub-router-agents.test.cjs", "cases": [
-        { "name": "all 9 sub-router files exist with valid frontmatter", "verifies": "VAL-HIER-001, VAL-HIER-002" },
-        { "name": "each sub-router has complete agent roster", "verifies": "VAL-HIER-003" },
-        { "name": "each sub-router declares default gateway", "verifies": "VAL-HIER-004" }
-      ]}
+      {
+        "file": "tests/lib/routing/sub-router-agents.test.cjs",
+        "cases": [
+          {
+            "name": "all 9 sub-router files exist with valid frontmatter",
+            "verifies": "VAL-HIER-001, VAL-HIER-002"
+          },
+          { "name": "each sub-router has complete agent roster", "verifies": "VAL-HIER-003" },
+          { "name": "each sub-router declares default gateway", "verifies": "VAL-HIER-004" }
+        ]
+      }
     ]
   },
   "discoveredIssues": []

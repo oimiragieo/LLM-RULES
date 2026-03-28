@@ -99,7 +99,10 @@ describe('generate-routing-prototypes CLI', () => {
     assert.strictEqual(typeof payload.dimensions, 'number');
 
     for (const subRouter of DOMAIN_SUB_ROUTERS) {
-      assert.ok(Array.isArray(payload.prototypes?.[subRouter]), `missing ${subRouter} in repo file`);
+      assert.ok(
+        Array.isArray(payload.prototypes?.[subRouter]),
+        `missing ${subRouter} in repo file`
+      );
       assert.strictEqual(
         payload.prototypes[subRouter].length,
         payload.dimensions,

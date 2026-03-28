@@ -20,12 +20,14 @@
 
 const fs = require('fs');
 const path = require('path');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 function run() {
   try {
-    // Determine project root (cwd when hook runs)
-    const projectRoot = process.cwd();
+    const projectRoot = fs.existsSync(path.join(process.cwd(), '.claude'))
+      ? process.cwd()
+      : PROJECT_ROOT;
     const runtimeDir = path.join(projectRoot, '.claude', 'context', 'runtime');
 
     // Read session ID
@@ -112,10 +114,8 @@ function run() {
     }
 
     // Check if sentinel already exists for this specific tier
-    const sentinelPath = path.join(
-      runtimeDir,
-      `session-handoff-reminder-${applicableTier.level}.txt`
-    );
+    const sentinelThreshold = `${Math.round((budget * applicableTier.tierTarget) / 1000)}K`;
+    const sentinelPath = path.join(runtimeDir, `session-handoff-reminder-${sentinelThreshold}.txt`);
 
     if (fs.existsSync(sentinelPath)) {
       // Already fired for this exact tier — do not re-fire

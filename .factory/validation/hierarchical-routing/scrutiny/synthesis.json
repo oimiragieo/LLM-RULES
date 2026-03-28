@@ -1,0 +1,7 @@
+{
+  "milestone": "hierarchical-routing",
+  "overridden": true,
+  "justification": "All M2 feature-specific tests pass comprehensively: 142 sub-router tests, 153+ routing tests, 21 backward-compat/reachability tests, 37 sub-router selection tests, 96 routing-guard tests, 24 intent-model tests. validate:routing green. Full agent reachability (119/119) verified. Sub-router prototype cosine similarity max 0.734 < 0.85 threshold. Pre-existing framework failures (42 unrelated suites) remain unchanged from M1 baseline - confirmed not caused by M2 changes.",
+  "appliedUpdates": [],
+  "suggestedGuidanceUpdates": []
+}

@@ -17,6 +17,7 @@ const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Determine PROJECT_ROOT (walk up from this script's location)
 const findProjectRoot = () => {
@@ -59,6 +60,44 @@ for (let i = 0; i < args.length; i++) {
  */
 function normalizePath(p) {
   return p.replace(/\\/g, '/');
+}
+
+const VALIDATION_EDGE_TARGETS = new Set([
+  'skill',
+  'agent',
+  'hook',
+  'workflow',
+  'template',
+  'rule',
+  'catalog',
+  'registry',
+]);
+
+/**
+ * Extract explicit artifact validation targets from schema metadata.
+ *
+ * Schemas may opt in with:
+ * {
+ *   "x-artifact-graph-targets": ["skill", "agent"]
+ * }
+ *
+ * This keeps the validates edge set bounded and avoids broad title-based fan-out.
+ *
+ * @param {string} content
+ * @returns {string[]}
+ */
+function extractSchemaValidationTargets(content) {
+  const parsed = safeParseJSON(content);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return [];
+  }
+
+  const rawTargets = parsed['x-artifact-graph-targets'];
+  if (!Array.isArray(rawTargets)) {
+    return [];
+  }
+
+  return [...new Set(rawTargets.filter(target => VALIDATION_EDGE_TARGETS.has(target)))];
 }
 
 /**
@@ -452,18 +491,13 @@ function detectEdges(artifacts) {
 
     // Edge Type 5: validates (schema -> artifact types)
     if (artifact.type === 'schema') {
-      // Look for title or description mentioning artifact types
-      const typeRefs = content.matchAll(/"title":\s*"([^"]*?)"/g);
-      for (const match of typeRefs) {
-        const title = match[1].toLowerCase();
-        if (title.includes('skill')) {
-          for (const target of artifacts) {
-            if (target.type === 'skill') {
-              edges.push({ from: artifact.id, to: target.id, type: 'validates', status: 'active' });
-            }
+      const targetTypes = extractSchemaValidationTargets(content);
+      for (const targetType of targetTypes) {
+        for (const target of artifacts) {
+          if (target.type === targetType) {
+            edges.push({ from: artifact.id, to: target.id, type: 'validates', status: 'active' });
           }
         }
-        // Similar for other types (agent, workflow, etc.)
       }
     }
   }

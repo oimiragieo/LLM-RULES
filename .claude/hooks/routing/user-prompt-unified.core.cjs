@@ -42,10 +42,10 @@ const {
   classifyIntent: classifyIntent,
   classifyDomain: classifyDomain,
   isHierarchicalRoutingEnabled: isHierarchicalRoutingEnabled,
-} = libRequire(
-  path.join('routing', 'intent-classifier.cjs')
+} = libRequire(path.join('routing', 'intent-classifier.cjs'));
+const { getFlatRoutingFallbackAgent } = libRequire(
+  path.join('routing', 'sub-router-selection.cjs')
 );
-const { getFlatRoutingFallbackAgent } = libRequire(path.join('routing', 'sub-router-selection.cjs'));
 const { getAgentForCapability: getAgentForCapability } = libRequire(
   path.join('routing', 'agent-registry-resolver.cjs')
 );
@@ -371,10 +371,37 @@ function syncEvolutionSpawnReminder(options = {}) {
   trivial: ['hello', 'hi', 'thanks', 'thank you', 'bye', 'goodbye', 'what is', 'how are you'],
   low: ['typo', 'rename', 'fix typo', 'small fix', 'minor fix', 'quick fix'],
   high: ['integrate', 'integration', 'migrate', 'migration', 'architecture', 'refactor'],
-  epic: ['rewrite', 'rebuild', 'new system', 'platform', 'framework', 'all hooks', 'all agents', 'system-wide'],
-  documentationTargets: ['readme', 'docs', 'documentation', 'guide', 'tutorial', 'changelog', 'api doc', 'markdown'],
+  epic: [
+    'rewrite',
+    'rebuild',
+    'new system',
+    'platform',
+    'framework',
+    'all hooks',
+    'all agents',
+    'system-wide',
+  ],
+  documentationTargets: [
+    'readme',
+    'docs',
+    'documentation',
+    'guide',
+    'tutorial',
+    'changelog',
+    'api doc',
+    'markdown',
+  ],
   narrowTargets: ['module', 'file', 'function', 'class', 'method', 'component', 'readme'],
-  broadTargets: ['system', 'platform', 'framework', 'codebase', 'repo', 'all hooks', 'all agents', 'entire'],
+  broadTargets: [
+    'system',
+    'platform',
+    'framework',
+    'codebase',
+    'repo',
+    'all hooks',
+    'all agents',
+    'entire',
+  ],
   securityDomains: [
     'auth',
     'authentication',
@@ -848,7 +875,10 @@ function maybeAutoCompress(tokenStatus) {
 }
 
 function promptHasAnySignal(promptLower, phrases) {
-  return Array.isArray(phrases) && phrases.some(phrase => promptLower.includes(String(phrase).toLowerCase()));
+  return (
+    Array.isArray(phrases) &&
+    phrases.some(phrase => promptLower.includes(String(phrase).toLowerCase()))
+  );
 }
 
 function countPromptSignals(promptLower, phrases) {
@@ -886,7 +916,10 @@ function detectPrimaryAction(promptLower) {
   const highSignals = countPromptSignals(promptLower, COMPLEXITY_KEYWORDS.high);
   const epicSignals = countPromptSignals(promptLower, COMPLEXITY_KEYWORDS.epic);
   const securitySignals = countPromptSignals(promptLower, COMPLEXITY_KEYWORDS.securityDomains);
-  const hasDocumentationTarget = promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.documentationTargets);
+  const hasDocumentationTarget = promptHasAnySignal(
+    promptLower,
+    COMPLEXITY_KEYWORDS.documentationTargets
+  );
   const hasBroadTarget = promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.broadTargets);
   const hasNarrowTarget = promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.narrowTargets);
   const hasImplementationVerb =
@@ -895,14 +928,17 @@ function detectPrimaryAction(promptLower) {
   const hasReviewVerb =
     primaryAction === 'review' || promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.reviewVerbs);
   const hasRewriteVerb =
-    primaryAction === 'rewrite' || promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.rewriteVerbs);
+    primaryAction === 'rewrite' ||
+    promptHasAnySignal(promptLower, COMPLEXITY_KEYWORDS.rewriteVerbs);
   const isTrivialFix =
     primaryAction === 'trivial_fix' ||
     (primaryAction === 'rename' && !hasBroadTarget) ||
     lowSignals > 0;
-  const documentationOnly = hasDocumentationTarget && !hasImplementationVerb && securitySignals === 0;
+  const documentationOnly =
+    hasDocumentationTarget && !hasImplementationVerb && securitySignals === 0;
   const securityHeavy =
-    securitySignals >= 2 || promptHasAnySignal(promptLower, ['oauth2', 'jwt', 'rbac', 'refresh token']);
+    securitySignals >= 2 ||
+    promptHasAnySignal(promptLower, ['oauth2', 'jwt', 'rbac', 'refresh token']);
 
   let complexity = trivialSignals > 0 ? 'trivial' : 'low';
 

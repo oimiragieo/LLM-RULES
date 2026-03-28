@@ -40,18 +40,18 @@ infrastructure, SRE, incidents, and Microsoft 365 administration.
 
 ## Agent Roster
 
-| Agent | Use when | Key signals |
-| --- | --- | --- |
-| `devops` | General DevOps and CI/CD work | deploy, pipeline, container, release |
-| `devops-troubleshooter` | Production debugging | broken deploy, runtime issue, flaky ops |
-| `kubernetes-specialist` | Kubernetes platform work | Kubernetes, Helm, ArgoCD, cluster |
-| `terraform-engineer` | Terraform IaC work | Terraform, modules, state, providers |
-| `terragrunt-pro` | Terragrunt structure and orchestration | Terragrunt, DRY IaC stacks |
-| `azure-infra-pro` | Azure-specific infra work | Azure, ARM, Bicep-adjacent infra concerns |
-| `windows-infra-pro` | Windows infrastructure work | Windows Server, PowerShell, AD-adjacent ops |
-| `sre-engineer` | Reliability engineering | SLO, error budget, reliability, observability |
-| `incident-responder` | Live incidents and outages | outage, incident, on-call, recovery |
-| `m365-admin` | Microsoft 365 administration | M365, Exchange, SharePoint, Entra admin |
+| Agent                   | Use when                               | Key signals                                   |
+| ----------------------- | -------------------------------------- | --------------------------------------------- |
+| `devops`                | General DevOps and CI/CD work          | deploy, pipeline, container, release          |
+| `devops-troubleshooter` | Production debugging                   | broken deploy, runtime issue, flaky ops       |
+| `kubernetes-specialist` | Kubernetes platform work               | Kubernetes, Helm, ArgoCD, cluster             |
+| `terraform-engineer`    | Terraform IaC work                     | Terraform, modules, state, providers          |
+| `terragrunt-pro`        | Terragrunt structure and orchestration | Terragrunt, DRY IaC stacks                    |
+| `azure-infra-pro`       | Azure-specific infra work              | Azure, ARM, Bicep-adjacent infra concerns     |
+| `windows-infra-pro`     | Windows infrastructure work            | Windows Server, PowerShell, AD-adjacent ops   |
+| `sre-engineer`          | Reliability engineering                | SLO, error budget, reliability, observability |
+| `incident-responder`    | Live incidents and outages             | outage, incident, on-call, recovery           |
+| `m365-admin`            | Microsoft 365 administration           | M365, Exchange, SharePoint, Entra admin       |
 
 ## Default Gateway Agent
 
@@ -84,6 +84,7 @@ specific platform, reliability, or incident signal.
 Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
+
 - You need to compare several infrastructure specialties before routing.
 - Retrieved context is too large to keep directly in working memory.
 - You are preparing an evidence-heavy routing handoff.

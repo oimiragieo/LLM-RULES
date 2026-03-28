@@ -378,11 +378,15 @@ const fs = require('fs');
 const path = require('path');
 
 const batPath = path.join(tmpDir, '_launcher.bat').replace(/\//g, '\\');
-fs.writeFileSync(batPath, [
-  '@echo off',
-  `wt -w 0 new-tab --title "MySession" -- cmd /k "cd /d "${rootWin}" && my-command"`,
-  `del "%~f0" 2>nul`,
-].join('\r\n'), 'utf8');  // MUST be \r\n for bat files
+fs.writeFileSync(
+  batPath,
+  [
+    '@echo off',
+    `wt -w 0 new-tab --title "MySession" -- cmd /k "cd /d "${rootWin}" && my-command"`,
+    `del "%~f0" 2>nul`,
+  ].join('\r\n'),
+  'utf8'
+); // MUST be \r\n for bat files
 
 try {
   execFileSync('cmd', ['/c', batPath], {
@@ -398,6 +402,7 @@ try {
 ```
 
 Why this works:
+
 1. `cmd.exe /c bat` runs the bat synchronously
 2. `wt` or `start` inside the bat creates a process in a NEW process tree
 3. The bat returns immediately after `wt`/`start` fires
@@ -420,6 +425,7 @@ start "" /D "C:\mydir" cmd /k "my-command"
 
 When sending keystrokes to a specific window (e.g., auto-accepting a confirmation
 prompt), you MUST target by PID. Window titles are unreliable because:
+
 - WT overrides `title` command and `start` title with the running process name
 - Multiple windows may have the same title (e.g., two "claude" sessions)
 
@@ -551,15 +557,15 @@ Node handles backslash paths correctly.
 
 ## Quick Reference: Anti-Pattern Table
 
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| `spawn({detached:true})` in hooks | Windows kills child on hook exit | Write bat + `execFileSync` |
-| `AppActivate("title")` | Multiple windows match | Target by PID via WMI |
-| `start "Title" cmd /k` from hook | Opens new window, not tab | `wt -w 0 new-tab --` in bat |
-| `.join('\n')` for bat files | cmd.exe fails | `.join('\r\n')` (CRLF) |
-| `cmd /c path\file.bat` from bash | Bash eats backslashes | Use Node.js `execFileSync` |
-| `title MyTitle` in cmd | WT overrides with process name | Don't rely on titles, use PID |
-| `process.exit(1)` to block hook | Exit 1 = error, NOT block | Use `process.exit(2)` |
+| Pattern                           | Problem                          | Fix                           |
+| --------------------------------- | -------------------------------- | ----------------------------- |
+| `spawn({detached:true})` in hooks | Windows kills child on hook exit | Write bat + `execFileSync`    |
+| `AppActivate("title")`            | Multiple windows match           | Target by PID via WMI         |
+| `start "Title" cmd /k` from hook  | Opens new window, not tab        | `wt -w 0 new-tab --` in bat   |
+| `.join('\n')` for bat files       | cmd.exe fails                    | `.join('\r\n')` (CRLF)        |
+| `cmd /c path\file.bat` from bash  | Bash eats backslashes            | Use Node.js `execFileSync`    |
+| `title MyTitle` in cmd            | WT overrides with process name   | Don't rely on titles, use PID |
+| `process.exit(1)` to block hook   | Exit 1 = error, NOT block        | Use `process.exit(2)`         |
 
 ## Related Files (agent-studio)
 

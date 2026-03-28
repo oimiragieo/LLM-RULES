@@ -16,11 +16,13 @@ Use for features that verify system behavior after routing, hierarchical, and cr
 1. **Read the feature description** — it specifies which subsystem to verify and what assertions to validate.
 
 2. **Run baseline tests first** — Before investigating anything:
+
    ```
    pnpm test
    pnpm test:framework
    pnpm validate:routing
    ```
+
    Record results. If baseline tests fail, document failures as discovered issues.
 
 3. **Verify the specific subsystem** — Follow the feature's verification steps:
@@ -73,28 +75,57 @@ Use for features that verify system behavior after routing, hierarchical, and cr
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "pnpm test:framework", "exitCode": 0, "observation": "All framework tests pass including memory tests" },
-      { "command": "pnpm metrics:memory:slo:ci", "exitCode": 0, "observation": "Memory SLOs within bounds: write p95 < 120ms, lock wait p95 < 40ms" },
-      { "command": "pnpm metrics:memory:audit", "exitCode": 0, "observation": "No memory leaks detected" },
-      { "command": "pnpm validate:full:parallel", "exitCode": 0, "observation": "Full validation suite passes" }
+      {
+        "command": "pnpm test:framework",
+        "exitCode": 0,
+        "observation": "All framework tests pass including memory tests"
+      },
+      {
+        "command": "pnpm metrics:memory:slo:ci",
+        "exitCode": 0,
+        "observation": "Memory SLOs within bounds: write p95 < 120ms, lock wait p95 < 40ms"
+      },
+      {
+        "command": "pnpm metrics:memory:audit",
+        "exitCode": 0,
+        "observation": "No memory leaks detected"
+      },
+      {
+        "command": "pnpm validate:full:parallel",
+        "exitCode": 0,
+        "observation": "Full validation suite passes"
+      }
     ],
     "interactiveChecks": [
-      { "action": "Verified STM write creates file at expected path", "observed": "stm/session_current.json created with correct schema" },
-      { "action": "Verified MTM cap at 10 sessions after 15 consolidations", "observed": "getMTMSessions().length === 10 after 15th consolidation, 5 oldest summarized to LTM" }
+      {
+        "action": "Verified STM write creates file at expected path",
+        "observed": "stm/session_current.json created with correct schema"
+      },
+      {
+        "action": "Verified MTM cap at 10 sessions after 15 consolidations",
+        "observed": "getMTMSessions().length === 10 after 15th consolidation, 5 oldest summarized to LTM"
+      }
     ]
   },
   "tests": {
     "added": [
-      { "file": "tests/lib/memory/memory-tiers-verification.test.cjs", "cases": [
-        { "name": "STM write and read round-trip", "verifies": "VAL-SYS-001" },
-        { "name": "MTM consolidation from STM", "verifies": "VAL-SYS-002" },
-        { "name": "LTM promotion from MTM", "verifies": "VAL-SYS-003" },
-        { "name": "MTM capacity enforcement at 10", "verifies": "VAL-SYS-004" }
-      ]}
+      {
+        "file": "tests/lib/memory/memory-tiers-verification.test.cjs",
+        "cases": [
+          { "name": "STM write and read round-trip", "verifies": "VAL-SYS-001" },
+          { "name": "MTM consolidation from STM", "verifies": "VAL-SYS-002" },
+          { "name": "LTM promotion from MTM", "verifies": "VAL-SYS-003" },
+          { "name": "MTM capacity enforcement at 10", "verifies": "VAL-SYS-004" }
+        ]
+      }
     ]
   },
   "discoveredIssues": [
-    { "severity": "low", "description": "evictStaleLTMFiles() uses hardcoded 30-day retention instead of configurable LTM_RETENTION_DAYS env var", "suggestedFix": "Add LTM_RETENTION_DAYS env var with 30 default in eviction function" }
+    {
+      "severity": "low",
+      "description": "evictStaleLTMFiles() uses hardcoded 30-day retention instead of configurable LTM_RETENTION_DAYS env var",
+      "suggestedFix": "Add LTM_RETENTION_DAYS env var with 30 default in eviction function"
+    }
   ]
 }
 ```

@@ -69,9 +69,8 @@ async function predict(prompt, options = {}) {
         const routerScore = cosineSimilarity(embedding, routerVector);
         const thresholdScore =
           results.length >= topK
-            ? results
-                .slice()
-                .sort((a, b) => b.score - a.score)[Math.max(0, topK - 1)]?.score ?? routerScore
+            ? (results.slice().sort((a, b) => b.score - a.score)[Math.max(0, topK - 1)]?.score ??
+              routerScore)
             : routerScore;
 
         const boostedScore = Math.max(routerScore, thresholdScore + 0.001);

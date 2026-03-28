@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const ROOT = path.resolve(__dirname, '../../..');
 const learnPath = path.join(ROOT, '.claude/context/memory/learnings.md');
@@ -58,19 +59,15 @@ try {
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed) continue;
-        try {
-          const parsed = JSON.parse(trimmed);
-          if (parsed && parsed.type === 'evolution-dispatch' && parsed.skill) {
-            const argsStr =
-              typeof parsed.args === 'string' ? parsed.args : JSON.stringify(parsed.args || {});
-            actions.push({
-              type: 'task_create',
-              subject: parsed.skill,
-              description: `Process self-healing evolution request (trigger: ${parsed.trigger}). Execute with args: ${argsStr}`,
-            });
-          }
-        } catch (_e) {
-          // Ignore non-JSON lines or parse errors
+        const parsed = safeParseJSON(trimmed, null);
+        if (parsed && parsed.type === 'evolution-dispatch' && parsed.skill) {
+          const argsStr =
+            typeof parsed.args === 'string' ? parsed.args : JSON.stringify(parsed.args || {});
+          actions.push({
+            type: 'task_create',
+            subject: parsed.skill,
+            description: `Process self-healing evolution request (trigger: ${parsed.trigger}). Execute with args: ${argsStr}`,
+          });
         }
       }
     }

@@ -20,6 +20,7 @@ const path = require('path');
 /* eslint-disable max-lines */
 const fs = require('fs');
 const os = require('os');
+const yaml = require('js-yaml');
 
 // Test file paths
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -613,10 +614,20 @@ describe('token monitoring and cost risk', () => {
     'runtime',
     'token-slo-state.json'
   );
+  const budgetTrackerPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'runtime',
+    'budget-tracker.json'
+  );
 
   beforeEach(() => {
     if (fs.existsSync(tokenStatePath)) {
       fs.unlinkSync(tokenStatePath);
+    }
+    if (fs.existsSync(budgetTrackerPath)) {
+      fs.unlinkSync(budgetTrackerPath);
     }
   });
 
@@ -624,11 +635,19 @@ describe('token monitoring and cost risk', () => {
     if (fs.existsSync(tokenStatePath)) {
       fs.unlinkSync(tokenStatePath);
     }
+    if (fs.existsSync(budgetTrackerPath)) {
+      fs.unlinkSync(budgetTrackerPath);
+    }
   });
 
   it('should downgrade to conservative mode after repeated token breaches', () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
-    const largePrompt = 'x'.repeat(210000); // ~52.5k tokens by estimator
+    const config = yaml.load(
+      fs.readFileSync(path.join(process.cwd(), '.claude', 'config.yaml'), 'utf8')
+    );
+    const maxSessionTokens = Number(config?.token_monitoring?.max_session_tokens || 0);
+    const charsToExceedLimit = Math.ceil((maxSessionTokens * 1.05) / 0.75);
+    const largePrompt = 'x'.repeat(charsToExceedLimit);
 
     const first = unified.checkTokenMonitoring({ prompt: largePrompt });
     const second = unified.checkTokenMonitoring({ prompt: largePrompt });

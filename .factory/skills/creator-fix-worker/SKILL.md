@@ -64,22 +64,49 @@ Use for features that fix the skill-creator and agent-creator systems: refactori
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "wc -l .claude/skills/skill-creator/SKILL.md", "exitCode": 0, "observation": "487 lines" },
-      { "command": "ls .claude/skills/skill-creator/docs/", "exitCode": 0, "observation": "4 files: research-gate.md, security-scan-checklist.md, enterprise-bundle-details.md, typed-search-dorks.md" },
-      { "command": "pnpm validate:full:parallel", "exitCode": 0, "observation": "All validation passes, no broken references" }
+      {
+        "command": "wc -l .claude/skills/skill-creator/SKILL.md",
+        "exitCode": 0,
+        "observation": "487 lines"
+      },
+      {
+        "command": "ls .claude/skills/skill-creator/docs/",
+        "exitCode": 0,
+        "observation": "4 files: research-gate.md, security-scan-checklist.md, enterprise-bundle-details.md, typed-search-dorks.md"
+      },
+      {
+        "command": "pnpm validate:full:parallel",
+        "exitCode": 0,
+        "observation": "All validation passes, no broken references"
+      }
     ],
     "interactiveChecks": [
-      { "action": "Verified SKILL.md still contains core creation steps 1-8", "observed": "All 8 steps present with relative links to reference docs" },
-      { "action": "Verified no content was deleted by comparing total line count", "observed": "Original 2161 lines = 487 (SKILL.md) + 1674 (docs/). All content accounted for." }
+      {
+        "action": "Verified SKILL.md still contains core creation steps 1-8",
+        "observed": "All 8 steps present with relative links to reference docs"
+      },
+      {
+        "action": "Verified no content was deleted by comparing total line count",
+        "observed": "Original 2161 lines = 487 (SKILL.md) + 1674 (docs/). All content accounted for."
+      }
     ]
   },
   "tests": {
     "added": [
-      { "file": "tests/skills/skill-creator-refactor.test.cjs", "cases": [
-        { "name": "SKILL.md is <= 500 lines", "verifies": "VAL-CRT-001 line count" },
-        { "name": "docs/ subfolder exists with reference files", "verifies": "VAL-CRT-001 reference extraction" },
-        { "name": "SKILL.md contains relative links to docs/", "verifies": "VAL-CRT-010 relative references" }
-      ]}
+      {
+        "file": "tests/skills/skill-creator-refactor.test.cjs",
+        "cases": [
+          { "name": "SKILL.md is <= 500 lines", "verifies": "VAL-CRT-001 line count" },
+          {
+            "name": "docs/ subfolder exists with reference files",
+            "verifies": "VAL-CRT-001 reference extraction"
+          },
+          {
+            "name": "SKILL.md contains relative links to docs/",
+            "verifies": "VAL-CRT-010 relative references"
+          }
+        ]
+      }
     ]
   },
   "discoveredIssues": []

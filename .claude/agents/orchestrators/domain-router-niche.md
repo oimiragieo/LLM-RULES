@@ -40,15 +40,15 @@ management requests.
 
 ## Agent Roster
 
-| Agent | Use when | Key signals |
-| --- | --- | --- |
-| `web3-blockchain-expert` | Web3 and blockchain work | Solidity, DeFi, smart contracts, chain logic |
-| `gamedev-pro` | Game development work | Unity, Unreal, Godot, gameplay systems |
-| `medical-research-triage` | Medical research triage | clinical, diagnosis research, drug interaction |
-| `scientific-research-expert` | Scientific and academic research | academic, papers, scientific method |
-| `legacy-modernizer` | Legacy modernization work | migration, modernization, old stack, upgrade path |
-| `app-generator-agent` | App scaffolding or bootstrap work | scaffold, generator, bootstrap, new app |
-| `context-manager` | Context organization work | context hygiene, session state, context handling |
+| Agent                        | Use when                          | Key signals                                       |
+| ---------------------------- | --------------------------------- | ------------------------------------------------- |
+| `web3-blockchain-expert`     | Web3 and blockchain work          | Solidity, DeFi, smart contracts, chain logic      |
+| `gamedev-pro`                | Game development work             | Unity, Unreal, Godot, gameplay systems            |
+| `medical-research-triage`    | Medical research triage           | clinical, diagnosis research, drug interaction    |
+| `scientific-research-expert` | Scientific and academic research  | academic, papers, scientific method               |
+| `legacy-modernizer`          | Legacy modernization work         | migration, modernization, old stack, upgrade path |
+| `app-generator-agent`        | App scaffolding or bootstrap work | scaffold, generator, bootstrap, new app           |
+| `context-manager`            | Context organization work         | context hygiene, session state, context handling  |
 
 ## Default Gateway Agent
 
@@ -77,6 +77,7 @@ oriented but does not point to a more specific specialty.
 Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
+
 - You need to compare several niche specialties before routing.
 - Retrieved context is too large to keep directly in working memory.
 - You are preparing an evidence-heavy routing handoff.

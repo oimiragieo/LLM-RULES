@@ -8,11 +8,13 @@ Key architectural patterns and decisions for agent-studio.
 ---
 
 ## Codebase Structure
+
 - `.claude/` — Main codebase: agents, skills, hooks, lib, tools, workflows, schemas, config, context
 - `tests/` — Test suites organized by area (hooks/, lib/, skills/, agents/, audit/, commands/)
 - `scripts/` — Build, validation, and utility scripts
 
 ## Key Subsystems
+
 - **Routing:** Unified pipeline in `user-prompt-unified.core.cjs` (2,216 lines). Hierarchical routing via 9 domain sub-routers.
 - **Creators:** skill-creator and agent-creator in `.claude/skills/`, with SKILL.md + docs/ + scripts/ structure.
 - **Reflection:** RECE loop (Reflect-Evaluate-Correct-Execute) via 9 hook files + 1 agent + 2 workflows.
@@ -21,7 +23,9 @@ Key architectural patterns and decisions for agent-studio.
 - **Telegram:** MCP relay server + auto-start hook + 10-command bot.
 
 ## Hook Contract
+
 All hooks must:
+
 - Read input from stdin (JSON)
 - Write output to stdout (JSON)
 - Use `safeParseJSON` from `.claude/lib/utils/safe-json.cjs`

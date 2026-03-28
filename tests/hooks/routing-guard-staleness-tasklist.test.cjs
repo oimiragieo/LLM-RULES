@@ -80,8 +80,16 @@ describe('Fix 4b: applyStaleDetection', () => {
     const result = routingGuard.applyStaleDetection(state);
     assert.strictEqual(result.mode, 'router', 'Session mismatch should force router mode');
     assert.strictEqual(result.taskSpawned, false, 'Session mismatch should clear taskSpawned');
-    assert.strictEqual(result.sessionId, 'session-current', 'Session mismatch should refresh session');
-    assert.strictEqual(result.plannerSpawned, true, 'Session mismatch should preserve spawn history');
+    assert.strictEqual(
+      result.sessionId,
+      'session-current',
+      'Session mismatch should refresh session'
+    );
+    assert.strictEqual(
+      result.plannerSpawned,
+      true,
+      'Session mismatch should preserve spawn history'
+    );
     assert.strictEqual(result.complexity, 'high', 'Session mismatch should preserve complexity');
   });
 
@@ -140,8 +148,16 @@ describe('Fix 4b: applyStaleDetection', () => {
     const result = routingGuard.applyStaleDetection(state);
     assert.strictEqual(result.mode, 'router', 'Session mismatch should force router mode');
     assert.strictEqual(result.taskSpawned, false, 'Session mismatch should clear taskSpawned');
-    assert.strictEqual(result.sessionId, 'session-current', 'Session mismatch should refresh session');
-    assert.strictEqual(result.securitySpawned, true, 'Session mismatch should preserve spawn history');
+    assert.strictEqual(
+      result.sessionId,
+      'session-current',
+      'Session mismatch should refresh session'
+    );
+    assert.strictEqual(
+      result.securitySpawned,
+      true,
+      'Session mismatch should preserve spawn history'
+    );
   });
 
   it('should preserve active agent state when lastReset is invalid (backward compatibility)', () => {

@@ -48,13 +48,13 @@ Creates specialized AI agents on-demand for capabilities that do not already hav
 
 ## Quick Reference
 
-| Operation | Primary command or tool |
-| --- | --- |
-| Check for existing agents | `Glob: .claude/agents/**/*.md` |
-| Generate the managed template | `node .claude/skills/agent-creator/scripts/main.cjs --action generate --name <agent-name> --description "<summary>" --category <core|domain|specialized|orchestrators>` |
-| Validate the managed template | `node .claude/skills/agent-creator/scripts/main.cjs --action validate --file .claude/agents/<category>/<agent-name>.md` |
-| Research the role | Follow [occupational alignment details](./docs/occupational-alignment.md) and [research and skills-gap details](./docs/research-and-skills-gap.md) |
-| Final integration | Follow [integration reference](./docs/integration-reference.md) |
+| Operation                     | Primary command or tool                                                                                                                            |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------- | --------------- |
+| Check for existing agents     | `Glob: .claude/agents/**/*.md`                                                                                                                     |
+| Generate the managed template | `node .claude/skills/agent-creator/scripts/main.cjs --action generate --name <agent-name> --description "<summary>" --category <core               | domain | specialized | orchestrators>` |
+| Validate the managed template | `node .claude/skills/agent-creator/scripts/main.cjs --action validate --file .claude/agents/<category>/<agent-name>.md`                            |
+| Research the role             | Follow [occupational alignment details](./docs/occupational-alignment.md) and [research and skills-gap details](./docs/research-and-skills-gap.md) |
+| Final integration             | Follow [integration reference](./docs/integration-reference.md)                                                                                    |
 
 ## Core Creation Workflow
 
@@ -120,12 +120,12 @@ Every new agent still needs a deliberate skill set.
 
 Decide the agent archetype, category, and model before generation.
 
-| Agent Type | Use when | Model |
-| --- | --- | --- |
-| Worker | Executes tasks directly | `sonnet` |
-| Analyst | Research, review, or evaluation focused | `sonnet` |
-| Specialist | Deep domain expertise | `opus` |
-| Advisor | Strategic guidance or consulting | `opus` |
+| Agent Type | Use when                                | Model    |
+| ---------- | --------------------------------------- | -------- |
+| Worker     | Executes tasks directly                 | `sonnet` |
+| Analyst    | Research, review, or evaluation focused | `sonnet` |
+| Specialist | Deep domain expertise                   | `opus`   |
+| Advisor    | Strategic guidance or consulting        | `opus`   |
 
 Choose the output directory that matches the role: core, specialized, domain, or orchestrators.
 
@@ -182,6 +182,43 @@ And keep the generated body aligned with these sections:
 - [ ] `.claude/config/agent-config.json` was updated when tool defaults are required.
 - [ ] `npm run gen:all-registries` was run for new or re-registered agents.
 - [ ] README footprint updates, memory notes, and integration follow-ups were captured.
+
+## Ecosystem Alignment Contract (MANDATORY)
+
+This creator skill must keep new or updated agents aligned with the rest of the creator ecosystem:
+
+- `skill-creator` for reusable capabilities and assignments
+- `tool-creator` for executable automation surfaces
+- `hook-creator` for guardrails and enforcement
+- `template-creator` for scaffold reuse
+- `workflow-creator` for orchestration and phase gating
+- `command-creator` for operator-facing entry points
+
+### Cross-Creator Handshake (Required)
+
+Before handoff, verify the related ecosystem updates:
+
+1. The route is discoverable in routing docs and registries.
+2. Companion skills, tools, hooks, templates, or workflows were created or explicitly waived.
+3. `validate-integration.cjs` passes for the affected agent artifact.
+4. Registries and indexes were regenerated when metadata changed.
+5. Follow-up gaps were recorded instead of silently deferred.
+
+### Research Gate (Exa + arXiv — BOTH MANDATORY)
+
+For new agent patterns, role designs, orchestration models, or evaluation flows:
+
+1. Use Exa to review current implementation patterns and ecosystem conventions.
+2. Search arXiv for relevant research when the topic touches AI agents, evaluation, orchestration, memory/RAG, or security.
+3. Record the decisions, constraints, and non-goals that shaped the final agent contract.
+4. Prefer minimal, validated changes over speculative expansion.
+
+### Regression-Safe Delivery
+
+- Follow RED -> GREEN -> REFACTOR for behavior changes.
+- Run targeted tests for the touched agent and creator surfaces.
+- Run required format and validation commands before handoff.
+- Keep changes scoped to the failing contract instead of bundling unrelated cleanup.
 
 ## Notes
 

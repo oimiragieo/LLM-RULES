@@ -290,7 +290,11 @@ describe('user-prompt-orchestrator.cjs - bootstrap read targets', () => {
       assert.equal(fs.existsSync(trendPath), true);
 
       const spawnRequests = JSON.parse(fs.readFileSync(spawnRequestPath, 'utf8'));
-      assert.deepEqual(spawnRequests, []);
+      assert.equal(spawnRequests.length, 1);
+      assert.equal(spawnRequests[0].id, 'bootstrap-init');
+      assert.equal(spawnRequests[0].status, 'pending');
+      assert.equal(spawnRequests[0].subagent_type, 'init');
+      assert.equal(spawnRequests[0].source?.trigger, 'missing_agents_md');
 
       const openFindings = JSON.parse(fs.readFileSync(openFindingsPath, 'utf8'));
       assert.equal(Array.isArray(openFindings.findings), true);

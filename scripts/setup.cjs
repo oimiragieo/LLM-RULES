@@ -288,13 +288,21 @@ const steps = [
   { name: 'Compile Agent Registry', cmd: 'pnpm', args: ['agents:registry'], est: '2s' },
   { name: 'Generate Routing Prototypes', cmd: 'pnpm', args: ['routing:prototypes'], est: '2s' },
   { name: 'Compile Skills Catalog', cmd: 'pnpm', args: ['agents:catalog'], est: '1s' },
-  { name: 'Generate Tiered Subagent Context', cmd: 'node', args: ['-e', `
+  {
+    name: 'Generate Tiered Subagent Context',
+    cmd: 'node',
+    args: [
+      '-e',
+      `
     const fs = require('fs');
     const path = require('path');
     const dir = path.join(__dirname, '..', '.claude', 'worktrees');
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'CLAUDE.md'), \`${SUBAGENT_CLAUDE_MD}\`, 'utf8');
-  `], est: '1s' },
+  `,
+    ],
+    est: '1s',
+  },
   {
     name: 'Build Hybrid Search Vector Index',
     cmd: 'pnpm',

@@ -205,13 +205,14 @@ function fileToChunks(filePath, tier) {
     return [];
   }
 
-  let data;
   try {
-    data = safeParseJSON(raw);
+    JSON.parse(raw);
   } catch (err) {
     console.error(`[WARN] Cannot parse JSON ${filePath}: ${err.message}`);
     return [];
   }
+
+  const data = safeParseJSON(raw);
 
   let texts;
   if (tier === 'mtm') {

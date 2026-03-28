@@ -143,36 +143,19 @@ function writeSessionPing(pid, mode) {
 
 /**
  * Validate that required environment variables are present.
- * If missing, attempt to load them from a local .env file.
- * We no longer enforce ANTHROPIC_API_KEY as a fatal requirement because
- * Claude Code handles global OAuth authentication natively.
  * @returns {{ valid: boolean, missing: string[] }}
  */
 function validateEnvironment() {
-  // Attempt to load .env manually if missing
+  const missing = [];
+
   if (!process.env.ANTHROPIC_API_KEY) {
-    const envPath = path.join(PROJECT_ROOT, '.env');
-    if (fs.existsSync(envPath)) {
-      try {
-        const envContent = fs.readFileSync(envPath, 'utf8');
-        envContent.split('\n').forEach(line => {
-          const match = line.match(/^\s*([^#]\w+)\s*=\s*(.*)/);
-          if (match) {
-            const key = match[1].trim();
-            const val = match[2].trim().replace(/^['"]|['"]$/g, '');
-            if (!process.env[key]) {
-              process.env[key] = val;
-            }
-          }
-        });
-      } catch (_err) {
-        // ignore read errors
-      }
-    }
+    missing.push('ANTHROPIC_API_KEY');
   }
 
-  // Always return valid so Claude CLI can use its global keyring/OAuth
-  return { valid: true, missing: [] };
+  return {
+    valid: missing.length === 0,
+    missing,
+  };
 }
 
 /**

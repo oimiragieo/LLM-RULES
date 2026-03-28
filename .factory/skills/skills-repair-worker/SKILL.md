@@ -10,6 +10,7 @@ NOTE: Startup and cleanup are handled by `worker-base`. This skill defines the W
 ## When to Use This Skill
 
 Features involving:
+
 - Creating missing skill scripts (scripts/main.cjs)
 - Adding missing SKILL.md sections
 - Fixing catalog/index agent assignment mismatches
@@ -51,6 +52,7 @@ Features involving:
    - NEVER create empty stub files -- all artifacts must have real content
 
 7. **Run skill tests after each batch of changes:**
+
    ```
    node --test tests/skills/<skill-name>.test.cjs
    pnpm validate:skills
@@ -69,7 +71,11 @@ Features involving:
   "whatWasLeftUndone": "59 remaining catalog/index mismatches (separate feature).",
   "verification": {
     "commandsRun": [
-      { "command": "node --test tests/skills/token-saver-context-compression.test.cjs", "exitCode": 0, "observation": "All tests pass" },
+      {
+        "command": "node --test tests/skills/token-saver-context-compression.test.cjs",
+        "exitCode": 0,
+        "observation": "All tests pass"
+      },
       { "command": "pnpm validate:skills", "exitCode": 0, "observation": "20 fewer mismatches" }
     ],
     "interactiveChecks": []

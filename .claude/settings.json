@@ -14,7 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/worktree-prune-on-start.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/user-prompt-unified.cjs"
           }
         ]
       },
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/user-prompt-unified.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/worktree-prune-on-start.cjs"
           }
         ]
       },
@@ -156,19 +156,20 @@
         ]
       },
       {
-        "matcher": "Edit|Write|NotebookEdit|mcp__filesystem__write_file|mcp__filesystem__edit_file",
+        "matcher": "Edit|Write|NotebookEdit",
         "hooks": [
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/write-pretool-bundle.cjs"
-          },
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__filesystem__write_file|mcp__filesystem__edit_file",
+        "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/flight-recorder-schema-gate.cjs"
-          },
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/unified-creator-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/write-pretool-bundle.cjs"
           }
         ]
       },

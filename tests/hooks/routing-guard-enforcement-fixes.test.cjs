@@ -26,8 +26,7 @@ function useTempRouterState(t) {
     ROUTER_READ_GOVERNANCE: process.env.ROUTER_READ_GOVERNANCE,
     PLANNER_FIRST_ENFORCEMENT: process.env.PLANNER_FIRST_ENFORCEMENT,
     SECURITY_REVIEW_ENFORCEMENT: process.env.SECURITY_REVIEW_ENFORCEMENT,
-    CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT:
-      process.env.CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT,
+    CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT: process.env.CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT,
     HIGH_RISK_SPECIALIST_ARCHITECT_ENFORCEMENT:
       process.env.HIGH_RISK_SPECIALIST_ARCHITECT_ENFORCEMENT,
     SPECIALIST_ROUTING_ENFORCEMENT: process.env.SPECIALIST_ROUTING_ENFORCEMENT,
@@ -35,11 +34,13 @@ function useTempRouterState(t) {
     TASK_RESUME_ENFORCEMENT: process.env.TASK_RESUME_ENFORCEMENT,
     CONCURRENT_AGENT_CAP_ENFORCEMENT: process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT,
     TASK_REQUIRE_CORE_MEMORY_READ: process.env.TASK_REQUIRE_CORE_MEMORY_READ,
+    MEMORY_SPAWN_THROTTLING: process.env.MEMORY_SPAWN_THROTTLING,
   };
 
   process.env.ROUTER_STATE_FILE = stateFile;
   process.env.ROUTING_BLOCK_DEDUPE_PATH = dedupeFile;
   process.env.CLAUDE_SESSION_ID = `routing-enforcement-${Date.now()}-${Math.random()}`;
+  process.env.MEMORY_SPAWN_THROTTLING = 'false';
 
   const restoreEnv = () => {
     for (const [key, value] of Object.entries(savedEnv)) {
@@ -80,10 +81,7 @@ test('shouldAutoReroute supports named checks and never reroutes safety-critical
   assert.equal(shared.shouldAutoReroute('intent-agent-match', 'block', 3, 3, 'true'), true);
   assert.equal(shared.shouldAutoReroute('checkPlannerFirst', 'block', 99, 3, 'true'), false);
   assert.equal(shared.shouldAutoReroute('checkSecurityReview', 'block', 99, 3, 'true'), false);
-  assert.equal(
-    shared.shouldAutoReroute('checkSpecialistOverride', 'block', 99, 3, 'true'),
-    false
-  );
+  assert.equal(shared.shouldAutoReroute('checkSpecialistOverride', 'block', 99, 3, 'true'), false);
 });
 
 test('safety-critical block messages include the recommended agent name', t => {
@@ -221,57 +219,67 @@ test('force mode makes routing-guard the single owner for planner and architect 
   process.env.CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT = 'block';
   process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
 
-  await t.test('planner-first blocks in routing-guard and is skipped in pre-task-unified', async () => {
-    ctx.setState({
-      mode: 'router',
-      taskSpawned: false,
-      taskListCalledSincePrompt: true,
-      requiresPlannerFirst: true,
-      plannerSpawned: false,
-      complexity: 'high',
-    });
+  await t.test(
+    'planner-first blocks in routing-guard and is skipped in pre-task-unified',
+    async () => {
+      ctx.setState({
+        mode: 'router',
+        taskSpawned: false,
+        taskListCalledSincePrompt: true,
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'high',
+      });
 
-    const toolInput = {
-      subagent_type: 'developer',
-      prompt: 'You are developer. Implement the feature.',
-      description: 'Implement the feature',
-    };
+      const toolInput = {
+        subagent_type: 'developer',
+        prompt: 'You are developer. Implement the feature.',
+        description: 'Implement the feature',
+      };
 
-    const guardResult = routingGuard.runAllChecks('Task', toolInput, { permission_mode: 'normal' });
-    assert.equal(guardResult.pass, false);
-    assert.equal(guardResult.checkName, 'planner-first-guard');
+      const guardResult = routingGuard.runAllChecks('Task', toolInput, {
+        permission_mode: 'normal',
+      });
+      assert.equal(guardResult.pass, false);
+      assert.equal(guardResult.checkName, 'planner-first-guard');
 
-    const preTaskResult = await preTask.checkRoutingGuard('Task', toolInput, {
-      session_id: process.env.CLAUDE_SESSION_ID,
-    });
-    assert.equal(preTaskResult.pass, true);
-  });
+      const preTaskResult = await preTask.checkRoutingGuard('Task', toolInput, {
+        session_id: process.env.CLAUDE_SESSION_ID,
+      });
+      assert.equal(preTaskResult.pass, true);
+    }
+  );
 
-  await t.test('architect review blocks in routing-guard and is skipped in pre-task-unified', async () => {
-    ctx.setState({
-      mode: 'router',
-      taskSpawned: false,
-      taskListCalledSincePrompt: true,
-      requiresPlannerFirst: false,
-      plannerSpawned: false,
-      architectSpawned: false,
-    });
+  await t.test(
+    'architect review blocks in routing-guard and is skipped in pre-task-unified',
+    async () => {
+      ctx.setState({
+        mode: 'router',
+        taskSpawned: false,
+        taskListCalledSincePrompt: true,
+        requiresPlannerFirst: false,
+        plannerSpawned: false,
+        architectSpawned: false,
+      });
 
-    const toolInput = {
-      subagent_type: 'code-simplifier',
-      prompt: 'You are code-simplifier. Refactor the implementation.',
-      description: 'Refactor the implementation',
-    };
+      const toolInput = {
+        subagent_type: 'code-simplifier',
+        prompt: 'You are code-simplifier. Refactor the implementation.',
+        description: 'Refactor the implementation',
+      };
 
-    const guardResult = routingGuard.runAllChecks('Task', toolInput, { permission_mode: 'normal' });
-    assert.equal(guardResult.pass, false);
-    assert.equal(guardResult.checkName, 'code-simplifier-architect-guard');
+      const guardResult = routingGuard.runAllChecks('Task', toolInput, {
+        permission_mode: 'normal',
+      });
+      assert.equal(guardResult.pass, false);
+      assert.equal(guardResult.checkName, 'code-simplifier-architect-guard');
 
-    const preTaskResult = await preTask.checkRoutingGuard('Task', toolInput, {
-      session_id: process.env.CLAUDE_SESSION_ID,
-    });
-    assert.equal(preTaskResult.pass, true);
-  });
+      const preTaskResult = await preTask.checkRoutingGuard('Task', toolInput, {
+        session_id: process.env.CLAUDE_SESSION_ID,
+      });
+      assert.equal(preTaskResult.pass, true);
+    }
+  );
 });
 
 test('blocked planner spawn does not record plannerSpawned before the task actually runs', async t => {

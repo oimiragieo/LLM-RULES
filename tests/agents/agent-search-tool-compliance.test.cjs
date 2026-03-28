@@ -192,11 +192,7 @@ describe('Phase 2 Specialized Non-Code', () => {
 
 describe('Phase 3 Orchestrators', () => {
   testHasSkills(P3_ORCH, RG_TS, 'Orchestrators');
-  testExcludesSkills(
-    P3_ORCH,
-    ['code-semantic-search', 'code-structural-search'],
-    'Orchestrators'
-  );
+  testExcludesSkills(P3_ORCH, ['code-semantic-search', 'code-structural-search'], 'Orchestrators');
 });
 
 describe('Registry propagation Phase 2/3', () => {

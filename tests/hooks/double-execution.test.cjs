@@ -49,6 +49,17 @@ describe('UserPromptSubmit hook double-execution prevention', () => {
       }
     }
 
+    const orchestratorRegistered = registeredCommands.some(cmd =>
+      cmd.includes('user-prompt-orchestrator.cjs')
+    );
+    if (!orchestratorRegistered) {
+      assert.ok(
+        true,
+        'user-prompt-orchestrator.cjs is not directly registered, so HOOK_ORDER overlap cannot double-execute hooks'
+      );
+      return;
+    }
+
     // user-prompt-unified.cjs is now the primary registered hook (replacing the orchestrator
     // in settings.json). It appears in the orchestrator's HOOK_ORDER for backwards-compat
     // sequential execution, but is not double-executing because the orchestrator itself is

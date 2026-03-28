@@ -40,13 +40,7 @@ describe('validate-routing-consistency', () => {
         defaultAgents: { implementation: 'developer' },
         domainFallbacks: { core: ['planner'] },
       },
-      agentIds: new Set([
-        'developer',
-        'planner',
-        'qa',
-        'security-architect',
-        'domain-router-core',
-      ]),
+      agentIds: new Set(['developer', 'planner', 'qa', 'security-architect', 'domain-router-core']),
     });
 
     assert.deepStrictEqual(issues, []);

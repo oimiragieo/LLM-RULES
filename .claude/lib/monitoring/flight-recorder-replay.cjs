@@ -16,9 +16,16 @@ function replay(filePath = getRecorderPath()) {
 
   const lines = fs.readFileSync(filePath, 'utf8').split('\n').filter(Boolean);
   for (const line of lines) {
-    try {
-      result.entries.push(safeParseJSON(line));
-    } catch (_err) {
+    const entry = safeParseJSON(line);
+    if (
+      entry &&
+      typeof entry === 'object' &&
+      !Array.isArray(entry) &&
+      typeof entry.event === 'string' &&
+      typeof entry.timestamp === 'string'
+    ) {
+      result.entries.push(entry);
+    } else {
       result.skipped += 1;
     }
   }

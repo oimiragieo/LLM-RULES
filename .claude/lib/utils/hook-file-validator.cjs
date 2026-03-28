@@ -106,6 +106,7 @@ function validateHookFiles(projectRoot) {
       execFileSync('git', ['ls-files', '--error-unmatch', hp], {
         cwd: projectRoot,
         stdio: 'pipe',
+        windowsHide: true,
       });
     } catch {
       untracked.push(hp);

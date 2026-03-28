@@ -28,6 +28,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `quality-gate-validator.cjs`        |        | x           |          | x          |              |            |
 | `adaptive-quality-gate.cjs`         | x      | x           | x        | x          | x            | x          |
 | `handover-detector.cjs`             | x      |             |          |            |              |            |
+| `channel-auto-start.cjs`            | x      |             |          |            |              |            |
 | `spawn-token-guard.cjs`             | x      | x           |          |            | x            |            |
 | `finish-only-guard.cjs`             | x      | x           |          |            | x            |            |
 | `session-end-memory-promotion.cjs`  | x      |             |          |            |              |            |
@@ -43,6 +44,12 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `ccusage-statusline.cjs`            | x      |             |          |            |              |            |
 | `worktree-prune-on-start.cjs`       | x      |             |          |            |              |            |
 | `hook-error-detector.cjs`           | x      | x           | x        | x          | x            | x          |
+| `recurring-issue-detector.cjs`      | x      | x           | x        | x          | x            | x          |
+| `dlp-pretool.cjs`                   |        | x           | x        | x          |              | x          |
+| `flight-recorder-schema-gate.cjs`   |        | x           |          | x          |              |            |
+| `post-pipeline-token-report.cjs`    | x      | x           | x        | x          | x            | x          |
+| `post-pipeline-self-review.cjs`     | x      | x           | x        | x          | x            | x          |
+| `pre-spawn-hook-check.cjs`          |        | x           |          |            | x            |            |
 
 **Agent Archetype Definitions:**
 

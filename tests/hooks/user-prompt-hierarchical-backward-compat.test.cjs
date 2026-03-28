@@ -78,24 +78,27 @@ test('hierarchical routing preserves direct-route behavior and slash command han
     }
   });
 
-  await t.test('canonical direct-route prompts dispatch identically with the feature flag on and off', async () => {
-    for (const [expectedAgent, prompt] of DIRECT_ROUTE_CASES) {
-      process.env.HIERARCHICAL_ROUTING = 'off';
-      const flatResult = await loadHook().checkRouterEnforcement({ prompt });
-      const flatAgent = flatResult.candidates[0]?.agent?.name;
+  await t.test(
+    'canonical direct-route prompts dispatch identically with the feature flag on and off',
+    async () => {
+      for (const [expectedAgent, prompt] of DIRECT_ROUTE_CASES) {
+        process.env.HIERARCHICAL_ROUTING = 'off';
+        const flatResult = await loadHook().checkRouterEnforcement({ prompt });
+        const flatAgent = flatResult.candidates[0]?.agent?.name;
 
-      process.env.HIERARCHICAL_ROUTING = 'on';
-      const hierarchicalResult = await loadHook().checkRouterEnforcement({ prompt });
-      const hierarchicalAgent = hierarchicalResult.candidates[0]?.agent?.name;
+        process.env.HIERARCHICAL_ROUTING = 'on';
+        const hierarchicalResult = await loadHook().checkRouterEnforcement({ prompt });
+        const hierarchicalAgent = hierarchicalResult.candidates[0]?.agent?.name;
 
-      assert.strictEqual(flatAgent, expectedAgent, `flat routing mismatch for "${prompt}"`);
-      assert.strictEqual(
-        hierarchicalAgent,
-        flatAgent,
-        `hierarchical routing changed direct-route dispatch for "${prompt}"`
-      );
+        assert.strictEqual(flatAgent, expectedAgent, `flat routing mismatch for "${prompt}"`);
+        assert.strictEqual(
+          hierarchicalAgent,
+          flatAgent,
+          `hierarchical routing changed direct-route dispatch for "${prompt}"`
+        );
+      }
     }
-  });
+  );
 
   await t.test('slash commands remain skipped when hierarchical routing is enabled', async () => {
     process.env.HIERARCHICAL_ROUTING = 'on';

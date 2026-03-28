@@ -23,10 +23,12 @@ Use for features that fix bugs in the routing system: hooks in `.claude/hooks/ro
    - `.claude/hooks/routing/*.test.cjs` for co-located hook tests
 
 4. **Write failing tests FIRST (red)** — Create regression tests that demonstrate the bug. Tests use `node:test` built-in:
+
    ```javascript
    const { describe, it } = require('node:test');
    const assert = require('node:assert');
    ```
+
    Place tests in `tests/lib/routing/` or `tests/hooks/` matching existing conventions.
 
 5. **Implement the fix (green)** — Make the minimal change to fix the bug. Do NOT refactor unrelated code.
@@ -48,21 +50,48 @@ Use for features that fix bugs in the routing system: hooks in `.claude/hooks/ro
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "node --test tests/lib/routing/router-state-reset.test.cjs", "exitCode": 0, "observation": "3 tests passing, covers spawn preservation, complexity persistence, and transient reset" },
-      { "command": "node --test tests/lib/routing/", "exitCode": 0, "observation": "All 12 routing tests pass, no regressions" },
-      { "command": "pnpm validate:routing", "exitCode": 0, "observation": "Routing consistency validated" }
+      {
+        "command": "node --test tests/lib/routing/router-state-reset.test.cjs",
+        "exitCode": 0,
+        "observation": "3 tests passing, covers spawn preservation, complexity persistence, and transient reset"
+      },
+      {
+        "command": "node --test tests/lib/routing/",
+        "exitCode": 0,
+        "observation": "All 12 routing tests pass, no regressions"
+      },
+      {
+        "command": "pnpm validate:routing",
+        "exitCode": 0,
+        "observation": "Routing consistency validated"
+      }
     ],
     "interactiveChecks": [
-      { "action": "Grepped for resetToRouterMode calls across codebase", "observed": "Called in user-prompt-unified.core.cjs line 47 and router-state.cjs line 347. Both now use the updated function." }
+      {
+        "action": "Grepped for resetToRouterMode calls across codebase",
+        "observed": "Called in user-prompt-unified.core.cjs line 47 and router-state.cjs line 347. Both now use the updated function."
+      }
     ]
   },
   "tests": {
     "added": [
-      { "file": "tests/lib/routing/router-state-reset.test.cjs", "cases": [
-        { "name": "preserves plannerSpawned across prompt reset", "verifies": "VAL-RTR-001 spawn history" },
-        { "name": "preserves complexity within same session", "verifies": "VAL-RTR-001 complexity persistence" },
-        { "name": "resets transient fields to defaults", "verifies": "VAL-RTR-001 transient field reset" }
-      ]}
+      {
+        "file": "tests/lib/routing/router-state-reset.test.cjs",
+        "cases": [
+          {
+            "name": "preserves plannerSpawned across prompt reset",
+            "verifies": "VAL-RTR-001 spawn history"
+          },
+          {
+            "name": "preserves complexity within same session",
+            "verifies": "VAL-RTR-001 complexity persistence"
+          },
+          {
+            "name": "resets transient fields to defaults",
+            "verifies": "VAL-RTR-001 transient field reset"
+          }
+        ]
+      }
     ]
   },
   "discoveredIssues": []

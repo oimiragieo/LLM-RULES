@@ -47,18 +47,18 @@ Use this skill to:
 
 ## Actions
 
-| Action | Use when | Primary command |
-| --- | --- | --- |
-| `create` | Creating a brand-new skill | `node .claude/skills/skill-creator/scripts/create.cjs --name <skill-name> --description "<summary>"` |
-| `convert` | Converting an MCP server into a skill | `node .claude/skills/skill-creator/scripts/convert.cjs --source <package-or-url>` |
-| `validate` | Checking an existing skill definition | `node .claude/tools/cli/validate-integration.cjs .claude/skills/<skill-name>/SKILL.md` |
-| `install` | Importing a skill from GitHub | Follow the preserved install flow in [enterprise bundle details](./docs/enterprise-bundle.md) |
-| `convert-codebase` | Turning an external tool or codebase into a skill | Follow the preserved conversion notes in [enterprise bundle details](./docs/enterprise-bundle.md) |
-| `consolidate` | Folding many narrow skills into domain experts | Use the preserved consolidation reference in [enterprise bundle details](./docs/enterprise-bundle.md) |
-| `convert-rules` | Migrating legacy rules into skills | Use the preserved rule-conversion reference in [enterprise bundle details](./docs/enterprise-bundle.md) |
-| `assign` | Assigning a skill to one or more agents | Use the checklist below and the detailed matrix in [integration reference](./docs/integration-reference.md) |
-| `register-hooks` / `register-schemas` | Wiring existing assets into a skill | Use the preserved action notes in [enterprise bundle details](./docs/enterprise-bundle.md) |
-| `show-structure` | Reviewing the expected folder layout | Use the template and directory guidance below |
+| Action                                | Use when                                          | Primary command                                                                                             |
+| ------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `create`                              | Creating a brand-new skill                        | `node .claude/skills/skill-creator/scripts/create.cjs --name <skill-name> --description "<summary>"`        |
+| `convert`                             | Converting an MCP server into a skill             | `node .claude/skills/skill-creator/scripts/convert.cjs --source <package-or-url>`                           |
+| `validate`                            | Checking an existing skill definition             | `node .claude/tools/cli/validate-integration.cjs .claude/skills/<skill-name>/SKILL.md`                      |
+| `install`                             | Importing a skill from GitHub                     | Follow the preserved install flow in [enterprise bundle details](./docs/enterprise-bundle.md)               |
+| `convert-codebase`                    | Turning an external tool or codebase into a skill | Follow the preserved conversion notes in [enterprise bundle details](./docs/enterprise-bundle.md)           |
+| `consolidate`                         | Folding many narrow skills into domain experts    | Use the preserved consolidation reference in [enterprise bundle details](./docs/enterprise-bundle.md)       |
+| `convert-rules`                       | Migrating legacy rules into skills                | Use the preserved rule-conversion reference in [enterprise bundle details](./docs/enterprise-bundle.md)     |
+| `assign`                              | Assigning a skill to one or more agents           | Use the checklist below and the detailed matrix in [integration reference](./docs/integration-reference.md) |
+| `register-hooks` / `register-schemas` | Wiring existing assets into a skill               | Use the preserved action notes in [enterprise bundle details](./docs/enterprise-bundle.md)                  |
+| `show-structure`                      | Reviewing the expected folder layout              | Use the template and directory guidance below                                                               |
 
 ## Core Creation Workflow
 
@@ -153,6 +153,14 @@ Before completion:
 4. Re-run any targeted validators needed for the touched surface.
 5. If the new skill reveals companion artifact work for another creator, record it as a **Follow-Up** item instead of invoking another creator inline from this flow.
 
+## Router Gap Detection
+
+After scaffolding or updating a skill, verify the routing layer can still discover it. Treat any `no matching agent/skill` result as a routing gap that must be resolved before handoff.
+
+- Check whether the skill needs a new or updated agent assignment.
+- Regenerate indexes and registries when discoverability metadata changed.
+- Record unresolved routing follow-ups explicitly instead of assuming another creator will infer them.
+
 ## Template Reference
 
 Use this baseline structure in `SKILL.md`:
@@ -199,6 +207,44 @@ Required frontmatter fields that must stay explicit: `name`, `description`, `ver
 - [ ] `npm run gen:all-registries` was run for new or re-registered skills.
 - [ ] README footprint or catalog updates were completed when the creation flow requires them.
 - [ ] Companion artifacts, memory notes, and follow-up items were recorded.
+
+## Ecosystem Alignment Contract (MANDATORY)
+
+This creator skill must keep every new or updated skill aligned with the broader creator ecosystem:
+
+- `agent-creator` for ownership and execution paths
+- `tool-creator` for executable helpers
+- `hook-creator` for enforcement and guardrails
+- `rule-creator` and `semgrep-rule-creator` for policy coverage
+- `template-creator` for reusable scaffolds
+- `workflow-creator` for orchestration
+- `command-creator` for user-facing shortcuts
+
+### Cross-Creator Handshake (Required)
+
+Before handoff, verify the related ecosystem updates:
+
+1. Routing and discovery metadata were updated where required.
+2. Companion agents, hooks, tools, templates, rules, or workflows were created or explicitly waived.
+3. `validate-integration.cjs` passes for the skill artifact.
+4. Skill indexes and registries were regenerated when metadata changed.
+5. Any unresolved ecosystem gaps were recorded as follow-up work.
+
+### Research Gate (Exa + arXiv — BOTH MANDATORY)
+
+For new skill patterns, packaging approaches, or AI-adjacent methodologies:
+
+1. Use Exa to review current ecosystem patterns and implementation examples.
+2. Search arXiv when the topic touches AI agents, evaluation, orchestration, memory/RAG, security, or other emerging methods.
+3. Record the decisions, constraints, and non-goals that shaped the skill contract.
+4. Prefer the smallest validated change that satisfies the request.
+
+### Regression-Safe Delivery
+
+- Follow RED -> GREEN -> REFACTOR for behavior changes.
+- Run targeted tests for the touched skill and creator surfaces.
+- Run required format and validation commands before handoff.
+- Keep changes scoped to the failing contract instead of bundling unrelated cleanup.
 
 ## Notes
 

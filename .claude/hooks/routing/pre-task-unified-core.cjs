@@ -21,10 +21,9 @@ const { getToolName, getToolInput, getEnforcementMode, auditLog } = libRequire(
 const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
 const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manager.cjs'));
-const {
-  getHierarchicalTaskContext,
-  validateHierarchicalTaskContext,
-} = libRequire(path.join('routing', 'sub-router-selection.cjs'));
+const { getHierarchicalTaskContext, validateHierarchicalTaskContext } = libRequire(
+  path.join('routing', 'sub-router-selection.cjs')
+);
 
 const state = require('./pre-task-unified-state.cjs');
 const helpers = require('./pre-task-unified-helpers.cjs');

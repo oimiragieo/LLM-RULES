@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
 /**
  * Model Benchmark Harness
  *
@@ -88,7 +90,13 @@ function loadBaselines(baselinePath) {
     return { models: {}, dimensions: {} };
   }
   try {
-    return JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+    const parsed = safeParseJSON(fs.readFileSync(baselinePath, 'utf8'), {
+      models: {},
+      dimensions: {},
+    });
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed;
+    }
   } catch {
     console.error(`Warning: Could not parse baseline file at ${baselinePath}`);
     return { models: {}, dimensions: {} };

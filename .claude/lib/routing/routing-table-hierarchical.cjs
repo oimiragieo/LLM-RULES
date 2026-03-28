@@ -208,7 +208,11 @@ const UNIQUE_ROUTING_TARGETS = Object.freeze(
 );
 
 function isPreservedDirectRouteAgent(agentId) {
-  return PRESERVED_DIRECT_ROUTE_AGENTS.includes(String(agentId || '').trim().toLowerCase());
+  return PRESERVED_DIRECT_ROUTE_AGENTS.includes(
+    String(agentId || '')
+      .trim()
+      .toLowerCase()
+  );
 }
 
 module.exports = {

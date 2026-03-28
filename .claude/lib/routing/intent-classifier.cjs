@@ -32,23 +32,30 @@ const AGENT_TO_CANONICAL_INTENT = Object.entries(INTENT_TO_AGENT || {}).reduce(
   },
   {}
 );
-const EXACT_INTENT_KEYWORD_MAP = Object.entries(INTENT_KEYWORDS || {}).reduce((acc, [intent, phrases]) => {
-  if (!Array.isArray(phrases)) return acc;
-  for (const phrase of phrases) {
-    const normalized = String(phrase || '').trim().toLowerCase();
-    if (normalized && !acc[normalized]) {
-      acc[normalized] = intent;
+const EXACT_INTENT_KEYWORD_MAP = Object.entries(INTENT_KEYWORDS || {}).reduce(
+  (acc, [intent, phrases]) => {
+    if (!Array.isArray(phrases)) return acc;
+    for (const phrase of phrases) {
+      const normalized = String(phrase || '')
+        .trim()
+        .toLowerCase();
+      if (normalized && !acc[normalized]) {
+        acc[normalized] = intent;
+      }
     }
-  }
-  return acc;
-}, {});
+    return acc;
+  },
+  {}
+);
 
 function loadCapabilityRoutingForClassifier() {
   return loadCapabilityRouting();
 }
 
 function matchesPromptKeyword(promptLower, keyword) {
-  const normalizedKeyword = String(keyword || '').trim().toLowerCase();
+  const normalizedKeyword = String(keyword || '')
+    .trim()
+    .toLowerCase();
   if (!promptLower || !normalizedKeyword) return false;
 
   const isTechnical =
@@ -67,9 +74,12 @@ function matchesPromptKeyword(promptLower, keyword) {
 }
 
 function getRoutingIntentMetadata(keyword, agent) {
-  const normalizedKeyword = String(keyword || '').trim().toLowerCase();
+  const normalizedKeyword = String(keyword || '')
+    .trim()
+    .toLowerCase();
   const publicIntent = EXACT_INTENT_KEYWORD_MAP[normalizedKeyword] || normalizedKeyword;
-  const ruleIntent = EXACT_INTENT_KEYWORD_MAP[normalizedKeyword] || AGENT_TO_CANONICAL_INTENT[agent] || publicIntent;
+  const ruleIntent =
+    EXACT_INTENT_KEYWORD_MAP[normalizedKeyword] || AGENT_TO_CANONICAL_INTENT[agent] || publicIntent;
 
   return {
     intent: publicIntent || 'general',
@@ -87,7 +97,10 @@ function applyDisambiguation(intent, promptLower, defaultAgent) {
   }
 
   for (const rule of rules) {
-    if (Array.isArray(rule?.condition) && rule.condition.some(cond => promptLower.includes(String(cond).toLowerCase()))) {
+    if (
+      Array.isArray(rule?.condition) &&
+      rule.condition.some(cond => promptLower.includes(String(cond).toLowerCase()))
+    ) {
       resolvedAgent = rule.prefer;
       disambiguated = true;
     }

@@ -12,14 +12,16 @@ function countLines(filePath) {
   if (content.length === 0) {
     return 0;
   }
-  return content.endsWith('\n') ? content.slice(0, -1).split('\n').length : content.split('\n').length;
+  return content.endsWith('\n')
+    ? content.slice(0, -1).split('\n').length
+    : content.split('\n').length;
 }
 
 function listMarkdownFiles(dirPath) {
   return fs
     .readdirSync(dirPath, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
-    .map((entry) => entry.name)
+    .filter(entry => entry.isFile() && entry.name.endsWith('.md'))
+    .map(entry => entry.name)
     .sort();
 }
 

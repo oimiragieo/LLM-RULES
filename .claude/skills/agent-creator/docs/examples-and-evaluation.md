@@ -59,13 +59,13 @@ await queueCrossCreatorReview('agent', '.claude/agents/<category>/<agent-name>.m
 
 This skill is part of the **Creator Ecosystem**. After creating an agent, consider whether companion follow-ups are needed:
 
-| Creator/Updater      | When to Use                                     | Follow-Up Action                              |
-| -------------------- | ----------------------------------------------- | --------------------------------------------- |
-| **skill-creator**    | Agent needs new skills not in `.claude/skills/` | Queue a **Follow-Up** for `skill-creator`     |
-| **workflow-creator** | Agent needs orchestration workflow              | Queue a follow-up for `workflow-creator`      |
-| **template-creator** | Agent needs code templates                      | Queue a follow-up for `template-creator`      |
-| **schema-creator**   | Agent needs input/output validation schemas     | Queue a follow-up for `schema-creator`        |
-| **hook-creator**     | Agent needs pre/post execution hooks            | Queue a follow-up for `hook-creator`          |
+| Creator/Updater      | When to Use                                     | Follow-Up Action                          |
+| -------------------- | ----------------------------------------------- | ----------------------------------------- |
+| **skill-creator**    | Agent needs new skills not in `.claude/skills/` | Queue a **Follow-Up** for `skill-creator` |
+| **workflow-creator** | Agent needs orchestration workflow              | Queue a follow-up for `workflow-creator`  |
+| **template-creator** | Agent needs code templates                      | Queue a follow-up for `template-creator`  |
+| **schema-creator**   | Agent needs input/output validation schemas     | Queue a follow-up for `schema-creator`    |
+| **hook-creator**     | Agent needs pre/post execution hooks            | Queue a follow-up for `hook-creator`      |
 
 ### Integration Workflow
 

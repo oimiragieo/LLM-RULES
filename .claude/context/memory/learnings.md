@@ -379,6 +379,7 @@ The hook chain (currently 6 consolidated hooks) must stay bounded. Each new hook
 From Claude CLI + Codex council on ecosystem audit (185 orphans, 21 model mismatches, 20+ stale rename refs):
 
 **Remediation priority order (consensus):**
+
 1. Fix model mismatches (config.yaml → registry drift) — active runtime failure
 2. Fix stale token-saver → context-compressor refs — active breakage
 3. Build require() dependency graph before bulk orphan deletion
@@ -387,6 +388,7 @@ From Claude CLI + Codex council on ecosystem audit (185 orphans, 21 model mismat
 6. Scaffold missing schemas/workflows retroactively
 
 **Systemic root causes identified:**
+
 - No referential integrity on artifact names (rename cascade root cause)
 - No lifecycle coupling in creator skills (schema/workflow gap root cause)
 - No dependency graph (orphan accumulation root cause)
@@ -414,3 +416,1041 @@ From Claude CLI + Codex council on ecosystem audit (185 orphans, 21 model mismat
 - Updated workflow: evolution-workflow (2026-03-26)
 
 - Updated workflow: missing-workflow-xyz (2026-03-26)
+
+- Created new agent: qa-guardian (2026-03-26)
+
+- Created new agent: contract-check (2026-03-26)
+
+- Created new agent: bool-action (2026-03-26)
+
+- Created new agent: repo-onboarder (2026-03-26)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-26)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-26)
+
+- Updated workflow: evolution-workflow (2026-03-26)
+
+- Updated workflow: missing-workflow-xyz (2026-03-26)
+
+- Created new agent: qa-guardian (2026-03-26)
+
+- Created new agent: contract-check (2026-03-26)
+
+- Created new agent: bool-action (2026-03-26)
+
+- Created new agent: repo-onboarder (2026-03-26)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-26)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-26)
+
+- Updated workflow: evolution-workflow (2026-03-26)
+
+- Updated workflow: missing-workflow-xyz (2026-03-26)
+
+- Created new agent: qa-guardian (2026-03-26)
+
+- Created new agent: contract-check (2026-03-26)
+
+- Created new agent: bool-action (2026-03-26)
+
+- Created new agent: repo-onboarder (2026-03-26)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-26)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-26)
+
+- Updated workflow: evolution-workflow (2026-03-26)
+
+- Updated workflow: missing-workflow-xyz (2026-03-26)
+
+- Created new agent: qa-guardian (2026-03-26)
+
+- Created new agent: contract-check (2026-03-26)
+
+- Created new agent: bool-action (2026-03-26)
+
+- Created new agent: repo-onboarder (2026-03-26)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-26)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-26)
+
+- Updated workflow: evolution-workflow (2026-03-26)
+
+- Updated workflow: missing-workflow-xyz (2026-03-26)
+
+- Created new agent: qa-guardian (2026-03-26)
+
+- Created new agent: contract-check (2026-03-26)
+
+- Created new agent: bool-action (2026-03-26)
+
+- Created new agent: repo-onboarder (2026-03-26)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-26)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-26)
+
+- Updated workflow: evolution-workflow (2026-03-26)
+
+- Updated workflow: missing-workflow-xyz (2026-03-26)
+
+- Created new agent: qa-guardian (2026-03-26)
+
+- Created new agent: contract-check (2026-03-26)
+
+- Created new agent: bool-action (2026-03-26)
+
+- Created new agent: repo-onboarder (2026-03-26)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-26)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-26)
+
+- Updated workflow: evolution-workflow (2026-03-26)
+
+- Updated workflow: missing-workflow-xyz (2026-03-26)
+
+- Created new agent: qa-guardian (2026-03-27)
+
+- Created new agent: contract-check (2026-03-27)
+
+- Created new agent: bool-action (2026-03-27)
+
+- Created new agent: repo-onboarder (2026-03-27)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-27)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-27)
+
+- Updated workflow: evolution-workflow (2026-03-27)
+
+- Updated workflow: missing-workflow-xyz (2026-03-27)
+
+- Created new agent: qa-guardian (2026-03-27)
+
+- Created new agent: contract-check (2026-03-27)
+
+- Created new agent: bool-action (2026-03-27)
+
+- Created new agent: repo-onboarder (2026-03-27)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-27)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-27)
+
+- Updated workflow: evolution-workflow (2026-03-27)
+
+- Updated workflow: missing-workflow-xyz (2026-03-27)
+
+- Created new agent: qa-guardian (2026-03-27)
+
+- Created new agent: qa-guardian (2026-03-27)
+
+- Created new agent: contract-check (2026-03-27)
+
+- Created new agent: contract-check (2026-03-27)
+
+- Created new agent: bool-action (2026-03-27)
+
+- Created new agent: bool-action (2026-03-27)
+
+- Created new agent: repo-onboarder (2026-03-27)
+
+- Created new agent: repo-onboarder (2026-03-27)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-27)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-27)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-27)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-27)
+
+- Updated workflow: evolution-workflow (2026-03-27)
+
+- Updated workflow: missing-workflow-xyz (2026-03-27)
+
+- Updated workflow: evolution-workflow (2026-03-27)
+
+- Updated workflow: missing-workflow-xyz (2026-03-27)
+
+- Created new agent: qa-guardian (2026-03-27)
+
+- Created new agent: contract-check (2026-03-27)
+
+- Created new agent: bool-action (2026-03-27)
+
+- Created new agent: repo-onboarder (2026-03-27)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-27)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-27)
+
+- Updated workflow: evolution-workflow (2026-03-27)
+
+- Updated workflow: missing-workflow-xyz (2026-03-27)
+
+- Created new agent: qa-guardian (2026-03-27)
+
+- Created new agent: contract-check (2026-03-27)
+
+- Created new agent: bool-action (2026-03-27)
+
+- Created new agent: repo-onboarder (2026-03-27)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-27)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-27)
+
+- Updated workflow: evolution-workflow (2026-03-27)
+
+- Updated workflow: missing-workflow-xyz (2026-03-27)
+
+- Created new agent: qa-guardian (2026-03-27)
+
+- Created new agent: contract-check (2026-03-27)
+
+- Created new agent: bool-action (2026-03-27)
+
+- Created new agent: repo-onboarder (2026-03-27)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-27)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-27)
+
+- Updated workflow: evolution-workflow (2026-03-27)
+
+- Updated workflow: missing-workflow-xyz (2026-03-27)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)
+
+- Created new agent: qa-guardian (2026-03-28)
+
+- Created new agent: contract-check (2026-03-28)
+
+- Created new agent: bool-action (2026-03-28)
+
+- Created new agent: repo-onboarder (2026-03-28)
+
+- Created new agent: release-guardian (2026-03-28)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-28)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
+
+- Updated workflow: evolution-workflow (2026-03-28)
+
+- Updated workflow: missing-workflow-xyz (2026-03-28)

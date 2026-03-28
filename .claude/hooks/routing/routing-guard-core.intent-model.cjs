@@ -94,8 +94,16 @@ function getIntentSignalText(prompt, description = '') {
   return `${String(description || '')}\n${trimmedPrompt}`.trim();
 }
 
-function agentMatchesIntent(subagentType, suggestedAgents, prompt = '', hookInput = null, toolInput = {}) {
-  const normalizedSubagentType = String(subagentType || '').trim().toLowerCase();
+function agentMatchesIntent(
+  subagentType,
+  suggestedAgents,
+  prompt = '',
+  hookInput = null,
+  toolInput = {}
+) {
+  const normalizedSubagentType = String(subagentType || '')
+    .trim()
+    .toLowerCase();
   if (suggestedAgents.length === 0) {
     return true;
   }
@@ -115,7 +123,9 @@ function agentMatchesIntent(subagentType, suggestedAgents, prompt = '', hookInpu
 
   if (isDomainSubRouterName(normalizedSubagentType)) {
     const hierarchicalMatch = classifyDomain(prompt);
-    return hierarchicalMatch.type === 'domain' && hierarchicalMatch.router === normalizedSubagentType;
+    return (
+      hierarchicalMatch.type === 'domain' && hierarchicalMatch.router === normalizedSubagentType
+    );
   }
 
   return false;

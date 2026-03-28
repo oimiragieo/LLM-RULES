@@ -25,12 +25,7 @@ function createActions(ctx) {
   const REGISTRATION_TARGETS = {
     claudeMd: path.join(CLAUDE_DIR, 'CLAUDE.md'),
     skillCatalog: path.join(CLAUDE_DIR, 'context', 'artifacts', 'catalogs', 'skill-catalog.md'),
-    routingKeywords: path.join(
-      CLAUDE_DIR,
-      'lib',
-      'routing',
-      'routing-table-intent-keywords.cjs'
-    ),
+    routingKeywords: path.join(CLAUDE_DIR, 'lib', 'routing', 'routing-table-intent-keywords.cjs'),
     routingAgents: path.join(CLAUDE_DIR, 'lib', 'routing', 'routing-table-intent-agents.cjs'),
     skillIndex: path.join(CLAUDE_DIR, 'config', 'skill-index.json'),
   };
@@ -421,7 +416,10 @@ function createActions(ctx) {
       }
 
       const registrationSnapshots = Object.fromEntries(
-        Object.entries(REGISTRATION_TARGETS).map(([key, targetPath]) => [key, snapshotPath(targetPath)])
+        Object.entries(REGISTRATION_TARGETS).map(([key, targetPath]) => [
+          key,
+          snapshotPath(targetPath),
+        ])
       );
       const registration = runRegistrationSteps({ name, description, tools });
 
@@ -468,8 +466,7 @@ function createActions(ctx) {
         artifactType: 'skill',
         stage: 'write',
         reason: String(error),
-        remediation:
-          'Check filesystem permissions and target paths, then rerun the creator.',
+        remediation: 'Check filesystem permissions and target paths, then rerun the creator.',
         artifactPath: skillFilePath,
       });
     }
@@ -496,7 +493,10 @@ function createActions(ctx) {
     }
     content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
     fs.writeFileSync(filePath, content, 'utf8');
-    return createRegistrationStepSuccess(filePath, 'Registered routing keywords for the new skill.');
+    return createRegistrationStepSuccess(
+      filePath,
+      'Registered routing keywords for the new skill.'
+    );
   }
 
   function updateRoutingTableAgents(name) {
@@ -506,7 +506,11 @@ function createActions(ctx) {
     }
     let content = fs.readFileSync(filePath, 'utf8');
     if (content.includes(`'${name}':`)) {
-      return createRegistrationStepSuccess(filePath, 'Routing agent mapping already registered.', false);
+      return createRegistrationStepSuccess(
+        filePath,
+        'Routing agent mapping already registered.',
+        false
+      );
     }
 
     const entry = `  '${name}': '${name}',`;
@@ -519,14 +523,14 @@ function createActions(ctx) {
       `${entry}\n};\n\nmodule.exports = { INTENT_TO_AGENT };`
     );
     fs.writeFileSync(filePath, content, 'utf8');
-    return createRegistrationStepSuccess(filePath, 'Registered routing agent mapping for the new skill.');
+    return createRegistrationStepSuccess(
+      filePath,
+      'Registered routing agent mapping for the new skill.'
+    );
   }
 
   function usesCatalogDrivenSkillDiscovery(content) {
-    return (
-      /@SKILL_CATALOG_TABLE\.md/.test(content) &&
-      /Discovery:\s*read catalog/i.test(content)
-    );
+    return /@SKILL_CATALOG_TABLE\.md/.test(content) && /Discovery:\s*read catalog/i.test(content);
   }
 
   function updateClaudeMdSkills(name) {
@@ -536,7 +540,11 @@ function createActions(ctx) {
     }
     let content = fs.readFileSync(claudeMdPath, 'utf8');
     if (content.includes(`\`${name}\``)) {
-      return createRegistrationStepSuccess(claudeMdPath, 'CLAUDE.md already references the skill.', false);
+      return createRegistrationStepSuccess(
+        claudeMdPath,
+        'CLAUDE.md already references the skill.',
+        false
+      );
     }
 
     if (usesCatalogDrivenSkillDiscovery(content)) {
@@ -563,7 +571,11 @@ function createActions(ctx) {
     }
     let content = fs.readFileSync(catalogPath, 'utf8');
     if (content.includes(`\`${name}\``)) {
-      return createRegistrationStepSuccess(catalogPath, 'Skill catalog already includes the new skill.', false);
+      return createRegistrationStepSuccess(
+        catalogPath,
+        'Skill catalog already includes the new skill.',
+        false
+      );
     }
 
     if (/Generated from skill-index\.json/i.test(content)) {
@@ -587,7 +599,10 @@ function createActions(ctx) {
     }
     content = content.slice(0, tableEnd + 1) + `\n${entry}` + content.slice(tableEnd + 1);
     fs.writeFileSync(catalogPath, content, 'utf8');
-    return createRegistrationStepSuccess(catalogPath, 'Inserted the new skill into the skill catalog.');
+    return createRegistrationStepSuccess(
+      catalogPath,
+      'Inserted the new skill into the skill catalog.'
+    );
   }
 
   function regenerateSkillIndex() {

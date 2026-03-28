@@ -185,6 +185,7 @@ try {
       shell: false,
       timeout: 5000,
       stdio: 'ignore',
+      windowsHide: true,
       cwd: ROOT,
     });
   } catch (_) {

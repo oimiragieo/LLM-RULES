@@ -263,7 +263,18 @@ function getDynamicTokenCeiling() {
         if (process.platform === 'win32') {
           const ppid = String(Number(process.ppid) || 0);
           const { spawnSync: spawnSyncWin } = require('child_process');
-          const psResult = spawnSyncWin('powershell', ['-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process -Filter "ProcessId=\'' + ppid + '\'" | Select-Object -ExpandProperty CommandLine'], { encoding: 'utf8', timeout: 2000 });
+          const psResult = spawnSyncWin(
+            'powershell',
+            [
+              '-NoProfile',
+              '-NonInteractive',
+              '-Command',
+              'Get-CimInstance Win32_Process -Filter "ProcessId=\'' +
+                ppid +
+                '\'" | Select-Object -ExpandProperty CommandLine',
+            ],
+            { encoding: 'utf8', timeout: 2000 }
+          );
           const out = (psResult.stdout || '').trim();
           if (out.includes('claude-opus')) {
             ceiling = 950000;
@@ -271,7 +282,10 @@ function getDynamicTokenCeiling() {
         } else {
           const ppidUnix = String(Number(process.ppid) || 0);
           const { spawnSync: spawnSyncUnix } = require('child_process');
-          const psUnix = spawnSyncUnix('ps', ['-o', 'args=', '-p', ppidUnix], { encoding: 'utf8', timeout: 2000 });
+          const psUnix = spawnSyncUnix('ps', ['-o', 'args=', '-p', ppidUnix], {
+            encoding: 'utf8',
+            timeout: 2000,
+          });
           const out = (psUnix.stdout || '').trim();
           if (out.includes('claude-opus')) {
             ceiling = 950000;
@@ -290,19 +304,19 @@ function getDynamicTokenCeiling() {
 function checkExecutionLimit(hookInput, toolName, toolInput) {
   try {
     const sessionId = getSessionId(hookInput);
-    
+
     // --- Phase 4b: Dynamic Token Limit Check to prevent API 429s ---
     try {
       const budgetTracker = require('../../lib/utils/token-budget-tracker.cjs');
       const tokenStatus = budgetTracker.checkBudgetStatus(sessionId);
-      
+
       const TOKEN_CEILING = getDynamicTokenCeiling();
       if (tokenStatus && tokenStatus.used > TOKEN_CEILING) {
         if (toolName !== 'TaskOutput' && toolName !== 'TaskUpdate' && toolName !== 'TaskList') {
           return {
             checked: true,
             action: 'block',
-            message: `[SYSTEM URGENT] Context pressure > ${Math.floor(TOKEN_CEILING/1000)}k tokens (${tokenStatus.used} used). You MUST call TaskOutput() immediately to yield control or you will crash. Do not execute any more tools.`
+            message: `[SYSTEM URGENT] Context pressure > ${Math.floor(TOKEN_CEILING / 1000)}k tokens (${tokenStatus.used} used). You MUST call TaskOutput() immediately to yield control or you will crash. Do not execute any more tools.`,
           };
         }
       }

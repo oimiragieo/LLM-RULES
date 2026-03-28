@@ -40,19 +40,19 @@ PostgreSQL, C4 diagrams, and IoT architecture.
 
 ## Agent Roster
 
-| Agent | Use when | Key signals |
-| --- | --- | --- |
-| `api-designer` | REST and gRPC API design | API shape, contracts, OpenAPI, gRPC |
-| `graphql-pro` | GraphQL schema and federation work | GraphQL, Apollo, federation, resolver design |
-| `microservices-architect` | Distributed systems architecture | microservices, DDD, eventing, service boundaries |
-| `database-architect` | Database schema and design work | schema, relational design, normalization |
-| `sql-pro` | SQL query work | SQL tuning, query shape, indexes |
-| `postgres-pro` | PostgreSQL-specific work | PostgreSQL, Postgres extensions, migrations |
-| `c4-context` | Context diagrams | system context, landscape |
-| `c4-container` | Container diagrams | container view, runtime boundaries |
-| `c4-component` | Component diagrams | component view, internal structure |
-| `c4-code` | Code-level diagrams | code relationships, implementation view |
-| `iot-engineer` | IoT system architecture | IoT devices, telemetry, edge systems |
+| Agent                     | Use when                           | Key signals                                      |
+| ------------------------- | ---------------------------------- | ------------------------------------------------ |
+| `api-designer`            | REST and gRPC API design           | API shape, contracts, OpenAPI, gRPC              |
+| `graphql-pro`             | GraphQL schema and federation work | GraphQL, Apollo, federation, resolver design     |
+| `microservices-architect` | Distributed systems architecture   | microservices, DDD, eventing, service boundaries |
+| `database-architect`      | Database schema and design work    | schema, relational design, normalization         |
+| `sql-pro`                 | SQL query work                     | SQL tuning, query shape, indexes                 |
+| `postgres-pro`            | PostgreSQL-specific work           | PostgreSQL, Postgres extensions, migrations      |
+| `c4-context`              | Context diagrams                   | system context, landscape                        |
+| `c4-container`            | Container diagrams                 | container view, runtime boundaries               |
+| `c4-component`            | Component diagrams                 | component view, internal structure               |
+| `c4-code`                 | Code-level diagrams                | code relationships, implementation view          |
+| `iot-engineer`            | IoT system architecture            | IoT devices, telemetry, edge systems             |
 
 ## Default Gateway Agent
 
@@ -84,6 +84,7 @@ clearly favor a narrower specialist.
 Use `Skill({ skill: 'context-compressor' })` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
+
 - You need to compare several architecture-data specialties before routing.
 - Retrieved context is too large to keep directly in working memory.
 - You are preparing an evidence-heavy routing handoff.

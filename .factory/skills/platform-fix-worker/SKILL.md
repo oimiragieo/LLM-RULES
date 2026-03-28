@@ -10,6 +10,7 @@ NOTE: Startup and cleanup are handled by `worker-base`. This skill defines the W
 ## When to Use This Skill
 
 Features involving:
+
 - Windows path resolution fixes (MODULE_NOT_FOUND)
 - Glob pattern cross-platform compatibility
 - WSL/bash script compatibility
@@ -62,8 +63,16 @@ Features involving:
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "pnpm validate:full:parallel", "exitCode": 0, "observation": "All validators pass, no MODULE_NOT_FOUND" },
-      { "command": "pnpm test:tools", "exitCode": 0, "observation": "15 tool tests executed and passed" }
+      {
+        "command": "pnpm validate:full:parallel",
+        "exitCode": 0,
+        "observation": "All validators pass, no MODULE_NOT_FOUND"
+      },
+      {
+        "command": "pnpm test:tools",
+        "exitCode": 0,
+        "observation": "15 tool tests executed and passed"
+      }
     ],
     "interactiveChecks": []
   },

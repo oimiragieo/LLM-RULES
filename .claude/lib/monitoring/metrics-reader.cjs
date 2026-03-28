@@ -16,6 +16,20 @@ const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 
+function parseMetricLine(line) {
+  const metric = safeParseJSON(line);
+  if (!metric || typeof metric !== 'object' || Array.isArray(metric)) {
+    return null;
+  }
+
+  const timestamp = typeof metric.timestamp === 'string' ? metric.timestamp : '';
+  if (!timestamp || Number.isNaN(new Date(timestamp).getTime())) {
+    return null;
+  }
+
+  return metric;
+}
+
 function percentile(values, p) {
   if (!Array.isArray(values) || values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
@@ -53,13 +67,14 @@ async function readMetrics(file, options = {}) {
   for await (const line of rl) {
     try {
       if (line.trim()) {
-        const { success, data: metric } = safeParseJSON(line);
-        if (success) {
-          const metricTime = new Date(metric.timestamp).getTime();
+        const metric = parseMetricLine(line);
+        if (!metric) {
+          continue;
+        }
+        const metricTime = new Date(metric.timestamp).getTime();
 
-          if (metricTime >= cutoffTime) {
-            metrics.push(metric);
-          }
+        if (metricTime >= cutoffTime) {
+          metrics.push(metric);
         }
       }
     } catch (error) {
@@ -99,15 +114,15 @@ async function readMetricsWithStats(file, options = {}) {
     totalLines++;
     try {
       if (line.trim()) {
-        const { success, data: metric } = safeParseJSON(line);
-        if (success) {
-          const metricTime = new Date(metric.timestamp).getTime();
-
-          if (metricTime >= cutoffTime) {
-            metrics.push(metric);
-          }
-        } else {
+        const metric = parseMetricLine(line);
+        if (!metric) {
           parseErrors++;
+          continue;
+        }
+        const metricTime = new Date(metric.timestamp).getTime();
+
+        if (metricTime >= cutoffTime) {
+          metrics.push(metric);
         }
       }
     } catch (_error) {
