@@ -2,30 +2,32 @@
 
 Testing surface, validation approach, and resource cost classification.
 
-**What belongs here:** How to test the user-facing surface, tool requirements, resource costs.
-**What does NOT belong here:** Unit test details (those are in services.yaml commands).
+**What belongs here:** How to validate mission output through its real user surface.
 
 ---
 
 ## Validation Surface
-- **Primary surface:** CLI (Claude Code terminal session)
-- **No web UI** — agent-studio is a Claude Code extension, not a web application
-- **No browser testing needed** — all validation is via test suites, CLI scripts, and integration tests
 
-## Validation Tools
-- `node --test` — Unit and integration tests (984 files)
-- `pnpm validate:full` — 20+ validation scripts (reference integrity, schema compliance, routing consistency)
-- `pnpm integration:headless` — Full agent framework integration test
-- `pnpm metrics:ci` — Routing, spawn, memory, and findings metrics validation
+Primary surface: CLI test commands and validation scripts.
+No browser-based UI to test.
+
+### Available Test Commands
+- `pnpm test` — Unit/integration tests (~9000 tests, ~2-3 min)
+- `pnpm test:framework` — Framework tests (~3250 tests, ~2-3 min)
+- `pnpm test:all` — Combined (runs both in parallel)
+- `pnpm test:tools` — Tool tests (currently 0 on Windows due to glob issue)
+- `pnpm test:code-indexing` — Code indexing (79 tests, ~30s)
+- `pnpm validate:full` — Full validation pipeline (~2-5 min)
+- `pnpm validate:routing` — Routing consistency
+- `pnpm validate:skills` — Skill-agent consistency
+- `pnpm skills:ecosystem:gate` — Skill ecosystem scoring
+- `pnpm metrics:ci` — Metrics and SLO checks
+- `pnpm integration:headless` — Headless integration (144 checks, ~90s)
+- `pnpm format:check` — Formatting validation
 
 ## Validation Concurrency
-- Machine: 128GB RAM, 16 logical processors, ~65GB available
-- Test concurrency: 1 (set in test command, node --test --test-concurrency=1)
-- Validation scripts can run sequentially via `pnpm validate:full` or parallel via `pnpm validate:full:parallel`
-- Max concurrent validators: 5 (CLI-only surface, each validator uses ~200MB for node process)
 
-## Resource Cost Classification
-- **Unit tests:** Lightweight (~200MB per node process). Can run with concurrency=1 safely.
-- **Validation suite:** Medium (~500MB peak for schema validation with --max-old-space-size=4096). Run sequentially.
-- **Integration test:** Heavier (~1GB for full framework simulation). Run alone.
-- **Metrics CI:** Lightweight (~200MB). Can run after other tests.
+Machine: 128GB RAM, 16 cores.
+Max concurrent validators: 5 (CLI-based validation is lightweight).
+Each test suite uses ~500MB-1GB RAM.
+All suites complete within 5 minutes individually.

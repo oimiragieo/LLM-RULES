@@ -1,14 +1,18 @@
 commands:
   install: pnpm install
-  test: node --test --test-concurrency=1 "tests/**/*.test.{mjs,cjs}"
-  test_framework: node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs .claude/lib/**/*.test.cjs tests/hooks/*.test.cjs tests/lib/**/*.test.cjs
-  validate: pnpm validate:full:parallel
-  validate_full: pnpm validate:full
-  format: pnpm format
-  format_check: pnpm format:check
-  integration: pnpm integration:headless
-  integration_json: pnpm integration:headless:json
-  metrics_ci: pnpm metrics:ci
-  lint: pnpm format:check
+  test: pnpm test
+  test:framework: pnpm test:framework
+  test:all: pnpm test:all
+  test:tools: pnpm test:tools
+  test:code-indexing: pnpm test:code-indexing
+  validate:full: pnpm validate:full
+  validate:routing: pnpm validate:routing
+  validate:skills: pnpm validate:skills
+  validate:hooks:docs: pnpm validate:hooks:docs
+  skills:ecosystem:gate: pnpm skills:ecosystem:gate
+  metrics:ci: pnpm metrics:ci
+  integration:headless: pnpm integration:headless
+  format:check: pnpm format:check
+  lint: pnpm lint
 
 services: {}

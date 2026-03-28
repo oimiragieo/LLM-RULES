@@ -1,31 +1,28 @@
 # Architecture
 
-Architectural decisions, patterns discovered, and system design notes.
+Key architectural patterns and decisions for agent-studio.
 
-**What belongs here:** Architectural decisions made during the mission, patterns discovered, design rationale.
-**What does NOT belong here:** Environment setup (use environment.md), testing details (use user-testing.md).
+**What belongs here:** Architectural decisions, module boundaries, integration patterns, routing architecture.
+**What does NOT belong here:** Service ports/commands (use `.factory/services.yaml`).
 
 ---
 
-## Routing Architecture
-- **Current:** Flat routing — main session (router) classifies intent and dispatches to 1 of 109 agents via Task()
-- **Target (M2):** Hierarchical — core router dispatches to ~12 targets (10 core agents + domain sub-routers). Sub-routers handle fine-grained agent selection within their domain.
-- **Design document:** `.claude/designs/hierarchical-routing-architecture.md`
+## Codebase Structure
+- `.claude/` — Main codebase: agents, skills, hooks, lib, tools, workflows, schemas, config, context
+- `tests/` — Test suites organized by area (hooks/, lib/, skills/, agents/, audit/, commands/)
+- `scripts/` — Build, validation, and utility scripts
 
-## Hook Architecture
-- Hooks are registered in `.claude/settings.json`
-- Each hook is a separate .cjs file spawned as a Node.js process
-- Hook types: UserPromptSubmit, PreToolUse, PostToolUse, PostToolUseFailure, SessionEnd, PreCompact, Stop
-- Hooks communicate via state files in `.claude/context/runtime/`
+## Key Subsystems
+- **Routing:** Unified pipeline in `user-prompt-unified.core.cjs` (2,216 lines). Hierarchical routing via 9 domain sub-routers.
+- **Creators:** skill-creator and agent-creator in `.claude/skills/`, with SKILL.md + docs/ + scripts/ structure.
+- **Reflection:** RECE loop (Reflect-Evaluate-Correct-Execute) via 9 hook files + 1 agent + 2 workflows.
+- **Memory:** Session handoff, learnings, patterns, gotchas, integration queue.
+- **A2A:** Express HTTP server in `.claude/lib/a2a/` with JSON-RPC 2.0, SSE, SQLite persistence.
+- **Telegram:** MCP relay server + auto-start hook + 10-command bot.
 
-## Memory Architecture
-- 3-tier: STM (short-term), MTM (medium-term), LTM (long-term)
-- Implementation: `.claude/lib/memory/memory-tiers.cjs`
-- Vector storage: LanceDB via `.claude/lib/memory/lancedb-client-impl.cjs`
-- Memory files: `.claude/context/memory/`
-
-## Creator Architecture
-- Skills created via `.claude/skills/skill-creator/SKILL.md`
-- Agents created via `.claude/skills/agent-creator/SKILL.md`
-- Guard: `.claude/hooks/routing/unified-creator-guard.cjs` (TTL-based write access)
-- Post-creation: `.claude/hooks/workflow/post-creation-integration.cjs`
+## Hook Contract
+All hooks must:
+- Read input from stdin (JSON)
+- Write output to stdout (JSON)
+- Use `safeParseJSON` from `.claude/lib/utils/safe-json.cjs`
+- Exit promptly (hooks that block are fatal)

@@ -8,18 +8,17 @@ Environment variables, external dependencies, and setup notes.
 ---
 
 ## Platform
-- Windows 10, 128GB RAM, 16 logical processors
-- Node.js v22+, pnpm package manager
-- PowerShell default shell (use semicolons not && for command chaining)
+- Primary: Windows 10 (10.0.26200)
+- Node.js available via pnpm
+- 128GB RAM, 16 logical processors
+- WSL available but init.sh has known path issues
 
-## Key Dependencies
-- `proper-lockfile` — File locking (MUST use for concurrent state file access on Windows)
-- `@lancedb/lancedb` + `fastembed` — Vector search for code indexing and memory
-- `tree-sitter` — AST parsing for code indexing
-- `@ast-grep/cli` — Structural code search
-- `ajv` + `ajv-formats` — JSON Schema validation
+## Key Environment Variables
+- `HIERARCHICAL_ROUTING` — `on`/`off` to enable/disable hierarchical routing (default: off)
+- `CHANNEL_AUTO_START` — `true` to auto-start Telegram channel session
+- `A2A_AUTO_START` — `true` to auto-start A2A server (port 3100)
+- `TELEGRAM_BOT_TOKEN` — Required for Telegram integration
+- `REFLECTION_SEMANTIC_READ` — `off` to disable semantic prior learnings in reflection
 
-## Environment Variables
-- See `.env.example` for full list
-- `HIERARCHICAL_ROUTING` — Feature flag for hierarchical routing (M2). Values: `on`/`off`. Default: `off`.
-- `MEMORY_MODE` — Memory injection mode: `hybrid` (default) or `observational`
+## External Services
+- Ollama on localhost:11434 (do not modify)
