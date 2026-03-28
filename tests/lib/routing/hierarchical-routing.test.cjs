@@ -44,12 +44,8 @@ describe('hierarchical routing table', () => {
   it('keeps direct specialist routes for review prompts', () => {
     const result = classifyDomain('Please review this pull request for regressions.');
 
-    assert.deepStrictEqual(result, {
-      type: 'direct',
-      agent: 'code-reviewer',
-      source: 'hierarchical_table',
-      keyword: 'review',
-    });
+    assert.strictEqual(result.type, 'direct');
+    assert.strictEqual(result.agent, 'code-reviewer');
   });
 });
 

@@ -2,6 +2,41 @@
 
 const { ROUTING_TABLE } = require('./routing-table-core-map.cjs');
 
+const CORE_DIRECT_ROUTE_AGENTS = Object.freeze([
+  'developer',
+  'planner',
+  'architect',
+  'qa',
+  'general-assistant',
+  'code-reviewer',
+  'code-simplifier',
+  'technical-writer',
+  'researcher',
+  'context-compressor',
+]);
+
+const META_ORCHESTRATION_AGENTS = Object.freeze([
+  'master-orchestrator',
+  'swarm-coordinator',
+  'party-orchestrator',
+  'evolution-orchestrator',
+  'heartbeat-orchestrator',
+  'loop-operator',
+  'artifact-integrator',
+  'reflection-agent',
+  'memory-manager',
+  'task-manager',
+  'ecosystem-auditor',
+  'conductor-validator',
+  'claude-md-auditor',
+  'channel-responder',
+]);
+
+const PRESERVED_DIRECT_ROUTE_AGENTS = Object.freeze([
+  ...CORE_DIRECT_ROUTE_AGENTS,
+  ...META_ORCHESTRATION_AGENTS,
+]);
+
 const DOMAIN_ROUTERS = Object.freeze({
   'web-frontend': 'domain-router-web-frontend',
   'backend-languages': 'domain-router-backend',
@@ -172,12 +207,20 @@ const UNIQUE_ROUTING_TARGETS = Object.freeze(
   [...new Set(Object.values(DOMAIN_ROUTING_TABLE).map(entry => entry.agent || entry.router))].sort()
 );
 
+function isPreservedDirectRouteAgent(agentId) {
+  return PRESERVED_DIRECT_ROUTE_AGENTS.includes(String(agentId || '').trim().toLowerCase());
+}
+
 module.exports = {
   DOMAIN_ROUTING_TABLE,
   DOMAIN_ROUTERS,
+  CORE_DIRECT_ROUTE_AGENTS,
+  META_ORCHESTRATION_AGENTS,
+  PRESERVED_DIRECT_ROUTE_AGENTS,
   DIRECT_AGENT_ALIASES,
   AGENT_TO_DOMAIN,
   UNIQUE_ROUTING_TARGETS,
   buildDomainRoutingTable,
   getHierarchicalEntryForAgent,
+  isPreservedDirectRouteAgent,
 };

@@ -6,12 +6,14 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { spawnSync } = require('child_process');
 const {
   EmbeddingGenerator,
 } = require('../../../.claude/lib/code-indexing/embedding-generator.cjs');
 const semanticRouter = require('../../../.claude/lib/routing/semantic-router.cjs');
 
 const originalEmbedder = process.env.CODE_INDEX_EMBEDDER;
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 beforeEach(() => {
   process.env.CODE_INDEX_EMBEDDER = 'mock';
@@ -80,5 +82,43 @@ describe('semantic-router', () => {
 
     assert.ok(results.length >= 1, 'Should return at least one candidate');
     assert.strictEqual(results[0].agent, 'developer');
+  });
+
+  it('returns sub-routers in the top results for domain prompts', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'semantic-router-domains-'));
+    const prototypesPath = path.join(tmpDir, 'routing-prototypes.json');
+
+    const generation = spawnSync(
+      process.execPath,
+      ['.claude/tools/cli/generate-routing-prototypes.cjs', '--output', prototypesPath],
+      {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env, CODE_INDEX_EMBEDDER: 'mock' },
+        encoding: 'utf8',
+      }
+    );
+
+    assert.strictEqual(generation.status, 0, generation.stderr || generation.stdout);
+
+    const cases = [
+      ['Build a React component with responsive Tailwind styles.', 'domain-router-web-frontend'],
+      ['Design a FastAPI service with Pydantic models and async endpoints.', 'domain-router-backend'],
+      ['Plan a Kubernetes rollout with Helm and ArgoCD.', 'domain-router-infra'],
+      ['Evaluate a RAG pipeline with embeddings and retrieval tuning.', 'domain-router-ai-ml'],
+      ['Create a sprint planning and backlog prioritization strategy.', 'domain-router-product'],
+    ];
+
+    for (const [prompt, expectedRouter] of cases) {
+      const results = await semanticRouter.predict(prompt, {
+        prototypesPath,
+        topK: 3,
+        minScore: -1,
+      });
+
+      assert.ok(
+        results.some(result => result.agent === expectedRouter),
+        `expected ${expectedRouter} in top-3 for "${prompt}", got ${results.map(result => result.agent).join(', ')}`
+      );
+    }
   });
 });

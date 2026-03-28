@@ -14,7 +14,10 @@ const {
   DISAMBIGUATION_RULES,
   getPreferredAgent,
 } = require('./routing-table.cjs');
-const { DOMAIN_ROUTING_TABLE } = require('./routing-table-hierarchical.cjs');
+const {
+  DOMAIN_ROUTING_TABLE,
+  isPreservedDirectRouteAgent,
+} = require('./routing-table-hierarchical.cjs');
 const { resolveByPattern } = require('./pattern-router.cjs');
 const { fuzzyMatchIntent, fuzzyMatchIntentAlternatives } = require('./fuzzy-intent-matcher.cjs');
 const { loadCapabilityRouting } = require('./capability-routing-loader.cjs');
@@ -430,6 +433,16 @@ function classifyDomain(prompt) {
   }
 
   const promptLower = normalizedPrompt.toLowerCase();
+  const directClassification = classifyIntent(normalizedPrompt);
+  if (isPreservedDirectRouteAgent(directClassification.defaultAgent)) {
+    return {
+      type: 'direct',
+      agent: directClassification.defaultAgent,
+      source: 'flat_direct',
+      keyword: null,
+    };
+  }
+
   const domainMatch = matchDomainFromRoutingTable(promptLower);
   if (domainMatch) {
     return domainMatch;

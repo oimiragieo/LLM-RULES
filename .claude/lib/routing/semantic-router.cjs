@@ -5,6 +5,7 @@ const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { EmbeddingGenerator } = require('../code-indexing/embedding-generator.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { classifyDomain } = require('./intent-classifier.cjs');
 
 let cachedPrototypes = null;
 
@@ -58,6 +59,31 @@ async function predict(prompt, options = {}) {
       const score = cosineSimilarity(embedding, vector);
       if (score >= minScore) {
         results.push({ agent, score });
+      }
+    }
+
+    const domainMatch = classifyDomain(prompt);
+    if (domainMatch?.type === 'domain' && domainMatch.router) {
+      const routerVector = loaded.prototypes[domainMatch.router];
+      if (Array.isArray(routerVector) && routerVector.length === embedding.length) {
+        const routerScore = cosineSimilarity(embedding, routerVector);
+        const thresholdScore =
+          results.length >= topK
+            ? results
+                .slice()
+                .sort((a, b) => b.score - a.score)[Math.max(0, topK - 1)]?.score ?? routerScore
+            : routerScore;
+
+        const boostedScore = Math.max(routerScore, thresholdScore + 0.001);
+        const existing = results.find(result => result.agent === domainMatch.router);
+        if (existing) {
+          existing.score = Math.max(existing.score, boostedScore);
+        } else {
+          results.push({
+            agent: domainMatch.router,
+            score: boostedScore,
+          });
+        }
       }
     }
 
