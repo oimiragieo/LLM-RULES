@@ -41,14 +41,29 @@ const MODEL_COSTS = {
     output: 0.075 / 1000, // $75 per 1M output tokens
     shorthand: 'opus',
   },
+  'claude-opus-4-5-20251101': {
+    input: 0.015 / 1000, // Backward-compatible alias for legacy tests/configs
+    output: 0.075 / 1000,
+    shorthand: 'opus',
+  },
   'claude-sonnet-4-6': {
     input: 0.003 / 1000, // $3 per 1M input tokens
     output: 0.015 / 1000, // $15 per 1M output tokens
     shorthand: 'sonnet',
   },
+  'claude-sonnet-4-5': {
+    input: 0.003 / 1000, // Backward-compatible alias for legacy tests/configs
+    output: 0.015 / 1000,
+    shorthand: 'sonnet',
+  },
   'claude-haiku-4-5-20251001': {
     input: 0.00025 / 1000, // $0.25 per 1M input tokens
     output: 0.00125 / 1000, // $1.25 per 1M output tokens
+    shorthand: 'haiku',
+  },
+  'claude-haiku-4-5': {
+    input: 0.00025 / 1000, // Backward-compatible alias for legacy tests/configs
+    output: 0.00125 / 1000,
     shorthand: 'haiku',
   },
 };
@@ -280,8 +295,8 @@ function parseAuditLog(projectRoot) {
 
   const events = [];
   for (const line of lines) {
-    const { success, data: event } = safeParseJSON(line, null);
-    if (success && event && event.event === 'ConfigModelSelection') {
+    const event = safeParseJSON(line, null);
+    if (event && typeof event === 'object' && event.event === 'ConfigModelSelection') {
       events.push(event);
     }
   }
@@ -446,8 +461,8 @@ function rotateAuditLogs(options = {}) {
   const lines = content.trim().split('\n').filter(Boolean);
 
   const kept = lines.filter(line => {
-    const { success, data: event } = safeParseJSON(line, null);
-    return success && event && event.timestamp && event.timestamp >= cutoff;
+    const event = safeParseJSON(line, null);
+    return event && typeof event === 'object' && event.timestamp && event.timestamp >= cutoff;
   });
 
   fs.writeFileSync(logPath, kept.join('\n') + (kept.length > 0 ? '\n' : ''));
