@@ -1,0 +1,21 @@
+{
+  "featureId": "fix-routing-overlap-and-ghost-agent",
+  "reviewedAt": "2026-03-28T16:20:00Z",
+  "commitId": "a1641668097fdf50aaefb0c4c6fdec204680a254",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The implementation correctly removes the ghost agent `tmp-routing-1774614986474` from INTENT_KEYWORDS and explicitly allows the `code` keyword overlap mapping to both `code-reviewer` and `developer` in ALLOWED_INTENT_KEYWORD_OVERLAPS. A regression test for these specific fixes was appropriately added.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "The worker encountered pre-existing test failures when running the full baseline suite (`pnpm test` failed with 60 existing failures), leading them to rely solely on targeted test validations. The worker documented this deviation, highlighting that the worker-base skill or mission instructions lack guidance on proceeding with baseline validation when the system is intentionally or known to be in a broken state for that milestone.",
+      "evidence": "Transcript shows `pnpm test` execution resulted in exit code 1. Handoff skillFeedback notes this deviation from `mission-worker-base 1.3 Baseline Validation / compliance-fix-worker steps 6-7`."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review passed. The worker successfully resolved the intent keyword overlap and ghost agent issues by modifying the keyword data file and creating a targeted regression test, fulfilling all requirements of the feature description."
+}

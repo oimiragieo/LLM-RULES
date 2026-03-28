@@ -1,0 +1,59 @@
+{
+  "milestone": "test-compliance",
+  "round": 1,
+  "status": "pass",
+  "validatorsRun": {
+    "test": { "passed": true, "command": "pnpm test:all", "exitCode": 0 },
+    "typecheck": { "passed": true, "command": "pnpm validate:full", "exitCode": 0 },
+    "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 }
+  },
+  "reviewsSummary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "failedFeatures": []
+  },
+  "blockingIssues": [],
+  "appliedUpdates": [
+    {
+      "target": "library",
+      "description": "Added .factory/library/testing-quirks.md to document that safe-json returns null-prototype objects which break assert.deepStrictEqual.",
+      "sourceFeature": "fix-remaining-15-test-failures"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "skills",
+      "suggestion": "Update mission-worker-base and compliance-fix-worker to provide explicit guidance on handling baseline validation (e.g., pnpm test) when the codebase is known to be in a broken state for the current milestone. Multiple workers bypassed full suites in favor of targeted tests.",
+      "evidence": "Observed in features fix-agent-skill-matrix-and-read-safety, fix-lint-warnings, and fix-routing-overlap-and-ghost-agent.",
+      "isSystemic": true
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Provide guidance on using git commit --no-verify when repo-wide pre-commit hooks fail due to unrelated staged files left by previous workers.",
+      "evidence": "Observed in feature fix-metrics-ci-and-validate-full.",
+      "isSystemic": false
+    },
+    {
+      "target": "orchestrator",
+      "suggestion": "Ensure feature descriptions do not contain constraints that conflict with their expectedBehavior fields (e.g., 'Do NOT run pnpm test' vs 'pnpm test exits 0').",
+      "evidence": "Observed in feature fix-metrics-ci-and-validate-full.",
+      "isSystemic": false
+    }
+  ],
+  "rejectedObservations": [
+    {
+      "observation": ".factory/init.sh WSL/bash mismatch needs native-Windows fallback.",
+      "reason": "already-planned-for-milestone-5"
+    },
+    {
+      "observation": "Worker skipped commit step because fix was already present.",
+      "reason": "situational"
+    },
+    {
+      "observation": "Working tree contained many unrelated modified files.",
+      "reason": "situational"
+    }
+  ],
+  "previousRound": null
+}
