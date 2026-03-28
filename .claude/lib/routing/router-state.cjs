@@ -23,6 +23,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const lockfile = require('proper-lockfile');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 const { invalidateCache } = require('../../lib/utils/state-cache.cjs');
 const { readRouterStateFile } = require('../../lib/runtime/state-contracts.cjs');
@@ -52,26 +53,70 @@ function ensureRuntimeDir() {
   }
 }
 
+function ensureStateFileForLock() {
+  const stateFile = getStateFilePath();
+  ensureRuntimeDir();
+
+  if (!fs.existsSync(stateFile)) {
+    try {
+      fs.writeFileSync(stateFile, JSON.stringify(getDefaultState(), null, 2) + '\n', {
+        encoding: 'utf8',
+        flag: 'wx',
+      });
+    } catch (_err) {
+      // Another process may have created the file between existsSync and writeFileSync.
+    }
+  }
+
+  return stateFile;
+}
+
 /**
  * Valid complexity levels
  */
 const VALID_COMPLEXITY_LEVELS = ['trivial', 'low', 'medium', 'high', 'epic'];
 
 // =============================================================================
-// Optimistic Concurrency Constants
+// State Write Retry / Locking Constants
 // =============================================================================
 
 /**
- * Maximum number of retries for optimistic concurrency
+ * Maximum number of retries for locked state writes
  * Security: Prevents infinite loops/DoS
  */
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 8;
 
 /**
  * Base backoff delay in milliseconds for retry
  * Uses exponential backoff: BASE_BACKOFF * 2^(retry-1)
  */
-const BASE_BACKOFF = 100;
+const BASE_BACKOFF = 25;
+
+const SESSION_SCOPED_RESET_DEFAULTS = {
+  complexity: 'trivial',
+  requiresPlannerFirst: false,
+  plannerSpawned: false,
+  requiresSecurityReview: false,
+  securitySpawned: false,
+  architectSpawned: false,
+};
+
+const TRANSIENT_RESET_DEFAULTS = {
+  mode: 'router',
+  taskSpawned: false,
+  taskSpawnedAt: null,
+  taskDescription: null,
+  taskListCalledSincePrompt: false,
+  lastTaskUpdateCall: null,
+  lastTaskUpdateTaskId: null,
+  lastTaskUpdateStatus: null,
+  taskUpdatesThisSession: 0,
+  currentSpawnTaskId: null,
+};
+
+const LOCK_OPTIONS = {
+  stale: 5000,
+};
 
 /**
  * Get default state
@@ -232,34 +277,27 @@ function syncSleep(ms) {
 }
 
 /**
- * Save state with optimistic concurrency control and retry
+ * Save state with a proper-lockfile-protected read-modify-write cycle.
  *
  * SEC-AUDIT-016 FIX #4: Atomic file operations using write-then-rename pattern.
+ * VAL-RTR-004 FIX: Hold a proper-lockfile lock across the full read-modify-write
+ * cycle so concurrent writers cannot lose disjoint fields.
  * SEC-AUDIT-016 FIX #6: Bounded retry with stderr logging on exhaustion.
  *
- * Uses read-modify-write pattern with version checking:
- * 1. Read current state
- * 2. Check version
- * 3. Merge updates
- * 4. Increment version
- * 5. Re-read and verify version hasn't changed
- * 6. Write atomically (temp file + rename)
- *
- * On conflict (version changed), retry with exponential backoff
- *
  * Security safeguards:
- * - Max 5 retries (DoS protection) - SEC-AUDIT-016 FIX #6
+ * - Bounded retries (DoS protection) - SEC-AUDIT-016 FIX #6
  * - Version validated as positive integer (manipulation prevention)
  * - Exponential backoff (thundering herd prevention)
  * - Stderr logging on retry exhaustion - SEC-AUDIT-016 FIX #6
  *
- * @param {Object} updates - Fields to update in state
- * @param {number} [maxRetries=MAX_RETRIES] - Maximum retries (default: 5)
+ * @param {Object|Function} updates - Fields to update in state or updater callback
+ * @param {number} [maxRetries=MAX_RETRIES] - Maximum retries
  * @returns {Object} Merged state that was saved
  * @throws {Error} If save fails after all retries
  */
 function saveStateWithRetry(updates, maxRetries = MAX_RETRIES) {
   const stateFile = getStateFilePath();
+  let lastError = null;
 
   for (let i = 0; i < maxRetries; i++) {
     // Apply exponential backoff on retries (skip first attempt)
@@ -276,47 +314,48 @@ function saveStateWithRetry(updates, maxRetries = MAX_RETRIES) {
       }
     }
 
-    // Step 1: Read current state directly from file
-    const current = loadStateFromFile();
-
-    // Step 2: Validate and normalize version
-    const currentVersion = validateVersion(current.version);
-
-    // Step 3: Merge updates with current state
-    const merged = {
-      ...current,
-      ...updates,
-      // Step 4: Increment version
-      version: currentVersion + 1,
-    };
-
-    // Step 5: Re-read to check for conflicts (TOCTOU check)
-    const recheck = loadStateFromFile();
-    const recheckVersion = validateVersion(recheck.version);
-
-    // If version changed since we read, someone else wrote - retry
-    if (recheckVersion !== currentVersion) {
-      // SEC-AUDIT-016 FIX #6: Log conflict detection
-      if (process.env.METRICS_DEBUG === 'true' || process.env.MEMORY_DEBUG === 'true') {
-        process.stderr.write(
-          `[router-state] Conflict detected on attempt ${i + 1}/${maxRetries}: ` +
-            `expected version ${currentVersion}, found ${recheckVersion}\n`
-        );
-      }
-      continue; // Conflict detected, retry
-    }
-
-    // Step 6: Write atomically (SEC-AUDIT-016 FIX #4)
-    // atomicWriteJSONSync already uses write-then-rename pattern
+    let releaseLock = null;
     try {
-      ensureRuntimeDir();
-      atomicWriteJSONSync(stateFile, merged);
+      const lockTarget = ensureStateFileForLock();
+      releaseLock = lockfile.lockSync(lockTarget, LOCK_OPTIONS);
+
+      // Step 1: Read current state directly from file while holding the lock.
+      const current = loadStateFromFile();
+
+      // Step 2: Validate and normalize version.
+      const currentVersion = validateVersion(current.version);
+
+      // Step 3: Resolve updates, supporting updater callbacks for session-aware resets.
+      const resolvedUpdates =
+        typeof updates === 'function'
+          ? updates({ ...getDefaultState(), ...current })
+          : updates;
+
+      if (
+        resolvedUpdates == null ||
+        typeof resolvedUpdates !== 'object' ||
+        Array.isArray(resolvedUpdates)
+      ) {
+        throw new TypeError('saveStateWithRetry updates must be an object or updater function');
+      }
+
+      // Step 4: Merge updates with current state and increment version.
+      const merged = {
+        ...getDefaultState(),
+        ...current,
+        ...resolvedUpdates,
+        version: currentVersion + 1,
+      };
+
+      // Step 5: Write atomically while reusing the outer proper-lockfile lock.
+      atomicWriteJSONSync(stateFile, merged, { skipLock: true });
       invalidateCache(stateFile);
       // Clear TTL cache so subsequent getState() sees fresh data
       delete getState._cache;
       delete getState._cacheTimestamp;
       return merged;
     } catch (e) {
+      lastError = e;
       // SEC-AUDIT-016 FIX #6: Log write failure
       if (process.env.METRICS_DEBUG === 'true' || process.env.MEMORY_DEBUG === 'true') {
         process.stderr.write(
@@ -325,6 +364,14 @@ function saveStateWithRetry(updates, maxRetries = MAX_RETRIES) {
       }
       // Write failed, retry
       continue;
+    } finally {
+      if (typeof releaseLock === 'function') {
+        try {
+          releaseLock();
+        } catch (_unlockErr) {
+          // Best-effort unlock.
+        }
+      }
     }
   }
 
@@ -334,6 +381,7 @@ function saveStateWithRetry(updates, maxRetries = MAX_RETRIES) {
     `[router-state] CRITICAL: ${errorMsg}\n` +
       `File: ${stateFile}\n` +
       `Updates: ${JSON.stringify(updates)}\n` +
+      `Last error: ${lastError ? lastError.message : 'unknown'}\n` +
       `Consider increasing MAX_RETRIES or investigating concurrent access patterns.\n`
   );
   throw new Error(errorMsg);
@@ -342,31 +390,25 @@ function saveStateWithRetry(updates, maxRetries = MAX_RETRIES) {
 /**
  * Reset to router mode (called on UserPromptSubmit)
  * This indicates a new user prompt has started, so we're back to router context.
- * Uses saveStateWithRetry for safe concurrent updates.
+ * Resets transient per-prompt fields on every prompt while preserving
+ * session-scoped routing knowledge within the same session.
  */
-function resetToRouterMode() {
-  return saveStateWithRetry({
-    mode: 'router',
-    lastReset: new Date().toISOString(),
-    taskSpawned: false,
-    taskSpawnedAt: null,
-    taskDescription: null,
-    sessionId: process.env.CLAUDE_SESSION_ID || null,
-    taskListCalledSincePrompt: false,
-    // Reset complexity tracking fields
-    complexity: 'trivial',
-    requiresPlannerFirst: false,
-    plannerSpawned: false,
-    requiresSecurityReview: false,
-    securitySpawned: false,
-    architectSpawned: false,
-    // Reset TaskUpdate tracking fields
-    lastTaskUpdateCall: null,
-    lastTaskUpdateTaskId: null,
-    lastTaskUpdateStatus: null,
-    taskUpdatesThisSession: 0,
-    // Reset spawn task tracker for a new prompt cycle
-    currentSpawnTaskId: null,
+function resetToRouterMode(extraState = {}) {
+  const hasExplicitSessionId = Object.prototype.hasOwnProperty.call(extraState, 'sessionId');
+  const targetSessionId = hasExplicitSessionId
+    ? extraState.sessionId
+    : process.env.CLAUDE_SESSION_ID || null;
+
+  return saveStateWithRetry(current => {
+    const sameSession = current.sessionId === targetSessionId;
+
+    return {
+      ...TRANSIENT_RESET_DEFAULTS,
+      lastReset: new Date().toISOString(),
+      sessionId: targetSessionId,
+      ...(sameSession ? {} : SESSION_SCOPED_RESET_DEFAULTS),
+      ...extraState,
+    };
   });
 }
 

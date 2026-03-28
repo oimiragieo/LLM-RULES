@@ -256,29 +256,18 @@ function recordPromptFindingsTrendSnapshot(
   // - Router must evaluate whether to spawn agents
   // - Agent mode is for SUBAGENTS, not for Router handling new prompts
   // - Subagent context is tracked by subagent_id in hook input, not state file
-  // Reset to router mode
-  routerState.resetToRouterMode();
-  result.stateReset = true;
-  // ROUTING-003 FIX: Update sessionId in state after reset
-  // This ensures the new session ID is persisted for future boundary detection
-  if (currentSessionId !== null) {
-    routerState.saveStateWithRetry({ sessionId: currentSessionId });
-  }
-  // PRESET-001: Update preset in state when AGENT_PRESET env var is set
-  // This allows spawn-prompt-assembler to read the preset from router-state.json
-  if (process.env.AGENT_PRESET) {
-    routerState.saveStateWithRetry({ preset: process.env.AGENT_PRESET });
-  }
-  // CREATOR-ROUTING-001: Detect creator intent in user prompt
-  // Sets flags in router-state.json for downstream routing-guard enforcement
+  // Reset to router mode while keeping prompt-scoped metadata batched into the same write.
   const creatorIntent = detectCreatorIntent(userPrompt);
+  routerState.resetToRouterMode({
+    sessionId: currentSessionId,
+    preset: process.env.AGENT_PRESET || null,
+    creatorIntentDetected: creatorIntent.detected,
+    detectedCreatorType: creatorIntent.detected ? creatorIntent.type : null,
+    requiredCreatorSkill: creatorIntent.detected ? creatorIntent.skill : null,
+    batchCreation: creatorIntent.detected ? creatorIntent.isBatch || false : false,
+  });
+  result.stateReset = true;
   if (creatorIntent.detected) {
-    routerState.saveStateWithRetry({
-      creatorIntentDetected: true,
-      detectedCreatorType: creatorIntent.type,
-      requiredCreatorSkill: creatorIntent.skill,
-      batchCreation: creatorIntent.isBatch || false,
-    });
     if (process.env.ROUTER_DEBUG === 'true') {
       console.error(
         `[user-prompt-unified:creator] Creator intent detected: ${creatorIntent.type}${creatorIntent.isBatch ? ' (batch)' : ''}`
@@ -906,11 +895,6 @@ function maybeAutoCompress(tokenStatus) {
   } else if (lowMatches > 0 && complexity === 'trivial') {
     complexity = 'low';
   }
-  // Save complexity to router state
-  routerState.setComplexity(complexity);
-  if (requiresSecurityReview) {
-    routerState.setSecurityRequired(true);
-  }
 
   // PLATFORM AWARENESS INJECTION (Phase 4.3 Remediation)
   // Ensure all spawned agents are aware they are on Windows to prevent pathing loops.
@@ -922,13 +906,18 @@ function maybeAutoCompress(tokenStatus) {
     '|  2. NO BASH REDIRECTION: Avoid cat > file. Use Write/Edit tools.     |\n' +
     '|  3. NO /tmp: Use the project temp dir provided in the prompt.         |\n' +
     '+======================================================================+\n';
-  routerState.saveStateWithRetry({ platformAwarenessRule: platformRule });
 
   return {
     complexity: complexity,
     requiresArchitectReview: requiresArchitectReview,
     requiresSecurityReview: requiresSecurityReview,
     multiAgentRequired: requiresArchitectReview || requiresSecurityReview,
+    stateUpdates: {
+      complexity: complexity,
+      requiresPlannerFirst: complexity === 'high' || complexity === 'epic',
+      requiresSecurityReview: requiresSecurityReview,
+      platformAwarenessRule: platformRule,
+    },
   };
 }
 /**
@@ -1105,6 +1094,7 @@ function recordUserPromptResult(result) {
     classification
   );
   const planningReq = detectPlanningRequirement(userPrompt);
+  routerState.saveStateWithRetry(planningReq.stateUpdates);
   result.candidates = candidates;
   result.planningReq = planningReq;
   result.intent = classification.intent || intent;
