@@ -174,9 +174,6 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
           warnings,
         };
       }
-      if (plannerCheck.markPlanner) {
-        routerState.markPlannerSpawned();
-      }
       captureWarn('planner-first-guard', plannerCheck);
     }
 
@@ -203,9 +200,6 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
           warnings,
         };
       }
-      if (securityCheck.markSecurity) {
-        routerState.markSecuritySpawned();
-      }
       captureWarn('security-review-guard', securityCheck);
 
       const architectCheck = checkCodeSimplifierArchitectReview(toolName, toolInput);
@@ -218,9 +212,6 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
           warnings,
         };
       }
-      if (architectCheck.markArchitect) {
-        routerState.markArchitectSpawned();
-      }
       captureWarn('code-simplifier-architect-guard', architectCheck);
 
       const highRiskArchitectCheck = checkHighRiskSpecialistArchitectReview(toolName, toolInput);
@@ -232,9 +223,6 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
           checkName: 'high-risk-specialist-architect-guard',
           warnings,
         };
-      }
-      if (highRiskArchitectCheck.markArchitect) {
-        routerState.markArchitectSpawned();
       }
       captureWarn('high-risk-specialist-architect-guard', highRiskArchitectCheck);
     }

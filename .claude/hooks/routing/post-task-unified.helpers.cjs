@@ -66,6 +66,22 @@ function createPostTaskUnifiedHelpers(deps) {
     return false;
   }
 
+  function isArchitectSpawn(toolInput = {}) {
+    const subagentType = (toolInput.subagent_type || '').toLowerCase();
+    if (subagentType === 'architect') {
+      return true;
+    }
+
+    const prompt = (toolInput.prompt || '').toLowerCase();
+    const description = (toolInput.description || '').toLowerCase();
+    const combined = `${prompt} ${description}`;
+    if (combined.includes('security-architect') || combined.includes('database-architect')) {
+      return false;
+    }
+
+    return prompt.includes('you are architect') || prompt.includes('you are the architect');
+  }
+
   function runAgentContextTracker(toolInput) {
     const description = extractTaskDescription(toolInput);
     if (isPlannerSpawn(toolInput)) {
@@ -78,6 +94,12 @@ function createPostTaskUnifiedHelpers(deps) {
       routerState.markSecuritySpawned();
       if (process.env.ROUTER_DEBUG === 'true') {
         console.error('[post-task-unified] SECURITY-ARCHITECT agent detected and marked');
+      }
+    }
+    if (isArchitectSpawn(toolInput)) {
+      routerState.markArchitectSpawned();
+      if (process.env.ROUTER_DEBUG === 'true') {
+        console.error('[post-task-unified] ARCHITECT agent detected and marked');
       }
     }
     if (process.env.ROUTER_DEBUG === 'true') {

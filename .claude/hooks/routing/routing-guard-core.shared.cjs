@@ -213,21 +213,22 @@ function applyStaleDetection(state) {
     return state;
   }
 
-  const thresholdMs = parseInt(process.env.STATE_STALE_THRESHOLD_MS || '600000', 10);
-  if (isNaN(thresholdMs) || thresholdMs <= 0) {
-    return state;
-  }
   const currentSessionId = process.env.CLAUDE_SESSION_ID || null;
   const stateSessionId = state.sessionId || null;
   const hasSessionMismatch =
     currentSessionId && stateSessionId && String(currentSessionId) !== String(stateSessionId);
+  if (hasSessionMismatch) {
+    return { ...state, mode: 'router', taskSpawned: false, sessionId: currentSessionId };
+  }
+
+  const thresholdMs = parseInt(process.env.STATE_STALE_THRESHOLD_MS || '600000', 10);
+  if (isNaN(thresholdMs) || thresholdMs <= 0) {
+    return state;
+  }
 
   if (!state.lastReset) {
     if (state.mode === 'agent' || state.taskSpawned === true) {
       return state;
-    }
-    if (hasSessionMismatch) {
-      return { ...state, mode: 'router', taskSpawned: false, sessionId: currentSessionId };
     }
     return state;
   }
@@ -237,17 +238,11 @@ function applyStaleDetection(state) {
     if (state.mode === 'agent' || state.taskSpawned === true) {
       return state;
     }
-    if (hasSessionMismatch) {
-      return { ...state, mode: 'router', taskSpawned: false, sessionId: currentSessionId };
-    }
     return state;
   }
 
   const ageMs = Date.now() - resetTime;
   if (ageMs > thresholdMs) {
-    if (hasSessionMismatch) {
-      return { ...state, mode: 'router', taskSpawned: false, sessionId: currentSessionId };
-    }
     return state;
   }
 

@@ -588,15 +588,6 @@ async function runAllChecks(hookInput) {
       message: routingResult.message,
     };
   }
-  if (routingResult.markPlanner) {
-    routerState.markPlannerSpawned();
-  }
-  if (routingResult.markSecurity) {
-    routerState.markSecuritySpawned();
-  }
-  if (routingResult.markArchitect) {
-    routerState.markArchitectSpawned();
-  }
 
   const spawnGuardrailResult = checkSpawnRoleGuardrails(toolInput);
   if (!spawnGuardrailResult.pass) {

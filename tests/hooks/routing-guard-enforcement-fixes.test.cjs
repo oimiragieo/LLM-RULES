@@ -32,6 +32,9 @@ function useTempRouterState(t) {
       process.env.HIGH_RISK_SPECIALIST_ARCHITECT_ENFORCEMENT,
     SPECIALIST_ROUTING_ENFORCEMENT: process.env.SPECIALIST_ROUTING_ENFORCEMENT,
     TASKLIST_FIRST_ENFORCEMENT: process.env.TASKLIST_FIRST_ENFORCEMENT,
+    TASK_RESUME_ENFORCEMENT: process.env.TASK_RESUME_ENFORCEMENT,
+    CONCURRENT_AGENT_CAP_ENFORCEMENT: process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT,
+    TASK_REQUIRE_CORE_MEMORY_READ: process.env.TASK_REQUIRE_CORE_MEMORY_READ,
   };
 
   process.env.ROUTER_STATE_FILE = stateFile;
@@ -269,6 +272,42 @@ test('force mode makes routing-guard the single owner for planner and architect 
     });
     assert.equal(preTaskResult.pass, true);
   });
+});
+
+test('blocked planner spawn does not record plannerSpawned before the task actually runs', async t => {
+  const ctx = useTempRouterState(t);
+  process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
+  process.env.TASK_RESUME_ENFORCEMENT = 'block';
+  process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
+  process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT = 'off';
+  process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
+
+  ctx.setState({
+    mode: 'router',
+    taskSpawned: false,
+    taskListCalledSincePrompt: true,
+    requiresPlannerFirst: true,
+    plannerSpawned: false,
+    complexity: 'high',
+  });
+
+  const toolInput = {
+    subagent_type: 'planner',
+    prompt: 'You are PLANNER. Resume phase 1 implementation.',
+    description: 'Planner resume phase 1 implementation',
+  };
+
+  const result = await preTask.runAllChecks({
+    tool_name: 'Task',
+    tool_input: toolInput,
+    session_id: process.env.CLAUDE_SESSION_ID,
+  });
+
+  assert.equal(result.pass, false);
+  assert.match(result.message, /\[SPAWN-GUARDRAIL\]/);
+
+  ctx.resetCaches();
+  assert.equal(routerState.getState().plannerSpawned, false);
 });
 
 test('router read governance allows documented router reads and gap logging bash command', t => {
