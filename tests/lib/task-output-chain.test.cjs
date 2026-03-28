@@ -68,11 +68,17 @@ describe('task-output-chain', () => {
     it('returns all outputs for a task', () => {
       setTaskOutput('task-1', 'a', 1);
       setTaskOutput('task-1', 'b', 2);
-      assert.deepEqual(getTaskOutputs('task-1'), { a: 1, b: 2 });
+      const outputs = getTaskOutputs('task-1');
+      // getTaskOutputs returns a null-prototype object from safe-json
+      // Compare values explicitly rather than using deepStrictEqual
+      assert.strictEqual(outputs.a, 1);
+      assert.strictEqual(outputs.b, 2);
+      assert.strictEqual(Object.keys(outputs).length, 2);
     });
 
     it('returns empty object for missing task', () => {
-      assert.deepEqual(getTaskOutputs('nonexistent'), {});
+      const outputs = getTaskOutputs('nonexistent');
+      assert.strictEqual(Object.keys(outputs).length, 0);
     });
   });
 

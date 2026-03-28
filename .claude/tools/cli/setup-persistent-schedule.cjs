@@ -135,6 +135,7 @@ function setupUnix() {
       input: newCrontab,
       stdio: ['pipe', 'inherit', 'inherit'],
       shell: false,
+      windowsHide: true,
     });
 
     if (result.status !== 0) {

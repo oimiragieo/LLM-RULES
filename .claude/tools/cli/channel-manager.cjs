@@ -222,6 +222,7 @@ function startChannel() {
         shell: false,
         detached: true,
         stdio: 'ignore',
+        windowsHide: true,
         cwd: ROOT,
       }).unref();
     } catch (_) {

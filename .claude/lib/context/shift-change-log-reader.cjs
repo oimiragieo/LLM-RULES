@@ -2,6 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 
+// Supported schema versions (must match SCHEMA_VERSION in shift-change-log-writer.cjs)
+// v1.0.0: Legacy string resumeInstructions format
+// v2.0.0: Structured resumeInstructions format (objective, nextStep, openTasks, etc.)
+const SUPPORTED_SCHEMA_VERSIONS = ['1.0.0', '2.0.0'];
+
 function readHandoverLog(runtimeDir = path.join(process.cwd(), '.claude/context/runtime')) {
   const logPath = path.join(runtimeDir, 'shift-change-log.json');
 
@@ -21,6 +26,11 @@ function readHandoverLog(runtimeDir = path.join(process.cwd(), '.claude/context/
   }
 
   if (!log.schemaVersion) {
+    return null;
+  }
+
+  // Reject log with unsupported schemaVersion (forward/backward compatibility guard)
+  if (!SUPPORTED_SCHEMA_VERSIONS.includes(log.schemaVersion)) {
     return null;
   }
 

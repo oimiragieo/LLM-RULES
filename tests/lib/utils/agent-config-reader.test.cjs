@@ -39,21 +39,21 @@ const PROJECT_ROOT = path.dirname(path.dirname(path.dirname(__dirname)));
 describe('agent-config-reader', () => {
   describe('normalizeModel', () => {
     it('should normalize opus shorthand to full model ID', () => {
-      assert.strictEqual(normalizeModel('opus'), 'claude-opus-4-5-20251101');
+      assert.strictEqual(normalizeModel('opus'), 'claude-opus-4-6');
     });
 
     it('should normalize sonnet shorthand to full model ID', () => {
-      assert.strictEqual(normalizeModel('sonnet'), 'claude-sonnet-4-5');
+      assert.strictEqual(normalizeModel('sonnet'), 'claude-sonnet-4-6');
     });
 
     it('should normalize haiku shorthand to full model ID', () => {
-      assert.strictEqual(normalizeModel('haiku'), 'claude-haiku-4-5');
+      assert.strictEqual(normalizeModel('haiku'), 'claude-haiku-4-5-20251001');
     });
 
     it('should pass through full model IDs unchanged', () => {
-      assert.strictEqual(normalizeModel('claude-opus-4-5-20251101'), 'claude-opus-4-5-20251101');
-      assert.strictEqual(normalizeModel('claude-sonnet-4-5'), 'claude-sonnet-4-5');
-      assert.strictEqual(normalizeModel('claude-haiku-4-5'), 'claude-haiku-4-5');
+      assert.strictEqual(normalizeModel('claude-opus-4-6'), 'claude-opus-4-6');
+      assert.strictEqual(normalizeModel('claude-sonnet-4-6'), 'claude-sonnet-4-6');
+      assert.strictEqual(normalizeModel('claude-haiku-4-5-20251001'), 'claude-haiku-4-5-20251001');
     });
 
     it('should handle unknown models by returning input', () => {
@@ -61,26 +61,26 @@ describe('agent-config-reader', () => {
     });
 
     it('should handle null/undefined by returning sonnet default', () => {
-      assert.strictEqual(normalizeModel(null), 'claude-sonnet-4-5');
-      assert.strictEqual(normalizeModel(undefined), 'claude-sonnet-4-5');
-      assert.strictEqual(normalizeModel(''), 'claude-sonnet-4-5');
+      assert.strictEqual(normalizeModel(null), 'claude-sonnet-4-6');
+      assert.strictEqual(normalizeModel(undefined), 'claude-sonnet-4-6');
+      assert.strictEqual(normalizeModel(''), 'claude-sonnet-4-6');
     });
   });
 
   describe('MODEL_ALIASES', () => {
     it('should have bidirectional mapping for opus', () => {
       assert.ok(MODEL_ALIASES['opus']);
-      assert.ok(MODEL_ALIASES['claude-opus-4-5-20251101']);
+      assert.ok(MODEL_ALIASES['claude-opus-4-6']);
     });
 
     it('should have bidirectional mapping for sonnet', () => {
       assert.ok(MODEL_ALIASES['sonnet']);
-      assert.ok(MODEL_ALIASES['claude-sonnet-4-5']);
+      assert.ok(MODEL_ALIASES['claude-sonnet-4-6']);
     });
 
     it('should have bidirectional mapping for haiku', () => {
       assert.ok(MODEL_ALIASES['haiku']);
-      assert.ok(MODEL_ALIASES['claude-haiku-4-5']);
+      assert.ok(MODEL_ALIASES['claude-haiku-4-5-20251001']);
     });
   });
 
@@ -177,17 +177,17 @@ describe('agent-config-reader', () => {
   describe('resolveAgentModel', () => {
     it('should resolve planner model correctly', () => {
       const result = resolveAgentModel('planner', PROJECT_ROOT);
-      assert.strictEqual(result.model, 'claude-opus-4-5-20251101');
+      assert.strictEqual(result.model, 'claude-opus-4-6');
     });
 
     it('should resolve developer model correctly', () => {
       const result = resolveAgentModel('developer', PROJECT_ROOT);
-      assert.strictEqual(result.model, 'claude-sonnet-4-5');
+      assert.strictEqual(result.model, 'claude-sonnet-4-6');
     });
 
     it('should resolve qa model correctly', () => {
       const result = resolveAgentModel('qa', PROJECT_ROOT);
-      assert.strictEqual(result.model, 'claude-opus-4-5-20251101');
+      assert.strictEqual(result.model, 'claude-opus-4-6');
     });
 
     it('should resolve security-architect model from configured sources', () => {
@@ -199,7 +199,7 @@ describe('agent-config-reader', () => {
       const result = resolveAgentModel('unknown-agent', PROJECT_ROOT);
       // Unknown agent should use complexity default (sonnet)
       assert.strictEqual(result.source, 'complexity-default');
-      assert.strictEqual(result.model, 'claude-sonnet-4-5');
+      assert.strictEqual(result.model, 'claude-sonnet-4-6');
     });
 
     it('should return shorthand and normalized model', () => {
@@ -240,7 +240,7 @@ describe('agent-config-reader', () => {
 
       fs.writeFileSync(
         path.join(tempRoot, '.claude', 'config.yaml'),
-        'agents:\n  planner:\n    model: claude-haiku-4-5\n',
+        'agents:\n  planner:\n    model: claude-haiku-4-5-20251001\n',
         'utf8'
       );
       fs.writeFileSync(
@@ -251,7 +251,7 @@ describe('agent-config-reader', () => {
 
       const plannerResult = resolveAgentModel('planner', tempRoot);
       assert.strictEqual(plannerResult.source, 'frontmatter');
-      assert.strictEqual(plannerResult.model, 'claude-opus-4-5-20251101');
+      assert.strictEqual(plannerResult.model, 'claude-opus-4-6');
 
       const unknownResult = resolveAgentModel('totally-unknown', tempRoot);
       assert.strictEqual(unknownResult.source, 'complexity-default');
