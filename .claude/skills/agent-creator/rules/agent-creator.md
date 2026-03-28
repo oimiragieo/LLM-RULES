@@ -11,7 +11,7 @@ Creates specialized AI agents on-demand when no existing agent matches a request
 - Align agent to BLS OOH occupational profiles (Step 2.3)
 - Compare against Ongig job titles for routing keywords
 - Use MyMajors career skills for real-world skill grounding
-- Run skills gap analysis and invoke skill-creator/skill-updater for gaps
+- Run skills gap analysis and record follow-up items for reusable skill gaps
 - Assign relevant skills to new agents
 
 ## Integration Points

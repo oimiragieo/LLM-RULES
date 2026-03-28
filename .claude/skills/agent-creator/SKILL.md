@@ -17,7 +17,7 @@ best_practices:
   - Align agent to BLS OOH occupational profiles (Step 2.3)
   - Compare against Ongig job titles for routing keywords
   - Use MyMajors career skills for real-world skill grounding
-  - Run skills gap analysis and invoke skill-creator/skill-updater for gaps
+  - Run skills gap analysis and record follow-up items for reusable skill gaps
   - Assign relevant skills to new agents
 error_handling: graceful
 streaming: supported
@@ -27,7 +27,7 @@ lastVerifiedAt: '2026-02-28'
 dependencies: [research-synthesis]
 ---
 
-**Mode: Hybrid (Prompt + Scripted Guardrails)** - Use prompt workflow plus `scripts/main.cjs` for contract-safe generation/validation.
+**Mode: Script-First** - Use `scripts/main.cjs` as the canonical path for generation and validation, then use this guide for research, skill assignment, and integration follow-through.
 
 # Agent Creator Skill
 
@@ -112,8 +112,9 @@ Every new agent still needs a deliberate skill set.
 
 1. Scan the existing skill catalog.
 2. Identify primary, supporting, and on-demand skills.
-3. Include the assigned skills in frontmatter and in the workflow Step 0 load sequence.
-4. Keep search-oriented and task-management skills aligned with existing conventions.
+3. Record reusable skill gaps as **Follow-Up** items for the appropriate creator/updater instead of invoking another creator inline from this workflow.
+4. Include the assigned skills in frontmatter and in the workflow Step 0 load sequence.
+5. Keep search-oriented and task-management skills aligned with existing conventions.
 
 ### Step 4: Determine Agent Configuration
 
@@ -185,4 +186,5 @@ And keep the generated body aligned with these sections:
 ## Notes
 
 - Use [integration reference](./docs/integration-reference.md) for the preserved verbose Step 6-14 guidance.
+- If the agent uncovers reusable skill work, capture it as a Follow-Up for the next creator workflow rather than chaining to `skill-creator` inline.
 - Use [examples and evaluation](./docs/examples-and-evaluation.md) for the preserved examples, orchestrator sync notes, and optional evaluation material.

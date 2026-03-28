@@ -28,32 +28,32 @@ diff <(grep "^## " .claude/skills/tdd/SKILL.md) <(grep "^## " .claude/skills/{sk
 
 This skill is part of the Creator Ecosystem. After creating a skill, consider if companion artifacts are needed:
 
-| Gap Discovered                           | Required Artifact | Creator to Invoke                      | When                              |
-| ---------------------------------------- | ----------------- | -------------------------------------- | --------------------------------- |
-| Domain knowledge needs a reusable skill  | skill             | `Skill({ skill: 'skill-creator' })`    | Gap is a full skill domain        |
-| Existing skill has incomplete coverage   | skill update      | `Skill({ skill: 'skill-updater' })`    | Close skill exists but incomplete |
-| Capability needs a dedicated agent       | agent             | `Skill({ skill: 'agent-creator' })`    | Agent to own the capability       |
-| Existing agent needs capability update   | agent update      | `Skill({ skill: 'agent-updater' })`    | Close agent exists but incomplete |
-| Domain needs code/project scaffolding    | template          | `Skill({ skill: 'template-creator' })` | Reusable code patterns needed     |
-| Behavior needs pre/post execution guards | hook              | `Skill({ skill: 'hook-creator' })`     | Enforcement behavior required     |
-| Process needs multi-phase orchestration  | workflow          | `Skill({ skill: 'workflow-creator' })` | Multi-step coordination needed    |
-| Artifact needs structured I/O validation | schema            | `Skill({ skill: 'schema-creator' })`   | JSON schema for artifact I/O      |
-| User interaction needs a slash command   | command           | `Skill({ skill: 'command-creator' })`  | User-facing shortcut needed       |
-| Repeated logic needs a reusable CLI tool | tool              | `Skill({ skill: 'tool-creator' })`     | CLI utility needed                |
-| Narrow/single-artifact capability only   | inline            | Document within this artifact only     | Too specific to generalize        |
+| Gap Discovered                           | Required Artifact | Action to Record                          | When                              |
+| ---------------------------------------- | ----------------- | ----------------------------------------- | --------------------------------- |
+| Domain knowledge needs a reusable skill  | skill             | Handle inside this flow                    | Gap is a full skill domain        |
+| Existing skill has incomplete coverage   | skill update      | Hand off to `skill-updater` if needed      | Close skill exists but incomplete |
+| Capability needs a dedicated agent       | agent             | Add a **Follow-Up** for `agent-creator`    | Agent should own the capability   |
+| Existing agent needs capability update   | agent update      | Add a follow-up for `agent-updater`        | Close agent exists but incomplete |
+| Domain needs code/project scaffolding    | template          | Add a follow-up for `template-creator`     | Reusable code patterns needed     |
+| Behavior needs pre/post execution guards | hook              | Add a follow-up for `hook-creator`         | Enforcement behavior required     |
+| Process needs multi-phase orchestration  | workflow          | Add a follow-up for `workflow-creator`     | Multi-step coordination needed    |
+| Artifact needs structured I/O validation | schema            | Add a follow-up for `schema-creator`       | JSON schema for artifact I/O      |
+| User interaction needs a slash command   | command           | Add a follow-up for `command-creator`      | User-facing shortcut needed       |
+| Repeated logic needs a reusable CLI tool | tool              | Add a follow-up for `tool-creator`         | CLI utility needed                |
+| Narrow/single-artifact capability only   | inline            | Document within this artifact only         | Too specific to generalize        |
 
 **Chain Example:**
 
 ```text
 [SKILL-CREATOR] Created: <new-skill-name> skill
 [SKILL-CREATOR] This skill needs a dedicated agent...
-[SKILL-CREATOR] -> Invoking agent-creator to create <new-agent-name> agent
-[AGENT-CREATOR] Created: <new-agent-name> agent with <new-skill-name> skill
+[SKILL-CREATOR] -> Added Follow-Up: agent-creator should evaluate <new-agent-name>
+[FOLLOW-UP] agent-creator review queued with required skill: <new-skill-name>
 ```
 
 **Integration Verification:**
 
-After using companion creators, verify the full chain:
+After recording or completing companion follow-ups, verify the resulting chain:
 
 ```bash
 # Verify skill exists
@@ -104,7 +104,7 @@ These rules are INVIOLABLE. Breaking them causes bugs that are hard to detect.
 
 7. NO CREATION WITHOUT SYSTEM IMPACT ANALYSIS
    - Check if skill requires new routes in CLAUDE.md
-   - Check if skill requires new agent (spawn agent-creator if yes)
+   - Check if skill requires a dedicated agent (record a Follow-Up for agent-creator if yes)
    - Check if existing workflows need updating
    - Check if CLAUDE.md agent table needs updating
    - Document all system changes made
@@ -148,8 +148,8 @@ Run this analysis after every skill creation:
 1. ROUTING TABLE CHECK
    - Does this skill introduce a new capability type?
    - Is there an agent that can use this skill?
-   - If NO agent exists → spawn agent-creator to create one
-   - If new agent created → update CLAUDE.md routing table and routing-table.cjs
+   - If NO agent exists → add a Follow-Up for agent-creator review
+   - If a new agent is later created → update CLAUDE.md routing table and routing-table.cjs
 
 2. AGENT ASSIGNMENT CHECK
    - Which existing agents should have this skill?
@@ -181,7 +181,7 @@ Run this analysis after every skill creation:
 
 1. ROUTING TABLE CHECK
    ❌ No agent handles "documentation" or "writing" tasks
-   → Spawning agent-creator to create technical-writer agent
+   → Added Follow-Up for agent-creator to review a technical-writer agent
    → Adding to CLAUDE.md: | Documentation, docs | technical-writer | ...
 
 2. AGENT ASSIGNMENT CHECK
@@ -332,37 +332,37 @@ Read your assigned skill files to understand specialized workflows:
 - `.claude/skills/<new-skill>/SKILL.md` # Newly added
 ```
 
-## Integration with Agent Creator
+## Integration Follow-Up for Agent Coverage
 
-The skill-creator works with agent-creator for full ecosystem evolution:
+The skill-creator can surface agent coverage gaps without chaining directly into `agent-creator`:
 
 1. **New Capability Request** → skill-creator creates skill
 2. **Auto-Assign** → skill-creator updates relevant agents with new skill
-3. **No Matching Agent** → agent-creator creates agent (with skill auto-discovery)
-4. **Execute Task** → Agent loads skills and handles request
+3. **No Matching Agent** → create a **Follow-Up** item for `agent-creator`
+4. **Execute Task** → Once the follow-up is completed, the new agent loads the skill and handles requests
 
-This enables a self-healing, self-evolving agent ecosystem where:
+This preserves a clean creator boundary while still evolving the ecosystem:
 
-- New skills are automatically distributed to relevant agents
-- New agents automatically discover and include relevant skills
-- Both intake paths ensure skills are properly loaded and used
+- New skills are distributed to relevant agents once follow-ups are completed
+- New agents still discover and include relevant skills
+- The skill and agent creation paths stay decoupled
 
-### Occupational Alignment (Bidirectional Contract)
+### Occupational Alignment Follow-Up
 
-When skill-creator triggers agent-creator (Step 1 above: no matching agent), the spawned agent-creator MUST execute **Step 2.3: Occupational Alignment Research** as part of its creation process. This means:
+When skill creation reveals a missing specialist, the follow-up for `agent-creator` should still require **Step 2.3: Occupational Alignment Research**. That means:
 
 1. The new agent will be grounded in BLS OOH occupational profiles (real-world task and tool data)
 2. Job title variants from Ongig will be collected for routing keyword precision
 3. MyMajors career skill lists will be cross-referenced for coverage gaps
-4. **Any additional skill gaps discovered during Step 2.3** will be reported back to skill-creator for follow-up creation — forming a recursive but bounded improvement loop
+4. **Any additional skill gaps discovered during Step 2.3** should become follow-up items, not inline creator chaining
 
-**Termination condition**: The loop terminates when all real-world skill gaps are either:
+**Termination condition**: The follow-up closes when all real-world skill gaps are either:
 
 - Covered by existing skills in `.claude/skills/`
-- Created as new skills (and wired to the agent)
+- Created as new skills through their own creator runs (and wired to the agent)
 - Explicitly waived with documented reasoning
 
-This contract ensures that skills and agents are always co-aligned with real industry standards, not just internal framework conventions.
+This keeps skills and agents co-aligned with real industry standards without reintroducing circular creator dependencies.
 
 ## Ecosystem Alignment Contract (MANDATORY)
 
@@ -415,7 +415,7 @@ When router analysis has no matching agent/skill for recurring intent:
 
 1. Route evidence to planner or evolution-orchestrator.
 2. Run creation-feasibility gate.
-3. Invoke `skill-creator` (or `agent-creator` if skill is not the right artifact).
+3. Route a Follow-Up to the correct creator (`skill-creator` or `agent-creator`) if this creator is not the right artifact owner.
 4. Complete integration wiring and validation before closing the gap.
 
 Do not bypass this flow with direct unmanaged artifact writes.

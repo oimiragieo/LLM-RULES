@@ -173,22 +173,23 @@ const STATE_FILE = '.claude/context/runtime/active-creators.json';
 /**
  * TTL bounds for creator state (HIGH-002 security fix)
  * Minimum: 30 seconds (prevents zero-window attacks)
- * Maximum: 10 minutes (prevents permanent bypass)
+ * Maximum: 30 minutes (caps long-lived bypass windows while allowing full creator runs)
  */
 const MIN_TTL_MS = 30 * 1000; // 30 seconds minimum
-const MAX_TTL_MS = 10 * 60 * 1000; // 10 minutes maximum
+const MAX_TTL_MS = 30 * 60 * 1000; // 30 minutes maximum
 
 /**
- * Default time-to-live for active creator state (3 minutes)
- * SEC-REMEDIATION-001: Reduced from 10 to 3 minutes to minimize
- * state tampering window while still allowing creator workflow completion.
+ * Default time-to-live for active creator state (30 minutes)
+ * The creator workflow can legitimately span research, generation, and validation steps.
+ * Keep the fallback TTL long enough to cover the full flow, while post-execute cleanup
+ * still clears state immediately on successful completion.
  * HIGH-002 FIX: Add bounds checking for CREATOR_STATE_TTL_MS env var
  */
 const DEFAULT_TTL_MS = (() => {
   const envVal = Number(process.env.CREATOR_STATE_TTL_MS);
   // Invalid values (NaN, Infinity, -Infinity, 0, negative) fall back to default
   if (!Number.isFinite(envVal) || envVal <= 0) {
-    return 3 * 60 * 1000; // 180000ms
+    return 30 * 60 * 1000; // 1800000ms
   }
   // Clamp to MIN/MAX bounds
   return Math.max(MIN_TTL_MS, Math.min(envVal, MAX_TTL_MS));

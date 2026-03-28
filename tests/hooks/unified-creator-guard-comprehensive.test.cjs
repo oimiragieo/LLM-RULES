@@ -422,7 +422,7 @@ describe('unified-creator-guard.cjs - TTL Bounds Validation (HIGH-002)', () => {
     assert.ok(guard.DEFAULT_TTL_MS >= 30000);
   });
 
-  it('should enforce maximum TTL of 10 minutes', () => {
+  it('should enforce maximum TTL of 30 minutes', () => {
     process.env.CREATOR_STATE_TTL_MS = '3600000'; // 1 hour (too long)
     delete require.cache[
       require.resolve(
@@ -433,8 +433,8 @@ describe('unified-creator-guard.cjs - TTL Bounds Validation (HIGH-002)', () => {
       path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs')
     );
 
-    // DEFAULT_TTL_MS should be clamped to MAX_TTL_MS (600000)
-    assert.ok(guard.DEFAULT_TTL_MS <= 600000);
+    // DEFAULT_TTL_MS should be clamped to MAX_TTL_MS (1800000)
+    assert.ok(guard.DEFAULT_TTL_MS <= 1800000);
   });
 
   it('should use default TTL for invalid values', () => {
@@ -448,7 +448,7 @@ describe('unified-creator-guard.cjs - TTL Bounds Validation (HIGH-002)', () => {
       path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs')
     );
 
-    // Should fall back to 3 minutes (180000ms)
-    assert.equal(guard.DEFAULT_TTL_MS, 180000);
+    // Should fall back to 30 minutes (1800000ms)
+    assert.equal(guard.DEFAULT_TTL_MS, 1800000);
   });
 });

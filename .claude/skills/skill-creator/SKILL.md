@@ -22,7 +22,7 @@ lastVerifiedAt: '2026-02-28'
 dependencies: [research-synthesis]
 ---
 
-**Mode: Cognitive/Prompt-Driven** - No standalone utility script; use via agent context.
+**Mode: Script-First** - Use `scripts/create.cjs` as the canonical path for new skill creation, then use this guide for research, review, and integration follow-through.
 
 # Skill Creator
 
@@ -120,11 +120,17 @@ Pick the narrowest action that matches the request:
 
 Complete the preserved research workflow in [research gate details](./docs/research-gate.md) before you finalize the skill body. That reference keeps the original VoltAgent, Exa, arXiv, typed-artifact-search, evidence-quality, and external-content safety material.
 
-### Step 3: Draft the Skill from the Standard Template
+### Step 3: Run the Canonical Create Script
 
-Use the template below as the minimum contract. The detailed format notes, action examples, and layout guidance remain preserved in [enterprise bundle details](./docs/enterprise-bundle.md).
+For a brand-new skill, start with the managed scaffold:
 
-### Step 4: Build the Requested Scaffold
+```bash
+node .claude/skills/skill-creator/scripts/create.cjs --name <skill-name> --description "<summary>"
+```
+
+Use the template below as the contract that the generated `SKILL.md` must satisfy. The detailed format notes, action examples, and layout guidance remain preserved in [enterprise bundle details](./docs/enterprise-bundle.md).
+
+### Step 4: Review the Requested Scaffold
 
 By default, new skills still expect the enterprise bundle unless the request explicitly asks for minimal mode. At minimum, decide whether the skill needs:
 
@@ -145,6 +151,7 @@ Before completion:
 2. Run `node .claude/tools/cli/validate-integration.cjs .claude/skills/<skill-name>/SKILL.md`.
 3. Regenerate the skill index if the artifact is new or materially changed.
 4. Re-run any targeted validators needed for the touched surface.
+5. If the new skill reveals companion artifact work for another creator, record it as a **Follow-Up** item instead of invoking another creator inline from this flow.
 
 ## Template Reference
 
@@ -196,5 +203,6 @@ Required frontmatter fields that must stay explicit: `name`, `description`, `ver
 ## Notes
 
 - Direct creation outside the creator flow risks invisible skills and broken registry state.
+- If the new skill implies a new agent or other companion artifact, capture that as a Follow-Up for the next creator workflow rather than chaining creators inline.
 - Use [integration reference](./docs/integration-reference.md) for the preserved verbose Step 6-13 guidance.
 - Use [examples and evaluation](./docs/examples-and-evaluation.md) for the preserved reference skill, example creation walkthrough, and optional evaluation add-ons.

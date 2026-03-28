@@ -57,15 +57,15 @@ await queueCrossCreatorReview('agent', '.claude/agents/<category>/<agent-name>.m
 
 ## Cross-Reference: Creator Ecosystem
 
-This skill is part of the **Creator Ecosystem**. After creating an agent, consider whether companion creators are needed:
+This skill is part of the **Creator Ecosystem**. After creating an agent, consider whether companion follow-ups are needed:
 
-| Creator              | When to Use                                     | Invocation                             |
-| -------------------- | ----------------------------------------------- | -------------------------------------- |
-| **skill-creator**    | Agent needs new skills not in `.claude/skills/` | `Skill({ skill: 'skill-creator' })`    |
-| **workflow-creator** | Agent needs orchestration workflow              | `Skill({ skill: 'workflow-creator' })` |
-| **template-creator** | Agent needs code templates                      | `Skill({ skill: 'template-creator' })` |
-| **schema-creator**   | Agent needs input/output validation schemas     | `Skill({ skill: 'schema-creator' })`   |
-| **hook-creator**     | Agent needs pre/post execution hooks            | `Skill({ skill: 'hook-creator' })`     |
+| Creator/Updater      | When to Use                                     | Follow-Up Action                              |
+| -------------------- | ----------------------------------------------- | --------------------------------------------- |
+| **skill-creator**    | Agent needs new skills not in `.claude/skills/` | Queue a **Follow-Up** for `skill-creator`     |
+| **workflow-creator** | Agent needs orchestration workflow              | Queue a follow-up for `workflow-creator`      |
+| **template-creator** | Agent needs code templates                      | Queue a follow-up for `template-creator`      |
+| **schema-creator**   | Agent needs input/output validation schemas     | Queue a follow-up for `schema-creator`        |
+| **hook-creator**     | Agent needs pre/post execution hooks            | Queue a follow-up for `hook-creator`          |
 
 ### Integration Workflow
 
@@ -73,11 +73,11 @@ After creating an agent that needs additional capabilities:
 
 ```javascript
 // 1. Agent created but needs new skill
-Skill({ skill: 'skill-creator' });
-// Create the skill, then update agent's skills: array
+// Record Follow-Up: skill-creator should build the reusable skill
+// Then update the agent's skills: array when that follow-up lands
 
 // 2. Agent needs MCP server integration
-// Use skill-creator to convert MCP server to skill
+// Record Follow-Up: skill-creator should convert MCP server to skill
 // node .claude/skills/skill-creator/scripts/convert.cjs --server "@modelcontextprotocol/server-xyz"
 
 // 3. Agent needs workflow
@@ -90,7 +90,7 @@ Skill({ skill: 'skill-creator' });
 After agent is fully created and validated:
 
 ```
-[ ] Does agent need skills that don't exist? -> Use skill-creator
+[ ] Does agent need skills that don't exist? -> Add Follow-Up for skill-creator
 [ ] Does agent need multi-phase orchestration? -> Create workflow
 [ ] Does agent need code scaffolding? -> Create templates
 [ ] Does agent interact with external services? -> Consider MCP integration

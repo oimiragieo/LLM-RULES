@@ -34,12 +34,12 @@ describe('unified-creator-guard - TTL Bounds Checking', () => {
   });
 
   describe('Default TTL', () => {
-    it('should use 180000ms (3 minutes) when no env var set', () => {
+    it('should use 1800000ms (30 minutes) when no env var set', () => {
       delete process.env.CREATOR_STATE_TTL_MS;
 
       const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
-      assert.strictEqual(DEFAULT_TTL_MS, 180000, 'Default should be 3 minutes (180000ms)');
+      assert.strictEqual(DEFAULT_TTL_MS, 1800000, 'Default should be 30 minutes (1800000ms)');
     });
   });
 
@@ -51,43 +51,51 @@ describe('unified-creator-guard - TTL Bounds Checking', () => {
 
       assert.strictEqual(
         DEFAULT_TTL_MS,
-        180000,
+        1800000,
         'Infinity should use default (not max) for security'
       );
     });
 
-    it('should clamp very large values to MAX_TTL_MS (600000ms)', () => {
+    it('should clamp very large values to MAX_TTL_MS (1800000ms)', () => {
       process.env.CREATOR_STATE_TTL_MS = '999999999999';
 
       const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
-      assert.strictEqual(DEFAULT_TTL_MS, 600000, 'Very large value should clamp to 10 minutes');
+      assert.strictEqual(DEFAULT_TTL_MS, 1800000, 'Very large value should clamp to 30 minutes');
     });
 
-    it('should clamp 11 minutes to MAX_TTL_MS (600000ms)', () => {
+    it('should accept 11 minutes as-is', () => {
       process.env.CREATOR_STATE_TTL_MS = String(11 * 60 * 1000); // 660000ms
 
       const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
-      assert.strictEqual(DEFAULT_TTL_MS, 600000, '11 minutes should clamp to 10 minutes');
+      assert.strictEqual(DEFAULT_TTL_MS, 11 * 60 * 1000, '11 minutes should be accepted');
+    });
+
+    it('should clamp 31 minutes to MAX_TTL_MS (1800000ms)', () => {
+      process.env.CREATOR_STATE_TTL_MS = String(31 * 60 * 1000); // 1860000ms
+
+      const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
+
+      assert.strictEqual(DEFAULT_TTL_MS, 1800000, '31 minutes should clamp to 30 minutes');
     });
   });
 
   describe('TTL Minimum Bound', () => {
-    it('should clamp negative values to default (180000ms)', () => {
+    it('should clamp negative values to default (1800000ms)', () => {
       process.env.CREATOR_STATE_TTL_MS = '-1';
 
       const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
-      assert.strictEqual(DEFAULT_TTL_MS, 180000, 'Negative value should use default');
+      assert.strictEqual(DEFAULT_TTL_MS, 1800000, 'Negative value should use default');
     });
 
-    it('should clamp zero to default (180000ms)', () => {
+    it('should clamp zero to default (1800000ms)', () => {
       process.env.CREATOR_STATE_TTL_MS = '0';
 
       const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
-      assert.strictEqual(DEFAULT_TTL_MS, 180000, 'Zero should use default');
+      assert.strictEqual(DEFAULT_TTL_MS, 1800000, 'Zero should use default');
     });
 
     it('should clamp values below 30 seconds to MIN_TTL_MS (30000ms)', () => {
@@ -132,12 +140,12 @@ describe('unified-creator-guard - TTL Bounds Checking', () => {
       assert.strictEqual(DEFAULT_TTL_MS, 30000, '30 seconds should be accepted');
     });
 
-    it('should accept exactly 10 minutes (MAX_TTL_MS)', () => {
-      process.env.CREATOR_STATE_TTL_MS = '600000';
+    it('should accept exactly 30 minutes (MAX_TTL_MS)', () => {
+      process.env.CREATOR_STATE_TTL_MS = '1800000';
 
       const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
-      assert.strictEqual(DEFAULT_TTL_MS, 600000, '10 minutes should be accepted');
+      assert.strictEqual(DEFAULT_TTL_MS, 1800000, '30 minutes should be accepted');
     });
   });
 
@@ -147,7 +155,7 @@ describe('unified-creator-guard - TTL Bounds Checking', () => {
 
       const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
-      assert.strictEqual(DEFAULT_TTL_MS, 180000, 'NaN should use default');
+      assert.strictEqual(DEFAULT_TTL_MS, 1800000, 'NaN should use default');
     });
 
     it('should use default for empty string', () => {
@@ -155,7 +163,7 @@ describe('unified-creator-guard - TTL Bounds Checking', () => {
 
       const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
-      assert.strictEqual(DEFAULT_TTL_MS, 180000, 'Empty string should use default');
+      assert.strictEqual(DEFAULT_TTL_MS, 1800000, 'Empty string should use default');
     });
   });
 });

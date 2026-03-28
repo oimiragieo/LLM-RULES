@@ -221,11 +221,11 @@ After collecting occupational data from all three sources:
    GAP:     "<real-world skill>" → no matching skill exists
    ```
 4. **Resolve each gap:**
-   | Gap Type                          | Action                                          | When                                   |
-   | --------------------------------- | ----------------------------------------------- | -------------------------------------- |
-   | Substantial reusable domain skill | `Skill({ skill: 'skill-creator' })`             | Gap represents a full skill domain     |
-   | Existing skill missing coverage   | `Skill({ skill: 'skill-updater' })`             | A close skill exists but is incomplete |
-   | Narrow agent-specific capability  | Document inline in agent's Capabilities section | Too specific to generalize             |
+   | Gap Type                          | Action                                                 | When                                   |
+   | --------------------------------- | ------------------------------------------------------ | -------------------------------------- |
+   | Substantial reusable domain skill | Record a **Follow-Up** for `skill-creator`             | Gap represents a full skill domain     |
+   | Existing skill missing coverage   | Record a follow-up for `skill-updater`                 | A close skill exists but is incomplete |
+   | Narrow agent-specific capability  | Document inline in agent's Capabilities section        | Too specific to generalize             |
 5. **Record the alignment in the research report** (created in Step 2.5):
    ```markdown
    ## Occupational Alignment
@@ -235,8 +235,8 @@ After collecting occupational data from all three sources:
    | Real-World Skill | Status  | Resolution                                       |
    | ---------------- | ------- | ------------------------------------------------ |
    | skill-name       | COVERED | .claude/skills/matching-skill/                   |
-   | another-skill    | GAP     | created new skill 'new-skill-name'               |
-   | tool-name        | GAP     | updated skill 'existing-skill' with new coverage |
+   | another-skill    | GAP     | follow-up queued for skill-creator: 'new-skill-name' |
+   | tool-name        | GAP     | follow-up queued for skill-updater               |
    ### Ongig Title Alignment
    - Official titles: [list]
    - Used for routing keywords: [list]
@@ -244,36 +244,33 @@ After collecting occupational data from all three sources:
    - Career: [career name and URL]
    - Critical skills identified: [list]
    ```
-#### Bidirectional Gap Trigger (MANDATORY)
-**When creating an AGENT** (this process): After gap analysis, for EACH identified GAP, determine the required companion artifact type and trigger the appropriate creator. Do not document inline what should be a real artifact.
-| Gap Type                                       | Required Artifact | Creator to Invoke                      | When                                                                        |
-| ---------------------------------------------- | ----------------- | -------------------------------------- | --------------------------------------------------------------------------- |
-| Substantial reusable domain skill              | skill             | `Skill({ skill: 'skill-creator' })`    | Gap is a full skill domain (e.g., `finops-kubernetes`, `capacity-planning`) |
-| Existing skill missing coverage                | skill update      | `Skill({ skill: 'skill-updater' })`    | A close skill exists but is incomplete                                      |
-| Agent needs code/project scaffolding           | template          | `Skill({ skill: 'template-creator' })` | Reusable code patterns, starter files, or boilerplate for this domain       |
-| Agent needs pre/post execution guards          | hook              | `Skill({ skill: 'hook-creator' })`     | Enforcement behavior not covered by existing hooks                          |
-| Agent needs orchestration/multi-phase flow     | workflow          | `Skill({ skill: 'workflow-creator' })` | Multi-step coordination pattern that other agents would also reuse          |
-| Agent needs structured input/output validation | schema            | `Skill({ skill: 'schema-creator' })`   | JSON schema for agent I/O or domain data structures                         |
-| Narrow agent-specific capability               | inline            | Document in Capabilities section only  | Too specific to generalize; only one agent would ever use it                |
+#### Gap Follow-Up Protocol (MANDATORY)
+**When creating an AGENT** (this process): After gap analysis, for EACH identified GAP, determine the required companion artifact type and record the next owner as a **Follow-Up** item. Do not document inline what should be a real artifact.
+| Gap Type                                       | Required Artifact | Follow-Up Owner                         | When                                                                        |
+| ---------------------------------------------- | ----------------- | --------------------------------------- | --------------------------------------------------------------------------- |
+| Substantial reusable domain skill              | skill             | `skill-creator`                         | Gap is a full skill domain (e.g., `finops-kubernetes`, `capacity-planning`) |
+| Existing skill missing coverage                | skill update      | `skill-updater`                         | A close skill exists but is incomplete                                      |
+| Agent needs code/project scaffolding           | template          | `template-creator`                      | Reusable code patterns, starter files, or boilerplate for this domain       |
+| Agent needs pre/post execution guards          | hook              | `hook-creator`                          | Enforcement behavior not covered by existing hooks                          |
+| Agent needs orchestration/multi-phase flow     | workflow          | `workflow-creator`                      | Multi-step coordination pattern that other agents would also reuse          |
+| Agent needs structured input/output validation | schema            | `schema-creator`                        | JSON schema for agent I/O or domain data structures                         |
+| Narrow agent-specific capability               | inline            | Document in Capabilities section only   | Too specific to generalize; only one agent would ever use it                |
 **Resolution Protocol (execute in this order):**
 1. Scan the completed gap analysis table for every GAP row
 2. For each GAP, classify it using the table above (skill vs. template vs. hook vs. workflow vs. schema vs. inline)
-3. Invoke the appropriate creator skill for each non-inline gap (skills first, then templates, hooks, schemas, workflows)
-4. After each creator completes, record the artifact name it produced
-5. Wire all created artifacts into the agent's frontmatter (`skills:`) or body (Capabilities/Workflow sections)
-6. Only after ALL creator invocations complete, continue to Step 2.5
+3. Record a Follow-Up item for each non-inline gap, including the target creator/updater and the exact artifact needed
+4. Record the planned artifact names or discovery notes in the research report
+5. Wire only existing artifacts into the agent's frontmatter (`skills:`) or body (Capabilities/Workflow sections)
+6. Continue once the current agent contract is complete; do not chain into another creator from this run
 **Example — Kubernetes Specialist gap resolution:**
 ```
-GAP: "FinOps/cost optimization" → substantial reusable skill → Skill({ skill: 'skill-creator' })
-  Result: created .claude/skills/finops-kubernetes/[SKILL.md] → added to frontmatter skills:
-GAP: "K8s Helm scaffold templates" → template domain → Skill({ skill: 'template-creator' })
-  Result: created .claude/templates/kubernetes/helm-chart-template/ → referenced in Capabilities
+GAP: "FinOps/cost optimization" → substantial reusable skill → Follow-Up for skill-creator
+  Result: queued .claude/skills/finops-kubernetes/[SKILL.md] as the next creator task
+GAP: "K8s Helm scaffold templates" → template domain → Follow-Up for template-creator
+  Result: queued kubernetes/helm-chart-template follow-up for later implementation
 GAP: "vendor tool evaluation" → narrow/one-agent → document inline in Capabilities section
 ```
-**When creating a SKILL** (via `skill-creator`): After the new skill is created, check if it represents a new domain of expertise substantial enough to warrant a dedicated agent:
-- If YES → invoke `Skill({ skill: 'agent-creator' })` to create the companion agent
-- If NO → continue with skill integration normally
-This bidirectional contract ensures the ecosystem evolves together. Every agent creation is an opportunity to identify and close ecosystem-wide gaps — not just for the current agent, but for all agents that would benefit from the same skills, templates, and hooks.
+This keeps the ecosystem evolving together without inline creator recursion. Every agent creation is still an opportunity to surface ecosystem-wide gaps, but those gaps are closed by separate follow-up runs.
 #### Security Review (applies to all fetched content)
 Before incorporating content from BLS, Ongig, or MyMajors, apply the Security Review Gate defined below in Step 2.5. These are public government and educational sites with low injection risk, but SIZE CHECK and TOOL INVOCATION SCAN are still required for all external content.
 #### Validation Gate
@@ -283,8 +280,8 @@ Before incorporating content from BLS, Ongig, or MyMajors, apply the Security Re
 - [ ] MyMajors career page AND `/skills/` subpage fetched
 - [ ] Skills gap analysis completed (covered vs. gaps identified and resolved)
 - [ ] Each GAP classified: skill / template / hook / workflow / schema / inline
-- [ ] Appropriate creator invoked for every non-inline GAP (skill-creator, skill-updater, template-creator, hook-creator, workflow-creator, schema-creator)
-- [ ] All created companion artifact names recorded and wired into agent frontmatter/body
+- [ ] Appropriate Follow-Up item recorded for every non-inline GAP (skill-creator, skill-updater, template-creator, hook-creator, workflow-creator, schema-creator)
+- [ ] Planned companion artifact names or discovery notes recorded in the research report
 - [ ] Occupational alignment section added to research report
 **BLOCKING**: Agent creation CANNOT proceed without completing occupational alignment. An agent whose skills don't reflect real industry standards will miss critical domain capabilities and use terminology that practitioners don't recognize.
 **Example — Game Developer Agent:**
@@ -296,5 +293,5 @@ Tab extractions:
 - Tab-8: VR/AR growth, AI-driven NPCs, procedural generation, cloud game streaming
 Ongig: "Game Developer", "Gameplay Engineer", "Game Programmer", "Senior Game Software Engineer"
 MyMajors `/career/video-game-designers/skills/`: creativity, C++, Unity, 3D modeling, physics simulation, agile/scrum
-Gap analysis: no `game-engine-expert` skill found → invoked `skill-creator` to create `unity-game-development` skill → added to agent frontmatter.
+Gap analysis: no `game-engine-expert` skill found → recorded Follow-Up for `skill-creator` to create `unity-game-development` → keep current agent contract scoped to existing skills until that follow-up lands.
 ---
