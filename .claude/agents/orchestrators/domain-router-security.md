@@ -15,7 +15,14 @@ tools:
   - Task
   - Skill
 skills:
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - memory-search
+  - ripgrep
   - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 ---
 
 <!-- agent-template-contract:v1 -->

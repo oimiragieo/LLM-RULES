@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-28T01:50:52.255Z",
+  "generatedAt": "2026-03-28T02:01:03.037Z",
   "metadata": {
     "totalAgents": 119,
     "healthyAgents": 119,
     "degradedAgents": 0,
     "unavailableAgents": 0,
-    "lastHealthCheck": "2026-03-28T01:50:52.255Z",
-    "lastFullScan": "2026-03-28T01:50:52.255Z"
+    "lastHealthCheck": "2026-03-28T02:01:03.037Z",
+    "lastFullScan": "2026-03-28T02:01:03.037Z"
   },
   "agents": {
     "architect": {
@@ -130,24 +130,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.241Z",
+        "lastUpdate": "2026-03-28T02:01:03.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.241Z",
-        "updatedAt": "2026-03-28T01:50:52.241Z"
+        "createdAt": "2026-03-28T02:01:03.024Z",
+        "updatedAt": "2026-03-28T02:01:03.024Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "context-compressor": {
@@ -238,23 +237,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.242Z",
+        "lastUpdate": "2026-03-28T02:01:03.025Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-28T01:50:52.242Z",
-        "updatedAt": "2026-03-28T01:50:52.242Z"
+        "createdAt": "2026-03-28T02:01:03.025Z",
+        "updatedAt": "2026-03-28T02:01:03.025Z"
       },
       "alwaysSkills": [
+        "task-management-protocol",
+        "memory-search",
+        "ripgrep",
         "code-semantic-search",
         "code-structural-search",
         "context-compressor",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
         "verification-before-completion"
       ]
     },
@@ -593,25 +591,24 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.242Z",
+        "lastUpdate": "2026-03-28T02:01:03.025Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.242Z",
-        "updatedAt": "2026-03-28T01:50:52.242Z"
+        "createdAt": "2026-03-28T02:01:03.025Z",
+        "updatedAt": "2026-03-28T02:01:03.025Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
         "github-mcp",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "general-assistant": {
@@ -722,24 +719,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.242Z",
+        "lastUpdate": "2026-03-28T02:01:03.025Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.242Z",
-        "updatedAt": "2026-03-28T01:50:52.242Z"
+        "createdAt": "2026-03-28T02:01:03.025Z",
+        "updatedAt": "2026-03-28T02:01:03.025Z"
       },
       "alwaysSkills": [
+        "verification-before-completion",
+        "memory-search",
+        "ripgrep",
         "code-semantic-search",
         "code-structural-search",
         "context-compressor",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "task-management-protocol"
       ]
     },
     "planner": {
@@ -874,23 +870,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.243Z",
+        "lastUpdate": "2026-03-28T02:01:03.026Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.5.0",
-        "createdAt": "2026-03-28T01:50:52.243Z",
-        "updatedAt": "2026-03-28T01:50:52.243Z"
+        "createdAt": "2026-03-28T02:01:03.026Z",
+        "updatedAt": "2026-03-28T02:01:03.026Z"
       },
       "alwaysSkills": [
+        "task-management-protocol",
+        "memory-search",
+        "ripgrep",
         "code-semantic-search",
         "code-structural-search",
         "context-compressor",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
         "verification-before-completion"
       ]
     },
@@ -983,23 +978,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.243Z",
+        "lastUpdate": "2026-03-28T02:01:03.026Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.243Z",
-        "updatedAt": "2026-03-28T01:50:52.243Z"
+        "createdAt": "2026-03-28T02:01:03.026Z",
+        "updatedAt": "2026-03-28T02:01:03.026Z"
       },
       "alwaysSkills": [
+        "task-management-protocol",
+        "memory-search",
+        "ripgrep",
         "code-semantic-search",
         "code-structural-search",
         "context-compressor",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
         "verification-before-completion"
       ]
     },
@@ -1139,24 +1133,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.243Z",
+        "lastUpdate": "2026-03-28T02:01:03.026Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.243Z",
-        "updatedAt": "2026-03-28T01:50:52.243Z"
+        "createdAt": "2026-03-28T02:01:03.026Z",
+        "updatedAt": "2026-03-28T02:01:03.026Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "reflection-agent": {
@@ -1264,14 +1257,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.243Z",
+        "lastUpdate": "2026-03-28T02:01:03.026Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.243Z",
-        "updatedAt": "2026-03-28T01:50:52.243Z"
+        "createdAt": "2026-03-28T02:01:03.026Z",
+        "updatedAt": "2026-03-28T02:01:03.026Z"
       },
       "alwaysSkills": []
     },
@@ -1368,24 +1361,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.243Z",
+        "lastUpdate": "2026-03-28T02:01:03.026Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.243Z",
-        "updatedAt": "2026-03-28T01:50:52.243Z"
+        "createdAt": "2026-03-28T02:01:03.026Z",
+        "updatedAt": "2026-03-28T02:01:03.026Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "technical-writer": {
@@ -1480,24 +1472,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.243Z",
+        "lastUpdate": "2026-03-28T02:01:03.026Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.243Z",
-        "updatedAt": "2026-03-28T01:50:52.243Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "accessibility-tester": {
@@ -1588,24 +1579,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.244Z",
+        "lastUpdate": "2026-03-28T02:01:03.027Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-28T01:50:52.244Z",
-        "updatedAt": "2026-03-28T01:50:52.244Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "advanced-debugging": {
@@ -1703,24 +1693,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.244Z",
+        "lastUpdate": "2026-03-28T02:01:03.027Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.244Z",
-        "updatedAt": "2026-03-28T01:50:52.244Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "c4-code": {
@@ -1805,22 +1794,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.244Z",
+        "lastUpdate": "2026-03-28T02:01:03.027Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.244Z",
-        "updatedAt": "2026-03-28T01:50:52.244Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "c4-component": {
@@ -1905,22 +1893,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.244Z",
+        "lastUpdate": "2026-03-28T02:01:03.027Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.244Z",
-        "updatedAt": "2026-03-28T01:50:52.244Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "c4-container": {
@@ -2008,22 +1995,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.244Z",
+        "lastUpdate": "2026-03-28T02:01:03.027Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.244Z",
-        "updatedAt": "2026-03-28T01:50:52.244Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "c4-context": {
@@ -2110,22 +2096,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.244Z",
+        "lastUpdate": "2026-03-28T02:01:03.027Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.244Z",
-        "updatedAt": "2026-03-28T01:50:52.244Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "channel-responder": {
@@ -2163,8 +2148,8 @@
             "MemoryRecord",
             "Write",
             "Edit",
-            "TaskCreate",
-            "TaskUpdate"
+            "TaskUpdate",
+            "TaskCreate"
           ],
           "skills": [
             "channel-management",
@@ -2203,24 +2188,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.244Z",
+        "lastUpdate": "2026-03-28T02:01:03.027Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.244Z",
-        "updatedAt": "2026-03-28T01:50:52.244Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "chaos-engineer": {
       "id": "chaos-engineer",
@@ -2313,24 +2290,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.244Z",
+        "lastUpdate": "2026-03-28T02:01:03.027Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-28T01:50:52.244Z",
-        "updatedAt": "2026-03-28T01:50:52.244Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "claude-md-auditor": {
@@ -2407,24 +2383,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.244Z",
+        "lastUpdate": "2026-03-28T02:01:03.027Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.244Z",
-        "updatedAt": "2026-03-28T01:50:52.244Z"
+        "createdAt": "2026-03-28T02:01:03.027Z",
+        "updatedAt": "2026-03-28T02:01:03.027Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "code-reviewer": {
       "id": "code-reviewer",
@@ -2543,26 +2511,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.245Z",
+        "lastUpdate": "2026-03-28T02:01:03.028Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.245Z",
-        "updatedAt": "2026-03-28T01:50:52.245Z"
+        "createdAt": "2026-03-28T02:01:03.028Z",
+        "updatedAt": "2026-03-28T02:01:03.028Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
-        "memory-search",
+        "verification-before-completion",
         "receiving-code-review",
         "requesting-code-review",
-        "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "memory-search",
+        "ripgrep",
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "code-simplifier": {
@@ -2661,24 +2628,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.245Z",
+        "lastUpdate": "2026-03-28T02:01:03.028Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.245Z",
-        "updatedAt": "2026-03-28T01:50:52.245Z"
+        "createdAt": "2026-03-28T02:01:03.028Z",
+        "updatedAt": "2026-03-28T02:01:03.028Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "conductor-validator": {
@@ -2770,24 +2736,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.245Z",
+        "lastUpdate": "2026-03-28T02:01:03.028Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.245Z",
-        "updatedAt": "2026-03-28T01:50:52.245Z"
+        "createdAt": "2026-03-28T02:01:03.028Z",
+        "updatedAt": "2026-03-28T02:01:03.028Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "database-architect": {
@@ -2886,24 +2851,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.245Z",
+        "lastUpdate": "2026-03-28T02:01:03.028Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.245Z",
-        "updatedAt": "2026-03-28T01:50:52.245Z"
+        "createdAt": "2026-03-28T02:01:03.028Z",
+        "updatedAt": "2026-03-28T02:01:03.028Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "devops-troubleshooter": {
@@ -3007,24 +2971,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.245Z",
+        "lastUpdate": "2026-03-28T02:01:03.028Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.245Z",
-        "updatedAt": "2026-03-28T01:50:52.245Z"
+        "createdAt": "2026-03-28T02:01:03.028Z",
+        "updatedAt": "2026-03-28T02:01:03.028Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "devops": {
@@ -3175,32 +3138,31 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.245Z",
+        "lastUpdate": "2026-03-28T02:01:03.028Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.245Z",
-        "updatedAt": "2026-03-28T01:50:52.245Z"
+        "createdAt": "2026-03-28T02:01:03.028Z",
+        "updatedAt": "2026-03-28T02:01:03.028Z"
       },
       "alwaysSkills": [
-        "architecture-review",
-        "code-semantic-search",
-        "code-structural-search",
-        "consensus-voting",
-        "containerization-rules",
-        "context-compressor",
-        "database-architect",
-        "filesystem",
+        "verification-before-completion",
+        "task-management-protocol",
         "git-expert",
         "github-mcp",
+        "filesystem",
+        "containerization-rules",
+        "architecture-review",
+        "database-architect",
+        "consensus-voting",
+        "context-compressor",
         "kubernetes-flux",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search"
       ]
     },
     "ecosystem-auditor": {
@@ -3290,24 +3252,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.245Z",
+        "lastUpdate": "2026-03-28T02:01:03.028Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.245Z",
-        "updatedAt": "2026-03-28T01:50:52.245Z"
+        "createdAt": "2026-03-28T02:01:03.028Z",
+        "updatedAt": "2026-03-28T02:01:03.028Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "incident-responder": {
@@ -3405,24 +3366,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.245Z",
+        "lastUpdate": "2026-03-28T02:01:03.028Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.245Z",
-        "updatedAt": "2026-03-28T01:50:52.245Z"
+        "createdAt": "2026-03-28T02:01:03.028Z",
+        "updatedAt": "2026-03-28T02:01:03.028Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "memory-manager": {
@@ -3463,8 +3423,8 @@
             "MemoryRecord",
             "TaskUpdate",
             "Skill",
-            "TaskCreate",
             "TaskList",
+            "TaskCreate",
             "TaskGet"
           ],
           "skills": [
@@ -3510,24 +3470,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.245Z",
+        "lastUpdate": "2026-03-28T02:01:03.029Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.245Z",
-        "updatedAt": "2026-03-28T01:50:52.245Z"
+        "createdAt": "2026-03-28T02:01:03.029Z",
+        "updatedAt": "2026-03-28T02:01:03.029Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "penetration-tester": {
       "id": "penetration-tester",
@@ -3621,24 +3573,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.246Z",
+        "lastUpdate": "2026-03-28T02:01:03.029Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-28T01:50:52.246Z",
-        "updatedAt": "2026-03-28T01:50:52.246Z"
+        "createdAt": "2026-03-28T02:01:03.029Z",
+        "updatedAt": "2026-03-28T02:01:03.029Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "performance-engineer": {
@@ -3733,24 +3684,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.246Z",
+        "lastUpdate": "2026-03-28T02:01:03.029Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.246Z",
-        "updatedAt": "2026-03-28T01:50:52.246Z"
+        "createdAt": "2026-03-28T02:01:03.029Z",
+        "updatedAt": "2026-03-28T02:01:03.029Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "researcher": {
@@ -3859,21 +3809,20 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.246Z",
+        "lastUpdate": "2026-03-28T02:01:03.029Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.246Z",
-        "updatedAt": "2026-03-28T01:50:52.246Z"
+        "createdAt": "2026-03-28T02:01:03.029Z",
+        "updatedAt": "2026-03-28T02:01:03.029Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ]
     },
@@ -3970,24 +3919,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.246Z",
+        "lastUpdate": "2026-03-28T02:01:03.029Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.246Z",
-        "updatedAt": "2026-03-28T01:50:52.246Z"
+        "createdAt": "2026-03-28T02:01:03.029Z",
+        "updatedAt": "2026-03-28T02:01:03.029Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "security-architect": {
@@ -4111,24 +4059,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.246Z",
+        "lastUpdate": "2026-03-28T02:01:03.029Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.246Z",
-        "updatedAt": "2026-03-28T01:50:52.246Z"
+        "createdAt": "2026-03-28T02:01:03.029Z",
+        "updatedAt": "2026-03-28T02:01:03.029Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "sre-engineer": {
@@ -4223,24 +4170,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.246Z",
+        "lastUpdate": "2026-03-28T02:01:03.029Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.246Z",
-        "updatedAt": "2026-03-28T01:50:52.246Z"
+        "createdAt": "2026-03-28T02:01:03.029Z",
+        "updatedAt": "2026-03-28T02:01:03.029Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "task-manager": {
@@ -4280,7 +4226,10 @@
             "TaskCreate",
             "TaskGet",
             "Write",
-            "Edit"
+            "Edit",
+            "Glob",
+            "Grep",
+            "Skill"
           ],
           "skills": [
             "code-semantic-search",
@@ -4327,24 +4276,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.247Z",
+        "lastUpdate": "2026-03-28T02:01:03.029Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.247Z",
-        "updatedAt": "2026-03-28T01:50:52.247Z"
+        "createdAt": "2026-03-28T02:01:03.029Z",
+        "updatedAt": "2026-03-28T02:01:03.029Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "ai-ml-specialist": {
       "id": "ai-ml-specialist",
@@ -4436,24 +4377,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.247Z",
+        "lastUpdate": "2026-03-28T02:01:03.029Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.247Z",
-        "updatedAt": "2026-03-28T01:50:52.247Z"
+        "createdAt": "2026-03-28T02:01:03.029Z",
+        "updatedAt": "2026-03-28T02:01:03.029Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "android-pro": {
@@ -4545,24 +4485,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.247Z",
+        "lastUpdate": "2026-03-28T02:01:03.030Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.247Z",
-        "updatedAt": "2026-03-28T01:50:52.247Z"
+        "createdAt": "2026-03-28T02:01:03.030Z",
+        "updatedAt": "2026-03-28T02:01:03.030Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "angular-pro": {
@@ -4648,24 +4587,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.247Z",
+        "lastUpdate": "2026-03-28T02:01:03.030Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.247Z",
-        "updatedAt": "2026-03-28T01:50:52.247Z"
+        "createdAt": "2026-03-28T02:01:03.030Z",
+        "updatedAt": "2026-03-28T02:01:03.030Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "api-designer": {
       "id": "api-designer",
@@ -4757,24 +4688,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.030Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.030Z",
+        "updatedAt": "2026-03-28T02:01:03.030Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "app-generator-agent": {
@@ -4867,24 +4797,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.030Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.030Z",
+        "updatedAt": "2026-03-28T02:01:03.030Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "aso-specialist": {
       "id": "aso-specialist",
@@ -4966,23 +4888,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.030Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.030Z",
+        "updatedAt": "2026-03-28T02:01:03.030Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
         "code-structural-search",
-        "context-compressor",
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ]
     },
@@ -5073,24 +4994,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.030Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.030Z",
+        "updatedAt": "2026-03-28T02:01:03.030Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "brand-guardian": {
       "id": "brand-guardian",
@@ -5170,23 +5083,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
         "code-structural-search",
-        "context-compressor",
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ]
     },
@@ -5273,24 +5185,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "compliance-checker": {
       "id": "compliance-checker",
@@ -5374,23 +5278,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
         "code-structural-search",
-        "context-compressor",
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ]
     },
@@ -5471,24 +5374,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "data-engineer": {
       "id": "data-engineer",
@@ -5585,24 +5480,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "data-scientist": {
@@ -5700,22 +5594,19 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
         "ripgrep",
+        "code-semantic-search",
         "task-management-protocol",
-        "token-saver-context-compression",
         "verification-before-completion"
       ]
     },
@@ -5807,24 +5698,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.248Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.248Z",
-        "updatedAt": "2026-03-28T01:50:52.248Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "dotnet-pro": {
       "id": "dotnet-pro",
@@ -5911,24 +5794,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "expo-mobile-developer": {
       "id": "expo-mobile-developer",
@@ -6023,24 +5898,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "fastapi-pro": {
@@ -6138,24 +6012,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "feedback-synthesizer": {
@@ -6234,23 +6107,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
         "code-structural-search",
-        "context-compressor",
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ]
     },
@@ -6293,7 +6165,9 @@
             "TaskCreate",
             "TaskGet",
             "Skill",
-            "MemoryRecord"
+            "MemoryRecord",
+            "Glob",
+            "Grep"
           ],
           "skills": [
             "browser-automation",
@@ -6342,24 +6216,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "frontend-pro": {
       "id": "frontend-pro",
@@ -6479,24 +6345,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "gamedev-pro": {
@@ -6585,24 +6450,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.031Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.031Z",
+        "updatedAt": "2026-03-28T02:01:03.031Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "golang-pro": {
@@ -6701,24 +6565,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "graphql-pro": {
@@ -6816,24 +6679,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "ios-pro": {
@@ -6927,24 +6789,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "iot-engineer": {
@@ -7024,24 +6885,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "java-pro": {
       "id": "java-pro",
@@ -7139,24 +6992,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "kotlin-pro": {
@@ -7242,24 +7094,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "kubernetes-specialist": {
       "id": "kubernetes-specialist",
@@ -7347,22 +7191,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "legacy-modernizer": {
@@ -7452,22 +7295,18 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.249Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.249Z",
-        "updatedAt": "2026-03-28T01:50:52.249Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
         "verification-before-completion"
       ]
     },
@@ -7558,24 +7397,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "llm-architect": {
       "id": "llm-architect",
@@ -7660,22 +7491,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.032Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.032Z",
+        "updatedAt": "2026-03-28T02:01:03.032Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "m365-admin": {
@@ -7758,24 +7588,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "marketing-strategist": {
       "id": "marketing-strategist",
@@ -7855,23 +7677,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
         "code-structural-search",
-        "context-compressor",
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ]
     },
@@ -7964,24 +7785,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "medical-research-triage": {
@@ -8069,21 +7889,20 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ]
     },
@@ -8177,22 +7996,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "ml-researcher": {
@@ -8270,24 +8088,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "mlops-engineer": {
       "id": "mlops-engineer",
@@ -8381,22 +8191,19 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
         "ripgrep",
+        "code-semantic-search",
         "task-management-protocol",
-        "token-saver-context-compression",
         "verification-before-completion"
       ]
     },
@@ -8501,22 +8308,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "model-benchmarker-agent": {
@@ -8557,7 +8363,9 @@
             "TaskCreate",
             "TaskGet",
             "Skill",
-            "MemoryRecord"
+            "MemoryRecord",
+            "Glob",
+            "Grep"
           ],
           "skills": [
             "code-semantic-search",
@@ -8604,24 +8412,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.250Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.250Z",
-        "updatedAt": "2026-03-28T01:50:52.250Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "multi-llm-consultant": {
       "id": "multi-llm-consultant",
@@ -8764,22 +8564,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "nextjs-pro": {
@@ -8882,24 +8681,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.033Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.033Z",
+        "updatedAt": "2026-03-28T02:01:03.033Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "nlp-engineer": {
@@ -8993,22 +8791,19 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
         "ripgrep",
+        "code-semantic-search",
         "task-management-protocol",
-        "token-saver-context-compression",
         "verification-before-completion"
       ]
     },
@@ -9106,24 +8901,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "php-pro": {
@@ -9217,24 +9011,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "pm-coordinator": {
@@ -9326,22 +9119,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "post-analyzer-agent": {
@@ -9434,24 +9226,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "postgres-pro": {
       "id": "postgres-pro",
@@ -9537,24 +9321,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "product-manager": {
       "id": "product-manager",
@@ -9641,24 +9417,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "prompt-engineer": {
       "id": "prompt-engineer",
@@ -9749,22 +9517,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "python-pro": {
@@ -9870,24 +9637,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.251Z",
-        "updatedAt": "2026-03-28T01:50:52.251Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "quant-analyst": {
@@ -9976,24 +9742,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.251Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "rails-pro": {
       "id": "rails-pro",
@@ -10077,24 +9835,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "rust-pro": {
       "id": "rust-pro",
@@ -10186,24 +9936,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "scientific-research-expert": {
@@ -10294,22 +10043,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
       "alwaysSkills": [
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "context-compressor"
       ]
     },
     "spring-boot-pro": {
@@ -10399,24 +10147,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.034Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.034Z",
+        "updatedAt": "2026-03-28T02:01:03.034Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "sql-pro": {
       "id": "sql-pro",
@@ -10502,24 +10242,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "sveltekit-expert": {
       "id": "sveltekit-expert",
@@ -10614,24 +10346,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "swift-pro": {
@@ -10719,24 +10450,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "tauri-desktop-developer": {
       "id": "tauri-desktop-developer",
@@ -10833,24 +10556,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "terraform-engineer": {
@@ -10951,22 +10673,19 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
         "ripgrep",
+        "code-semantic-search",
         "task-management-protocol",
-        "token-saver-context-compression",
         "verification-before-completion"
       ]
     },
@@ -11053,24 +10772,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "typescript-pro": {
       "id": "typescript-pro",
@@ -11168,24 +10879,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "ux-researcher": {
@@ -11268,23 +10978,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
         "code-structural-search",
-        "context-compressor",
         "memory-search",
         "ripgrep",
         "task-management-protocol",
-        "token-saver-context-compression",
+        "context-compressor",
         "verification-before-completion"
       ]
     },
@@ -11376,24 +11085,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.252Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.252Z",
-        "updatedAt": "2026-03-28T01:50:52.252Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "web3-blockchain-expert": {
       "id": "web3-blockchain-expert",
@@ -11482,24 +11183,23 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
       "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "context-compressor",
+        "verification-before-completion",
+        "task-management-protocol",
         "memory-search",
         "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
+        "code-semantic-search",
+        "code-structural-search",
+        "context-compressor"
       ]
     },
     "windows-infra-pro": {
@@ -11584,24 +11284,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "wordpress-master": {
       "id": "wordpress-master",
@@ -11683,24 +11375,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "artifact-integrator": {
       "id": "artifact-integrator",
@@ -11801,20 +11485,20 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
       "alwaysSkills": [
-        "memory-search",
-        "ripgrep",
+        "verification-before-completion",
         "task-management-protocol",
-        "verification-before-completion"
+        "ripgrep",
+        "memory-search"
       ]
     },
     "domain-router-ai-ml": {
@@ -11831,30 +11515,49 @@
           "triggerPhrases": [
             "domain",
             "router",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Task",
             "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep",
-            "TaskUpdate",
-            "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskList",
+            "TaskGet",
+            "TaskUpdate",
+            "Write",
+            "Bash",
+            "Edit"
           ],
           "skills": [
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
             "domain",
             "router",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ]
         }
       ],
@@ -11868,16 +11571,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.035Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.035Z",
+        "updatedAt": "2026-03-28T02:01:03.035Z"
       },
-      "alwaysSkills": []
+      "alwaysSkills": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ]
     },
     "domain-router-arch-data": {
       "id": "domain-router-arch-data",
@@ -11895,24 +11607,36 @@
             "router",
             "arch",
             "data",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Task",
             "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep",
-            "TaskUpdate",
-            "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskList",
+            "TaskGet",
+            "TaskUpdate",
+            "Write",
+            "Bash",
+            "Edit"
           ],
           "skills": [
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
@@ -11920,7 +11644,14 @@
             "router",
             "arch",
             "data",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ]
         }
       ],
@@ -11934,16 +11665,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
-      "alwaysSkills": []
+      "alwaysSkills": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ]
     },
     "domain-router-backend": {
       "id": "domain-router-backend",
@@ -11960,31 +11700,50 @@
             "domain",
             "router",
             "backend",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Task",
             "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep",
-            "TaskUpdate",
-            "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskList",
+            "TaskGet",
+            "TaskUpdate",
+            "Write",
+            "Bash",
+            "Edit"
           ],
           "skills": [
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
             "domain",
             "router",
             "backend",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ]
         }
       ],
@@ -11998,16 +11757,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
-      "alwaysSkills": []
+      "alwaysSkills": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ]
     },
     "domain-router-infra": {
       "id": "domain-router-infra",
@@ -12024,31 +11792,50 @@
             "domain",
             "router",
             "infra",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Task",
             "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep",
-            "TaskUpdate",
-            "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskList",
+            "TaskGet",
+            "TaskUpdate",
+            "Write",
+            "Bash",
+            "Edit"
           ],
           "skills": [
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
             "domain",
             "router",
             "infra",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ]
         }
       ],
@@ -12062,16 +11849,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
-      "alwaysSkills": []
+      "alwaysSkills": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ]
     },
     "domain-router-mobile": {
       "id": "domain-router-mobile",
@@ -12088,31 +11884,50 @@
             "domain",
             "router",
             "mobile",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Task",
             "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep",
-            "TaskUpdate",
-            "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskList",
+            "TaskGet",
+            "TaskUpdate",
+            "Write",
+            "Bash",
+            "Edit"
           ],
           "skills": [
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
             "domain",
             "router",
             "mobile",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ]
         }
       ],
@@ -12126,16 +11941,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
-      "alwaysSkills": []
+      "alwaysSkills": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ]
     },
     "domain-router-niche": {
       "id": "domain-router-niche",
@@ -12152,31 +11976,50 @@
             "domain",
             "router",
             "niche",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Task",
             "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep",
-            "TaskUpdate",
-            "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskList",
+            "TaskGet",
+            "TaskUpdate",
+            "Write",
+            "Bash",
+            "Edit"
           ],
           "skills": [
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
             "domain",
             "router",
             "niche",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ]
         }
       ],
@@ -12190,16 +12033,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
-      "alwaysSkills": []
+      "alwaysSkills": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ]
     },
     "domain-router-product": {
       "id": "domain-router-product",
@@ -12216,31 +12068,50 @@
             "domain",
             "router",
             "product",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Task",
             "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep",
-            "TaskUpdate",
-            "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskList",
+            "TaskGet",
+            "TaskUpdate",
+            "Write",
+            "Bash",
+            "Edit"
           ],
           "skills": [
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
             "domain",
             "router",
             "product",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ]
         }
       ],
@@ -12254,16 +12125,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
-      "alwaysSkills": []
+      "alwaysSkills": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ]
     },
     "domain-router-security": {
       "id": "domain-router-security",
@@ -12280,31 +12160,50 @@
             "domain",
             "router",
             "security",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Task",
             "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep",
-            "TaskUpdate",
-            "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskList",
+            "TaskGet",
+            "TaskUpdate",
+            "Write",
+            "Bash",
+            "Edit"
           ],
           "skills": [
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
             "domain",
             "router",
             "security",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ]
         }
       ],
@@ -12318,16 +12217,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
-      "alwaysSkills": []
+      "alwaysSkills": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ]
     },
     "domain-router-web-frontend": {
       "id": "domain-router-web-frontend",
@@ -12345,24 +12253,36 @@
             "router",
             "web",
             "frontend",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Task",
             "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep",
-            "TaskUpdate",
-            "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskList",
+            "TaskGet",
+            "TaskUpdate",
+            "Write",
+            "Bash",
+            "Edit"
           ],
           "skills": [
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
@@ -12370,7 +12290,14 @@
             "router",
             "web",
             "frontend",
-            "task-management-protocol"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "memory-search",
+            "ripgrep",
+            "task-management-protocol",
+            "token-saver-context-compression",
+            "verification-before-completion"
           ]
         }
       ],
@@ -12384,16 +12311,25 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
-      "alwaysSkills": []
+      "alwaysSkills": [
+        "verification-before-completion",
+        "task-management-protocol",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ]
     },
     "evolution-orchestrator": {
       "id": "evolution-orchestrator",
@@ -12505,21 +12441,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
       "alwaysSkills": [
-        "artifact-lifecycle",
-        "memory-search",
-        "ripgrep",
+        "verification-before-completion",
         "task-management-protocol",
-        "verification-before-completion"
+        "artifact-lifecycle",
+        "ripgrep",
+        "memory-search"
       ]
     },
     "heartbeat-orchestrator": {
@@ -12606,23 +12542,22 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.253Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.253Z",
-        "updatedAt": "2026-03-28T01:50:52.253Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
       "alwaysSkills": [
+        "task-management-protocol",
+        "memory-search",
+        "ripgrep",
         "code-semantic-search",
         "code-structural-search",
         "context-compressor",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
         "verification-before-completion"
       ]
     },
@@ -12718,24 +12653,16 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.254Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.254Z",
-        "updatedAt": "2026-03-28T01:50:52.254Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
-      "alwaysSkills": [
-        "code-semantic-search",
-        "code-structural-search",
-        "memory-search",
-        "ripgrep",
-        "task-management-protocol",
-        "token-saver-context-compression",
-        "verification-before-completion"
-      ]
+      "alwaysSkills": []
     },
     "master-orchestrator": {
       "id": "master-orchestrator",
@@ -12857,21 +12784,21 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.254Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.254Z",
-        "updatedAt": "2026-03-28T01:50:52.254Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
       "alwaysSkills": [
-        "memory-search",
-        "ripgrep",
+        "verification-before-completion",
         "subagent-driven-development",
         "task-management-protocol",
-        "verification-before-completion"
+        "ripgrep",
+        "memory-search"
       ]
     },
     "party-orchestrator": {
@@ -12955,20 +12882,20 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.254Z",
+        "lastUpdate": "2026-03-28T02:01:03.036Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-28T01:50:52.254Z",
-        "updatedAt": "2026-03-28T01:50:52.254Z"
+        "createdAt": "2026-03-28T02:01:03.036Z",
+        "updatedAt": "2026-03-28T02:01:03.036Z"
       },
       "alwaysSkills": [
-        "memory-search",
-        "ripgrep",
         "task-management-protocol",
-        "verification-before-completion"
+        "ripgrep",
+        "verification-before-completion",
+        "memory-search"
       ]
     },
     "swarm-coordinator": {
@@ -13052,20 +12979,20 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-28T01:50:52.254Z",
+        "lastUpdate": "2026-03-28T02:01:03.037Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-28T01:50:52.254Z",
-        "updatedAt": "2026-03-28T01:50:52.254Z"
+        "createdAt": "2026-03-28T02:01:03.037Z",
+        "updatedAt": "2026-03-28T02:01:03.037Z"
       },
       "alwaysSkills": [
-        "memory-search",
-        "ripgrep",
+        "verification-before-completion",
         "task-management-protocol",
-        "verification-before-completion"
+        "ripgrep",
+        "memory-search"
       ]
     }
   },

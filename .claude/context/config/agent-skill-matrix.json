@@ -1294,6 +1294,141 @@
           "ripgrep",
           "memory-search"
         ]
+      },
+      "domain-router-ai-ml": {
+        "primary": ["task-management-protocol"],
+        "secondary": ["context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
+      "domain-router-arch-data": {
+        "primary": ["task-management-protocol"],
+        "secondary": ["context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
+      "domain-router-backend": {
+        "primary": ["task-management-protocol"],
+        "secondary": ["context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
+      "domain-router-infra": {
+        "primary": ["task-management-protocol"],
+        "secondary": ["context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
+      "domain-router-mobile": {
+        "primary": ["task-management-protocol"],
+        "secondary": ["context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
+      "domain-router-niche": {
+        "primary": ["task-management-protocol"],
+        "secondary": ["context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
+      "domain-router-product": {
+        "primary": ["task-management-protocol"],
+        "secondary": ["context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
+      "domain-router-security": {
+        "primary": ["task-management-protocol"],
+        "secondary": ["context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
+      "domain-router-web-frontend": {
+        "primary": ["task-management-protocol"],
+        "secondary": ["context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
       }
     }
   },
