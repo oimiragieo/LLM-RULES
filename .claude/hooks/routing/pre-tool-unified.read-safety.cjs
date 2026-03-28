@@ -76,6 +76,10 @@ const SEARCH_EVIDENCE_PATTERNS = [
   /\bhybrid-search\b/i,
   /\bsemantic-search\b/i,
 ];
+const TOKEN_SAVER_SKILL_NAMES = new Set([
+  'context-compressor',
+  'token-saver-context-compression',
+]);
 const CORE_MEMORY_FILES = new Set([
   path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'patterns.json'),
   path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'gotchas.json'),
@@ -165,7 +169,7 @@ function isTokenSaverSkillInvocation(toolInput) {
     toolInput?.id ||
     null;
   if (!skillNameRaw) return false;
-  return String(skillNameRaw).trim().toLowerCase() === 'context-compressor';
+  return TOKEN_SAVER_SKILL_NAMES.has(String(skillNameRaw).trim().toLowerCase());
 }
 
 function recordToolGovernanceEvidence(toolName, toolInput, hookInput) {
@@ -744,7 +748,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
             },
             bypassWarning:
               '[READ SAFETY][bypass] Context pressure is high and token-saver evidence is missing. ' +
-              `Auto-windowed to offset=0, limit=${limit}; run context-compressor before more large Reads.`,
+              `Auto-windowed to offset=0, limit=${limit}; run context-compressor or token-saver-context-compression before more large Reads.`,
           };
         }
         return {
@@ -752,7 +756,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
           action: 'block',
           message:
             '[READ SAFETY] Context pressure is high for this session. ' +
-            'Invoke `Skill({ skill: "context-compressor" })` before large Read calls.',
+            'Invoke `Skill({ skill: "context-compressor" })` or `Skill({ skill: "token-saver-context-compression" })` before large Read calls.',
         };
       }
     }

@@ -405,6 +405,55 @@ describe('pre-tool-unified read safety', () => {
     });
   });
 
+  test('checkReadSafety accepts context-compressor and references both compressor skill names when context pressure is high', () => {
+    const sessionId = `read-pressure-context-compressor-${Date.now()}`;
+    const targetPath = path.join(reflectionRuntimeDir, `read-pressure-context-${Date.now()}.txt`);
+    withFileRestored(governanceStatePath, () => {
+      withFileRestored(tokenSloStatePath, () => {
+        fs.mkdirSync(reflectionRuntimeDir, { recursive: true });
+        fs.writeFileSync(targetPath, 'z'.repeat(60000), 'utf8');
+
+        const tokenState = {
+          sessions: {
+            [sessionId]: {
+              breachCount: 4,
+              lastBreachAt: Date.now(),
+              downgradedUntil: Date.now() + 5 * 60 * 1000,
+            },
+          },
+        };
+        fs.writeFileSync(tokenSloStatePath, JSON.stringify(tokenState, null, 2) + '\n', 'utf8');
+
+        try {
+          checkReadSafety(
+            'Bash',
+            { command: 'pnpm search:code "context pressure dual compressor"' },
+            { session_id: sessionId }
+          );
+          const blocked = checkReadSafety(
+            'Read',
+            { file_path: '.claude/context/runtime/' + path.basename(targetPath) },
+            { session_id: sessionId }
+          );
+          assert.strictEqual(blocked.action, 'block');
+          const message = String(blocked.message || '');
+          assert.ok(message.includes('token-saver-context-compression'));
+          assert.ok(message.includes('context-compressor'));
+
+          checkReadSafety('Skill', { skill: 'context-compressor' }, { session_id: sessionId });
+          const allowed = checkReadSafety(
+            'Read',
+            { file_path: '.claude/context/runtime/' + path.basename(targetPath) },
+            { session_id: sessionId }
+          );
+          assert.strictEqual(allowed.action, 'allow');
+        } finally {
+          if (fs.existsSync(targetPath)) fs.unlinkSync(targetPath);
+        }
+      });
+    });
+  });
+
   test('checkReadSafety records core memory read evidence for session governance', () => {
     const sessionId = `memory-core-${Date.now()}`;
     withFileRestored(governanceStatePath, () => {

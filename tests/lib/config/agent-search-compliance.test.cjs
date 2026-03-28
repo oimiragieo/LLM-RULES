@@ -43,7 +43,7 @@ const NON_CODE_AGENTS = new Set([
   'researcher',
 ]);
 
-// Orchestrators exempt from memory-search and token-saver-context-compression
+// Orchestrators exempt from memory-search only
 const ORCHESTRATORS = new Set([
   'master-orchestrator',
   'swarm-coordinator',
@@ -129,11 +129,11 @@ describe('Agent Search Skill Compliance (agent-skill-matrix.json)', () => {
     });
   });
 
-  describe('5. All non-exempt, non-orchestrator agents have token-saver-context-compression', () => {
+  describe('5. All matrix agents have token-saver-context-compression', () => {
     it('should have token-saver-context-compression in always array', () => {
-      const missing = allAgentEntries
-        .filter(a => !EXEMPT_AGENTS.has(a.name) && !ORCHESTRATORS.has(a.name))
-        .filter(a => !a.always.includes('token-saver-context-compression'));
+      const missing = allAgentEntries.filter(
+        a => !a.always.includes('token-saver-context-compression')
+      );
       assert.strictEqual(
         missing.length,
         0,
@@ -142,14 +142,13 @@ describe('Agent Search Skill Compliance (agent-skill-matrix.json)', () => {
     });
   });
 
-  describe('6. Exempt agents have empty or minimal always arrays', () => {
-    it('reflection-agent should have empty always array', () => {
+  describe('6. Reflection agent keeps token-saver coverage', () => {
+    it('reflection-agent should include token-saver-context-compression', () => {
       const ra = allAgentEntries.find(a => a.name === 'reflection-agent');
       assert.ok(ra, 'reflection-agent must exist in matrix');
-      assert.strictEqual(
-        ra.always.length,
-        0,
-        `reflection-agent always array should be empty, got: ${JSON.stringify(ra.always)}`
+      assert.ok(
+        ra.always.includes('token-saver-context-compression'),
+        `reflection-agent always array should include token-saver-context-compression, got: ${JSON.stringify(ra.always)}`
       );
     });
   });

@@ -16,7 +16,6 @@ const ALL_SEARCH = [
   'token-saver-context-compression',
 ];
 const RG_TS = ['ripgrep', 'token-saver-context-compression'];
-const RG_ONLY = ['ripgrep'];
 const SEMANTIC_STRUCTURAL = ['code-semantic-search', 'code-structural-search'];
 
 // Phase 1: Core + high-impact (all 4 search skills)
@@ -192,10 +191,10 @@ describe('Phase 2 Specialized Non-Code', () => {
 });
 
 describe('Phase 3 Orchestrators', () => {
-  testHasSkills(P3_ORCH, RG_ONLY, 'Orchestrators');
+  testHasSkills(P3_ORCH, RG_TS, 'Orchestrators');
   testExcludesSkills(
     P3_ORCH,
-    ['code-semantic-search', 'code-structural-search', 'token-saver-context-compression'],
+    ['code-semantic-search', 'code-structural-search'],
     'Orchestrators'
   );
 });
@@ -203,5 +202,5 @@ describe('Phase 3 Orchestrators', () => {
 describe('Registry propagation Phase 2/3', () => {
   testRegistrySkills(P2_DOMAIN_NONCODE, RG_TS, 'Domain non-code');
   testRegistrySkills(P2_SPEC_NONCODE, RG_TS, 'Specialized non-code');
-  testRegistrySkills(P3_ORCH, RG_ONLY, 'Orchestrators');
+  testRegistrySkills(P3_ORCH, RG_TS, 'Orchestrators');
 });
