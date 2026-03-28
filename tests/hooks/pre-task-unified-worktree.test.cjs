@@ -98,6 +98,21 @@ describe('Fix 3 — checkNestedWorktreeSpawn', () => {
     const result = checkNestedWorktreeSpawn({}, fakeCwd);
     assert.strictEqual(result.pass, false, 'Windows worktree path should be detected');
   });
+
+  it('allows a hierarchical sub-router to delegate to one specialist from a worktree', async () => {
+    process.env.HIERARCHICAL_ROUTING = 'on';
+    const fakeCwd = '/project/.claude/worktrees/domain-router-backend';
+    const result = checkNestedWorktreeSpawn(
+      {
+        agent_id: 'domain-router-backend',
+        tool_name: 'Task',
+        tool_input: { subagent_type: 'fastapi-pro' },
+      },
+      fakeCwd
+    );
+
+    assert.strictEqual(result.pass, true, 'router -> sub-router -> specialist should be allowed');
+  });
 });
 
 // ── Fix 4: Concurrent Agent Cap ──────────────────────────────────────────────

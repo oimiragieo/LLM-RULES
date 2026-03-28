@@ -45,6 +45,7 @@ const {
 } = libRequire(
   path.join('routing', 'intent-classifier.cjs')
 );
+const { getFlatRoutingFallbackAgent } = libRequire(path.join('routing', 'sub-router-selection.cjs'));
 const { getAgentForCapability: getAgentForCapability } = libRequire(
   path.join('routing', 'agent-registry-resolver.cjs')
 );
@@ -1151,6 +1152,8 @@ function recordUserPromptResult(result) {
     result.intentSource = 'hierarchical';
     result.defaultAgentForCapability = hierarchicalTarget;
     result.routingType = 'hierarchical';
+    result.originalPrompt = userPrompt;
+    result.flatFallbackAgent = getFlatRoutingFallbackAgent(userPrompt);
     if (hierarchicalMatch.type === 'domain') {
       result.domain = hierarchicalMatch.domain;
       result.subRouter = hierarchicalMatch.router;

@@ -113,6 +113,10 @@ describe('pre-task-unified exports and context tracker', () => {
     assert.strictEqual(result.pass, true);
   });
 
+  it('should expose a depth limit that allows router -> sub-router -> specialist chains', async () => {
+    assert.ok(preTaskUnified.getDepthLimit() >= 3);
+  });
+
   it('should block Task when no recent core memory read evidence exists', async () => {
     writeState(ROUTER_STATE_FILE, {
       mode: 'router',
@@ -173,6 +177,71 @@ describe('pre-task-unified exports and context tracker', () => {
 
     assert.strictEqual(result.pass, true);
     assert.strictEqual(result.exitCode, 0);
+  });
+
+  it('should allow sub-router to specialist chain without TaskList/core-memory blockers when HIERARCHICAL_ROUTING=on', async () => {
+    process.env.HIERARCHICAL_ROUTING = 'on';
+    process.env.NESTED_WORKTREE_ENFORCEMENT = 'off';
+    process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT = 'off';
+
+    writeState(ROUTER_STATE_FILE, {
+      mode: 'agent',
+      requiresPlannerFirst: false,
+      requiresSecurityReview: false,
+      taskListCalledSincePrompt: false,
+    });
+
+    writeState(LOOP_STATE_FILE, {
+      spawnDepth: 1,
+      actionHistory: [],
+    });
+
+    restoreState(TOOL_GOVERNANCE_STATE_FILE, null);
+    const result = await preTaskUnified.runAllChecks({
+      agent_id: 'domain-router-backend',
+      tool_name: 'Task',
+      tool_input: {
+        subagent_type: 'fastapi-pro',
+        description: 'Implement a FastAPI service with Pydantic validation.',
+        prompt: 'Implement a FastAPI service with Pydantic validation.',
+      },
+    });
+
+    assert.strictEqual(result.pass, true);
+    assert.strictEqual(result.exitCode, 0);
+  });
+
+  it('should block sub-router to sub-router dispatch when HIERARCHICAL_ROUTING=on', async () => {
+    process.env.HIERARCHICAL_ROUTING = 'on';
+    process.env.NESTED_WORKTREE_ENFORCEMENT = 'off';
+    process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT = 'off';
+    process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
+
+    writeState(ROUTER_STATE_FILE, {
+      mode: 'agent',
+      requiresPlannerFirst: false,
+      requiresSecurityReview: false,
+      taskListCalledSincePrompt: false,
+    });
+
+    writeState(LOOP_STATE_FILE, {
+      spawnDepth: 1,
+      actionHistory: [],
+    });
+
+    const result = await preTaskUnified.runAllChecks({
+      agent_id: 'domain-router-backend',
+      tool_name: 'Task',
+      tool_input: {
+        subagent_type: 'domain-router-ai-ml',
+        description: 'Route this AI prompt elsewhere.',
+        prompt: 'Route this AI prompt elsewhere.',
+      },
+    });
+
+    assert.strictEqual(result.pass, false);
+    assert.strictEqual(result.exitCode, 2);
+    assert.match(String(result.message || ''), /Circular sub-router dispatch blocked/i);
   });
 
   // Fix B: Update-intent bypass for evolution cooldown in checkLoopPrevention

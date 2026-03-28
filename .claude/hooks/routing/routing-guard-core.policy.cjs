@@ -2,6 +2,11 @@
 
 const path = require('path');
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+const {
+  DOMAIN_SUB_ROUTERS,
+  isDomainSubRouterName,
+  isHierarchicalRoutingEnabled,
+} = require('../../lib/routing/sub-router-selection.cjs');
 
 const ALL_WATCHED_TOOLS = [
   'Glob',
@@ -485,6 +490,7 @@ module.exports = {
   BLACKLISTED_TOOLS,
   ROUTER_BASH_WHITELIST,
   ROUTER_READ_WHITELIST,
+  DOMAIN_SUB_ROUTERS,
   WHITELISTED_TOOLS,
   WRITE_TOOLS,
   IMPLEMENTATION_AGENTS,
@@ -500,5 +506,7 @@ module.exports = {
   isImplementationAgentSpawn,
   isWhitelistedBashCommand,
   isWhitelistedRouterReadPath,
+  isDomainSubRouterName,
+  isHierarchicalRoutingEnabled,
   extractTaskIdFromPrompt,
 };

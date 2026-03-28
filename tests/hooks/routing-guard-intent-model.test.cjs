@@ -79,6 +79,7 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
     delete process.env.INTENT_AGENT_MATCH;
     delete process.env.INTENT_AGENT_AUTOREROUTE;
     delete process.env.INTENT_AGENT_AUTOREROUTE_THRESHOLD;
+    delete process.env.HIERARCHICAL_ROUTING;
     delete process.env.CLAUDE_SESSION_ID;
     delete process.env.INTENT_AGENT_ENFORCEMENT;
   });
@@ -106,6 +107,32 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
       subagent_type: 'security-architect',
       prompt: 'Review authentication security and check for vulnerabilities.',
     });
+    assert.equal(result.pass, true);
+  });
+
+  it('should allow hierarchical router-to-sub-router dispatch when HIERARCHICAL_ROUTING=on', () => {
+    process.env.HIERARCHICAL_ROUTING = 'on';
+
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'domain-router-web-frontend',
+      prompt: 'Build a React component with responsive Tailwind styles.',
+    });
+
+    assert.equal(result.pass, true);
+  });
+
+  it('should allow sub-router-to-specialist dispatch when the selected specialist matches the prompt', () => {
+    process.env.HIERARCHICAL_ROUTING = 'on';
+
+    const result = routingGuard.checkIntentAgentMatch(
+      'Task',
+      {
+        subagent_type: 'fastapi-pro',
+        prompt: 'Implement a FastAPI service with Pydantic validation.',
+      },
+      { agent_id: 'domain-router-backend' }
+    );
+
     assert.equal(result.pass, true);
   });
 

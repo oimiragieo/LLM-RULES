@@ -59,6 +59,7 @@ const {
 } = require('./routing-guard-core.checks-router.cjs');
 const {
   checkTaskPayloadContract,
+  checkHierarchicalSubRouterDispatch,
   checkPlannerFirst,
   checkTaskCreate,
   checkSecurityReview,
@@ -115,7 +116,7 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
     }
     captureWarn('tasklist-first-gate', taskListCheck);
 
-    const payloadCheck = checkTaskPayloadContract(toolName, toolInput);
+    const payloadCheck = checkTaskPayloadContract(toolName, toolInput, hookInput);
     if (!payloadCheck.pass) {
       return {
         pass: false,
@@ -126,6 +127,22 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
       };
     }
     captureWarn('task-payload-contract', payloadCheck);
+
+    const hierarchicalDispatchCheck = checkHierarchicalSubRouterDispatch(
+      toolName,
+      toolInput,
+      hookInput
+    );
+    if (!hierarchicalDispatchCheck.pass) {
+      return {
+        pass: false,
+        result: hierarchicalDispatchCheck.result,
+        message: hierarchicalDispatchCheck.message,
+        checkName: 'hierarchical-sub-router-dispatch',
+        warnings,
+      };
+    }
+    captureWarn('hierarchical-sub-router-dispatch', hierarchicalDispatchCheck);
 
     const bashCheck = checkRouterBash(toolName, toolInput, hookInput);
     if (!bashCheck.pass) {
@@ -297,7 +314,7 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
       };
     }
 
-    const intentCheck = checkIntentAgentMatch(toolName, toolInput);
+    const intentCheck = checkIntentAgentMatch(toolName, toolInput, hookInput);
     if (!intentCheck.pass) {
       return {
         pass: false,

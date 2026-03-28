@@ -3,6 +3,11 @@
 
 const { getEnforcementMode, auditSecurityOverride } = require('../../lib/utils/hook-input.cjs');
 const {
+  getHierarchicalTaskContext,
+  isHierarchicalRoutingEnabled,
+  validateHierarchicalTaskContext,
+} = require('../../lib/routing/sub-router-selection.cjs');
+const {
   isPlannerSpawn,
   isSecuritySpawn,
   isArchitectSpawn,
@@ -39,7 +44,7 @@ const {
   buildSkillAgentConfusionMessage,
 } = require('./routing-guard-core.helpers.cjs');
 
-function checkTaskPayloadContract(toolName, toolInput = {}) {
+function checkTaskPayloadContract(toolName, toolInput = {}, hookInput = null) {
   if (toolName !== 'Task' && toolName !== 'TaskCreate') {
     return { pass: true };
   }
@@ -55,7 +60,12 @@ function checkTaskPayloadContract(toolName, toolInput = {}) {
   }
 
   if (toolName === 'Task') {
-    if (!isNonEmptyString(toolInput.prompt)) {
+    const hierarchicalContext = getHierarchicalTaskContext(hookInput, toolInput);
+    const allowPromptOmission =
+      isHierarchicalRoutingEnabled() &&
+      (hierarchicalContext.currentIsSubRouter || hierarchicalContext.targetIsSubRouter);
+
+    if (!allowPromptOmission && !isNonEmptyString(toolInput.prompt)) {
       missing.push('prompt');
     }
     if (!isNonEmptyString(toolInput.subagent_type || toolInput.agent_type)) {
@@ -73,6 +83,14 @@ function checkTaskPayloadContract(toolName, toolInput = {}) {
     return { pass: false, result: 'block', message };
   }
   return { pass: true, result: 'warn', message };
+}
+
+function checkHierarchicalSubRouterDispatch(toolName, toolInput = {}, hookInput = null) {
+  if (toolName !== 'Task' || !isHierarchicalRoutingEnabled()) {
+    return { pass: true };
+  }
+
+  return validateHierarchicalTaskContext(hookInput, toolInput);
 }
 
 function checkPlannerFirst(toolName, toolInput) {
@@ -613,6 +631,7 @@ function checkSkillAgentConfused(toolName, toolInput = {}) {
 
 module.exports = {
   checkTaskPayloadContract,
+  checkHierarchicalSubRouterDispatch,
   checkPlannerFirst,
   checkTaskCreate,
   checkSecurityReview,

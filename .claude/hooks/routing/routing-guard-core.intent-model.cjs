@@ -11,8 +11,17 @@ const {
   shouldAutoReroute,
   getIntentAutoRerouteConfig,
 } = require('./routing-guard-core.shared.cjs');
-const { classifyIntent } = require('../../lib/routing/intent-classifier.cjs');
+const {
+  classifyIntent,
+  classifyDomain,
+  isHierarchicalRoutingEnabled,
+} = require('../../lib/routing/intent-classifier.cjs');
 const { getPreferredAgent } = require('../../lib/routing/routing-table.cjs');
+const {
+  getHookAgentId,
+  isDomainSubRouterName,
+  selectSubRouterAgent,
+} = require('../../lib/routing/sub-router-selection.cjs');
 
 let eventBus;
 try {
@@ -85,12 +94,31 @@ function getIntentSignalText(prompt, description = '') {
   return `${String(description || '')}\n${trimmedPrompt}`.trim();
 }
 
-function agentMatchesIntent(subagentType, suggestedAgents) {
+function agentMatchesIntent(subagentType, suggestedAgents, prompt = '', hookInput = null, toolInput = {}) {
+  const normalizedSubagentType = String(subagentType || '').trim().toLowerCase();
   if (suggestedAgents.length === 0) {
     return true;
   }
 
-  return suggestedAgents.includes(subagentType);
+  if (suggestedAgents.includes(normalizedSubagentType)) {
+    return true;
+  }
+
+  if (!isHierarchicalRoutingEnabled()) {
+    return false;
+  }
+
+  const currentAgent = getHookAgentId(hookInput, toolInput);
+  if (isDomainSubRouterName(currentAgent) && !isDomainSubRouterName(normalizedSubagentType)) {
+    return selectSubRouterAgent(currentAgent, prompt).agent === normalizedSubagentType;
+  }
+
+  if (isDomainSubRouterName(normalizedSubagentType)) {
+    const hierarchicalMatch = classifyDomain(prompt);
+    return hierarchicalMatch.type === 'domain' && hierarchicalMatch.router === normalizedSubagentType;
+  }
+
+  return false;
 }
 
 function isExplicitAuditRoutingOverride(subagentType, prompt, description = '') {
@@ -136,7 +164,7 @@ function isExplicitAuditRoutingOverride(subagentType, prompt, description = '') 
   return text.includes('audit') || hasExplicitSignal || isCodebaseScan || hasCodebaseIssueSweep;
 }
 
-function checkIntentAgentMatch(toolName, toolInput = {}) {
+function checkIntentAgentMatch(toolName, toolInput = {}, hookInput = null) {
   if (toolName !== 'Task') {
     return { pass: true };
   }
@@ -153,7 +181,7 @@ function checkIntentAgentMatch(toolName, toolInput = {}) {
   const intentSignalText = getIntentSignalText(prompt, description);
   const { detectedSignals, suggestedAgents, isCritical } = detectIntent(intentSignalText);
 
-  if (!agentMatchesIntent(subagentType, suggestedAgents)) {
+  if (!agentMatchesIntent(subagentType, suggestedAgents, intentSignalText, hookInput, toolInput)) {
     const dedupe = registerBlockAttempt('intent-agent-match', `Task:${subagentType}`);
     if (isExplicitAuditRoutingOverride(subagentType, prompt, description)) {
       return {

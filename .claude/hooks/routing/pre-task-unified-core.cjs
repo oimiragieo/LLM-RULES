@@ -21,6 +21,10 @@ const { getToolName, getToolInput, getEnforcementMode, auditLog } = libRequire(
 const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
 const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manager.cjs'));
+const {
+  getHierarchicalTaskContext,
+  validateHierarchicalTaskContext,
+} = libRequire(path.join('routing', 'sub-router-selection.cjs'));
 
 const state = require('./pre-task-unified-state.cjs');
 const helpers = require('./pre-task-unified-helpers.cjs');
@@ -89,6 +93,14 @@ async function checkTaskListFirst(toolName, hookInput = null) {
   if (toolName !== 'Task') {
     return { pass: true };
   }
+  const toolInput = getToolInput(hookInput);
+  const hierarchicalDispatch = validateHierarchicalTaskContext(hookInput, toolInput);
+  if (!hierarchicalDispatch.pass) {
+    return hierarchicalDispatch;
+  }
+  if (hierarchicalDispatch.context.allowSubRouterToSpecialist) {
+    return { pass: true };
+  }
   const permissionMode = String(
     hookInput?.permission_mode || hookInput?.permissionMode || ''
   ).toLowerCase();
@@ -146,6 +158,11 @@ async function checkCoreMemoryReadBeforeTask(hookInput) {
   const agentId = String(hookInput?.agent_id || hookInput?.agentId || '').toLowerCase();
 
   if (permissionMode === 'bypasspermissions' || agentId === 'router') {
+    return { pass: true };
+  }
+
+  const hierarchicalContext = getHierarchicalTaskContext(hookInput, getToolInput(hookInput));
+  if (hierarchicalContext.allowSubRouterToSpecialist) {
     return { pass: true };
   }
 
@@ -466,6 +483,11 @@ function checkNestedWorktreeSpawn(hookInput, cwd = process.cwd()) {
     return { pass: true };
   }
 
+  const hierarchicalContext = getHierarchicalTaskContext(hookInput, getToolInput(hookInput));
+  if (hierarchicalContext.allowSubRouterToSpecialist) {
+    return { pass: true };
+  }
+
   const depth = getWorktreeDepth(cwd);
   if (depth < 1) {
     return { pass: true }; // Not in a worktree — router context, allow
@@ -530,6 +552,14 @@ async function runAllChecks(hookInput) {
 
   invalidateCachedState();
   const toolInput = getToolInput(hookInput);
+  const hierarchicalDispatch = validateHierarchicalTaskContext(hookInput, toolInput);
+  if (!hierarchicalDispatch.pass) {
+    return {
+      pass: false,
+      exitCode: hierarchicalDispatch.result === 'block' ? 2 : 0,
+      message: hierarchicalDispatch.message,
+    };
+  }
 
   // Fix 3: Block nested worktree spawns (subagent trying to spawn a sub-subagent)
   const nestedWorktreeResult = checkNestedWorktreeSpawn(hookInput);
@@ -669,6 +699,7 @@ module.exports = {
   extractAgentType,
   isEvolutionTrigger,
   detectEvolutionType,
+  getDepthLimit,
   getLoopState,
   readTaskListLoopStateAsync,
   writeTaskListLoopStateAsync,

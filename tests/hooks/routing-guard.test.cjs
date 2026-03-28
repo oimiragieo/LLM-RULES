@@ -392,6 +392,23 @@ describe('routing-guard', () => {
       assert.strictEqual(result.result, 'block');
       assert.match(result.message, /missing required field\(s\): description/i);
     });
+
+    it('should allow hierarchical sub-router Task payloads without prompt when HIERARCHICAL_ROUTING=on', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      process.env.HIERARCHICAL_ROUTING = 'on';
+      process.env.TASK_PAYLOAD_CONTRACT_ENFORCEMENT = 'block';
+
+      const result = routingGuard.checkTaskPayloadContract(
+        'Task',
+        {
+          subagent_type: 'domain-router-backend',
+          description: 'Implement a FastAPI service with Pydantic validation.',
+        },
+        { permission_mode: 'normal' }
+      );
+
+      assert.strictEqual(result.pass, true);
+    });
   });
 
   describe('runAllChecks payload contract integration', () => {
@@ -897,6 +914,32 @@ describe('routing-guard', () => {
     it('should export ROUTER_BASH_WHITELIST constant', () => {
       assert.ok(routingGuard, 'Module should be loadable');
       assert.ok(Array.isArray(routingGuard.ROUTER_BASH_WHITELIST));
+    });
+  });
+
+  // ============================================================================
+  describe('hierarchical routing helpers', () => {
+    it('extractSpawnAgentType recognizes all domain sub-router names', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+
+      const subRouters = [
+        'domain-router-web-frontend',
+        'domain-router-backend',
+        'domain-router-mobile',
+        'domain-router-ai-ml',
+        'domain-router-infra',
+        'domain-router-security',
+        'domain-router-arch-data',
+        'domain-router-product',
+        'domain-router-niche',
+      ];
+
+      for (const subRouter of subRouters) {
+        assert.strictEqual(
+          routingGuard.extractSpawnAgentType({ subagent_type: subRouter }),
+          subRouter
+        );
+      }
     });
   });
 
