@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-26T12:57:20.037Z",
+  "generatedAt": "2026-03-28T03:56:56.822Z",
   "metadata": {
     "totalSkills": 339,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-26T12:57:20.038Z",
+    "lastValidated": "2026-03-28T03:56:56.822Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -283,7 +283,16 @@
         "swarm-coordinator",
         "evolution-orchestrator",
         "party-orchestrator",
-        "artifact-integrator"
+        "artifact-integrator",
+        "domain-router-ai-ml",
+        "domain-router-arch-data",
+        "domain-router-backend",
+        "domain-router-infra",
+        "domain-router-mobile",
+        "domain-router-niche",
+        "domain-router-product",
+        "domain-router-security",
+        "domain-router-web-frontend"
       ],
       "agentSupporting": [
         "multi-llm-consultant",
@@ -464,7 +473,16 @@
         "performance-engineer",
         "sre-engineer",
         "advanced-debugging",
-        "code-simplifier"
+        "code-simplifier",
+        "domain-router-ai-ml",
+        "domain-router-arch-data",
+        "domain-router-backend",
+        "domain-router-infra",
+        "domain-router-mobile",
+        "domain-router-niche",
+        "domain-router-product",
+        "domain-router-security",
+        "domain-router-web-frontend"
       ],
       "agentSupporting": [],
       "tags": [
@@ -539,7 +557,16 @@
         "performance-engineer",
         "sre-engineer",
         "advanced-debugging",
-        "code-simplifier"
+        "code-simplifier",
+        "domain-router-ai-ml",
+        "domain-router-arch-data",
+        "domain-router-backend",
+        "domain-router-infra",
+        "domain-router-mobile",
+        "domain-router-niche",
+        "domain-router-product",
+        "domain-router-security",
+        "domain-router-web-frontend"
       ],
       "agentSupporting": [],
       "tags": [
@@ -686,7 +713,16 @@
         "swarm-coordinator",
         "evolution-orchestrator",
         "party-orchestrator",
-        "artifact-integrator"
+        "artifact-integrator",
+        "domain-router-ai-ml",
+        "domain-router-arch-data",
+        "domain-router-backend",
+        "domain-router-infra",
+        "domain-router-mobile",
+        "domain-router-niche",
+        "domain-router-product",
+        "domain-router-security",
+        "domain-router-web-frontend"
       ],
       "agentSupporting": [],
       "tags": [
@@ -3411,7 +3447,7 @@
       "displayName": "Agent Creator",
       "category": "Creator Tools",
       "domain": "creator",
-      "description": "Creates specialized AI agents on-demand when no existing agent matches a request. Use when the Router cannot find a suitable agent for a task. Enables self-evolution by generating persistent agents.",
+      "description": "Creator Tools - agent-creator",
       "requiredTools": [
         "Read",
         "Write",
@@ -3469,7 +3505,7 @@
       "displayName": "Skill Creator",
       "category": "Creator Tools",
       "domain": "creator",
-      "description": "Create, validate, and convert skills for the agent ecosystem. Enforces standardized structure for consistency. Enables self-evolution by creating new skills on demand, converting MCP servers and codebases to skills.",
+      "description": "Creator Tools - skill-creator",
       "requiredTools": [
         "Read",
         "Write",
@@ -3833,7 +3869,16 @@
         "sre-engineer",
         "advanced-debugging",
         "code-simplifier",
-        "researcher"
+        "researcher",
+        "domain-router-ai-ml",
+        "domain-router-arch-data",
+        "domain-router-backend",
+        "domain-router-infra",
+        "domain-router-mobile",
+        "domain-router-niche",
+        "domain-router-product",
+        "domain-router-security",
+        "domain-router-web-frontend"
       ],
       "agentSupporting": [
         "developer",
@@ -3842,7 +3887,16 @@
         "prompt-engineer",
         "researcher",
         "swarm-coordinator",
-        "artifact-integrator"
+        "artifact-integrator",
+        "domain-router-ai-ml",
+        "domain-router-arch-data",
+        "domain-router-backend",
+        "domain-router-infra",
+        "domain-router-mobile",
+        "domain-router-niche",
+        "domain-router-product",
+        "domain-router-security",
+        "domain-router-web-frontend"
       ],
       "tags": [
         "memory",
@@ -3991,7 +4045,16 @@
         "swarm-coordinator",
         "evolution-orchestrator",
         "party-orchestrator",
-        "artifact-integrator"
+        "artifact-integrator",
+        "domain-router-ai-ml",
+        "domain-router-arch-data",
+        "domain-router-backend",
+        "domain-router-infra",
+        "domain-router-mobile",
+        "domain-router-niche",
+        "domain-router-product",
+        "domain-router-security",
+        "domain-router-web-frontend"
       ],
       "agentSupporting": [],
       "tags": [
@@ -4317,7 +4380,16 @@
         "swarm-coordinator",
         "evolution-orchestrator",
         "party-orchestrator",
-        "artifact-integrator"
+        "artifact-integrator",
+        "domain-router-ai-ml",
+        "domain-router-arch-data",
+        "domain-router-backend",
+        "domain-router-infra",
+        "domain-router-mobile",
+        "domain-router-niche",
+        "domain-router-product",
+        "domain-router-security",
+        "domain-router-web-frontend"
       ],
       "agentSupporting": [],
       "tags": [
@@ -7639,28 +7711,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "enterprise-skill-test-1774529839629": {
-      "name": "enterprise-skill-test-1774529839629",
-      "displayName": "Enterprise Skill Test 1774529839629",
-      "category": "Other",
-      "domain": "other",
-      "description": "Enterprise scaffold validation skill for test coverage and reliability checks.",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "enterprise-skill-test-1774529839629"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
     "error-recovery-escalation": {
       "name": "error-recovery-escalation",
       "displayName": "Error Recovery Escalation",
@@ -8760,6 +8810,36 @@
       "priority": 3,
       "aliasOf": null
     },
+    "token-saver-context-compression": {
+      "name": "token-saver-context-compression",
+      "displayName": "Token Saver Context Compression",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - token-saver-context-compression",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "domain-router-ai-ml",
+        "domain-router-arch-data",
+        "domain-router-backend",
+        "domain-router-infra",
+        "domain-router-mobile",
+        "domain-router-niche",
+        "domain-router-product",
+        "domain-router-security",
+        "domain-router-web-frontend"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "token-saver-context-compression"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
     "transcription": {
       "name": "transcription",
       "displayName": "Transcription",
@@ -9167,7 +9247,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1774529839629",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -9213,6 +9292,7 @@
         "team-orchestration",
         "telegram-polling",
         "telegram-voice-pipeline",
+        "token-saver-context-compression",
         "transcription",
         "tts-generation",
         "uat-verify",
@@ -9612,7 +9692,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1774529839629",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -9658,6 +9737,7 @@
         "team-orchestration",
         "telegram-polling",
         "telegram-voice-pipeline",
+        "token-saver-context-compression",
         "transcription",
         "tts-generation",
         "uat-verify",
@@ -10040,7 +10120,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1774529839629",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -10086,6 +10165,7 @@
         "team-orchestration",
         "telegram-polling",
         "telegram-voice-pipeline",
+        "token-saver-context-compression",
         "transcription",
         "tts-generation",
         "uat-verify",
@@ -10329,7 +10409,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1774529839629",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -10364,6 +10443,7 @@
         "task-delegation",
         "team-orchestration",
         "telegram-polling",
+        "token-saver-context-compression",
         "transcription",
         "tts-generation",
         "uat-verify",
@@ -10582,6 +10662,7 @@
         "style-analyzer",
         "task-delegation",
         "team-orchestration",
+        "token-saver-context-compression",
         "uat-verify",
         "user-research",
         "voice-clone-generator",
@@ -10758,7 +10839,6 @@
         "de-sloppify",
         "deep-research",
         "electron-pro",
-        "enterprise-skill-test-1774529839629",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -11464,7 +11544,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1774529839629",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -12600,6 +12679,96 @@
         "task-management-protocol",
         "memory-search",
         "context-compressor"
+      ],
+      "domain-router-ai-ml": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-arch-data": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-backend": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-infra": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-mobile": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-niche": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-product": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-security": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-web-frontend": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
       ]
     }
   },
@@ -12804,7 +12973,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1774529839629",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -13940,6 +14108,96 @@
         "task-management-protocol",
         "memory-search",
         "context-compressor"
+      ],
+      "domain-router-ai-ml": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-arch-data": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-backend": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-infra": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-mobile": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-niche": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-product": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-security": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
+      ],
+      "domain-router-web-frontend": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "token-saver-context-compression",
+        "ripgrep",
+        "memory-search",
+        "context-compressor",
+        "code-structural-search",
+        "code-semantic-search"
       ]
     }
   }
