@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable max-lines */
 /**
  * Post-Creation Integration Hook (Phase 1.5 - Task #7)
  * =====================================================
@@ -41,6 +42,96 @@ const MAX_QUEUE_ENTRY_BYTES = 10 * 1024; // 10KB per JSONL line
 const ENFORCEMENT_MODE = process.env.INTEGRATION_ENFORCEMENT || 'warn';
 const MAX_IMPACT_ITEMS = 25;
 const MAX_IMPACT_TEXT_CHARS = 240;
+const QUALITY_PLACEHOLDER_PATTERNS = [/\bTODO\b/i, /\bTBD\b/i, /\bFIXME\b/i];
+const QUALITY_RULES = Object.freeze({
+  skill: {
+    minLines: 50,
+    requiredSections: [
+      { pattern: /<identity>|##\s*identity/i, name: 'identity' },
+      { pattern: /<capabilities>|##\s*capabilities/i, name: 'capabilities' },
+      { pattern: /<instructions>|##\s*instructions/i, name: 'instructions' },
+      { pattern: /##\s*Memory Protocol/i, name: 'Memory Protocol' },
+    ],
+  },
+  agent: {
+    minLines: 30,
+    requiredSections: [
+      { pattern: /##\s*Core Persona/i, name: 'Core Persona' },
+      { pattern: /##\s*Workflow/i, name: 'Workflow' },
+      { pattern: /##\s*Memory Protocol/i, name: 'Memory Protocol' },
+    ],
+  },
+});
+
+function stripFrontmatter(content) {
+  return String(content || '').replace(/^---\n[\s\S]*?\n---\n?/, '');
+}
+
+function stripFencedCodeBlocks(content) {
+  return String(content || '').replace(/```[\s\S]*?```/g, '');
+}
+
+function findQualityPlaceholders(content) {
+  const issues = [];
+  const lines = stripFencedCodeBlocks(stripFrontmatter(content)).split('\n');
+
+  lines.forEach((line, index) => {
+    QUALITY_PLACEHOLDER_PATTERNS.forEach(pattern => {
+      if (pattern.test(line)) {
+        issues.push(`Placeholder "${pattern.source.replace(/\\b/g, '')}" found on line ${index + 1}`);
+      }
+    });
+  });
+
+  return issues;
+}
+
+function validateArtifactQuality(artifactType, artifactPath) {
+  const rules = QUALITY_RULES[artifactType];
+  if (!rules) {
+    return {
+      valid: true,
+      issues: [],
+      lineCount: 0,
+      artifactType,
+      skipped: true,
+      reason: `No quality rules configured for ${artifactType}`,
+    };
+  }
+
+  if (!artifactPath || !fs.existsSync(artifactPath)) {
+    return {
+      valid: false,
+      issues: [`Artifact file not found: ${artifactPath}`],
+      lineCount: 0,
+      artifactType,
+    };
+  }
+
+  const content = fs.readFileSync(artifactPath, 'utf8');
+  const lineCount = content.split('\n').length;
+  const issues = [...findQualityPlaceholders(content)];
+
+  if (lineCount < rules.minLines) {
+    issues.push(
+      `${artifactType} content must be at least ${rules.minLines} lines (found ${lineCount}).`
+    );
+  }
+
+  for (const section of rules.requiredSections) {
+    if (!section.pattern.test(content)) {
+      issues.push(`Missing required section: ${section.name}`);
+    }
+  }
+
+  return {
+    valid: issues.length === 0,
+    issues,
+    lineCount,
+    artifactType,
+    artifactPath,
+  };
+}
 
 /**
  * Check if TaskUpdate represents a creator completion
@@ -470,6 +561,10 @@ async function processCreatorCompletion(hookData) {
 
   // Extract artifact path from metadata
   const artifactPath = toolInput.metadata?.artifactPath || artifactId;
+  const qualityValidation =
+    detection.creatorType === 'skill' || detection.creatorType === 'agent'
+      ? validateArtifactQuality(detection.creatorType, artifactPath)
+      : { valid: true, issues: [], skipped: true };
 
   // Quick integration check (artifact-graph)
   const check = quickIntegrationCheck(artifactId, GRAPH_PATH);
@@ -488,6 +583,11 @@ async function processCreatorCompletion(hookData) {
   process.stderr.write(
     `[post-creation-integration] Integration status: ${check.status}, gaps: ${check.gaps.join(', ')}\n`
   );
+  if (!qualityValidation.valid) {
+    process.stderr.write(
+      `[post-creation-integration] Quality validation failed: ${qualityValidation.issues.join(' | ')}\n`
+    );
+  }
 
   if (impactReport) {
     const mustHavePending = impactReport.mustHave.filter(item => item.status === 'pending');
@@ -534,12 +634,23 @@ async function processCreatorCompletion(hookData) {
 
   // Determine if we should block based on enforcement mode
   const hasMustHaveGaps = check.gaps.length > 0 && check.status !== 'fully-integrated';
-  const shouldBlock = ENFORCEMENT_MODE === 'block' && hasMustHaveGaps;
+  const hasQualityIssues = qualityValidation.valid === false;
+  const shouldBlock = ENFORCEMENT_MODE === 'block' && (hasMustHaveGaps || hasQualityIssues);
 
-  const message =
-    check.gaps.length > 0
-      ? `⚠️ Artifact ${artifactId} has ${check.gaps.length} missing integration(s): ${check.gaps.join(', ')}. Queued for integration analysis.`
-      : `✅ Artifact ${artifactId} appears fully integrated.`;
+  const messageParts = [];
+  if (check.gaps.length > 0) {
+    messageParts.push(
+      `Artifact ${artifactId} has ${check.gaps.length} missing integration(s): ${check.gaps.join(', ')}. Queued for integration analysis.`
+    );
+  } else {
+    messageParts.push(`Artifact ${artifactId} appears fully integrated.`);
+  }
+  if (hasQualityIssues) {
+    messageParts.push(
+      `Quality validation failed: ${qualityValidation.issues.join(' | ')}`
+    );
+  }
+  const message = `${hasMustHaveGaps || hasQualityIssues ? '⚠️' : '✅'} ${messageParts.join(' ')}`;
 
   if (shouldBlock) {
     process.stdout.write(formatHookResult({ allow: false, message: `BLOCKED: ${message}` }));
@@ -548,7 +659,7 @@ async function processCreatorCompletion(hookData) {
 
   // Allow by default (warn mode)
   process.stdout.write(formatHookResult({ allow: true, message }));
-  return { result: { allow: true, message } };
+  return { result: { allow: true, message, qualityValidation } };
 }
 
 /**
@@ -582,6 +693,7 @@ module.exports = {
   quickIntegrationCheck,
   runEcosystemImpactAnalysis,
   runEcosystemImpactAnalysisWithTimeout,
+  validateArtifactQuality,
   extractArtifactId,
   sanitizeImpactReport,
   serializeQueueEntryWithCap,

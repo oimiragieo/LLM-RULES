@@ -58,6 +58,7 @@ function renderFromFileTemplate(template, params) {
     .replace(/\{\{title\}\}/g, params.title)
     .replace(/\{\{description\}\}/g, params.description)
     .replace(/\{\{model\}\}/g, params.model)
+    .replace(/\{\{category\}\}/g, params.category)
     .replace(/\{\{temperature\}\}/g, String(params.temperature))
     .replace(/\{\{tools_csv\}\}/g, params.tools.join(', '))
     .replace(/\{\{skills_yaml\}\}/g, params.skills.map(skill => `  - ${skill}`).join('\n'))
@@ -69,6 +70,7 @@ function buildParams(options) {
   if (!name) throw new Error('Missing required --name');
   const description = String(options.description || `${name} specialist agent`).trim();
   const model = String(options.model || 'sonnet').trim();
+  const category = String(options.category || 'domain').trim();
   const temperature = Number.isFinite(Number(options.temperature))
     ? Number(options.temperature)
     : 0.3;
@@ -95,6 +97,7 @@ function buildParams(options) {
     title: toTitleCase(name),
     description,
     model,
+    category,
     temperature,
     tools,
     skills,

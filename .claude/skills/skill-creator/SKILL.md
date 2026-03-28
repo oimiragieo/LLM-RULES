@@ -132,7 +132,7 @@ Use the template below as the contract that the generated `SKILL.md` must satisf
 
 ### Step 4: Review the Requested Scaffold
 
-By default, new skills still expect the enterprise bundle unless the request explicitly asks for minimal mode. At minimum, decide whether the skill needs:
+The enterprise bundle is now **opt-in**. Start from the minimal scaffold by default, and only add enterprise files when the request explicitly asks for `--enterprise` or the capability truly needs them. At minimum, decide whether the skill needs:
 
 - `scripts/` for executable helpers
 - `hooks/` for pre/post execution enforcement

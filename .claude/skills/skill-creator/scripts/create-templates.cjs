@@ -7,6 +7,75 @@ function toTitleCase(name) {
     .join(' ');
 }
 
+function normalizeListInput(value, fallback = []) {
+  if (Array.isArray(value)) {
+    return value.map(item => String(item).trim()).filter(Boolean);
+  }
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map(item => item.trim())
+      .filter(Boolean);
+  }
+  return [...fallback];
+}
+
+function slugifyToken(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function deriveSkillCategory({ category, name, description }) {
+  if (typeof category === 'string' && category.trim()) {
+    return category.trim();
+  }
+
+  const signal = `${name || ''} ${description || ''}`.toLowerCase();
+  if (/(test|qa|validat|quality|contract)/.test(signal)) return 'Validation & Quality';
+  if (/(secur|auth|threat|vuln)/.test(signal)) return 'Security';
+  if (/(architect|plan|design|orchestrat|workflow)/.test(signal)) {
+    return 'Planning & Architecture';
+  }
+  if (/(react|next|frontend|ui|component)/.test(signal)) return 'Frameworks';
+  if (/(git|commit|branch|release|deploy)/.test(signal)) return 'Git & Version Control';
+  return 'Specialized Patterns';
+}
+
+function deriveSkillAgents({ agents, name, description, category }) {
+  const explicitAgents = normalizeListInput(agents);
+  if (explicitAgents.length > 0) return explicitAgents;
+
+  const signal = `${name || ''} ${description || ''} ${category || ''}`.toLowerCase();
+  const resolved = new Set(['developer']);
+  if (/(test|qa|validat|quality)/.test(signal)) resolved.add('qa');
+  if (/(architect|plan|design)/.test(signal)) resolved.add('architect');
+  if (/(secur|auth|threat|vuln)/.test(signal)) resolved.add('security-architect');
+  return [...resolved].slice(0, 4);
+}
+
+function deriveSkillTags({ tags, name, description, category }) {
+  const explicitTags = normalizeListInput(tags).map(slugifyToken).filter(Boolean);
+  if (explicitTags.length > 0) return explicitTags;
+
+  const derived = [
+    ...normalizeListInput(name, []).flatMap(item => item.split('-')),
+    ...(
+      String(description || '')
+        .toLowerCase()
+        .match(/\b[a-z0-9-]{4,}\b/g) || []
+    ),
+    ...normalizeListInput(category, []).flatMap(item => item.split(/\s+/)),
+  ]
+    .map(slugifyToken)
+    .filter(Boolean);
+
+  const unique = Array.from(new Set(derived));
+  return unique.slice(0, 8).length > 0 ? unique.slice(0, 8) : ['general'];
+}
+
 function generateSkillContent(config) {
   const {
     name,
@@ -20,6 +89,9 @@ function generateSkillContent(config) {
     bestPractices = [],
     capabilities = [],
     steps = [],
+    agents,
+    category,
+    tags,
   } = config;
 
   const toolsArray = Array.isArray(tools)
@@ -28,6 +100,19 @@ function generateSkillContent(config) {
         .split(',')
         .map(t => t.trim());
   const titleCase = toTitleCase(name);
+  const resolvedCategory = deriveSkillCategory({ category, name, description });
+  const resolvedAgents = deriveSkillAgents({
+    agents,
+    name,
+    description,
+    category: resolvedCategory,
+  });
+  const resolvedTags = deriveSkillTags({
+    tags,
+    name,
+    description,
+    category: resolvedCategory,
+  });
 
   const defaultCapabilities =
     capabilities.length > 0
@@ -73,6 +158,9 @@ tools: [${toolsArray.join(', ')}]
 ${args ? `args: "${args}"` : ''}
 verified: true
 lastVerifiedAt: ${new Date().toISOString()}
+agents: [${resolvedAgents.join(', ')}]
+category: ${JSON.stringify(resolvedCategory)}
+tags: [${resolvedTags.join(', ')}]
 best_practices:
 ${defaultBestPractices.map(p => `  - ${p}`).join('\n')}
 error_handling: graceful
@@ -322,13 +410,16 @@ Create Options:
   --name            Skill name (required, lowercase-with-hyphens)
   --description     Skill description (required, min 20 chars)
   --tools           Comma-separated tools (default: Read,Write,Bash)
+  --agents          Comma-separated primary agents for frontmatter metadata
+  --category        Catalog category for frontmatter metadata
+  --tags            Comma-separated discovery tags for frontmatter metadata
   --refs            Create references/ directory
   --hooks           Create hooks/ directory with pre/post execute hooks
   --schemas         Create schemas/ directory with input/output schemas
   --register-hooks  Also register hooks in settings.json
   --register-schemas Also register schemas in global schemas/
-  --enterprise      Enable enterprise scaffolding bundle (default)
-  --no-enterprise   Disable enterprise defaults and use minimal scaffold
+  --enterprise      Enable enterprise scaffolding bundle (opt-in)
+  --no-enterprise   Force the minimal scaffold bundle (default behavior)
   --help            Show this help
 `;
 }

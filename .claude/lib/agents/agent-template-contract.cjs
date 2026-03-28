@@ -143,6 +143,7 @@ function ensureDirectory(p) {
 function renderAgentTemplate({
   name,
   description,
+  category = 'domain',
   model = 'sonnet',
   temperature = 0.3,
   tools = [
@@ -170,6 +171,7 @@ name: ${name}
 version: 1.0.0
 description: ${description}
 model: ${model}
+category: ${category}
 temperature: ${temperature}
 context_strategy: lazy_load
 maxTurns: 18

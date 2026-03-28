@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable max-lines */
 
 function createActions(ctx) {
   const {
@@ -21,30 +22,142 @@ function createActions(ctx) {
     requiredSections: ['identity', 'capabilities', 'instructions', 'Memory Protocol'],
     descriptionMinLength: 20,
   };
+  const REGISTRATION_TARGETS = {
+    claudeMd: path.join(CLAUDE_DIR, 'CLAUDE.md'),
+    skillCatalog: path.join(CLAUDE_DIR, 'context', 'artifacts', 'catalogs', 'skill-catalog.md'),
+    routingKeywords: path.join(
+      CLAUDE_DIR,
+      'lib',
+      'routing',
+      'routing-table-intent-keywords.cjs'
+    ),
+    routingAgents: path.join(CLAUDE_DIR, 'lib', 'routing', 'routing-table-intent-agents.cjs'),
+    skillIndex: path.join(CLAUDE_DIR, 'config', 'skill-index.json'),
+  };
+  const SKILL_INDEX_SCRIPT_PATH = path.join(CLAUDE_DIR, 'tools', 'cli', 'generate-skill-index.cjs');
 
   function preValidateSkill(config) {
     const errors = [];
     const claudeMdPath = path.join(CLAUDE_DIR, 'CLAUDE.md');
     if (!fs.existsSync(claudeMdPath)) {
-      errors.push('ERROR: Not in a Claude Code project. Missing .claude/CLAUDE.md');
+      errors.push(`Missing required project file: ${claudeMdPath}`);
     }
     if (config.name && !/^[a-z][a-z0-9-]*$/.test(config.name)) {
-      errors.push('ERROR: Invalid skill name format. Must be lowercase-with-hyphens.');
+      errors.push('Invalid skill name format. Must be lowercase-with-hyphens.');
     }
     if (config.description && config.description.length < CONTENT_MINIMUMS.descriptionMinLength) {
       errors.push(
-        `ERROR: Description must be at least ${CONTENT_MINIMUMS.descriptionMinLength} characters`
+        `Description must be at least ${CONTENT_MINIMUMS.descriptionMinLength} characters`
       );
     }
     if (config.name) {
       const skillPath = path.join(SKILLS_DIR, config.name);
       if (fs.existsSync(skillPath)) {
-        errors.push(`ERROR: Skill "${config.name}" already exists at ${skillPath}`);
+        errors.push(`Skill "${config.name}" already exists at ${skillPath}`);
       }
     }
     if (errors.length > 0) {
-      errors.forEach(e => console.error(e));
-      process.exit(1);
+      throw createActionableError({
+        artifactType: 'skill',
+        stage: 'preflight',
+        reason: errors.join(' | '),
+        remediation:
+          'Fix the reported project or input issues, then rerun the creator with a unique kebab-case name and a full description.',
+      });
+    }
+  }
+
+  function createActionableError({
+    artifactType = 'artifact',
+    stage,
+    step,
+    reason,
+    remediation,
+    artifactPath,
+    result,
+  }) {
+    const detail = [
+      `${artifactType} creation failed during ${stage}${step ? ` (${step})` : ''}.`,
+      `What failed: ${reason}`,
+      artifactPath ? `Where: ${artifactPath}` : null,
+      `Remediation: ${remediation}`,
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    const error = new Error(detail);
+    error.stage = stage;
+    if (step) error.step = step;
+    if (artifactPath) error.artifactPath = artifactPath;
+    if (result) error.result = result;
+    return error;
+  }
+
+  function snapshotPath(filePath) {
+    if (!filePath) return null;
+    return {
+      filePath,
+      existed: fs.existsSync(filePath),
+      content: fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : null,
+    };
+  }
+
+  function restoreSnapshot(snapshot) {
+    if (!snapshot || !snapshot.filePath) return;
+    if (snapshot.existed) {
+      fs.mkdirSync(path.dirname(snapshot.filePath), { recursive: true });
+      fs.writeFileSync(snapshot.filePath, snapshot.content, 'utf8');
+      return;
+    }
+    if (fs.existsSync(snapshot.filePath)) {
+      fs.rmSync(snapshot.filePath, { force: true });
+    }
+  }
+
+  function cleanupCreatedPath(targetPath) {
+    if (!targetPath || !fs.existsSync(targetPath)) return;
+    fs.rmSync(targetPath, { recursive: true, force: true });
+  }
+
+  function createRegistrationStepSuccess(target, message, updated = true) {
+    return {
+      status: 'success',
+      target,
+      updated,
+      message,
+    };
+  }
+
+  function _createRegistrationStepSkipped(target, message) {
+    return {
+      status: 'skipped',
+      target,
+      updated: false,
+      message,
+    };
+  }
+
+  function runRegistrationStep(stepName, target, remediation, work) {
+    try {
+      const result = work();
+      if (result && result.status) {
+        return result;
+      }
+      return createRegistrationStepSuccess(target, `${stepName} completed.`);
+    } catch (error) {
+      return {
+        status: 'failed',
+        target,
+        updated: false,
+        message: error && error.message ? error.message : String(error),
+        remediation,
+      };
+    }
+  }
+
+  function rollbackCreatedArtifacts(createdPaths = []) {
+    for (const targetPath of [...createdPaths].reverse()) {
+      cleanupCreatedPath(targetPath);
     }
   }
 
@@ -180,17 +293,72 @@ function createActions(ctx) {
     fs.mkdirSync(workflowsDir, { recursive: true });
     const workflowPath = path.join(workflowsDir, `${name}-skill-workflow.md`);
     fs.writeFileSync(workflowPath, templates.generateWorkflowExample(name));
+    return workflowPath;
+  }
+
+  function runRegistrationSteps({ name, description, tools }) {
+    const steps = {
+      claudeMd: runRegistrationStep(
+        'CLAUDE.md registration',
+        REGISTRATION_TARGETS.claudeMd,
+        'Restore the framework-context anchor line in .claude/CLAUDE.md, or register the new skill manually in the skills list before rerunning the creator.',
+        () => updateClaudeMdSkills(name)
+      ),
+      skillCatalog: runRegistrationStep(
+        'skill catalog registration',
+        REGISTRATION_TARGETS.skillCatalog,
+        'Restore the `## Specialized Patterns` table structure in the skill catalog, or insert the new catalog row manually before rerunning the creator.',
+        () => updateSkillCatalog(name, description, tools)
+      ),
+      routingKeywords: runRegistrationStep(
+        'routing keyword registration',
+        REGISTRATION_TARGETS.routingKeywords,
+        'Restore the keyword routing table export structure so a new keyword entry can be inserted, or add the skill keywords manually before rerunning the creator.',
+        () => updateRoutingTableKeywords(name, description)
+      ),
+      routingAgents: runRegistrationStep(
+        'routing agent registration',
+        REGISTRATION_TARGETS.routingAgents,
+        'Restore/update .claude/lib/routing/routing-table-intent-agents.cjs so the INTENT_TO_AGENT export block exists, or register the skill agent mapping manually before rerunning the creator.',
+        () => updateRoutingTableAgents(name)
+      ),
+      skillIndex: runRegistrationStep(
+        'skill index regeneration',
+        REGISTRATION_TARGETS.skillIndex,
+        'Ensure .claude/tools/cli/generate-skill-index.cjs exists and exits cleanly, or regenerate .claude/config/skill-index.json manually before rerunning the creator.',
+        () => regenerateSkillIndex()
+      ),
+    };
+
+    const failedSteps = Object.entries(steps)
+      .filter(([, step]) => step.status === 'failed')
+      .map(([stepName]) => stepName);
+
+    return {
+      ok: failedSteps.length === 0,
+      failedSteps,
+      steps,
+    };
   }
 
   function createSkill(config) {
     const { name, description, tools, refs, hooks, schemas } = config;
     if (!name) {
-      console.error('Skill name is required (--name)');
-      process.exit(1);
+      throw createActionableError({
+        artifactType: 'skill',
+        stage: 'input-validation',
+        reason: 'Skill name is required (--name).',
+        remediation: 'Provide --name <skill-name> when running the creator.',
+      });
     }
     if (!description) {
-      console.error('Skill description is required (--description)');
-      process.exit(1);
+      throw createActionableError({
+        artifactType: 'skill',
+        stage: 'input-validation',
+        reason: 'Skill description is required (--description).',
+        remediation:
+          'Provide --description "<summary>" with at least 20 characters when running the creator.',
+      });
     }
 
     preValidateSkill(config);
@@ -202,14 +370,18 @@ function createActions(ctx) {
     ];
     for (const check of manifestChecks) {
       if (!fs.existsSync(check.path)) {
-        console.error(
-          `ERROR: Pre-write manifest check failed — ${check.label} not found at ${check.path}`
-        );
-        process.exit(1);
+        throw createActionableError({
+          artifactType: 'skill',
+          stage: 'preflight',
+          reason: `Pre-write manifest check failed — ${check.label} not found at ${check.path}`,
+          remediation:
+            'Restore the missing framework file or directory before rerunning the creator.',
+          artifactPath: check.path,
+        });
       }
     }
 
-    const enterpriseEnabled = config.enterprise !== false && !config.noEnterprise;
+    const enterpriseEnabled = config.enterprise === true;
     const flags = {
       refs: !!(refs || enterpriseEnabled),
       hooks: !!(hooks || enterpriseEnabled),
@@ -220,58 +392,119 @@ function createActions(ctx) {
     };
 
     const skillDir = path.join(SKILLS_DIR, name);
-    fs.mkdirSync(skillDir, { recursive: true });
+    const skillFilePath = path.join(skillDir, 'SKILL.md');
+    const createdPaths = [];
 
-    fs.writeFileSync(path.join(skillDir, 'SKILL.md'), templates.generateSkillContent(config));
-
-    const scriptsDir = path.join(skillDir, 'scripts');
-    fs.mkdirSync(scriptsDir, { recursive: true });
-    fs.writeFileSync(
-      path.join(scriptsDir, 'main.cjs'),
-      templates.generateScriptContent(name, description)
-    );
-
-    writeEnterpriseDirs(skillDir, name, description, flags);
-    formatDirectory(skillDir, PROJECT_ROOT);
-
-    if (!config.noWorkflow) {
-      createWorkflow(name);
-    }
-
-    const toolDir = maybeCreateCompanionTool(config, enterpriseEnabled, skillDir);
-
-    if (!config.noVerify) {
-      const validation = validateSkillContent(path.join(skillDir, 'SKILL.md'));
-      if (!validation.valid) {
-        console.error('Post-creation validation failed');
-        process.exit(1);
-      }
-    }
-
-    if (toolDir) {
-      console.log(`Companion tool created at ${toolDir}`);
-    }
-
-    // POST-CREATION INTEGRATION (Phase 4.3 Hardening)
     try {
-      updateClaudeMdSkills(name, description);
-      updateSkillCatalog(name, description, tools);
-      updateRoutingTableKeywords(name, description);
-      updateRoutingTableAgents(name);
-      regenerateSkillIndex();
-    } catch (err) {
-      console.error(`Warning: Post-creation integration partial: ${err.message}`);
-    }
+      fs.mkdirSync(skillDir, { recursive: true });
+      createdPaths.push(skillDir);
 
-    void tools;
-    return skillDir;
+      fs.writeFileSync(skillFilePath, templates.generateSkillContent(config));
+
+      const scriptsDir = path.join(skillDir, 'scripts');
+      fs.mkdirSync(scriptsDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(scriptsDir, 'main.cjs'),
+        templates.generateScriptContent(name, description)
+      );
+
+      writeEnterpriseDirs(skillDir, name, description, flags);
+      formatDirectory(skillDir, PROJECT_ROOT);
+
+      if (!config.noWorkflow) {
+        createdPaths.push(createWorkflow(name));
+      }
+
+      const toolDir = maybeCreateCompanionTool(config, enterpriseEnabled, skillDir);
+      if (toolDir) {
+        createdPaths.push(toolDir);
+        console.log(`Companion tool created at ${toolDir}`);
+      }
+
+      if (!config.noVerify) {
+        const validation = validateSkillContent(skillFilePath);
+        if (!validation.valid) {
+          rollbackCreatedArtifacts(createdPaths);
+          throw createActionableError({
+            artifactType: 'skill',
+            stage: 'post-create-validation',
+            reason: validation.warnings.join(' | ') || 'Generated skill content failed validation.',
+            remediation:
+              'Update the generated SKILL.md so it includes all required sections and minimum content, then rerun the creator.',
+            artifactPath: skillFilePath,
+            result: {
+              ok: false,
+              artifact: { type: 'skill', name, path: skillFilePath },
+              validation,
+            },
+          });
+        }
+      }
+
+      const registrationSnapshots = Object.fromEntries(
+        Object.entries(REGISTRATION_TARGETS).map(([key, targetPath]) => [key, snapshotPath(targetPath)])
+      );
+      const registration = runRegistrationSteps({ name, description, tools });
+
+      const result = {
+        ok: registration.ok,
+        artifact: {
+          type: 'skill',
+          name,
+          path: skillFilePath,
+          directory: skillDir,
+        },
+        enterpriseEnabled,
+        registration,
+      };
+
+      if (!registration.ok) {
+        Object.values(registrationSnapshots).forEach(restoreSnapshot);
+        rollbackCreatedArtifacts(createdPaths);
+
+        const failedStep = registration.failedSteps[0];
+        const failedDetails = registration.steps[failedStep];
+        throw createActionableError({
+          artifactType: 'skill',
+          stage: 'registration',
+          step: failedStep,
+          reason: failedDetails.message,
+          remediation:
+            failedDetails.remediation ||
+            'Resolve the reported registration issue, then rerun the creator.',
+          artifactPath: skillFilePath,
+          result,
+        });
+      }
+
+      return result;
+    } catch (error) {
+      if (!error.result) {
+        rollbackCreatedArtifacts(createdPaths);
+      }
+      if (error && error.message) {
+        throw error;
+      }
+      throw createActionableError({
+        artifactType: 'skill',
+        stage: 'write',
+        reason: String(error),
+        remediation:
+          'Check filesystem permissions and target paths, then rerun the creator.',
+        artifactPath: skillFilePath,
+      });
+    }
   }
 
   function updateRoutingTableKeywords(name, description) {
-    const filePath = path.join(CLAUDE_DIR, 'lib', 'routing', 'routing-table-intent-keywords.cjs');
-    if (!fs.existsSync(filePath)) return;
+    const filePath = REGISTRATION_TARGETS.routingKeywords;
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Routing keyword table not found at ${filePath}`);
+    }
     let content = fs.readFileSync(filePath, 'utf8');
-    if (content.includes(`'${name}':`)) return;
+    if (content.includes(`'${name}':`)) {
+      return createRegistrationStepSuccess(filePath, 'Routing keywords already registered.', false);
+    }
 
     const keywords = Array.from(
       new Set([name, ...name.split('-'), ...(description.toLowerCase().match(/\b\w{4,}\b/g) || [])])
@@ -279,75 +512,103 @@ function createActions(ctx) {
 
     const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\]/g, '],')},`;
     const insertionPoint = content.lastIndexOf('};');
-    if (insertionPoint !== -1) {
-      content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
-      fs.writeFileSync(filePath, content, 'utf8');
+    if (insertionPoint === -1) {
+      throw new Error(`Unable to locate INTENT_KEYWORDS insertion point in ${filePath}`);
     }
+    content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
+    fs.writeFileSync(filePath, content, 'utf8');
+    return createRegistrationStepSuccess(filePath, 'Registered routing keywords for the new skill.');
   }
 
   function updateRoutingTableAgents(name) {
-    const filePath = path.join(CLAUDE_DIR, 'lib', 'routing', 'routing-table-intent-agents.cjs');
-    if (!fs.existsSync(filePath)) return;
+    const filePath = REGISTRATION_TARGETS.routingAgents;
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Routing agent table not found at ${filePath}`);
+    }
     let content = fs.readFileSync(filePath, 'utf8');
-    if (content.includes(`'${name}':`)) return;
+    if (content.includes(`'${name}':`)) {
+      return createRegistrationStepSuccess(filePath, 'Routing agent mapping already registered.', false);
+    }
 
     const entry = `  '${name}': '${name}',`;
-    // Find the end of module.exports = { INTENT_TO_AGENT ... }; block correctly or the INTENT_TO_AGENT object itself
-    const insertionPoint = content.lastIndexOf('};');
-    if (insertionPoint !== -1) {
-      // If we're hitting the module.exports = { ... }; instead of the INTENT_TO_AGENT object end, we need to be careful.
-      // Easiest is to replace the end of INTENT_TO_AGENT
-      content = content.replace(
-        /};\s*module\.exports = { INTENT_TO_AGENT };/,
-        `${entry}\n};\n\nmodule.exports = { INTENT_TO_AGENT };`
-      );
-      fs.writeFileSync(filePath, content, 'utf8');
+    const exportPattern = /};\s*module\.exports = { INTENT_TO_AGENT };/;
+    if (!exportPattern.test(content)) {
+      throw new Error(`Unable to locate INTENT_TO_AGENT insertion point in ${filePath}`);
     }
+    content = content.replace(
+      exportPattern,
+      `${entry}\n};\n\nmodule.exports = { INTENT_TO_AGENT };`
+    );
+    fs.writeFileSync(filePath, content, 'utf8');
+    return createRegistrationStepSuccess(filePath, 'Registered routing agent mapping for the new skill.');
   }
 
-  function updateClaudeMdSkills(name, _description) {
-    const claudeMdPath = path.join(CLAUDE_DIR, 'CLAUDE.md');
-    if (!fs.existsSync(claudeMdPath)) return;
+  function updateClaudeMdSkills(name) {
+    const claudeMdPath = REGISTRATION_TARGETS.claudeMd;
+    if (!fs.existsSync(claudeMdPath)) {
+      throw new Error(`CLAUDE.md not found at ${claudeMdPath}`);
+    }
     let content = fs.readFileSync(claudeMdPath, 'utf8');
-    if (content.includes(`\`${name}\``)) return;
+    if (content.includes(`\`${name}\``)) {
+      return createRegistrationStepSuccess(claudeMdPath, 'CLAUDE.md already references the skill.', false);
+    }
 
     const insertionPoint = content.indexOf('- `framework-context`');
-    if (insertionPoint !== -1) {
-      content =
-        content.slice(0, insertionPoint) + `- \`${name}\`\n` + content.slice(insertionPoint);
-      fs.writeFileSync(claudeMdPath, content, 'utf8');
+    if (insertionPoint === -1) {
+      throw new Error(`Unable to locate skills insertion anchor in ${claudeMdPath}`);
     }
+    content = content.slice(0, insertionPoint) + `- \`${name}\`\n` + content.slice(insertionPoint);
+    fs.writeFileSync(claudeMdPath, content, 'utf8');
+    return createRegistrationStepSuccess(claudeMdPath, 'Registered the new skill in CLAUDE.md.');
   }
 
   function updateSkillCatalog(name, description, tools) {
-    const catalogPath = path.join(
-      CLAUDE_DIR,
-      'context',
-      'artifacts',
-      'catalogs',
-      'skill-catalog.md'
-    );
-    if (!fs.existsSync(catalogPath)) return;
+    const catalogPath = REGISTRATION_TARGETS.skillCatalog;
+    if (!fs.existsSync(catalogPath)) {
+      throw new Error(`Skill catalog not found at ${catalogPath}`);
+    }
     let content = fs.readFileSync(catalogPath, 'utf8');
-    if (content.includes(`\`${name}\``)) return;
+    if (content.includes(`\`${name}\``)) {
+      return createRegistrationStepSuccess(catalogPath, 'Skill catalog already includes the new skill.', false);
+    }
 
     const entry = `| \`${name}\` | ${description} | ${tools || 'Read'} |`;
     const section = '## Specialized Patterns';
     const idx = content.indexOf(section);
-    if (idx !== -1) {
-      const nextSection = content.indexOf('\n---', idx);
-      const tableEnd = content.lastIndexOf('|', nextSection !== -1 ? nextSection : undefined);
-      if (tableEnd !== -1) {
-        content = content.slice(0, tableEnd + 1) + `\n${entry}` + content.slice(tableEnd + 1);
-        fs.writeFileSync(catalogPath, content, 'utf8');
-      }
+    if (idx === -1) {
+      throw new Error(`Unable to locate skill catalog section "${section}" in ${catalogPath}`);
     }
+    const nextSection = content.indexOf('\n---', idx);
+    const tableEnd = content.lastIndexOf('|', nextSection !== -1 ? nextSection : undefined);
+    if (tableEnd === -1) {
+      throw new Error(`Unable to locate catalog table insertion point in ${catalogPath}`);
+    }
+    content = content.slice(0, tableEnd + 1) + `\n${entry}` + content.slice(tableEnd + 1);
+    fs.writeFileSync(catalogPath, content, 'utf8');
+    return createRegistrationStepSuccess(catalogPath, 'Inserted the new skill into the skill catalog.');
   }
 
   function regenerateSkillIndex() {
-    const scriptPath = path.join(CLAUDE_DIR, 'tools', 'cli', 'generate-skill-index.cjs');
+    const scriptPath = SKILL_INDEX_SCRIPT_PATH;
+    if (!fs.existsSync(scriptPath)) {
+      throw new Error(`Skill index generator not found at ${scriptPath}`);
+    }
     const { spawnSync } = require('child_process');
-    spawnSync('node', [scriptPath], { windowsHide: true });
+    const result = spawnSync('node', [scriptPath], {
+      windowsHide: true,
+      encoding: 'utf8',
+    });
+    if (result.status !== 0) {
+      const stderr = (result.stderr || '').trim();
+      const stdout = (result.stdout || '').trim();
+      throw new Error(
+        `Skill index generation failed with exit code ${result.status}: ${stderr || stdout || 'no output'}`
+      );
+    }
+    return createRegistrationStepSuccess(
+      REGISTRATION_TARGETS.skillIndex,
+      'Regenerated .claude/config/skill-index.json.'
+    );
   }
 
   function validateSkill(skillPath) {
