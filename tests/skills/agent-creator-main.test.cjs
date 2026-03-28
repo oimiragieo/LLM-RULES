@@ -40,6 +40,7 @@ test('agent-creator generate writes contract-compliant agent file', () => {
   assert.match(content, /task-management-protocol/);
   assert.match(content, /code-semantic-search/);
   assert.match(content, /context-compressor/);
+  assert.match(content, /token-saver-context-compression/);
 });
 
 test('agent-creator validate returns ok=true for generated managed file', () => {
@@ -151,6 +152,7 @@ test('agent-creator generate populates required frontmatter fields from creation
     'ripgrep',
     'code-semantic-search',
     'context-compressor',
+    'token-saver-context-compression',
   ]);
   assert.deepEqual(frontmatter.tools, ['Read', 'Write', 'TaskUpdate']);
 });

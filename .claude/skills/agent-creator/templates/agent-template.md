@@ -45,7 +45,7 @@ For code discovery and search tasks, follow this priority order:
 
 ## Token Saver Invocation Rule
 
-Use \`Skill({ skill: 'context-compressor' })\` only when context pressure is high and normal search+read would over-expand tokens.
+Use \`Skill({ skill: 'token-saver-context-compression' })\` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 

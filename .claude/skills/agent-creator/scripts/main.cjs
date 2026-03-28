@@ -8,6 +8,8 @@ const {
   ensureDirectory,
   renderAgentTemplate,
   validateAgentFile,
+  REQUIRED_SKILLS_BASE,
+  REQUIRED_SKILLS_SEARCH_HEAVY,
 } = require('../../../lib/agents/agent-template-contract.cjs');
 
 const TEMPLATE_PATH = path.join(
@@ -65,6 +67,18 @@ function renderFromFileTemplate(template, params) {
     .replace(/\{\{lastVerifiedAt\}\}/g, params.lastVerifiedAt);
 }
 
+function ensureContractSkills(skills) {
+  return Array.from(
+    new Set([
+      ...skills,
+      ...REQUIRED_SKILLS_BASE,
+      // Generated agents always include the search protocol and token-saver section,
+      // so they must satisfy the search-heavy contract requirements up front.
+      ...REQUIRED_SKILLS_SEARCH_HEAVY,
+    ])
+  );
+}
+
 function buildParams(options) {
   const name = String(options.name || '').trim();
   if (!name) throw new Error('Missing required --name');
@@ -84,7 +98,7 @@ function buildParams(options) {
     new Set(
       String(
         options.skills ||
-          'task-management-protocol,ripgrep,code-semantic-search,context-compressor,verification-before-completion,memory-search'
+          'task-management-protocol,ripgrep,code-semantic-search,context-compressor,token-saver-context-compression,verification-before-completion,memory-search'
       )
         .split(',')
         .map(v => v.trim())
@@ -100,7 +114,7 @@ function buildParams(options) {
     category,
     temperature,
     tools,
-    skills,
+    skills: ensureContractSkills(skills),
     lastVerifiedAt: new Date().toISOString(),
   };
 }
