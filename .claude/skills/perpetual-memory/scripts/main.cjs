@@ -17,6 +17,27 @@
 
 const { embedAndStore, queryMemory, getStats } = require('../../../tools/cli/auto-embed.cjs');
 
+async function handleQueryMode(query, limit) {
+  if (!query) {
+    console.error('Error: --query requires a search string');
+    return 1;
+  }
+
+  const results = await queryMemory(query, limit);
+  if (results.length === 0) {
+    console.log(`No perpetual memory results for: "${query}"`);
+    return 0;
+  }
+
+  console.log(`Perpetual Memory: ${results.length} results for "${query}"\n`);
+  for (const r of results) {
+    console.log(`[${r.category}] sim=${r.similarity} agent=${r.agent} ${r.timestamp}`);
+    console.log(`  ${r.text.slice(0, 200)}${r.text.length > 200 ? '...' : ''}\n`);
+  }
+
+  return 0;
+}
+
 async function main() {
   const args = process.argv.slice(2);
   let mode = 'store';
@@ -69,21 +90,7 @@ async function main() {
   }
 
   if (mode === 'query') {
-    if (!query) {
-      console.error('Error: --query requires a search string');
-      return 1;
-    }
-    const results = await queryMemory(query, limit);
-    if (results.length === 0) {
-      console.log(`No perpetual memory results for: "${query}"`);
-      return 0;
-    }
-    console.log(`Perpetual Memory: ${results.length} results for "${query}"\n`);
-    for (const r of results) {
-      console.log(`[${r.category}] sim=${r.similarity} agent=${r.agent} ${r.timestamp}`);
-      console.log(`  ${r.text.slice(0, 200)}${r.text.length > 200 ? '...' : ''}\n`);
-    }
-    return 0;
+    return handleQueryMode(query, limit);
   }
 
   // Store mode
