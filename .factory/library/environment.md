@@ -12,6 +12,7 @@ Environment variables, external dependencies, and setup notes.
 - Node.js available via pnpm
 - 128GB RAM, 16 logical processors
 - WSL available but init.sh has known path issues
+- On this workstation, running `.factory/init.sh` through WSL/bash resolves `pnpm` to a Linux Node runtime that is too old for the installed pnpm (`SyntaxError` at optional chaining in `pnpm.cjs`); prefer native Windows `pnpm` commands until M5 fixes init/bootstrap compatibility.
 
 ## Key Environment Variables
 - `HIERARCHICAL_ROUTING` — `on`/`off` to enable/disable hierarchical routing (default: off)
