@@ -6,9 +6,16 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
+const yaml = require('js-yaml');
 
 const agentCreator = require('../../.claude/skills/agent-creator/scripts/main.cjs');
 const { CONTRACT_MARKER } = require('../../.claude/lib/agents/agent-template-contract.cjs');
+
+function parseFrontmatter(content) {
+  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  assert.ok(match, 'expected YAML frontmatter');
+  return yaml.load(match[1]);
+}
 
 test('agent-creator generate writes contract-compliant agent file', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-creator-generate-'));
@@ -26,11 +33,13 @@ test('agent-creator generate writes contract-compliant agent file', () => {
   assert.equal(result.outputPath, outputPath);
 
   const content = fs.readFileSync(outputPath, 'utf8');
+  const frontmatter = parseFrontmatter(content);
+  assert.equal(frontmatter.category, 'domain');
   assert.match(content, /## Token Saver Invocation Rule/);
   assert.match(content, new RegExp(CONTRACT_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(content, /task-management-protocol/);
   assert.match(content, /code-semantic-search/);
-  assert.match(content, /token-saver-context-compression/);
+  assert.match(content, /context-compressor/);
 });
 
 test('agent-creator validate returns ok=true for generated managed file', () => {
@@ -111,4 +120,37 @@ test('agent-creator generate returns orchestrator integration checklist for orch
     '.claude/workflows/core/router-decision.md',
     '.claude/workflows/core/ecosystem-creation-workflow.md',
   ]);
+});
+
+test('agent-creator generate populates required frontmatter fields from creation args', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-creator-frontmatter-'));
+  const outputPath = path.join(tmpDir, '.claude', 'agents', 'specialized', 'release-guardian.md');
+
+  const result = agentCreator.main({
+    action: 'generate',
+    name: 'release-guardian',
+    category: 'specialized',
+    model: 'opus',
+    description: 'Release safety specialist',
+    tools: 'Read,Write,TaskUpdate',
+    skills:
+      'task-management-protocol,verification-before-completion,ripgrep,code-semantic-search,context-compressor',
+    output: outputPath,
+  });
+
+  assert.equal(result.ok, true);
+
+  const frontmatter = parseFrontmatter(fs.readFileSync(outputPath, 'utf8'));
+  assert.equal(frontmatter.name, 'release-guardian');
+  assert.equal(frontmatter.description, 'Release safety specialist');
+  assert.equal(frontmatter.model, 'opus');
+  assert.equal(frontmatter.category, 'specialized');
+  assert.deepEqual(frontmatter.skills, [
+    'task-management-protocol',
+    'verification-before-completion',
+    'ripgrep',
+    'code-semantic-search',
+    'context-compressor',
+  ]);
+  assert.deepEqual(frontmatter.tools, ['Read', 'Write', 'TaskUpdate']);
 });

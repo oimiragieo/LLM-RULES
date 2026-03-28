@@ -515,6 +515,35 @@ function serializeQueueEntryWithCap(entry) {
   return serialized;
 }
 
+function buildStructuredWarnings({ artifactId, creatorType, integrationCheck, qualityValidation }) {
+  const warnings = [];
+
+  if (integrationCheck && integrationCheck.status !== 'fully-integrated') {
+    warnings.push({
+      type: 'integration',
+      artifactId,
+      creatorType,
+      status: integrationCheck.status,
+      gaps: Array.isArray(integrationCheck.gaps) ? integrationCheck.gaps : [],
+      score: Number.isFinite(Number(integrationCheck.score))
+        ? Number(integrationCheck.score)
+        : undefined,
+    });
+  }
+
+  if (qualityValidation && qualityValidation.valid === false) {
+    warnings.push({
+      type: 'quality',
+      artifactId,
+      creatorType,
+      lineCount: qualityValidation.lineCount,
+      issues: Array.isArray(qualityValidation.issues) ? qualityValidation.issues : [],
+    });
+  }
+
+  return warnings;
+}
+
 /**
  * Process creator completion and queue integration check
  * @param {Object} hookData - Parsed hook input data
@@ -636,6 +665,12 @@ async function processCreatorCompletion(hookData) {
   const hasMustHaveGaps = check.gaps.length > 0 && check.status !== 'fully-integrated';
   const hasQualityIssues = qualityValidation.valid === false;
   const shouldBlock = ENFORCEMENT_MODE === 'block' && (hasMustHaveGaps || hasQualityIssues);
+  const warnings = buildStructuredWarnings({
+    artifactId,
+    creatorType: detection.creatorType,
+    integrationCheck: check,
+    qualityValidation,
+  });
 
   const messageParts = [];
   if (check.gaps.length > 0) {
@@ -651,15 +686,28 @@ async function processCreatorCompletion(hookData) {
     );
   }
   const message = `${hasMustHaveGaps || hasQualityIssues ? '⚠️' : '✅'} ${messageParts.join(' ')}`;
+  const hookPayload = {
+    allow: !shouldBlock,
+    message: shouldBlock ? `BLOCKED: ${message}` : message,
+    artifactId,
+    creatorType: detection.creatorType,
+    integrationCheck: {
+      status: check.status,
+      gaps: check.gaps,
+      score: check.score,
+    },
+    qualityValidation,
+    warnings,
+  };
 
   if (shouldBlock) {
-    process.stdout.write(formatHookResult({ allow: false, message: `BLOCKED: ${message}` }));
-    return { result: { allow: false, message: `BLOCKED: ${message}` } };
+    process.stdout.write(formatHookResult(hookPayload));
+    return { result: hookPayload };
   }
 
   // Allow by default (warn mode)
-  process.stdout.write(formatHookResult({ allow: true, message }));
-  return { result: { allow: true, message, qualityValidation } };
+  process.stdout.write(formatHookResult(hookPayload));
+  return { result: hookPayload };
 }
 
 /**
@@ -697,6 +745,7 @@ module.exports = {
   extractArtifactId,
   sanitizeImpactReport,
   serializeQueueEntryWithCap,
+  buildStructuredWarnings,
   appendToQueueWithImpact,
   rotateQueue,
   processCreatorCompletion,

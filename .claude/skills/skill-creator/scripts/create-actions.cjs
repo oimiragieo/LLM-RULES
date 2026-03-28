@@ -180,24 +180,6 @@ function createActions(ctx) {
     return { valid: true, warnings, lines };
   }
 
-  function detectComplexity(config) {
-    const reasons = [];
-    if (config.hooks) reasons.push('hooks');
-    if (config.schemas) reasons.push('schemas');
-    const toolList = String(config.tools || '')
-      .split(',')
-      .map(t => t.trim())
-      .filter(Boolean);
-    if (toolList.length >= 6) reasons.push('many-tools');
-    if (config.args) reasons.push('args');
-    if (
-      /(orchestrat|pipeline|workflow|integrat|automati)/i.test(String(config.description || ''))
-    ) {
-      reasons.push('complex-domain');
-    }
-    return { isComplex: reasons.length >= 2, reasons };
-  }
-
   function writeEnterpriseDirs(skillDir, name, description, flags) {
     if (flags.refs) {
       const refsDir = path.join(skillDir, 'references');
@@ -282,10 +264,7 @@ function createActions(ctx) {
     if (config.createTool || enterpriseEnabled) {
       return createCompanionTool(config.name, config.description, skillDir);
     }
-    const complexity = detectComplexity(config);
-    return complexity.isComplex
-      ? createCompanionTool(config.name, config.description, skillDir)
-      : null;
+    return null;
   }
 
   function createWorkflow(name) {
@@ -411,7 +390,7 @@ function createActions(ctx) {
       writeEnterpriseDirs(skillDir, name, description, flags);
       formatDirectory(skillDir, PROJECT_ROOT);
 
-      if (!config.noWorkflow) {
+      if (enterpriseEnabled && !config.noWorkflow) {
         createdPaths.push(createWorkflow(name));
       }
 
@@ -543,6 +522,13 @@ function createActions(ctx) {
     return createRegistrationStepSuccess(filePath, 'Registered routing agent mapping for the new skill.');
   }
 
+  function usesCatalogDrivenSkillDiscovery(content) {
+    return (
+      /@SKILL_CATALOG_TABLE\.md/.test(content) &&
+      /Discovery:\s*read catalog/i.test(content)
+    );
+  }
+
   function updateClaudeMdSkills(name) {
     const claudeMdPath = REGISTRATION_TARGETS.claudeMd;
     if (!fs.existsSync(claudeMdPath)) {
@@ -551,6 +537,14 @@ function createActions(ctx) {
     let content = fs.readFileSync(claudeMdPath, 'utf8');
     if (content.includes(`\`${name}\``)) {
       return createRegistrationStepSuccess(claudeMdPath, 'CLAUDE.md already references the skill.', false);
+    }
+
+    if (usesCatalogDrivenSkillDiscovery(content)) {
+      return createRegistrationStepSuccess(
+        claudeMdPath,
+        'CLAUDE.md already delegates skill discovery to @SKILL_CATALOG_TABLE.md.',
+        false
+      );
     }
 
     const insertionPoint = content.indexOf('- `framework-context`');
@@ -570,6 +564,14 @@ function createActions(ctx) {
     let content = fs.readFileSync(catalogPath, 'utf8');
     if (content.includes(`\`${name}\``)) {
       return createRegistrationStepSuccess(catalogPath, 'Skill catalog already includes the new skill.', false);
+    }
+
+    if (/Generated from skill-index\.json/i.test(content)) {
+      return createRegistrationStepSuccess(
+        catalogPath,
+        'Skill catalog is generated from skill-index.json; regeneration is handled separately.',
+        false
+      );
     }
 
     const entry = `| \`${name}\` | ${description} | ${tools || 'Read'} |`;

@@ -21,7 +21,11 @@ function writeFile(filePath, content) {
   fs.writeFileSync(filePath, content, 'utf8');
 }
 
-function createTempProject({ breakRoutingAgents = false } = {}) {
+function createTempProject({
+  breakRoutingAgents = false,
+  claudeMdContent,
+  skillCatalogContent,
+} = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-creator-registration-'));
   const claudeDir = path.join(root, '.claude');
 
@@ -29,17 +33,21 @@ function createTempProject({ breakRoutingAgents = false } = {}) {
   fs.mkdirSync(path.join(claudeDir, 'agents'), { recursive: true });
   fs.mkdirSync(path.join(claudeDir, 'tools'), { recursive: true });
 
-  writeFile(path.join(claudeDir, 'CLAUDE.md'), '# Test CLAUDE\n- `framework-context`\n');
+  writeFile(
+    path.join(claudeDir, 'CLAUDE.md'),
+    claudeMdContent || '# Test CLAUDE\n- `framework-context`\n'
+  );
   writeFile(
     path.join(claudeDir, 'context', 'artifacts', 'catalogs', 'skill-catalog.md'),
-    [
-      '## Specialized Patterns',
-      '| Skill | Description | Tools |',
-      '| --- | --- | --- |',
-      '| `existing-skill` | Existing skill | Read |',
-      '---',
-      '',
-    ].join('\n')
+    skillCatalogContent ||
+      [
+        '## Specialized Patterns',
+        '| Skill | Description | Tools |',
+        '| --- | --- | --- |',
+        '| `existing-skill` | Existing skill | Read |',
+        '---',
+        '',
+      ].join('\n')
   );
   writeFile(
     path.join(claudeDir, 'lib', 'routing', 'routing-table-intent-keywords.cjs'),
@@ -178,6 +186,56 @@ test('createSkill returns structured per-step registration status on success', (
 
   const skillFile = path.join(claudeDir, 'skills', 'quality-sentinel', 'SKILL.md');
   assert.equal(fs.existsSync(skillFile), true);
+});
+
+test('createSkill treats catalog-driven CLAUDE.md discovery as already integrated', () => {
+  const { root } = createTempProject({
+    claudeMdContent: [
+      '# Test CLAUDE',
+      '',
+      'Catalog: **@SKILL_CATALOG_TABLE.md** | Discovery: read catalog → `Skill({ skill: "<name>" })`',
+      '',
+    ].join('\n'),
+  });
+  const actions = makeActions(root);
+
+  const result = actions.createSkill({
+    name: 'catalog-first-sentinel',
+    description: 'Ensures catalog-driven CLAUDE.md layouts still register successfully.',
+    noWorkflow: true,
+    noTool: true,
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.registration.steps.claudeMd.status, 'success');
+  assert.equal(result.registration.steps.claudeMd.updated, false);
+  assert.match(result.registration.steps.claudeMd.message, /delegates skill discovery/i);
+});
+
+test('createSkill treats generated skill catalogs as index-driven outputs', () => {
+  const { root } = createTempProject({
+    skillCatalogContent: [
+      '<!-- Generated from skill-index.json -->',
+      '',
+      '# Skill Catalog',
+      '',
+      'Generated catalog body.',
+      '',
+    ].join('\n'),
+  });
+  const actions = makeActions(root);
+
+  const result = actions.createSkill({
+    name: 'generated-catalog-sentinel',
+    description: 'Ensures generated skill catalogs do not block creator registration.',
+    noWorkflow: true,
+    noTool: true,
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.registration.steps.skillCatalog.status, 'success');
+  assert.equal(result.registration.steps.skillCatalog.updated, false);
+  assert.match(result.registration.steps.skillCatalog.message, /generated from skill-index/i);
 });
 
 test('createSkill reports actionable registration errors and rolls back partial artifacts', () => {

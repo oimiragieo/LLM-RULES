@@ -15,6 +15,36 @@ function writeTempArtifact(prefix, content) {
   return filePath;
 }
 
+async function captureHookOutput(fn) {
+  const originalStdoutWrite = process.stdout.write;
+  const originalStderrWrite = process.stderr.write;
+  let stdout = '';
+  let stderr = '';
+
+  process.stdout.write = (chunk, ...args) => {
+    stdout += String(chunk);
+    if (typeof args[args.length - 1] === 'function') {
+      args[args.length - 1]();
+    }
+    return true;
+  };
+  process.stderr.write = (chunk, ...args) => {
+    stderr += String(chunk);
+    if (typeof args[args.length - 1] === 'function') {
+      args[args.length - 1]();
+    }
+    return true;
+  };
+
+  try {
+    const result = await fn();
+    return { result, stdout, stderr };
+  } finally {
+    process.stdout.write = originalStdoutWrite;
+    process.stderr.write = originalStderrWrite;
+  }
+}
+
 test('validateArtifactQuality flags TODO placeholders and missing skill sections', () => {
   const skillPath = writeTempArtifact(
     'invalid-skill',
@@ -114,24 +144,39 @@ test('processCreatorCompletion surfaces structured quality warnings to the creat
     fs.rmSync(hook.QUEUE_PATH, { force: true });
   }
 
-  const result = await hook.processCreatorCompletion({
-    toolUse: {
-      tool: 'TaskUpdate',
-      input: {
-        status: 'completed',
-        metadata: {
-          creatorType: 'skill',
-          artifactId: 'skill:warn-skill',
-          artifactPath: skillPath,
+  const { result, stdout } = await captureHookOutput(() =>
+    hook.processCreatorCompletion({
+      toolUse: {
+        tool: 'TaskUpdate',
+        input: {
+          status: 'completed',
+          metadata: {
+            creatorType: 'skill',
+            artifactId: 'skill:warn-skill',
+            artifactPath: skillPath,
+          },
         },
       },
-    },
-  });
+    })
+  );
+  const outputPayload = JSON.parse(stdout.trim());
 
   assert.equal(result.result.allow, true);
   assert.match(result.result.message, /quality validation failed/i);
   assert.match(result.result.message, /TODO/i);
   assert.match(result.result.message, /50 lines/i);
+  assert.equal(outputPayload.allow, true);
+  assert.equal(outputPayload.qualityValidation.valid, false);
+  assert.equal(outputPayload.integrationCheck.status, 'unknown');
+  assert.deepEqual(
+    outputPayload.warnings.map(warning => warning.type),
+    ['integration', 'quality']
+  );
+  assert.ok(
+    outputPayload.warnings
+      .find(warning => warning.type === 'quality')
+      .issues.some(issue => /TODO/i.test(issue))
+  );
 
   if (fs.existsSync(hook.QUEUE_PATH)) {
     fs.rmSync(hook.QUEUE_PATH, { force: true });
