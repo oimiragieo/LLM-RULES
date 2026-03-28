@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- hybrid memory aggregation coordinates search, telemetry, and tier loading in one facade */
 // .claude/lib/memory/contextual-memory.cjs
 // ContextualMemory aggregation layer for hybrid memory system (Task #32 - P1-4.1)
 
@@ -69,6 +70,7 @@ class ContextualMemory {
     this.entityQuery = undefined;
     this._mockModeWarned = false;
     this._semanticFallbackWarned = false;
+    this._semanticDisabledWarned = false;
   }
 
   /**
@@ -332,6 +334,7 @@ class ContextualMemory {
     }
 
     if (process.env.MEMORY_SEMANTIC_SEARCH === 'off') {
+      this._recordSemanticDisabled();
       const kwResults = await this._keywordSearch(query, { limit });
       const weighted = this._applyRecencyWeight(kwResults);
       for (const r of weighted) {
@@ -449,6 +452,18 @@ class ContextualMemory {
     }
   }
 
+  _recordSemanticDisabled(reason = 'MEMORY_SEMANTIC_SEARCH=off') {
+    this._logLancedbEvent('semantic_disabled', {
+      status: 'disabled',
+      reason,
+      mode: 'keyword',
+    });
+    if (!this._semanticDisabledWarned) {
+      logger.warn('Semantic search disabled; using keyword fallback', { reason });
+      this._semanticDisabledWarned = true;
+    }
+  }
+
   _fuseHybridResultsRRF(keywordResults, vectorResults) {
     const map = new Map();
     const rrfK = Number(process.env.MEMORY_HYBRID_RRF_K || 60);
@@ -524,6 +539,7 @@ class ContextualMemory {
     const vectorLimit = vectorBranchLimitMode === 'expanded' ? branchLimit : limit;
 
     if (process.env.MEMORY_SEMANTIC_SEARCH === 'off') {
+      this._recordSemanticDisabled();
       return await this._keywordSearch(query, { limit });
     }
 

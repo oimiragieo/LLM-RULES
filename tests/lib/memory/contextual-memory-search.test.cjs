@@ -101,6 +101,20 @@ function createLearningsFile(content) {
   return filePath;
 }
 
+function getLancedbEventsPath() {
+  return path.join(TEST_MEMORY_DIR, 'metrics', 'lancedb-events.jsonl');
+}
+
+function readEvents() {
+  const eventsPath = getLancedbEventsPath();
+  if (!fs.existsSync(eventsPath)) return [];
+  return fs
+    .readFileSync(eventsPath, 'utf8')
+    .split('\n')
+    .filter(Boolean)
+    .map(line => JSON.parse(line));
+}
+
 // =============================================================================
 
 // Test Suite 5: Search functionality
@@ -166,6 +180,98 @@ test('search - with MEMORY_SEMANTIC_SEARCH=off uses keyword fallback and does no
   assert.ok(Array.isArray(results));
   assert.equal(results.length, 1);
   assert.equal(results[0].content, 'keyword-result');
+
+  memory.close();
+});
+
+test('search - with MEMORY_SEMANTIC_SEARCH=off logs semantic_disabled degradation events', async t => {
+  setupTestDir();
+  t.after(cleanupTestDir);
+
+  const previous = process.env.MEMORY_SEMANTIC_SEARCH;
+  process.env.MEMORY_SEMANTIC_SEARCH = 'off';
+  t.after(() => {
+    if (previous === undefined) {
+      delete process.env.MEMORY_SEMANTIC_SEARCH;
+    } else {
+      process.env.MEMORY_SEMANTIC_SEARCH = previous;
+    }
+  });
+
+  const { ContextualMemory } = getModule();
+  const memory = new ContextualMemory({
+    projectRoot: TEST_DIR,
+    memoryDir: TEST_MEMORY_DIR,
+    dbPath: TEST_DB_PATH,
+  });
+
+  memory._keywordSearch = async () => [
+    { content: 'keyword-result', metadata: { path: 'learnings.md' }, similarity: 0.5 },
+  ];
+
+  const results = await memory.search('semantic off query');
+
+  assert.equal(results.length, 1);
+  const events = readEvents();
+  assert.ok(events.length >= 1, 'Expected degradation events to be written to JSONL');
+  assert.ok(
+    events.some(
+      event =>
+        event.event === 'semantic_disabled' &&
+        event.reason === 'MEMORY_SEMANTIC_SEARCH=off' &&
+        event.mode === 'keyword'
+    ),
+    'Expected semantic_disabled event for MEMORY_SEMANTIC_SEARCH=off'
+  );
+
+  memory.close();
+});
+
+test('search - LanceDB init failure logs lancedb_init_failed and falls back to keyword results', async t => {
+  setupTestDir();
+  t.after(cleanupTestDir);
+
+  const { MemoryVectorStore } = require('../../../.claude/lib/memory/lancedb-client.cjs');
+  const originalGetSharedStore = MemoryVectorStore.getSharedStore;
+  MemoryVectorStore.clearSharedStores?.();
+  t.after(() => {
+    MemoryVectorStore.getSharedStore = originalGetSharedStore;
+    MemoryVectorStore.clearSharedStores?.();
+  });
+
+  MemoryVectorStore.getSharedStore = () => ({
+    initialize: async () => {
+      throw new Error('corrupted LanceDB directory');
+    },
+    close: () => {},
+  });
+
+  const { ContextualMemory } = getModule();
+  const memory = new ContextualMemory({
+    projectRoot: TEST_DIR,
+    memoryDir: TEST_MEMORY_DIR,
+    dbPath: TEST_DB_PATH,
+  });
+
+  memory._keywordSearch = async () => [
+    { content: 'fallback-keyword', metadata: { path: 'learnings.md' }, similarity: null },
+  ];
+
+  const results = await memory.search('corrupted lancedb query');
+
+  assert.equal(results.length, 1);
+  assert.equal(results[0].content, 'fallback-keyword');
+
+  const events = readEvents();
+  assert.ok(
+    events.some(
+      event =>
+        event.event === 'lancedb_init_failed' &&
+        typeof event.message === 'string' &&
+        event.message.includes('corrupted LanceDB directory')
+    ),
+    'Expected lancedb_init_failed event when initialize() throws'
+  );
 
   memory.close();
 });
