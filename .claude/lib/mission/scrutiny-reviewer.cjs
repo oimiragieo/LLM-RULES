@@ -54,7 +54,7 @@ function filterDestructiveCommands(steps) {
   const skippedDestructive = [];
 
   for (const step of steps) {
-    const isDestructive = DESTRUCTIVE_PATTERNS.some((pattern) => pattern.test(step));
+    const isDestructive = DESTRUCTIVE_PATTERNS.some(pattern => pattern.test(step));
 
     if (isDestructive) {
       skippedDestructive.push(step);
@@ -77,7 +77,7 @@ function filterDestructiveCommands(steps) {
 function executeVerificationStep(command, options = {}) {
   const { timeoutMs = DEFAULT_STEP_TIMEOUT_MS } = options;
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     let output = '';
     let errorOutput = '';
     let timedOut = false;
@@ -111,12 +111,12 @@ function executeVerificationStep(command, options = {}) {
     const child = spawn(actualCommand, args, spawnOptions);
 
     // Capture stdout
-    child.stdout.on('data', (data) => {
+    child.stdout.on('data', data => {
       output += data.toString();
     });
 
     // Capture stderr
-    child.stderr.on('data', (data) => {
+    child.stderr.on('data', data => {
       errorOutput += data.toString();
     });
 
@@ -157,7 +157,7 @@ function executeVerificationStep(command, options = {}) {
     });
 
     // Handle spawn errors
-    child.on('error', (err) => {
+    child.on('error', err => {
       clearTimeout(timeoutId);
       resolve({
         exitCode: 'ERROR',
@@ -345,14 +345,21 @@ class ScrutinyReviewer {
     this.steps = [];
     this.failures = [];
 
-    // Track overall timeout
+    // Track overall timeout using AbortController pattern
+    let timeoutError = null;
     const overallTimeoutId = setTimeout(() => {
-      throw new Error(`Overall timeout of ${this.overallTimeoutMs}ms exceeded`);
+      timeoutError = new Error(`Overall timeout of ${this.overallTimeoutMs}ms exceeded`);
     }, this.overallTimeoutMs);
 
     try {
       // Execute each verification step sequentially
       for (const command of this.safeSteps) {
+        // Check for timeout triggered by setTimeout
+        if (timeoutError) {
+          clearTimeout(overallTimeoutId);
+          return this.createTimeoutVerdict();
+        }
+
         // Check overall timeout before each step
         if (Date.now() - this.startTime > this.overallTimeoutMs) {
           clearTimeout(overallTimeoutId);
@@ -401,6 +408,11 @@ class ScrutinyReviewer {
       }
 
       clearTimeout(overallTimeoutId);
+
+      // Check if timeout occurred during execution
+      if (timeoutError) {
+        return this.createTimeoutVerdict();
+      }
 
       // Build verdict
       const verdict = this.failures.length === 0 ? 'approved' : 'rejected';

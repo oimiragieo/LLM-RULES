@@ -305,3 +305,218 @@ describe('Error handling', () => {
     assert.ok(result.error || result.blocking.find(b => b.reason === 'features_parse_error'));
   });
 });
+
+// ========================================
+// VAL-MG-003: Infrastructure features exempt from assertion checks
+// ========================================
+describe('VAL-MG-003: Infrastructure features exempt from assertion checks', () => {
+  let tempDir;
+
+  beforeEach(() => {
+    tempDir = createTempDir();
+  });
+
+  afterEach(() => {
+    cleanupTempDir(tempDir);
+  });
+
+  it('gate passes for completed infrastructure feature without assertions', async () => {
+    writeFeatures(tempDir, [
+      {
+        id: 'infra-feature',
+        description: 'Infrastructure',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: [],
+      },
+    ]);
+    writeValidationState(tempDir, {});
+
+    const result = await evaluateMilestoneGate({
+      milestone: 'validation-gates',
+      featuresPath: path.join(tempDir, 'features.json'),
+      statePath: path.join(tempDir, 'validation-state.json'),
+    });
+
+    assert.equal(result.passed, true);
+    assert.equal(result.blocking.length, 0);
+  });
+
+  it('mixed: infrastructure feature + regular feature with passed assertions', async () => {
+    writeFeatures(tempDir, [
+      {
+        id: 'infra-feature',
+        description: 'Infrastructure',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: [],
+      },
+      {
+        id: 'regular-feature',
+        description: 'Regular',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-REG-001'],
+      },
+    ]);
+    writeValidationState(tempDir, {
+      'VAL-REG-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
+    });
+
+    const result = await evaluateMilestoneGate({
+      milestone: 'validation-gates',
+      featuresPath: path.join(tempDir, 'features.json'),
+      statePath: path.join(tempDir, 'validation-state.json'),
+    });
+
+    assert.equal(result.passed, true);
+    assert.equal(result.blocking.length, 0);
+  });
+
+  it('infrastructure feature still fails if not completed', async () => {
+    writeFeatures(tempDir, [
+      {
+        id: 'infra-feature',
+        description: 'Infrastructure',
+        milestone: 'validation-gates',
+        status: 'pending',
+        fulfills: [],
+      },
+    ]);
+    writeValidationState(tempDir, {});
+
+    const result = await evaluateMilestoneGate({
+      milestone: 'validation-gates',
+      featuresPath: path.join(tempDir, 'features.json'),
+      statePath: path.join(tempDir, 'validation-state.json'),
+    });
+
+    assert.equal(result.passed, false);
+    assert.ok(
+      result.blocking.find(
+        b => b.featureId === 'infra-feature' && b.reason === 'feature_not_completed'
+      )
+    );
+  });
+
+  it('feature with missing fulfills field is treated as infrastructure', async () => {
+    writeFeatures(tempDir, [
+      {
+        id: 'no-fulfills-feature',
+        description: 'No fulfills',
+        milestone: 'validation-gates',
+        status: 'completed',
+      },
+    ]);
+    writeValidationState(tempDir, {});
+
+    const result = await evaluateMilestoneGate({
+      milestone: 'validation-gates',
+      featuresPath: path.join(tempDir, 'features.json'),
+      statePath: path.join(tempDir, 'validation-state.json'),
+    });
+
+    assert.equal(result.passed, true);
+  });
+});
+
+// ========================================
+// VAL-MG-004: Cancelled features excluded from gate
+// ========================================
+describe('VAL-MG-004: Cancelled features excluded from gate', () => {
+  let tempDir;
+
+  beforeEach(() => {
+    tempDir = createTempDir();
+  });
+
+  afterEach(() => {
+    cleanupTempDir(tempDir);
+  });
+
+  it('gate passes with completed feature and cancelled feature', async () => {
+    writeFeatures(tempDir, [
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
+      {
+        id: 'feature-cancelled',
+        description: 'Cancelled',
+        milestone: 'validation-gates',
+        status: 'cancelled',
+        fulfills: ['VAL-C-001'],
+      },
+    ]);
+    writeValidationState(tempDir, {
+      'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
+      'VAL-C-001': { status: 'pending', updatedAt: '2024-01-01T00:00:00Z' },
+    });
+
+    const result = await evaluateMilestoneGate({
+      milestone: 'validation-gates',
+      featuresPath: path.join(tempDir, 'features.json'),
+      statePath: path.join(tempDir, 'validation-state.json'),
+    });
+
+    assert.equal(result.passed, true);
+    assert.equal(result.blocking.length, 0);
+  });
+
+  it('gate passes when only cancelled features exist in milestone', async () => {
+    writeFeatures(tempDir, [
+      {
+        id: 'feature-cancelled-1',
+        description: 'Cancelled 1',
+        milestone: 'validation-gates',
+        status: 'cancelled',
+        fulfills: [],
+      },
+      {
+        id: 'feature-cancelled-2',
+        description: 'Cancelled 2',
+        milestone: 'validation-gates',
+        status: 'cancelled',
+        fulfills: ['VAL-C-002'],
+      },
+    ]);
+    writeValidationState(tempDir, {
+      'VAL-C-002': { status: 'failed', updatedAt: '2024-01-01T00:00:00Z' },
+    });
+
+    const result = await evaluateMilestoneGate({
+      milestone: 'validation-gates',
+      featuresPath: path.join(tempDir, 'features.json'),
+      statePath: path.join(tempDir, 'validation-state.json'),
+    });
+
+    assert.equal(result.passed, true);
+  });
+
+  it('cancelled feature does not block even with failed assertions', async () => {
+    writeFeatures(tempDir, [
+      {
+        id: 'feature-cancelled',
+        description: 'Cancelled',
+        milestone: 'validation-gates',
+        status: 'cancelled',
+        fulfills: ['VAL-C-001', 'VAL-C-002'],
+      },
+    ]);
+    writeValidationState(tempDir, {
+      'VAL-C-001': { status: 'failed', updatedAt: '2024-01-01T00:00:00Z' },
+      'VAL-C-002': { status: 'pending', updatedAt: '2024-01-01T00:00:00Z' },
+    });
+
+    const result = await evaluateMilestoneGate({
+      milestone: 'validation-gates',
+      featuresPath: path.join(tempDir, 'features.json'),
+      statePath: path.join(tempDir, 'validation-state.json'),
+    });
+
+    assert.equal(result.passed, true);
+  });
+});
