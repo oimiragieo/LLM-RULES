@@ -1,0 +1,32 @@
+{
+  "testedAssertions": [
+    {
+      "id": "VAL-WP-003",
+      "status": "fail",
+      "reason": "bash .factory/init.sh exited with code 1 due to Node v12.22.7 syntax error on optional chaining during pnpm installation."
+    },
+    {
+      "id": "VAL-WP-005",
+      "status": "pass",
+      "reason": "Both index-rules and format:check commands succeeded with exit code 0."
+    }
+  ],
+  "frictions": [
+    {
+      "description": "bash .factory/init.sh failed due to Node.js version in WSL being v12.22.7, which doesn't support the optional chaining syntax required by pnpm. WSL environment seems to require Node.js upgrade for init.sh to work correctly.",
+      "resolved": false,
+      "resolution": "Failed assertion, requires environment fix or script modification.",
+      "affectedAssertions": ["VAL-WP-003"]
+    },
+    {
+      "description": "pnpm format:check timed out when checking 10096 files because the default 60s timeout was not enough.",
+      "resolved": true,
+      "resolution": "Increased the execution timeout to 180s which allowed the command to finish successfully.",
+      "affectedAssertions": ["VAL-WP-005"]
+    }
+  ],
+  "blockers": [],
+  "toolsUsed": [
+    "Execute"
+  ]
+}

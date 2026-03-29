@@ -40,3 +40,5 @@ All suites complete within 5 minutes individually.
 - Validation is purely CLI-based. Use `Execute` tool to run the required `pnpm` and `node` commands.
 - Check the output of commands carefully to verify pass/fail criteria.
 - Evidence can be saved as text files containing the command outputs.
+
+- Note on format:check: increase execution timeout to 180s or more, because the default 60s is often not enough to check >10,000 files.

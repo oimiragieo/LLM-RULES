@@ -1,31 +1,34 @@
 {
   "milestone": "windows-cleanup",
-  "round": 1,
+  "round": 2,
   "status": "fail",
   "assertionsSummary": {
     "total": 7,
-    "passed": 5,
-    "failed": 2,
+    "passed": 6,
+    "failed": 1,
     "blocked": 0
   },
-  "passedAssertions": ["VAL-WP-001", "VAL-WP-002", "VAL-WP-004", "VAL-WP-006", "VAL-WP-007"],
+  "passedAssertions": [
+    "VAL-WP-001",
+    "VAL-WP-002",
+    "VAL-WP-004",
+    "VAL-WP-005",
+    "VAL-WP-006",
+    "VAL-WP-007"
+  ],
   "failedAssertions": [
     {
       "id": "VAL-WP-003",
-      "reason": "init.sh relies on WSL bash executing node/pnpm. The WSL environment had an older node version causing a SyntaxError on '?.' in pnpm."
-    },
-    {
-      "id": "VAL-WP-005",
-      "reason": ".claude/context/config/rule-index.json has code style issues after generation, meaning format:check did not pass."
+      "reason": "bash .factory/init.sh exited with code 1 due to Node v12.22.7 syntax error on optional chaining during pnpm installation."
     }
   ],
   "blockedAssertions": [],
   "appliedUpdates": [
     {
       "target": "user-testing.md",
-      "description": "cmd /c needed for executing `pnpm index-rules && git diff --stat` because `&&` is not supported in the default PowerShell runner.",
+      "description": "Added note to increase execution timeout to 180s for format:check because 60s is not enough for >10,000 files.",
       "source": "flow-report"
     }
   ],
-  "previousRound": null
+  "previousRound": ".factory/validation/windows-cleanup/user-testing/synthesis-round-1.json"
 }
