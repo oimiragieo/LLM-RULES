@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "designSystemsInput",
+  "description": "Input schema for design-systems skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "Component or pattern to search for"
+    },
+    "system": {
+      "type": "string",
+      "description": "Design system name (material, ant, carbon, chakra)"
+    },
+    "framework": {
+      "type": "string",
+      "description": "Target framework (react, vue, svelte)"
+    }
+  }
+}

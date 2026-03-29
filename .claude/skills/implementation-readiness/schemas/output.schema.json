@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","title":"implementationReadinessOutput","type":"object","additionalProperties":true,"properties":{"ok":{"type":"boolean"},"ready":{"type":"boolean"},"blockers":{"type":"array","items":{"type":"string"}}}}

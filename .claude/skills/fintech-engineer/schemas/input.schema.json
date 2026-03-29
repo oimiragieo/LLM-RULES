@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","title":"fintechEngineerInput","type":"object","additionalProperties":true,"properties":{"domain":{"type":"string","enum":["payments","lending","trading","compliance","security"]},"task":{"type":"string"},"requirements":{"type":"object"}}}

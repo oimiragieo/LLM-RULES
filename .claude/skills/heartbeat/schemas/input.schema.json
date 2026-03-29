@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","title":"heartbeatInput","type":"object","additionalProperties":true,"properties":{"action":{"type":"string","enum":["start","stop","status","check"]}}}

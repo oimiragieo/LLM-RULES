@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "cloudflareWorkersOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "workerUrl": {
+      "type": "string"
+    },
+    "workerName": {
+      "type": "string"
+    },
+    "deployedAt": {
+      "type": "string"
+    }
+  }
+}

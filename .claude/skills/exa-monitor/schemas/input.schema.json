@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "exaMonitorInput",
+  "description": "Input schema for exa-monitor skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "topics": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Search topics to monitor"
+    },
+    "maxResults": {
+      "type": "integer",
+      "description": "Max results per topic (default 5)"
+    },
+    "schedule": {
+      "type": "string",
+      "description": "Cron schedule for monitoring"
+    }
+  }
+}

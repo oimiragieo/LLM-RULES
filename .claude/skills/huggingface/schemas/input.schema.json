@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","title":"huggingfaceInput","type":"object","additionalProperties":true,"properties":{"model":{"type":"string"},"task":{"type":"string"},"action":{"type":"string","enum":["download","inference","list","search"]}}}

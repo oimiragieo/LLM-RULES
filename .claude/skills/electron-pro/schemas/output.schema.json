@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "electronProOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "code": {
+      "type": "string"
+    },
+    "instructions": {
+      "type": "string"
+    },
+    "securityChecklist": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

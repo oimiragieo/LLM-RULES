@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","title":"markitdownConverterInput","type":"object","additionalProperties":true,"properties":{"inputFile":{"type":"string"},"outputFile":{"type":"string"},"format":{"type":"string"}}}

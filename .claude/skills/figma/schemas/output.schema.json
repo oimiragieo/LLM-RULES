@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "figmaOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "tokens": {
+      "type": "object"
+    },
+    "components": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "cssCode": {
+      "type": "string"
+    }
+  }
+}

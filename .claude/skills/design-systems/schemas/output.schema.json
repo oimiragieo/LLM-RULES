@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "designSystemsOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "components": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "tokens": {
+      "type": "object"
+    },
+    "patterns": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  }
+}

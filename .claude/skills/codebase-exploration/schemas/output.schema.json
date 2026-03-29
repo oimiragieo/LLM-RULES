@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "codebaseExplorationOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "reportPath": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "phasesCompleted": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tokensUsed": {
+      "type": "integer"
+    }
+  }
+}

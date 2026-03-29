@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","title":"googleWorkspaceInput","type":"object","additionalProperties":true,"properties":{"service":{"type":"string","enum":["docs","sheets","drive","gmail","calendar"]},"action":{"type":"string"}}}

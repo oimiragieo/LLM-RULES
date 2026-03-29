@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "codeGraphContextInput",
+  "description": "Input schema for code-graph-context skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Function or class name to query"
+    },
+    "file": {
+      "type": "string",
+      "description": "Optional file path to scope the query"
+    },
+    "depth": {
+      "type": "integer",
+      "description": "Depth of traversal (default 1)"
+    },
+    "operation": {
+      "type": "string",
+      "enum": ["find_callers", "find_callees", "get_class_hierarchy", "find_dead_code", "get_module_deps", "query_graph"],
+      "description": "Graph operation to perform"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "cronRunnerInput",
+  "description": "Input schema for cron-runner skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "queuePath": {
+      "type": "string",
+      "description": "Path to cron-actions-queue.jsonl"
+    },
+    "tickInterval": {
+      "type": "integer",
+      "description": "Seconds between queue checks"
+    }
+  }
+}

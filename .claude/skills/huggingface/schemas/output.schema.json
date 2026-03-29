@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","title":"huggingfaceOutput","type":"object","additionalProperties":true,"properties":{"ok":{"type":"boolean"},"models":{"type":"array","items":{"type":"object"}},"result":{"type":"object"}}}

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "contentAnalyzerInput",
+  "description": "Input schema for content-analyzer skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "url": {
+      "type": "string",
+      "description": "URL of content to analyze"
+    },
+    "file": {
+      "type": "string",
+      "description": "Local file path to analyze"
+    },
+    "text": {
+      "type": "string",
+      "description": "Raw text content to analyze"
+    },
+    "engagementData": {
+      "type": "object",
+      "description": "Engagement metrics (views, likes, comments, shares)"
+    }
+  }
+}

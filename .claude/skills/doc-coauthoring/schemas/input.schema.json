@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "docCoauthoringInput",
+  "description": "Input schema for doc-coauthoring skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "documentType": {
+      "type": "string",
+      "enum": ["prd", "design-doc", "rfc", "proposal", "spec", "runbook"],
+      "description": "Type of document to create"
+    },
+    "audience": {
+      "type": "string",
+      "description": "Target audience"
+    },
+    "topic": {
+      "type": "string",
+      "description": "Document topic or title"
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Document constraints (length, format, deadline)"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "electronProInput",
+  "description": "Input schema for electron-pro skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "task": {
+      "type": "string",
+      "description": "Development task (create-window, ipc, security, package)"
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["mac", "win", "linux", "all"]
+    },
+    "options": {
+      "type": "object",
+      "description": "Task-specific options"
+    }
+  }
+}

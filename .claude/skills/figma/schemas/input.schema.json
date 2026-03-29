@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "figmaInput",
+  "description": "Input schema for figma skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "fileKey": {
+      "type": "string",
+      "description": "Figma file key or URL"
+    },
+    "nodeIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Specific node IDs to extract"
+    },
+    "outputFormat": {
+      "type": "string",
+      "enum": ["tokens", "components", "code"],
+      "description": "Extraction format"
+    }
+  }
+}

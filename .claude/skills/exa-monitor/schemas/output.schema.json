@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "exaMonitorOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "newResults": {
+      "type": "integer"
+    },
+    "totalSeen": {
+      "type": "integer"
+    },
+    "digestPath": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "cloudflareWorkersInput",
+  "description": "Input schema for cloudflare-workers skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "workerName": {
+      "type": "string",
+      "description": "Worker script name"
+    },
+    "bindings": {
+      "type": "object",
+      "description": "KV, R2, D1, Durable Object bindings"
+    },
+    "environment": {
+      "type": "string",
+      "description": "Target environment (production, staging)"
+    }
+  }
+}
