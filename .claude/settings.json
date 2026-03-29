@@ -98,6 +98,15 @@
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/channels/channel-auto-start.cjs"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/a2a/a2a-server-autostart.cjs"
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -478,6 +487,10 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/worktree-prune-on-start.cjs"
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/a2a/a2a-shutdown.cjs"
           }
         ]
       }
