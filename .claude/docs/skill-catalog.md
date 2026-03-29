@@ -420,7 +420,7 @@ External tools and systems.
 | `omega-gemini-cli` | Headless wrapper for Google Gemini CLI; stdin-based prompt delivery to `gemini -p "" --yolo`; free tier via Google OAuth; supports --model, --json, --sandbox; npx fallback when gemini not on PATH | multi-llm-consultant, task-manager |
 | `omega-claude-cli` | Headless wrapper for Claude Code CLI; spawns a second Claude session headlessly for cross-validation, second opinions, and isolated analysis without sharing current agent context | multi-llm-consultant |
 | `llm-council` | Orchestrate multi-LLM parallel debate and synthesis; dispatches prompts to omega CLI wrappers in parallel, collects responses, runs peer review, and synthesizes via chairman model | developer |
-| `integration` | Integration patterns and best practices for connecting systems and services | developer |
+| ~~`integration`~~ | Integration patterns and best practices for connecting systems and services | *deprecated* |
 
 ---
 
@@ -620,7 +620,7 @@ Skills present on disk and now explicitly cataloged for index/discovery complete
 
 | Deprecated Skill | Replacement      | Notes     |
 | ---------------- | ---------------- | --------- |
-| `writing`        | `writing-skills` | developer |
+| ~~`writing`~~        | `writing-skills` | *deprecated* |
 
 ---
 

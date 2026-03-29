@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-29T15:08:54.392Z",
+  "generatedAt": "2026-03-29T17:48:17.525Z",
   "metadata": {
-    "totalSkills": 341,
+    "totalSkills": 339,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-29T15:08:54.393Z",
+    "lastValidated": "2026-03-29T17:48:17.526Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -5421,28 +5421,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "integration": {
-      "name": "integration",
-      "displayName": "Integration",
-      "category": "Other",
-      "domain": "other",
-      "description": "Other - integration",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "integration"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
     "scientific-skills/rdkit": {
       "name": "scientific-skills/rdkit",
       "displayName": "Scientific Skills/rdkit",
@@ -7305,28 +7283,6 @@
         "workflow-patterns"
       ],
       "priority": 1,
-      "aliasOf": null
-    },
-    "writing": {
-      "name": "writing",
-      "displayName": "Writing",
-      "category": "Other",
-      "domain": "other",
-      "description": "Other - writing",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "writing"
-      ],
-      "priority": 3,
       "aliasOf": null
     },
     "adversarial-debate": {
@@ -9623,7 +9579,6 @@
         "omega-gemini-cli",
         "omega-claude-cli",
         "llm-council",
-        "integration",
         "scientific-skills/rdkit",
         "scientific-skills/scanpy",
         "scientific-skills/biopython",
@@ -9654,7 +9609,6 @@
         "multi-agent-architecture-reference",
         "spec-to-code-compliance",
         "webapp-testing",
-        "writing",
         "adversarial-debate",
         "adversarial-review",
         "api-testing",
@@ -10033,7 +9987,6 @@
         "omega-gemini-cli",
         "omega-claude-cli",
         "llm-council",
-        "integration",
         "scientific-skills/rdkit",
         "scientific-skills/scanpy",
         "scientific-skills/biopython",
@@ -10101,7 +10054,6 @@
         "visual-and-observational-rules",
         "webapp-testing",
         "workflow-patterns",
-        "writing",
         "adversarial-debate",
         "adversarial-review",
         "api-testing",
@@ -10458,7 +10410,6 @@
         "omega-gemini-cli",
         "omega-claude-cli",
         "llm-council",
-        "integration",
         "scientific-skills/rdkit",
         "scientific-skills/scanpy",
         "scientific-skills/biopython",
@@ -10531,7 +10482,6 @@
         "visual-and-observational-rules",
         "webapp-testing",
         "workflow-patterns",
-        "writing",
         "adversarial-debate",
         "adversarial-review",
         "api-testing",
@@ -10763,7 +10713,6 @@
         "convex-development-general",
         "starknet-react-rules",
         "llm-council",
-        "integration",
         "scientific-skills/rdkit",
         "scientific-skills/scanpy",
         "scientific-skills/biopython",
@@ -10826,7 +10775,6 @@
         "visual-and-observational-rules",
         "webapp-testing",
         "workflow-patterns",
-        "writing",
         "adversarial-debate",
         "adversarial-review",
         "api-testing",
@@ -11016,7 +10964,6 @@
         "medusa",
         "convex-development-general",
         "starknet-react-rules",
-        "integration",
         "scientific-skills/rdkit",
         "scientific-skills/scanpy",
         "scientific-skills/biopython",
@@ -11067,7 +11014,6 @@
         "ui-components-expert",
         "visual-and-observational-rules",
         "workflow-patterns",
-        "writing",
         "adversarial-debate",
         "atlassian-integration",
         "auto-recall",
@@ -11903,7 +11849,6 @@
         "starknet-react-rules",
         "omega-cursor-cli",
         "llm-council",
-        "integration",
         "scientific-skills/rdkit",
         "scientific-skills/scanpy",
         "scientific-skills/biopython",
@@ -11958,7 +11903,6 @@
         "ui-components-expert",
         "visual-and-observational-rules",
         "webapp-testing",
-        "writing",
         "adversarial-review",
         "api-testing",
         "arxiv-monitor",
@@ -13789,7 +13733,6 @@
         "starknet-react-rules",
         "omega-cursor-cli",
         "llm-council",
-        "integration",
         "scientific-skills/rdkit",
         "scientific-skills/scanpy",
         "scientific-skills/biopython",
@@ -13844,7 +13787,6 @@
         "ui-components-expert",
         "visual-and-observational-rules",
         "webapp-testing",
-        "writing",
         "adversarial-review",
         "api-testing",
         "arxiv-monitor",
