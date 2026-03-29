@@ -26,7 +26,5 @@
     }
   ],
   "blockers": [],
-  "toolsUsed": [
-    "Execute"
-  ]
+  "toolsUsed": ["Execute"]
 }

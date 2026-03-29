@@ -19,9 +19,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "windows-cleanup/VAL-WP-003/VAL-WP-003-bash-init-output.txt"
-        ]
+        "terminalSnapshots": ["windows-cleanup/VAL-WP-003/VAL-WP-003-bash-init-output.txt"]
       },
       "issues": null
     }

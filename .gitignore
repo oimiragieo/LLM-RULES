@@ -315,6 +315,9 @@ temp_debug_*.txt
 tests/lib/memory/.test-memory-contracts-overflow-*/
 tests/lib/memory/.test-memory-contracts-*/
 
+# FastEmbed test artifacts
+.claude/data/test-fastembed-gpu-*
+
 # Runtime memory index files (auto-regenerated, not source-controlled)
 .claude/context/memory/agent-health.json
 .claude/context/memory/codebase_map.json

@@ -415,12 +415,12 @@ External tools and systems.
 | | Applies general rules for Convex development, emphasizing schema design, validator usage, and correct handling of system fields. | developer |
 | `convex-development-general` | Applies general rules for Convex development, emphasizing schema design, validator usage, and correct handling of system fields. | developer |
 | `starknet-react-rules` | Starknet React blockchain integration rules with hooks, error handling, and UI feedback patterns | developer |
-| `omega-codex-cli` | Headless wrapper for OpenAI Codex CLI; positional prompt delivery via `codex exec "PROMPT"`; OPENAI_API_KEY required; supports --json JSONL stream, --sandbox, --timeout-ms | multi-llm-consultant, task-manager |
+| `omega-codex-cli` | Headless wrapper for OpenAI Codex CLI; positional prompt delivery via `codex exec "PROMPT"`; OPENAI*API_KEY required; supports --json JSONL stream, --sandbox, --timeout-ms | multi-llm-consultant, task-manager |
 | `omega-cursor-cli` | Headless wrapper for Cursor Agent CLI; multi-model routing via --model auto; Cursor Pro/Business subscription required; supports --yolo, --trust, --timeout-ms | developer |
 | `omega-gemini-cli` | Headless wrapper for Google Gemini CLI; stdin-based prompt delivery to `gemini -p "" --yolo`; free tier via Google OAuth; supports --model, --json, --sandbox; npx fallback when gemini not on PATH | multi-llm-consultant, task-manager |
 | `omega-claude-cli` | Headless wrapper for Claude Code CLI; spawns a second Claude session headlessly for cross-validation, second opinions, and isolated analysis without sharing current agent context | multi-llm-consultant |
 | `llm-council` | Orchestrate multi-LLM parallel debate and synthesis; dispatches prompts to omega CLI wrappers in parallel, collects responses, runs peer review, and synthesizes via chairman model | developer |
-| ~~`integration`~~ | Integration patterns and best practices for connecting systems and services | *deprecated* |
+| ~~`integration`~~ | Integration patterns and best practices for connecting systems and services | \_deprecated* |
 
 ---
 
@@ -618,9 +618,9 @@ Skills present on disk and now explicitly cataloged for index/discovery complete
 
 ## Deprecated Skills
 
-| Deprecated Skill | Replacement      | Notes     |
-| ---------------- | ---------------- | --------- |
-| ~~`writing`~~        | `writing-skills` | *deprecated* |
+| Deprecated Skill | Replacement      | Notes        |
+| ---------------- | ---------------- | ------------ |
+| ~~`writing`~~    | `writing-skills` | _deprecated_ |
 
 ---
 

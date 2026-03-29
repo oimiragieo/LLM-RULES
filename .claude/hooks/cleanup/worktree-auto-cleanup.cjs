@@ -30,8 +30,14 @@ const { detectDefaultBranch } = require('../../lib/worktree/worktree-utils.cjs')
 // TTL for worktree branches (default 24 hours). Override with WORKTREE_TTL_MS env var.
 const WORKTREE_TTL_MS = parseInt(process.env.WORKTREE_TTL_MS ?? '86400000', 10);
 
+// TTL for delegation PID files (default 24 hours).
+const DELEGATION_PID_TTL_MS = parseInt(process.env.DELEGATION_PID_TTL_MS ?? '86400000', 10);
+
 // Resolve project root: .claude/hooks/cleanup/ → three levels up
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+
+// Resolve memory directory for delegation PID cleanup
+const MEMORY_DIR = path.resolve(PROJECT_ROOT, '.claude', 'context', 'memory');
 
 /**
  * Safe stdin reader — returns null if stdin is not available or empty.
@@ -144,6 +150,50 @@ function isStale(branch) {
 }
 
 /**
+ * Clean up stale delegation PID files older than DELEGATION_PID_TTL_MS (default 24 hours).
+ *
+ * These files are created during agent task delegation to track subprocess PIDs.
+ * They accumulate over time and should be cleaned up to prevent disk bloat.
+ *
+ * @returns {number} Number of PID files removed
+ */
+function cleanupStaleDelegationPids() {
+  const fs = require('fs');
+  let removed = 0;
+
+  try {
+    if (!fs.existsSync(MEMORY_DIR)) return removed;
+
+    const entries = fs.readdirSync(MEMORY_DIR, { withFileTypes: true });
+    const now = Date.now();
+    const pidPattern = /^delegations\.pid-.*\.json$/;
+
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      if (!pidPattern.test(entry.name)) continue;
+
+      const filePath = path.join(MEMORY_DIR, entry.name);
+      try {
+        const stats = fs.statSync(filePath);
+        const ageMs = now - stats.mtimeMs;
+
+        if (ageMs > DELEGATION_PID_TTL_MS) {
+          fs.unlinkSync(filePath);
+          removed += 1;
+          process.stderr.write(`[worktree-auto-cleanup] Removed stale PID file: ${entry.name}\n`);
+        }
+      } catch (_statErr) {
+        // File may have been removed by another process; ignore
+      }
+    }
+  } catch (_dirErr) {
+    // Memory directory may not exist; ignore
+  }
+
+  return removed;
+}
+
+/**
  * Main hook logic — wrapped in outer try/catch so any error exits 0 (SE-03).
  */
 function run() {
@@ -226,6 +276,9 @@ function run() {
       process.stderr.write(`[worktree-auto-cleanup] Removed ${worktreePath}\n`);
     }
   }
+
+  // Step 5: Clean up stale delegation PID files (older than 24 hours)
+  cleanupStaleDelegationPids();
 }
 
 if (require.main === module) {

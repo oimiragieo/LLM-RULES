@@ -141,6 +141,7 @@ Currently drifted: `config.yaml` v2.2.2, `CLAUDE.md` v3.1.0, `@ENFORCEMENT_HOOKS
 **Fail condition**: Any two of the three files have different version strings.
 
 **Evidence**:
+
 ```powershell
 $v1 = (rg "^\s+version:" .claude/config.yaml | Select-String -Pattern "'([\d.]+)'" | ForEach-Object { $_.Matches.Groups[1].Value })
 $v2 = (rg "Version.*v[\d.]+" .claude/CLAUDE.md | Select-String -Pattern "v([\d.]+)" | ForEach-Object { $_.Matches.Groups[1].Value })
@@ -164,7 +165,7 @@ After unification, no other `.claude/` files reference the old drifted versions 
 
 ## Area: Archive Cleanup
 
-### VAL-CL-013: All _archive directories removed from .claude/
+### VAL-CL-013: All \_archive directories removed from .claude/
 
 25 `_archive` directories exist throughout `.claude/` containing dead code. All must be removed.
 
@@ -228,11 +229,11 @@ ESLint and Markdown lint must pass to confirm no formatting or code quality regr
 
 ## Summary
 
-| Area | Assertions | IDs |
-|------|-----------|-----|
-| Runtime File Cleanup | 5 | VAL-CL-001 through VAL-CL-005 |
-| Dead Code Removal | 5 | VAL-CL-006 through VAL-CL-010 |
-| Version & Config Consistency | 2 | VAL-CL-011 through VAL-CL-012 |
-| Archive Cleanup | 2 | VAL-CL-013 through VAL-CL-014 |
-| Regression Safety | 3 | VAL-CL-015 through VAL-CL-017 |
-| **Total** | **17** | |
+| Area                         | Assertions | IDs                           |
+| ---------------------------- | ---------- | ----------------------------- |
+| Runtime File Cleanup         | 5          | VAL-CL-001 through VAL-CL-005 |
+| Dead Code Removal            | 5          | VAL-CL-006 through VAL-CL-010 |
+| Version & Config Consistency | 2          | VAL-CL-011 through VAL-CL-012 |
+| Archive Cleanup              | 2          | VAL-CL-013 through VAL-CL-014 |
+| Regression Safety            | 3          | VAL-CL-015 through VAL-CL-017 |
+| **Total**                    | **17**     |                               |
