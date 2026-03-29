@@ -1,0 +1,32 @@
+{
+  "groupId": "VAL-WP-003",
+  "testedAt": "2026-03-29T07:27:00.000Z",
+  "isolation": {
+    "appUrl": "none",
+    "missionDir": "C:\\Users\\oimir\\.factory\\missions\\91ae9243-5217-4452-8593-40411a402f4b"
+  },
+  "toolsUsed": ["Execute"],
+  "assertions": [
+    {
+      "id": "VAL-WP-003",
+      "title": "init.sh works under WSL/bash",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run bash .factory/init.sh",
+          "expected": "Script exits 0 in WSL/bash. No syntax errors, no path failures. LF line endings.",
+          "observed": "Script executed with exit code 0. Printed a graceful node version warning, skipping dependencies, and exiting cleanly."
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "windows-cleanup/VAL-WP-003/VAL-WP-003-bash-init-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 1 assertion: 1 passed. bash .factory/init.sh exited cleanly with code 0."
+}
