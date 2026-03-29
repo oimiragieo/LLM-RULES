@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 8 — System Repair Mission (2026-03-29)
+
+- **Test suite**: Reduced 201 test failures to 0 (framework 3256/0, tools 462/0)
+- **Reflection system**: Fixed score normalization (handles both 0-1 and 1-10 scales), registered 2 missing hooks, fixed token reporting with structural detection, added TokenAccountant persistence
+- **A2A Protocol**: Wired existing A2A server into router with auto-start hook, graceful shutdown, lazy client dispatch, file-IPC fallback
+- **Skills ecosystem**: Improved 69 low-scoring skills to 100, average ecosystem score 87→96, fixed catalog sync, added missing skill artifacts
+- **Windows platform**: Fixed YAML block scalar parsing, path resolution, glob expansion, rule-index determinism, `init.sh` graceful degradation on old Node
+- **All validation gates green**: `validate:full`, `metrics:ci`, `integration:headless` 144/144, `lint`, `format:check`
+
 ### Added
 
 - **Channel management system**: `channel-manager.cjs`, `terminal-tracker.cjs`, `telegram-notify.cjs` — modular channel lifecycle and notification infrastructure

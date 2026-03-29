@@ -15,6 +15,17 @@ If you want a local-first, reproducible agent stack with strict validation and h
 `Memory System` · `.claude/docs/MEMORY_SYSTEM.md`  
 `Code Indexing` · `.claude/docs/CODE_INDEXING_DESIGN.md`
 
+## Recent Changes (Phase 8 — System Repair)
+
+- **Test suite**: 201 failures → 0 (framework 3256/0, tools 462/0)
+- **Reflection system**: Fixed score normalization, registered missing hooks, token reporting with structural detection, TokenAccountant persistence
+- **A2A Protocol**: Auto-start hook, graceful shutdown, lazy client dispatch, file-IPC fallback
+- **Skills ecosystem**: 69 low-scoring skills improved to 100; average score 87 → 96
+- **Windows platform**: YAML block scalar parsing, path resolution, glob expansion, rule-index determinism fixes
+- **All gates green**: `validate:full`, `metrics:ci`, `integration:headless` 144/144, `lint`, `format:check`
+
+See [`CHANGELOG.md`](CHANGELOG.md) for full details.
+
 ## Quick Start (TL;DR)
 
 Runtime: Node `>=22.5.0`, pnpm.
