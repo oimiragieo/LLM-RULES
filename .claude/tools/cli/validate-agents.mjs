@@ -64,6 +64,7 @@ function log(color, message) {
 
 /**
  * Parse YAML frontmatter from agent markdown
+ * Supports multi-line block scalars (|-, >-, |, >, |+, >+)
  */
 function parseFrontmatter(content) {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
@@ -72,12 +73,71 @@ function parseFrontmatter(content) {
   const yaml = match[1];
   const result = {};
 
-  // Simple YAML parser
+  // Enhanced YAML parser with block scalar support
   const lines = yaml.split('\n');
   let currentKey = null;
   let inArray = false;
+  let inBlockScalar = false;
+  let blockScalarLines = [];
+  let blockScalarIndent = 0;
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Check if we're collecting a block scalar
+    if (inBlockScalar) {
+      // Check if this line starts a new key (less indented or at root level)
+      if (line.match(/^[a-z_]+:/i) && !line.startsWith(' ')) {
+        // End block scalar, process it
+        const blockValue = blockScalarLines.join(' ');
+        result[currentKey] = blockValue.trim();
+        inBlockScalar = false;
+        blockScalarLines = [];
+        blockScalarIndent = 0;
+
+        // Process this line as a new key
+        const colonIndex = line.indexOf(':');
+        currentKey = line.slice(0, colonIndex).trim();
+        const value = line.slice(colonIndex + 1).trim();
+
+        if (value === '') {
+          result[currentKey] = [];
+          inArray = true;
+        } else if (value.startsWith('[')) {
+          result[currentKey] = value
+            .slice(1, -1)
+            .split(',')
+            .map(s => s.trim());
+          inArray = false;
+        } else {
+          result[currentKey] = value;
+          inArray = false;
+        }
+      } else {
+        // Continue collecting block scalar content
+        // Remove leading indentation (at least blockScalarIndent spaces)
+        const contentLine = line.slice(
+          Math.min(blockScalarIndent, line.length - line.trimStart().length)
+        );
+        blockScalarLines.push(contentLine.trim());
+      }
+      continue;
+    }
+
+    // Check for key with block scalar indicator (|, >, |-, >-, |+, >+)
+    const blockScalarMatch = line.match(/^([a-z_]+):\s*([|>][+-]?)\s*$/i);
+    if (blockScalarMatch) {
+      currentKey = blockScalarMatch[1];
+      inBlockScalar = true;
+      inArray = false;
+      blockScalarLines = [];
+      // Determine the indentation level from the next line
+      const nextLine = lines[i + 1] || '';
+      blockScalarIndent = nextLine.search(/\S/);
+      if (blockScalarIndent < 0) blockScalarIndent = 2;
+      continue;
+    }
+
     if (line.match(/^[a-z_]+:/i)) {
       const colonIndex = line.indexOf(':');
       currentKey = line.slice(0, colonIndex).trim();
@@ -100,6 +160,12 @@ function parseFrontmatter(content) {
     } else if (inArray && line.match(/^\s+-\s/)) {
       result[currentKey].push(line.replace(/^\s+-\s/, '').trim());
     }
+  }
+
+  // Handle trailing block scalar
+  if (inBlockScalar && currentKey) {
+    const blockValue = blockScalarLines.join(' ');
+    result[currentKey] = blockValue.trim();
   }
 
   return result;
@@ -171,10 +237,7 @@ function validateAgent(filePath, _relativePath) {
       }
     }
 
-    // Check for multi-line description (causes parsing issues)
-    if (content.includes('description: |') || content.includes('description: >')) {
-      errors.push('Description must be single-line (multi-line YAML causes issues)');
-    }
+    // Check for description - block scalars are now supported by the parser
 
     // Check for body content
     const bodyMatch = content.match(/---\n[\s\S]*?\n---\n([\s\S]*)/);

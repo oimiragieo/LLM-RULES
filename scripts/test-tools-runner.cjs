@@ -61,6 +61,6 @@ const proc = spawn(process.execPath, args, {
   windowsHide: true,
 });
 
-proc.on('close', (code) => {
+proc.on('close', code => {
   process.exit(code);
 });
