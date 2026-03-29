@@ -1,0 +1,21 @@
+{
+  "featureId": "mission-parsers",
+  "reviewedAt": "2026-03-29T21:00:00.000Z",
+  "commitId": "df6fb181",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The implementation successfully creates both the mission and agents parsers per the requirements. It effectively handles section extraction, degrades gracefully on missing sections and files, handles Windows CRLF line endings, and correctly injects prompt context.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "conventions",
+      "observation": "Worker encountered Windows-specific EBUSY errors during filesystem test cleanup in `tests/mission/agents-parser.test.cjs` and had to add retry/ignore logic. This Windows filesystem testing quirk might be useful to document in a shared library file to prevent future test flakiness.",
+      "evidence": "Transcript shows worker saying 'The test failures are due to Windows-specific EBUSY errors during cleanup' and explicitly editing the test file to handle it."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review passed successfully. The worker implemented both parsers accurately following TDD and gracefully handled missing sections and malformed markdown. All tests were added and passed."
+}

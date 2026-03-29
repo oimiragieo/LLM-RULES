@@ -618,6 +618,8 @@ Skills present on disk and now explicitly cataloged for index/discovery complete
 
 ## Deprecated Skills
 
+<!-- markdownlint-disable MD049 -->
+
 | Deprecated Skill | Replacement      | Notes        |
 | ---------------- | ---------------- | ------------ |
 | ~~`writing`~~    | `writing-skills` | _deprecated_ |

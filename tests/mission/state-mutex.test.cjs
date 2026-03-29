@@ -8,7 +8,12 @@ const os = require('node:os');
 const Ajv = require('ajv');
 
 // Module under test (will be created)
-const { StateMutex, acquireLock, releaseLock, initializeState } = require('../../.claude/lib/mission/state-mutex.cjs');
+const {
+  StateMutex,
+  acquireLock,
+  releaseLock,
+  initializeState,
+} = require('../../.claude/lib/mission/state-mutex.cjs');
 
 // AJV schema for state.json validation
 const STATE_SCHEMA = {

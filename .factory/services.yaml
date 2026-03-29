@@ -13,6 +13,7 @@ commands:
   metrics:ci: pnpm metrics:ci
   integration:headless: pnpm integration:headless
   format:check: pnpm format:check
+  format: node scripts/format-tracked.mjs --write
   lint: pnpm lint
 
 services: {}

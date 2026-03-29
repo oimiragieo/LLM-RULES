@@ -1,0 +1,63 @@
+{
+  "milestone": "mission-core",
+  "round": 1,
+  "status": "pass",
+  "validatorsRun": {
+    "test": {
+      "passed": true,
+      "command": "node --test tests/mission/*.test.cjs",
+      "exitCode": 0
+    },
+    "typecheck": {
+      "passed": true,
+      "command": "pnpm format:check",
+      "exitCode": 0
+    },
+    "lint": {
+      "passed": true,
+      "command": "pnpm lint",
+      "exitCode": 0
+    }
+  },
+  "reviewsSummary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "failedFeatures": []
+  },
+  "blockingIssues": [],
+  "appliedUpdates": [
+    {
+      "target": "services.yaml",
+      "description": "Added `format` command using the custom `node scripts/format-tracked.mjs --write` script to provide workers an auto-fix capability.",
+      "sourceFeature": "workspace-provisioner, features-state-machine"
+    },
+    {
+      "target": "library",
+      "description": "Added notes about Windows filesystem EBUSY errors during test cleanup to windows-quirks.md.",
+      "sourceFeature": "mission-parsers"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Workers should be advised to run targeted tests (e.g., `node --test tests/mission/*.test.cjs`) rather than `pnpm test` when working on mission features, because the full test suite contains 9000+ tests and consistently times out.",
+      "evidence": "Feature `features-state-machine` worker wasted multiple attempts and 300s timeouts on `pnpm test`.",
+      "isSystemic": true
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Document the project's max-lines limit for files (ESLint SEC-023 max-lines 500). Workers should proactively split large test files or implementations into smaller modules.",
+      "evidence": "Feature `features-state-machine` worker was blocked by the pre-commit hook enforcing the 500-line limit and had to rewrite/split the test files.",
+      "isSystemic": true
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "For new JSON files, enforce atomic writes (write to .tmp then rename) rather than `fs.writeFileSync`. This matches the convention for existing files.",
+      "evidence": "Feature `workspace-provisioner` incorrectly used `fs.writeFileSync` for `manifest.json` instead of following the atomic write pattern.",
+      "isSystemic": false
+    }
+  ],
+  "rejectedObservations": [],
+  "previousRound": null
+}
