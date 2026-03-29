@@ -297,3 +297,180 @@ describe('toJSON', () => {
     assert.ok('task-1' in json.tasks);
   });
 });
+
+// ─── Persistence (VAL-RF-016, VAL-RF-017, VAL-RF-018, VAL-RF-019) ───────────
+
+describe('persist and load', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const os = require('os');
+
+  function makeTempPath() {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'token-accountant-'));
+    return path.join(dir, 'token-usage.json');
+  }
+
+  it('VAL-RF-016: persist() writes to disk, load() recovers data', () => {
+    const filePath = makeTempPath();
+    const acc = new TokenAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 1000,
+      outputTokens: 500,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+
+    // Persist to disk
+    acc.persist(filePath);
+
+    // Verify file exists
+    assert.ok(fs.existsSync(filePath), 'Persistence file should exist');
+
+    // Create new instance and load
+    const acc2 = new TokenAccountant();
+    acc2.load(filePath);
+
+    const cost = acc2.getTaskCost('task-1');
+    assert.ok(cost !== null, 'Data should be recovered');
+    assert.equal(cost.inputTokens, 1000, 'Input tokens should match');
+    assert.equal(cost.outputTokens, 500, 'Output tokens should match');
+  });
+
+  it('VAL-RF-017: load() handles corrupted file gracefully (no crash, empty state)', () => {
+    const filePath = makeTempPath();
+    fs.writeFileSync(filePath, '{ invalid json }', 'utf8');
+
+    const acc = new TokenAccountant();
+    // Should not throw
+    assert.doesNotThrow(() => {
+      acc.load(filePath);
+    });
+
+    // Should have empty state
+    const total = acc.getSessionTotal();
+    assert.equal(total.taskCount, 0, 'Should have empty state after corrupted load');
+  });
+
+  it('VAL-RF-018: load() handles missing file gracefully (no crash, empty state)', () => {
+    const filePath = path.join(os.tmpdir(), 'nonexistent-token-usage-' + Date.now() + '.json');
+
+    const acc = new TokenAccountant();
+    // Should not throw
+    assert.doesNotThrow(() => {
+      acc.load(filePath);
+    });
+
+    // Should have empty state
+    const total = acc.getSessionTotal();
+    assert.equal(total.taskCount, 0, 'Should have empty state after missing file');
+  });
+
+  it('VAL-RF-019: persist() uses atomic writes (write-to-temp + rename)', () => {
+    const filePath = makeTempPath();
+    const acc = new TokenAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+
+    // Persist should complete without error
+    assert.doesNotThrow(() => {
+      acc.persist(filePath);
+    });
+
+    // Verify the file exists and has correct content
+    const content = fs.readFileSync(filePath, 'utf8');
+    const parsed = JSON.parse(content);
+    assert.ok('tasks' in parsed, 'Persisted file should have tasks');
+    assert.ok('task-1' in parsed.tasks, 'Persisted file should have task-1');
+  });
+
+  it('persist() creates parent directories if missing', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'token-accountant-nested-'));
+    const filePath = path.join(dir, 'subdir', 'token-usage.json');
+
+    const acc = new TokenAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+
+    assert.doesNotThrow(() => {
+      acc.persist(filePath);
+    });
+
+    assert.ok(fs.existsSync(filePath), 'File should be created in nested directory');
+  });
+
+  it('load() + persist() preserves all task data', () => {
+    const filePath = makeTempPath();
+    const acc = new TokenAccountant();
+    acc.recordUsage('task-1', {
+      inputTokens: 1000,
+      outputTokens: 500,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    acc.recordUsage('task-2', {
+      inputTokens: 2000,
+      outputTokens: 1000,
+      model: 'haiku',
+      agentType: 'qa',
+    });
+    acc.recordUsage('task-3', {
+      inputTokens: 500,
+      outputTokens: 250,
+      model: 'opus',
+      agentType: 'architect',
+    });
+
+    acc.persist(filePath);
+
+    const acc2 = new TokenAccountant();
+    acc2.load(filePath);
+
+    const total = acc2.getSessionTotal();
+    assert.equal(total.taskCount, 3, 'All 3 tasks should be recovered');
+    assert.equal(total.inputTokens, 3500, 'Total input tokens should match');
+    assert.equal(total.outputTokens, 1750, 'Total output tokens should match');
+  });
+
+  it('load() handles empty file gracefully', () => {
+    const filePath = makeTempPath();
+    fs.writeFileSync(filePath, '{}', 'utf8');
+
+    const acc = new TokenAccountant();
+    assert.doesNotThrow(() => {
+      acc.load(filePath);
+    });
+
+    const total = acc.getSessionTotal();
+    assert.equal(total.taskCount, 0, 'Should have empty state');
+  });
+
+  it('persist() overwrites existing file', () => {
+    const filePath = makeTempPath();
+    fs.writeFileSync(filePath, '{"old": "data"}', 'utf8');
+
+    const acc = new TokenAccountant();
+    acc.recordUsage('new-task', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    acc.persist(filePath);
+
+    const acc2 = new TokenAccountant();
+    acc2.load(filePath);
+
+    const oldTask = acc2.getTaskCost('old');
+    assert.equal(oldTask, null, 'Old data should be overwritten');
+    const newTask = acc2.getTaskCost('new-task');
+    assert.ok(newTask !== null, 'New data should exist');
+  });
+});

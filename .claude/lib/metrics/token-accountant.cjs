@@ -10,8 +10,18 @@
  *   sonnet: input=$3,    output=$15
  *   opus:   input=$15,   output=$75
  *
+ * Persistence (VAL-RF-016 to VAL-RF-019):
+ * - persist() writes to disk using atomic writes (write-to-temp + rename)
+ * - load() reads from disk for startup recovery
+ * - Handles corrupted/missing files gracefully
+ *
  * @module token-accountant
  */
+
+const fs = require('fs');
+const path = require('path');
+const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const MODEL_PRICING = {
   haiku: { input: 0.25, output: 1.25 },
@@ -167,17 +177,126 @@ class TokenAccountant {
   /**
    * Serialize to JSON-friendly object.
    *
-   * @returns {{ tasks: Object, session: Object }}
+   * @returns {{ tasks: Object, session: Object, records: Object }}
    */
   toJSON() {
     const tasks = {};
-    for (const [taskId] of this._tasks) {
+    const records = {};
+    for (const [taskId, taskRecords] of this._tasks) {
       tasks[taskId] = this.getTaskCost(taskId);
+      records[taskId] = taskRecords;
     }
     return {
       tasks,
       session: this.getSessionTotal(),
+      records, // Include raw records for persistence
     };
+  }
+
+  /**
+   * VAL-RF-016, VAL-RF-019: Persist state to disk using atomic writes.
+   *
+   * Uses write-to-temp + rename pattern to prevent data corruption on crash.
+   * Creates parent directories if they don't exist.
+   *
+   * @param {string} filePath - Path to the persistence file
+   * @throws {Error} If write fails (caller should handle gracefully)
+   */
+  persist(filePath) {
+    if (!filePath || typeof filePath !== 'string') {
+      throw new Error('persist() requires a valid file path');
+    }
+
+    const data = this.toJSON();
+    // Add version for future migration compatibility
+    data.version = 1;
+    data.persistedAt = new Date().toISOString();
+
+    // atomicWriteJSONSync creates parent dirs and uses atomic write
+    atomicWriteJSONSync(filePath, data);
+  }
+
+  /**
+   * VAL-RF-017, VAL-RF-018: Load state from disk for startup recovery.
+   *
+   * Handles corrupted and missing files gracefully (no crash, empty state).
+   *
+   * @param {string} filePath - Path to the persistence file
+   * @returns {boolean} True if data was loaded, false otherwise
+   */
+  load(filePath) {
+    if (!filePath || typeof filePath !== 'string') {
+      return false;
+    }
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      // VAL-RF-018: Missing file is okay - just start with empty state
+      return false;
+    }
+
+    try {
+      const content = fs.readFileSync(filePath, 'utf8');
+      // safeParseJSON returns the parsed object directly (not { success, data })
+      const data = safeParseJSON(content, null);
+
+      if (!data || typeof data !== 'object') {
+        // VAL-RF-017: Corrupted file - log warning and continue with empty state
+        // (In production, this would log to stderr, but we fail silently here)
+        return false;
+      }
+
+      // Restore records if present (from our own persist format)
+      if (data.records && typeof data.records === 'object') {
+        for (const [taskId, taskRecords] of Object.entries(data.records)) {
+          if (Array.isArray(taskRecords)) {
+            // Validate each record before restoring
+            const validRecords = taskRecords.filter(
+              r =>
+                r &&
+                typeof r === 'object' &&
+                typeof r.inputTokens === 'number' &&
+                typeof r.outputTokens === 'number' &&
+                typeof r.model === 'string' &&
+                typeof r.agentType === 'string'
+            );
+            if (validRecords.length > 0) {
+              this._tasks.set(taskId, validRecords);
+            }
+          }
+        }
+        return true;
+      }
+
+      // If no records but has tasks (older format), reconstruct minimal records
+      if (data.tasks && typeof data.tasks === 'object') {
+        for (const [taskId, taskCost] of Object.entries(data.tasks)) {
+          if (taskCost && typeof taskCost === 'object') {
+            // Create a synthetic record from the cost summary
+            const inputTokens = taskCost.inputTokens || 0;
+            const outputTokens = taskCost.outputTokens || 0;
+            if (inputTokens > 0 || outputTokens > 0) {
+              this._tasks.set(taskId, [
+                {
+                  inputTokens,
+                  outputTokens,
+                  model: DEFAULT_MODEL, // Unknown model, use default
+                  agentType: 'unknown',
+                  timestamp: data.persistedAt || new Date().toISOString(),
+                },
+              ]);
+            }
+          }
+        }
+        return true;
+      }
+
+      // Empty or unrecognized format - start fresh
+      return false;
+    } catch (_err) {
+      // VAL-RF-017: Any error reading/parsing - fail gracefully
+      return false;
+    }
   }
 }
 

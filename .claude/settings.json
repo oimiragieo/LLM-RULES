@@ -23,6 +23,15 @@
         "hooks": [
           {
             "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/force-step0-execution.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/ccusage-statusline.cjs"
           }
         ]
@@ -324,6 +333,10 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/reflection-cleanup.cjs"
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/reflection-data-aggregator.cjs"
           },
           {
             "type": "command",
