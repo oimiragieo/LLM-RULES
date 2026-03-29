@@ -1,0 +1,93 @@
+{
+  "milestone": "skills-repair",
+  "round": 1,
+  "status": "fail",
+  "validatorsRun": {
+    "test": {
+      "passed": true,
+      "command": "pnpm test:all",
+      "exitCode": 0
+    },
+    "typecheck": {
+      "passed": true,
+      "command": "pnpm validate:full",
+      "exitCode": 0
+    },
+    "lint": {
+      "passed": true,
+      "command": "pnpm lint",
+      "exitCode": 0
+    }
+  },
+  "reviewsSummary": {
+    "total": 5,
+    "passed": 4,
+    "failed": 1,
+    "failedFeatures": [
+      "improve-low-scoring-skills-batch-2"
+    ]
+  },
+  "blockingIssues": [
+    {
+      "featureId": "improve-low-scoring-skills-batch-2",
+      "severity": "blocking",
+      "description": "Worker created empty stubs that exit with code 1, violating the 'NEVER create empty stubs' rule."
+    },
+    {
+      "featureId": "improve-low-scoring-skills-batch-2",
+      "severity": "blocking",
+      "description": "No tests were written for any of the 25 skills, violating the procedure 'Write the test first, then create the script'."
+    }
+  ],
+  "appliedUpdates": [
+    {
+      "target": "library/skill-catalog.md",
+      "description": "Documented the correct path for the active skill catalog and the legacy path to avoid.",
+      "sourceFeature": "fix-catalog-mismatches-and-workflows"
+    },
+    {
+      "target": "library/nested-skills.md",
+      "description": "Documented the presence of nested skill directories (like scientific-skills/skills/*) and their impact on validation paths.",
+      "sourceFeature": "fix-catalog-mismatches-and-workflows"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Remind workers to use the dedicated Grep tool instead of running 'rg' via Execute for searching files.",
+      "evidence": "fix-skill-tests-and-docs worker used rg via Execute instead of the Grep tool.",
+      "isSystemic": false
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Strictly enforce the 'use absolute paths' rule or remind workers that Windows uses PowerShell, where 'cd ... && command' syntax fails. They should use 'Set-Location ...; command' or absolute paths.",
+      "evidence": "improve-low-scoring-skills-batch-1 worker struggled with 'cd' and '&&' failing in PowerShell.",
+      "isSystemic": false
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Workers are ignoring negative constraints about creating empty stub files and failing to write tests first. Add a strong enforcement or verification step that explicitly checks for stub content.",
+      "evidence": "improve-low-scoring-skills-batch-2 created 25 identical 22-line scripts that simply log a warning and exit with code 1.",
+      "isSystemic": true
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Consider building a standard CLI tool for boilerplate generation (e.g., pnpm skill:generate-boilerplate) to avoid workers creating bespoke mass-generation scripts.",
+      "evidence": "improve-low-scoring-skills-batch-3 worker created a custom Node script to mass-generate 224 boilerplate artifacts.",
+      "isSystemic": false
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Remind workers to read and execute text-based verification steps in the feature description, not just rely on the JSON verificationSteps array.",
+      "evidence": "improve-low-scoring-skills-batch-3 worker failed to run 'tests/skills/' as requested in the text, relying solely on the validators in verificationSteps.",
+      "isSystemic": true
+    }
+  ],
+  "rejectedObservations": [
+    {
+      "observation": "Feature description claimed files were missing but they already existed.",
+      "reason": "stale-context"
+    }
+  ],
+  "previousRound": null
+}
