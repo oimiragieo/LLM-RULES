@@ -1,7 +1,7 @@
 {
   "milestone": "reflection-token",
-  "round": 1,
-  "status": "fail",
+  "round": 2,
+  "status": "pass",
   "validatorsRun": {
     "test": { "passed": true, "command": "pnpm test:all", "exitCode": 0 },
     "typecheck": { "passed": true, "command": "pnpm validate:full", "exitCode": 0 },
@@ -9,18 +9,12 @@
     "format": { "passed": true, "command": "pnpm format:check", "exitCode": 0 }
   },
   "reviewsSummary": {
-    "total": 4,
-    "passed": 3,
-    "failed": 1,
-    "failedFeatures": ["fix-reflection-hooks-and-token-reporting"]
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "failedFeatures": []
   },
-  "blockingIssues": [
-    {
-      "featureId": "fix-reflection-hooks-and-token-reporting",
-      "severity": "blocking",
-      "description": "The persist() and load() methods were added to TokenAccountant, but they are never called (e.g., load() in constructor, persist() on updates). The required persistence path (.claude/context/metrics/token-usage.json) is ignored, making the fix incomplete as data is still lost on restart."
-    }
-  ],
+  "blockingIssues": [],
   "appliedUpdates": [
     {
       "target": "library",
@@ -40,8 +34,14 @@
       "suggestion": "Remind workers that they are running in Windows PowerShell, so `&&` chaining does not work natively like in bash. They should use `;` or separate commands.",
       "evidence": "Feature verify-reflection-loop-and-queue initially failed due to `cd ... && ...` syntax.",
       "isSystemic": true
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Remind workers that targeted tests should be run using native Node syntax `node --test tests/...` rather than Jest-style arguments like `pnpm test:framework --testPathPattern=...` which can cause timeouts.",
+      "evidence": "Feature fix-token-accountant-persistence-wiring initially timed out trying to run targeted tests using Jest-style arguments before pivoting to native Node syntax.",
+      "isSystemic": true
     }
   ],
   "rejectedObservations": [],
-  "previousRound": null
+  "previousRound": ".factory/validation/reflection-token/scrutiny/synthesis.json"
 }
