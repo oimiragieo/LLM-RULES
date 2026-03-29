@@ -1,11 +1,11 @@
 {
   "milestone": "skills-repair",
-  "round": 2,
-  "status": "pass",
+  "round": 1,
+  "status": "fail",
   "assertionsSummary": {
     "total": 13,
-    "passed": 13,
-    "failed": 0,
+    "passed": 12,
+    "failed": 1,
     "blocked": 0
   },
   "passedAssertions": [
@@ -20,11 +20,15 @@
     "VAL-SK-012",
     "VAL-SK-009",
     "VAL-SK-010",
-    "VAL-SK-013",
-    "VAL-SK-005"
+    "VAL-SK-013"
   ],
-  "failedAssertions": [],
+  "failedAssertions": [
+    {
+      "id": "VAL-SK-005",
+      "reason": "File .claude/skills/token-saver/SKILL.md does not exist."
+    }
+  ],
   "blockedAssertions": [],
   "appliedUpdates": [],
-  "previousRound": ".factory/validation/skills-repair/user-testing/synthesis-round1.json"
+  "previousRound": null
 }
