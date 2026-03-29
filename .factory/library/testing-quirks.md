@@ -15,11 +15,12 @@ To work around this, you must either:
 
 ## Async Event Emitter Testing
 
-When testing Node.js `EventEmitter` instances using async test utilities (like a `waitForEvent` helper), if the event is emitted synchronously inside a method, the test listener may attach *after* the event has already fired, causing the test to timeout. 
+When testing Node.js `EventEmitter` instances using async test utilities (like a `waitForEvent` helper), if the event is emitted synchronously inside a method, the test listener may attach _after_ the event has already fired, causing the test to timeout.
 
 To work around this, wrap the synchronous event emission in `setImmediate()` to ensure the event loop yields and allows the test listener to attach before firing the event.
 
 Example:
+
 ```javascript
 // Instead of:
 this.emit('event', payload);
@@ -27,3 +28,7 @@ this.emit('event', payload);
 // Use:
 setImmediate(() => this.emit('event', payload));
 ```
+
+## AJV Schema Validation
+
+AJV does not support the 'date-time' format natively. When validating schemas that use formats like 'date-time', you must install and require the `ajv-formats` plugin and apply it to your AJV instance via `addFormats(ajv)`.

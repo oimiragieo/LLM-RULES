@@ -11,3 +11,7 @@ Reliably obtaining the PID of a detached background process (like `cmd.exe`) on 
 ## Filesystem EBUSY
 
 When writing tests that involve filesystem operations (especially cleanup/deletion), Windows frequently throws `EBUSY` errors due to file locking. Test cleanup routines should implement retry logic or graceful error ignoring to prevent test flakiness.
+
+## Process Spawning
+
+When using `child_process.spawn` for shell commands, Windows requires using `cmd.exe /s /c` with `windowsVerbatimArguments: true` instead of `/bin/bash -c`. Ensure cross-platform code handles this platform difference correctly.
