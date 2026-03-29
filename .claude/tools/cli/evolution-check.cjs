@@ -3,8 +3,6 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
-const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const ROOT = path.resolve(__dirname, '../../..');
 const learnPath = path.join(ROOT, '.claude/context/memory/learnings.md');
@@ -42,39 +40,9 @@ if (fs.existsSync(learnPath)) {
   }
 }
 
-// Process self-healing reflection queue
-try {
-  const processorScript = path.join(ROOT, '.claude', 'hooks', 'process-evolution-queue.cjs');
-  if (fs.existsSync(processorScript)) {
-    const result = spawnSync('node', [processorScript, '--run-once'], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'], // ignore stderr to prevent cron noise
-      timeout: 60000,
-      shell: false,
-    });
-    const output = result.stdout;
-
-    if (output) {
-      const lines = output.split('\n');
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        const parsed = safeParseJSON(trimmed, null);
-        if (parsed && parsed.type === 'evolution-dispatch' && parsed.skill) {
-          const argsStr =
-            typeof parsed.args === 'string' ? parsed.args : JSON.stringify(parsed.args || {});
-          actions.push({
-            type: 'task_create',
-            subject: parsed.skill,
-            description: `Process self-healing evolution request (trigger: ${parsed.trigger}). Execute with args: ${argsStr}`,
-          });
-        }
-      }
-    }
-  }
-} catch (_err) {
-  // Graceful degradation if queue processor fails
-}
+// Process self-healing reflection queue (removed in Phase 10 cleanup)
+// process-evolution-queue.cjs was deleted as part of dead hook removal
+// Evolution processing now handled by unified-reflection-handler.cjs
 
 if (actions.length > 0) {
   const queuePath = path.join(ROOT, '.claude', 'context', 'runtime', 'cron-actions-queue.jsonl');

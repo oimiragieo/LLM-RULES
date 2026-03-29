@@ -6,6 +6,7 @@
  *
  * Created: 2026-02-07
  * Related: ADR-089 Tools System Overhaul
+ * Updated: 2026-03-29 (Phase 10) - Archive directory removed in Phase 9 cleanup
  */
 
 const { test } = require('node:test');
@@ -82,7 +83,7 @@ function isArchiveImport(importPath) {
 }
 
 test('No active code imports from _archive/', () => {
-  // Skip test if archive doesn't exist
+  // Skip test if archive doesn't exist (removed in Phase 9 cleanup)
   if (!fs.existsSync(ARCHIVE_DIR)) {
     return;
   }
@@ -124,16 +125,5 @@ test('No active code imports from _archive/', () => {
   assert.deepStrictEqual(violations, []);
 });
 
-test('Archive directory exists', () => {
-  assert.ok(fs.existsSync(ARCHIVE_DIR));
-});
-
-test('Archive README exists', () => {
-  const readmePath = path.join(ARCHIVE_DIR, 'README.md');
-  assert.ok(fs.existsSync(readmePath));
-
-  const content = fs.readFileSync(readmePath, 'utf8');
-  assert.ok(content.includes('Archived Tools'));
-  assert.ok(content.includes('ADR-089'));
-  assert.ok(content.includes('Restoration Instructions'));
-});
+// Archive directory was removed in Phase 9 cleanup as part of removing all _archive directories.
+// The tests below have been removed since the archive no longer exists.
