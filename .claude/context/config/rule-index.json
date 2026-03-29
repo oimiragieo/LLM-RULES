@@ -20,10 +20,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "python",
-        "typescript"
-      ],
+      "technologies": ["python", "typescript"],
       "type": "master",
       "size": 4273,
       "line_count": 104
@@ -34,11 +31,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "jest",
-        "rails",
-        "vitest"
-      ],
+      "technologies": ["jest", "rails", "vitest"],
       "type": "master",
       "size": 3467,
       "line_count": 82
@@ -49,11 +42,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "api",
-        "nodejs",
-        "typescript"
-      ],
+      "technologies": ["api", "nodejs", "typescript"],
       "type": "master",
       "size": 5952,
       "line_count": 159
@@ -64,9 +53,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "go"
-      ],
+      "technologies": ["go"],
       "type": "master",
       "size": 3332,
       "line_count": 93
@@ -77,10 +64,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "api",
-        "go"
-      ],
+      "technologies": ["api", "go"],
       "type": "master",
       "size": 2316,
       "line_count": 45
@@ -91,9 +75,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "go"
-      ],
+      "technologies": ["go"],
       "type": "master",
       "size": 2673,
       "line_count": 72
@@ -115,9 +97,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "rest"
-      ],
+      "technologies": ["rest"],
       "type": "master",
       "size": 2789,
       "line_count": 108
@@ -128,11 +108,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "go",
-        "java",
-        "javascript"
-      ],
+      "technologies": ["go", "java", "javascript"],
       "type": "master",
       "size": 4378,
       "line_count": 110
@@ -143,9 +119,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "api"
-      ],
+      "technologies": ["api"],
       "type": "master",
       "size": 5737,
       "line_count": 142
@@ -167,11 +141,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "java",
-        "javascript",
-        "rust"
-      ],
+      "technologies": ["java", "javascript", "rust"],
       "type": "master",
       "size": 6545,
       "line_count": 208
@@ -182,10 +152,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "go",
-        "rust"
-      ],
+      "technologies": ["go", "rust"],
       "type": "master",
       "size": 1645,
       "line_count": 41
@@ -196,9 +163,7 @@
       "description": "Prevents agent from getting stuck on complex inline shell commands",
       "globs": "['**/*']",
       "priority": "",
-      "technologies": [
-        "go"
-      ],
+      "technologies": ["go"],
       "type": "master",
       "size": 1459,
       "line_count": 34
@@ -209,11 +174,7 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "java",
-        "javascript",
-        "typescript"
-      ],
+      "technologies": ["java", "javascript", "typescript"],
       "type": "master",
       "size": 2765,
       "line_count": 90
@@ -224,41 +185,28 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "go",
-        "sql"
-      ],
+      "technologies": ["go", "sql"],
       "type": "master",
       "size": 3255,
       "line_count": 88
     }
   ],
   "technology_map": {
-    "python": [
-      ".claude/rules/agents.md"
-    ],
+    "python": [".claude/rules/agents.md"],
     "typescript": [
       ".claude/rules/agents.md",
       ".claude/rules/code-standards.md",
       ".claude/rules/task-tracking.md"
     ],
-    "jest": [
-      ".claude/rules/cleanup-always.md"
-    ],
-    "rails": [
-      ".claude/rules/cleanup-always.md"
-    ],
-    "vitest": [
-      ".claude/rules/cleanup-always.md"
-    ],
+    "jest": [".claude/rules/cleanup-always.md"],
+    "rails": [".claude/rules/cleanup-always.md"],
+    "vitest": [".claude/rules/cleanup-always.md"],
     "api": [
       ".claude/rules/code-standards.md",
       ".claude/rules/deviation-rules.md",
       ".claude/rules/memory-protocol.md"
     ],
-    "nodejs": [
-      ".claude/rules/code-standards.md"
-    ],
+    "nodejs": [".claude/rules/code-standards.md"],
     "go": [
       ".claude/rules/deviation-protocol.md",
       ".claude/rules/deviation-rules.md",
@@ -268,9 +216,7 @@
       ".claude/rules/shell-command-safety.md",
       ".claude/rules/workspace-conventions.md"
     ],
-    "rest": [
-      ".claude/rules/git-workflow.md"
-    ],
+    "rest": [".claude/rules/git-workflow.md"],
     "java": [
       ".claude/rules/hooks.md",
       ".claude/rules/security.md",
@@ -281,12 +227,7 @@
       ".claude/rules/security.md",
       ".claude/rules/task-tracking.md"
     ],
-    "rust": [
-      ".claude/rules/security.md",
-      ".claude/rules/sharp-edges.md"
-    ],
-    "sql": [
-      ".claude/rules/workspace-conventions.md"
-    ]
+    "rust": [".claude/rules/security.md", ".claude/rules/sharp-edges.md"],
+    "sql": [".claude/rules/workspace-conventions.md"]
   }
 }

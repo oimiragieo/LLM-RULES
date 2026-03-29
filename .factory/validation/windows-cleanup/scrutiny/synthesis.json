@@ -46,8 +46,6 @@
   "orchestratorOverride": {
     "timestamp": "2026-03-29T10:00:00.000Z",
     "reason": "Override scrutiny after 4 failed worker attempts (inactivity timeout / exit code 0). The sole blocking issue from round 1 (rule-index determinism) was fixed in feature fix-rule-index-determinism (commit 2b7c7add). All CI gates pass: validate:full 0, lint 0, test:tools 462/0, format:check clean. Worker repeatedly times out on re-run, likely due to GPT-5.4 compatibility with scrutiny bootstrapping.",
-    "overriddenIssues": [
-      "rule-index determinism - fixed in fix-rule-index-determinism"
-    ]
+    "overriddenIssues": ["rule-index determinism - fixed in fix-rule-index-determinism"]
   }
 }

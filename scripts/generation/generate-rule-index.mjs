@@ -9,6 +9,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import { spawnSync } from 'child_process';
 
 // Try to import js-yaml, fallback to simple parsing if not available
 let yaml;
@@ -443,6 +444,22 @@ async function generateIndex() {
 
   // Write index file
   await fs.writeFile(OUTPUT_PATH, JSON.stringify(index, null, 2) + '\n', 'utf-8');
+
+  // Run prettier on the output file to ensure consistent formatting
+  // Use spawnSync with array args to avoid command injection
+  try {
+    const result = spawnSync('pnpm', ['exec', 'prettier', '--write', OUTPUT_PATH], {
+      cwd: ROOT,
+      stdio: 'pipe', // Suppress output
+      shell: process.platform === 'win32', // Use shell on Windows for pnpm.cmd
+    });
+    if (result.status !== 0) {
+      console.warn('⚠️  Could not run prettier on output file, formatting may differ');
+    }
+  } catch {
+    // If prettier fails, the file is still valid JSON, just may not be formatted
+    console.warn('⚠️  Could not run prettier on output file, formatting may differ');
+  }
 
   // Calculate approximate token count (rough estimate: 1 token ≈ 4 chars)
   const indexSize = JSON.stringify(index).length;

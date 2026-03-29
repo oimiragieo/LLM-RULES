@@ -10,7 +10,11 @@
       "id": "VAL-WP-001",
       "status": "pass",
       "steps": [
-        { "action": "Run pnpm validate:full:parallel", "expected": "Exit code 0", "observed": "Exit code 0" }
+        {
+          "action": "Run pnpm validate:full:parallel",
+          "expected": "Exit code 0",
+          "observed": "Exit code 0"
+        }
       ],
       "evidence": {
         "terminal": ["windows-cleanup/windows-cleanup-all/VAL-WP-001-validate-full-parallel.txt"]
@@ -31,7 +35,11 @@
       "status": "fail",
       "reason": "output failed (SyntaxError in pnpm inside WSL bash due to ?. token support issue)",
       "steps": [
-        { "action": "Run bash .factory/init.sh", "expected": "Exit code 0", "observed": "Exit code 1" }
+        {
+          "action": "Run bash .factory/init.sh",
+          "expected": "Exit code 0",
+          "observed": "Exit code 1"
+        }
       ],
       "evidence": {
         "terminal": ["windows-cleanup/windows-cleanup-all/VAL-WP-003-init-sh.txt"]
@@ -42,7 +50,11 @@
       "id": "VAL-WP-004",
       "status": "pass",
       "steps": [
-        { "action": "Run pnpm index-rules && git diff --stat", "expected": "0 changes to generated files", "observed": "0 changes to generated files" }
+        {
+          "action": "Run pnpm index-rules && git diff --stat",
+          "expected": "0 changes to generated files",
+          "observed": "0 changes to generated files"
+        }
       ],
       "evidence": {
         "terminal": ["windows-cleanup/windows-cleanup-all/VAL-WP-004-index-rules.txt"]
@@ -64,7 +76,11 @@
       "id": "VAL-WP-006",
       "status": "pass",
       "steps": [
-        { "action": "Run test on tokens.md", "expected": "Exit code 0 and file exists", "observed": "Exit code 0" }
+        {
+          "action": "Run test on tokens.md",
+          "expected": "Exit code 0 and file exists",
+          "observed": "Exit code 0"
+        }
       ],
       "evidence": {
         "terminal": ["windows-cleanup/windows-cleanup-all/VAL-WP-006-tokens-command.txt"]
