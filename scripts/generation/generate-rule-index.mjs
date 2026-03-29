@@ -441,7 +441,7 @@ async function generateIndex() {
   await fs.mkdir(outputDir, { recursive: true });
 
   // Write index file
-  await fs.writeFile(OUTPUT_PATH, JSON.stringify(index, null, 2), 'utf-8');
+  await fs.writeFile(OUTPUT_PATH, JSON.stringify(index, null, 2) + '\n', 'utf-8');
 
   // Calculate approximate token count (rough estimate: 1 token ≈ 4 chars)
   const indexSize = JSON.stringify(index).length;

@@ -18,13 +18,36 @@ const { exec } = require('child_process');
 const util = require('util');
 const execAsync = util.promisify(exec);
 
+const path = require('path');
+
+// Use path.resolve for cross-platform path resolution
+// All paths resolved from repository root
+const ROOT = process.cwd();
 const VALIDATIONS = [
-  { name: 'validate-config', cmd: 'node scripts/validation/validate-config.cjs' },
-  { name: 'validate-models', cmd: 'node scripts/validation/validate-models.cjs' },
-  { name: 'validate-archived-tests', cmd: 'node scripts/validation/validate-archived-tests.mjs' },
-  { name: 'validate-agents', cmd: 'node scripts/validation/validate-agents.cjs' },
-  { name: 'validate-hooks', cmd: 'node scripts/validation/validate-hooks.cjs' },
-  { name: 'validate-skills', cmd: 'node scripts/validation/validate-skills.cjs' },
+  {
+    name: 'validate-config',
+    cmd: `node "${path.join(ROOT, 'scripts/validation/validate-config.mjs')}"`,
+  },
+  {
+    name: 'validate-models',
+    cmd: `node "${path.join(ROOT, 'scripts/validation/validate-model-names.mjs')}"`,
+  },
+  {
+    name: 'validate-archived-tests',
+    cmd: `node "${path.join(ROOT, 'scripts/validation/validate-archived-tests.mjs')}"`,
+  },
+  {
+    name: 'validate-agents',
+    cmd: `node "${path.join(ROOT, '.claude/tools/cli/validate-agents.mjs')}"`,
+  },
+  {
+    name: 'validate-hooks',
+    cmd: `node "${path.join(ROOT, 'scripts/validation/validate-hooks-doc-sync.cjs')}"`,
+  },
+  {
+    name: 'validate-skills',
+    cmd: `node "${path.join(ROOT, '.claude/tools/cli/validate-skill-agent-consistency.mjs')}"`,
+  },
 ];
 
 async function runValidation({ name, cmd }) {

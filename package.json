@@ -97,7 +97,7 @@
     "test:staging": "cross-env AGENT_STUDIO_ENV=staging node --test --test-concurrency=1 tests/*.test.mjs",
     "test:unit": "node --test --test-concurrency=1 tests/unit/**/*.test.mjs tests/unit/**/*.test.cjs",
     "test:integration": "node --test tests/integration/*.test.mjs",
-    "test:tools": "node --test --test-concurrency=1 \".claude/tools/**/*.test.mjs\" \".claude/tools/**/*.test.cjs\"",
+    "test:tools": "node scripts/test-tools-runner.cjs",
     "test:framework": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs .claude/lib/**/*.test.cjs tests/hooks/*.test.cjs tests/lib/agents/*.test.cjs tests/lib/config/*.test.cjs tests/lib/qa/*.test.cjs tests/lib/plan/*.test.cjs tests/lib/memory/*.test.cjs tests/lib/monitoring/*.test.cjs tests/lib/routing/*.test.cjs tests/lib/spawn/*.test.cjs tests/lib/text-processing/*.test.cjs tests/lib/tools/*.test.cjs tests/lib/scheduler/*.test.cjs tests/lib/reflection/*.test.cjs",
     "test:framework:memory": "node --test --test-concurrency=1 tests/lib/memory/*.test.cjs",
     "test:framework:hooks": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs",

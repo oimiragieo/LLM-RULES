@@ -407,7 +407,7 @@ class AgentRegistryGenerator {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(outputPath, JSON.stringify(registry, null, 2));
+    fs.writeFileSync(outputPath, JSON.stringify(registry, null, 2) + '\n');
     console.log(`Registry saved to ${outputPath}`);
   }
 }

@@ -667,7 +667,7 @@ function main() {
   }
 
   // Write index
-  fs.writeFileSync(INDEX_PATH, JSON.stringify(index, null, 2));
+  fs.writeFileSync(INDEX_PATH, JSON.stringify(index, null, 2) + '\n');
 
   console.log(`Index generated successfully!`);
   console.log(`Output: ${INDEX_PATH}`);
