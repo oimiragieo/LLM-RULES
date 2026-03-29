@@ -1,0 +1,21 @@
+{
+  "milestone": "windows-cleanup",
+  "round": 1,
+  "status": "fail",
+  "assertionsSummary": {
+    "total": 7,
+    "passed": 5,
+    "failed": 2,
+    "blocked": 0
+  },
+  "passedAssertions": ["VAL-WP-001", "VAL-WP-002", "VAL-WP-004", "VAL-WP-006", "VAL-WP-007"],
+  "failedAssertions": [
+    { "id": "VAL-WP-003", "reason": "init.sh relies on WSL bash executing node/pnpm. The WSL environment had an older node version causing a SyntaxError on '?.' in pnpm." },
+    { "id": "VAL-WP-005", "reason": ".claude/context/config/rule-index.json has code style issues after generation, meaning format:check did not pass." }
+  ],
+  "blockedAssertions": [],
+  "appliedUpdates": [
+    { "target": "user-testing.md", "description": "cmd /c needed for executing `pnpm index-rules && git diff --stat` because `&&` is not supported in the default PowerShell runner.", "source": "flow-report" }
+  ],
+  "previousRound": null
+}

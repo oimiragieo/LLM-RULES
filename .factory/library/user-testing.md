@@ -35,6 +35,7 @@ All suites complete within 5 minutes individually.
 
 ## Flow Validator Guidance: CLI
 
+- Note on PowerShell: When chaining commands with `&&` (e.g., `pnpm index-rules && git diff`), prepend the command with `cmd /c ` because `&&` is not supported in the default PowerShell runner.
 - Isolation: Tests can generally be run concurrently as they do not mutate shared global state, except that heavy test suites (like `pnpm test:all`) might compete for CPU/RAM.
 - Validation is purely CLI-based. Use `Execute` tool to run the required `pnpm` and `node` commands.
 - Check the output of commands carefully to verify pass/fail criteria.
