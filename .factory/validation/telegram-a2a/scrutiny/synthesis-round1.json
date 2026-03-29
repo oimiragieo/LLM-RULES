@@ -1,0 +1,45 @@
+{
+  "milestone": "telegram-a2a",
+  "round": 1,
+  "status": "fail",
+  "validatorsRun": {
+    "test": { "passed": true, "command": "pnpm test:framework", "exitCode": 0 },
+    "typecheck": { "passed": true, "command": "pnpm validate:full", "exitCode": 0 },
+    "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 }
+  },
+  "reviewsSummary": {
+    "total": 4,
+    "passed": 3,
+    "failed": 1,
+    "failedFeatures": ["wire-a2a-router-integration"]
+  },
+  "blockingIssues": [
+    {
+      "featureId": "wire-a2a-router-integration",
+      "severity": "blocking",
+      "description": "Missing integration wiring. The router should dispatch tasks to channel session via A2A HTTP, but no router code was modified to use A2AClient."
+    }
+  ],
+  "appliedUpdates": [
+    {
+      "target": "library/testing-quirks.md",
+      "description": "Added note that supertest hangs on SSE endpoints and to use raw http module instead.",
+      "sourceFeature": "build-a2a-client-and-server-tests"
+    },
+    {
+      "target": "library/windows-quirks.md",
+      "description": "Added notes about Windows AggregateError for network failures and powershell requirement for PID resolution.",
+      "sourceFeature": "build-a2a-client-and-server-tests"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Clarify if detached background process hooks (like auto-start/shutdown) are exempt from the 'All hooks must exit with valid JSON on stdout' rule. The existing reference pattern (`channel-auto-start.cjs`) exits silently, leading workers to copy the non-compliant pattern.",
+      "evidence": "Feature build-a2a-autostart-hook correctly copied channel-auto-start.cjs behavior, resulting in process.exit(0) without JSON stdout.",
+      "isSystemic": true
+    }
+  ],
+  "rejectedObservations": [],
+  "previousRound": null
+}
