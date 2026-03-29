@@ -1,0 +1,25 @@
+{
+  "milestone": "test-compliance",
+  "round": 1,
+  "status": "fail",
+  "assertionsSummary": {
+    "total": 19,
+    "passed": 14,
+    "failed": 5,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-TC-003", "VAL-TC-004", "VAL-TC-005", "VAL-TC-006", "VAL-TC-007", "VAL-TC-008", 
+    "VAL-TC-009", "VAL-TC-012", "VAL-TC-013", "VAL-TC-014", "VAL-TC-015", "VAL-TC-016", "VAL-TC-017", "VAL-TC-018"
+  ],
+  "failedAssertions": [
+    { "id": "VAL-TC-001", "reason": "Validation script failed due to expecting flat agent matrix instead of category-grouped structure." },
+    { "id": "VAL-TC-002", "reason": "Validation script failed due to expecting flat agent matrix instead of category-grouped structure." },
+    { "id": "VAL-TC-010", "reason": "metrics:ci failed: Runtime p95 1870ms exceeds 800ms threshold." },
+    { "id": "VAL-TC-011", "reason": "test failed: 2 test failures out of 9058 tests." },
+    { "id": "VAL-TC-019", "reason": "format:check failed: Code style issues found in 3 files." }
+  ],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}

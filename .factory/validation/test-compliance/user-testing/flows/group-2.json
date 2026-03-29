@@ -1,0 +1,112 @@
+{
+  "groupId": "group-2",
+  "testedAt": "2026-03-28T00:00:00Z",
+  "isolation": {
+    "execution": "CLI directly in repository root"
+  },
+  "toolsUsed": ["pnpm", "node", "rg"],
+  "results": [
+    {
+      "assertionId": "VAL-TC-001",
+      "status": "fail",
+      "notes": "Agent skill matrix covers all 119 registry agents. Script output showed 'matrix: 4 registry: 119' and listed 115 missing agents.",
+      "evidence": {
+        "text": ["test-compliance/group-2/VAL-TC-001-output.txt"]
+      }
+    },
+    {
+      "assertionId": "VAL-TC-002",
+      "status": "fail",
+      "notes": "All 119 agents have token-saver-context-compression in always array. Script output showed 'FAIL [ \\'core\\', \\'domain\\', \\'specialized\\', \\'orchestrators\\' ]'.",
+      "evidence": {
+        "text": ["test-compliance/group-2/VAL-TC-002-output.txt"]
+      }
+    },
+    {
+      "assertionId": "VAL-TC-003",
+      "status": "pass",
+      "notes": "Read-safety hook accepts context-compressor as valid skill evidence. Code inspection + unit tests (VAL-TC-005) passed."
+    },
+    {
+      "assertionId": "VAL-TC-004",
+      "status": "pass",
+      "notes": "Read-safety hook accepts token-saver-context-compression as valid skill evidence. Code inspection + unit tests (VAL-TC-005) passed."
+    },
+    {
+      "assertionId": "VAL-TC-005",
+      "status": "pass",
+      "notes": "Read safety test suite passed with 0 failures.",
+      "evidence": {
+        "text": ["test-compliance/group-2/VAL-TC-005-output.txt"]
+      }
+    },
+    {
+      "assertionId": "VAL-TC-006",
+      "status": "pass",
+      "notes": "Agent count test updated and passed. Expected total agent count (119).",
+      "evidence": {
+        "text": ["test-compliance/group-2/VAL-TC-006-015-output.txt"]
+      }
+    },
+    {
+      "assertionId": "VAL-TC-007",
+      "status": "pass",
+      "notes": "No ghost agent tmp-routing-* in routing table. Grep returned no matches."
+    },
+    {
+      "assertionId": "VAL-TC-008",
+      "status": "pass",
+      "notes": "Intent keyword overlap validator passed."
+    },
+    {
+      "assertionId": "VAL-TC-014",
+      "status": "pass",
+      "notes": "Routing validation passed.",
+      "evidence": {
+        "text": ["test-compliance/group-2/VAL-TC-014-output.txt"]
+      }
+    },
+    {
+      "assertionId": "VAL-TC-015",
+      "status": "pass",
+      "notes": "Agent search skill compliance test passed.",
+      "evidence": {
+        "text": ["test-compliance/group-2/VAL-TC-006-015-output.txt"]
+      }
+    },
+    {
+      "assertionId": "VAL-TC-016",
+      "status": "pass",
+      "notes": "Agent frontmatter search skills test passed.",
+      "evidence": {
+        "text": ["test-compliance/group-2/VAL-TC-016-output.txt"]
+      }
+    },
+    {
+      "assertionId": "VAL-TC-017",
+      "status": "pass",
+      "notes": "Agent search tool compliance test passed.",
+      "evidence": {
+        "text": ["test-compliance/group-2/VAL-TC-017-output.txt"]
+      }
+    },
+    {
+      "assertionId": "VAL-TC-018",
+      "status": "pass",
+      "notes": "Dual-compressor backward compat works at routing level. validate:routing and validate:agent-skill-refs passed.",
+      "evidence": {
+        "text": ["test-compliance/group-2/VAL-TC-018-output.txt"]
+      }
+    }
+  ],
+  "frictions": [
+    {
+      "description": "Script commands supplied in the validation contract for VAL-TC-001 and VAL-TC-002 expect flattened objects but agent-skill-matrix.json now contains category groups (core, domain, etc.). Both tests failed because of this mismatch.",
+      "resolved": false,
+      "resolution": "Reported as failures due to command output failure, as instructed by the contract.",
+      "affectedAssertions": ["VAL-TC-001", "VAL-TC-002"]
+    }
+  ],
+  "blockers": [],
+  "summary": "Tested 13 assertions: 11 passed, 2 failed (VAL-TC-001, VAL-TC-002 failed because the provided verification scripts do not match the current format of agent-skill-matrix.json)."
+}
