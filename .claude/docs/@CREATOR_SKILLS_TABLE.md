@@ -1,7 +1,7 @@
 # Creator Skills Table
 
 **Source:** CLAUDE.md Section 3 (subsection)
-**Version:** v2.2.1
+**Version:** v3.1.0
 **Last Updated:** 2026-02-15
 
 ---

@@ -618,7 +618,7 @@ Before calling `TaskUpdate({ status: "completed" })`, run the post-creation vali
 - Template catalog: `.claude/context/artifacts/catalogs/template-catalog.md`
 - Tests: `tests/` (NOT in `.claude/`)
 
-### Documentation References (CLAUDE.md v2.2.1)
+### Documentation References (CLAUDE.md v3.1.0)
 
 - Reference files use @notation: @TOOL_REFERENCE.md, @SKILL_CATALOG_TABLE.md
 - Located in: `.claude/docs/@*.md`

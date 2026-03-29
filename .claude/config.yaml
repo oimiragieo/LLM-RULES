@@ -3,7 +3,7 @@
 
 # --- Metadata (Version Tracking) ---
 metadata:
-  version: '2.2.2'
+  version: '3.1.0'
   last_updated: '2026-02-09'
   updated_by: 'developer-agent'
   config_modernization: 'Task #2 - Auto-compression enabled, env vars documented, agent models expanded'

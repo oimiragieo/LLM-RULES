@@ -1,7 +1,7 @@
 # EVOLVE Workflow
 
 **Source:** CLAUDE.md Section 4
-**Version:** v2.2.1
+**Version:** v3.1.0
 **Last Updated:** 2026-02-15
 
 ---

@@ -902,7 +902,7 @@ Use the template at `.claude/templates/workflows/workflow-template.md` for consi
 - Related skills: `.claude/skills/{name}/`
 - Related templates: `.claude/templates/`
 
-### Documentation References (CLAUDE.md v2.2.1)
+### Documentation References (CLAUDE.md v3.1.0)
 
 - Reference files use @notation: @ENTERPRISE_WORKFLOWS.md, @AGENT_ROUTING_TABLE.md
 - Located in: `.claude/docs/@*.md`

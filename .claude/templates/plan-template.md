@@ -505,7 +505,7 @@ This template uses the following tokens for customization:
 | --------------------------- | ----------------------------------- | ---------------------------------------------- | -------- |
 | `{{PLAN_TITLE}}`            | Title of the implementation plan    | "Spec-Kit Integration Plan"                    | Yes      |
 | `{{DATE}}`                  | Plan creation date (YYYY-MM-DD)     | "2026-01-28"                                   | Yes      |
-| `{{FRAMEWORK_VERSION}}`     | Current framework version           | "Agent-Studio v2.2.1"                          | Yes      |
+| `{{FRAMEWORK_VERSION}}`     | Current framework version           | "Agent-Studio v3.1.0"                          | Yes      |
 | `{{STATUS}}`                | Plan status                         | "Phase 0 - Research"                           | Yes      |
 | `{{EXECUTIVE_SUMMARY}}`     | Brief overview of the plan          | "Implementation plan for..."                   | Yes      |
 | `{{TOTAL_TASKS}}`           | Total number of tasks               | "14 atomic tasks"                              | Yes      |

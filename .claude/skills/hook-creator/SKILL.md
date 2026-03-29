@@ -1068,7 +1068,7 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
 - Related docs: `.claude/docs/`
 - Hook registry: `.claude/hooks/README.md`
 
-### Documentation References (CLAUDE.md v2.2.1)
+### Documentation References (CLAUDE.md v3.1.0)
 
 - Reference files use @notation: @ENFORCEMENT_HOOKS.md, @TOOL_REFERENCE.md
 - Located in: `.claude/docs/@*.md`

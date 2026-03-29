@@ -608,7 +608,7 @@ grep -E "^(name|description|agents|category|tags):" .claude/skills/<skill-name>/
 - Related hooks: `.claude/hooks/{category}/`
 - Related workflows: `.claude/workflows/{category}/`
 
-### Documentation References (CLAUDE.md v2.2.1)
+### Documentation References (CLAUDE.md v3.1.0)
 
 - Reference files use @notation: @SKILL_CATALOG_TABLE.md, @TOOL_REFERENCE.md
 - Located in: `.claude/docs/@*.md`

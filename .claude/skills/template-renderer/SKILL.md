@@ -315,7 +315,7 @@ Skill({
     tokens: {
       PLAN_TITLE: 'User Authentication Implementation Plan',
       DATE: '2026-01-28',
-      FRAMEWORK_VERSION: 'Agent-Studio v2.2.1',
+      FRAMEWORK_VERSION: 'Agent-Studio v3.1.0',
       STATUS: 'Phase 0 - Research',
       EXECUTIVE_SUMMARY: 'Implementation plan for JWT-based authentication...',
       TOTAL_TASKS: '14 atomic tasks',

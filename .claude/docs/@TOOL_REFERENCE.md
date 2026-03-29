@@ -1,7 +1,7 @@
 # Tool Reference
 
 **Source:** CLAUDE.md Section 1.4
-**Version:** v2.2.1
+**Version:** v3.1.0
 **Last Updated:** 2026-01-31
 
 ---

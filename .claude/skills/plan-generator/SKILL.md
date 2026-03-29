@@ -203,7 +203,7 @@ After creating plan data structure, invoke template-renderer to generate formatt
 const planTokens = {
   PLAN_TITLE: plan.title,
   DATE: new Date().toISOString().split('T')[0],
-  FRAMEWORK_VERSION: 'Agent-Studio v2.2.1',
+  FRAMEWORK_VERSION: 'Agent-Studio v3.1.0',
   STATUS: plan.status || 'Phase 0 - Research',
   EXECUTIVE_SUMMARY: plan.executiveSummary,
   TOTAL_TASKS: `${plan.totalTasks} atomic tasks`,
@@ -402,7 +402,7 @@ npm test -- --grep "auth" && echo "All auth tests passing"
 const tokens = {
   PLAN_TITLE: 'User Authentication Feature',
   DATE: '2026-01-28',
-  FRAMEWORK_VERSION: 'Agent-Studio v2.2.1',
+  FRAMEWORK_VERSION: 'Agent-Studio v3.1.0',
   STATUS: 'Phase 0 - Research',
   EXECUTIVE_SUMMARY: 'Add JWT-based authentication with login/logout endpoints...',
   TOTAL_TASKS: '8 atomic tasks',
