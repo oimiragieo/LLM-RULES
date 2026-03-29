@@ -1,0 +1,120 @@
+{
+  "auditDate": "2026-03-29",
+  "auditScope": ".claude/ configuration, data, and cross-referencing integrity",
+  "summary": {
+    "totalFindings": 8,
+    "critical": 1,
+    "high": 2,
+    "medium": 3,
+    "low": 2,
+    "pass": 6
+  },
+  "findings": [
+    {
+      "id": "CFG-001",
+      "area": "settings.json - Hook File Paths",
+      "severity": "PASS",
+      "description": "All 61 hook file paths in settings.json resolve to existing files on disk.",
+      "evidence": "Verified all 61 unique hook .cjs paths: 61 found, 0 missing."
+    },
+    {
+      "id": "CFG-002",
+      "area": "settings.json - Duplicate Registrations",
+      "severity": "PASS",
+      "description": "No duplicate event+matcher+command combinations found.",
+      "evidence": "Checked all hooks across 7 event types (UserPromptSubmit, PreToolUse, PostToolUse, PostToolUseFailure, SessionEnd, PreCompact, Stop)."
+    },
+    {
+      "id": "CFG-003",
+      "area": "config.yaml - Agent Model Assignments",
+      "severity": "MEDIUM",
+      "description": "9 agent files on disk are NOT registered in config.yaml. These are domain-router sub-routers that exist as .md files but lack config entries (no model assignment).",
+      "evidence": "Config: 111 agents, Disk: 119 agent .md files. Missing from config: domain-router-ai-ml, domain-router-arch-data, domain-router-backend, domain-router-infra, domain-router-mobile, domain-router-niche, domain-router-product, domain-router-security, domain-router-web-frontend",
+      "suggestedFix": "Add entries for the 9 domain-router agents in config.yaml under the agents section, or remove the orphaned .md files if they're not needed."
+    },
+    {
+      "id": "CFG-004",
+      "area": "config.yaml - Router Agent Path",
+      "severity": "LOW",
+      "description": "The 'router' agent in config.yaml points to .claude/CLAUDE.md (not a file in .claude/agents/). This is technically valid but inconsistent with the pattern of other agents.",
+      "evidence": "router: path: .claude/CLAUDE.md — file exists but is the main CLAUDE.md, not an agent definition file.",
+      "suggestedFix": "Consider clarifying this is intentional with a comment, or create a dedicated .claude/agents/core/router.md."
+    },
+    {
+      "id": "CFG-005",
+      "area": "config.yaml - Model Names",
+      "severity": "PASS",
+      "description": "All model assignments use valid model names: haiku (3), opus (17), sonnet (92). Total: 112 model assignments for 111 agents (router has model in routing section too).",
+      "evidence": "Model distribution: haiku=3, opus=17, sonnet=92"
+    },
+    {
+      "id": "CFG-006",
+      "area": "Tool Manifest Consistency",
+      "severity": "PASS",
+      "description": "Tool manifest tracks Claude's built-in tools (22 core + 9 MCP = 31 total), not .claude/tools/ skill directories. The manifest is internally consistent and self-describing.",
+      "evidence": "Manifest lists 22 core tools (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskCreate, TaskUpdate, TaskList, TaskGet, TaskOutput, TaskStop, Skill, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit, MemoryRecord) + 9 MCP tools. 491 skill tool directories exist on disk but are managed separately via skill-index."
+    },
+    {
+      "id": "CFG-007",
+      "area": "Agent Registry vs Config vs Disk",
+      "severity": "MEDIUM",
+      "description": "Agent registry (119) matches disk files (119) but config.yaml only defines 111. The 9 domain-router agents on disk + registry are absent from config.yaml.",
+      "evidence": "Registry: 119 agents (metadata.totalAgents=119), Config: 111 agents, Disk: 119 .md files. The registry is in sync with disk but config.yaml is 8 behind.",
+      "suggestedFix": "Add the 9 domain-router agents to config.yaml to achieve full three-way sync."
+    },
+    {
+      "id": "CFG-008",
+      "area": "Broken require() Chains",
+      "severity": "HIGH",
+      "description": "16 broken require() paths found across .claude/hooks/ and .claude/lib/. 14 are in non-production lib modules (workers/, events/, db/, utils/), and 2 are intentional test fixtures in require-analyzer.cjs.",
+      "evidence": "Broken paths found in: archive-retention.cjs, worker-pool.cjs, dispatcher.cjs, collector.cjs, budget-enforcement.cjs, enforcement-defaults.cjs, path-constants.cjs, safe-rename.cjs, safe-path.cjs, require-analyzer.cjs (2 test fixtures), event-bus.cjs, event-types.cjs, sqlite-manager.cjs, queue-operations.cjs, server.cjs (a2a). All use absolute-style paths (e.g., '.claude/lib/utils/...') instead of relative paths.",
+      "suggestedFix": "These 14 files use paths like require('.claude/lib/utils/X') which resolve relative to CWD, not the file. Convert to proper relative require() paths (e.g., './X' or '../../lib/X')."
+    },
+    {
+      "id": "CFG-009",
+      "area": "Self-Referencing Modules (Pseudo-Circular Dependencies)",
+      "severity": "LOW",
+      "description": "4 utility modules contain require() calls to themselves in JSDoc comments/examples, not in executable code. These are documentation self-references, not runtime circular deps.",
+      "evidence": "hook-input.cjs (line 9, JSDoc example), safe-json.cjs (line 13, JSDoc example), atomic-write.cjs (line 17, JSDoc example), token-budget-tracker.cjs (line 8, JSDoc example). All are in comment blocks showing usage examples.",
+      "suggestedFix": "No fix needed — these are documentation patterns. However, the require-analysis regex should skip JSDoc blocks to avoid false positives."
+    },
+    {
+      "id": "CFG-010",
+      "area": "True Circular Dependencies",
+      "severity": "PASS",
+      "description": "No real circular dependency chains found between routing/, memory/, or hooks<->lib boundaries. The 23 'cross-boundary cycles' initially detected were all false positives caused by the JSDoc self-reference pattern in hook-input.cjs and safe-json.cjs.",
+      "evidence": "Traced dependency graphs for 30+ hook files and all memory modules. All apparent cycles terminated at JSDoc self-references."
+    },
+    {
+      "id": "CFG-011",
+      "area": "Environment Variable Coverage",
+      "severity": "MEDIUM",
+      "description": "21 environment variables defined in .env.example are not referenced anywhere in .claude/ code. These may be dead configuration entries or consumed by external tools.",
+      "evidence": "Unreferenced vars: MCP_CONNECTION_NONBLOCKING, MCP_SERVER_CONNECTION_BATCH_SIZE, SMART_DEBUG_HITL, HEARTBEAT_AUTO_START, BASH_CWD_VALIDATOR, VARIABLE_QUOTING_VALIDATOR, ANTHROPIC_BETA, TASK_CLEANUP_RETENTION_MS, TASK_CLEANUP_INTERVAL_MS, TASK_CLEANUP_BATCH_SIZE, TELEGRAM_BOT_USERNAME, TELEGRAM_OWNER_USERNAME, TELEGRAM_CHAT_IDS, ARXIV_KEYWORDS, ARXIV_MAX_RESULTS, ARXIV_LOOKBACK_DAYS, EXA_MONITOR_TOPICS, EXA_MAX_RESULTS, EXA_AUTOPROMPT, ADVERSARIAL_REVIEW, TASK_GUARDRAIL_ENFORCEMENT",
+      "suggestedFix": "Audit each: remove truly dead vars from .env.example, or add code references if they're used by external scripts/tools not in .claude/."
+    },
+    {
+      "id": "CFG-012",
+      "area": "Data File Integrity",
+      "severity": "PASS",
+      "description": "All critical JSON files parse successfully. All expected context files are present. Memory directory structure is intact with expected subdirectories.",
+      "evidence": "Verified: agent-registry.json (425KB), rule-index.json (6KB), module-size-baseline.json (3KB), agent-skill-matrix.json (73KB). Memory dirs: archive/ (38 files), ltm/ (34 files), metrics/ (32 files), mtm/ (9 files), named/ (3 files), stm/ (2 files), queue/ (1 file). Note: .claude/context/config/tool-manifest.json does not exist (manifest is at .claude/config/tool-manifest.json instead)."
+    },
+    {
+      "id": "CFG-013",
+      "area": "Dangling Delegation PID File",
+      "severity": "HIGH",
+      "description": "A PID-specific delegation file exists: delegations.pid-614072.json. This appears to be a stale lock/temp file that was not cleaned up after a previous session.",
+      "evidence": ".claude/context/memory/delegations.pid-614072.json (709 bytes) exists alongside delegations.json (674 bytes).",
+      "suggestedFix": "Delete delegations.pid-614072.json if PID 614072 is no longer running. Add cleanup logic to session-end hooks."
+    },
+    {
+      "id": "CFG-014",
+      "area": "Data Directory Test Artifacts",
+      "severity": "CRITICAL",
+      "description": ".claude/data/ contains test artifacts that should not be in production: test-fastembed-gpu-cpu and test-fastembed-gpu-gpu directories alongside the legitimate code-index directory.",
+      "evidence": ".claude/data/ contains: code-index, test-fastembed-gpu-cpu, test-fastembed-gpu-gpu",
+      "suggestedFix": "Remove test-fastembed-gpu-cpu and test-fastembed-gpu-gpu directories. Add .claude/data/test-* to .gitignore."
+    }
+  ]
+}
