@@ -242,10 +242,13 @@ class TaskStateMachine {
    * @param {string} id - Task ID
    * @param {string} newStatus - Target state
    * @param {string|null} [error] - Error message (for failed transitions)
+   * @param {object} [metadata] - Optional metadata for completed tasks:
+   *   - result: Task result object
+   *   - artifacts: Array of artifact objects
    * @returns {object} Updated task snapshot
    * @throws {Error} If task not found or transition is invalid
    */
-  transition(id, newStatus, error = null) {
+  transition(id, newStatus, error = null, metadata = null) {
     const task = this._tasks.get(id);
     if (!task) {
       throw new Error(`Task not found: ${id}`);
@@ -258,6 +261,21 @@ class TaskStateMachine {
 
     task.status = newStatus;
     task.updatedAt = new Date().toISOString();
+
+    // Store error on task object for failed transitions
+    if (error) {
+      task.error = error;
+    }
+
+    // Store result and artifacts for completed tasks
+    if (metadata) {
+      if (metadata.result !== undefined) {
+        task.result = metadata.result;
+      }
+      if (metadata.artifacts !== undefined) {
+        task.artifacts = metadata.artifacts;
+      }
+    }
 
     this._persistTransition(id, newStatus, error);
 
