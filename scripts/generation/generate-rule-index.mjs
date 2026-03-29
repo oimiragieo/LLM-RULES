@@ -416,9 +416,10 @@ async function generateIndex() {
   const technologyMap = buildTechnologyMap(allRules);
 
   // Create index structure
+  // Note: No generated_at timestamp - removed for determinism
+  // The index content should be identical on repeated runs if no rules changed
   const index = {
     version: '1.1.0', // Updated: Added versioning metadata
-    generated_at: new Date().toISOString(),
     prebuilt: isPrebuilt,
     total_rules: allRules.length,
     master_rules: masterRules.length,
