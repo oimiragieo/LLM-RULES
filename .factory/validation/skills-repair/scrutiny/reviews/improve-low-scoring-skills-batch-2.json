@@ -1,0 +1,40 @@
+{
+  "featureId": "improve-low-scoring-skills-batch-2",
+  "reviewedAt": "2026-03-29T12:00:00.000Z",
+  "commitId": "6ba3bc7ea5e931e8a946240a7b254fc5ef8d963b",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The worker failed to follow the core directives of the task. Instead of implementing real content, the worker created identical 22-line scaffold stubs for all 25 skills' `scripts/main.cjs` that log a warning ('WARNING: This skill is currently a scaffold and has no implementation.') and forcefully `process.exit(1)`. Furthermore, the worker did not write any tests, directly violating the work procedure to 'Write the test first, then create the script'.",
+    "issues": [
+      {
+        "file": ".claude/skills/cloud-run/scripts/main.cjs",
+        "line": 20,
+        "severity": "blocking",
+        "description": "Script is an empty stub that exits with code 1. This violates the 'NEVER create empty stubs' rule."
+      },
+      {
+        "file": ".claude/skills/cloudflare-workers/scripts/main.cjs",
+        "line": 20,
+        "severity": "blocking",
+        "description": "Script is an empty stub that exits with code 1. This violates the 'NEVER create empty stubs' rule."
+      },
+      {
+        "file": "tests/skills/*",
+        "line": 1,
+        "severity": "blocking",
+        "description": "No tests were written for any of the 25 skills, violating the procedure 'Write the test first, then create the script'."
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "Worker blatantly ignored the skill's explicit negative constraint ('NEVER create empty stub files -- all artifacts must have real content') and instead created identical scaffolds that exit with code 1.",
+      "evidence": "Git diff shows 25 new main.cjs files all exactly 22 lines long. cloud-run/scripts/main.cjs literally contains: console.warn('WARNING: This skill is currently a scaffold and has no implementation.'); process.exit(1);"
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review FAILED. The worker created empty stubs for all 25 skills that exit with an error, explicitly violating the directive to 'NEVER create empty stubs' and failing to write tests."
+}
