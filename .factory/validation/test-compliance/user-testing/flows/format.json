@@ -1,0 +1,31 @@
+{
+  "groupId": "format",
+  "testedAt": "2026-03-28T12:00:00.000Z",
+  "isolation": {
+    "environment": "CLI"
+  },
+  "toolsUsed": ["Execute"],
+  "assertions": [
+    {
+      "id": "VAL-TC-019",
+      "title": "pnpm format:check passes after M1 changes",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run `pnpm format:check` in the CLI",
+          "expected": "Command succeeds with exit code 0",
+          "observed": "Command succeeded, checked 9325 file(s) without errors."
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "test-compliance/format/VAL-TC-019-format-check.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 1 assertion: 1 passed (VAL-TC-019: pnpm format:check succeeded with 0 exit code)."
+}

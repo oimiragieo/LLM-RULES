@@ -1,0 +1,46 @@
+{
+  "groupId": "agent-matrix",
+  "testedAt": "2026-03-28T00:00:00.000Z",
+  "isolation": {
+    "type": "cli",
+    "directory": "C:\\dev\\projects\\agent-studio"
+  },
+  "toolsUsed": ["Execute"],
+  "assertions": [
+    {
+      "id": "VAL-TC-001",
+      "title": "Agent skill matrix covers all 119 registry agents",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node script to compare agent counts in registry and matrix",
+          "expected": "matrix: 119 registry: 119, missing: []",
+          "observed": "matrix: 119 registry: 119, missing: []"
+        }
+      ],
+      "evidence": {
+        "terminal": ["test-compliance/agent-matrix/VAL-TC-001-agent-count.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-TC-002",
+      "title": "All 119 agents have token-saver-context-compression in always array",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node script to verify token-saver-context-compression is in all always arrays",
+          "expected": "PASS []",
+          "observed": "PASS []"
+        }
+      ],
+      "evidence": {
+        "terminal": ["test-compliance/agent-matrix/VAL-TC-002-token-saver.txt"]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 2 assertions: 2 passed"
+}
