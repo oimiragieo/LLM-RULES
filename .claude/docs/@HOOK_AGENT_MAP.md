@@ -21,6 +21,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `post-task-unified.cjs`             | x      |             |          |            | x            |            |
 | `unified-reflection-handler.cjs`    | x      | x           | x        | x          | x            | x          |
 | `reflection-cleanup.cjs`            |        | x           | x        | x          |              | x          |
+| `reflection-data-aggregator.cjs`    |        | x           | x        | x          |              | x          |
 | `subagent-citation-guard.cjs`       |        | x           | x        | x          |              | x          |
 | `taskupdate-contract-validator.cjs` |        | x           | x        | x          |              | x          |
 | `pre-completion-validation.cjs`     |        | x           | x        | x          |              | x          |

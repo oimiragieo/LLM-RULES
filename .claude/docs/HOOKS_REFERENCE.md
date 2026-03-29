@@ -80,6 +80,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `reflection-cleanup.cjs`: Performs cleanup after reflections.
 - `artifact-scoring-ledger-hook.cjs`: Updates artifact scores.
 - `post-creation-integration.cjs`: Validates post-creation integration.
+- `reflection-data-aggregator.cjs`: Aggregates tool-call metrics and error data for reflection-agent consumption.
 - `post-pipeline-token-report.cjs`: Emits a token usage report when a pipeline-final TaskUpdate drains the session.
 - `post-pipeline-self-review.cjs`: Queues milestone self-review reflections when a pipeline-final TaskUpdate completes.
 - `subagent-citation-guard.cjs`: Validates subagent citations in task outputs.
