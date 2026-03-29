@@ -32,6 +32,15 @@ const MODEL_PRICING = {
 const DEFAULT_MODEL = 'sonnet';
 
 /**
+ * Default persistence path for token usage data.
+ * This path is used when load()/persist() are called without explicit paths.
+ */
+const DEFAULT_PERSISTENCE_PATH = path.join(
+  __dirname,
+  '../../context/metrics/token-usage.json'
+);
+
+/**
  * @typedef {Object} UsageRecord
  * @property {number} inputTokens
  * @property {number} outputTokens
@@ -41,9 +50,18 @@ const DEFAULT_MODEL = 'sonnet';
  */
 
 class TokenAccountant {
-  constructor() {
+  /**
+   * @param {string} [persistencePath] - Optional path for persistence file.
+   *        Defaults to .claude/context/metrics/token-usage.json
+   */
+  constructor(persistencePath) {
     /** @type {Map<string, UsageRecord[]>} */
     this._tasks = new Map();
+    /** @type {string} Path to persistence file */
+    this._persistencePath = persistencePath || DEFAULT_PERSISTENCE_PATH;
+
+    // VAL-RF-016: Load state on init to restore state after session restart
+    this.load(this._persistencePath);
   }
 
   /**
@@ -76,6 +94,15 @@ class TokenAccountant {
       agentType,
       timestamp: new Date().toISOString(),
     });
+
+    // VAL-RF-016: Persist after each recording to survive session restarts
+    // Use try-catch to prevent persistence failures from breaking the recording
+    try {
+      this.persist(this._persistencePath);
+    } catch (_err) {
+      // Silently fail persistence - recording is more important
+      // In production, this would log to stderr
+    }
   }
 
   /**
@@ -304,4 +331,5 @@ module.exports = {
   TokenAccountant,
   MODEL_PRICING,
   DEFAULT_MODEL,
+  DEFAULT_PERSISTENCE_PATH,
 };

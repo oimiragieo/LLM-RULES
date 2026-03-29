@@ -2,16 +2,26 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
 const {
   TokenAccountant,
   MODEL_PRICING,
+  DEFAULT_PERSISTENCE_PATH,
 } = require('../../.claude/lib/metrics/token-accountant.cjs');
 
 // --- helpers ---
 
+function makeTempPath() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'token-accountant-'));
+  return path.join(dir, 'token-usage.json');
+}
+
 function makeAccountant() {
-  return new TokenAccountant();
+  // Use temp path for isolation - tests should not pollute each other
+  return new TokenAccountant(makeTempPath());
 }
 
 // ─── MODEL_PRICING ──────────────────────────────────────────────────────────
@@ -298,9 +308,9 @@ describe('toJSON', () => {
   });
 });
 
-// ─── Persistence (VAL-RF-016, VAL-RF-017, VAL-RF-018, VAL-RF-019) ───────────
+// ─── Lifecycle Wiring ───────────────────────────────────────────────────────
 
-describe('persist and load', () => {
+describe('Lifecycle Wiring', () => {
   const fs = require('fs');
   const path = require('path');
   const os = require('os');
@@ -310,9 +320,114 @@ describe('persist and load', () => {
     return path.join(dir, 'token-usage.json');
   }
 
+  it('DEFAULT_PERSISTENCE_PATH is exported and points to correct location', () => {
+    assert.ok(typeof DEFAULT_PERSISTENCE_PATH === 'string');
+    assert.ok(DEFAULT_PERSISTENCE_PATH.endsWith('token-usage.json'));
+    // Check for both forward slash and backslash (platform-independent)
+    const normalizedPath = DEFAULT_PERSISTENCE_PATH.replace(/\\/g, '/');
+    assert.ok(normalizedPath.includes('context/metrics'));
+  });
+
+  it('constructor calls load() on init with default path', () => {
+    const filePath = makeTempPath();
+    // Create pre-existing data
+    const acc1 = new TokenAccountant(filePath);
+    acc1.recordUsage('task-preexisting', {
+      inputTokens: 500,
+      outputTokens: 250,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+
+    // Create new instance - should load on init
+    const acc2 = new TokenAccountant(filePath);
+    const cost = acc2.getTaskCost('task-preexisting');
+    assert.ok(cost !== null, 'Constructor should have loaded pre-existing data');
+    assert.equal(cost.inputTokens, 500, 'Input tokens should match after auto-load');
+  });
+
+  it('recordUsage() calls persist() automatically after each recording', () => {
+    const filePath = makeTempPath();
+    const acc = new TokenAccountant(filePath);
+
+    // Record usage - should auto-persist
+    acc.recordUsage('task-auto-persist', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+
+    // Verify file was written
+    assert.ok(fs.existsSync(filePath), 'Persistence file should be created automatically');
+
+    // Verify data by reading directly
+    const content = fs.readFileSync(filePath, 'utf8');
+    const data = JSON.parse(content);
+    assert.ok('task-auto-persist' in data.tasks, 'Task should be persisted');
+  });
+
+  it('multiple recordUsage() calls all persist correctly', () => {
+    const filePath = makeTempPath();
+    const acc = new TokenAccountant(filePath);
+
+    acc.recordUsage('task-1', { inputTokens: 100, outputTokens: 50, model: 'sonnet', agentType: 'dev' });
+    acc.recordUsage('task-2', { inputTokens: 200, outputTokens: 100, model: 'haiku', agentType: 'qa' });
+    acc.recordUsage('task-1', { inputTokens: 50, outputTokens: 25, model: 'sonnet', agentType: 'dev' });
+
+    // Create new instance to verify persistence
+    const acc2 = new TokenAccountant(filePath);
+    const total = acc2.getSessionTotal();
+    assert.equal(total.taskCount, 2, 'Both tasks should be persisted');
+    assert.equal(total.inputTokens, 350, 'All input tokens should be accumulated');
+    assert.equal(total.outputTokens, 175, 'All output tokens should be accumulated');
+  });
+
+  it('constructor accepts custom persistence path', () => {
+    const filePath = makeTempPath();
+    const acc = new TokenAccountant(filePath);
+    acc.recordUsage('custom-path-task', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+
+    // Verify custom path was used
+    assert.ok(fs.existsSync(filePath), 'Custom persistence path should be used');
+  });
+
+  it('persistence failure does not break recording', () => {
+    // Use an invalid path that will fail persistence
+    const acc = new TokenAccountant('/invalid/path/that/does/not/exist/token-usage.json');
+
+    // Should not throw even though persist will fail
+    assert.doesNotThrow(() => {
+      acc.recordUsage('task-fail-persist', {
+        inputTokens: 100,
+        outputTokens: 50,
+        model: 'sonnet',
+        agentType: 'dev',
+      });
+    });
+
+    // Data should still be in memory even if persist failed
+    const cost = acc.getTaskCost('task-fail-persist');
+    assert.ok(cost !== null, 'Data should be recorded in memory even if persist fails');
+  });
+});
+
+// ─── Persistence (VAL-RF-016, VAL-RF-017, VAL-RF-018, VAL-RF-019) ───────────
+
+describe('persist and load', () => {
+  function makeTempPath() {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'token-accountant-'));
+    return path.join(dir, 'token-usage.json');
+  }
+
   it('VAL-RF-016: persist() writes to disk, load() recovers data', () => {
     const filePath = makeTempPath();
-    const acc = new TokenAccountant();
+    const acc = new TokenAccountant(filePath);
     acc.recordUsage('task-1', {
       inputTokens: 1000,
       outputTokens: 500,
@@ -320,15 +435,11 @@ describe('persist and load', () => {
       agentType: 'dev',
     });
 
-    // Persist to disk
-    acc.persist(filePath);
-
-    // Verify file exists
+    // Verify file exists (auto-persisted by recordUsage)
     assert.ok(fs.existsSync(filePath), 'Persistence file should exist');
 
     // Create new instance and load
-    const acc2 = new TokenAccountant();
-    acc2.load(filePath);
+    const acc2 = new TokenAccountant(filePath);
 
     const cost = acc2.getTaskCost('task-1');
     assert.ok(cost !== null, 'Data should be recovered');
@@ -340,11 +451,8 @@ describe('persist and load', () => {
     const filePath = makeTempPath();
     fs.writeFileSync(filePath, '{ invalid json }', 'utf8');
 
-    const acc = new TokenAccountant();
-    // Should not throw
-    assert.doesNotThrow(() => {
-      acc.load(filePath);
-    });
+    const acc = new TokenAccountant(filePath);
+    // Should not throw on init with corrupted file
 
     // Should have empty state
     const total = acc.getSessionTotal();
@@ -354,11 +462,8 @@ describe('persist and load', () => {
   it('VAL-RF-018: load() handles missing file gracefully (no crash, empty state)', () => {
     const filePath = path.join(os.tmpdir(), 'nonexistent-token-usage-' + Date.now() + '.json');
 
-    const acc = new TokenAccountant();
-    // Should not throw
-    assert.doesNotThrow(() => {
-      acc.load(filePath);
-    });
+    const acc = new TokenAccountant(filePath);
+    // Should not throw on init with missing file
 
     // Should have empty state
     const total = acc.getSessionTotal();
@@ -367,7 +472,7 @@ describe('persist and load', () => {
 
   it('VAL-RF-019: persist() uses atomic writes (write-to-temp + rename)', () => {
     const filePath = makeTempPath();
-    const acc = new TokenAccountant();
+    const acc = new TokenAccountant(filePath);
     acc.recordUsage('task-1', {
       inputTokens: 100,
       outputTokens: 50,
@@ -375,10 +480,8 @@ describe('persist and load', () => {
       agentType: 'dev',
     });
 
-    // Persist should complete without error
-    assert.doesNotThrow(() => {
-      acc.persist(filePath);
-    });
+    // Persist should complete without error (recordUsage auto-persists)
+    assert.ok(fs.existsSync(filePath), 'File should exist after recordUsage');
 
     // Verify the file exists and has correct content
     const content = fs.readFileSync(filePath, 'utf8');
@@ -391,7 +494,7 @@ describe('persist and load', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'token-accountant-nested-'));
     const filePath = path.join(dir, 'subdir', 'token-usage.json');
 
-    const acc = new TokenAccountant();
+    const acc = new TokenAccountant(filePath);
     acc.recordUsage('task-1', {
       inputTokens: 100,
       outputTokens: 50,
@@ -399,16 +502,12 @@ describe('persist and load', () => {
       agentType: 'dev',
     });
 
-    assert.doesNotThrow(() => {
-      acc.persist(filePath);
-    });
-
     assert.ok(fs.existsSync(filePath), 'File should be created in nested directory');
   });
 
   it('load() + persist() preserves all task data', () => {
     const filePath = makeTempPath();
-    const acc = new TokenAccountant();
+    const acc = new TokenAccountant(filePath);
     acc.recordUsage('task-1', {
       inputTokens: 1000,
       outputTokens: 500,
@@ -428,10 +527,7 @@ describe('persist and load', () => {
       agentType: 'architect',
     });
 
-    acc.persist(filePath);
-
-    const acc2 = new TokenAccountant();
-    acc2.load(filePath);
+    const acc2 = new TokenAccountant(filePath);
 
     const total = acc2.getSessionTotal();
     assert.equal(total.taskCount, 3, 'All 3 tasks should be recovered');
@@ -443,9 +539,9 @@ describe('persist and load', () => {
     const filePath = makeTempPath();
     fs.writeFileSync(filePath, '{}', 'utf8');
 
-    const acc = new TokenAccountant();
+    const acc = new TokenAccountant(filePath);
     assert.doesNotThrow(() => {
-      acc.load(filePath);
+      // Load happens in constructor
     });
 
     const total = acc.getSessionTotal();
@@ -456,17 +552,16 @@ describe('persist and load', () => {
     const filePath = makeTempPath();
     fs.writeFileSync(filePath, '{"old": "data"}', 'utf8');
 
-    const acc = new TokenAccountant();
+    const acc = new TokenAccountant(filePath);
+    // Constructor will load corrupted/old format data and ignore it
     acc.recordUsage('new-task', {
       inputTokens: 100,
       outputTokens: 50,
       model: 'sonnet',
       agentType: 'dev',
     });
-    acc.persist(filePath);
 
-    const acc2 = new TokenAccountant();
-    acc2.load(filePath);
+    const acc2 = new TokenAccountant(filePath);
 
     const oldTask = acc2.getTaskCost('old');
     assert.equal(oldTask, null, 'Old data should be overwritten');
