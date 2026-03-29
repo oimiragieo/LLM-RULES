@@ -24,6 +24,8 @@ const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manage
 const { getHierarchicalTaskContext, validateHierarchicalTaskContext } = libRequire(
   path.join('routing', 'sub-router-selection.cjs')
 );
+// A2A dispatch integration for channel session routing
+const a2aDispatch = libRequire(path.join('routing', 'a2a-dispatch.cjs'));
 
 const state = require('./pre-task-unified-state.cjs');
 const helpers = require('./pre-task-unified-helpers.cjs');
@@ -506,6 +508,91 @@ function checkNestedWorktreeSpawn(hookInput, cwd = process.cwd()) {
 }
 
 /**
+ * A2A Dispatch Intercept for channel-responder tasks.
+ *
+ * When the target agent is channel-responder and A2A_AUTO_START is enabled,
+ * intercept the spawn and dispatch via A2A instead of spawning a local process.
+ *
+ * This allows the router to communicate with the channel session via HTTP
+ * instead of spawning a new process.
+ *
+ * @param {Object} toolInput - Task tool input
+ * @returns {Promise<{intercepted: boolean, dispatch?: object, message?: string}>}
+ */
+async function checkA2ADispatchIntercept(toolInput) {
+  // Check if A2A dispatch is explicitly disabled
+  const a2aDispatchMode = String(process.env.A2A_DISPATCH_MODE || 'auto').toLowerCase();
+  if (a2aDispatchMode === 'off') {
+    return { intercepted: false };
+  }
+
+  // Extract target agent type
+  const subagentType = String(toolInput.subagent_type || toolInput.agent_type || '').trim();
+
+  // Only intercept channel-responder targets
+  if (!a2aDispatch.isChannelSessionTarget(subagentType)) {
+    return { intercepted: false };
+  }
+
+  // Check if A2A is enabled and reachable (unless forced)
+  const forceA2A = a2aDispatchMode === 'force';
+  const a2aStatus = await a2aDispatch.getA2AStatus();
+
+  if (!a2aStatus.enabled && !forceA2A) {
+    return { intercepted: false };
+  }
+
+  // If A2A is not reachable and not forced, fall back to normal spawn
+  if (!a2aStatus.reachable && !forceA2A) {
+    process.stderr.write(
+      '[pre-task-unified] A2A dispatch: channel-responder target but A2A not reachable, using local spawn\n'
+    );
+    return { intercepted: false };
+  }
+
+  // Dispatch via A2A
+  const dispatchResult = await a2aDispatch.dispatchToChannelSession({
+    target: subagentType,
+    input: toolInput.prompt || '',
+    context: {
+      taskId: toolInput.task_id || toolInput.id,
+      description: toolInput.description,
+    },
+    taskId: toolInput.task_id || toolInput.id,
+    forceA2A,
+  });
+
+  if (dispatchResult.success) {
+    process.stderr.write(
+      `[pre-task-unified] A2A dispatch: task ${dispatchResult.taskId} sent to channel-responder via A2A (${dispatchResult.method})\n`
+    );
+    return {
+      intercepted: true,
+      dispatch: dispatchResult,
+      message: `Task dispatched via A2A to channel-responder. Task ID: ${dispatchResult.taskId}`,
+    };
+  }
+
+  // A2A dispatch failed but we have fallback
+  if (dispatchResult.fallback) {
+    process.stderr.write(
+      `[pre-task-unified] A2A dispatch: fallback to file IPC, task ${dispatchResult.taskId}\n`
+    );
+    return {
+      intercepted: true,
+      dispatch: dispatchResult,
+      message: `Task dispatched via file IPC fallback. Task ID: ${dispatchResult.taskId}`,
+    };
+  }
+
+  // Dispatch failed completely - log warning but allow normal spawn
+  process.stderr.write(
+    `[pre-task-unified] A2A dispatch failed: ${dispatchResult.error}, falling back to local spawn\n`
+  );
+  return { intercepted: false };
+}
+
+/**
  * Fix 4: Cap concurrent agents by counting active worktree directories.
  * Prevents spawning too many parallel agents which exhausts memory.
  *
@@ -670,6 +757,21 @@ async function runAllChecks(hookInput) {
   }
 
   updateLoopStateAfterAllow(hookInput);
+
+  // ── A2A dispatch intercept for channel-responder ────────────────────────
+  // When the target is channel-responder and A2A is available, dispatch via A2A.
+  const a2aInterceptResult = await checkA2ADispatchIntercept(toolInput);
+  if (a2aInterceptResult.intercepted) {
+    // Return the A2A dispatch result to the caller
+    // The hook passes (allow), but provides the dispatch result for the caller
+    return {
+      pass: true,
+      exitCode: 0,
+      a2aDispatch: a2aInterceptResult.dispatch,
+      message: a2aInterceptResult.message,
+    };
+  }
+
   // Preserve synchronous return contract for test and hook callers where possible.
   // Task lifecycle persistence is best-effort and can continue asynchronously.
   void updateTaskLifecycleStateAfterAllow(hookInput);
@@ -687,6 +789,7 @@ module.exports = {
   checkLoopPrevention,
   checkNestedWorktreeSpawn,
   checkConcurrentAgentCap,
+  checkA2ADispatchIntercept,
   isPlannerSpawn,
   isSecuritySpawn,
   isArchitectSpawn,
