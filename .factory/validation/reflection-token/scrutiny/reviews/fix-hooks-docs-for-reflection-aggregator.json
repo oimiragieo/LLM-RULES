@@ -1,0 +1,15 @@
+{
+  "featureId": "fix-hooks-docs-for-reflection-aggregator",
+  "reviewedAt": "2026-03-29T02:27:42.942Z",
+  "commitId": "25bf3b85",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The worker effectively updated the hook documentation. `reflection-data-aggregator.cjs` was added to both `HOOKS_REFERENCE.md` and `@HOOK_AGENT_MAP.md` matching existing patterns. The worker also correctly verified that `force-step0-execution.cjs` was already documented. The implementation successfully passes all related validation tests.",
+    "issues": []
+  },
+  "sharedStateObservations": [],
+  "addressesFailureFrom": null,
+  "summary": "Review passed. The documentation files were correctly updated to include the missing hook references, and the worker verified validation scripts passed successfully."
+}

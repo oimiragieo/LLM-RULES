@@ -1,0 +1,47 @@
+{
+  "milestone": "reflection-token",
+  "round": 1,
+  "status": "fail",
+  "validatorsRun": {
+    "test": { "passed": true, "command": "pnpm test:all", "exitCode": 0 },
+    "typecheck": { "passed": true, "command": "pnpm validate:full", "exitCode": 0 },
+    "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 },
+    "format": { "passed": true, "command": "pnpm format:check", "exitCode": 0 }
+  },
+  "reviewsSummary": {
+    "total": 4,
+    "passed": 3,
+    "failed": 1,
+    "failedFeatures": ["fix-reflection-hooks-and-token-reporting"]
+  },
+  "blockingIssues": [
+    {
+      "featureId": "fix-reflection-hooks-and-token-reporting",
+      "severity": "blocking",
+      "description": "The persist() and load() methods were added to TokenAccountant, but they are never called (e.g., load() in constructor, persist() on updates). The required persistence path (.claude/context/metrics/token-usage.json) is ignored, making the fix incomplete as data is still lost on restart."
+    }
+  ],
+  "appliedUpdates": [
+    {
+      "target": "library",
+      "description": "Added documentation about TokenAccountant not being instantiated in production.",
+      "sourceFeature": "fix-reflection-hooks-and-token-reporting"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Explicitly warn against running the full `pnpm test` suite during general verification due to extreme runtimes (400+ sec). Suggest targeted runs `node --test tests/...` instead.",
+      "evidence": "Feature verify-reflection-loop-and-queue timed out after 180s running full tests. Previous milestone workers had to be explicitly told not to run it.",
+      "isSystemic": true
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Remind workers that they are running in Windows PowerShell, so `&&` chaining does not work natively like in bash. They should use `;` or separate commands.",
+      "evidence": "Feature verify-reflection-loop-and-queue initially failed due to `cd ... && ...` syntax.",
+      "isSystemic": true
+    }
+  ],
+  "rejectedObservations": [],
+  "previousRound": null
+}
