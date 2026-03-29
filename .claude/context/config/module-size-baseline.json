@@ -9,7 +9,7 @@
   ".claude\\lib\\routing\\router-state.cjs": 811,
   ".claude\\hooks\\workflow\\post-creation-integration.cjs": 762,
   ".claude\\lib\\routing\\routing-table-intent-keywords-data.cjs": 754,
-  ".claude\\hooks\\routing\\pre-task-unified-core.cjs": 732,
+  ".claude\\hooks\\routing\\pre-task-unified-core.cjs": 835,
   ".claude\\lib\\workflow\\step-validators.cjs": 719,
   ".claude\\lib\\workflow\\workflow-cli.cjs": 714,
   ".claude\\lib\\memory\\contextual-memory.cjs": 706,
