@@ -3,11 +3,31 @@
   "blockers": [],
   "toolsUsed": ["Execute"],
   "results": [
-    { "assertionId": "VAL-TC-009", "status": "pass", "notes": "validate:full passed successfully." },
-    { "assertionId": "VAL-TC-010", "status": "fail", "notes": "metrics:ci failed: Runtime p95 1870ms exceeds 800ms threshold." },
-    { "assertionId": "VAL-TC-011", "status": "fail", "notes": "test failed: 2 test failures out of 9058 tests." },
+    {
+      "assertionId": "VAL-TC-009",
+      "status": "pass",
+      "notes": "validate:full passed successfully."
+    },
+    {
+      "assertionId": "VAL-TC-010",
+      "status": "fail",
+      "notes": "metrics:ci failed: Runtime p95 1870ms exceeds 800ms threshold."
+    },
+    {
+      "assertionId": "VAL-TC-011",
+      "status": "fail",
+      "notes": "test failed: 2 test failures out of 9058 tests."
+    },
     { "assertionId": "VAL-TC-012", "status": "pass", "notes": "test:framework passed all tests." },
-    { "assertionId": "VAL-TC-013", "status": "pass", "notes": "integration:headless passed successfully (144/144)." },
-    { "assertionId": "VAL-TC-019", "status": "fail", "notes": "format:check failed: Code style issues found in 3 files (.claude/config/skill-index.json, .claude/context/agent-registry.json, .claude/context/config/rule-index.json)." }
+    {
+      "assertionId": "VAL-TC-013",
+      "status": "pass",
+      "notes": "integration:headless passed successfully (144/144)."
+    },
+    {
+      "assertionId": "VAL-TC-019",
+      "status": "fail",
+      "notes": "format:check failed: Code style issues found in 3 files (.claude/config/skill-index.json, .claude/context/agent-registry.json, .claude/context/config/rule-index.json)."
+    }
   ]
 }
