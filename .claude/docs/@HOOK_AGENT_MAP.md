@@ -30,6 +30,8 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `adaptive-quality-gate.cjs`         | x      | x           | x        | x          | x            | x          |
 | `handover-detector.cjs`             | x      |             |          |            |              |            |
 | `channel-auto-start.cjs`            | x      |             |          |            |              |            |
+| `a2a-server-autostart.cjs`          | x      |             |          |            |              |            |
+| `a2a-shutdown.cjs`                  | x      |             |          |            |              |            |
 | `spawn-token-guard.cjs`             | x      | x           |          |            | x            |            |
 | `finish-only-guard.cjs`             | x      | x           |          |            | x            |            |
 | `session-end-memory-promotion.cjs`  | x      |             |          |            |              |            |

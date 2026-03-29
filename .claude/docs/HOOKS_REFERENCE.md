@@ -44,6 +44,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `session-budget-watchdog.cjs`: Monitors session token budget and limits.
 - `ccusage-statusline.cjs`: Displays real-time token usage and cost from ccusage CLI on each prompt. Fail-open (advisory).
 - `channel-auto-start.cjs`: Starts configured channel infrastructure on prompt submit when needed.
+- `a2a-server-autostart.cjs`: Launches the A2A Express server as a detached background subprocess on session start. Uses lockfile cooldown to prevent duplicate spawns. Records PID in terminal-pids.json.
 
 ### PreToolUse
 
@@ -105,6 +106,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `sanitize-debug-log.cjs`: In-place sanitization of debug logs.
 - `session-end-memory-promotion.cjs`: Promotes short-term contextual memory to long-term index.
 - `worktree-auto-cleanup.cjs`: Cleans up residual worktrees left over by subagents.
+- `a2a-shutdown.cjs`: Gracefully shuts down the A2A server when the session ends. Kills the A2A server PID recorded in terminal-pids.json and updates status to 'stopped'.
 
 ### Stop
 
