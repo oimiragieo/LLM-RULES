@@ -13,7 +13,9 @@ if command -v node &> /dev/null; then
     echo "WARNING: Node version $NODE_VERSION is too old. Node $NODE_MIN_MAJOR+ is required."
     echo "         Some scripts may fail with SyntaxError on optional chaining."
     echo "         Please upgrade Node.js to version $NODE_MIN_MAJOR or higher."
-    echo "         Continuing anyway, but expect potential issues."
+    echo "         Skipping dependency install to avoid SyntaxError."
+    echo "Init complete (skipped pnpm install due to old Node)."
+    exit 0
   fi
 else
   echo "WARNING: Node.js not found. Cannot verify Node version."
