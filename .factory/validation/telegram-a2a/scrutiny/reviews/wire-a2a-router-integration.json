@@ -1,0 +1,22 @@
+{
+  "featureId": "wire-a2a-router-integration",
+  "reviewedAt": "2026-03-29T04:45:00.000Z",
+  "commitId": "fdfe9a51",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The worker wrote a comprehensive test suite simulating A2A integration, but completely failed to implement the actual integration wiring in the router product code. The commit only contains test file additions and a minor schema update in task-state-machine.cjs. The router itself was never wired to dispatch tasks to the channel session via A2A HTTP.",
+    "issues": [
+      {
+        "file": ".claude/hooks/routing/user-prompt-unified.core.cjs",
+        "line": 1,
+        "severity": "blocking",
+        "description": "Missing integration wiring. The router should dispatch tasks to channel session via A2A HTTP, but no router code was modified to use A2AClient."
+      }
+    ]
+  },
+  "sharedStateObservations": [],
+  "addressesFailureFrom": null,
+  "summary": "Failed because the worker did not actually modify the router to use A2A. The worker only wrote tests that simulate the router's behavior."
+}

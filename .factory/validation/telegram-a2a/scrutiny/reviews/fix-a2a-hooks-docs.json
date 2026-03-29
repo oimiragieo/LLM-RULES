@@ -1,0 +1,15 @@
+{
+  "featureId": "fix-a2a-hooks-docs",
+  "reviewedAt": "2026-03-29T05:09:17.290Z",
+  "commitId": "dcd2a08d",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The worker correctly added documentation for the `a2a-server-autostart.cjs` and `a2a-shutdown.cjs` hooks to `HOOKS_REFERENCE.md` and `@HOOK_AGENT_MAP.md`. The implementation fully covers what the feature description and expected behavior require. There are no bugs or edge cases missed, as it is a documentation-only change that satisfies the validator.",
+    "issues": []
+  },
+  "sharedStateObservations": [],
+  "addressesFailureFrom": null,
+  "summary": "Passed review. The documentation for A2A hooks was successfully and accurately added, satisfying the validate:hooks:docs guardrail without any issues."
+}

@@ -1,0 +1,26 @@
+{
+  "featureId": "build-a2a-autostart-hook",
+  "reviewedAt": "2026-03-29T03:20:00.000Z",
+  "commitId": "a0eff308",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The implementation correctly follows the `channel-auto-start.cjs` pattern to spawn the A2A server as a detached background process using a `.bat` file and `start` command. It successfully uses an atomic lockfile, records the process ID in `terminal-pids.json`, and properly implements graceful shutdown via `a2a-shutdown.cjs` on session end. It also includes comprehensive tests covering edge cases like dead PIDs and tracker file corruption.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "conventions",
+      "observation": "AGENTS.md explicitly states 'All hooks must exit with valid JSON on stdout (hook contract)'. However, the worker followed the existing pattern in `channel-auto-start.cjs` which ends with `process.exit(0)` without outputting any JSON to stdout. The worker copied this exact behavior for both `a2a-server-autostart.cjs` and `a2a-shutdown.cjs`.",
+      "evidence": "In `.claude/hooks/a2a/a2a-server-autostart.cjs` the process exits with `process.exit(0)` missing any `process.stdout.write('{}')`."
+    },
+    {
+      "area": "skills",
+      "observation": "The skill instructions explicitly requested spawning via `.bat` file but reliably obtaining the PID of the detached process on Windows required the worker to use an undocumented `powershell` command fallback.",
+      "evidence": "In `.claude/hooks/a2a/a2a-server-autostart.cjs`, the worker added a retry loop using `execFileSync('powershell', ...)` to find the `cmd.exe` process with the specific window title."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "The feature was successfully implemented and passes code review. The worker correctly followed the provided skill instructions and reference patterns, creating robust auto-start and shutdown hooks along with an extensive suite of tests. A minor convention inconsistency regarding hook stdout JSON output was identified but it stems from the reference code."
+}
