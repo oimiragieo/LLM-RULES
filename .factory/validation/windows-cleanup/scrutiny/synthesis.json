@@ -1,0 +1,46 @@
+{
+  "milestone": "windows-cleanup",
+  "round": 1,
+  "status": "fail",
+  "validatorsRun": {
+    "test": { "passed": true, "command": "pnpm test:all", "exitCode": 0 },
+    "typecheck": { "passed": true, "command": "pnpm validate:full", "exitCode": 0 },
+    "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 }
+  },
+  "reviewsSummary": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "failedFeatures": ["fix-windows-platform-issues"]
+  },
+  "blockingIssues": [
+    {
+      "featureId": "fix-windows-platform-issues",
+      "severity": "blocking",
+      "description": "Worker did not fix the generator scripts to be deterministic. Running 'pnpm index-rules' leaves numerous files dirty in git status because the generated files use inconsistent key ordering or formatting. The worker bypassed this requirement by manually running prettier instead of fixing the underlying generator scripts."
+    }
+  ],
+  "appliedUpdates": [],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Workers must not bypass determinism requirements by running code formatters manually on generated files. Ensure generator scripts inherently output correctly-formatted and consistent code.",
+      "evidence": "Transcript shows: 'pnpm exec prettier --write .claude/config/skill-index.json .claude/context/config/rule-index.json'. A subsequent run of 'pnpm index-rules' leaves >100 files dirty.",
+      "isSystemic": false
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Workers must not ignore explicit task instructions, such as 'address warnings', simply because the blocking error has been fixed. All aspects of the feature description must be addressed.",
+      "evidence": "Handoff salientSummary states: 'validate:skills now passes with 0 errors (272 warnings remain).' and worker ignored the warnings.",
+      "isSystemic": false
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Workers must execute the broader test suites mandated by their skill procedures and the M1 Gate STRICT testing rules, rather than relying solely on targeted execution.",
+      "evidence": "Worker marked followedProcedure as true, but transcript shows worker only ran pnpm validate:full and validate:skills. No execution of pnpm test or test:framework is present.",
+      "isSystemic": true
+    }
+  ],
+  "rejectedObservations": [],
+  "previousRound": null
+}
