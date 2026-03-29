@@ -475,8 +475,25 @@ function checkGhostSkills(catalogMap, indexMap, agentToSkills, skillFilter) {
     const indexEntry = indexMap.get(skill);
     if (indexEntry && indexEntry.aliasOf) continue;
 
-    const skillMdPath = path.join(SKILLS_DIR, skill, 'SKILL.md');
-    if (!fs.existsSync(skillMdPath)) {
+    // Try multiple possible paths for nested skills
+    // 1. Direct path: .claude/skills/{skill}/SKILL.md
+    // 2. Nested path with 'skills' subdir (for scientific-skills/*): .claude/skills/{parent}/skills/{name}/SKILL.md
+    const directPath = path.join(SKILLS_DIR, skill, 'SKILL.md');
+    
+    // For nested skills like scientific-skills/rdkit, also check scientific-skills/skills/rdkit
+    const parts = skill.split('/');
+    const nestedPath = parts.length >= 2 
+      ? path.join(SKILLS_DIR, parts[0], 'skills', parts.slice(1).join('/'), 'SKILL.md')
+      : null;
+    
+    // Also check archive
+    const archivePath = path.join(SKILLS_DIR, '_archive', skill, 'SKILL.md');
+    
+    const skillExists = fs.existsSync(directPath) || 
+                        (nestedPath && fs.existsSync(nestedPath)) || 
+                        fs.existsSync(archivePath);
+
+    if (!skillExists) {
       // Check if maybe the skill directory exists under a sub-path
       const relPath = `.claude/skills/${skill}/SKILL.md`;
       findings.push({

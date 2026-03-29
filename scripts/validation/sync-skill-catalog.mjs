@@ -17,9 +17,7 @@ const PROJECT_ROOT = findProjectRoot();
 const CATALOG_PATH = path.join(
   PROJECT_ROOT,
   '.claude',
-  'context',
-  'artifacts',
-  'catalogs',
+  'docs',
   'skill-catalog.md'
 );
 const INDEX_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'skill-index.json');
