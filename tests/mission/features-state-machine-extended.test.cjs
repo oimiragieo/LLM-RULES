@@ -272,7 +272,9 @@ describe('Features State Machine - Extended Tests', () => {
         },
         err => {
           assert.ok(
-            err.code === 'INVALID_JSON' || err.message.includes('JSON') || err.message.includes('parse')
+            err.code === 'INVALID_JSON' ||
+              err.message.includes('JSON') ||
+              err.message.includes('parse')
           );
           assert.ok(err.details && err.details.path);
           return true;

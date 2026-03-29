@@ -379,7 +379,12 @@ describe('Features State Machine', () => {
 
     it('cancelled to any state throws INVALID_TRANSITION', () => {
       writeFeatures([
-        { id: 'feature-cancelled', description: 'Cancelled', status: 'cancelled', preconditions: [] },
+        {
+          id: 'feature-cancelled',
+          description: 'Cancelled',
+          status: 'cancelled',
+          preconditions: [],
+        },
       ]);
 
       const machine = new FeaturesStateMachine(featuresPath);
