@@ -1,0 +1,134 @@
+{
+  "groupId": "group-2",
+  "testedAt": "2026-03-28T23:10:00Z",
+  "isolation": {
+    "context": "CLI test commands, no shared global state mutations expected.",
+    "missionDir": "C:\\Users\\oimir\\.factory\\missions\\91ae9243-5217-4452-8593-40411a402f4b"
+  },
+  "toolsUsed": ["rg", "node"],
+  "assertions": [
+    {
+      "id": "VAL-RF-010",
+      "title": "force-step0-execution.cjs registered in settings.json",
+      "status": "pass",
+      "steps": [
+        { "action": "rg force-step0-execution .claude/settings.json", "expected": "Match found", "observed": "Match found" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-010.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-011",
+      "title": "reflection-data-aggregator.cjs registered in settings.json",
+      "status": "pass",
+      "steps": [
+        { "action": "rg reflection-data-aggregator .claude/settings.json", "expected": "Match found", "observed": "Match found" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-011.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-012",
+      "title": "All registered reflection hooks resolve to existing files",
+      "status": "pass",
+      "steps": [
+        { "action": "Script validation of all reflection hook paths", "expected": "ALL PASSED", "observed": "ALL PASSED" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-012.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-013",
+      "title": "Token report fires regardless of task wording",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test post-pipeline-token-report.test.cjs", "expected": "fires on metadata.pipelineComplete without keywords passes", "observed": "Test passed" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-013-015.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-014",
+      "title": "Token report has structural detection",
+      "status": "pass",
+      "steps": [
+        { "action": "Code inspection of post-pipeline-token-report.cjs", "expected": "Structural signal path explicitly defined", "observed": "pipelineComplete and isFinalTask structural logic found" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-014-inspection.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-015",
+      "title": "Token report avoids false positives on intermediate tasks",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test post-pipeline-token-report.test.cjs", "expected": "does NOT fire on intermediate task with 'final' substring passes", "observed": "Test passed" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-013-015.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-016",
+      "title": "TokenAccountant persists state to disk",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test token-accountant.test.cjs", "expected": "VAL-RF-016 tests pass", "observed": "persist() writes to disk, load() recovers data passed" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-016-019.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-017",
+      "title": "TokenAccountant recovers from corrupted persistence file",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test token-accountant.test.cjs", "expected": "VAL-RF-017 tests pass", "observed": "load() handles corrupted file gracefully passed" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-016-019.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-018",
+      "title": "TokenAccountant recovers from missing persistence file",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test token-accountant.test.cjs", "expected": "VAL-RF-018 tests pass", "observed": "load() handles missing file gracefully passed" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-016-019.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-019",
+      "title": "TokenAccountant persistence is atomic",
+      "status": "pass",
+      "steps": [
+        { "action": "Code inspection and unit test token-accountant.test.cjs", "expected": "atomicWriteJSONSync used and test passes", "observed": "atomicWriteJSONSync logic observed and VAL-RF-019 test passed" }
+      ],
+      "evidence": {
+        "terminal": ["reflection-token/group-2/VAL-RF-016-019.txt", "reflection-token/group-2/VAL-RF-019-inspection.txt"]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 10 assertions (VAL-RF-010 through VAL-RF-019): 10 passed."
+}

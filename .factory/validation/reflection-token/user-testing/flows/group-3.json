@@ -1,0 +1,85 @@
+{
+  "groupId": "group-3",
+  "testedAt": "2026-03-28T23:03:00.000Z",
+  "isolation": {
+    "context": "CLI test commands, no shared global state mutations expected. Tests are run locally on the existing codebase."
+  },
+  "toolsUsed": ["CLI"],
+  "assertions": [
+    {
+      "id": "VAL-RF-020",
+      "title": "Full RECE reflection loop completes end-to-end",
+      "status": "pass",
+      "steps": [
+        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-021",
+      "title": "Reflection queue includes semantic prior learnings",
+      "status": "pass",
+      "steps": [
+        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-022",
+      "title": "Reflection queue doesn't accumulate ghost entries",
+      "status": "pass",
+      "steps": [
+        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-023",
+      "title": "Reflection queue bounded by REFLECTION_QUEUE_MAX_LINES",
+      "status": "pass",
+      "steps": [
+        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-024",
+      "title": "Processed entries removed from queue",
+      "status": "pass",
+      "steps": [
+        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-025",
+      "title": "All reflection hook tests pass",
+      "status": "pass",
+      "steps": [
+        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 6 assertions: 6 passed. All reflection hook tests passed successfully."
+}

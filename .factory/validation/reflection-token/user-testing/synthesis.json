@@ -1,0 +1,43 @@
+{
+  "milestone": "reflection-token",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 26,
+    "passed": 26,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-RF-001",
+    "VAL-RF-002",
+    "VAL-RF-003",
+    "VAL-RF-004",
+    "VAL-RF-005",
+    "VAL-RF-006",
+    "VAL-RF-007",
+    "VAL-RF-008",
+    "VAL-RF-009",
+    "VAL-RF-010",
+    "VAL-RF-011",
+    "VAL-RF-012",
+    "VAL-RF-013",
+    "VAL-RF-014",
+    "VAL-RF-015",
+    "VAL-RF-016",
+    "VAL-RF-017",
+    "VAL-RF-018",
+    "VAL-RF-019",
+    "VAL-RF-020",
+    "VAL-RF-021",
+    "VAL-RF-022",
+    "VAL-RF-023",
+    "VAL-RF-024",
+    "VAL-RF-025",
+    "VAL-RF-026"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}

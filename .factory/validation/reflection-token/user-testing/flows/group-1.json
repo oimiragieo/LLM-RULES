@@ -1,0 +1,196 @@
+{
+  "groupId": "group-1",
+  "testedAt": "2026-03-28T12:00:00.000Z",
+  "isolation": {
+    "context": "CLI test commands, no shared global state mutations expected",
+    "missionDir": "C:\\Users\\oimir\\.factory\\missions\\91ae9243-5217-4452-8593-40411a402f4b"
+  },
+  "toolsUsed": [
+    "node"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-RF-001",
+      "title": "Score tracker handles 0-1 scale scores correctly",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/lib/reflection-score-tracker.test.cjs",
+          "expected": "Passes test for VAL-RF-001",
+          "observed": "ok 1 - correctly detects low scores on 0-1 scale (VAL-RF-001)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-002",
+      "title": "Score tracker handles 1-10 scale scores defensively",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/lib/reflection-score-tracker.test.cjs",
+          "expected": "Passes test for VAL-RF-002",
+          "observed": "ok 1 - handles both scales without configuration (VAL-RF-002)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-003",
+      "title": "Score tracker handles mixed-scale entries gracefully",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/lib/reflection-score-tracker.test.cjs",
+          "expected": "Passes test for VAL-RF-003",
+          "observed": "ok 3 - handles mixed-scale entries gracefully (VAL-RF-003)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-004",
+      "title": "LOW_SCORE_THRESHOLD calibrated to actual LLM output scale",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Inspect code and run unit tests",
+          "expected": "LOW_SCORE_THRESHOLD aligns with scaling",
+          "observed": "ok 4 - LOW_SCORE_THRESHOLD aligns with rubric Critical Fail (VAL-RF-004/005)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-005",
+      "title": "LOW_SCORE_THRESHOLD aligns with reflection-agent rubric",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Inspect code and run unit tests",
+          "expected": "Threshold corresponds to Critical Fail",
+          "observed": "ok 4 - LOW_SCORE_THRESHOLD aligns with rubric Critical Fail (VAL-RF-004/005)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-006",
+      "title": "Evolution trigger fires for 3+ consecutive low-scoring agents",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/lib/reflection-score-tracker.test.cjs",
+          "expected": "Passes test for VAL-RF-006",
+          "observed": "ok 5 - evolution fires for 3+ consecutive low 0-1 scale scores (VAL-RF-006)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-007",
+      "title": "Evolution trigger does NOT fire for well-performing agents",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/lib/reflection-score-tracker.test.cjs",
+          "expected": "Passes test for VAL-RF-007",
+          "observed": "ok 6 - evolution does NOT fire for well-performing agents (VAL-RF-007)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-008",
+      "title": "Evolution trigger respects protected agents list",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/lib/reflection-score-tracker.test.cjs",
+          "expected": "Passes test for VAL-RF-008",
+          "observed": "ok 7 - protected agents are never flagged (VAL-RF-008)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-009",
+      "title": "Evolution trigger respects 24-hour cooldown",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/lib/reflection-score-tracker.test.cjs",
+          "expected": "Passes test for VAL-RF-009",
+          "observed": "ok 8 - cooldown prevents rapid re-evolution (VAL-RF-009)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-RF-026",
+      "title": "Score normalization implements CTO directive (handle both scales)",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Inspect reflection-score-tracker.cjs and run unit tests",
+          "expected": "normalizeScore function present, and unit tests pass with both scale inputs",
+          "observed": "ok 1 - handles both scales without configuration (VAL-RF-002)"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "reflection-token/group-1/test-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 10 assertions (VAL-RF-001 through VAL-RF-009, and VAL-RF-026): all 10 passed. The reflection-score-tracker.cjs file correctly handles and normalizes both 0-1 and 1-10 scales as per CTO Directive #2, and all related unit tests passed perfectly."
+}
