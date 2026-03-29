@@ -6,9 +6,29 @@ const { safeParseJSON } = require('./safe-json.cjs');
 
 const REFLECTION_LOG_PATH = path.resolve(__dirname, '../../context/memory/reflection-log.jsonl');
 const ROLLING_WINDOW = 10;
-const LOW_SCORE_THRESHOLD = 6.0;
+// Critical Fail < 0.4 on 0-1 scale = < 4.0 on 1-10 scale
+const LOW_SCORE_THRESHOLD = 4.0;
 const PROTECTED_AGENTS = ['router', 'planner', 'master-orchestrator', 'evolution-orchestrator'];
 const EVOLUTION_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+/**
+ * Normalize scores from 0-1 scale to 1-10 scale.
+ * CTO Directive #2: Handle both scales defensively.
+ * @param {number} score - Raw score (either 0-1 or 1-10 scale)
+ * @returns {number} Normalized score on 1-10 scale
+ */
+function normalizeScore(score) {
+  // Handle invalid inputs
+  if (score === null || score === undefined) return score;
+  if (typeof score !== 'number' || Number.isNaN(score)) return score;
+
+  // If score is <= 1.0, treat as 0-1 scale and multiply by 10
+  // If score is > 1.0, treat as 1-10 scale (pass through)
+  if (score <= 1.0) {
+    return score * 10;
+  }
+  return score;
+}
 
 /**
  * Parse reflection-log.jsonl entries, filtering for scored reflections.
@@ -59,9 +79,11 @@ function getAgentScoreSummary(agentId, logPath) {
   }
 
   // Compute average score across all dimensions per entry
+  // Apply normalization to each dimension score before averaging
   const entryAvgs = entries.map(e => {
     const dims = Object.values(e.scores);
-    return dims.reduce((a, b) => a + b, 0) / dims.length;
+    const normalizedDims = dims.map(normalizeScore);
+    return normalizedDims.reduce((a, b) => a + b, 0) / normalizedDims.length;
   });
 
   const avgScore = entryAvgs.reduce((a, b) => a + b, 0) / entryAvgs.length;
@@ -169,6 +191,7 @@ module.exports = {
   getUnderperformingAgents,
   isEvolutionEligible,
   readReflectionLog,
+  normalizeScore,
   LOW_SCORE_THRESHOLD,
   ROLLING_WINDOW,
   PROTECTED_AGENTS,
