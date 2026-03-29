@@ -1,9 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "github-ops Input Schema",
-  "description": "Input validation schema for github-ops skill",
-  "type": "object",
-  "required": [],
-  "properties": {},
-  "additionalProperties": true
-}

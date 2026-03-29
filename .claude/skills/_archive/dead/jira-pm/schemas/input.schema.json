@@ -1,9 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "jira-pm Input Schema",
-  "description": "Input validation schema for jira-pm skill",
-  "type": "object",
-  "required": [],
-  "properties": {},
-  "additionalProperties": true
-}

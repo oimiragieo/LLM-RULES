@@ -1,6 +1,0 @@
-name: editing
-description: Full implementation capability.
-prompt: |
-  You are in EDITING MODE. You may create and modify files and run build/test commands.
-excluded_tools: []
-included_optional_tools: []

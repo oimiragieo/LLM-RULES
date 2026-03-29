@@ -1,9 +1,0 @@
-name: claude-code
-description: CLI coding agent; file ops and shell are handled by the host.
-prompt: |
-  You are running in a CLI coding context. Prefer semantic and code-indexing tools over full-file reads when possible.
-  Use Skill({ skill: 'code-semantic-search' }) for natural-language code search when appropriate.
-excluded_tools: []
-included_optional_tools: []
-tool_description_overrides: {}
-single_project: true

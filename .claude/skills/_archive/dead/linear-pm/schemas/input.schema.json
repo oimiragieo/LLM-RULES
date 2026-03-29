@@ -1,9 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "linear-pm Input Schema",
-  "description": "Input validation schema for linear-pm skill",
-  "type": "object",
-  "required": [],
-  "properties": {},
-  "additionalProperties": true
-}
