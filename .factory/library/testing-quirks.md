@@ -12,3 +12,18 @@ To work around this, you must either:
 ## Server-Sent Events (SSE) Tests
 
 `supertest` hangs when used with Server-Sent Events (SSE) streaming endpoints. When writing tests for SSE streams, do not use `supertest`. Instead, use the raw Node.js `http` client.
+
+## Async Event Emitter Testing
+
+When testing Node.js `EventEmitter` instances using async test utilities (like a `waitForEvent` helper), if the event is emitted synchronously inside a method, the test listener may attach *after* the event has already fired, causing the test to timeout. 
+
+To work around this, wrap the synchronous event emission in `setImmediate()` to ensure the event loop yields and allows the test listener to attach before firing the event.
+
+Example:
+```javascript
+// Instead of:
+this.emit('event', payload);
+
+// Use:
+setImmediate(() => this.emit('event', payload));
+```
