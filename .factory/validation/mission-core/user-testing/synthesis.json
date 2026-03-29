@@ -1,0 +1,29 @@
+{
+  "milestone": "mission-core",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 25,
+    "passed": 25,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-MC-001", "VAL-MC-002", "VAL-MC-003", "VAL-MC-004",
+    "VAL-FS-001", "VAL-FS-002", "VAL-FS-003", "VAL-FS-004", "VAL-FS-005",
+    "VAL-FS-006", "VAL-FS-007", "VAL-FS-008", "VAL-FS-009", "VAL-FS-010",
+    "VAL-MX-001", "VAL-MX-002", "VAL-MX-003", "VAL-MX-004", "VAL-MX-005",
+    "VAL-MP-001", "VAL-MP-002", "VAL-MP-003",
+    "VAL-AP-001", "VAL-AP-002", "VAL-AP-003"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [
+    {
+      "target": "user-testing.md",
+      "description": "Added flow validator guidance for unit tests",
+      "source": "setup"
+    }
+  ],
+  "previousRound": null
+}

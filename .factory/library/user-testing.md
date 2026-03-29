@@ -37,6 +37,7 @@ pnpm validate:full
 **Max concurrent validators:** 5 (all programmatic, minimal resource per instance)
 
 All validation is programmatic (unit/integration tests). Each validator instance:
+
 - ~100 MB RAM for Node.js process
 - Temp directory for filesystem tests
 - No long-running services needed
@@ -45,8 +46,18 @@ All validation is programmatic (unit/integration tests). Each validator instance
 
 ## Resource Cost Classification
 
-| Surface | Tool | RAM per instance | Max concurrent |
-|---------|------|-----------------|----------------|
-| Unit tests | node --test | ~100 MB | 5 |
-| Integration tests | node --test | ~200 MB | 5 |
-| CLI validation | node script | ~100 MB | 5 |
+| Surface           | Tool        | RAM per instance | Max concurrent |
+| ----------------- | ----------- | ---------------- | -------------- |
+| Unit tests        | node --test | ~100 MB          | 5              |
+| Integration tests | node --test | ~200 MB          | 5              |
+| CLI validation    | node script | ~100 MB          | 5              |
+
+## Flow Validator Guidance: Unit Tests
+
+When testing assertions via unit tests:
+1. Run the specific test file associated with the module using `node --test tests/mission/<module>.test.cjs`.
+2. Do not run the full `pnpm test` suite as it may time out and takes a long time.
+3. Assertions are considered passed if the relevant tests in the file pass. You may need to inspect the test file briefly to map the tests to the assertion IDs, or simply run the test file and if all pass, assume the implementation meets the contract.
+4. If a test fails, capture the error output as evidence.
+5. You can execute multiple test files if your group spans multiple modules.
+6. The tests use temporary directories for filesystem interactions and should be safe to run concurrently. Do not modify global state or create files outside of the test temporary directories.
