@@ -10,7 +10,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { evaluateMilestoneGate, MilestoneGate } = require('../../.claude/lib/mission/milestone-gate.cjs');
+const {
+  evaluateMilestoneGate,
+  MilestoneGate,
+} = require('../../.claude/lib/mission/milestone-gate.cjs');
 
 // Test fixtures directory
 const FIXTURES_DIR = path.join(__dirname, 'fixtures', 'milestone-gate-ext');
@@ -34,7 +37,11 @@ function writeFeatures(dir, features) {
 }
 
 function writeValidationState(dir, assertions) {
-  fs.writeFileSync(path.join(dir, 'validation-state.json'), JSON.stringify({ assertions }, null, 2), 'utf8');
+  fs.writeFileSync(
+    path.join(dir, 'validation-state.json'),
+    JSON.stringify({ assertions }, null, 2),
+    'utf8'
+  );
 }
 
 // ========================================
@@ -53,7 +60,13 @@ describe('Dynamic feature list read', () => {
 
   it('reads features at invocation time (no caching)', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'pending', fulfills: [] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'pending',
+        fulfills: [],
+      },
     ]);
     writeValidationState(tempDir, {});
 
@@ -67,7 +80,13 @@ describe('Dynamic feature list read', () => {
 
     // Update features.json externally
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: [] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: [],
+      },
     ]);
 
     const result2 = await evaluateMilestoneGate({
@@ -96,7 +115,13 @@ describe('Return structure', () => {
 
   it('returns correct structure with passed=true', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -116,7 +141,13 @@ describe('Return structure', () => {
 
   it('returns correct structure with passed=false', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'pending', fulfills: [] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'pending',
+        fulfills: [],
+      },
     ]);
     writeValidationState(tempDir, {});
 
@@ -137,7 +168,13 @@ describe('Return structure', () => {
 
   it('includes scrutiny and userTesting verdicts in result', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -182,7 +219,13 @@ describe('MilestoneGate class', () => {
 
   it('evaluate() method works correctly', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -229,7 +272,13 @@ describe('Error handling', () => {
 
   it('handles missing validation-state.json by creating it', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
     ]);
 
     const result = await evaluateMilestoneGate({

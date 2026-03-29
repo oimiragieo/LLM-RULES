@@ -64,8 +64,20 @@ describe('VAL-MG-001: All features must be completed', () => {
 
   it('gate passes when all features in milestone are completed', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
-      { id: 'feature-b', description: 'Feature B', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-B-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
+      {
+        id: 'feature-b',
+        description: 'Feature B',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-B-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -84,8 +96,20 @@ describe('VAL-MG-001: All features must be completed', () => {
 
   it('gate fails if any feature in milestone is not completed', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
-      { id: 'feature-b', description: 'Feature B', milestone: 'validation-gates', status: 'in_progress', fulfills: ['VAL-B-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
+      {
+        id: 'feature-b',
+        description: 'Feature B',
+        milestone: 'validation-gates',
+        status: 'in_progress',
+        fulfills: ['VAL-B-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -106,7 +130,13 @@ describe('VAL-MG-001: All features must be completed', () => {
 
   it('gate fails if a feature is pending', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'pending', fulfills: [] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'pending',
+        fulfills: [],
+      },
     ]);
     writeValidationState(tempDir, {});
 
@@ -117,12 +147,20 @@ describe('VAL-MG-001: All features must be completed', () => {
     });
 
     assert.equal(result.passed, false);
-    assert.ok(result.blocking.find(b => b.featureId === 'feature-a' && b.reason === 'feature_not_completed'));
+    assert.ok(
+      result.blocking.find(b => b.featureId === 'feature-a' && b.reason === 'feature_not_completed')
+    );
   });
 
   it('gate fails if a feature is failed', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'failed', fulfills: [] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'failed',
+        fulfills: [],
+      },
     ]);
     writeValidationState(tempDir, {});
 
@@ -133,7 +171,9 @@ describe('VAL-MG-001: All features must be completed', () => {
     });
 
     assert.equal(result.passed, false);
-    assert.ok(result.blocking.find(b => b.featureId === 'feature-a' && b.reason === 'feature_not_completed'));
+    assert.ok(
+      result.blocking.find(b => b.featureId === 'feature-a' && b.reason === 'feature_not_completed')
+    );
   });
 
   it('gate passes with empty milestone (no features)', async () => {
@@ -152,8 +192,20 @@ describe('VAL-MG-001: All features must be completed', () => {
 
   it('only evaluates features in the specified milestone', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
-      { id: 'feature-b', description: 'Feature B', milestone: 'other-milestone', status: 'pending', fulfills: ['VAL-B-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
+      {
+        id: 'feature-b',
+        description: 'Feature B',
+        milestone: 'other-milestone',
+        status: 'pending',
+        fulfills: ['VAL-B-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -187,7 +239,13 @@ describe('VAL-MG-002: All assertions must be passed', () => {
 
   it('gate fails when a feature has assertion not passed', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001', 'VAL-A-002'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001', 'VAL-A-002'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -201,12 +259,22 @@ describe('VAL-MG-002: All assertions must be passed', () => {
     });
 
     assert.equal(result.passed, false);
-    assert.ok(result.blocking.find(b => b.assertionId === 'VAL-A-002' && b.reason === 'assertion_not_passed'));
+    assert.ok(
+      result.blocking.find(
+        b => b.assertionId === 'VAL-A-002' && b.reason === 'assertion_not_passed'
+      )
+    );
   });
 
   it('gate fails when assertion is pending', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'pending', updatedAt: '2024-01-01T00:00:00Z' },
@@ -219,12 +287,22 @@ describe('VAL-MG-002: All assertions must be passed', () => {
     });
 
     assert.equal(result.passed, false);
-    assert.ok(result.blocking.find(b => b.assertionId === 'VAL-A-001' && b.reason === 'assertion_not_passed'));
+    assert.ok(
+      result.blocking.find(
+        b => b.assertionId === 'VAL-A-001' && b.reason === 'assertion_not_passed'
+      )
+    );
   });
 
   it('gate fails when assertion is blocked', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'blocked', updatedAt: '2024-01-01T00:00:00Z' },
@@ -237,12 +315,22 @@ describe('VAL-MG-002: All assertions must be passed', () => {
     });
 
     assert.equal(result.passed, false);
-    assert.ok(result.blocking.find(b => b.assertionId === 'VAL-A-001' && b.reason === 'assertion_not_passed'));
+    assert.ok(
+      result.blocking.find(
+        b => b.assertionId === 'VAL-A-001' && b.reason === 'assertion_not_passed'
+      )
+    );
   });
 
   it('gate passes when all assertions are passed', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001', 'VAL-A-002', 'VAL-A-003'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001', 'VAL-A-002', 'VAL-A-003'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -262,7 +350,13 @@ describe('VAL-MG-002: All assertions must be passed', () => {
 
   it('gate fails when assertion does not exist in validation state', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-UNKNOWN'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-UNKNOWN'],
+      },
     ]);
     writeValidationState(tempDir, {});
 
@@ -273,7 +367,11 @@ describe('VAL-MG-002: All assertions must be passed', () => {
     });
 
     assert.equal(result.passed, false);
-    assert.ok(result.blocking.find(b => b.assertionId === 'VAL-UNKNOWN' && b.reason === 'assertion_not_found'));
+    assert.ok(
+      result.blocking.find(
+        b => b.assertionId === 'VAL-UNKNOWN' && b.reason === 'assertion_not_found'
+      )
+    );
   });
 });
 
@@ -293,7 +391,13 @@ describe('VAL-MG-003: Infrastructure features exempt from assertion checks', () 
 
   it('gate passes for completed infrastructure feature without assertions', async () => {
     writeFeatures(tempDir, [
-      { id: 'infra-feature', description: 'Infrastructure', milestone: 'validation-gates', status: 'completed', fulfills: [] },
+      {
+        id: 'infra-feature',
+        description: 'Infrastructure',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: [],
+      },
     ]);
     writeValidationState(tempDir, {});
 
@@ -309,8 +413,20 @@ describe('VAL-MG-003: Infrastructure features exempt from assertion checks', () 
 
   it('mixed: infrastructure feature + regular feature with passed assertions', async () => {
     writeFeatures(tempDir, [
-      { id: 'infra-feature', description: 'Infrastructure', milestone: 'validation-gates', status: 'completed', fulfills: [] },
-      { id: 'regular-feature', description: 'Regular', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-REG-001'] },
+      {
+        id: 'infra-feature',
+        description: 'Infrastructure',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: [],
+      },
+      {
+        id: 'regular-feature',
+        description: 'Regular',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-REG-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-REG-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -328,7 +444,13 @@ describe('VAL-MG-003: Infrastructure features exempt from assertion checks', () 
 
   it('infrastructure feature still fails if not completed', async () => {
     writeFeatures(tempDir, [
-      { id: 'infra-feature', description: 'Infrastructure', milestone: 'validation-gates', status: 'pending', fulfills: [] },
+      {
+        id: 'infra-feature',
+        description: 'Infrastructure',
+        milestone: 'validation-gates',
+        status: 'pending',
+        fulfills: [],
+      },
     ]);
     writeValidationState(tempDir, {});
 
@@ -339,12 +461,21 @@ describe('VAL-MG-003: Infrastructure features exempt from assertion checks', () 
     });
 
     assert.equal(result.passed, false);
-    assert.ok(result.blocking.find(b => b.featureId === 'infra-feature' && b.reason === 'feature_not_completed'));
+    assert.ok(
+      result.blocking.find(
+        b => b.featureId === 'infra-feature' && b.reason === 'feature_not_completed'
+      )
+    );
   });
 
   it('feature with missing fulfills field is treated as infrastructure', async () => {
     writeFeatures(tempDir, [
-      { id: 'no-fulfills-feature', description: 'No fulfills', milestone: 'validation-gates', status: 'completed' },
+      {
+        id: 'no-fulfills-feature',
+        description: 'No fulfills',
+        milestone: 'validation-gates',
+        status: 'completed',
+      },
     ]);
     writeValidationState(tempDir, {});
 
@@ -374,8 +505,20 @@ describe('VAL-MG-004: Cancelled features excluded from gate', () => {
 
   it('gate passes with completed feature and cancelled feature', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-a', description: 'Feature A', milestone: 'validation-gates', status: 'completed', fulfills: ['VAL-A-001'] },
-      { id: 'feature-cancelled', description: 'Cancelled', milestone: 'validation-gates', status: 'cancelled', fulfills: ['VAL-C-001'] },
+      {
+        id: 'feature-a',
+        description: 'Feature A',
+        milestone: 'validation-gates',
+        status: 'completed',
+        fulfills: ['VAL-A-001'],
+      },
+      {
+        id: 'feature-cancelled',
+        description: 'Cancelled',
+        milestone: 'validation-gates',
+        status: 'cancelled',
+        fulfills: ['VAL-C-001'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-A-001': { status: 'passed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -394,8 +537,20 @@ describe('VAL-MG-004: Cancelled features excluded from gate', () => {
 
   it('gate passes when only cancelled features exist in milestone', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-cancelled-1', description: 'Cancelled 1', milestone: 'validation-gates', status: 'cancelled', fulfills: [] },
-      { id: 'feature-cancelled-2', description: 'Cancelled 2', milestone: 'validation-gates', status: 'cancelled', fulfills: ['VAL-C-002'] },
+      {
+        id: 'feature-cancelled-1',
+        description: 'Cancelled 1',
+        milestone: 'validation-gates',
+        status: 'cancelled',
+        fulfills: [],
+      },
+      {
+        id: 'feature-cancelled-2',
+        description: 'Cancelled 2',
+        milestone: 'validation-gates',
+        status: 'cancelled',
+        fulfills: ['VAL-C-002'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-C-002': { status: 'failed', updatedAt: '2024-01-01T00:00:00Z' },
@@ -412,7 +567,13 @@ describe('VAL-MG-004: Cancelled features excluded from gate', () => {
 
   it('cancelled feature does not block even with failed assertions', async () => {
     writeFeatures(tempDir, [
-      { id: 'feature-cancelled', description: 'Cancelled', milestone: 'validation-gates', status: 'cancelled', fulfills: ['VAL-C-001', 'VAL-C-002'] },
+      {
+        id: 'feature-cancelled',
+        description: 'Cancelled',
+        milestone: 'validation-gates',
+        status: 'cancelled',
+        fulfills: ['VAL-C-001', 'VAL-C-002'],
+      },
     ]);
     writeValidationState(tempDir, {
       'VAL-C-001': { status: 'failed', updatedAt: '2024-01-01T00:00:00Z' },
