@@ -1,0 +1,30 @@
+{
+  "milestone": "assimilate-e2e",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 13,
+    "passed": 13,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-E2E-001",
+    "VAL-E2E-002",
+    "VAL-E2E-003",
+    "VAL-E2E-004",
+    "VAL-E2E-005",
+    "VAL-E2E-006",
+    "VAL-E2E-007",
+    "VAL-E2E-008",
+    "VAL-E2E-009",
+    "VAL-E2E-010",
+    "VAL-E2E-011",
+    "VAL-E2E-012",
+    "VAL-E2E-013"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
