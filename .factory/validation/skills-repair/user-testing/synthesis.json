@@ -1,0 +1,34 @@
+{
+  "milestone": "skills-repair",
+  "round": 1,
+  "status": "fail",
+  "assertionsSummary": {
+    "total": 13,
+    "passed": 12,
+    "failed": 1,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-SK-001",
+    "VAL-SK-002",
+    "VAL-SK-003",
+    "VAL-SK-004",
+    "VAL-SK-006",
+    "VAL-SK-007",
+    "VAL-SK-008",
+    "VAL-SK-011",
+    "VAL-SK-012",
+    "VAL-SK-009",
+    "VAL-SK-010",
+    "VAL-SK-013"
+  ],
+  "failedAssertions": [
+    {
+      "id": "VAL-SK-005",
+      "reason": "File .claude/skills/token-saver/SKILL.md does not exist."
+    }
+  ],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}

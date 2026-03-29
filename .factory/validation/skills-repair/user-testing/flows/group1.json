@@ -1,0 +1,72 @@
+{
+  "groupId": "group1",
+  "testedAt": "2026-03-29T10:00:00Z",
+  "isolation": {
+    "context": "No shared mutating state. Test environment is CLI validation commands in current working directory."
+  },
+  "toolsUsed": ["Execute", "Glob", "Grep"],
+  "assertions": [
+    {
+      "id": "VAL-SK-001",
+      "title": "token-saver-context-compression scripts/main.cjs exists and tests pass",
+      "status": "pass",
+      "steps": [
+        { "action": "Verify file existence", "expected": "File exists", "observed": "File exists" },
+        { "action": "Run node --test tests/skills/token-saver-context-compression.test.cjs", "expected": "Tests pass", "observed": "4 tests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["skills-repair/group1/VAL-SK-001-test-output.txt"]
+      }
+    },
+    {
+      "id": "VAL-SK-002",
+      "title": "token-saver-adaptive-ratio scripts/main.cjs exists and tests pass",
+      "status": "pass",
+      "steps": [
+        { "action": "Verify file existence", "expected": "File exists", "observed": "File exists" },
+        { "action": "Run node --test tests/skills/token-saver-adaptive-ratio.test.cjs", "expected": "Tests pass", "observed": "6 tests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["skills-repair/group1/VAL-SK-002-test-output.txt"]
+      }
+    },
+    {
+      "id": "VAL-SK-003",
+      "title": "token-saver-memory-dedup scripts/main.cjs exists and tests pass",
+      "status": "pass",
+      "steps": [
+        { "action": "Verify file existence", "expected": "File exists", "observed": "File exists" },
+        { "action": "Run node --test tests/skills/token-saver-memory-dedup.test.cjs", "expected": "Tests pass", "observed": "7 tests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["skills-repair/group1/VAL-SK-003-test-output.txt"]
+      }
+    },
+    {
+      "id": "VAL-SK-004",
+      "title": "skill-creator SKILL.md contains Router Gap Detection section",
+      "status": "pass",
+      "steps": [
+        { "action": "Search for Router Gap Detection", "expected": "Match found", "observed": "Match found" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["skills-repair/group1/VAL-SK-004-grep-output.txt"]
+      }
+    },
+    {
+      "id": "VAL-SK-005",
+      "title": "token-saver SKILL.md contains Activation section and compression-reminder reference",
+      "status": "fail",
+      "steps": [
+        { "action": "Search for ## Activation", "expected": "Match found", "observed": "File does not exist" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["skills-repair/group1/VAL-SK-005-grep-output.txt"]
+      },
+      "issues": "File .claude/skills/token-saver/SKILL.md does not exist."
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 5 assertions: 4 passed, 1 failed (VAL-SK-005: .claude/skills/token-saver/SKILL.md does not exist)"
+}

@@ -1,0 +1,49 @@
+{
+  "groupId": "group3",
+  "testedAt": "2026-03-29T12:00:00.000Z",
+  "isolation": {
+    "context": "No shared mutating state. Test environment is CLI validation commands in current working directory."
+  },
+  "toolsUsed": ["Execute"],
+  "assertions": [
+    {
+      "id": "VAL-SK-009",
+      "title": "All 68 low-scoring skills score >= 80 on ecosystem gate",
+      "status": "pass",
+      "steps": [
+        { "action": "Run pnpm skills:ecosystem:gate", "expected": "zero skills below threshold", "observed": "Needs work: 0" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["skills-repair/group3/VAL-SK-009-010-ecosystem-gate.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-SK-010",
+      "title": "pnpm skills:ecosystem:gate passes",
+      "status": "pass",
+      "steps": [
+        { "action": "Run pnpm skills:ecosystem:gate", "expected": "exit code 0", "observed": "Process exited with code 0" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["skills-repair/group3/VAL-SK-009-010-ecosystem-gate.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-SK-013",
+      "title": "All skill tests pass",
+      "status": "pass",
+      "steps": [
+        { "action": "Run node --test \"tests/skills/**/*.test.cjs\"", "expected": "exit code 0, 0 failures", "observed": "pass 329, fail 0, Process exited with code 0" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["skills-repair/group3/VAL-SK-013-tests.txt"]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 3 assertions: 3 passed."
+}
