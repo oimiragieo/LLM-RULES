@@ -18,12 +18,12 @@
 
 ## Whisper Model Selection
 
-| Model      | Speed | Accuracy | Use when               |
-| ---------- | ----- | -------- | ---------------------- |
-| `tiny`     | ~2s   | Low      | Rapid prototyping      |
-| `small`    | ~5s   | Medium   | Short messages         |
-| `medium`   | ~12s  | High     | Default                |
-| `large-v3` | ~30s  | Best     | Long/complex messages  |
+| Model      | Speed | Accuracy | Use when              |
+| ---------- | ----- | -------- | --------------------- |
+| `tiny`     | ~2s   | Low      | Rapid prototyping     |
+| `small`    | ~5s   | Medium   | Short messages        |
+| `medium`   | ~12s  | High     | Default               |
+| `large-v3` | ~30s  | Best     | Long/complex messages |
 
 ## Implementation Patterns
 

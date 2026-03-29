@@ -1,1 +1,11 @@
-{"$schema":"http://json-schema.org/draft-07/schema#","title":"frontendDesignOutput","type":"object","additionalProperties":true,"properties":{"ok":{"type":"boolean"},"code":{"type":"string"},"styles":{"type":"string"}}}
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "frontendDesignOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": { "type": "boolean" },
+    "code": { "type": "string" },
+    "styles": { "type": "string" }
+  }
+}

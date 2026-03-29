@@ -6,15 +6,15 @@ Six-dimension content analysis for engagement intelligence.
 
 ## Hook Classification Taxonomy
 
-| Hook Type      | Pattern                          |
-| -------------- | -------------------------------- |
-| Question       | "Have you ever wondered...?"     |
-| Statistic      | "78% of readers abandon..."      |
-| Story          | "Last Tuesday, I discovered..."  |
-| Contrarian     | "Everything you know is wrong."   |
-| Pain Point     | "Tired of posts nobody reads?"   |
-| Bold Claim     | "This will triple your output"   |
-| How-To Promise | "How to go from 0 to 10K"        |
+| Hook Type      | Pattern                         |
+| -------------- | ------------------------------- |
+| Question       | "Have you ever wondered...?"    |
+| Statistic      | "78% of readers abandon..."     |
+| Story          | "Last Tuesday, I discovered..." |
+| Contrarian     | "Everything you know is wrong." |
+| Pain Point     | "Tired of posts nobody reads?"  |
+| Bold Claim     | "This will triple your output"  |
+| How-To Promise | "How to go from 0 to 10K"       |
 
 ## Readability Metrics
 

@@ -9,7 +9,10 @@ const fs = require('fs');
 const Database = require('better-sqlite3');
 
 const { createA2aServer } = require('../../../.claude/lib/a2a/server.cjs');
-const { TaskStateMachine, ZOMBIE_TIMEOUT_MS } = require('../../../.claude/lib/a2a/task-state-machine.cjs');
+const {
+  TaskStateMachine,
+  ZOMBIE_TIMEOUT_MS,
+} = require('../../../.claude/lib/a2a/task-state-machine.cjs');
 
 /**
  * Helper to create an in-memory SQLite db with the a2a_tasks schema.
@@ -406,10 +409,7 @@ describe('A2A Server Endpoints', () => {
     });
 
     it('returns -32600 for missing method', async () => {
-      const res = await request(app)
-        .post('/a2a')
-        .send({ jsonrpc: '2.0', id: 1 })
-        .expect(400);
+      const res = await request(app).post('/a2a').send({ jsonrpc: '2.0', id: 1 }).expect(400);
 
       assert.equal(res.body.error.code, -32600);
     });

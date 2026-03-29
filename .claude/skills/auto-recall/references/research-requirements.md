@@ -10,11 +10,11 @@
 
 ### Intent Classification
 
-| Intent | Filter |
-|--------|--------|
+| Intent   | Filter            |
+| -------- | ----------------- |
 | Decision | category=decision |
-| Issue | category=issue |
-| Pattern | category=pattern |
+| Issue    | category=issue    |
+| Pattern  | category=pattern  |
 | Learning | category=learning |
 
 ### Ranking Formula

@@ -31,14 +31,14 @@ ATLASSIAN_API_TOKEN=your-api-token
 ```json
 {
   "fields": {
-    "project": {"key": "PROJECT"},
+    "project": { "key": "PROJECT" },
     "summary": "Issue summary",
     "description": {
       "type": "doc",
       "version": 1,
-      "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Description"}]}]
+      "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Description" }] }]
     },
-    "issuetype": {"name": "Task"}
+    "issuetype": { "name": "Task" }
   }
 }
 ```

@@ -10,7 +10,5 @@
     "Test suite takes over 400s which causes subagents and execution commands to time out"
   ],
   "blockers": [],
-  "toolsUsed": [
-    "CLI"
-  ]
+  "toolsUsed": ["CLI"]
 }

@@ -12,23 +12,28 @@
 ## Prerequisites
 
 Set environment variable:
+
 - ANTHROPIC_API_KEY
 
 ## Common Workflows
 
 ### Single LLM Call
+
 - Classification, summarization, extraction
 - Q&A, simple completions
 
 ### Streaming
+
 - Long-form generation
 - Real-time output display
 
 ### Tool Use
+
 - Function calling
 - Agentic loops
 
 ### Agent SDK
+
 - Built-in web search
 - Code execution
 - Multi-session agents

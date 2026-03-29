@@ -344,11 +344,13 @@ describe('A2A and Telegram Coexistence', () => {
       // Telegram mock server responds
       const telegramPort = telegramMockServer.address().port;
       const telegramResponse = await new Promise((resolve, reject) => {
-        http.get(`http://localhost:${telegramPort}/`, res => {
-          let body = '';
-          res.on('data', chunk => (body += chunk));
-          res.on('end', () => resolve(JSON.parse(body)));
-        }).on('error', reject);
+        http
+          .get(`http://localhost:${telegramPort}/`, res => {
+            let body = '';
+            res.on('data', chunk => (body += chunk));
+            res.on('end', () => resolve(JSON.parse(body)));
+          })
+          .on('error', reject);
       });
 
       assert.equal(telegramResponse.status, 'telegram-ok', 'Telegram server should respond');
@@ -362,11 +364,13 @@ describe('A2A and Telegram Coexistence', () => {
       // Telegram server still works
       const telegramPort = telegramMockServer.address().port;
       const telegramResponse = await new Promise((resolve, reject) => {
-        http.get(`http://localhost:${telegramPort}/`, res => {
-          let body = '';
-          res.on('data', chunk => (body += chunk));
-          res.on('end', () => resolve(JSON.parse(body)));
-        }).on('error', reject);
+        http
+          .get(`http://localhost:${telegramPort}/`, res => {
+            let body = '';
+            res.on('data', chunk => (body += chunk));
+            res.on('end', () => resolve(JSON.parse(body)));
+          })
+          .on('error', reject);
       });
 
       assert.equal(telegramResponse.status, 'telegram-ok');
@@ -443,12 +447,14 @@ describe('A2A and Telegram Coexistence', () => {
       // Telegram request should not have A2A middleware headers
       const telegramPort = telegramMockServer.address().port;
       const response = await new Promise((resolve, reject) => {
-        http.get(`http://localhost:${telegramPort}/`, res => {
-          const headers = res.headers;
-          let body = '';
-          res.on('data', chunk => (body += chunk));
-          res.on('end', () => resolve({ headers, body }));
-        }).on('error', reject);
+        http
+          .get(`http://localhost:${telegramPort}/`, res => {
+            const headers = res.headers;
+            let body = '';
+            res.on('data', chunk => (body += chunk));
+            res.on('end', () => resolve({ headers, body }));
+          })
+          .on('error', reject);
       });
 
       // No A2A-specific headers leaked
@@ -463,11 +469,13 @@ describe('A2A and Telegram Coexistence', () => {
       // Telegram mock server handles its own responses
       const telegramPort = telegramMockServer.address().port;
       const tgResponse = await new Promise((resolve, reject) => {
-        http.get(`http://localhost:${telegramPort}/health`, res => {
-          let body = '';
-          res.on('data', chunk => (body += chunk));
-          res.on('end', () => resolve(JSON.parse(body)));
-        }).on('error', reject);
+        http
+          .get(`http://localhost:${telegramPort}/health`, res => {
+            let body = '';
+            res.on('data', chunk => (body += chunk));
+            res.on('end', () => resolve(JSON.parse(body)));
+          })
+          .on('error', reject);
       });
 
       assert.equal(tgResponse.status, 'telegram-ok', 'Telegram server responds independently');

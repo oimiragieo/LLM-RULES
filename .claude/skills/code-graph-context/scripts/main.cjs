@@ -14,7 +14,9 @@ const options = Object.fromEntries(
 
 if (options.help) {
   console.log('Code Graph Context - Main Script');
-  console.log('Structural code graph queries: find_callers, find_callees, get_class_hierarchy, find_dead_code');
+  console.log(
+    'Structural code graph queries: find_callers, find_callees, get_class_hierarchy, find_dead_code'
+  );
   process.exit(0);
 }
 

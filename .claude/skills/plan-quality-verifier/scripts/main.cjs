@@ -65,9 +65,9 @@ function main() {
         { name: 'artifact-wiring', score: 7 },
         { name: 'risk-assessment', score: 8 },
         { name: 'testability', score: 7 },
-        { name: 'estimation-quality', score: 9 }
+        { name: 'estimation-quality', score: 9 },
       ],
-      planPath
+      planPath,
     };
 
     console.log(JSON.stringify(result, null, 2));

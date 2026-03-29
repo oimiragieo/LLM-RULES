@@ -2,11 +2,11 @@
 
 ## Verified MCP Tools
 
-| MCP                  | Purpose                          |
-| -------------------- | -------------------------------- |
-| design-systems-mcp   | 188+ design system search        |
-| css-mcp              | MDN CSS docs + browser compat    |
-| magic-mcp            | AI UI component generation       |
+| MCP                | Purpose                       |
+| ------------------ | ----------------------------- |
+| design-systems-mcp | 188+ design system search     |
+| css-mcp            | MDN CSS docs + browser compat |
+| magic-mcp          | AI UI component generation    |
 
 ## Design Token Standards
 

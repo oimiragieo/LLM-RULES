@@ -2,12 +2,12 @@
 
 ## Verified Scheduling Tools
 
-| Tool           | Scope          | Persistence    | Precision    |
-| -------------- | -------------- | -------------- | ------------ |
-| CronCreate     | Session        | Dies on close  | ~15 min      |
-| OS cron        | System         | Survives       | Minute       |
-| GitHub Actions | Cloud          | Always on      | Minute       |
-| Task()         | One-time       | N/A            | Immediate    |
+| Tool           | Scope    | Persistence   | Precision |
+| -------------- | -------- | ------------- | --------- |
+| CronCreate     | Session  | Dies on close | ~15 min   |
+| OS cron        | System   | Survives      | Minute    |
+| GitHub Actions | Cloud    | Always on     | Minute    |
+| Task()         | One-time | N/A           | Immediate |
 
 ## CronCreate Constraints
 

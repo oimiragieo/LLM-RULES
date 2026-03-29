@@ -244,9 +244,7 @@ describe('reflection-score-tracker', () => {
     it('correctly detects low scores on 0-1 scale (VAL-RF-001)', () => {
       // Scores below 0.4 on 0-1 scale = Critical Fail
       // After normalization: 0.35 -> 3.5, which is below threshold 4.0
-      writeLog([
-        makeEntry('dev', { completeness: 0.3, accuracy: 0.35, clarity: 0.4 }),
-      ]);
+      writeLog([makeEntry('dev', { completeness: 0.3, accuracy: 0.35, clarity: 0.4 })]);
       const summary = getAgentScoreSummary('dev', logPath);
       // Average: (0.3 + 0.35 + 0.4) / 3 = 0.35 -> normalized to 3.5
       assert.strictEqual(summary.consecutiveLowCount, 1);
@@ -255,9 +253,7 @@ describe('reflection-score-tracker', () => {
 
     it('correctly detects high scores on 0-1 scale', () => {
       // Scores above 0.7 on 0-1 scale = Pass
-      writeLog([
-        makeEntry('dev', { completeness: 0.85, accuracy: 0.9, clarity: 0.8 }),
-      ]);
+      writeLog([makeEntry('dev', { completeness: 0.85, accuracy: 0.9, clarity: 0.8 })]);
       const summary = getAgentScoreSummary('dev', logPath);
       // Average: (0.85 + 0.9 + 0.8) / 3 = 0.85 -> normalized to 8.5
       assert.strictEqual(summary.consecutiveLowCount, 0);

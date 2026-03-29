@@ -514,7 +514,9 @@ describe('Pre-Task Hook A2A Dispatch Integration', () => {
   });
 
   it('checkA2ADispatchIntercept returns intercepted=false for non-channel targets', async () => {
-    const { checkA2ADispatchIntercept } = require('../../../.claude/hooks/routing/pre-task-unified-core.cjs');
+    const {
+      checkA2ADispatchIntercept,
+    } = require('../../../.claude/hooks/routing/pre-task-unified-core.cjs');
 
     const result = await checkA2ADispatchIntercept({
       subagent_type: 'developer',
@@ -528,7 +530,9 @@ describe('Pre-Task Hook A2A Dispatch Integration', () => {
     process.env.A2A_AUTO_START = 'true';
     process.env.A2A_PORT = String(server.port);
 
-    const { checkA2ADispatchIntercept } = require('../../../.claude/hooks/routing/pre-task-unified-core.cjs');
+    const {
+      checkA2ADispatchIntercept,
+    } = require('../../../.claude/hooks/routing/pre-task-unified-core.cjs');
 
     const result = await checkA2ADispatchIntercept({
       subagent_type: 'channel-responder',
@@ -548,8 +552,12 @@ describe('Pre-Task Hook A2A Dispatch Integration', () => {
     process.env.A2A_DISPATCH_MODE = 'off';
 
     // Clear require cache to pick up env change
-    delete require.cache[require.resolve('../../../.claude/hooks/routing/pre-task-unified-core.cjs')];
-    const { checkA2ADispatchIntercept } = require('../../../.claude/hooks/routing/pre-task-unified-core.cjs');
+    delete require.cache[
+      require.resolve('../../../.claude/hooks/routing/pre-task-unified-core.cjs')
+    ];
+    const {
+      checkA2ADispatchIntercept,
+    } = require('../../../.claude/hooks/routing/pre-task-unified-core.cjs');
 
     const result = await checkA2ADispatchIntercept({
       subagent_type: 'channel-responder',

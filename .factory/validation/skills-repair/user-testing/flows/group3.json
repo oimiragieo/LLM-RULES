@@ -11,7 +11,11 @@
       "title": "All 68 low-scoring skills score >= 80 on ecosystem gate",
       "status": "pass",
       "steps": [
-        { "action": "Run pnpm skills:ecosystem:gate", "expected": "zero skills below threshold", "observed": "Needs work: 0" }
+        {
+          "action": "Run pnpm skills:ecosystem:gate",
+          "expected": "zero skills below threshold",
+          "observed": "Needs work: 0"
+        }
       ],
       "evidence": {
         "terminalSnapshots": ["skills-repair/group3/VAL-SK-009-010-ecosystem-gate.txt"]
@@ -23,7 +27,11 @@
       "title": "pnpm skills:ecosystem:gate passes",
       "status": "pass",
       "steps": [
-        { "action": "Run pnpm skills:ecosystem:gate", "expected": "exit code 0", "observed": "Process exited with code 0" }
+        {
+          "action": "Run pnpm skills:ecosystem:gate",
+          "expected": "exit code 0",
+          "observed": "Process exited with code 0"
+        }
       ],
       "evidence": {
         "terminalSnapshots": ["skills-repair/group3/VAL-SK-009-010-ecosystem-gate.txt"]
@@ -35,7 +43,11 @@
       "title": "All skill tests pass",
       "status": "pass",
       "steps": [
-        { "action": "Run node --test \"tests/skills/**/*.test.cjs\"", "expected": "exit code 0, 0 failures", "observed": "pass 329, fail 0, Process exited with code 0" }
+        {
+          "action": "Run node --test \"tests/skills/**/*.test.cjs\"",
+          "expected": "exit code 0, 0 failures",
+          "observed": "pass 329, fail 0, Process exited with code 0"
+        }
       ],
       "evidence": {
         "terminalSnapshots": ["skills-repair/group3/VAL-SK-013-tests.txt"]

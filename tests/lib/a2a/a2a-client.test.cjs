@@ -5,7 +5,11 @@ const assert = require('node:assert/strict');
 const http = require('http');
 const { EventEmitter } = require('events');
 
-const { A2AClient, SSEStreamEmitter, ERR_TASK_NOT_FOUND } = require('../../../.claude/lib/a2a/client.cjs');
+const {
+  A2AClient,
+  SSEStreamEmitter,
+  ERR_TASK_NOT_FOUND,
+} = require('../../../.claude/lib/a2a/client.cjs');
 const { createA2aServer } = require('../../../.claude/lib/a2a/server.cjs');
 
 /**
@@ -287,7 +291,10 @@ describe('A2A Client Library', () => {
       try {
         await fastClient.discover();
       } catch (err) {
-        assert.ok(err.message.includes('timeout') || err.message.includes('ECONN'), 'should be timeout or connection error');
+        assert.ok(
+          err.message.includes('timeout') || err.message.includes('ECONN'),
+          'should be timeout or connection error'
+        );
       }
     });
 

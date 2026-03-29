@@ -8,11 +8,11 @@
 
 ## Configuration
 
-| Variable             | Default                 |
-| -------------------- | ----------------------- |
-| EXA_MONITOR_TOPICS   | ["Claude AI updates"]   |
-| EXA_MAX_RESULTS      | 5                       |
-| EXA_AUTOPROMPT       | true                    |
+| Variable           | Default               |
+| ------------------ | --------------------- |
+| EXA_MONITOR_TOPICS | ["Claude AI updates"] |
+| EXA_MAX_RESULTS    | 5                     |
+| EXA_AUTOPROMPT     | true                  |
 
 ## Source References
 

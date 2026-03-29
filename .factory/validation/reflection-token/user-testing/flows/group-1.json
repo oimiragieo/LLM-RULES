@@ -5,9 +5,7 @@
     "context": "CLI test commands, no shared global state mutations expected",
     "missionDir": "C:\\Users\\oimir\\.factory\\missions\\91ae9243-5217-4452-8593-40411a402f4b"
   },
-  "toolsUsed": [
-    "node"
-  ],
+  "toolsUsed": ["node"],
   "assertions": [
     {
       "id": "VAL-RF-001",
@@ -21,9 +19,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     },
@@ -39,9 +35,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     },
@@ -57,9 +51,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     },
@@ -75,9 +67,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     },
@@ -93,9 +83,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     },
@@ -111,9 +99,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     },
@@ -129,9 +115,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     },
@@ -147,9 +131,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     },
@@ -165,9 +147,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     },
@@ -183,9 +163,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "reflection-token/group-1/test-output.txt"
-        ]
+        "terminalSnapshots": ["reflection-token/group-1/test-output.txt"]
       },
       "issues": null
     }

@@ -1,1 +1,11 @@
-{"$schema":"http://json-schema.org/draft-07/schema#","title":"imagenGenerationInput","type":"object","additionalProperties":true,"properties":{"prompt":{"type":"string"},"aspectRatio":{"type":"string"},"outputPath":{"type":"string"}}}
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "imagenGenerationInput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "prompt": { "type": "string" },
+    "aspectRatio": { "type": "string" },
+    "outputPath": { "type": "string" }
+  }
+}

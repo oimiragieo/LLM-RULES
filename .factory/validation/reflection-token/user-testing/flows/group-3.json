@@ -11,7 +11,11 @@
       "title": "Full RECE reflection loop completes end-to-end",
       "status": "pass",
       "steps": [
-        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+        {
+          "action": "Run full reflection test suite",
+          "expected": "Tests pass",
+          "observed": "Tests pass"
+        }
       ],
       "evidence": {
         "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
@@ -23,7 +27,11 @@
       "title": "Reflection queue includes semantic prior learnings",
       "status": "pass",
       "steps": [
-        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+        {
+          "action": "Run full reflection test suite",
+          "expected": "Tests pass",
+          "observed": "Tests pass"
+        }
       ],
       "evidence": {
         "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
@@ -35,7 +43,11 @@
       "title": "Reflection queue doesn't accumulate ghost entries",
       "status": "pass",
       "steps": [
-        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+        {
+          "action": "Run full reflection test suite",
+          "expected": "Tests pass",
+          "observed": "Tests pass"
+        }
       ],
       "evidence": {
         "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
@@ -47,7 +59,11 @@
       "title": "Reflection queue bounded by REFLECTION_QUEUE_MAX_LINES",
       "status": "pass",
       "steps": [
-        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+        {
+          "action": "Run full reflection test suite",
+          "expected": "Tests pass",
+          "observed": "Tests pass"
+        }
       ],
       "evidence": {
         "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
@@ -59,7 +75,11 @@
       "title": "Processed entries removed from queue",
       "status": "pass",
       "steps": [
-        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+        {
+          "action": "Run full reflection test suite",
+          "expected": "Tests pass",
+          "observed": "Tests pass"
+        }
       ],
       "evidence": {
         "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]
@@ -71,7 +91,11 @@
       "title": "All reflection hook tests pass",
       "status": "pass",
       "steps": [
-        { "action": "Run full reflection test suite", "expected": "Tests pass", "observed": "Tests pass" }
+        {
+          "action": "Run full reflection test suite",
+          "expected": "Tests pass",
+          "observed": "Tests pass"
+        }
       ],
       "evidence": {
         "terminalSnapshots": ["reflection-token/group-3/VAL-RF-020-025-test-results.txt"]

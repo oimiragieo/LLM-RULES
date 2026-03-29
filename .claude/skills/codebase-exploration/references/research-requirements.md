@@ -8,13 +8,13 @@ Based on research into SWE-bench top performers, LocAgent, and OpenHands.
 
 ## Tool Selection
 
-| Need               | Tool                       |
-| ------------------ | -------------------------- |
-| File discovery     | Glob                       |
-| Content search     | Grep (ripgrep)             |
-| Targeted read      | Read with offset/limit     |
-| Structure patterns | ast-grep                   |
-| Definitions        | LSP                        |
+| Need               | Tool                   |
+| ------------------ | ---------------------- |
+| File discovery     | Glob                   |
+| Content search     | Grep (ripgrep)         |
+| Targeted read      | Read with offset/limit |
+| Structure patterns | ast-grep               |
+| Definitions        | LSP                    |
 
 ## Token Budget Management
 

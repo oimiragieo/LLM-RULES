@@ -23,9 +23,7 @@
     "total": 5,
     "passed": 4,
     "failed": 1,
-    "failedFeatures": [
-      "improve-low-scoring-skills-batch-2"
-    ]
+    "failedFeatures": ["improve-low-scoring-skills-batch-2"]
   },
   "blockingIssues": [
     {
@@ -93,9 +91,6 @@
   "orchestratorOverride": {
     "timestamp": "2026-03-29T08:10:00.000Z",
     "reason": "Override scrutiny failure. The 'empty stubs' in scripts/main.cjs are scaffolds for cognitive/rule-based skills where the real value lives in SKILL.md, rules/, commands/, and templates/. The ecosystem gate scoring is file-existence-based only (does not inspect content). All CI gates pass (test, typecheck, lint, validate:full, ecosystem gate at 96.44 avg). Writing real implementations for 69 cognitive skills is out of scope -- these skills do not have executable logic, they are reference/instruction-based skills that Claude follows via SKILL.md. The 'no tests' finding is similarly irrelevant since there is nothing executable to test.",
-    "overriddenIssues": [
-      "empty stubs that exit with code 1",
-      "no tests written for 25 skills"
-    ]
+    "overriddenIssues": ["empty stubs that exit with code 1", "no tests written for 25 skills"]
   }
 }

@@ -1684,3 +1684,21 @@ From Claude CLI + Codex council on ecosystem audit (185 orphans, 21 model mismat
 - Updated workflow: evolution-workflow (2026-03-29)
 
 - Updated workflow: missing-workflow-xyz (2026-03-29)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-29)
+
+- Created new agent: qa-guardian (2026-03-29)
+
+- Updated workflow: evolution-workflow (2026-03-29)
+
+- Updated workflow: missing-workflow-xyz (2026-03-29)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-29)
+
+- Created new agent: contract-check (2026-03-29)
+
+- Created new agent: bool-action (2026-03-29)
+
+- Created new agent: repo-onboarder (2026-03-29)
+
+- Created new agent: release-guardian (2026-03-29)

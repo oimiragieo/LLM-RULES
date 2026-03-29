@@ -14,7 +14,9 @@ const options = Object.fromEntries(
 
 if (options.help) {
   console.log('Doc Co-Authoring - Main Script');
-  console.log('Collaborative document creation: context gathering, section refinement, reader testing');
+  console.log(
+    'Collaborative document creation: context gathering, section refinement, reader testing'
+  );
   process.exit(0);
 }
 

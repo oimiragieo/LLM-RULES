@@ -1,1 +1,11 @@
-{"$schema":"http://json-schema.org/draft-07/schema#","title":"fintechEngineerOutput","type":"object","additionalProperties":true,"properties":{"ok":{"type":"boolean"},"code":{"type":"string"},"complianceChecklist":{"type":"array","items":{"type":"string"}}}}
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "fintechEngineerOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": { "type": "boolean" },
+    "code": { "type": "string" },
+    "complianceChecklist": { "type": "array", "items": { "type": "string" } }
+  }
+}

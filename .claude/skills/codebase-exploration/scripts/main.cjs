@@ -14,7 +14,9 @@ const options = Object.fromEntries(
 
 if (options.help) {
   console.log('Codebase Exploration - Main Script');
-  console.log('7-phase progressive exploration: structure scan, repo map, targeted search, synthesis');
+  console.log(
+    '7-phase progressive exploration: structure scan, repo map, targeted search, synthesis'
+  );
   process.exit(0);
 }
 

@@ -23,9 +23,7 @@
     "total": 5,
     "passed": 4,
     "failed": 1,
-    "failedFeatures": [
-      "wire-a2a-router-integration"
-    ]
+    "failedFeatures": ["wire-a2a-router-integration"]
   },
   "blockingIssues": [],
   "appliedUpdates": [],

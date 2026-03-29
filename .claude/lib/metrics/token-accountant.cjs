@@ -35,10 +35,7 @@ const DEFAULT_MODEL = 'sonnet';
  * Default persistence path for token usage data.
  * This path is used when load()/persist() are called without explicit paths.
  */
-const DEFAULT_PERSISTENCE_PATH = path.join(
-  __dirname,
-  '../../context/metrics/token-usage.json'
-);
+const DEFAULT_PERSISTENCE_PATH = path.join(__dirname, '../../context/metrics/token-usage.json');
 
 /**
  * @typedef {Object} UsageRecord

@@ -6,12 +6,12 @@ Three-stage collaborative document creation.
 
 ## Document Types
 
-| Type        | Key Sections                              |
-| ----------- | ----------------------------------------- |
-| PRD         | Problem, Goals, User Stories, Metrics     |
-| Design Doc  | Background, Design, Implementation, Test  |
-| RFC         | Motivation, Design, Drawbacks, Alternatives|
-| Proposal    | Problem, Solution, Business Case, Risks   |
+| Type       | Key Sections                                |
+| ---------- | ------------------------------------------- |
+| PRD        | Problem, Goals, User Stories, Metrics       |
+| Design Doc | Background, Design, Implementation, Test    |
+| RFC        | Motivation, Design, Drawbacks, Alternatives |
+| Proposal   | Problem, Solution, Business Case, Risks     |
 
 ## Editing Mechanics
 

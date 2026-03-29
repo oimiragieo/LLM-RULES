@@ -12,7 +12,11 @@
       "title": "force-step0-execution.cjs registered in settings.json",
       "status": "pass",
       "steps": [
-        { "action": "rg force-step0-execution .claude/settings.json", "expected": "Match found", "observed": "Match found" }
+        {
+          "action": "rg force-step0-execution .claude/settings.json",
+          "expected": "Match found",
+          "observed": "Match found"
+        }
       ],
       "evidence": {
         "terminal": ["reflection-token/group-2/VAL-RF-010.txt"]
@@ -24,7 +28,11 @@
       "title": "reflection-data-aggregator.cjs registered in settings.json",
       "status": "pass",
       "steps": [
-        { "action": "rg reflection-data-aggregator .claude/settings.json", "expected": "Match found", "observed": "Match found" }
+        {
+          "action": "rg reflection-data-aggregator .claude/settings.json",
+          "expected": "Match found",
+          "observed": "Match found"
+        }
       ],
       "evidence": {
         "terminal": ["reflection-token/group-2/VAL-RF-011.txt"]
@@ -36,7 +44,11 @@
       "title": "All registered reflection hooks resolve to existing files",
       "status": "pass",
       "steps": [
-        { "action": "Script validation of all reflection hook paths", "expected": "ALL PASSED", "observed": "ALL PASSED" }
+        {
+          "action": "Script validation of all reflection hook paths",
+          "expected": "ALL PASSED",
+          "observed": "ALL PASSED"
+        }
       ],
       "evidence": {
         "terminal": ["reflection-token/group-2/VAL-RF-012.txt"]
@@ -48,7 +60,11 @@
       "title": "Token report fires regardless of task wording",
       "status": "pass",
       "steps": [
-        { "action": "Run unit test post-pipeline-token-report.test.cjs", "expected": "fires on metadata.pipelineComplete without keywords passes", "observed": "Test passed" }
+        {
+          "action": "Run unit test post-pipeline-token-report.test.cjs",
+          "expected": "fires on metadata.pipelineComplete without keywords passes",
+          "observed": "Test passed"
+        }
       ],
       "evidence": {
         "terminal": ["reflection-token/group-2/VAL-RF-013-015.txt"]
@@ -60,7 +76,11 @@
       "title": "Token report has structural detection",
       "status": "pass",
       "steps": [
-        { "action": "Code inspection of post-pipeline-token-report.cjs", "expected": "Structural signal path explicitly defined", "observed": "pipelineComplete and isFinalTask structural logic found" }
+        {
+          "action": "Code inspection of post-pipeline-token-report.cjs",
+          "expected": "Structural signal path explicitly defined",
+          "observed": "pipelineComplete and isFinalTask structural logic found"
+        }
       ],
       "evidence": {
         "terminal": ["reflection-token/group-2/VAL-RF-014-inspection.txt"]
@@ -72,7 +92,11 @@
       "title": "Token report avoids false positives on intermediate tasks",
       "status": "pass",
       "steps": [
-        { "action": "Run unit test post-pipeline-token-report.test.cjs", "expected": "does NOT fire on intermediate task with 'final' substring passes", "observed": "Test passed" }
+        {
+          "action": "Run unit test post-pipeline-token-report.test.cjs",
+          "expected": "does NOT fire on intermediate task with 'final' substring passes",
+          "observed": "Test passed"
+        }
       ],
       "evidence": {
         "terminal": ["reflection-token/group-2/VAL-RF-013-015.txt"]
@@ -84,7 +108,11 @@
       "title": "TokenAccountant persists state to disk",
       "status": "pass",
       "steps": [
-        { "action": "Run unit test token-accountant.test.cjs", "expected": "VAL-RF-016 tests pass", "observed": "persist() writes to disk, load() recovers data passed" }
+        {
+          "action": "Run unit test token-accountant.test.cjs",
+          "expected": "VAL-RF-016 tests pass",
+          "observed": "persist() writes to disk, load() recovers data passed"
+        }
       ],
       "evidence": {
         "terminal": ["reflection-token/group-2/VAL-RF-016-019.txt"]
@@ -96,7 +124,11 @@
       "title": "TokenAccountant recovers from corrupted persistence file",
       "status": "pass",
       "steps": [
-        { "action": "Run unit test token-accountant.test.cjs", "expected": "VAL-RF-017 tests pass", "observed": "load() handles corrupted file gracefully passed" }
+        {
+          "action": "Run unit test token-accountant.test.cjs",
+          "expected": "VAL-RF-017 tests pass",
+          "observed": "load() handles corrupted file gracefully passed"
+        }
       ],
       "evidence": {
         "terminal": ["reflection-token/group-2/VAL-RF-016-019.txt"]
@@ -108,7 +140,11 @@
       "title": "TokenAccountant recovers from missing persistence file",
       "status": "pass",
       "steps": [
-        { "action": "Run unit test token-accountant.test.cjs", "expected": "VAL-RF-018 tests pass", "observed": "load() handles missing file gracefully passed" }
+        {
+          "action": "Run unit test token-accountant.test.cjs",
+          "expected": "VAL-RF-018 tests pass",
+          "observed": "load() handles missing file gracefully passed"
+        }
       ],
       "evidence": {
         "terminal": ["reflection-token/group-2/VAL-RF-016-019.txt"]
@@ -120,10 +156,17 @@
       "title": "TokenAccountant persistence is atomic",
       "status": "pass",
       "steps": [
-        { "action": "Code inspection and unit test token-accountant.test.cjs", "expected": "atomicWriteJSONSync used and test passes", "observed": "atomicWriteJSONSync logic observed and VAL-RF-019 test passed" }
+        {
+          "action": "Code inspection and unit test token-accountant.test.cjs",
+          "expected": "atomicWriteJSONSync used and test passes",
+          "observed": "atomicWriteJSONSync logic observed and VAL-RF-019 test passed"
+        }
       ],
       "evidence": {
-        "terminal": ["reflection-token/group-2/VAL-RF-016-019.txt", "reflection-token/group-2/VAL-RF-019-inspection.txt"]
+        "terminal": [
+          "reflection-token/group-2/VAL-RF-016-019.txt",
+          "reflection-token/group-2/VAL-RF-019-inspection.txt"
+        ]
       },
       "issues": null
     }

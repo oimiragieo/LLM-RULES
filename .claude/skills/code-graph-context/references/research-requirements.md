@@ -8,14 +8,14 @@
 
 ## Tool Reference
 
-| Tool                  | Purpose                                  |
-| --------------------- | ---------------------------------------- |
-| find_callers          | All functions that call a symbol         |
-| find_callees          | All symbols called by a function         |
-| get_class_hierarchy   | Superclasses, subclasses, interfaces     |
-| find_dead_code        | Functions with no callers in graph       |
-| get_module_deps       | Import/require dependency graph          |
-| query_graph           | Raw Cypher query against KuzuDB          |
+| Tool                | Purpose                              |
+| ------------------- | ------------------------------------ |
+| find_callers        | All functions that call a symbol     |
+| find_callees        | All symbols called by a function     |
+| get_class_hierarchy | Superclasses, subclasses, interfaces |
+| find_dead_code      | Functions with no callers in graph   |
+| get_module_deps     | Import/require dependency graph      |
+| query_graph         | Raw Cypher query against KuzuDB      |
 
 ## Source References
 

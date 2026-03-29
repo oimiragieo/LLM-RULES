@@ -28,6 +28,7 @@
 ## Heuristic Evaluation
 
 Apply Nielsen's 10 heuristics with severity ratings (0-4):
+
 1. Visibility of system status
 2. Match between system and real world
 3. User control and freedom

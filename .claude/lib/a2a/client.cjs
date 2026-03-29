@@ -48,9 +48,7 @@ class A2AClient {
       throw new Error('baseUrl is required');
     }
 
-    this._baseUrl = options.baseUrl.endsWith('/')
-      ? options.baseUrl.slice(0, -1)
-      : options.baseUrl;
+    this._baseUrl = options.baseUrl.endsWith('/') ? options.baseUrl.slice(0, -1) : options.baseUrl;
     this._timeout = options.timeout || 30000;
     this._headers = options.headers || {};
     this._requestId = 0;
@@ -154,7 +152,7 @@ class A2AClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'text/event-stream',
+          Accept: 'text/event-stream',
           'Content-Length': Buffer.byteLength(body),
           ...this._headers,
         },

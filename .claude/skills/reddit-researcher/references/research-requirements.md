@@ -20,7 +20,7 @@
 ```javascript
 const url = 'https://www.reddit.com/r/programming.json?limit=25';
 const response = await fetch(url, {
-  headers: { 'User-Agent': 'agent-studio-reddit-researcher/1.0' }
+  headers: { 'User-Agent': 'agent-studio-reddit-researcher/1.0' },
 });
 const data = await response.json();
 ```
@@ -30,7 +30,7 @@ const data = await response.json();
 ```javascript
 const url = 'https://www.reddit.com/r/programming/comments/abc123/post_title.json';
 const response = await fetch(url, {
-  headers: { 'User-Agent': 'agent-studio-reddit-researcher/1.0' }
+  headers: { 'User-Agent': 'agent-studio-reddit-researcher/1.0' },
 });
 const [post, comments] = await response.json();
 ```

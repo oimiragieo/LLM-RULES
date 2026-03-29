@@ -1,1 +1,10 @@
-{"$schema":"http://json-schema.org/draft-07/schema#","title":"knowledgeGraphInput","type":"object","additionalProperties":true,"properties":{"action":{"type":"string","enum":["build","query","add","traverse"]},"query":{"type":"string"}}}
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "knowledgeGraphInput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "action": { "type": "string", "enum": ["build", "query", "add", "traverse"] },
+    "query": { "type": "string" }
+  }
+}

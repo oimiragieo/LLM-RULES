@@ -38,7 +38,13 @@ const A2A_DEFAULT_TIMEOUT = 30000;
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const _RUNTIME_DIR = path.join(ROOT, '.claude', 'context', 'runtime');
-const TELEGRAM_CMD_QUEUE = path.join(ROOT, '.claude', 'context', 'tmp', 'telegram-command-queue.json');
+const TELEGRAM_CMD_QUEUE = path.join(
+  ROOT,
+  '.claude',
+  'context',
+  'tmp',
+  'telegram-command-queue.json'
+);
 
 /**
  * Get the A2A port from environment or default.

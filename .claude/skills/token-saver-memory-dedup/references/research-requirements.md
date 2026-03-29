@@ -17,11 +17,11 @@
 ### Entry Prioritization
 
 ```markdown
-| Priority | Factor |
-|----------|--------|
-| 1 | Most recent timestamp |
-| 2 | Highest detail level |
-| 3 | Most references |
+| Priority | Factor                |
+| -------- | --------------------- |
+| 1        | Most recent timestamp |
+| 2        | Highest detail level  |
+| 3        | Most references       |
 ```
 
 ## Source References

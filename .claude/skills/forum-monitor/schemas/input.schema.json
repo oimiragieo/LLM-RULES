@@ -1,1 +1,11 @@
-{"$schema":"http://json-schema.org/draft-07/schema#","title":"forumMonitorInput","type":"object","additionalProperties":true,"properties":{"forums":{"type":"array","items":{"type":"string"}},"keywords":{"type":"array","items":{"type":"string"}},"alertOn":{"type":"array","items":{"type":"string"}}}}
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "forumMonitorInput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "forums": { "type": "array", "items": { "type": "string" } },
+    "keywords": { "type": "array", "items": { "type": "string" } },
+    "alertOn": { "type": "array", "items": { "type": "string" } }
+  }
+}

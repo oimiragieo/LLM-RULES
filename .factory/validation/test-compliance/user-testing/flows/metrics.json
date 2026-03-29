@@ -4,10 +4,7 @@
   "isolation": {
     "runType": "CLI"
   },
-  "toolsUsed": [
-    "Execute",
-    "Create"
-  ],
+  "toolsUsed": ["Execute", "Create"],
   "assertions": [
     {
       "id": "VAL-TC-010",
@@ -21,9 +18,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "test-compliance/metrics/VAL-TC-010-metrics-ci.txt"
-        ]
+        "terminalSnapshots": ["test-compliance/metrics/VAL-TC-010-metrics-ci.txt"]
       },
       "issues": null
     }

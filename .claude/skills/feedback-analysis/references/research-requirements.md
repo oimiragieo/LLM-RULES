@@ -24,7 +24,7 @@
 
 ```markdown
 | Priority | Frequency | Severity | User Segment |
-|----------|-----------|----------|--------------|
+| -------- | --------- | -------- | ------------ |
 | P1       | >100      | High     | Enterprise   |
 | P2       | 50-100    | Medium   | All          |
 | P3       | <50       | Low      | Free tier    |

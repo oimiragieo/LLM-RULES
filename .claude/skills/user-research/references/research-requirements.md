@@ -25,6 +25,7 @@
 ## Heuristic Evaluation
 
 Nielsen's 10 heuristics with severity ratings:
+
 - 0: Not a problem
 - 1: Cosmetic problem
 - 2: Minor usability problem
@@ -34,6 +35,7 @@ Nielsen's 10 heuristics with severity ratings:
 ## Accessibility Standards
 
 WCAG 2.1 AA compliance checks:
+
 - Perceivable: alt text, captions, contrast ratios
 - Operable: keyboard nav, timing, navigation
 - Understandable: readable, predictable

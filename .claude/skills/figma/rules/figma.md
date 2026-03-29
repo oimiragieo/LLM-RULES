@@ -14,12 +14,12 @@ Design-to-code workflow: extract design tokens, components, translate designs to
 
 ## Auto-Layout Mapping
 
-| Figma          | CSS                      |
-| -------------- | ------------------------ |
-| Horizontal     | flex-direction: row      |
-| Vertical       | flex-direction: column   |
-| Space between  | justify-content: space-between |
-| Gap: 16        | gap: 1rem                |
+| Figma         | CSS                            |
+| ------------- | ------------------------------ |
+| Horizontal    | flex-direction: row            |
+| Vertical      | flex-direction: column         |
+| Space between | justify-content: space-between |
+| Gap: 16       | gap: 1rem                      |
 
 ## Integration Points
 

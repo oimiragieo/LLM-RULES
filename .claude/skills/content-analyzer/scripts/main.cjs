@@ -14,7 +14,9 @@ const options = Object.fromEntries(
 
 if (options.help) {
   console.log('Content Analyzer - Main Script');
-  console.log('Six-dimension content analysis: sentiment, readability, structure, topics, wording, engagement');
+  console.log(
+    'Six-dimension content analysis: sentiment, readability, structure, topics, wording, engagement'
+  );
   process.exit(0);
 }
 

@@ -13,12 +13,12 @@ Design system lookup, CSS best practices, and AI-driven UI component generation 
 
 ## MCP Tools
 
-- design_systems__search_components
-- design_systems__get_tokens
-- design_systems__get_patterns
-- css__query_property
-- css__check_compat
-- magic__create_component
+- design_systems\_\_search_components
+- design_systems\_\_get_tokens
+- design_systems\_\_get_patterns
+- css\_\_query_property
+- css\_\_check_compat
+- magic\_\_create_component
 
 ## Integration Points
 

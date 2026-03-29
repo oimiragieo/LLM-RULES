@@ -9,19 +9,23 @@
 ## Key Regulations by Domain
 
 ### Data Privacy
+
 - **GDPR**: EU data protection, consent management, DPO requirements
 - **CCPA**: California privacy rights, opt-out mechanisms
 - **LGPD**: Brazil data protection law
 
 ### Healthcare
+
 - **HIPAA**: PHI protection, BAA requirements, audit controls
 - **HITECH**: EHR meaningful use, breach notification
 
 ### Security
+
 - **SOC 2**: Trust services criteria (security, availability, confidentiality)
 - **ISO 27001**: Information security management
 
 ### Financial
+
 - **PCI-DSS**: Payment card data security
 - **SOX**: Financial reporting controls
 

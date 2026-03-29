@@ -31,7 +31,7 @@ https://export.arxiv.org/api/query?search_query=all:{ENCODED_KEYWORD}&sortBy=sub
 ```javascript
 CronCreate({
   schedule: '0 */6 * * *', // Every 6 hours
-  task: "Invoke Skill({ skill: 'arxiv-monitor' })"
+  task: "Invoke Skill({ skill: 'arxiv-monitor' })",
 });
 ```
 

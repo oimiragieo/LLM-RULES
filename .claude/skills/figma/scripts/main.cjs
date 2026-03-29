@@ -14,7 +14,9 @@ const options = Object.fromEntries(
 
 if (options.help) {
   console.log('Figma - Main Script');
-  console.log('Design-to-code: design values extraction, component inspection, auto-layout mapping');
+  console.log(
+    'Design-to-code: design values extraction, component inspection, auto-layout mapping'
+  );
   process.exit(0);
 }
 

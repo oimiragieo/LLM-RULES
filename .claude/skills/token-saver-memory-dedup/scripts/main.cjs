@@ -14,7 +14,9 @@ const {
 } = require('../../token-saver-context-compression/scripts/main.cjs');
 
 if (require.main === module) {
-  const options = require('../../token-saver-context-compression/scripts/main.cjs').parseArgs(process.argv.slice(2));
+  const options = require('../../token-saver-context-compression/scripts/main.cjs').parseArgs(
+    process.argv.slice(2)
+  );
   if (options.help) {
     process.stdout.write(`token-saver-memory-dedup
 

@@ -18,9 +18,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "test-compliance/format/VAL-TC-019-format-check.txt"
-        ]
+        "terminalSnapshots": ["test-compliance/format/VAL-TC-019-format-check.txt"]
       },
       "issues": null
     }

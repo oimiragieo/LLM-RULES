@@ -16,7 +16,7 @@ Schedule automated paper monitoring every 6 hours:
 ```javascript
 CronCreate({
   schedule: '0 */6 * * *',
-  task: "Invoke Skill({ skill: 'arxiv-monitor' })"
+  task: "Invoke Skill({ skill: 'arxiv-monitor' })",
 });
 ```
 

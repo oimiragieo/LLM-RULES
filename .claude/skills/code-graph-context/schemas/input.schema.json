@@ -19,7 +19,14 @@
     },
     "operation": {
       "type": "string",
-      "enum": ["find_callers", "find_callees", "get_class_hierarchy", "find_dead_code", "get_module_deps", "query_graph"],
+      "enum": [
+        "find_callers",
+        "find_callees",
+        "get_class_hierarchy",
+        "find_dead_code",
+        "get_module_deps",
+        "query_graph"
+      ],
       "description": "Graph operation to perform"
     }
   }

@@ -57,7 +57,7 @@ const fs = require('fs');
 async function parseSession(filePath) {
   const rl = readline.createInterface({
     input: fs.createReadStream(filePath),
-    crlfDelay: Infinity
+    crlfDelay: Infinity,
   });
 
   for await (const line of rl) {

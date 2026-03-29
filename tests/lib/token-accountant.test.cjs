@@ -371,9 +371,24 @@ describe('Lifecycle Wiring', () => {
     const filePath = makeTempPath();
     const acc = new TokenAccountant(filePath);
 
-    acc.recordUsage('task-1', { inputTokens: 100, outputTokens: 50, model: 'sonnet', agentType: 'dev' });
-    acc.recordUsage('task-2', { inputTokens: 200, outputTokens: 100, model: 'haiku', agentType: 'qa' });
-    acc.recordUsage('task-1', { inputTokens: 50, outputTokens: 25, model: 'sonnet', agentType: 'dev' });
+    acc.recordUsage('task-1', {
+      inputTokens: 100,
+      outputTokens: 50,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
+    acc.recordUsage('task-2', {
+      inputTokens: 200,
+      outputTokens: 100,
+      model: 'haiku',
+      agentType: 'qa',
+    });
+    acc.recordUsage('task-1', {
+      inputTokens: 50,
+      outputTokens: 25,
+      model: 'sonnet',
+      agentType: 'dev',
+    });
 
     // Create new instance to verify persistence
     const acc2 = new TokenAccountant(filePath);
