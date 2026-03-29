@@ -80,7 +80,7 @@ Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute 
 | integrate repo | researcher | **artifact-integrator**   |
 | debug prod     | developer  | **devops-troubleshooter** |
 
-110 agents exist. See **@AGENT_ROUTING_TABLE.md** for full matrix.
+119 agents exist. See **@AGENT_ROUTING_TABLE.md** for full matrix.
 
 **Rules:** Use `Task(...)` not persona-switching. Include `task_id` in every spawn. Agents invoke skills via `Skill()` tool.
 
@@ -175,7 +175,7 @@ Creator skills: Use `Skill({ skill: 'name' })`, invoke `research-synthesis` BEFO
 | Topic                                 | File                         |
 | ------------------------------------- | ---------------------------- |
 | Planning matrix, enterprise workflows | **@ENTERPRISE_WORKFLOWS.md** |
-| Agent routing (full 110-agent matrix) | **@AGENT_ROUTING_TABLE.md**  |
+| Agent routing (full 119-agent matrix) | **@AGENT_ROUTING_TABLE.md**  |
 | Router operations, gap protocol       | **@ROUTER_OPERATIONS.md**    |
 | Memory protocol (STM/MTM/LTM)         | **@MEMORY_PROTOCOL.md**      |
 | Hook enforcement                      | **@ENFORCEMENT_HOOKS.md**    |

@@ -379,6 +379,44 @@ agents:
     path: .claude/agents/orchestrators/loop-operator.md
     model: sonnet
 
+  # Domain routers (hierarchical routing)
+  domain-router-ai-ml:
+    path: .claude/agents/orchestrators/domain-router-ai-ml.md
+    model: haiku
+    context_strategy: lazy_load
+  domain-router-arch-data:
+    path: .claude/agents/orchestrators/domain-router-arch-data.md
+    model: haiku
+    context_strategy: lazy_load
+  domain-router-backend:
+    path: .claude/agents/orchestrators/domain-router-backend.md
+    model: haiku
+    context_strategy: lazy_load
+  domain-router-infra:
+    path: .claude/agents/orchestrators/domain-router-infra.md
+    model: haiku
+    context_strategy: lazy_load
+  domain-router-mobile:
+    path: .claude/agents/orchestrators/domain-router-mobile.md
+    model: haiku
+    context_strategy: lazy_load
+  domain-router-niche:
+    path: .claude/agents/orchestrators/domain-router-niche.md
+    model: haiku
+    context_strategy: lazy_load
+  domain-router-product:
+    path: .claude/agents/orchestrators/domain-router-product.md
+    model: haiku
+    context_strategy: lazy_load
+  domain-router-security:
+    path: .claude/agents/orchestrators/domain-router-security.md
+    model: haiku
+    context_strategy: lazy_load
+  domain-router-web-frontend:
+    path: .claude/agents/orchestrators/domain-router-web-frontend.md
+    model: haiku
+    context_strategy: lazy_load
+
   # Additional domain specialists
   angular-pro:
     path: .claude/agents/domain/angular-pro.md
