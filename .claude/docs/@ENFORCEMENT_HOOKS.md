@@ -20,8 +20,8 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 
 | Hook                            | Location                    | Trigger                                     | Default | Key Env Variables                                                                                                    |
 | ------------------------------- | --------------------------- | ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
-| `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task, Edit, Write, NotebookEdit) | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
-| `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | PreToolUse(Edit, Write, NotebookEdit)       | block   | `CREATOR_GUARD`                                                                                                      |
+| `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Glob\|Grep\|WebSearch, TaskCreate, TaskOutput) | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
+| `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | Called via write-pretool-bundle.cjs (not standalone) | block   | `CREATOR_GUARD`                                                                                                      |
 | `unified-pre-write-hook.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Write, Edit)                     | block   | Multiple (11 consolidated checks)                                                                                    |
 | `bash-command-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `BASH_VALIDATOR_FAIL_OPEN`                                                                                           |
 | `shell-injection-validator.cjs` | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `SHELL_INJECTION_VALIDATOR`                                                                                          |
@@ -29,7 +29,7 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 | `reflection-step0-guard.cjs`    | `.claude/hooks/reflection/` | PreToolUse(TaskList)                        | block   | `REFLECTION_STEP0_ENFORCEMENT`                                                                                       |
 | `post-creation-integration.cjs` | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate)                     | warn    | `INTEGRATION_ENFORCEMENT`                                                                                            |
 | `drift-detector.cjs`            | `.claude/hooks/session/`    | UserPromptSubmit                            | N/A     | None (always enabled, informational)                                                                                 |
-| `adaptive-quality-gate.cjs`     | `.claude/hooks/session/`    | PreToolUse(Edit, Write, NotebookEdit)       | N/A     | None (always enabled, informational)                                                                                 |
+| `adaptive-quality-gate.cjs`     | `.claude/hooks/session/`    | Called via write-pretool-bundle.cjs (not standalone) | N/A     | None (always enabled, informational)                                                                                 |
 | `post-edit-scanner.cjs`         | `.claude/hooks/session/`    | PostToolUse(Edit)                           | N/A     | None (always enabled, informational)                                                                                 |
 | `pre-compact.cjs`               | `.claude/hooks/session/`    | Stop                                        | N/A     | None (always enabled, informational)                                                                                 |
 | `bypass-audit-hook.cjs`         | `.claude/hooks/safety/`     | PostToolUse(Edit, Write, NotebookEdit)      | N/A     | `BYPASS_AUDIT_ENABLED`, `BYPASS_AUDIT_PATH`, `BYPASS_AUDIT_*_THRESHOLD`, `BYPASS_AUDIT_CORRELATION_WINDOW_MS`        |
@@ -41,7 +41,7 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 ## 1. routing-guard.cjs
 
 **Location:** `.claude/hooks/routing/routing-guard.cjs`
-**Event Type:** PreToolUse(Task), PreToolUse(Edit), PreToolUse(Write), PreToolUse(NotebookEdit)
+**Event Type:** PreToolUse(Glob|Grep|WebSearch), PreToolUse(TaskCreate), PreToolUse(TaskOutput)
 **Default Enforcement:** block
 **Purpose:** Enforces router-first protocol and CLAUDE.md Gates 1-3
 
@@ -116,9 +116,11 @@ STATE_STALE_THRESHOLD_MS=number  # Default: 600000 (10 minutes)
 ## 2. unified-creator-guard.cjs
 
 **Location:** `.claude/hooks/routing/unified-creator-guard.cjs`
-**Event Type:** PreToolUse(Write), PreToolUse(Edit)
+**Event Type:** Called via `write-pretool-bundle.cjs` (not registered standalone)
 **Default Enforcement:** block
 **Purpose:** Enforces Gate 4 (Creator Workflow) for all artifact types
+
+**Wiring Note:** This hook is NOT directly registered in `settings.json`. It is called in-process by `write-pretool-bundle.cjs`, which IS registered on `PreToolUse(Edit|Write|NotebookEdit)`.
 
 ### Blocked Paths
 
@@ -805,7 +807,7 @@ Hooks are registered in `.claude/settings.json` using the `{matcher, hooks: [{ty
 }
 ```
 
-> **Note:** `user-prompt-unified.cjs` is called indirectly via `user-prompt-orchestrator.cjs` (the registered UserPromptSubmit hook), not registered directly in settings.json.
+> **Note:** `user-prompt-unified.cjs` is registered directly in `settings.json` under `UserPromptSubmit`.
 
 ---
 
@@ -1029,68 +1031,28 @@ Best-effort updates to `codebase_map.json`:
 
 ---
 
-## 18. state-reset.cjs
+## 18. state-reset.cjs (DEPRECATED - DEAD CODE)
 
 **Location:** `.claude/hooks/session/state-reset.cjs`
-**Event Type:** UserPromptSubmit
-**Default Enforcement:** N/A (always enabled, non-blocking)
-**Purpose:** Resets router state on every user prompt to prevent stale state bypassing enforcement
+**Status:** **REMOVED/DEPRECATED** - This hook is dead code and is NOT registered in `settings.json`.
+**Purpose:** (Historical) Previously reset router state on every user prompt to prevent stale state bypassing enforcement.
 
-### What Gets Reset
-
-**File:** `.claude/context/runtime/router-state.json`
-
-**Reset Fields:**
-
-- `mode: 'router'` (always starts in router mode)
-- `taskSpawned: false` (prevents bypass of routing protocol)
-- `taskListCalledSincePrompt: false` (enforces TaskList-first)
-- `complexity: 'trivial'` (resets complexity assessment)
-- `requiresPlannerFirst: false` (resets planner gate)
-- `requiresSecurityReview: false` (resets security gate)
-- `plannerSpawned: false` (resets planner tracking)
-- `securitySpawned: false` (resets security tracking)
-
-**Preserved Fields:**
-
-- `sessionId` (maintains session continuity)
-
-### Why This Matters
-
-**Problem Solved (PROC-007):**
-
-- Prevents stale `taskSpawned: true` from bypassing routing protocol
-- Ensures every user prompt starts with clean state
-- Prevents enforcement drift across multiple prompts
-
-**Remediation Pattern:**
-
-- Part of PROC-007 Option A (state reset on every prompt)
-- Complements Fix 4b (staleness detection in routing-guard.cjs)
-- Fail-open on errors (logs error but doesn't block prompt)
+**Note:** The file still exists on disk but has no active registration. It should be removed in a future cleanup.
 
 **Safety Net:**
-If state reset fails, routing-guard.cjs detects stale state via:
+If state reset is needed, routing-guard.cjs detects stale state via:
 
 - `STATE_STALE_THRESHOLD_MS` (default: 600000ms / 10 minutes)
 - Invalid timestamps trigger fallback to router mode
-
-**No Environment Variables** - Always enabled, runs on UserPromptSubmit
 
 ---
 
 ### drift-detector.cjs
 
-**Event Type:** UserPromptSubmit (indirect -- NOT directly registered in settings.json)
+**Event Type:** UserPromptSubmit
 **Purpose:** Tracks original session intent, warns on drift after 6+ edits with <20% keyword overlap
 
-**Wiring Note:** `drift-detector.cjs` is NOT directly registered in `settings.json`. It is called indirectly through `user-prompt-orchestrator.cjs`, which IS registered on `UserPromptSubmit`. The orchestrator spawns three child processes on every user prompt:
-
-1. `state-reset.cjs` -- resets session state
-2. `drift-detector.cjs` -- detects session drift (this hook)
-3. `vector-db-warmstart.cjs` -- warms the vector DB
-
-Pattern: `settings.json` --> `user-prompt-orchestrator.cjs` --> `[state-reset.cjs, drift-detector.cjs, vector-db-warmstart.cjs]`
+**Wiring Note:** `drift-detector.cjs` is registered directly in `settings.json` under `UserPromptSubmit`. It runs independently on every user prompt.
 
 **State File:** `.claude/context/runtime/drift-state.json`
 
@@ -1116,8 +1078,10 @@ Session starts with "Add authentication to the app"
 
 ### adaptive-quality-gate.cjs
 
-**Event Type:** PreToolUse(Edit|Write|NotebookEdit)
+**Event Type:** Called via `write-pretool-bundle.cjs` (not registered standalone)
 **Purpose:** Counts edits per session, suggests quality checkpoints at adaptive thresholds
+
+**Wiring Note:** This hook is NOT directly registered in `settings.json`. It is called in-process by `write-pretool-bundle.cjs`, which IS registered on `PreToolUse(Edit|Write|NotebookEdit)`.
 
 **State File:** `.claude/context/runtime/edit-counter.json`
 **Metrics Input:** `.claude/context/runtime/session-metrics.json` (corrections_count, prompt_count)
@@ -1142,6 +1106,24 @@ Session starts with "Add authentication to the app"
 - Atomic file writes (tmp + rename)
 
 **No Environment Variables** - Always enabled, informational only
+
+---
+
+### agent-template-contract-validator.cjs
+
+**Event Type:** Called via `write-pretool-bundle.cjs` (not registered standalone)
+**Purpose:** Validates agent file content against the agent template contract during writes
+
+**Wiring Note:** This hook is NOT directly registered in `settings.json`. It is called in-process by `write-pretool-bundle.cjs`, which IS registered on `PreToolUse(Edit|Write|NotebookEdit)`.
+
+**Behavior:**
+
+- Detects agent files (`.claude/agents/**/*.md`)
+- Validates incoming content against agent template requirements
+- Enforces required frontmatter fields and structure
+- Blocks writes that violate the agent template contract
+
+**No Environment Variables** - Always enabled when agent files are written
 
 ---
 
