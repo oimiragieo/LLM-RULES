@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "session-log-analyzerInput",
+  "description": "Input schema for Parse Claude Code JSONL session logs from ~/.claude/projects/ for tool call inventory, token costs, error detection, subagent traces, and compaction detection",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

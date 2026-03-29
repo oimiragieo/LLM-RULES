@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "contextAttributionInput",
+  "description": "Input schema for context-attribution skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "content": {
+      "type": "string",
+      "description": "Content to attribute sources to"
+    },
+    "sources": {
+      "type": "array",
+      "description": "Available sources for attribution"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "scientificSkillsInput",
+  "description": "Input schema for scientific-skills skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target research area or database"
+    },
+    "subskill": {
+      "type": "string",
+      "description": "Specific sub-skill to invoke (e.g., rdkit, scanpy, biopython)"
+    },
+    "options": {
+      "type": "object",
+      "description": "Research options",
+      "additionalProperties": true
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "autoRecallInput",
+  "description": "Input schema for auto-recall skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "Semantic search query"
+    },
+    "limit": {
+      "type": "integer",
+      "description": "Maximum results to return"
+    },
+    "category": {
+      "type": "string",
+      "description": "Filter by category"
+    }
+  }
+}

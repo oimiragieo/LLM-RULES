@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "perpetualMemoryOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "id": {
+      "type": "string"
+    },
+    "stored": {
+      "type": "boolean"
+    }
+  }
+}

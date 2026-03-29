@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "compactionDetectorInput",
+  "description": "Input schema for compaction-detector skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target session or context to analyze"
+    },
+    "options": {
+      "type": "object",
+      "description": "Detection options",
+      "additionalProperties": true
+    }
+  }
+}

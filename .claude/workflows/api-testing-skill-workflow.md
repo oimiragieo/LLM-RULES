@@ -1,10 +1,7 @@
-# Api Testing Skill Workflow
+# api-testing Skill Workflow
 
-## Skill Location
-
-`.claude/skills/api-testing/SKILL.md`
-
-## Invocation
-
-- /api-testing
-- node .claude/skills/api-testing/scripts/main.cjs --help
+1. Parse API specification.
+2. Generate test cases.
+3. Execute tests against endpoints.
+4. Validate responses.
+5. Report coverage and issues.

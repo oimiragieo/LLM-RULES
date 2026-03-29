@@ -1,0 +1,21 @@
+{
+  "featureId": "fix-token-accountant-persistence-wiring",
+  "reviewedAt": "2026-03-29T03:00:00.000Z",
+  "commitId": "4d737287",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The worker successfully wired the persistence methods into the TokenAccountant lifecycle. A DEFAULT_PERSISTENCE_PATH pointing to .claude/context/metrics/token-usage.json was correctly added. The constructor auto-loads existing state, and recordUsage() auto-persists updates safely using a try-catch block to prevent metric failures from bubbling up to the main logic. Test cases were thoughtfully updated to use isolated temporary file paths to avoid pollution.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "conventions",
+      "observation": "Worker initially tried to run targeted tests using 'pnpm test:framework --testPathPattern=\"token-accountant\"' which timed out. This suggests a knowledge gap that 'pnpm test' wraps the native node test runner and doesn't support jest-style filter arguments directly, requiring 'node --test <path>' instead.",
+      "evidence": "Transcript shows: Command: 'pnpm test:framework --testPathPattern=\"token-accountant\"' timed out, followed by the worker using 'node --test tests/lib/token-accountant.test.cjs'"
+    }
+  ],
+  "addressesFailureFrom": ".factory/validation/reflection-token/scrutiny/reviews/fix-reflection-hooks-and-token-reporting.json",
+  "summary": "Review passed. The fix successfully wires persist() and load() into the TokenAccountant lifecycle, addressing the previous failure where token usage data was lost across session restarts."
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "azureDevopsInput",
+  "description": "Input schema for azure-devops skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "service": {
+      "type": "string",
+      "enum": ["pipelines", "boards", "repos", "artifacts"],
+      "description": "Which Azure DevOps service to interact with"
+    },
+    "action": {
+      "type": "string",
+      "description": "Action to perform (e.g., run-pipeline, create-work-item, create-pr)"
+    },
+    "params": {
+      "type": "object",
+      "description": "Action-specific parameters",
+      "additionalProperties": true
+    }
+  }
+}

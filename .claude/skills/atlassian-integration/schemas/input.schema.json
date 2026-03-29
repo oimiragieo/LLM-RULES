@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "atlassianIntegrationInput",
+  "description": "Input schema for atlassian-integration skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "operation": {
+      "type": "string",
+      "enum": ["jira", "confluence", "bitbucket"],
+      "description": "Which Atlassian product to interact with"
+    },
+    "action": {
+      "type": "string",
+      "description": "Action to perform (e.g., create-issue, get-page, create-pr)"
+    },
+    "params": {
+      "type": "object",
+      "description": "Action-specific parameters",
+      "additionalProperties": true
+    }
+  }
+}

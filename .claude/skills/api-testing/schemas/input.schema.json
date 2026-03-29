@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "apiTestingInput",
+  "description": "Input schema for api-testing skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target API endpoint or specification"
+    },
+    "options": {
+      "type": "object",
+      "description": "Testing options",
+      "additionalProperties": true
+    }
+  }
+}

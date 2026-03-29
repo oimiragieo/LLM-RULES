@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "browserAutomationOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "description": "Extracted data or action result"
+    },
+    "screenshotPath": {
+      "type": "string",
+      "description": "Path to saved screenshot file"
+    },
+    "pdfPath": {
+      "type": "string",
+      "description": "Path to saved PDF file"
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if operation failed"
+    }
+  }
+}

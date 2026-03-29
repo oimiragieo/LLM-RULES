@@ -1,13 +1,11 @@
 'use strict';
+
+const { runSkillToolCli } = require('../_shared/skill-wrapper.cjs');
+
 function main() {
-  process.stdout.write(
-    JSON.stringify({
-      ok: true,
-      stub: true,
-      tool: process.argv[1] || require('path').basename(__dirname),
-    }) + '\n'
-  );
+  runSkillToolCli('scientific-skills', 'scientific-skills');
 }
+
 if (require.main === module) {
   try {
     main();
@@ -16,4 +14,5 @@ if (require.main === module) {
     process.exit(1);
   }
 }
+
 module.exports = { main };

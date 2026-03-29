@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "tokenSaverAdaptiveRatioInput",
+  "description": "Input schema for token-saver-adaptive-ratio skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "context": {
+      "type": "object",
+      "description": "Context to analyze for token optimization"
+    },
+    "options": {
+      "type": "object",
+      "description": "Optimization options",
+      "additionalProperties": true
+    }
+  }
+}

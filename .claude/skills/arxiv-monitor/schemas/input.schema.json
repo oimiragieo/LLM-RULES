@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "arxivMonitorInput",
+  "description": "Input schema for arxiv-monitor skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Keywords to search for in ArXiv papers"
+    },
+    "maxResults": {
+      "type": "integer",
+      "description": "Maximum number of results per keyword",
+      "default": 10
+    },
+    "lookbackDays": {
+      "type": "integer",
+      "description": "Number of days to look back for new papers",
+      "default": 7
+    }
+  }
+}

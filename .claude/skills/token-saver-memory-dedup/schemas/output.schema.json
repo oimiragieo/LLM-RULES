@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "tokenSaverMemoryDedupOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "deduplicated": {
+      "type": "integer"
+    },
+    "removed": {
+      "type": "integer"
+    }
+  }
+}

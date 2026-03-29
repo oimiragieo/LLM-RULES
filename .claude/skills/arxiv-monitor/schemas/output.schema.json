@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "arxivMonitorOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "papers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "authors": { "type": "array", "items": { "type": "string" } },
+          "summary": { "type": "string" },
+          "published": { "type": "string" },
+          "url": { "type": "string" },
+          "keyword": { "type": "string" }
+        }
+      }
+    },
+    "newCount": {
+      "type": "integer",
+      "description": "Number of new papers found"
+    }
+  }
+}

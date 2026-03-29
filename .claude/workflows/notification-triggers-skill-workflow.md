@@ -1,10 +1,6 @@
-# Notification Triggers Skill Workflow
+# notification-triggers Skill Workflow
 
-## Skill Location
-
-`.claude/skills/notification-triggers/SKILL.md`
-
-## Invocation
-
-- /notification-triggers
-- node .claude/skills/notification-triggers/scripts/main.cjs --help
+1. Capture requirements and constraints.
+2. Run Exa-first research and fallback checks.
+3. Implement via TDD checkpoints.
+4. Validate lint/format/tests and ecosystem alignment.

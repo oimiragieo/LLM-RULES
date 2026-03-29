@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "browserAutomationInput",
+  "description": "Input schema for browser-automation skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "url": {
+      "type": "string",
+      "description": "URL to navigate to"
+    },
+    "action": {
+      "type": "string",
+      "enum": ["extract", "fill-form", "screenshot", "pdf", "navigate"],
+      "description": "Action to perform"
+    },
+    "selector": {
+      "type": "string",
+      "description": "CSS selector or Playwright locator for target element"
+    },
+    "formData": {
+      "type": "object",
+      "description": "Form field data for fill-form action",
+      "additionalProperties": true
+    },
+    "authState": {
+      "type": "string",
+      "description": "Path to auth state JSON file for session persistence"
+    },
+    "headless": {
+      "type": "boolean",
+      "default": true,
+      "description": "Run browser in headless mode"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "tokenSaverMemoryDedupInput",
+  "description": "Input schema for token-saver-memory-dedup skill",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "memory": {
+      "type": "array",
+      "description": "Memory entries to deduplicate"
+    },
+    "options": {
+      "type": "object",
+      "description": "Deduplication options",
+      "additionalProperties": true
+    }
+  }
+}
