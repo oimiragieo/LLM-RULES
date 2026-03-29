@@ -9,20 +9,23 @@ Environment variables, external dependencies, and setup notes.
 
 ## Platform
 
-- Primary: Windows 10 (10.0.26200)
-- Node.js available via pnpm
-- 128GB RAM, 16 logical processors
-- WSL available but init.sh has known path issues
-- On this workstation, running `.factory/init.sh` through WSL/bash resolves `pnpm` to a Linux Node runtime that is too old for the installed pnpm (`SyntaxError` at optional chaining in `pnpm.cjs`); prefer native Windows `pnpm` commands until M5 fixes init/bootstrap compatibility.
+- **OS:** Windows 10 (10.0.26200)
+- **Node.js:** v22+ (Python 3.14 also available)
+- **Package Manager:** pnpm
+- **Shell:** PowerShell (default on Windows)
+- **Git:** 2.53.0
 
-## Key Environment Variables
+## Key Dependencies (already installed)
 
-- `HIERARCHICAL_ROUTING` — `on`/`off` to enable/disable hierarchical routing (default: off)
-- `CHANNEL_AUTO_START` — `true` to auto-start Telegram channel session
-- `A2A_AUTO_START` — `true` to auto-start A2A server (port 3100)
-- `TELEGRAM_BOT_TOKEN` — Required for Telegram integration
-- `REFLECTION_SEMANTIC_READ` — `off` to disable semantic prior learnings in reflection
+- `ajv` - JSON Schema validation
+- `better-sqlite3` - SQLite for worker queue
+- `yaml` - YAML parsing
+- `prettier` - Code formatting
 
-## External Services
+## Windows-Specific Notes
 
-- Ollama on localhost:11434 (do not modify)
+- `fs.watch` may be unreliable on NTFS - use polling fallback
+- Use `where` instead of `command -v` for binary detection
+- Use `path.join()` and `path.normalize()` for all file paths
+- EBUSY errors possible on concurrent file access (use atomic writes)
+- `process.platform === 'win32'` for platform detection

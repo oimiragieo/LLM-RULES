@@ -1,32 +1,34 @@
 # Architecture
 
-Key architectural patterns and decisions for agent-studio.
+Architectural decisions and patterns discovered during mission execution.
 
-**What belongs here:** Architectural decisions, module boundaries, integration patterns, routing architecture.
-**What does NOT belong here:** Service ports/commands (use `.factory/services.yaml`).
+**What belongs here:** Module structure decisions, integration patterns, dependency choices.
 
 ---
 
-## Codebase Structure
+## Module Layout
 
-- `.claude/` — Main codebase: agents, skills, hooks, lib, tools, workflows, schemas, config, context
-- `tests/` — Test suites organized by area (hooks/, lib/, skills/, agents/, audit/, commands/)
-- `scripts/` — Build, validation, and utility scripts
+New mission engine modules go in:
+- `.claude/lib/mission/` - Core mission engine (workspace, state machine, mutex, parsers, handoff, dispatch, persona, friction, validation, scrutiny, gate)
+- `.claude/lib/services/` - services.yaml registry and bootstrap system
+- `.claude/lib/readiness/` - Readiness scoring engine and remediation
 
-## Key Subsystems
+Tests mirror the module structure:
+- `tests/mission/` - Mission engine tests
+- `tests/services/` - Services tests
+- `tests/readiness/` - Readiness tests
 
-- **Routing:** Unified pipeline in `user-prompt-unified.core.cjs` (2,216 lines). Hierarchical routing via 9 domain sub-routers.
-- **Creators:** skill-creator and agent-creator in `.claude/skills/`, with SKILL.md + docs/ + scripts/ structure.
-- **Reflection:** RECE loop (Reflect-Evaluate-Correct-Execute) via 9 hook files + 1 agent + 2 workflows.
-- **Memory:** Session handoff, learnings, patterns, gotchas, integration queue.
-- **A2A:** Express HTTP server in `.claude/lib/a2a/` with JSON-RPC 2.0, SSE, SQLite persistence.
-- **Telegram:** MCP relay server + auto-start hook + 10-command bot.
+## Integration Points
 
-## Hook Contract
+- **Existing SQLite queue:** `.claude/lib/db/queue-operations.cjs` - Worker dispatch bridge
+- **Existing worker pool:** `.claude/lib/workers/dispatcher.cjs` - EventEmitter pattern
+- **Existing platform utils:** `.claude/lib/platform.cjs` - isWindows, getShell
+- **Existing command detection:** `.claude/lib/utils/command-exists.cjs`
+- **Existing readiness:** `.claude/lib/utils/readiness-checker.cjs` (reference, not extend)
 
-All hooks must:
+## Design Decisions
 
-- Read input from stdin (JSON)
-- Write output to stdout (JSON)
-- Use `safeParseJSON` from `.claude/lib/utils/safe-json.cjs`
-- Exit promptly (hooks that block are fatal)
+- **Atomic writes for all state files** - Prevents corruption from crashes
+- **EventEmitter pattern** for handoff watcher and friction loop - Matches existing codebase
+- **AJV for all schema validation** - Consistent with existing codebase
+- **No new dependencies** - Use only packages already in package.json
