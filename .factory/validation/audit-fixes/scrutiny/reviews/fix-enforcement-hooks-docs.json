@@ -1,0 +1,15 @@
+{
+  "featureId": "fix-enforcement-hooks-docs",
+  "reviewedAt": "2026-03-29T18:40:00.000Z",
+  "commitId": "7756cb6d",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The implementation correctly updated @ENFORCEMENT_HOOKS.md to match the actual settings.json registrations. It fixed the routing-guard matchers, marked state-reset as deprecated, noted bundle membership for unified-creator-guard, adaptive-quality-gate, and agent-template-contract-validator, and fixed the wiring documentation for drift-detector and user-prompt-unified.",
+    "issues": []
+  },
+  "sharedStateObservations": [],
+  "addressesFailureFrom": null,
+  "summary": "Review complete and passed. The worker accurately documented the actual hook execution paths and registrations as requested."
+}

@@ -1,0 +1,15 @@
+{
+  "featureId": "remove-dead-hooks-and-fix-archive-test",
+  "reviewedAt": "2026-03-29T18:35:00.000Z",
+  "commitId": "b20408cf",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The worker correctly identified and deleted the 10 specified dead hook files along with one orphaned test file. The worker properly checked that the files were not registered in settings.json or required by other files. They also correctly removed a dangling reference to one of the hooks in evolution-check.cjs, and successfully fixed the archive-isolation.test.cjs by removing obsolete assertions about a deleted _archive directory.",
+    "issues": []
+  },
+  "sharedStateObservations": [],
+  "addressesFailureFrom": null,
+  "summary": "Feature successfully implemented according to requirements. Cleanly removed all dead hooks, handled a dangling import correctly, and fixed the broken test file."
+}

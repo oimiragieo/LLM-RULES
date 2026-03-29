@@ -1,0 +1,21 @@
+{
+  "featureId": "fix-ghost-skills-and-phantom-index",
+  "reviewedAt": "2026-03-29T18:05:00.000Z",
+  "commitId": "075368db",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The implementation correctly removed the ghost skills 'integration' and 'writing' by adding strikethrough notation in `skill-catalog.md` and regenerating `skill-index.json`. The scientific-skills sub-skills were found to have valid SKILL.md files, so regenerating the index appropriately resolved the phantom entries warnings as requested.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "knowledge",
+      "observation": "Worker spent time reading validation and generation scripts (`validate-skill-agent-consistency.mjs`, `generate-skill-index.cjs`, `generate-skill-index-definitions.cjs`) to understand how phantom entries are created and how the parser skips deprecated skills using `~~skill~~` notation. This notation convention is not documented in `.factory/library/skill-catalog.md`.",
+      "evidence": "Transcript shows the worker reading generation scripts and concluding: 'The parser skips skills with ~~skill~~ notation (strikethrough for deprecated).'"
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review passed. The worker correctly identified how the catalog parser ignores deprecated skills, updated the catalog using strikethrough notation, and regenerated the index to remove ghost entries. One knowledge gap was observed regarding the strikethrough notation convention."
+}
