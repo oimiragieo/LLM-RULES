@@ -98,7 +98,7 @@ class MilestoneGate {
    * @returns {Object[]} - Features in milestone (excluding cancelled)
    */
   _filterMilestoneFeatures(features) {
-    return features.filter((feature) => {
+    return features.filter(feature => {
       // Must be in the target milestone
       if (feature.milestone !== this.milestone) {
         return false;
@@ -198,13 +198,13 @@ class MilestoneGate {
     }
 
     // If there are feature completion blockers, scrutiny can't pass
-    const hasIncompleteFeatures = this.blocking.some((b) => b.reason === 'feature_not_completed');
+    const hasIncompleteFeatures = this.blocking.some(b => b.reason === 'feature_not_completed');
     if (hasIncompleteFeatures) {
       return { verdict: 'skipped', reason: 'incomplete_features' };
     }
 
     // If assertions failed, scrutiny would have rejected
-    const hasFailedAssertions = this.blocking.some((b) => b.reason.startsWith('assertion_'));
+    const hasFailedAssertions = this.blocking.some(b => b.reason.startsWith('assertion_'));
     if (hasFailedAssertions) {
       return { verdict: 'rejected' };
     }
@@ -224,13 +224,13 @@ class MilestoneGate {
     }
 
     // If there are feature completion blockers, user testing can't run
-    const hasIncompleteFeatures = this.blocking.some((b) => b.reason === 'feature_not_completed');
+    const hasIncompleteFeatures = this.blocking.some(b => b.reason === 'feature_not_completed');
     if (hasIncompleteFeatures) {
       return { verdict: 'skipped', reason: 'incomplete_features' };
     }
 
     // If assertions failed, user testing would have rejected
-    const hasFailedAssertions = this.blocking.some((b) => b.reason.startsWith('assertion_'));
+    const hasFailedAssertions = this.blocking.some(b => b.reason.startsWith('assertion_'));
     if (hasFailedAssertions) {
       return { verdict: 'rejected' };
     }
@@ -289,7 +289,11 @@ class MilestoneGate {
       return {
         passed,
         blocking: this.blocking,
-        features: milestoneFeatures.map((f) => ({ id: f.id, status: f.status, fulfills: f.fulfills || [] })),
+        features: milestoneFeatures.map(f => ({
+          id: f.id,
+          status: f.status,
+          fulfills: f.fulfills || [],
+        })),
         scrutiny: scrutinyVerdict,
         userTesting: userTestingVerdict,
       };
