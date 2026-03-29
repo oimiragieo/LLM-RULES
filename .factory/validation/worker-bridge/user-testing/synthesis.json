@@ -1,0 +1,33 @@
+{
+  "milestone": "worker-bridge",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 16,
+    "passed": 16,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-HW-001",
+    "VAL-HW-002",
+    "VAL-HW-003",
+    "VAL-HW-004",
+    "VAL-HW-005",
+    "VAL-WD-001",
+    "VAL-WD-002",
+    "VAL-WD-003",
+    "VAL-WD-004",
+    "VAL-PI-001",
+    "VAL-PI-002",
+    "VAL-PI-003",
+    "VAL-FL-001",
+    "VAL-FL-002",
+    "VAL-FL-003",
+    "VAL-FL-004"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}

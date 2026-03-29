@@ -1,0 +1,107 @@
+{
+  "groupId": "hw-assertions",
+  "testedAt": "2026-03-29T12:00:00.000Z",
+  "isolation": {
+    "type": "unit-tests",
+    "description": "Run the provided node command and assert that the tests corresponding to these assertions pass.",
+    "isolationContext": "Unit tests are isolated using temporary directories for filesystem interactions. Do not modify global state or create files outside of the test temporary directories."
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-HW-001",
+      "title": "Detects new JSON file in handoffs directory",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests via node --test tests/mission/handoff-watcher.test.cjs",
+          "expected": "Tests for VAL-HW-001 pass",
+          "observed": "Test passed: emits handoff-detected event when new .json file is created, event fires within 2s, includes filename in payload"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "worker-bridge/hw-assertions/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-HW-002",
+      "title": "Debounce prevents duplicate processing",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests via node --test tests/mission/handoff-watcher.test.cjs",
+          "expected": "Tests for VAL-HW-002 pass",
+          "observed": "Test passed: emits exactly one event for multiple writes, same file triggers multiple events across debounce windows"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "worker-bridge/hw-assertions/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-HW-003",
+      "title": "FIFO ordering by timestamp in filename",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests via node --test tests/mission/handoff-watcher.test.cjs",
+          "expected": "Tests for VAL-HW-003 pass",
+          "observed": "Test passed: processes files in ascending order, handles identical timestamps alphabetically"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "worker-bridge/hw-assertions/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-HW-004",
+      "title": "Malformed JSON emits error event without crash",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests via node --test tests/mission/handoff-watcher.test.cjs",
+          "expected": "Tests for VAL-HW-004 pass",
+          "observed": "Test passed: emits handoff-error for invalid JSON, continues watching, includes filename and details in payload"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "worker-bridge/hw-assertions/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-HW-005",
+      "title": "Non-JSON files ignored",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests via node --test tests/mission/handoff-watcher.test.cjs",
+          "expected": "Tests for VAL-HW-005 pass",
+          "observed": "Test passed: produces no events for .txt or other non-.json extensions"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "worker-bridge/hw-assertions/test-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 5 assertions (VAL-HW-001 through VAL-HW-005) using node --test: all 5 passed successfully without issues."
+}

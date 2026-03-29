@@ -1,0 +1,87 @@
+{
+  "groupId": "wd-assertions",
+  "testedAt": "2026-03-29T18:38:00.000Z",
+  "isolation": {
+    "context": "Unit tests in temporary directories"
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-WD-001",
+      "title": "Selects next pending feature with met preconditions",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite",
+          "expected": "Test 'selects feature with completed preconditions' passes",
+          "observed": "Test passed"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": [
+          "worker-bridge/wd-assertions/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-WD-002",
+      "title": "Enqueues feature to SQLite worker pool",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite",
+          "expected": "Test 'increases pending count after dispatch' passes",
+          "observed": "Test passed"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": [
+          "worker-bridge/wd-assertions/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-WD-003",
+      "title": "No-op when no eligible features",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite",
+          "expected": "Test 'returns dispatched:false when all features completed' passes",
+          "observed": "Test passed"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": [
+          "worker-bridge/wd-assertions/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-WD-004",
+      "title": "Feature priority by array index",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite",
+          "expected": "Test 'selects lower index feature when both eligible' passes",
+          "observed": "Test passed"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": [
+          "worker-bridge/wd-assertions/test-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 4 assertions via unit tests: all 4 passed. Note: the test suite numbers some tests differently than the contract (e.g., contract VAL-WD-003 corresponds to test suite VAL-WD-004, and contract VAL-WD-004 corresponds to test suite VAL-WD-007), but all required behaviors are successfully verified."
+}

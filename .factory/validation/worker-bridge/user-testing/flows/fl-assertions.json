@@ -1,0 +1,87 @@
+{
+  "groupId": "fl-assertions",
+  "testedAt": "2026-03-29T00:00:00.000Z",
+  "isolation": {
+    "type": "unit-tests-temp-dir"
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-FL-001",
+      "title": "Validation failure triggers worker revival",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/friction-loop.test.cjs",
+          "expected": "Tests 're-enqueues task when validation-failed event fires' and 'increments attempt_count on each failure' pass",
+          "observed": "Both tests passed"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FL-002",
+      "title": "Revived worker gets context plus stderr plus iteration",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/friction-loop.test.cjs",
+          "expected": "Tests for originalContext, stderrDump, and iteration number pass",
+          "observed": "All 3 tests passed"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FL-003",
+      "title": "Escalation — retry at 1, replan at 2, human at 3",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/friction-loop.test.cjs",
+          "expected": "Tests for strategy 'retry', 'replan', and 'human-intervention-required' event pass",
+          "observed": "All 4 tests passed"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FL-004",
+      "title": "Capped after max iterations",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/friction-loop.test.cjs",
+          "expected": "Tests for 'friction-capped' event and no re-enqueue after cap pass",
+          "observed": "All 3 tests passed"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 4 assertions (VAL-FL-001, VAL-FL-002, VAL-FL-003, VAL-FL-004) via unit tests: all 4 passed."
+}
