@@ -254,10 +254,6 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/task-pretool-orchestrator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/spawn-prompt-validator.cjs"
           }
         ]
       },
