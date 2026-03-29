@@ -1,11 +1,11 @@
 {
   "milestone": "audit-fixes",
-  "round": 1,
-  "status": "fail",
+  "round": 2,
+  "status": "pass",
   "assertionsSummary": {
     "total": 20,
-    "passed": 17,
-    "failed": 3,
+    "passed": 20,
+    "failed": 0,
     "blocked": 0
   },
   "passedAssertions": [
@@ -16,32 +16,22 @@
     "VAL-AR-005",
     "VAL-AR-006",
     "VAL-AR-007",
+    "VAL-AR-008",
     "VAL-AR-009",
     "VAL-AR-010",
     "VAL-AR-011",
     "VAL-AR-012",
     "VAL-AR-013",
     "VAL-AR-014",
+    "VAL-AR-015",
     "VAL-AR-016",
     "VAL-AR-017",
     "VAL-AR-018",
-    "VAL-AR-019"
+    "VAL-AR-019",
+    "VAL-AR-020"
   ],
-  "failedAssertions": [
-    {
-      "id": "VAL-AR-008",
-      "reason": "Found 'router-identity-reminder' string still present in tests/hooks/user-prompt-orchestrator.test.cjs."
-    },
-    {
-      "id": "VAL-AR-015",
-      "reason": "Running pnpm skills:index + validate did not resolve the 272 agent-not-in-index warnings. There are still 270 total warnings, and 167 of them are agent-not-in-index warnings."
-    },
-    {
-      "id": "VAL-AR-020",
-      "reason": "format:check failed with exit code 1. Code style issues found in .claude/config/skill-index.json"
-    }
-  ],
+  "failedAssertions": [],
   "blockedAssertions": [],
   "appliedUpdates": [],
-  "previousRound": null
+  "previousRound": ".factory/validation/audit-fixes/user-testing/synthesis-round-1.json"
 }

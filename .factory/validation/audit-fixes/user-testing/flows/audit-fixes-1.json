@@ -1,0 +1,10 @@
+{
+  "assertions": {
+    "VAL-AR-008": { "status": "pass", "evidence": "audit-fixes/audit-fixes-1/VAL-AR-008.txt" },
+    "VAL-AR-015": { "status": "pass", "evidence": "audit-fixes/audit-fixes-1/VAL-AR-015.txt" },
+    "VAL-AR-020": { "status": "pass", "evidence": "audit-fixes/audit-fixes-1/VAL-AR-020.txt" }
+  },
+  "frictions": [],
+  "blockers": [],
+  "toolsUsed": ["cli"]
+}
