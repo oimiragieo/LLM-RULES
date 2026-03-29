@@ -620,7 +620,7 @@ Skills present on disk and now explicitly cataloged for index/discovery complete
 
 | Deprecated Skill | Replacement      | Notes        |
 | ---------------- | ---------------- | ------------ |
-| ~~`writing`~~    | `writing-skills` | *deprecated* |
+| ~~`writing`~~    | `writing-skills` | _deprecated_ |
 
 ---
 

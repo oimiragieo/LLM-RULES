@@ -11,8 +11,16 @@
       "title": "spawn-prompt-validator no longer double-executes",
       "status": "pass",
       "steps": [
-        { "action": "rg spawn-prompt-validator in settings.json", "expected": "0 matches", "observed": "0 matches" },
-        { "action": "rg spawn-prompt-validator in task-pretool-orchestrator.cjs", "expected": "Present in TASK_HOOKS", "observed": "Present in TASK_HOOKS" }
+        {
+          "action": "rg spawn-prompt-validator in settings.json",
+          "expected": "0 matches",
+          "observed": "0 matches"
+        },
+        {
+          "action": "rg spawn-prompt-validator in task-pretool-orchestrator.cjs",
+          "expected": "Present in TASK_HOOKS",
+          "observed": "Present in TASK_HOOKS"
+        }
       ],
       "evidence": {
         "screenshots": [],
@@ -30,13 +38,15 @@
       "title": "9 domain-router agents in config.yaml",
       "status": "pass",
       "steps": [
-        { "action": "rg domain-router- in config.yaml", "expected": "9 matches", "observed": "9 matches" }
+        {
+          "action": "rg domain-router- in config.yaml",
+          "expected": "9 matches",
+          "observed": "9 matches"
+        }
       ],
       "evidence": {
         "screenshots": [],
-        "terminalSnapshots": [
-          "audit-fixes/group-1/VAL-AR-002-config-grep.txt"
-        ],
+        "terminalSnapshots": ["audit-fixes/group-1/VAL-AR-002-config-grep.txt"],
         "consoleErrors": "none",
         "network": "none"
       },
@@ -47,13 +57,15 @@
       "title": "Agent count accurate in CLAUDE.md",
       "status": "pass",
       "steps": [
-        { "action": "rg agents in CLAUDE.md", "expected": "Matches reality (119)", "observed": "Found '119 agents exist'" }
+        {
+          "action": "rg agents in CLAUDE.md",
+          "expected": "Matches reality (119)",
+          "observed": "Found '119 agents exist'"
+        }
       ],
       "evidence": {
         "screenshots": [],
-        "terminalSnapshots": [
-          "audit-fixes/group-1/VAL-AR-003-claude-md-grep.txt"
-        ],
+        "terminalSnapshots": ["audit-fixes/group-1/VAL-AR-003-claude-md-grep.txt"],
         "consoleErrors": "none",
         "network": "none"
       },
@@ -64,14 +76,20 @@
       "title": "@ENFORCEMENT_HOOKS.md matches settings.json",
       "status": "pass",
       "steps": [
-        { "action": "rg user-prompt-orchestrator in @ENFORCEMENT_HOOKS.md", "expected": "0 matches", "observed": "0 matches" },
-        { "action": "rg state-reset in @ENFORCEMENT_HOOKS.md", "expected": "shows as deprecated/removed", "observed": "shows as DEPRECATED - DEAD CODE" }
+        {
+          "action": "rg user-prompt-orchestrator in @ENFORCEMENT_HOOKS.md",
+          "expected": "0 matches",
+          "observed": "0 matches"
+        },
+        {
+          "action": "rg state-reset in @ENFORCEMENT_HOOKS.md",
+          "expected": "shows as deprecated/removed",
+          "observed": "shows as DEPRECATED - DEAD CODE"
+        }
       ],
       "evidence": {
         "screenshots": [],
-        "terminalSnapshots": [
-          "audit-fixes/group-1/VAL-AR-004-docs-grep.txt"
-        ],
+        "terminalSnapshots": ["audit-fixes/group-1/VAL-AR-004-docs-grep.txt"],
         "consoleErrors": "none",
         "network": "none"
       },
@@ -82,13 +100,15 @@
       "title": "Ghost skills resolved",
       "status": "pass",
       "steps": [
-        { "action": "run pnpm validate:skills", "expected": "0 ghost-skill errors", "observed": "0 errors reported in summary" }
+        {
+          "action": "run pnpm validate:skills",
+          "expected": "0 ghost-skill errors",
+          "observed": "0 errors reported in summary"
+        }
       ],
       "evidence": {
         "screenshots": [],
-        "terminalSnapshots": [
-          "audit-fixes/group-1/VAL-AR-005-validate-skills.txt"
-        ],
+        "terminalSnapshots": ["audit-fixes/group-1/VAL-AR-005-validate-skills.txt"],
         "consoleErrors": "none",
         "network": "none"
       },

@@ -11,7 +11,11 @@
       "title": "Orphaned templates documented or wired",
       "status": "pass",
       "steps": [
-        { "action": "Read .claude/templates/README.md", "expected": "Find documentation of archived templates", "observed": "README.md documents all 14 archived templates under 'Archived Content Summary'" }
+        {
+          "action": "Read .claude/templates/README.md",
+          "expected": "Find documentation of archived templates",
+          "observed": "README.md documents all 14 archived templates under 'Archived Content Summary'"
+        }
       ],
       "evidence": {
         "text": ["audit-fixes/group-4/VAL-AR-016-evidence.txt"]
@@ -23,7 +27,11 @@
       "title": "Memory parse failure recovery improved",
       "status": "pass",
       "steps": [
-        { "action": "Check memory-manager parse recovery", "expected": "try-catch with recovery or parse failure rate check passes", "observed": "Code uses safeParseJSON and validates parseFailureRate; pnpm validate:agent-memory passes" }
+        {
+          "action": "Check memory-manager parse recovery",
+          "expected": "try-catch with recovery or parse failure rate check passes",
+          "observed": "Code uses safeParseJSON and validates parseFailureRate; pnpm validate:agent-memory passes"
+        }
       ],
       "evidence": {
         "text": ["audit-fixes/group-4/VAL-AR-017-evidence.txt"]
@@ -35,7 +43,11 @@
       "title": "validate:full passes",
       "status": "pass",
       "steps": [
-        { "action": "Run pnpm validate:full", "expected": "Exit code 0", "observed": "Exited with code 0" }
+        {
+          "action": "Run pnpm validate:full",
+          "expected": "Exit code 0",
+          "observed": "Exited with code 0"
+        }
       ],
       "evidence": {
         "text": ["audit-fixes/group-4/VAL-AR-018-evidence.txt"]
@@ -59,7 +71,11 @@
       "title": "format:check passes",
       "status": "fail",
       "steps": [
-        { "action": "Run pnpm format:check", "expected": "Exit code 0", "observed": "Exited with code 1 due to style issues in .claude/config/skill-index.json" }
+        {
+          "action": "Run pnpm format:check",
+          "expected": "Exit code 0",
+          "observed": "Exited with code 1 due to style issues in .claude/config/skill-index.json"
+        }
       ],
       "evidence": {
         "text": ["audit-fixes/group-4/VAL-AR-020-evidence.txt"]

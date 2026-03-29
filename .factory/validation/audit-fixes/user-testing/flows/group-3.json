@@ -11,7 +11,11 @@
       "title": "Unused env vars removed from .env.example",
       "status": "pass",
       "steps": [
-        { "action": "Count matching env vars in .env.example", "expected": "Reduced count of uppercase vars", "observed": "Count is 90" }
+        {
+          "action": "Count matching env vars in .env.example",
+          "expected": "Reduced count of uppercase vars",
+          "observed": "Count is 90"
+        }
       ],
       "evidence": {
         "output": ["audit-fixes/group-3/VAL-AR-011-evidence.txt"]
@@ -23,7 +27,11 @@
       "title": "Test artifact directories cleaned",
       "status": "pass",
       "steps": [
-        { "action": "Check .gitignore for test-fastembed-gpu-*", "expected": "Entry exists in .gitignore", "observed": "Entry found at line 144" }
+        {
+          "action": "Check .gitignore for test-fastembed-gpu-*",
+          "expected": "Entry exists in .gitignore",
+          "observed": "Entry found at line 144"
+        }
       ],
       "evidence": {
         "output": ["audit-fixes/group-3/VAL-AR-012-evidence.txt"]
@@ -35,7 +43,11 @@
       "title": "Stale PID cleanup logic added",
       "status": "pass",
       "steps": [
-        { "action": "Search for delegations.pid cleanup logic", "expected": "Logic found in .claude/hooks/*.cjs", "observed": "Logic found in .claude/lib/memory/memory-rotator.cjs" }
+        {
+          "action": "Search for delegations.pid cleanup logic",
+          "expected": "Logic found in .claude/hooks/*.cjs",
+          "observed": "Logic found in .claude/lib/memory/memory-rotator.cjs"
+        }
       ],
       "evidence": {
         "output": ["audit-fixes/group-3/VAL-AR-013-evidence.txt"]
@@ -47,7 +59,11 @@
       "title": "settings.json version field",
       "status": "pass",
       "steps": [
-        { "action": "Check version field in settings.json via node", "expected": "Prints 3.1.0", "observed": "Printed 3.1.0" }
+        {
+          "action": "Check version field in settings.json via node",
+          "expected": "Prints 3.1.0",
+          "observed": "Printed 3.1.0"
+        }
       ],
       "evidence": {
         "output": ["audit-fixes/group-3/VAL-AR-014-evidence.txt"]
@@ -59,7 +75,11 @@
       "title": "Agent-skill catalog warnings reduced",
       "status": "fail",
       "steps": [
-        { "action": "Run pnpm skills:index then pnpm validate:skills", "expected": "Significantly fewer warnings", "observed": "Still 270 warnings, 167 of which are agent-not-in-index" }
+        {
+          "action": "Run pnpm skills:index then pnpm validate:skills",
+          "expected": "Significantly fewer warnings",
+          "observed": "Still 270 warnings, 167 of which are agent-not-in-index"
+        }
       ],
       "evidence": {
         "output": ["audit-fixes/group-3/VAL-AR-015-evidence.txt"]

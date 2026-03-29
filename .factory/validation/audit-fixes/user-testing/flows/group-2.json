@@ -11,8 +11,16 @@
       "title": "Phantom skill-index entries cleaned",
       "status": "pass",
       "steps": [
-        { "action": "Run pnpm skills:index", "expected": "Regenerates cleanly", "observed": "Regenerated successfully without errors" },
-        { "action": "Run pnpm validate:full", "expected": "Passes without ghost-skill errors", "observed": "Passed and exited with code 0" }
+        {
+          "action": "Run pnpm skills:index",
+          "expected": "Regenerates cleanly",
+          "observed": "Regenerated successfully without errors"
+        },
+        {
+          "action": "Run pnpm validate:full",
+          "expected": "Passes without ghost-skill errors",
+          "observed": "Passed and exited with code 0"
+        }
       ],
       "evidence": {
         "CLI_Output_skills_index": "audit-fixes/group-2/VAL-AR-006-skills-index.txt",
@@ -25,8 +33,16 @@
       "title": "Dead hook files removed",
       "status": "pass",
       "steps": [
-        { "action": "Check existence of state-reset.cjs", "expected": "Returns False", "observed": "Returned False" },
-        { "action": "Check existence of perf-gate.cjs", "expected": "Returns False", "observed": "Returned False" }
+        {
+          "action": "Check existence of state-reset.cjs",
+          "expected": "Returns False",
+          "observed": "Returned False"
+        },
+        {
+          "action": "Check existence of perf-gate.cjs",
+          "expected": "Returns False",
+          "observed": "Returned False"
+        }
       ],
       "evidence": {
         "CLI_Output_dead_hooks": "audit-fixes/group-2/VAL-AR-007-dead-hooks.txt"
@@ -38,7 +54,11 @@
       "title": "Dead hook test files cleaned",
       "status": "fail",
       "steps": [
-        { "action": "Run rg 'router-identity-reminder' tests/ --glob '*.cjs' -l", "expected": "Returns 0 matches", "observed": "Returned 1 match: tests/hooks/user-prompt-orchestrator.test.cjs" }
+        {
+          "action": "Run rg 'router-identity-reminder' tests/ --glob '*.cjs' -l",
+          "expected": "Returns 0 matches",
+          "observed": "Returned 1 match: tests/hooks/user-prompt-orchestrator.test.cjs"
+        }
       ],
       "evidence": {
         "CLI_Output_dead_tests": "audit-fixes/group-2/VAL-AR-008-dead-tests.txt"
@@ -50,7 +70,11 @@
       "title": "Archive-isolation test fixed",
       "status": "pass",
       "steps": [
-        { "action": "Run node --test tests/tools/archive-isolation.test.cjs", "expected": "Passes without errors", "observed": "Test passed successfully" }
+        {
+          "action": "Run node --test tests/tools/archive-isolation.test.cjs",
+          "expected": "Passes without errors",
+          "observed": "Test passed successfully"
+        }
       ],
       "evidence": {
         "CLI_Output_archive_test": "audit-fixes/group-2/VAL-AR-009-archive-test.txt"
@@ -62,7 +86,11 @@
       "title": "PostToolUse TaskUpdate hooks have timeouts",
       "status": "pass",
       "steps": [
-        { "action": "Read .claude/settings.json TaskUpdate PostToolUse entries", "expected": "All hooks have explicit timeout_ms values", "observed": "All 9 hooks have timeout_ms values (ranging from 3000 to 15000)" }
+        {
+          "action": "Read .claude/settings.json TaskUpdate PostToolUse entries",
+          "expected": "All hooks have explicit timeout_ms values",
+          "observed": "All 9 hooks have timeout_ms values (ranging from 3000 to 15000)"
+        }
       ],
       "evidence": {
         "CLI_Output_settings": "audit-fixes/group-2/VAL-AR-010-taskupdate-timeouts.txt"
