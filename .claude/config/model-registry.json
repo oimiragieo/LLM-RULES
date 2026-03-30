@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "models": [
+    {
+      "id": "claude-opus-4-6",
+      "shorthand": "opus",
+      "provider": "anthropic",
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000,
+      "costPer1KInput": 15,
+      "costPer1KOutput": 75,
+      "latencyClass": "slow",
+      "features": ["tool_use", "vision", "reasoning", "extended_thinking"]
+    },
+    {
+      "id": "claude-sonnet-4-6",
+      "shorthand": "sonnet",
+      "provider": "anthropic",
+      "contextWindow": 200000,
+      "maxOutputTokens": 16384,
+      "costPer1KInput": 3,
+      "costPer1KOutput": 15,
+      "latencyClass": "medium",
+      "features": ["tool_use", "vision"]
+    },
+    {
+      "id": "claude-haiku-4-5-20251001",
+      "shorthand": "haiku",
+      "provider": "anthropic",
+      "contextWindow": 200000,
+      "maxOutputTokens": 8192,
+      "costPer1KInput": 0.25,
+      "costPer1KOutput": 1.25,
+      "latencyClass": "fast",
+      "features": ["tool_use"]
+    }
+  ]
+}
