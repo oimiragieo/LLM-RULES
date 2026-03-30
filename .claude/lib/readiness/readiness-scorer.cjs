@@ -120,9 +120,7 @@ const PILLAR_DEFINITIONS = [
   },
   {
     name: 'testing',
-    commands: [
-      { cmd: 'pnpm test', weight: 0.6 },
-    ],
+    commands: [{ cmd: 'pnpm test', weight: 0.6 }],
     files: [
       { pattern: 'jest.config.js', score: 10 },
       { pattern: 'jest.config.ts', score: 10 },
@@ -498,7 +496,9 @@ function generateRecommendations(pillars) {
     if (!pillar.passed) {
       const def = PILLAR_DEFINITIONS.find(d => d.name === name);
       if (def) {
-        recommendations.push(`Improve ${name}: ${def.description}. Current score: ${pillar.score}/100`);
+        recommendations.push(
+          `Improve ${name}: ${def.description}. Current score: ${pillar.score}/100`
+        );
       }
     }
   }

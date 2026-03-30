@@ -473,7 +473,10 @@ services:
 
       // Service without 'start' should fail validation
       assert.strictEqual(result.valid, false, 'Service without start should be invalid');
-      assert.ok(result.errors.some(e => e.includes('start')), 'Error should mention start field');
+      assert.ok(
+        result.errors.some(e => e.includes('start')),
+        'Error should mention start field'
+      );
     });
 
     it('service requires port field minimum', () => {
@@ -490,7 +493,10 @@ services:
       const result = registry.load();
 
       assert.strictEqual(result.valid, false, 'Service without port should be invalid');
-      assert.ok(result.errors.some(e => e.includes('port')), 'Error should mention port field');
+      assert.ok(
+        result.errors.some(e => e.includes('port')),
+        'Error should mention port field'
+      );
     });
 
     it('service with optional stop and healthcheck is valid', () => {

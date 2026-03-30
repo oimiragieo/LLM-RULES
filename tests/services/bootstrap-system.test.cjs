@@ -110,8 +110,16 @@ echo "Init complete."
       const preseededState = {
         status: 'halted',
         components: {
-          node: { status: 'failed', timestamp: new Date().toISOString(), reason: 'Simulated critical failure' },
-          npm: { status: 'skipped', timestamp: new Date().toISOString(), reason: 'Skipped due to previous critical failure' },
+          node: {
+            status: 'failed',
+            timestamp: new Date().toISOString(),
+            reason: 'Simulated critical failure',
+          },
+          npm: {
+            status: 'skipped',
+            timestamp: new Date().toISOString(),
+            reason: 'Skipped due to previous critical failure',
+          },
         },
       };
       fs.writeFileSync(statePath, JSON.stringify(preseededState, null, 2), 'utf8');
@@ -121,7 +129,11 @@ echo "Init complete."
         initShPath,
         statePath,
         components: [
-          { name: 'nonexistent_critical', check: 'nonexistent_binary_that_does_not_exist --version', critical: true },
+          {
+            name: 'nonexistent_critical',
+            check: 'nonexistent_binary_that_does_not_exist --version',
+            critical: true,
+          },
           { name: 'npm', check: 'npm --version' },
         ],
         skipInitSh: true,
@@ -131,8 +143,16 @@ echo "Init complete."
 
       // Critical failure should halt
       assert.strictEqual(result.status, 'halted', 'Status should be halted on critical failure');
-      assert.strictEqual(result.components.nonexistent_critical.status, 'failed', 'Critical component should show failure');
-      assert.strictEqual(result.components.npm.status, 'skipped', 'Subsequent component should be skipped');
+      assert.strictEqual(
+        result.components.nonexistent_critical.status,
+        'failed',
+        'Critical component should show failure'
+      );
+      assert.strictEqual(
+        result.components.npm.status,
+        'skipped',
+        'Subsequent component should be skipped'
+      );
     });
 
     it('non-critical component failure continues', () => {
@@ -141,7 +161,11 @@ echo "Init complete."
         statePath,
         components: [
           { name: 'node', check: 'node --version' },
-          { name: 'nonexistent', check: 'nonexistent_binary_that_does_not_exist --version', critical: false },
+          {
+            name: 'nonexistent',
+            check: 'nonexistent_binary_that_does_not_exist --version',
+            critical: false,
+          },
         ],
         skipInitSh: true,
       });
@@ -151,7 +175,11 @@ echo "Init complete."
       // Should complete even with non-critical failure
       assert.strictEqual(result.status, 'complete', 'Should complete with non-critical failure');
       assert.strictEqual(result.components.node.status, 'ok', 'node should be ok');
-      assert.strictEqual(result.components.nonexistent.status, 'failed', 'nonexistent should be failed');
+      assert.strictEqual(
+        result.components.nonexistent.status,
+        'failed',
+        'nonexistent should be failed'
+      );
     });
 
     it('subsequent components get skipped status after critical failure', () => {
@@ -159,7 +187,11 @@ echo "Init complete."
         initShPath,
         statePath,
         components: [
-          { name: 'nonexistent_critical', check: 'nonexistent_binary_that_does_not_exist --version', critical: true },
+          {
+            name: 'nonexistent_critical',
+            check: 'nonexistent_binary_that_does_not_exist --version',
+            critical: true,
+          },
           { name: 'npm', check: 'npm --version' },
           { name: 'pnpm', check: 'pnpm --version' },
         ],
@@ -227,8 +259,16 @@ echo "Init complete."
         status: 'partial',
         components: {
           node: { status: 'ok', timestamp: '2026-01-01T00:00:00.000Z' },
-          npm: { status: 'failed', timestamp: '2026-01-01T00:00:00.000Z', reason: 'Command failed' },
-          pnpm: { status: 'skipped', timestamp: '2026-01-01T00:00:00.000Z', reason: 'Skipped due to previous failure' },
+          npm: {
+            status: 'failed',
+            timestamp: '2026-01-01T00:00:00.000Z',
+            reason: 'Command failed',
+          },
+          pnpm: {
+            status: 'skipped',
+            timestamp: '2026-01-01T00:00:00.000Z',
+            reason: 'Skipped due to previous failure',
+          },
         },
       };
       fs.writeFileSync(statePath, JSON.stringify(preseededState, null, 2), 'utf8');
@@ -345,7 +385,10 @@ echo "unclosed
       const result = bootstrap.run();
 
       // Should handle syntax error gracefully
-      assert.ok(result.status === 'error' || result.status === 'halted', 'Should report error status');
+      assert.ok(
+        result.status === 'error' || result.status === 'halted',
+        'Should report error status'
+      );
       assert.ok(result.error, 'Should have error details');
     });
 
@@ -442,13 +485,19 @@ echo "Init complete."
       assert.ok('timestamp' in state, 'Should have timestamp');
 
       // Status should be one of the valid values
-      assert.ok(['complete', 'halted', 'error', 'partial'].includes(state.status), 'Status should be valid');
+      assert.ok(
+        ['complete', 'halted', 'error', 'partial'].includes(state.status),
+        'Status should be valid'
+      );
 
       // Each component should have required fields
       for (const [name, comp] of Object.entries(state.components)) {
         assert.ok('status' in comp, `Component ${name} should have status`);
         assert.ok('timestamp' in comp, `Component ${name} should have timestamp`);
-        assert.ok(['ok', 'failed', 'skipped', 'timeout', 'halted'].includes(comp.status), `Component ${name} status should be valid`);
+        assert.ok(
+          ['ok', 'failed', 'skipped', 'timeout', 'halted'].includes(comp.status),
+          `Component ${name} status should be valid`
+        );
       }
     });
 
@@ -456,7 +505,13 @@ echo "Init complete."
       const bootstrap = new BootstrapSystem({
         initShPath,
         statePath,
-        components: [{ name: 'nonexistent', check: 'nonexistent_binary_that_does_not_exist --version', critical: false }],
+        components: [
+          {
+            name: 'nonexistent',
+            check: 'nonexistent_binary_that_does_not_exist --version',
+            critical: false,
+          },
+        ],
         skipInitSh: true,
       });
 
@@ -503,7 +558,11 @@ echo "Init complete."
         initShPath,
         statePath,
         components: [
-          { name: 'nonexistent', check: 'nonexistent_binary_that_does_not_exist --version', binary: 'nonexistent_binary_that_does_not_exist' },
+          {
+            name: 'nonexistent',
+            check: 'nonexistent_binary_that_does_not_exist --version',
+            binary: 'nonexistent_binary_that_does_not_exist',
+          },
         ],
         skipInitSh: true,
       });

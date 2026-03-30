@@ -230,9 +230,7 @@ class StateMutex {
     // Check if lock is currently held
     if (state.lockedBy && !isLockStale(state)) {
       // Fresh lock is held by someone else
-      const error = new Error(
-        `Lock is held by ${state.lockedBy} since ${state.lockedAt}`
-      );
+      const error = new Error(`Lock is held by ${state.lockedBy} since ${state.lockedAt}`);
       error.code = 'LOCK_HELD';
       error.details = {
         lockedBy: state.lockedBy,
@@ -254,9 +252,7 @@ class StateMutex {
     if (state.turn === 'orchestrator_turn') {
       if (requesterType !== 'orchestrator') {
         // Worker trying to acquire during orchestrator_turn
-        const error = new Error(
-          `Worker cannot acquire lock during orchestrator_turn`
-        );
+        const error = new Error(`Worker cannot acquire lock during orchestrator_turn`);
         error.code = 'TURN_VIOLATION';
         error.details = {
           turn: state.turn,
@@ -272,9 +268,7 @@ class StateMutex {
     } else if (state.turn === 'worker_turn') {
       if (requesterType !== 'worker') {
         // Orchestrator trying to acquire during worker_turn
-        const error = new Error(
-          `Orchestrator cannot acquire lock during worker_turn`
-        );
+        const error = new Error(`Orchestrator cannot acquire lock during worker_turn`);
         error.code = 'TURN_VIOLATION';
         error.details = {
           turn: state.turn,
@@ -369,9 +363,7 @@ class StateMutex {
 
     // Can't transition while lock is held
     if (state.lockedBy && !isLockStale(state)) {
-      const error = new Error(
-        `Cannot transition turn while lock is held by ${state.lockedBy}`
-      );
+      const error = new Error(`Cannot transition turn while lock is held by ${state.lockedBy}`);
       error.code = 'LOCK_HELD';
       error.details = {
         lockedBy: state.lockedBy,

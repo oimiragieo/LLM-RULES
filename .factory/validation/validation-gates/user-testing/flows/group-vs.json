@@ -4,9 +4,7 @@
   "isolation": {
     "command": "node --test tests/mission/validation-state-gatekeeper.test.cjs"
   },
-  "toolsUsed": [
-    "node --test"
-  ],
+  "toolsUsed": ["node --test"],
   "assertions": [
     {
       "id": "VAL-VS-001",

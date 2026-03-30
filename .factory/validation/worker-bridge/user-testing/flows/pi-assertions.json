@@ -4,9 +4,7 @@
   "isolation": {
     "context": "Unit tests using temporary directories for filesystem interactions. Run via provided node command."
   },
-  "toolsUsed": [
-    "node --test"
-  ],
+  "toolsUsed": ["node --test"],
   "assertions": [
     {
       "id": "VAL-PI-001",
@@ -20,9 +18,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "worker-bridge/pi-assertions/test-output.txt"
-        ]
+        "testOutput": ["worker-bridge/pi-assertions/test-output.txt"]
       },
       "issues": null
     },
@@ -38,9 +34,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "worker-bridge/pi-assertions/test-output.txt"
-        ]
+        "testOutput": ["worker-bridge/pi-assertions/test-output.txt"]
       },
       "issues": null
     },
@@ -56,9 +50,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "worker-bridge/pi-assertions/test-output.txt"
-        ]
+        "testOutput": ["worker-bridge/pi-assertions/test-output.txt"]
       },
       "issues": null
     }

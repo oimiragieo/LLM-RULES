@@ -5,9 +5,7 @@
     "command": "node --test tests/mission/validation-contract-parser.test.cjs",
     "missionDir": "C:\\Users\\oimir\\.factory\\missions\\91ae9243-5217-4452-8593-40411a402f4b"
   },
-  "toolsUsed": [
-    "node --test"
-  ],
+  "toolsUsed": ["node --test"],
   "assertions": [
     {
       "id": "VAL-VC-001",
@@ -21,9 +19,7 @@
         }
       ],
       "evidence": {
-        "terminal": [
-          "validation-gates/group-vc/VAL-VC-terminal-snapshot.txt"
-        ]
+        "terminal": ["validation-gates/group-vc/VAL-VC-terminal-snapshot.txt"]
       },
       "issues": null
     },
@@ -39,9 +35,7 @@
         }
       ],
       "evidence": {
-        "terminal": [
-          "validation-gates/group-vc/VAL-VC-terminal-snapshot.txt"
-        ]
+        "terminal": ["validation-gates/group-vc/VAL-VC-terminal-snapshot.txt"]
       },
       "issues": null
     },
@@ -57,9 +51,7 @@
         }
       ],
       "evidence": {
-        "terminal": [
-          "validation-gates/group-vc/VAL-VC-terminal-snapshot.txt"
-        ]
+        "terminal": ["validation-gates/group-vc/VAL-VC-terminal-snapshot.txt"]
       },
       "issues": null
     }

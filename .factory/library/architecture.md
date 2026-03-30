@@ -9,11 +9,13 @@ Architectural decisions and patterns discovered during mission execution.
 ## Module Layout
 
 New mission engine modules go in:
+
 - `.claude/lib/mission/` - Core mission engine (workspace, state machine, mutex, parsers, handoff, dispatch, persona, friction, validation, scrutiny, gate)
 - `.claude/lib/services/` - services.yaml registry and bootstrap system
 - `.claude/lib/readiness/` - Readiness scoring engine and remediation
 
 Tests mirror the module structure:
+
 - `tests/mission/` - Mission engine tests
 - `tests/services/` - Services tests
 - `tests/readiness/` - Readiness tests

@@ -213,7 +213,11 @@ describe('HandoffWatcher', () => {
       // Wait for second event
       await waitForEvent(fastWatcher, 'handoff-detected', 3000);
 
-      assert.strictEqual(events.length, 2, 'Should emit 2 events for writes across debounce windows');
+      assert.strictEqual(
+        events.length,
+        2,
+        'Should emit 2 events for writes across debounce windows'
+      );
       fastWatcher.stop();
     });
   });

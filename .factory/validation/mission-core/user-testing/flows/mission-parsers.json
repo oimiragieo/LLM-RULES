@@ -1,0 +1,127 @@
+{
+  "groupId": "mission-parsers",
+  "testedAt": "2026-03-29T17:25:00Z",
+  "isolation": {
+    "description": "Run unit tests for Mission Parsers using temp directories for filesystem tests",
+    "commands": [
+      "node --test tests/mission/mission-parser.test.cjs",
+      "node --test tests/mission/agents-parser.test.cjs"
+    ]
+  },
+  "toolsUsed": [
+    "Execute"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-MP-001",
+      "title": "Extracts objectives from mission.md",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/mission-parser.test.cjs",
+          "expected": "Tests for VAL-MP-001 pass",
+          "observed": "Tests passed successfully"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "mission-core/mission-parsers/VAL-MP-tests-passed.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-MP-002",
+      "title": "Missing sections return empty arrays",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/mission-parser.test.cjs",
+          "expected": "Tests for VAL-MP-002 pass",
+          "observed": "Tests passed successfully"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "mission-core/mission-parsers/VAL-MP-tests-passed.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-MP-003",
+      "title": "Context injection into worker prompts",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/mission-parser.test.cjs",
+          "expected": "Tests for VAL-MP-003 pass",
+          "observed": "Tests passed successfully"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "mission-core/mission-parsers/VAL-MP-tests-passed.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-AP-001",
+      "title": "Extracts Build and Test section",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/agents-parser.test.cjs",
+          "expected": "Tests for VAL-AP-001 pass",
+          "observed": "Tests passed successfully"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "mission-core/mission-parsers/VAL-AP-tests-passed.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-AP-002",
+      "title": "Discovery override hierarchy",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/agents-parser.test.cjs",
+          "expected": "Tests for VAL-AP-002 pass",
+          "observed": "Tests passed successfully"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "mission-core/mission-parsers/VAL-AP-tests-passed.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-AP-003",
+      "title": "Missing AGENTS.md returns default structure",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/agents-parser.test.cjs",
+          "expected": "Tests for VAL-AP-003 pass",
+          "observed": "Tests passed successfully"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "mission-core/mission-parsers/VAL-AP-tests-passed.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 6 assertions (VAL-MP-001, VAL-MP-002, VAL-MP-003, VAL-AP-001, VAL-AP-002, VAL-AP-003): all 6 passed successfully via unit test execution."
+}

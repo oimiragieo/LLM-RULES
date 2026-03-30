@@ -6,7 +6,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 
-const { ValidationStateGatekeeper, createGatekeeper } = require('../../.claude/lib/mission/validation-state-gatekeeper.cjs');
+const {
+  ValidationStateGatekeeper,
+  createGatekeeper,
+} = require('../../.claude/lib/mission/validation-state-gatekeeper.cjs');
 
 // Test fixtures directory
 let tempDir;
@@ -147,7 +150,7 @@ describe('Validation State Gatekeeper', () => {
 
       assert.throws(
         () => gatekeeper.transition('VAL-TEST-001', 'pending'),
-        (err) => {
+        err => {
           assert.equal(err.code, 'INVALID_TRANSITION');
           assert.ok(err.message.includes('passed'));
           assert.ok(err.message.includes('pending'));
@@ -166,7 +169,7 @@ describe('Validation State Gatekeeper', () => {
 
       assert.throws(
         () => gatekeeper.transition('VAL-TEST-001', 'failed'),
-        (err) => {
+        err => {
           assert.equal(err.code, 'INVALID_TRANSITION');
           return true;
         }
@@ -183,7 +186,7 @@ describe('Validation State Gatekeeper', () => {
 
       assert.throws(
         () => gatekeeper.transition('VAL-TEST-001', 'blocked'),
-        (err) => {
+        err => {
           assert.equal(err.code, 'INVALID_TRANSITION');
           return true;
         }
@@ -202,7 +205,7 @@ describe('Validation State Gatekeeper', () => {
       for (const targetState of ['pending', 'failed', 'blocked']) {
         assert.throws(
           () => gatekeeper.transition('VAL-TEST-001', targetState),
-          (err) => err.code === 'INVALID_TRANSITION',
+          err => err.code === 'INVALID_TRANSITION',
           `Transition passed->${targetState} should be rejected`
         );
       }
@@ -432,7 +435,7 @@ describe('Validation State Gatekeeper', () => {
 
       // Check backup file exists
       const files = fs.readdirSync(tempDir);
-      const backupFiles = files.filter((f) => f.startsWith('validation-state.json.corrupt.'));
+      const backupFiles = files.filter(f => f.startsWith('validation-state.json.corrupt.'));
       assert.ok(backupFiles.length > 0, 'Backup file should be created');
     });
 
@@ -497,7 +500,7 @@ describe('Validation State Gatekeeper', () => {
       const warnings = gatekeeper.syncWithContract();
 
       assert.ok(Array.isArray(warnings));
-      assert.ok(warnings.some((w) => w.code === 'ORPHANED_ASSERTION'));
+      assert.ok(warnings.some(w => w.code === 'ORPHANED_ASSERTION'));
 
       // Orphaned assertion should not block canComplete for known assertions
       const result = gatekeeper.canComplete(['VAL-TEST-001']);
@@ -601,7 +604,7 @@ describe('Validation State Gatekeeper', () => {
 
       assert.throws(
         () => gatekeeper.transition('VAL-UNKNOWN-999', 'passed'),
-        (err) => {
+        err => {
           assert.equal(err.code, 'ASSERTION_NOT_FOUND');
           return true;
         }
@@ -618,7 +621,7 @@ describe('Validation State Gatekeeper', () => {
 
       assert.throws(
         () => gatekeeper.transition('VAL-TEST-001', 'invalid_status'),
-        (err) => {
+        err => {
           assert.equal(err.code, 'INVALID_STATUS');
           return true;
         }

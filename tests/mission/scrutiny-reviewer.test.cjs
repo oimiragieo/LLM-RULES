@@ -139,7 +139,10 @@ describe('Scrutiny Reviewer', () => {
 
       // Verify required fields
       assert.ok(verdict.verdict, 'verdict field required');
-      assert.ok(['approved', 'rejected'].includes(verdict.verdict), 'verdict must be approved or rejected');
+      assert.ok(
+        ['approved', 'rejected'].includes(verdict.verdict),
+        'verdict must be approved or rejected'
+      );
       assert.equal(verdict.featureId, 'test-feature');
       assert.ok(verdict.timestamp, 'timestamp required');
       assert.ok(Array.isArray(verdict.steps), 'steps array required');
@@ -327,13 +330,13 @@ describe('Scrutiny Reviewer', () => {
       const { safeSteps, skippedDestructive } = filterDestructiveCommands(verificationSteps);
 
       // Safe steps should not include rm commands
-      assert.ok(!safeSteps.some((s) => s.includes('rm -rf')));
+      assert.ok(!safeSteps.some(s => s.includes('rm -rf')));
       assert.equal(safeSteps.length, 3);
 
       // Skipped destructive should include rm commands
       assert.equal(skippedDestructive.length, 2);
-      assert.ok(skippedDestructive.some((s) => s.includes('rm -rf /dangerous')));
-      assert.ok(skippedDestructive.some((s) => s.includes('rm -rf node_modules')));
+      assert.ok(skippedDestructive.some(s => s.includes('rm -rf /dangerous')));
+      assert.ok(skippedDestructive.some(s => s.includes('rm -rf node_modules')));
     });
 
     it('write attempts would be blocked (mock verification)', async () => {
@@ -553,7 +556,7 @@ describe('Scrutiny Reviewer', () => {
       const verdictsDir = path.join(tempDir, 'verdicts');
       assert.ok(fs.existsSync(verdictsDir), 'verdicts directory should be created');
 
-      const verdictFiles = fs.readdirSync(verdictsDir).filter((f) => f.includes('test-feature'));
+      const verdictFiles = fs.readdirSync(verdictsDir).filter(f => f.includes('test-feature'));
       assert.ok(verdictFiles.length > 0, 'verdict file should be written');
     });
   });
@@ -564,22 +567,14 @@ describe('Scrutiny Reviewer', () => {
       createFeaturesJson(featuresPath, [
         {
           id: 'integration-test',
-          verificationSteps: [
-            'echo Running step 1',
-            'echo Running step 2',
-            'echo All done',
-          ],
+          verificationSteps: ['echo Running step 1', 'echo Running step 2', 'echo All done'],
         },
       ]);
 
       const verdict = await spawnReviewer({
         featureId: 'integration-test',
         featuresPath,
-        verificationSteps: [
-          'echo Running step 1',
-          'echo Running step 2',
-          'echo All done',
-        ],
+        verificationSteps: ['echo Running step 1', 'echo Running step 2', 'echo All done'],
         missionDir: tempDir,
       });
 
@@ -600,11 +595,7 @@ describe('Scrutiny Reviewer', () => {
       createFeaturesJson(featuresPath, [
         {
           id: 'mixed-test',
-          verificationSteps: [
-            'echo step1',
-            'exit 1',
-            'echo step3',
-          ],
+          verificationSteps: ['echo step1', 'exit 1', 'echo step3'],
         },
       ]);
 

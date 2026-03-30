@@ -16,10 +16,10 @@
   },
   "blockingIssues": [],
   "appliedUpdates": [
-    { 
-      "target": "library", 
-      "description": "Added 'Async Event Emitter Testing' quirk to testing-quirks.md noting the need for setImmediate() when emitting events tested by async listeners.", 
-      "sourceFeature": "friction-loop" 
+    {
+      "target": "library",
+      "description": "Added 'Async Event Emitter Testing' quirk to testing-quirks.md noting the need for setImmediate() when emitting events tested by async listeners.",
+      "sourceFeature": "friction-loop"
     }
   ],
   "suggestedGuidanceUpdates": [

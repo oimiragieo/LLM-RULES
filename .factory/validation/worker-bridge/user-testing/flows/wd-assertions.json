@@ -4,9 +4,7 @@
   "isolation": {
     "context": "Unit tests in temporary directories"
   },
-  "toolsUsed": [
-    "node --test"
-  ],
+  "toolsUsed": ["node --test"],
   "assertions": [
     {
       "id": "VAL-WD-001",
@@ -20,9 +18,7 @@
         }
       ],
       "evidence": {
-        "unitTestLogs": [
-          "worker-bridge/wd-assertions/test-output.txt"
-        ]
+        "unitTestLogs": ["worker-bridge/wd-assertions/test-output.txt"]
       },
       "issues": null
     },
@@ -38,9 +34,7 @@
         }
       ],
       "evidence": {
-        "unitTestLogs": [
-          "worker-bridge/wd-assertions/test-output.txt"
-        ]
+        "unitTestLogs": ["worker-bridge/wd-assertions/test-output.txt"]
       },
       "issues": null
     },
@@ -56,9 +50,7 @@
         }
       ],
       "evidence": {
-        "unitTestLogs": [
-          "worker-bridge/wd-assertions/test-output.txt"
-        ]
+        "unitTestLogs": ["worker-bridge/wd-assertions/test-output.txt"]
       },
       "issues": null
     },
@@ -74,9 +66,7 @@
         }
       ],
       "evidence": {
-        "unitTestLogs": [
-          "worker-bridge/wd-assertions/test-output.txt"
-        ]
+        "unitTestLogs": ["worker-bridge/wd-assertions/test-output.txt"]
       },
       "issues": null
     }

@@ -21,7 +21,10 @@ const os = require('node:os');
 const Database = require('better-sqlite3');
 const { BudgetEnforcementService } = require('../../.claude/lib/workers/budget-enforcement.cjs');
 const { getPendingCount, claimNextMessage } = require('../../.claude/lib/db/queue-operations.cjs');
-const { dispatchFeature, getDispatchStatus } = require('../../.claude/lib/mission/worker-features-dispatcher.cjs');
+const {
+  dispatchFeature,
+  getDispatchStatus,
+} = require('../../.claude/lib/mission/worker-features-dispatcher.cjs');
 
 // Helper to create temp directory
 function createTempDir() {
@@ -100,8 +103,20 @@ describe('Worker-to-Features Dispatcher', () => {
     it('selects feature with completed preconditions', () => {
       featuresPath = createFeaturesJson(tempDir, [
         { id: 'feature-a', description: 'Feature A', status: 'completed', skillName: 'skill-a' },
-        { id: 'feature-b', description: 'Feature B', status: 'pending', skillName: 'skill-b', preconditions: ['feature-a'] },
-        { id: 'feature-c', description: 'Feature C', status: 'pending', skillName: 'skill-c', preconditions: ['feature-a', 'feature-b'] },
+        {
+          id: 'feature-b',
+          description: 'Feature B',
+          status: 'pending',
+          skillName: 'skill-b',
+          preconditions: ['feature-a'],
+        },
+        {
+          id: 'feature-c',
+          description: 'Feature C',
+          status: 'pending',
+          skillName: 'skill-c',
+          preconditions: ['feature-a', 'feature-b'],
+        },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -115,7 +130,13 @@ describe('Worker-to-Features Dispatcher', () => {
     it('does not select feature with incomplete preconditions', () => {
       featuresPath = createFeaturesJson(tempDir, [
         { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'skill-a' },
-        { id: 'feature-b', description: 'Feature B', status: 'pending', skillName: 'skill-b', preconditions: ['feature-a'] },
+        {
+          id: 'feature-b',
+          description: 'Feature B',
+          status: 'pending',
+          skillName: 'skill-b',
+          preconditions: ['feature-a'],
+        },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -177,7 +198,10 @@ describe('Worker-to-Features Dispatcher', () => {
 
       assert.ok(payload.personaContext, 'Should have personaContext');
       assert.ok(payload.personaContext.missionObjectives, 'Should have missionObjectives');
-      assert.deepEqual(payload.personaContext.missionObjectives, ['Build the thing', 'Ship it fast']);
+      assert.deepEqual(payload.personaContext.missionObjectives, [
+        'Build the thing',
+        'Ship it fast',
+      ]);
     });
 
     it('persona context contains feature fields', () => {
@@ -200,7 +224,10 @@ describe('Worker-to-Features Dispatcher', () => {
       const payload = JSON.parse(row.text);
 
       assert.equal(payload.personaContext.featureDescription, 'Feature A description');
-      assert.deepEqual(payload.personaContext.expectedBehavior, ['Works correctly', 'Handles errors']);
+      assert.deepEqual(payload.personaContext.expectedBehavior, [
+        'Works correctly',
+        'Handles errors',
+      ]);
       assert.deepEqual(payload.personaContext.verificationSteps, ['Run tests']);
     });
   });
@@ -242,8 +269,20 @@ describe('Worker-to-Features Dispatcher', () => {
       // Circular dependencies are detected at load time by features-state-machine
       // This test checks that the dispatcher handles the error gracefully
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'skill-a', preconditions: ['feature-b'] },
-        { id: 'feature-b', description: 'Feature B', status: 'pending', skillName: 'skill-b', preconditions: ['feature-a'] },
+        {
+          id: 'feature-a',
+          description: 'Feature A',
+          status: 'pending',
+          skillName: 'skill-a',
+          preconditions: ['feature-b'],
+        },
+        {
+          id: 'feature-b',
+          description: 'Feature B',
+          status: 'pending',
+          skillName: 'skill-b',
+          preconditions: ['feature-a'],
+        },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -258,7 +297,13 @@ describe('Worker-to-Features Dispatcher', () => {
     it('returns dispatched:false when preconditions are in_progress', () => {
       featuresPath = createFeaturesJson(tempDir, [
         { id: 'feature-a', description: 'Feature A', status: 'in_progress', skillName: 'skill-a' },
-        { id: 'feature-b', description: 'Feature B', status: 'pending', skillName: 'skill-b', preconditions: ['feature-a'] },
+        {
+          id: 'feature-b',
+          description: 'Feature B',
+          status: 'pending',
+          skillName: 'skill-b',
+          preconditions: ['feature-a'],
+        },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -334,7 +379,10 @@ describe('Worker-to-Features Dispatcher', () => {
       fs.writeFileSync(featuresPath, JSON.stringify(data, null, 2));
 
       // Second dispatch (need fresh budget slot)
-      const freshBudget = new BudgetEnforcementService({ maxTokensPerMinute: 400000, maxConcurrentWorkers: 3 });
+      const freshBudget = new BudgetEnforcementService({
+        maxTokensPerMinute: 400000,
+        maxConcurrentWorkers: 3,
+      });
       const result2 = dispatchFeature({ db, budget: freshBudget, featuresPath, missionPath });
       assert.equal(result2.featureId, 'feature-2', 'Second dispatch should be feature-2');
     });
@@ -344,8 +392,20 @@ describe('Worker-to-Features Dispatcher', () => {
     it('returns correct status breakdown', () => {
       featuresPath = createFeaturesJson(tempDir, [
         { id: 'feature-a', description: 'Feature A', status: 'completed', skillName: 'skill-a' },
-        { id: 'feature-b', description: 'Feature B', status: 'pending', skillName: 'skill-b', preconditions: ['feature-a'] },
-        { id: 'feature-c', description: 'Feature C', status: 'pending', skillName: 'skill-c', preconditions: ['feature-d'] },
+        {
+          id: 'feature-b',
+          description: 'Feature B',
+          status: 'pending',
+          skillName: 'skill-b',
+          preconditions: ['feature-a'],
+        },
+        {
+          id: 'feature-c',
+          description: 'Feature C',
+          status: 'pending',
+          skillName: 'skill-c',
+          preconditions: ['feature-d'],
+        },
       ]);
 
       const status = getDispatchStatus(featuresPath);

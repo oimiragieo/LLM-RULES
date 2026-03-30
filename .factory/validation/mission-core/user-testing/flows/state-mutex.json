@@ -1,0 +1,74 @@
+{
+  "groupId": "state-mutex",
+  "testedAt": "2026-03-29T12:00:00.000Z",
+  "isolation": {
+    "command": "node --test tests/mission/state-mutex.test.cjs",
+    "directories": "temp directories for filesystem tests"
+  },
+  "toolsUsed": ["Execute"],
+  "assertions": [
+    {
+      "id": "VAL-MX-001",
+      "title": "Lock acquisition succeeds when turn matches",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test tests/mission/state-mutex.test.cjs", "expected": "Tests for VAL-MX-001 pass", "observed": "All 3 subtests passed" }
+      ],
+      "evidence": {
+        "terminalOutput": "mission-core/state-mutex/VAL-MX-test-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-MX-002",
+      "title": "Worker cannot acquire lock during orchestrator_turn",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test tests/mission/state-mutex.test.cjs", "expected": "Tests for VAL-MX-002 pass", "observed": "All 2 subtests passed" }
+      ],
+      "evidence": {
+        "terminalOutput": "mission-core/state-mutex/VAL-MX-test-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-MX-003",
+      "title": "Stale lock detection and recovery",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test tests/mission/state-mutex.test.cjs", "expected": "Tests for VAL-MX-003 pass", "observed": "All 3 subtests passed" }
+      ],
+      "evidence": {
+        "terminalOutput": "mission-core/state-mutex/VAL-MX-test-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-MX-004",
+      "title": "Lock release clears lock fields",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test tests/mission/state-mutex.test.cjs", "expected": "Tests for VAL-MX-004 pass", "observed": "All 2 subtests passed" }
+      ],
+      "evidence": {
+        "terminalOutput": "mission-core/state-mutex/VAL-MX-test-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-MX-005",
+      "title": "Corrupted state.json triggers recovery",
+      "status": "pass",
+      "steps": [
+        { "action": "Run unit test tests/mission/state-mutex.test.cjs", "expected": "Tests for VAL-MX-005 pass", "observed": "All 3 subtests passed" }
+      ],
+      "evidence": {
+        "terminalOutput": "mission-core/state-mutex/VAL-MX-test-output.txt"
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 5 assertions: 5 passed (VAL-MX-001 through VAL-MX-005 via unit tests)."
+}

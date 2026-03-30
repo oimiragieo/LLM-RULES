@@ -16,7 +16,10 @@ const path = require('node:path');
 const os = require('node:os');
 
 // Module under test
-const { composePersona, DEFAULT_MAX_PROMPT_CHARS } = require('../../.claude/lib/mission/persona-injector.cjs');
+const {
+  composePersona,
+  DEFAULT_MAX_PROMPT_CHARS,
+} = require('../../.claude/lib/mission/persona-injector.cjs');
 
 // Test fixtures
 let tempDir;
@@ -82,22 +85,46 @@ This is the skill template content.
 
       // Verify all 3 layers are present
       assert.ok(persona.prompt, 'Persona should have a prompt');
-      assert.ok(persona.prompt.includes('=== LAYER 1: BASE WORKER BOILERPLATE ==='), 'Should have Layer 1 delimiter');
-      assert.ok(persona.prompt.includes('=== LAYER 2: SKILL TEMPLATE ==='), 'Should have Layer 2 delimiter');
-      assert.ok(persona.prompt.includes('=== LAYER 3: MISSION CONTEXT ==='), 'Should have Layer 3 delimiter');
+      assert.ok(
+        persona.prompt.includes('=== LAYER 1: BASE WORKER BOILERPLATE ==='),
+        'Should have Layer 1 delimiter'
+      );
+      assert.ok(
+        persona.prompt.includes('=== LAYER 2: SKILL TEMPLATE ==='),
+        'Should have Layer 2 delimiter'
+      );
+      assert.ok(
+        persona.prompt.includes('=== LAYER 3: MISSION CONTEXT ==='),
+        'Should have Layer 3 delimiter'
+      );
 
       // Verify Layer 1 content (base boilerplate from PRD)
-      assert.ok(persona.prompt.includes('Role Definition'), 'Layer 1 should contain role definition');
-      assert.ok(persona.prompt.includes('Strict Mandates'), 'Layer 1 should contain strict mandates');
+      assert.ok(
+        persona.prompt.includes('Role Definition'),
+        'Layer 1 should contain role definition'
+      );
+      assert.ok(
+        persona.prompt.includes('Strict Mandates'),
+        'Layer 1 should contain strict mandates'
+      );
 
       // Verify Layer 2 content (skill template)
       assert.ok(persona.prompt.includes('test-skill'), 'Layer 2 should reference skill name');
-      assert.ok(persona.prompt.includes('skill template content'), 'Layer 2 should contain skill content');
+      assert.ok(
+        persona.prompt.includes('skill template content'),
+        'Layer 2 should contain skill content'
+      );
 
       // Verify Layer 3 content (mission context)
-      assert.ok(persona.prompt.includes('Build the persona injector module'), 'Layer 3 should contain objectives');
+      assert.ok(
+        persona.prompt.includes('Build the persona injector module'),
+        'Layer 3 should contain objectives'
+      );
       assert.ok(persona.prompt.includes('test-feature'), 'Layer 3 should contain feature id');
-      assert.ok(persona.prompt.includes('Test feature description'), 'Layer 3 should contain feature description');
+      assert.ok(
+        persona.prompt.includes('Test feature description'),
+        'Layer 3 should contain feature description'
+      );
     });
 
     it('includes all expected sections in base boilerplate (Layer 1)', async () => {
@@ -116,11 +143,17 @@ This is the skill template content.
       });
 
       // Verify base boilerplate includes key PRD mandates
-      assert.ok(persona.prompt.includes('COGNITIVE ENGINE'), 'Should include COGNITIVE ENGINE mandate');
+      assert.ok(
+        persona.prompt.includes('COGNITIVE ENGINE'),
+        'Should include COGNITIVE ENGINE mandate'
+      );
       assert.ok(persona.prompt.includes('<thought>'), 'Should include thought block instruction');
       assert.ok(persona.prompt.includes('SOURCE CONTROL'), 'Should include SOURCE CONTROL mandate');
       assert.ok(persona.prompt.includes('git status'), 'Should include git status instruction');
-      assert.ok(persona.prompt.includes('CONTRACTUAL EXIT'), 'Should include CONTRACTUAL EXIT mandate');
+      assert.ok(
+        persona.prompt.includes('CONTRACTUAL EXIT'),
+        'Should include CONTRACTUAL EXIT mandate'
+      );
     });
 
     it('includes mission objectives and feature fields in Layer 3', async () => {
@@ -154,9 +187,18 @@ This is the skill template content.
 
       // Verify feature fields are included
       assert.ok(persona.prompt.includes('feature-xyz'), 'Should include feature id');
-      assert.ok(persona.prompt.includes('This is a feature description'), 'Should include feature description');
-      assert.ok(persona.prompt.includes('Expected behavior A'), 'Should include expected behaviors');
-      assert.ok(persona.prompt.includes('Verification step 1'), 'Should include verification steps');
+      assert.ok(
+        persona.prompt.includes('This is a feature description'),
+        'Should include feature description'
+      );
+      assert.ok(
+        persona.prompt.includes('Expected behavior A'),
+        'Should include expected behaviors'
+      );
+      assert.ok(
+        persona.prompt.includes('Verification step 1'),
+        'Should include verification steps'
+      );
     });
   });
 
@@ -195,13 +237,21 @@ This is the skill template content.
       });
 
       // Attempting to modify a frozen object should throw in strict mode
-      assert.throws(() => {
-        persona.prompt = 'modified';
-      }, TypeError, 'Should throw on prompt modification');
+      assert.throws(
+        () => {
+          persona.prompt = 'modified';
+        },
+        TypeError,
+        'Should throw on prompt modification'
+      );
 
-      assert.throws(() => {
-        persona.newField = 'new value';
-      }, TypeError, 'Should throw on adding new field');
+      assert.throws(
+        () => {
+          persona.newField = 'new value';
+        },
+        TypeError,
+        'Should throw on adding new field'
+      );
     });
 
     it('nested prompt string is immutable via frozen object', async () => {
@@ -411,7 +461,10 @@ ${Array(200).fill('- Objective line').join('\n')}
       // Persona should have truncation info
       assert.ok(persona.truncated === true, 'Should indicate truncation occurred');
       assert.ok(typeof persona.originalLength === 'number', 'Should include original length');
-      assert.ok(persona.originalLength > persona.prompt.length, 'Original should be larger than truncated');
+      assert.ok(
+        persona.originalLength > persona.prompt.length,
+        'Original should be larger than truncated'
+      );
     });
   });
 
@@ -440,7 +493,10 @@ ${Array(200).fill('- Objective line').join('\n')}
         feature,
       });
 
-      assert.ok(persona.prompt.includes('Content from alt path'), 'Should find skill in alternate path');
+      assert.ok(
+        persona.prompt.includes('Content from alt path'),
+        'Should find skill in alternate path'
+      );
     });
 
     it('supports .claude/skills path convention', async () => {
@@ -466,7 +522,10 @@ ${Array(200).fill('- Objective line').join('\n')}
         feature,
       });
 
-      assert.ok(persona.prompt.includes('From .claude/skills'), 'Should load from .claude/skills path');
+      assert.ok(
+        persona.prompt.includes('From .claude/skills'),
+        'Should load from .claude/skills path'
+      );
     });
   });
 

@@ -19,8 +19,11 @@ const os = require('node:os');
 const Ajv = require('ajv');
 
 // Module under test
-const { ReadinessScorer, PILLAR_WEIGHTS, LEVEL_BOUNDARIES } =
-  require('../../.claude/lib/readiness/readiness-scorer.cjs');
+const {
+  ReadinessScorer,
+  PILLAR_WEIGHTS,
+  LEVEL_BOUNDARIES,
+} = require('../../.claude/lib/readiness/readiness-scorer.cjs');
 
 // Expected pillar names (from spec)
 const EXPECTED_PILLARS = [
@@ -479,10 +482,7 @@ describe('Readiness Scorer', () => {
 
       for (const [name, pillar] of Object.entries(report.pillars)) {
         // exitCode should be defined (null for timeout, number for actual exit)
-        assert.ok(
-          pillar.exitCode !== undefined,
-          `${name} should have exitCode defined`
-        );
+        assert.ok(pillar.exitCode !== undefined, `${name} should have exitCode defined`);
       }
     });
 

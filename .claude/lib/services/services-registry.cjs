@@ -22,7 +22,15 @@ const Ajv = require('ajv');
 const { commandExists } = require('../utils/command-exists.cjs');
 
 // Canonical command keys that are recognized
-const CANONICAL_COMMANDS = ['install', 'test', 'lint', 'build', 'validate', 'typecheck', 'benchmark'];
+const CANONICAL_COMMANDS = [
+  'install',
+  'test',
+  'lint',
+  'build',
+  'validate',
+  'typecheck',
+  'benchmark',
+];
 
 // JSON Schema for services.yaml validation
 const SERVICES_SCHEMA = {

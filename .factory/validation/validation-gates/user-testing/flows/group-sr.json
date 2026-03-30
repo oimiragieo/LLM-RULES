@@ -5,9 +5,7 @@
     "command": "node --test tests/mission/scrutiny-reviewer.test.cjs",
     "missionDir": "C:\\Users\\oimir\\.factory\\missions\\91ae9243-5217-4452-8593-40411a402f4b"
   },
-  "toolsUsed": [
-    "node --test"
-  ],
+  "toolsUsed": ["node --test"],
   "assertions": [
     {
       "id": "VAL-SR-001",
@@ -21,9 +19,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "validation-gates/group-sr/test-output.txt"
-        ]
+        "testOutput": ["validation-gates/group-sr/test-output.txt"]
       },
       "issues": null
     },
@@ -39,9 +35,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "validation-gates/group-sr/test-output.txt"
-        ]
+        "testOutput": ["validation-gates/group-sr/test-output.txt"]
       },
       "issues": null
     },
@@ -57,9 +51,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "validation-gates/group-sr/test-output.txt"
-        ]
+        "testOutput": ["validation-gates/group-sr/test-output.txt"]
       },
       "issues": null
     },
@@ -75,9 +67,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "validation-gates/group-sr/test-output.txt"
-        ]
+        "testOutput": ["validation-gates/group-sr/test-output.txt"]
       },
       "issues": null
     }

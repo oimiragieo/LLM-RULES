@@ -10,10 +10,10 @@
     "issues": []
   },
   "sharedStateObservations": [
-    { 
-      "area": "conventions", 
-      "observation": "Worker ran `node scripts/format-tracked.mjs --write` instead of the documented `pnpm format` command.", 
-      "evidence": "Transcript shows worker executing `node scripts/format-tracked.mjs --write` after `pnpm format:check` failed, whereas AGENTS.md instructs: 'If format fails, run: pnpm format then re-check'." 
+    {
+      "area": "conventions",
+      "observation": "Worker ran `node scripts/format-tracked.mjs --write` instead of the documented `pnpm format` command.",
+      "evidence": "Transcript shows worker executing `node scripts/format-tracked.mjs --write` after `pnpm format:check` failed, whereas AGENTS.md instructs: 'If format fails, run: pnpm format then re-check'."
     },
     {
       "area": "architecture",

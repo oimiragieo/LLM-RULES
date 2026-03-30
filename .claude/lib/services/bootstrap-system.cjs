@@ -376,7 +376,11 @@ class BootstrapSystem {
       }
 
       // Check if we should skip this component (idempotency)
-      if (this.previousState && this.previousState.components && this.previousState.components[name]) {
+      if (
+        this.previousState &&
+        this.previousState.components &&
+        this.previousState.components[name]
+      ) {
         const prevComp = this.previousState.components[name];
 
         // Skip if previously ok and binary still exists
@@ -397,7 +401,11 @@ class BootstrapSystem {
         }
 
         // Re-attempt if previously failed or skipped
-        if (prevComp.status === 'failed' || prevComp.status === 'skipped' || prevComp.status === 'timeout') {
+        if (
+          prevComp.status === 'failed' ||
+          prevComp.status === 'skipped' ||
+          prevComp.status === 'timeout'
+        ) {
           const result = this.checkComponent(component, this.options.timeout);
           this.state.components[name] = result;
           if (result.status !== 'ok' && component.critical) {

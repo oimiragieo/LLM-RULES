@@ -10,6 +10,7 @@ NOTE: Startup and cleanup are handled by `worker-base`. This skill defines the W
 ## When to Use This Skill
 
 Use for features that implement the mission engine subsystem:
+
 - Mission workspace provisioning and state management
 - features.json state machine and precondition DAG
 - state.json mutex and lock management
@@ -39,6 +40,7 @@ Before writing ANY implementation code:
 5. Run tests with `node --test <test-file>` to confirm they FAIL (red phase)
 
 Test file conventions:
+
 - Filename: `<module-name>.test.cjs`
 - Use temp directories for filesystem tests (clean up in `after()`)
 - Mock external dependencies with manual stubs (no sinon/jest)
@@ -80,13 +82,23 @@ Test file conventions:
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "node --test tests/mission/features-state-machine.test.cjs", "exitCode": 0, "observation": "14 tests passing, 0 failing" },
+      {
+        "command": "node --test tests/mission/features-state-machine.test.cjs",
+        "exitCode": 0,
+        "observation": "14 tests passing, 0 failing"
+      },
       { "command": "pnpm test", "exitCode": 0, "observation": "Full suite passes, no regressions" },
       { "command": "pnpm format:check", "exitCode": 0, "observation": "All files formatted" }
     ],
     "interactiveChecks": [
-      { "action": "Required module and called loadFeatures() with valid fixtures", "observed": "Returns parsed features array with correct schema" },
-      { "action": "Called transitionFeature with invalid transition pending->completed", "observed": "Throws INVALID_TRANSITION error as expected" }
+      {
+        "action": "Required module and called loadFeatures() with valid fixtures",
+        "observed": "Returns parsed features array with correct schema"
+      },
+      {
+        "action": "Called transitionFeature with invalid transition pending->completed",
+        "observed": "Throws INVALID_TRANSITION error as expected"
+      }
     ]
   },
   "tests": {

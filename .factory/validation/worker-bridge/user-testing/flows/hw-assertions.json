@@ -6,9 +6,7 @@
     "description": "Run the provided node command and assert that the tests corresponding to these assertions pass.",
     "isolationContext": "Unit tests are isolated using temporary directories for filesystem interactions. Do not modify global state or create files outside of the test temporary directories."
   },
-  "toolsUsed": [
-    "node --test"
-  ],
+  "toolsUsed": ["node --test"],
   "assertions": [
     {
       "id": "VAL-HW-001",
@@ -22,9 +20,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "worker-bridge/hw-assertions/test-output.txt"
-        ]
+        "terminalSnapshots": ["worker-bridge/hw-assertions/test-output.txt"]
       },
       "issues": null
     },
@@ -40,9 +36,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "worker-bridge/hw-assertions/test-output.txt"
-        ]
+        "terminalSnapshots": ["worker-bridge/hw-assertions/test-output.txt"]
       },
       "issues": null
     },
@@ -58,9 +52,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "worker-bridge/hw-assertions/test-output.txt"
-        ]
+        "terminalSnapshots": ["worker-bridge/hw-assertions/test-output.txt"]
       },
       "issues": null
     },
@@ -76,9 +68,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "worker-bridge/hw-assertions/test-output.txt"
-        ]
+        "terminalSnapshots": ["worker-bridge/hw-assertions/test-output.txt"]
       },
       "issues": null
     },
@@ -94,9 +84,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "worker-bridge/hw-assertions/test-output.txt"
-        ]
+        "terminalSnapshots": ["worker-bridge/hw-assertions/test-output.txt"]
       },
       "issues": null
     }

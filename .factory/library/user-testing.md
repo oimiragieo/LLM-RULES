@@ -55,6 +55,7 @@ All validation is programmatic (unit/integration tests). Each validator instance
 ## Flow Validator Guidance: Unit Tests
 
 When testing assertions via unit tests:
+
 1. Run the specific test file associated with the module using `node --test tests/mission/<module>.test.cjs`.
 2. Do not run the full `pnpm test` suite as it may time out and takes a long time.
 3. Assertions are considered passed if the relevant tests in the file pass. You may need to inspect the test file briefly to map the tests to the assertion IDs, or simply run the test file and if all pass, assume the implementation meets the contract.

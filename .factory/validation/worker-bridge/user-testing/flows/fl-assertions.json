@@ -4,9 +4,7 @@
   "isolation": {
     "type": "unit-tests-temp-dir"
   },
-  "toolsUsed": [
-    "node --test"
-  ],
+  "toolsUsed": ["node --test"],
   "assertions": [
     {
       "id": "VAL-FL-001",
@@ -20,9 +18,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"
-        ]
+        "terminalSnapshots": ["worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"]
       },
       "issues": null
     },
@@ -38,9 +34,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"
-        ]
+        "terminalSnapshots": ["worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"]
       },
       "issues": null
     },
@@ -56,9 +50,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"
-        ]
+        "terminalSnapshots": ["worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"]
       },
       "issues": null
     },
@@ -74,9 +66,7 @@
         }
       ],
       "evidence": {
-        "terminalSnapshots": [
-          "worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"
-        ]
+        "terminalSnapshots": ["worker-bridge/fl-assertions/VAL-FL-001-to-004-test-output.txt"]
       },
       "issues": null
     }

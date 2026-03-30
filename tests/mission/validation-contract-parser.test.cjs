@@ -15,7 +15,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 // Module under test
-const { parseValidationContract } = require('../../.claude/lib/mission/validation-contract-parser.cjs');
+const {
+  parseValidationContract,
+} = require('../../.claude/lib/mission/validation-contract-parser.cjs');
 
 // Test fixtures directory
 const FIXTURES_DIR = path.join(__dirname, 'fixtures', 'validation-contract');
@@ -182,14 +184,8 @@ describe('validation-contract-parser', () => {
         'Fresh workspace provisioning creates required directory tree',
         'Should extract correct title'
       );
-      assert.ok(
-        firstRule.description.includes('provisionWorkspace'),
-        'Should extract description'
-      );
-      assert.ok(
-        firstRule.evidence.includes('fs.existsSync'),
-        'Should extract evidence'
-      );
+      assert.ok(firstRule.description.includes('provisionWorkspace'), 'Should extract description');
+      assert.ok(firstRule.evidence.includes('fs.existsSync'), 'Should extract evidence');
     });
 
     it('extracts all rule IDs from contract', () => {
@@ -222,7 +218,10 @@ describe('validation-contract-parser', () => {
 
       const firstRule = result.rules[0];
       assert.ok(firstRule.description.includes('spans'), 'Should capture multiline content');
-      assert.ok(firstRule.description.includes('multiple lines'), 'Should capture multiline content');
+      assert.ok(
+        firstRule.description.includes('multiple lines'),
+        'Should capture multiline content'
+      );
     });
 
     it('parses various area prefixes', () => {
@@ -302,10 +301,7 @@ describe('validation-contract-parser', () => {
         e => e.code === 'MISSING_EVIDENCE' || e.code === 'MALFORMED_RULE'
       );
       assert.ok(missingEvidenceError, 'Should report error for rule without Evidence');
-      assert.ok(
-        typeof missingEvidenceError.line === 'number',
-        'Error should include line number'
-      );
+      assert.ok(typeof missingEvidenceError.line === 'number', 'Error should include line number');
     });
 
     it('does not crash on completely invalid content', () => {

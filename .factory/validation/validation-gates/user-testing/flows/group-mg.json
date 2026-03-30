@@ -4,9 +4,7 @@
   "isolation": {
     "command": "node --test tests/mission/milestone-gate.test.cjs"
   },
-  "toolsUsed": [
-    "node --test"
-  ],
+  "toolsUsed": ["node --test"],
   "assertions": [
     {
       "id": "VAL-MG-001",
@@ -21,9 +19,7 @@
       ],
       "evidence": {
         "screenshots": [],
-        "terminalSnapshots": [
-          "validation-gates/group-mg/VAL-MG-001-002-test-output.txt"
-        ]
+        "terminalSnapshots": ["validation-gates/group-mg/VAL-MG-001-002-test-output.txt"]
       },
       "issues": null
     },
@@ -40,9 +36,7 @@
       ],
       "evidence": {
         "screenshots": [],
-        "terminalSnapshots": [
-          "validation-gates/group-mg/VAL-MG-001-002-test-output.txt"
-        ]
+        "terminalSnapshots": ["validation-gates/group-mg/VAL-MG-001-002-test-output.txt"]
       },
       "issues": null
     },
@@ -59,9 +53,7 @@
       ],
       "evidence": {
         "screenshots": [],
-        "terminalSnapshots": [
-          "validation-gates/group-mg/VAL-MG-003-004-test-output.txt"
-        ]
+        "terminalSnapshots": ["validation-gates/group-mg/VAL-MG-003-004-test-output.txt"]
       },
       "issues": null
     },
@@ -78,9 +70,7 @@
       ],
       "evidence": {
         "screenshots": [],
-        "terminalSnapshots": [
-          "validation-gates/group-mg/VAL-MG-003-004-test-output.txt"
-        ]
+        "terminalSnapshots": ["validation-gates/group-mg/VAL-MG-003-004-test-output.txt"]
       },
       "issues": null
     }

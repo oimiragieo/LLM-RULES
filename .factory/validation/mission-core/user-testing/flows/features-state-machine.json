@@ -1,0 +1,188 @@
+{
+  "groupId": "features-state-machine",
+  "testedAt": "2026-03-29T12:00:00.000Z",
+  "isolation": {
+    "testCommand": "node --test tests/mission/features-state-machine.test.cjs",
+    "missionDir": "C:\\Users\\oimir\\.factory\\missions\\91ae9243-5217-4452-8593-40411a402f4b",
+    "directoryContext": "temp directories for filesystem tests"
+  },
+  "toolsUsed": ["Execute"],
+  "assertions": [
+    {
+      "id": "VAL-FS-001",
+      "title": "Valid transition pending to in_progress succeeds",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine.test.cjs",
+          "expected": "Test for pending to in_progress succeeds",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/test-output.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-002",
+      "title": "Valid transition in_progress to completed succeeds",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine.test.cjs",
+          "expected": "Test for in_progress to completed succeeds",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/test-output.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-003",
+      "title": "Transition in_progress to failed increments retry counter",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine.test.cjs",
+          "expected": "Test for retry counter increment succeeds",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/test-output.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-004",
+      "title": "Invalid transition pending to completed is rejected",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine.test.cjs",
+          "expected": "Test for invalid transition pending to completed is rejected",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/test-output.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-005",
+      "title": "Completed is a terminal state",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine.test.cjs",
+          "expected": "Test for completed as terminal state succeeds",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/test-output.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-006",
+      "title": "Precondition check blocks dependent feature",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine-extended.test.cjs",
+          "expected": "Test for precondition check blocks dependent feature succeeds",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/extended-test-output.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-007",
+      "title": "Precondition passes when dependency is completed",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine-extended.test.cjs",
+          "expected": "Test for precondition passes when dependency is completed succeeds",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/extended-test-output.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-008",
+      "title": "Circular dependency detection",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine-extended.test.cjs",
+          "expected": "Test for circular dependency detection succeeds",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/extended-test-output.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-009",
+      "title": "Malformed features.json rejected gracefully",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine-extended.test.cjs",
+          "expected": "Test for malformed features.json rejected gracefully succeeds",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/extended-test-output.txt"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-010",
+      "title": "Atomic write safety",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/features-state-machine-extended.test.cjs",
+          "expected": "Test for atomic write safety succeeds",
+          "observed": "Test passed successfully"
+        }
+      ],
+      "evidence": {
+        "unitTestLogs": ["mission-core/features-state-machine/extended-test-output.txt"]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [
+    {
+      "description": "Assertions VAL-FS-006 through VAL-FS-010 were not included in features-state-machine.test.cjs as initially given in the test command.",
+      "resolved": true,
+      "resolution": "Found and ran features-state-machine-extended.test.cjs to verify the remaining assertions.",
+      "affectedAssertions": [
+        "VAL-FS-006",
+        "VAL-FS-007",
+        "VAL-FS-008",
+        "VAL-FS-009",
+        "VAL-FS-010"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Tested 10 assertions (VAL-FS-001 through VAL-FS-010). All 10 assertions passed via unit test suites."
+}
