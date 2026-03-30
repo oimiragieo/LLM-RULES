@@ -256,6 +256,9 @@ describe('HandoffPipeline', () => {
       pipeline.start();
       await completedPromise;
 
+      // Stop pipeline immediately to prevent Windows polling re-detection
+      pipeline.stop();
+
       // Allow time for file write
       await new Promise(r => setTimeout(r, 100));
 
