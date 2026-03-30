@@ -1,0 +1,34 @@
+{
+  "milestone": "integration",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 17,
+    "passed": 17,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-INFRA-001",
+    "VAL-INFRA-002",
+    "VAL-CROSS-001",
+    "VAL-CROSS-002",
+    "VAL-CROSS-003",
+    "VAL-CROSS-004",
+    "VAL-CROSS-005",
+    "VAL-CROSS-006",
+    "VAL-CROSS-007",
+    "VAL-CROSS-008",
+    "VAL-E2E-001",
+    "VAL-E2E-002",
+    "VAL-E2E-003",
+    "VAL-E2E-004",
+    "VAL-E2E-005",
+    "VAL-E2E-006",
+    "VAL-E2E-007"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
