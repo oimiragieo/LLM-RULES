@@ -78,7 +78,19 @@ function loadConfig(projectDir) {
   let userConfig;
   try {
     const raw = fs.readFileSync(configPath, 'utf8');
-    userConfig = JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      console.warn(
+        `[readiness-config] Warning: ${configPath} is not a valid config object. Using defaults.`
+      );
+      return {
+        gateThreshold: DEFAULT_CONFIG.gateThreshold,
+        pillarWeights: { ...DEFAULT_CONFIG.pillarWeights },
+        pillarThresholds: {},
+        levelBoundaries: DEFAULT_CONFIG.levelBoundaries.map((b) => ({ ...b })),
+      };
+    }
+    userConfig = parsed;
   } catch (err) {
     console.warn(
       `[readiness-config] Warning: invalid JSON in ${configPath}: ${err.message}. Using defaults.`
