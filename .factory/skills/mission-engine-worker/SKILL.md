@@ -1,6 +1,6 @@
 ---
 name: mission-engine-worker
-description: Builds mission engine core modules, validation gates, worker bridge, and operational infrastructure
+description: Builds mission engine modules, orchestration wiring, plugin system, headless execution, and code review infrastructure
 ---
 
 # Mission Engine Worker
@@ -9,8 +9,12 @@ NOTE: Startup and cleanup are handled by `worker-base`. This skill defines the W
 
 ## When to Use This Skill
 
-Use for features that implement the mission engine subsystem:
+Use for features that implement the mission engine subsystem and production infrastructure:
 
+- Mission orchestrator wiring (dispatch loop, handoff pipeline, milestone gates)
+- Plugin marketplace (manifest, registry, resolver, loader, CLI)
+- Headless execution engine (autonomy tiers, output formats, permission enforcement)
+- Code review system (diff engine, severity matrix, 2-pass pipeline)
 - Mission workspace provisioning and state management
 - features.json state machine and precondition DAG
 - state.json mutex and lock management
