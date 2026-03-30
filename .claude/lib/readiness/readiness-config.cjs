@@ -102,6 +102,7 @@ function loadConfig(projectDir) {
         ? userConfig.gateThreshold
         : DEFAULT_CONFIG.gateThreshold,
     pillarWeights: mergedWeights,
+    pillarThresholds: userConfig.pillarThresholds || {},
     levelBoundaries:
       userConfig.levelBoundaries !== undefined
         ? userConfig.levelBoundaries
