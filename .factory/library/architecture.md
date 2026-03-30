@@ -34,3 +34,21 @@ Tests mirror the module structure:
 - **EventEmitter pattern** for handoff watcher and friction loop - Matches existing codebase
 - **AJV for all schema validation** - Consistent with existing codebase
 - **No new dependencies** - Use only packages already in package.json
+
+## State Machine Transitions (CRITICAL)
+
+FeaturesStateMachine VALID_TRANSITIONS:
+- pending -> in_progress
+- in_progress -> validating | failed
+- validating -> completed
+- failed -> pending
+- completed (terminal)
+- cancelled (terminal)
+
+FrictionLoopEngine events (emitted):
+- re-enqueued (with strategy: 'retry' | 'replan')
+- human-intervention-required
+- friction-capped
+- error
+
+FrictionLoopEngine listens for: validation-failed

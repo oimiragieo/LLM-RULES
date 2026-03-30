@@ -62,3 +62,13 @@ When testing assertions via unit tests:
 4. If a test fails, capture the error output as evidence.
 5. You can execute multiple test files if your group spans multiple modules.
 6. The tests use temporary directories for filesystem interactions and should be safe to run concurrently. Do not modify global state or create files outside of the test temporary directories.
+
+## Flow Validator Guidance: Integration Tests
+
+For cross-area integration assertions (VAL-INFRA-*, VAL-CROSS-*, VAL-E2E-*):
+
+1. Run integration tests: `node --test tests/integration/<file>.test.cjs`
+2. Each describe() block maps to a validation assertion ID
+3. Integration tests create temp workspaces and clean up after themselves
+4. Tests use mock workers (no real LLM calls) — should complete quickly
+5. Some tests (VAL-E2E-003, VAL-E2E-004) run against the real agent-studio repo
