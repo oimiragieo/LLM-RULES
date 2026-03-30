@@ -1,0 +1,495 @@
+{
+  "milestone": "milestone-5-intelligent-model-router-cost-engine",
+  "title": "Intelligent Model Router & Cost Engine",
+  "generatedAt": "2026-03-30T00:00:00.000Z",
+  "features": [
+    {
+      "id": "model-registry",
+      "title": "Model Registry",
+      "modulePath": ".claude/lib/routing/model-registry.cjs",
+      "configPath": ".claude/config/model-registry.json",
+      "description": "Central registry of available models with capabilities, pricing, and provider metadata. Loads model definitions from a data-driven JSON config file at .claude/config/model-registry.json. Provides lookup by name, filtering by provider, and cost-optimized selection for a given capability requirement. Integrates with the existing MODEL_ALIASES and MODEL_PRICING constants from agent-config-reader.cjs and token-accountant.cjs respectively, serving as the single source of truth for model metadata across the routing system.",
+      "preconditions": [
+        "model-registry.json config file must be created with schema for model entries",
+        "Existing MODEL_PRICING in token-accountant.cjs and MODEL_ALIASES in agent-config-reader.cjs serve as reference data to seed the registry"
+      ],
+      "exports": {
+        "class": "ModelRegistry",
+        "constructor": "ModelRegistry(configPath?)",
+        "methods": [
+          "getModel(name: string) → ModelEntry | null",
+          "listModels() → ModelEntry[]",
+          "getModelsByProvider(provider: string) → ModelEntry[]",
+          "getCheapestModelForCapability(capability: { minContextWindow?, maxLatencyClass?, features? }) → ModelEntry | null",
+          "reload() → void"
+        ],
+        "types": {
+          "ModelEntry": {
+            "id": "string (e.g., 'claude-opus-4-6')",
+            "shorthand": "string (e.g., 'opus')",
+            "provider": "string (e.g., 'anthropic')",
+            "contextWindow": "number (tokens, e.g., 200000)",
+            "costPer1KInput": "number (USD)",
+            "costPer1KOutput": "number (USD)",
+            "latencyClass": "'low' | 'medium' | 'high'",
+            "features": "string[] (e.g., ['tool_use', 'vision', 'extended_thinking'])",
+            "maxOutputTokens": "number"
+          }
+        }
+      },
+      "expectedBehavior": [
+        "getModel('claude-opus-4-6') returns a complete ModelEntry with all fields populated",
+        "getModel('opus') resolves shorthand aliases to full model entries (leveraging MODEL_ALIASES pattern)",
+        "getModel('nonexistent-model') returns null without throwing",
+        "listModels() returns all registered models as an array sorted by cost (cheapest first)",
+        "getModelsByProvider('anthropic') returns only Anthropic models",
+        "getModelsByProvider('unknown') returns empty array",
+        "getCheapestModelForCapability({ minContextWindow: 100000 }) returns haiku or the cheapest model meeting the threshold",
+        "getCheapestModelForCapability({ features: ['extended_thinking'] }) filters models that support the feature",
+        "getCheapestModelForCapability with impossible constraints returns null",
+        "Constructor with missing config file falls back to hardcoded defaults matching current MODEL_PRICING",
+        "reload() re-reads config from disk without requiring new instance",
+        "Config file with invalid JSON is handled gracefully (fallback to defaults, stderr warning)",
+        "Registry is immutable after load — getModel returns copies, not references"
+      ],
+      "verificationSteps": [
+        "Unit test: Create model-registry.json with 3+ models, verify getModel returns correct entries",
+        "Unit test: Verify shorthand alias resolution (opus → claude-opus-4-6)",
+        "Unit test: Verify getCheapestModelForCapability sorting and filtering logic",
+        "Unit test: Verify graceful fallback when config file is missing or corrupt",
+        "Unit test: Verify reload() picks up config changes",
+        "Integration test: Verify MODEL_PRICING values from token-accountant.cjs match registry entries",
+        "Contract test: Exported ModelEntry shape matches documented type"
+      ],
+      "validationContracts": [
+        "VAL-M5-REG-001: ModelRegistry loads from JSON config and exposes getModel()",
+        "VAL-M5-REG-002: Shorthand aliases resolve correctly (opus/sonnet/haiku)",
+        "VAL-M5-REG-003: getCheapestModelForCapability returns cost-optimal model meeting constraints",
+        "VAL-M5-REG-004: Missing/corrupt config triggers graceful fallback with defaults",
+        "VAL-M5-REG-005: Registry data is immutable (copies returned, not references)"
+      ],
+      "dependsOn": [],
+      "usedBy": ["cost-predictor", "dynamic-model-router", "budget-engine"]
+    },
+    {
+      "id": "cost-predictor",
+      "title": "Cost Predictor",
+      "modulePath": ".claude/lib/routing/cost-predictor.cjs",
+      "description": "Pre-task cost estimation engine that combines token estimation with model pricing data to predict the cost of running a prompt against a specific model. Uses the existing estimateTokens() function from token-budget-tracker.cjs for character-to-token conversion and retrieves pricing from the ModelRegistry. Provides budget-aware model suggestion that recommends the cheapest model meeting a quality threshold, and exposes burn rate calculation for active sessions by querying the TokenAccountant's session totals.",
+      "preconditions": [
+        "model-registry feature must be implemented (provides pricing data)",
+        "token-budget-tracker.cjs estimateTokens() function is available",
+        "token-accountant.cjs TokenAccountant class is available for session cost queries"
+      ],
+      "exports": {
+        "class": "CostPredictor",
+        "constructor": "CostPredictor(modelRegistry: ModelRegistry, tokenAccountant: TokenAccountant)",
+        "methods": [
+          "estimateCost(prompt: string, modelName: string) → { estimatedTokens: number, inputCostUSD: number, estimatedOutputTokens: number, outputCostUSD: number, totalCostUSD: number, model: string }",
+          "suggestModel(prompt: string, budget: { maxCostUSD: number, qualityPreference?: 'cost' | 'balanced' | 'quality' }) → { model: string, estimatedCostUSD: number, reason: string } | null",
+          "getBudgetStatus(sessionId: string) → { totalSpent: number, remaining: number, burnRatePerMinute: number, estimatedMinutesLeft: number | null, status: 'ok' | 'warning' | 'critical' }"
+        ]
+      },
+      "expectedBehavior": [
+        "estimateCost('Hello world', 'sonnet') returns token estimate using CHAR_TO_TOKEN_RATIO (0.75) and sonnet pricing",
+        "estimateCost with unknown model name throws descriptive error or falls back to sonnet pricing",
+        "estimateCost with empty prompt returns zero cost",
+        "estimatedOutputTokens defaults to a configurable ratio of input tokens (e.g., 1.5x for generation tasks)",
+        "suggestModel selects cheapest model that fits within maxCostUSD budget",
+        "suggestModel with qualityPreference='quality' prefers opus over sonnet even if costlier",
+        "suggestModel with qualityPreference='cost' always returns cheapest option within budget",
+        "suggestModel returns null when no model fits the budget",
+        "getBudgetStatus returns burn rate calculated from TokenAccountant session data",
+        "getBudgetStatus with no session data returns status='ok' with zero spent",
+        "getBudgetStatus accurately computes estimatedMinutesLeft from burn rate and remaining budget",
+        "getBudgetStatus returns status='warning' when >80% budget consumed, 'critical' when >90%"
+      ],
+      "verificationSteps": [
+        "Unit test: estimateCost returns mathematically correct cost based on token count × pricing",
+        "Unit test: suggestModel with budget=$0.01 picks haiku over sonnet/opus",
+        "Unit test: suggestModel with budget=$0.001 returns null (too small for any model)",
+        "Unit test: getBudgetStatus computes correct burn rate from TokenAccountant mock data",
+        "Unit test: Edge cases — empty prompt, null model, zero budget",
+        "Integration test: estimateCost pricing matches MODEL_PRICING from token-accountant.cjs",
+        "Contract test: suggestModel response shape has model, estimatedCostUSD, reason"
+      ],
+      "validationContracts": [
+        "VAL-M5-COST-001: estimateCost returns accurate cost using registry pricing and token estimation",
+        "VAL-M5-COST-002: suggestModel returns cheapest model within budget constraints",
+        "VAL-M5-COST-003: getBudgetStatus calculates burn rate from session token usage",
+        "VAL-M5-COST-004: Quality preference parameter influences model selection",
+        "VAL-M5-COST-005: Graceful handling of edge cases (empty prompt, unknown model, zero budget)"
+      ],
+      "dependsOn": ["model-registry"],
+      "usedBy": ["dynamic-model-router", "budget-engine"]
+    },
+    {
+      "id": "provider-compat",
+      "title": "Provider Compatibility Layer",
+      "modulePath": ".claude/lib/routing/provider-compat.cjs",
+      "description": "Normalizes model capabilities across different LLM providers into a unified interface. Currently the system is Anthropic-only, but this layer prepares for multi-provider support by abstracting provider-specific model configurations into a standard format. It maps provider-specific feature names to canonical feature identifiers (e.g., Anthropic 'extended_thinking' → canonical 'reasoning'), validates that a model supports a requested feature, and returns a normalized capability object that other routing modules can depend on without provider awareness.",
+      "preconditions": [
+        "model-registry feature should be implemented (provides raw model data)",
+        "Understanding of current Anthropic-specific features used in agent-config.json (tool_use, vision, extended_thinking)"
+      ],
+      "exports": {
+        "functions": [
+          "normalizeModelConfig(provider: string, modelEntry: ModelEntry) → NormalizedModelConfig",
+          "getProviderCapabilities(provider: string) → ProviderCapabilities",
+          "isFeatureSupported(modelEntry: ModelEntry, feature: string) → boolean"
+        ],
+        "types": {
+          "NormalizedModelConfig": {
+            "id": "string",
+            "provider": "string",
+            "contextWindow": "number",
+            "maxOutput": "number",
+            "costPer1KInput": "number",
+            "costPer1KOutput": "number",
+            "latency": "'low' | 'medium' | 'high'",
+            "capabilities": "string[] (canonical feature names)",
+            "supportsStreaming": "boolean",
+            "supportsToolUse": "boolean",
+            "supportsVision": "boolean",
+            "supportsReasoning": "boolean"
+          },
+          "ProviderCapabilities": {
+            "provider": "string",
+            "supportedModels": "string[]",
+            "features": "string[]",
+            "apiVersion": "string | null"
+          }
+        }
+      },
+      "expectedBehavior": [
+        "normalizeModelConfig('anthropic', opusEntry) returns NormalizedModelConfig with all boolean flags resolved",
+        "normalizeModelConfig maps 'extended_thinking' to supportsReasoning=true",
+        "normalizeModelConfig maps 'tool_use' to supportsToolUse=true",
+        "normalizeModelConfig for unknown provider returns config with all optional booleans set to false",
+        "getProviderCapabilities('anthropic') returns list of supported models and features",
+        "getProviderCapabilities('unknown') returns empty capabilities object",
+        "isFeatureSupported checks both raw feature names and canonical aliases",
+        "isFeatureSupported(haikuEntry, 'extended_thinking') returns false (haiku doesn't support it)",
+        "isFeatureSupported(opusEntry, 'tool_use') returns true",
+        "All functions are pure — no side effects, no file I/O, no state mutation"
+      ],
+      "verificationSteps": [
+        "Unit test: normalizeModelConfig produces correct NormalizedModelConfig for each Claude model tier",
+        "Unit test: Feature mapping (provider-specific → canonical) is bidirectionally correct",
+        "Unit test: isFeatureSupported correctly differentiates model capabilities",
+        "Unit test: Unknown provider handling returns safe defaults",
+        "Unit test: Functions are pure — calling twice with same input returns same output",
+        "Contract test: NormalizedModelConfig shape matches documented type"
+      ],
+      "validationContracts": [
+        "VAL-M5-COMPAT-001: normalizeModelConfig produces unified interface from provider-specific input",
+        "VAL-M5-COMPAT-002: Feature name mapping is consistent (provider→canonical→provider round-trip)",
+        "VAL-M5-COMPAT-003: isFeatureSupported accurately reflects model capabilities",
+        "VAL-M5-COMPAT-004: Unknown providers return safe default configurations",
+        "VAL-M5-COMPAT-005: All functions are side-effect-free and deterministic"
+      ],
+      "dependsOn": ["model-registry"],
+      "usedBy": ["dynamic-model-router"]
+    },
+    {
+      "id": "dynamic-model-router",
+      "title": "Dynamic Model Router",
+      "modulePath": ".claude/lib/routing/model-router.cjs",
+      "description": "Runtime model selection engine that integrates intent classification, cost prediction, and budget constraints to select the optimal model for each task. Extends the existing intent→agent→model resolution chain (from agent-config-reader.cjs resolveAgentModel) by adding cost-aware overrides: when budget is low, it can downgrade from opus to sonnet or sonnet to haiku while maintaining minimum quality thresholds. The router consumes the existing classifyIntent() output from intent-classifier.cjs to determine task complexity, then applies cost and budget constraints from the CostPredictor and ModelRegistry.",
+      "preconditions": [
+        "model-registry feature must be implemented",
+        "cost-predictor feature must be implemented",
+        "intent-classifier.cjs classifyIntent() is available",
+        "agent-config-reader.cjs resolveAgentModel() is available for baseline model selection",
+        "provider-compat feature is recommended but not strictly required"
+      ],
+      "exports": {
+        "class": "ModelRouter",
+        "constructor": "ModelRouter({ modelRegistry: ModelRegistry, costPredictor: CostPredictor, intentClassifier: { classifyIntent }, config?: ModelRouterConfig })",
+        "methods": [
+          "selectModel(prompt: string, context?: { sessionId?: string, agentType?: string, budget?: number, phase?: string }) → ModelSelection",
+          "applyBudgetConstraint(selection: ModelSelection, budget: { remaining: number, burnRate: number }) → ModelSelection"
+        ],
+        "types": {
+          "ModelSelection": {
+            "model": "string (full model ID)",
+            "shorthand": "string",
+            "reason": "string (human-readable explanation)",
+            "source": "'intent' | 'cost-override' | 'budget-downgrade' | 'complexity-default' | 'config'",
+            "originalModel": "string | null (if downgraded, what was the initial pick)",
+            "estimatedCostUSD": "number",
+            "confidence": "'high' | 'medium' | 'low'"
+          },
+          "ModelRouterConfig": {
+            "enableCostAwareRouting": "boolean (default: true)",
+            "budgetDowngradeThreshold": "number (0-1, fraction of budget remaining to trigger downgrade, default: 0.2)",
+            "qualityFloor": "string (minimum model shorthand, default: 'haiku')",
+            "overrides": "Record<string, string> (agentType → forced model)"
+          }
+        }
+      },
+      "expectedBehavior": [
+        "selectModel('plan the architecture') with no constraints returns opus (high-complexity intent maps to planner agent)",
+        "selectModel('fix a typo') with no constraints returns sonnet (simple task)",
+        "selectModel with agentType='context-compressor' returns haiku (COMPLEXITY_DEFAULTS mapping)",
+        "selectModel with budget at 10% remaining triggers cost-aware downgrade",
+        "selectModel honors config.overrides (e.g., force all qa agents to opus)",
+        "selectModel falls back to resolveAgentModel() precedence chain when no cost overrides apply",
+        "applyBudgetConstraint with remaining budget < threshold downgrades opus→sonnet or sonnet→haiku",
+        "applyBudgetConstraint preserves model if budget is healthy (remaining > threshold)",
+        "applyBudgetConstraint never downgrades below qualityFloor",
+        "applyBudgetConstraint sets source='budget-downgrade' and preserves originalModel when downgrading",
+        "selectModel returns estimatedCostUSD from CostPredictor.estimateCost()",
+        "selectModel with phase='planning' biases toward higher-capability models per phase-models.json pattern",
+        "selectModel with unknown prompt returns sonnet with source='complexity-default'"
+      ],
+      "verificationSteps": [
+        "Unit test: selectModel returns correct model for high/medium/low complexity intents",
+        "Unit test: Budget downgrade triggers at configurable threshold",
+        "Unit test: applyBudgetConstraint respects qualityFloor",
+        "Unit test: Config overrides take precedence over dynamic routing",
+        "Unit test: selectModel response shape matches ModelSelection type",
+        "Integration test: selectModel integrates with real classifyIntent() output",
+        "Integration test: Cost estimates from CostPredictor flow through to ModelSelection.estimatedCostUSD",
+        "Contract test: selectModel never returns a model not in ModelRegistry"
+      ],
+      "validationContracts": [
+        "VAL-M5-ROUTER-001: selectModel integrates intent classification with model selection",
+        "VAL-M5-ROUTER-002: Cost-aware routing downgrades models when budget is low",
+        "VAL-M5-ROUTER-003: Budget downgrade respects quality floor configuration",
+        "VAL-M5-ROUTER-004: Config overrides take precedence over dynamic selection",
+        "VAL-M5-ROUTER-005: All returned models exist in ModelRegistry",
+        "VAL-M5-ROUTER-006: ModelSelection includes cost estimate and human-readable reason"
+      ],
+      "dependsOn": ["model-registry", "cost-predictor", "provider-compat"],
+      "usedBy": ["budget-engine"]
+    },
+    {
+      "id": "budget-engine",
+      "title": "Budget Engine",
+      "modulePath": ".claude/lib/routing/budget-engine.cjs",
+      "description": "Session-level and project-level budget enforcement with automatic model downgrade. Extends the existing BudgetEnforcementService (TPM rate limiting) and token-budget-tracker (per-agent tracking) into a comprehensive cost control system. Manages budget allocation across pipeline phases (spec/planning/coding/qa from phase-models.json), monitors real-time spend via the TokenAccountant, and triggers automatic model downgrades when spend exceeds configurable thresholds. When budget is fully exhausted, throws a BudgetExhaustedError that the routing system can catch to halt operations gracefully.",
+      "preconditions": [
+        "model-registry feature must be implemented",
+        "cost-predictor feature is recommended for burn rate calculations",
+        "token-accountant.cjs TokenAccountant class is available",
+        "budget-enforcement.cjs BudgetEnforcementService is available (for TPM integration)",
+        "phase-models.json exists with phase→model mappings"
+      ],
+      "exports": {
+        "class": "BudgetEngine",
+        "errorClass": "BudgetExhaustedError",
+        "constructor": "BudgetEngine({ tokenAccountant: TokenAccountant, modelRegistry: ModelRegistry, config?: BudgetEngineConfig })",
+        "methods": [
+          "allocateBudget(sessionId: string, phases: { phase: string, fraction: number }[]) → BudgetAllocation",
+          "checkBudget(sessionId: string) → BudgetStatus",
+          "enforceLimit(sessionId: string) → { model: string, downgraded: boolean } | throws BudgetExhaustedError",
+          "recordSpend(sessionId: string, costUSD: number, phase?: string) → void",
+          "getPhaseStatus(sessionId: string, phase: string) → { allocated: number, spent: number, remaining: number }"
+        ],
+        "types": {
+          "BudgetEngineConfig": {
+            "defaultSessionBudget": "number (USD, default: 5.00)",
+            "warningThreshold": "number (0-1, default: 0.8)",
+            "criticalThreshold": "number (0-1, default: 0.9)",
+            "autoDowngrade": "boolean (default: true)",
+            "downgradeChain": "string[] (default: ['opus', 'sonnet', 'haiku'])"
+          },
+          "BudgetAllocation": {
+            "sessionId": "string",
+            "totalBudget": "number (USD)",
+            "phases": "Record<string, { allocated: number, spent: number }>"
+          },
+          "BudgetStatus": {
+            "sessionId": "string",
+            "totalBudget": "number",
+            "totalSpent": "number",
+            "remaining": "number",
+            "burnRate": "number (USD per minute)",
+            "status": "'ok' | 'warning' | 'critical' | 'exhausted'",
+            "autoDowngradeTriggered": "boolean",
+            "currentModel": "string | null",
+            "phases": "Record<string, { allocated: number, spent: number, remaining: number }>"
+          }
+        }
+      },
+      "expectedBehavior": [
+        "allocateBudget splits total budget across phases by fraction (e.g., planning=0.3, coding=0.5, qa=0.2)",
+        "allocateBudget fractions must sum to ≤ 1.0, throws if > 1.0",
+        "allocateBudget with no phases allocates 100% to a single 'default' phase",
+        "checkBudget returns current spend status with burn rate from TokenAccountant data",
+        "checkBudget returns status='ok' when spend < warningThreshold × budget",
+        "checkBudget returns status='warning' when spend ≥ warningThreshold × budget",
+        "checkBudget returns status='critical' when spend ≥ criticalThreshold × budget",
+        "checkBudget returns status='exhausted' when spend ≥ totalBudget",
+        "checkBudget.autoDowngradeTriggered is true when model was automatically downgraded",
+        "enforceLimit returns current model when budget is healthy",
+        "enforceLimit with autoDowngrade=true downgrades opus→sonnet when status='critical'",
+        "enforceLimit with autoDowngrade=true downgrades sonnet→haiku when already critical after first downgrade",
+        "enforceLimit throws BudgetExhaustedError when budget is fully exhausted and model is already at minimum",
+        "BudgetExhaustedError includes sessionId, totalBudget, totalSpent in error properties",
+        "recordSpend updates both session total and phase-specific spend",
+        "recordSpend for unknown session initializes with default budget",
+        "getPhaseStatus returns correct allocation/spent/remaining for a given phase",
+        "Multiple concurrent sessions have independent budget tracking"
+      ],
+      "verificationSteps": [
+        "Unit test: allocateBudget correctly distributes budget across phases",
+        "Unit test: allocateBudget rejects fractions summing > 1.0",
+        "Unit test: checkBudget status transitions (ok→warning→critical→exhausted) at correct thresholds",
+        "Unit test: enforceLimit downgrade chain works (opus→sonnet→haiku→BudgetExhaustedError)",
+        "Unit test: BudgetExhaustedError has correct properties and is instanceof Error",
+        "Unit test: recordSpend updates totals correctly for both session and phase",
+        "Unit test: Multiple sessions are isolated (spending in session A doesn't affect session B)",
+        "Unit test: getPhaseStatus returns correct per-phase data",
+        "Integration test: BudgetEngine works with real TokenAccountant for burn rate calculation",
+        "Integration test: enforceLimit returns models that exist in ModelRegistry",
+        "Contract test: BudgetStatus shape matches documented type"
+      ],
+      "validationContracts": [
+        "VAL-M5-BUDGET-001: allocateBudget distributes budget across phases correctly",
+        "VAL-M5-BUDGET-002: checkBudget returns accurate status at each threshold level",
+        "VAL-M5-BUDGET-003: enforceLimit performs automatic model downgrade through the chain",
+        "VAL-M5-BUDGET-004: BudgetExhaustedError is thrown when budget is fully consumed",
+        "VAL-M5-BUDGET-005: Multiple sessions have independent budget tracking",
+        "VAL-M5-BUDGET-006: Phase-level budget allocation and tracking is accurate",
+        "VAL-M5-BUDGET-007: Burn rate calculation integrates with TokenAccountant session data"
+      ],
+      "dependsOn": ["model-registry", "cost-predictor"],
+      "usedBy": []
+    }
+  ],
+  "dependencyGraph": {
+    "model-registry": {
+      "dependsOn": [],
+      "implementationOrder": 1,
+      "estimatedLines": 150
+    },
+    "provider-compat": {
+      "dependsOn": ["model-registry"],
+      "implementationOrder": 2,
+      "estimatedLines": 120
+    },
+    "cost-predictor": {
+      "dependsOn": ["model-registry"],
+      "implementationOrder": 2,
+      "estimatedLines": 160
+    },
+    "dynamic-model-router": {
+      "dependsOn": ["model-registry", "cost-predictor", "provider-compat"],
+      "implementationOrder": 3,
+      "estimatedLines": 200
+    },
+    "budget-engine": {
+      "dependsOn": ["model-registry", "cost-predictor"],
+      "implementationOrder": 3,
+      "estimatedLines": 220
+    }
+  },
+  "implementationWaves": [
+    {
+      "wave": 1,
+      "features": ["model-registry"],
+      "rationale": "Foundation layer — all other features depend on model metadata"
+    },
+    {
+      "wave": 2,
+      "features": ["cost-predictor", "provider-compat"],
+      "rationale": "Both depend only on model-registry and can be built in parallel"
+    },
+    {
+      "wave": 3,
+      "features": ["dynamic-model-router", "budget-engine"],
+      "rationale": "Top-level orchestration features that consume all lower layers"
+    }
+  ],
+  "existingModuleIntegrationPoints": {
+    "agent-config-reader.cjs": {
+      "consumed_by": ["model-registry", "dynamic-model-router"],
+      "interfaces_used": ["MODEL_ALIASES", "COMPLEXITY_DEFAULTS", "resolveAgentModel()"]
+    },
+    "token-accountant.cjs": {
+      "consumed_by": ["cost-predictor", "budget-engine"],
+      "interfaces_used": ["TokenAccountant.getSessionTotal()", "TokenAccountant.getTaskCost()", "MODEL_PRICING"]
+    },
+    "token-budget-tracker.cjs": {
+      "consumed_by": ["cost-predictor"],
+      "interfaces_used": ["estimateTokens()"]
+    },
+    "budget-enforcement.cjs": {
+      "consumed_by": ["budget-engine"],
+      "interfaces_used": ["BudgetEnforcementService (TPM rate limiting, complementary to cost-based budget)"]
+    },
+    "intent-classifier.cjs": {
+      "consumed_by": ["dynamic-model-router"],
+      "interfaces_used": ["classifyIntent()"]
+    },
+    "circuit-breaker.cjs": {
+      "consumed_by": ["dynamic-model-router"],
+      "interfaces_used": ["CircuitBreaker.canExecute() for provider health-aware routing"]
+    }
+  },
+  "configFiles": {
+    "model-registry.json": {
+      "path": ".claude/config/model-registry.json",
+      "description": "Central model definitions with pricing, capabilities, and provider metadata",
+      "schema": ".claude/schemas/model-registry.schema.json",
+      "example": {
+        "$schema": "../schemas/model-registry.schema.json",
+        "version": "1.0.0",
+        "models": [
+          {
+            "id": "claude-opus-4-6",
+            "shorthand": "opus",
+            "provider": "anthropic",
+            "contextWindow": 200000,
+            "maxOutputTokens": 32000,
+            "costPer1KInput": 15,
+            "costPer1KOutput": 75,
+            "latencyClass": "high",
+            "features": ["tool_use", "vision", "extended_thinking"]
+          },
+          {
+            "id": "claude-sonnet-4-6",
+            "shorthand": "sonnet",
+            "provider": "anthropic",
+            "contextWindow": 200000,
+            "maxOutputTokens": 16000,
+            "costPer1KInput": 3,
+            "costPer1KOutput": 15,
+            "latencyClass": "medium",
+            "features": ["tool_use", "vision", "extended_thinking"]
+          },
+          {
+            "id": "claude-haiku-4-5-20251001",
+            "shorthand": "haiku",
+            "provider": "anthropic",
+            "contextWindow": 200000,
+            "maxOutputTokens": 8192,
+            "costPer1KInput": 0.25,
+            "costPer1KOutput": 1.25,
+            "latencyClass": "low",
+            "features": ["tool_use", "vision"]
+          }
+        ]
+      }
+    }
+  },
+  "testingStrategy": {
+    "framework": "node:test with describe/it and assert/strict",
+    "convention": "Tests in tests/lib/routing/*.test.cjs mirroring module path",
+    "testFiles": [
+      "tests/lib/routing/model-registry.test.cjs",
+      "tests/lib/routing/cost-predictor.test.cjs",
+      "tests/lib/routing/provider-compat.test.cjs",
+      "tests/lib/routing/model-router.test.cjs",
+      "tests/lib/routing/budget-engine.test.cjs"
+    ],
+    "patterns": [
+      "Use factory helpers (makeRegistry, makePredictorWithMocks) for test isolation",
+      "Use temp directories for any file-based state (like token-accountant tests)",
+      "Mock TokenAccountant and ModelRegistry in consumer tests",
+      "Test edge cases: null inputs, empty strings, missing config, concurrent sessions"
+    ]
+  }
+}

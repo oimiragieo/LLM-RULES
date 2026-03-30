@@ -10,9 +10,9 @@ Testing surface, resource cost classification, and validation approach.
 
 This mission builds programmatic infrastructure (no UI). Validation is through:
 
-1. **Unit test suites** - Each module's test file in tests/mission/, tests/services/, tests/readiness/
-2. **Integration tests** - E2E pipeline tests with mock workers
-3. **CLI command validation** - readiness-report produces valid JSON
+1. **Unit test suites** - Each module's test file in tests/mission/, tests/services/, tests/readiness/, tests/routing/, tests/memory/, tests/monitoring/
+2. **Integration tests** - E2E pipeline tests with mock workers, cross-area-phase2.test.cjs
+3. **CLI command validation** - readiness CLI and observability CLI produce formatted output
 4. **JSON output contract verification** - All outputs validated against AJV schemas
 
 ### Test Execution
