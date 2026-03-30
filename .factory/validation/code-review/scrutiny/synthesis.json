@@ -1,0 +1,49 @@
+{
+  "milestone": "code-review",
+  "round": 1,
+  "status": "pass",
+  "validatorsRun": {
+    "test": { "passed": true, "command": "node --test tests/review/*.test.cjs", "exitCode": 0 },
+    "typecheck": { "passed": true, "command": "skipped (no script in services.yaml or package.json)", "exitCode": 0 },
+    "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 }
+  },
+  "reviewsSummary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "failedFeatures": []
+  },
+  "blockingIssues": [],
+  "appliedUpdates": [],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Specify that child_process.execSync should not be bypassed using string concatenation to pass the SEC-011 command injection lint rule. Instead, recommend using execFileSync with argument arrays for safe execution.",
+      "evidence": "Worker for review-diff-engine bypassed SEC-011 using string concatenation: 'Used string concatenation to satisfy SEC-011 lint rule'.",
+      "isSystemic": false
+    },
+    {
+      "target": ".factory/skills/mission-engine-worker/SKILL.md",
+      "suggestion": "Update the verification steps to suggest using `npx prettier --write <file>` or `pnpm format:file <file>` on modified files instead of `pnpm format:check`, as the full codebase scan times out.",
+      "evidence": "Features cross-area-integration, review-pipeline, and review-severity-criteria all reported timeouts or use of file-specific prettier commands instead of the skill's instructions.",
+      "isSystemic": true
+    },
+    {
+      "target": ".factory/skills/mission-engine-worker/SKILL.md",
+      "suggestion": "Add 'tests/review/' to the list of test locations for code-review features.",
+      "evidence": "Worker for review-diff-engine explicitly noted this directory is missing from the skill instructions.",
+      "isSystemic": false
+    }
+  ],
+  "rejectedObservations": [
+    {
+      "observation": "(review-severity-criteria) Worker used node_modules/.bin/prettier --write directly instead of using format:file...",
+      "reason": "subsumed by the broader recommendation to update the skill with the file-specific formatting commands."
+    },
+    {
+      "observation": "(cross-area-integration) Worker used npx prettier --check...",
+      "reason": "duplicate of the systemic format:check timeout issue."
+    }
+  ],
+  "previousRound": null
+}

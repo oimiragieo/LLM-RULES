@@ -1,0 +1,26 @@
+{
+  "featureId": "review-severity-criteria",
+  "reviewedAt": "2026-03-30T17:15:00.000Z",
+  "commitId": "12cba8c6",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "Implementation fully covers the feature requirements. The severity matrix (P0-P3) and the 8 bug criteria are correctly defined. The Finding class safely handles missing criteriaResults by defaulting to an empty object. The validation and filtering logic perfectly implement the ALL-criteria-must-pass rule, correctly handling missing criteria as false. Code includes comprehensive testing with 36 test cases.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "Worker experienced a 60-second timeout when running `pnpm format:check` as instructed by the `mission-engine-worker` skill, because the command scans the entire codebase. The worker successfully worked around this by manually running `node_modules/.bin/prettier --check` and `--write` on the specific changed files, and suggested updating the skill.",
+      "evidence": "Transcript shows `pnpm format:check` command timing out after 60 seconds. Worker then executed `node_modules/.bin/prettier --write .claude/lib/review/severity.cjs tests/review/severity.test.cjs`. `skillFeedback.suggestedChanges` explicitly mentions: 'pnpm format:check scans entire codebase and times out; the skill could suggest using prettier --check on specific files instead'."
+    },
+    {
+      "area": "services",
+      "observation": "Worker used `node_modules/.bin/prettier --write` manually to format specific files. `services.yaml` already contains a command `format:file` mapped to `npx prettier --write` which could have been used, but the worker didn't appear to know or use this shortcut, likely because the skill procedure only mentions `pnpm format:check` and `pnpm format`.",
+      "evidence": "Transcript shows the worker executing `node_modules/.bin/prettier --write .claude/lib/review/severity.cjs tests/review/severity.test.cjs` directly instead of checking services.yaml for file-specific format commands."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review passed without any issues. The worker perfectly implemented the severity matrix, bug criteria, and finding class validation/filtering. Identified 2 shared state gaps related to formatting commands and skill instructions causing a timeout."
+}

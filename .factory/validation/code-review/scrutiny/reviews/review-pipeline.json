@@ -1,0 +1,21 @@
+{
+  "featureId": "review-pipeline",
+  "reviewedAt": "2026-03-30T17:20:00.000Z",
+  "commitId": "2998a32f34fe16134be303f14d88cc3ba36514b8",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The implementation correctly creates the 2-pass review pipeline, including candidate generation from diff hunks, criteria filtering via severity module, and structured JSON-serializable output. The assessment logic correctly assigns 'request-changes', 'comment', or 'approve' based on priority. Tests adequately cover the requirements.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "The `mission-engine-worker` skill specifies running `pnpm format:check` to verify work. However, the worker noted this takes >10 minutes for the entire repository and instead used `npx prettier --check` on just the modified files. The worker suggested updating the skill to reflect this more efficient approach.",
+      "evidence": "Transcript shows fallback to `npx prettier`. `handoff.skillFeedback.suggestedChanges` contains: 'The skill could note that pnpm format:check takes >10 minutes on all files; workers should use npx prettier --check on specific files instead.'"
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review pipeline correctly implemented with all required passes, output structure, and test coverage. Passed."
+}
