@@ -1,39 +1,27 @@
 {
   "milestone": "validation-gates",
-  "round": 1,
-  "status": "fail",
+  "round": 2,
+  "status": "pass",
   "validatorsRun": {
     "test": { "passed": true, "command": "node --test tests/mission/*.test.cjs", "exitCode": 0 },
     "typecheck": { "passed": true, "command": "pnpm lint", "exitCode": 0 },
-    "lint": { "passed": false, "command": "pnpm format:check", "exitCode": 1 }
+    "lint": { "passed": true, "command": "pnpm format:check", "exitCode": 0 }
   },
   "reviewsSummary": {
-    "total": 4,
-    "passed": 3,
-    "failed": 1,
-    "failedFeatures": ["scrutiny-reviewer"]
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "failedFeatures": []
   },
-  "blockingIssues": [
-    { "featureId": "scrutiny-reviewer", "severity": "blocking", "description": "The overallTimeoutId uses setTimeout with an asynchronous throw. Since it runs in a different tick, throwing an Error here will not be caught by the try/catch block in run(). It will crash the Node process with an 'Uncaught Exception' instead of creating and persisting the synthetic timeout verdict as intended." }
-  ],
+  "blockingIssues": [],
   "appliedUpdates": [
-    { "target": "library/windows-quirks.md", "description": "Added documentation about cross-platform differences when using child_process.spawn on Windows requiring cmd.exe.", "sourceFeature": "scrutiny-reviewer" },
-    { "target": "library/testing-quirks.md", "description": "Added documentation about AJV missing native date-time support and requiring ajv-formats.", "sourceFeature": "scrutiny-reviewer" }
-  ],
-  "suggestedGuidanceUpdates": [
     {
-      "target": "AGENTS.md",
-      "suggestion": "Document the project's 500-line ESLint limit for test files, which requires workers to split up large test suites (e.g., into extended files).",
-      "evidence": "Worker for milestone-gate had to split tests into two files to meet a 500-line ESLint limit.",
-      "isSystemic": false
-    },
-    {
-      "target": "AGENTS.md",
-      "suggestion": "Document that validation contract AREA codes can contain digits (e.g., VAL-E2E-001).",
-      "evidence": "Worker for validation-contract-parser failed initial regex matching by assuming area codes were strictly alphabetic.",
-      "isSystemic": false
+      "target": "library/windows-quirks.md",
+      "description": "Added documentation about alternatives to Unix utilities (like line counting with wc -l vs find /c /v \"\") and the recommendation to use node -e scripts.",
+      "sourceFeature": "fix-scrutiny-reviewer-and-format"
     }
   ],
+  "suggestedGuidanceUpdates": [],
   "rejectedObservations": [],
-  "previousRound": null
+  "previousRound": ".factory/validation/validation-gates/scrutiny/synthesis-round-1.json"
 }

@@ -15,3 +15,7 @@ When writing tests that involve filesystem operations (especially cleanup/deleti
 ## Process Spawning
 
 When using `child_process.spawn` for shell commands, Windows requires using `cmd.exe /s /c` with `windowsVerbatimArguments: true` instead of `/bin/bash -c`. Ensure cross-platform code handles this platform difference correctly.
+
+## Unix Utilities Alternatives
+
+When trying to use standard Unix utilities like `wc -l` for line counting, the Windows equivalent `find /c /v ""` can sometimes fail with "Parameter format not correct". A reliable cross-platform alternative is writing a simple `node -e` script.
