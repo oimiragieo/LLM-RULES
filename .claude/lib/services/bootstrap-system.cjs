@@ -28,6 +28,54 @@ const { isWindows } = require('../platform.cjs');
 const { commandExists } = require('../utils/command-exists.cjs');
 
 /**
+ * Detect whether the available bash is WSL (Windows System32/bash.exe) or Git Bash.
+ * WSL requires /mnt/drive/path format; Git Bash accepts drive:/path format.
+ *
+ * Cached at module load to avoid repeated subprocess calls.
+ */
+let _bashIsWsl = null;
+
+function isWslBash() {
+  if (_bashIsWsl !== null) return _bashIsWsl;
+  if (!isWindows) {
+    _bashIsWsl = false;
+    return false;
+  }
+  try {
+    const result = childProcess.spawnSync(process.env.COMSPEC || 'cmd.exe', ['/c', 'where bash'], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+      timeout: 3000,
+    });
+    if (result.status === 0 && result.stdout) {
+      const loc = result.stdout.toString().trim().split('\n')[0].trim();
+      _bashIsWsl = /system32/i.test(loc);
+      return _bashIsWsl;
+    }
+  } catch (_) {
+    // Detection failed — assume not WSL
+  }
+  _bashIsWsl = false;
+  return false;
+}
+
+/**
+ * Convert a Windows path to a bash-compatible path.
+ * - WSL (System32/bash.exe):  C:\path → /mnt/c/path
+ * - Git Bash / other:         C:\path → C:/path
+ *
+ * @param {string} winPath - Windows absolute path
+ * @returns {string} Bash-compatible path
+ */
+function toShellPath(winPath) {
+  if (!isWindows) return winPath;
+  if (isWslBash()) {
+    return winPath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, (_, d) => `/mnt/${d.toLowerCase()}`);
+  }
+  return winPath.replace(/\\/g, '/');
+}
+
+/**
  * Default timeout in milliseconds (60 seconds)
  */
 const DEFAULT_TIMEOUT = 60000;
@@ -236,36 +284,71 @@ class BootstrapSystem {
     const timeout = this.options.timeout;
 
     try {
-      // On Windows with bash (Git Bash), we need to convert backslashes to forward slashes
-      // because bash interprets backslashes as escape characters
-      let bashPath = initShPath;
       if (isWindows && commandExists('bash')) {
-        // Convert Windows path to Unix-style path for bash
-        bashPath = initShPath.replace(/\\/g, '/');
+        // Convert path for the bash variant available on this system.
+        // Spawn bash directly (not via cmd.exe) to avoid cmd.exe quoting issues
+        // that can cause bash to receive paths with literal quote characters.
+        const bashScript = toShellPath(initShPath);
+        return this._spawnBashDirect(bashScript, timeout);
       }
 
-      // On Windows, we need to use bash if available, or the script directly
-      let command;
       if (isWindows) {
-        // Try to use bash (Git Bash, WSL, etc.)
-        if (commandExists('bash')) {
-          command = `bash "${bashPath}"`;
-        } else {
-          // Fall back to running directly (may work if .sh is associated)
-          command = `"${initShPath}"`;
-        }
-      } else {
-        // Unix: run with bash
-        command = `bash "${initShPath}"`;
+        // No bash available — fall back to running the script directly
+        return this.executeCommand(`"${initShPath}"`, timeout);
       }
 
-      return this.executeCommand(command, timeout);
+      // Unix: run with bash
+      return this.executeCommand(`bash "${initShPath}"`, timeout);
     } catch (_err) {
       return {
         error: _err,
         code: null,
         timedOut: false,
       };
+    }
+  }
+
+  /**
+   * Spawn bash directly with a single script-path argument.
+   * Used on Windows to avoid cmd.exe quoting issues that cause bash to receive
+   * paths with literal quote characters.
+   *
+   * @param {string} scriptPath - Bash-compatible path to the script
+   * @param {number} timeout - Timeout in ms
+   * @returns {Object} Execution result { code, stdout, stderr, timedOut, error }
+   */
+  _spawnBashDirect(scriptPath, timeout) {
+    try {
+      const result = childProcess.spawnSync('bash', [scriptPath], {
+        timeout,
+        maxBuffer: 1024 * 1024,
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+
+      if (result.signal === 'SIGKILL' || (result.error && result.error.code === 'ETIMEDOUT')) {
+        return { timedOut: true, error: null, code: null };
+      }
+
+      if (result.status === null && result.error) {
+        return {
+          timedOut: false,
+          error: result.error,
+          code: null,
+          stdout: result.stdout ? result.stdout.toString() : '',
+          stderr: result.stderr ? result.stderr.toString() : '',
+        };
+      }
+
+      return {
+        timedOut: false,
+        error: result.error || null,
+        code: result.status,
+        stdout: result.stdout ? result.stdout.toString() : '',
+        stderr: result.stderr ? result.stderr.toString() : '',
+      };
+    } catch (err) {
+      return { timedOut: false, error: err, code: null };
     }
   }
 

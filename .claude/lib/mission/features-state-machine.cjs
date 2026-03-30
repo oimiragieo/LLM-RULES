@@ -66,7 +66,7 @@ const FEATURES_FILE_SCHEMA = {
 
 // Valid state transitions (from -> [allowed to states])
 const VALID_TRANSITIONS = {
-  pending: ['in_progress'],
+  pending: ['in_progress', 'cancelled'],
   in_progress: ['validating', 'failed'],
   validating: ['completed'],
   failed: ['pending'],
