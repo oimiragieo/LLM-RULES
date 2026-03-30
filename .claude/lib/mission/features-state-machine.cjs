@@ -68,7 +68,7 @@ const FEATURES_FILE_SCHEMA = {
 const VALID_TRANSITIONS = {
   pending: ['in_progress', 'cancelled'],
   in_progress: ['validating', 'failed'],
-  validating: ['completed'],
+  validating: ['completed', 'failed'],
   failed: ['pending'],
   completed: [], // Terminal
   cancelled: [], // Terminal
