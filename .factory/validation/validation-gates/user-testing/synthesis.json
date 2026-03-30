@@ -1,0 +1,33 @@
+{
+  "milestone": "validation-gates",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 16,
+    "passed": 16,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-VC-001",
+    "VAL-VC-002",
+    "VAL-VC-003",
+    "VAL-VS-001",
+    "VAL-VS-002",
+    "VAL-VS-003",
+    "VAL-VS-004",
+    "VAL-VS-005",
+    "VAL-SR-001",
+    "VAL-SR-002",
+    "VAL-SR-003",
+    "VAL-SR-004",
+    "VAL-MG-001",
+    "VAL-MG-002",
+    "VAL-MG-003",
+    "VAL-MG-004"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}

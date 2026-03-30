@@ -1,0 +1,88 @@
+{
+  "groupId": "group-sr",
+  "testedAt": "2026-03-29T12:00:00.000Z",
+  "isolation": {
+    "command": "node --test tests/mission/scrutiny-reviewer.test.cjs",
+    "missionDir": "C:\\Users\\oimir\\.factory\\missions\\91ae9243-5217-4452-8593-40411a402f4b"
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-SR-001",
+      "title": "Auto-spawns after worker handoff",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite",
+          "expected": "Test 'VAL-SR-001: Auto-spawns after worker handoff' passes",
+          "observed": "Passed with 3 subtests"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "validation-gates/group-sr/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-SR-002",
+      "title": "Outputs structured JSON verdict",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite",
+          "expected": "Test 'VAL-SR-002: Outputs structured JSON verdict' passes",
+          "observed": "Passed with 5 subtests"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "validation-gates/group-sr/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-SR-003",
+      "title": "Reviewer crash produces rejected verdict",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite",
+          "expected": "Test 'VAL-SR-003: Reviewer crash produces rejected verdict' passes",
+          "observed": "Passed with 3 subtests"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "validation-gates/group-sr/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-SR-004",
+      "title": "Read-only enforcement",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite",
+          "expected": "Test 'VAL-SR-004: Read-only enforcement' passes",
+          "observed": "Passed with 3 subtests"
+        }
+      ],
+      "evidence": {
+        "testOutput": [
+          "validation-gates/group-sr/test-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 4 assertions: 4 passed. All unit tests for scrutiny reviewer passed successfully."
+}

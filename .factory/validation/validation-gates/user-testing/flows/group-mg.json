@@ -1,0 +1,91 @@
+{
+  "groupId": "group-mg",
+  "testedAt": "2026-03-30T00:00:00Z",
+  "isolation": {
+    "command": "node --test tests/mission/milestone-gate.test.cjs"
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-MG-001",
+      "title": "All features must be completed",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite for VAL-MG-001",
+          "expected": "Tests pass",
+          "observed": "All 6 subtests passed successfully"
+        }
+      ],
+      "evidence": {
+        "screenshots": [],
+        "terminalSnapshots": [
+          "validation-gates/group-mg/VAL-MG-001-002-test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-MG-002",
+      "title": "All assertions must be passed",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite for VAL-MG-002",
+          "expected": "Tests pass",
+          "observed": "All 5 subtests passed successfully"
+        }
+      ],
+      "evidence": {
+        "screenshots": [],
+        "terminalSnapshots": [
+          "validation-gates/group-mg/VAL-MG-001-002-test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-MG-003",
+      "title": "Infrastructure features exempt from assertion checks",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite for VAL-MG-003",
+          "expected": "Tests pass",
+          "observed": "All 4 subtests passed successfully"
+        }
+      ],
+      "evidence": {
+        "screenshots": [],
+        "terminalSnapshots": [
+          "validation-gates/group-mg/VAL-MG-003-004-test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-MG-004",
+      "title": "Cancelled features excluded from gate",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test suite for VAL-MG-004",
+          "expected": "Tests pass",
+          "observed": "All 3 subtests passed successfully"
+        }
+      ],
+      "evidence": {
+        "screenshots": [],
+        "terminalSnapshots": [
+          "validation-gates/group-mg/VAL-MG-003-004-test-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 4 assertions: 4 passed. Executed node --test for both base and extended milestone-gate tests, and verified all relevant assertion scenarios are working."
+}

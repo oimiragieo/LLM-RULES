@@ -1,0 +1,95 @@
+{
+  "groupId": "group-vs",
+  "testedAt": "2026-03-29T12:00:00.000Z",
+  "isolation": {
+    "command": "node --test tests/mission/validation-state-gatekeeper.test.cjs"
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-VS-001",
+      "title": "Tracks assertion states with valid transitions",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Tests for valid and invalid transitions pass",
+          "observed": "10/10 transition tests passed"
+        }
+      ],
+      "evidence": {
+        "testOutput": "validation-gates/group-vs/test-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-VS-002",
+      "title": "Blocks feature completion until all assertions pass",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Tests for canComplete behavior pass",
+          "observed": "5/5 canComplete tests passed"
+        }
+      ],
+      "evidence": {
+        "testOutput": "validation-gates/group-vs/test-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-VS-003",
+      "title": "Partial re-validation only re-runs failed checks",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Tests for revalidate behavior pass",
+          "observed": "4/4 re-validation tests passed"
+        }
+      ],
+      "evidence": {
+        "testOutput": "validation-gates/group-vs/test-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-VS-004",
+      "title": "Atomic state persistence",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Tests for atomic write pattern pass",
+          "observed": "3/3 persistence tests passed"
+        }
+      ],
+      "evidence": {
+        "testOutput": "validation-gates/group-vs/test-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-VS-005",
+      "title": "Corrupted state file triggers recovery",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Tests for corruption recovery pass",
+          "observed": "5/5 recovery tests passed"
+        }
+      ],
+      "evidence": {
+        "testOutput": "validation-gates/group-vs/test-output.txt"
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 5 assertions via unit tests: 5 passed. All 36 tests in validation-state-gatekeeper.test.cjs executed successfully."
+}

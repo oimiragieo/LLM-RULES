@@ -1,0 +1,70 @@
+{
+  "groupId": "group-vc",
+  "testedAt": "2026-03-29T20:10:00Z",
+  "isolation": {
+    "command": "node --test tests/mission/validation-contract-parser.test.cjs",
+    "missionDir": "C:\\Users\\oimir\\.factory\\missions\\91ae9243-5217-4452-8593-40411a402f4b"
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-VC-001",
+      "title": "Parses well-formed contract into executable checks",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/validation-contract-parser.test.cjs",
+          "expected": "Test suite 'VAL-VC-001' passes all subtests",
+          "observed": "Test suite 'VAL-VC-001' passed 6/6 subtests"
+        }
+      ],
+      "evidence": {
+        "terminal": [
+          "validation-gates/group-vc/VAL-VC-terminal-snapshot.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-VC-002",
+      "title": "Duplicate rule IDs rejected",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/validation-contract-parser.test.cjs",
+          "expected": "Test suite 'VAL-VC-002' passes all subtests",
+          "observed": "Test suite 'VAL-VC-002' passed 4/4 subtests"
+        }
+      ],
+      "evidence": {
+        "terminal": [
+          "validation-gates/group-vc/VAL-VC-terminal-snapshot.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-VC-003",
+      "title": "Malformed markdown degrades gracefully",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/mission/validation-contract-parser.test.cjs",
+          "expected": "Test suite 'VAL-VC-003' passes all subtests",
+          "observed": "Test suite 'VAL-VC-003' passed 5/5 subtests"
+        }
+      ],
+      "evidence": {
+        "terminal": [
+          "validation-gates/group-vc/VAL-VC-terminal-snapshot.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 3 assertions (VAL-VC-001, VAL-VC-002, VAL-VC-003): 3 passed, 0 failed."
+}
