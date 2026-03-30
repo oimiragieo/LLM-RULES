@@ -1,0 +1,23 @@
+{
+  "milestone": "headless-exec",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-HE-001",
+    "VAL-HE-002",
+    "VAL-HE-003",
+    "VAL-HE-004",
+    "VAL-HE-005",
+    "VAL-HE-006"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
