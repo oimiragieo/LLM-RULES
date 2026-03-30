@@ -1,0 +1,23 @@
+{
+  "milestone": "plugin-marketplace",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-PM-001",
+    "VAL-PM-002",
+    "VAL-PM-003",
+    "VAL-PM-004",
+    "VAL-PM-005",
+    "VAL-PM-006"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
