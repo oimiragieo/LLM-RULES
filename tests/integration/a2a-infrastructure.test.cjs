@@ -89,9 +89,9 @@ describe('VAL-E2E-005: Dispatcher-to-Collector Round Trip', () => {
    * @param {object} _row - Claimed message row from the DB
    * @returns {Promise<{result: string}>}
    */
-  const processFn = async (_row) => {
+  const processFn = async _row => {
     processFnCalls++;
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 100));
     return { result: 'ok' };
   };
 
@@ -133,7 +133,7 @@ describe('VAL-E2E-005: Dispatcher-to-Collector Round Trip', () => {
         reject(new Error('Timeout: worker-done event not received within 5 seconds'));
       }, 5000);
 
-      pool.once('worker-done', (payload) => {
+      pool.once('worker-done', payload => {
         clearTimeout(timer);
         _donePayload = payload;
         resolve(payload);
@@ -169,9 +169,7 @@ describe('VAL-E2E-005: Dispatcher-to-Collector Round Trip', () => {
 
   it('SQLite row status is completed after processing', () => {
     assert.ok(enqueuedId, 'enqueuedId must be set by prior test');
-    const row = db
-      .prepare('SELECT id, status FROM message_queue WHERE id = ?')
-      .get(enqueuedId);
+    const row = db.prepare('SELECT id, status FROM message_queue WHERE id = ?').get(enqueuedId);
     assert.ok(row, 'Message row should exist in the DB');
     assert.strictEqual(
       row.status,
@@ -245,9 +243,7 @@ describe('VAL-E2E-006: Task State Machine Recovery on Restart', () => {
   });
 
   it('Task-A DB row has failed status with orphaned error message', () => {
-    const row = db
-      .prepare('SELECT status, error FROM a2a_tasks WHERE id = ?')
-      .get(taskAId);
+    const row = db.prepare('SELECT status, error FROM a2a_tasks WHERE id = ?').get(taskAId);
     assert.ok(row, 'Task-A DB row should exist');
     assert.strictEqual(
       row.status,
@@ -271,7 +267,7 @@ describe('VAL-E2E-006: Task State Machine Recovery on Restart', () => {
 
   it('no tasks remain in working state after restore', () => {
     const allTasks = tsm2.listTasks();
-    const workingTasks = allTasks.filter((t) => t.status === 'working');
+    const workingTasks = allTasks.filter(t => t.status === 'working');
     assert.strictEqual(
       workingTasks.length,
       0,
