@@ -317,10 +317,10 @@ Features with `status: 'cancelled'` are excluded from the milestone gate evaluat
 
 ## Summary
 
-| Area                          | Assertions | IDs                           |
-| ----------------------------- | ---------- | ----------------------------- |
-| Validation Contract Parser    | 5          | VAL-VC-001 through VAL-VC-005 |
-| Validation State Gatekeeper   | 7          | VAL-VS-001 through VAL-VS-007 |
-| Scrutiny Reviewer Auto-Spawn  | 7          | VAL-SR-001 through VAL-SR-007 |
-| Milestone Gate Check          | 6          | VAL-MG-001 through VAL-MG-006 |
-| **Total**                     | **25**     |                               |
+| Area                         | Assertions | IDs                           |
+| ---------------------------- | ---------- | ----------------------------- |
+| Validation Contract Parser   | 5          | VAL-VC-001 through VAL-VC-005 |
+| Validation State Gatekeeper  | 7          | VAL-VS-001 through VAL-VS-007 |
+| Scrutiny Reviewer Auto-Spawn | 7          | VAL-SR-001 through VAL-SR-007 |
+| Milestone Gate Check         | 6          | VAL-MG-001 through VAL-MG-006 |
+| **Total**                    | **25**     |                               |

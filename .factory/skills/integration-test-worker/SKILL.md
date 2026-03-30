@@ -10,6 +10,7 @@ NOTE: Startup and cleanup are handled by `worker-base`. This skill defines the W
 ## When to Use This Skill
 
 Use for features that build integration tests wiring multiple mission engine modules together:
+
 - Shared mock infrastructure (mock factories, test pipeline helpers)
 - Cross-area flow tests (dependency chains, friction loops, milestone gates)
 - End-to-end pipeline tests (full lifecycle, concurrent dispatch, recovery)
@@ -26,12 +27,14 @@ Read AGENTS.md for the EXACT state machine transitions and event names. Using wr
 ### 2. Understand the Module APIs
 
 Before writing any code, read the actual module source files to understand:
+
 - The exact export names and function signatures
 - The exact constructor parameters and options
 - The exact return value shapes
 - Any side effects (file writes, events emitted)
 
 Key modules to reference:
+
 - `.claude/lib/mission/features-state-machine.cjs` — VALID_TRANSITIONS, FeaturesStateMachine class
 - `.claude/lib/mission/friction-loop.cjs` — FrictionLoopEngine, event names
 - `.claude/lib/mission/worker-features-dispatcher.cjs` — dispatchFeature function
@@ -55,6 +58,7 @@ Before writing ANY helper/infrastructure code:
 5. Run tests with `node --test <test-file>` to confirm they FAIL (red phase)
 
 Test file conventions:
+
 - Filename: matches feature scope (e.g., `cross-area.test.cjs`, `e2e-pipeline.test.cjs`)
 - Use temp directories for workspace isolation (clean up in `after()`)
 - Mock external dependencies with the shared mock factory when available
@@ -71,6 +75,7 @@ If the feature requires shared helpers (mock factory, test pipeline):
 4. Each mock factory function returns a fresh instance
 
 If the feature is purely tests (no new helpers needed):
+
 1. Wire the real modules together with mocks for external deps
 2. Drive the lifecycle through explicit method calls
 3. Assert state at each transition point
@@ -97,8 +102,16 @@ If the feature is purely tests (no new helpers needed):
   "whatWasLeftUndone": "",
   "verification": {
     "commandsRun": [
-      { "command": "node --test tests/integration/helpers/mock-factory.test.cjs", "exitCode": 0, "observation": "12 tests pass, 0 fail" },
-      { "command": "pnpm test", "exitCode": 0, "observation": "457 tests pass including 12 new integration tests" },
+      {
+        "command": "node --test tests/integration/helpers/mock-factory.test.cjs",
+        "exitCode": 0,
+        "observation": "12 tests pass, 0 fail"
+      },
+      {
+        "command": "pnpm test",
+        "exitCode": 0,
+        "observation": "457 tests pass including 12 new integration tests"
+      },
       { "command": "pnpm format:check", "exitCode": 0, "observation": "No format issues" }
     ],
     "interactiveChecks": []

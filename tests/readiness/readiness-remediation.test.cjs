@@ -115,7 +115,11 @@ describe('Readiness Remediation', () => {
       const result = remediator.remediate();
 
       assert.ok(Array.isArray(result.remediations), 'Should have remediations array');
-      assert.strictEqual(result.remediations.length, 0, 'Should have no remediations when all pass');
+      assert.strictEqual(
+        result.remediations.length,
+        0,
+        'Should have no remediations when all pass'
+      );
     });
 
     it('no remediations when fix:false', () => {
@@ -131,7 +135,11 @@ describe('Readiness Remediation', () => {
       const result = remediator.remediate();
 
       // When fix:false, should not generate remediations
-      assert.strictEqual(result.remediations.length, 0, 'Should have no remediations when fix:false');
+      assert.strictEqual(
+        result.remediations.length,
+        0,
+        'Should have no remediations when fix:false'
+      );
     });
 
     it('remediation task has correct structure', () => {
@@ -168,13 +176,13 @@ describe('Readiness Remediation', () => {
 
       const result = remediator.remediate();
 
-      const devEnvRemediation = result.remediations.find(r => r.pillar === 'developmentEnvironment');
+      const devEnvRemediation = result.remediations.find(
+        r => r.pillar === 'developmentEnvironment'
+      );
       assert.ok(devEnvRemediation, 'Should have developmentEnvironment remediation');
 
       // Should include devcontainer.json in files to scaffold
-      const hasDevcontainer = devEnvRemediation.files.some(f =>
-        f.includes('devcontainer.json')
-      );
+      const hasDevcontainer = devEnvRemediation.files.some(f => f.includes('devcontainer.json'));
       assert.ok(hasDevcontainer, 'Should scaffold devcontainer.json');
     });
 
@@ -214,8 +222,8 @@ describe('Readiness Remediation', () => {
       assert.ok(secRemediation, 'Should have security remediation');
 
       // Should include pre-commit hooks in files to scaffold
-      const hasPreCommit = secRemediation.files.some(f =>
-        f.includes('.pre-commit-hooks.yaml') || f.includes('pre-commit')
+      const hasPreCommit = secRemediation.files.some(
+        f => f.includes('.pre-commit-hooks.yaml') || f.includes('pre-commit')
       );
       assert.ok(hasPreCommit, 'Should scaffold pre-commit hooks');
     });
@@ -275,8 +283,8 @@ describe('Readiness Remediation', () => {
       const result = remediator.remediate();
 
       // Plan should include file paths
-      const hasFilePath = result.plan.some(entry =>
-        typeof entry === 'string' || (entry && entry.file)
+      const hasFilePath = result.plan.some(
+        entry => typeof entry === 'string' || (entry && entry.file)
       );
       assert.ok(hasFilePath, 'Plan should list file paths');
     });
@@ -507,10 +515,7 @@ describe('Readiness Remediation', () => {
       for (const [pillar, template] of Object.entries(REMEDIATION_TEMPLATES)) {
         if (template.files) {
           for (const file of template.files) {
-            assert.ok(
-              file.content !== undefined,
-              `Template for ${pillar} should have content`
-            );
+            assert.ok(file.content !== undefined, `Template for ${pillar} should have content`);
           }
         }
       }

@@ -174,13 +174,7 @@
       "description": "Assertions VAL-FS-006 through VAL-FS-010 were not included in features-state-machine.test.cjs as initially given in the test command.",
       "resolved": true,
       "resolution": "Found and ran features-state-machine-extended.test.cjs to verify the remaining assertions.",
-      "affectedAssertions": [
-        "VAL-FS-006",
-        "VAL-FS-007",
-        "VAL-FS-008",
-        "VAL-FS-009",
-        "VAL-FS-010"
-      ]
+      "affectedAssertions": ["VAL-FS-006", "VAL-FS-007", "VAL-FS-008", "VAL-FS-009", "VAL-FS-010"]
     }
   ],
   "blockers": [],

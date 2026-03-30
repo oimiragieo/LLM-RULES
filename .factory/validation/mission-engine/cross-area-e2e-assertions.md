@@ -9,6 +9,7 @@
 ### VAL-CROSS-001: Full Mission Lifecycle — Create to Milestone Complete
 
 When a user creates a mission with a valid features.json containing ≥1 milestone with ≥1 feature, the engine must:
+
 1. Provision a workspace directory on disk
 2. Parse features.json and populate the state machine with all features in `pending` status
 3. Dispatch workers for features whose dependencies are satisfied (no deps → immediate dispatch)
@@ -27,6 +28,7 @@ Evidence: state.json content, filesystem listing of workspace/handoffs/, feature
 ### VAL-CROSS-002: Feature Dependency Chain — Sequential Unblock
 
 Given features.json with Feature-A (no deps) and Feature-B (depends on Feature-A):
+
 1. Engine dispatches Feature-A immediately (deps satisfied)
 2. Feature-B remains `blocked` while Feature-A is in-progress
 3. Feature-A worker completes and writes handoff
@@ -44,6 +46,7 @@ Evidence: state.json timestamps per feature, dispatcher event log showing dispat
 ### VAL-CROSS-003: Validation Rejection and Friction Loop Revival
 
 Given a worker that produces a handoff failing scrutiny validation:
+
 1. Worker completes Feature-X and writes handoff.json
 2. Scrutiny reviewer evaluates handoff → produces `{ "status": "fail", "blockingIssues": [...] }`
 3. Engine detects rejection and enters friction loop
@@ -55,13 +58,14 @@ Given a worker that produces a handoff failing scrutiny validation:
 **Pass condition:** Feature-X has ≥2 scrutiny review rounds in its validation history. Final round is `pass`. State.json shows feature `completed`. The re-dispatched worker's prompt includes the blocking issues from round 1.
 **Fail condition:** Feature stuck in failed validation with no re-dispatch, or re-dispatch prompt missing rejection context.
 
-Evidence: scrutiny/reviews/*.json files (round count ≥ 2), scrutiny/synthesis.json final status, worker dispatch logs showing re-dispatch with rejection context
+Evidence: scrutiny/reviews/\*.json files (round count ≥ 2), scrutiny/synthesis.json final status, worker dispatch logs showing re-dispatch with rejection context
 
 ---
 
 ### VAL-CROSS-004: Milestone Boundary Gate — Sequential Milestone Progression
 
 Given features.json with Milestone-1 (features A, B) and Milestone-2 (features C, D):
+
 1. Engine starts Milestone-1: dispatches A and B
 2. A and B complete and pass validation
 3. Milestone-1 gate evaluates: all features passed → milestone `completed`
@@ -79,6 +83,7 @@ Evidence: state.json with per-milestone status and timestamps, dispatcher event 
 ### VAL-CROSS-005: Readiness Gate Constrains Mission Feature Set
 
 Given a repository assessed at readiness level L2:
+
 1. Readiness scorer runs against the repository → produces JSON with 9 pillar scores and `overallLevel: "L2"`
 2. Mission loads features.json which contains both L2-compatible and L3-requiring features
 3. Engine filters available features to only those compatible with current readiness level (≤ L2)
@@ -95,6 +100,7 @@ Evidence: readiness-report.json with pillar scores and overall level, state.json
 ### VAL-CROSS-006: Services.yaml Canonical Command Resolution in Worker Context
 
 Given `.factory/services.yaml` defines `test: pnpm test`:
+
 1. Mission boots and loads services.yaml
 2. Worker is dispatched for a feature requiring test execution
 3. Worker references canonical command name `test`
@@ -111,6 +117,7 @@ Evidence: Worker execution logs showing resolved command, services.yaml parse tr
 ### VAL-CROSS-007: Init.sh Bootstrap Runs Before Any Worker Dispatch
 
 Given `.factory/init.sh` exists and is executable:
+
 1. Mission boots
 2. Engine executes init.sh before any worker dispatch
 3. init.sh runs `pnpm install` (or equivalent) and writes bootstrap artifacts
@@ -127,6 +134,7 @@ Evidence: init.sh execution log with exit code and timestamp, first worker dispa
 ### VAL-CROSS-008: State Recovery After Interruption
 
 Given a mission interrupted mid-execution (e.g., process kill) with Feature-A `completed` and Feature-B `dispatched`:
+
 1. state.json on disk shows Feature-A `completed`, Feature-B `dispatched`
 2. features.json on disk is intact
 3. Mission engine restarts and detects existing state.json
@@ -148,6 +156,7 @@ Evidence: state.json before crash vs after recovery, dispatcher logs showing onl
 ### VAL-E2E-001: Mock Worker Full Pipeline
 
 End-to-end test using a mock worker (no real LLM calls):
+
 1. Provision a temp workspace directory
 2. Load a test features.json with 1 milestone, 1 feature (no deps)
 3. Engine dispatches mock worker
@@ -167,6 +176,7 @@ Evidence: state.json final content, handoff file on disk, event log showing miss
 ### VAL-E2E-002: Multi-Feature Concurrent Dispatch with Dependency
 
 Given features.json with 3 features: F1 (no deps), F2 (no deps), F3 (depends on F1 and F2):
+
 1. Engine starts → dispatches F1 and F2 concurrently (both have no deps)
 2. WorkerPool runs F1 and F2 in parallel (concurrency ≥ 2, matching WorkerPool architecture)
 3. F1 completes first → state.json updated → F3 still blocked (needs F2)
@@ -184,6 +194,7 @@ Evidence: state.json with per-feature dispatch/complete timestamps, dispatcher e
 ### VAL-E2E-003: Readiness Self-Assessment Against Agent-Studio
 
 Run the readiness scorer against the agent-studio repository itself:
+
 1. Execute readiness assessment module against `C:\dev\projects\agent-studio`
 2. Scorer evaluates all 9 readiness pillars
 3. Produces a JSON report with structure: `{ "pillars": { "<name>": { "score": <0-100>, ... } }, "overallLevel": "L<N>" }`
@@ -201,6 +212,7 @@ Evidence: readiness-report.json output, JSON schema validation result, diff betw
 ### VAL-E2E-004: Services.yaml Self-Resolution and Executability
 
 Load agent-studio's own `.factory/services.yaml` and verify all commands resolve:
+
 1. Parse `.factory/services.yaml` → extract `commands` map
 2. For each canonical command name (install, test, test:framework, test:all, etc.), resolve to actual command string
 3. Verify each resolved command's binary exists on PATH (e.g., `pnpm` for `pnpm test`)
@@ -216,6 +228,7 @@ Evidence: services.yaml parsed content, resolution map (canonical → actual), P
 ### VAL-E2E-005: Dispatcher-to-Collector Round Trip
 
 Verify the full Dispatcher → WorkerPool → Collector pipeline using the existing SQLite-based queue:
+
 1. Create an in-memory SQLite database with queue schema
 2. Instantiate BudgetEnforcementService with default limits
 3. Instantiate WorkerPool with a mock processFn that returns `{ result: "ok" }` after 100ms delay
@@ -234,6 +247,7 @@ Evidence: waitForResult return value, processFn call count, budget.currentConcur
 ### VAL-E2E-006: Task State Machine Recovery on Restart
 
 Verify the A2A TaskStateMachine's orphan recovery (matching existing production code in task-state-machine.cjs):
+
 1. Create TaskStateMachine with a SQLite database
 2. Create Task-A → transition to `working`
 3. Create Task-B → transition to `working` → transition to `completed`
@@ -242,7 +256,7 @@ Verify the A2A TaskStateMachine's orphan recovery (matching existing production 
 6. New instance runs `_restoreFromDb()`
 
 **Pass condition:** Task-A (was `working` at crash) is now `failed` with error containing `orphaned`. Task-B (was `completed` at crash) is pruned or absent from in-memory map (terminal pruning). No tasks are in `working` state after recovery. DB row for Task-A has status `failed`.
-**Fail condition:** Task-A still in `working` state after recovery, Task-B re-appears as non-terminal, or _restoreFromDb throws.
+**Fail condition:** Task-A still in `working` state after recovery, Task-B re-appears as non-terminal, or \_restoreFromDb throws.
 
 Evidence: task-state-machine listTasks() output post-recovery, SQLite a2a_tasks table dump, error field on Task-A
 
@@ -251,6 +265,7 @@ Evidence: task-state-machine listTasks() output post-recovery, SQLite a2a_tasks 
 ### VAL-E2E-007: Validation Gate Pass/Fail Determines Feature Outcome
 
 End-to-end validation gate wired to a feature state:
+
 1. Feature-X completes worker execution → handoff written
 2. Validation gate runs scrutiny review on handoff
 3. **Scenario A (pass):** Scrutiny returns `{ "status": "pass" }` → Feature-X → `completed`
@@ -266,8 +281,8 @@ Evidence: scrutiny/synthesis.json with round count, state.json feature history, 
 
 ## Summary
 
-| Area  | Count | IDs |
-|-------|-------|-----|
-| CROSS | 8     | VAL-CROSS-001 through VAL-CROSS-008 |
-| E2E   | 7     | VAL-E2E-001 through VAL-E2E-007 |
-| **Total** | **15** | |
+| Area      | Count  | IDs                                 |
+| --------- | ------ | ----------------------------------- |
+| CROSS     | 8      | VAL-CROSS-001 through VAL-CROSS-008 |
+| E2E       | 7      | VAL-E2E-001 through VAL-E2E-007     |
+| **Total** | **15** |                                     |

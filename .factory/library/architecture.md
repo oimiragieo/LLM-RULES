@@ -38,6 +38,7 @@ Tests mirror the module structure:
 ## State Machine Transitions (CRITICAL)
 
 FeaturesStateMachine VALID_TRANSITIONS:
+
 - pending -> in_progress
 - in_progress -> validating | failed
 - validating -> completed
@@ -46,6 +47,7 @@ FeaturesStateMachine VALID_TRANSITIONS:
 - cancelled (terminal)
 
 FrictionLoopEngine events (emitted):
+
 - re-enqueued (with strategy: 'retry' | 'replan')
 - human-intervention-required
 - friction-capped

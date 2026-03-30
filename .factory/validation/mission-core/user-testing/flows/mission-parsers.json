@@ -8,9 +8,7 @@
       "node --test tests/mission/agents-parser.test.cjs"
     ]
   },
-  "toolsUsed": [
-    "Execute"
-  ],
+  "toolsUsed": ["Execute"],
   "assertions": [
     {
       "id": "VAL-MP-001",
@@ -24,9 +22,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "mission-core/mission-parsers/VAL-MP-tests-passed.txt"
-        ]
+        "testOutput": ["mission-core/mission-parsers/VAL-MP-tests-passed.txt"]
       },
       "issues": null
     },
@@ -42,9 +38,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "mission-core/mission-parsers/VAL-MP-tests-passed.txt"
-        ]
+        "testOutput": ["mission-core/mission-parsers/VAL-MP-tests-passed.txt"]
       },
       "issues": null
     },
@@ -60,9 +54,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "mission-core/mission-parsers/VAL-MP-tests-passed.txt"
-        ]
+        "testOutput": ["mission-core/mission-parsers/VAL-MP-tests-passed.txt"]
       },
       "issues": null
     },
@@ -78,9 +70,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "mission-core/mission-parsers/VAL-AP-tests-passed.txt"
-        ]
+        "testOutput": ["mission-core/mission-parsers/VAL-AP-tests-passed.txt"]
       },
       "issues": null
     },
@@ -96,9 +86,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "mission-core/mission-parsers/VAL-AP-tests-passed.txt"
-        ]
+        "testOutput": ["mission-core/mission-parsers/VAL-AP-tests-passed.txt"]
       },
       "issues": null
     },
@@ -114,9 +102,7 @@
         }
       ],
       "evidence": {
-        "testOutput": [
-          "mission-core/mission-parsers/VAL-AP-tests-passed.txt"
-        ]
+        "testOutput": ["mission-core/mission-parsers/VAL-AP-tests-passed.txt"]
       },
       "issues": null
     }

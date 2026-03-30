@@ -405,11 +405,10 @@ function checkGitAvailable(repoPath) {
   try {
     // Check if git command exists
     const isWindows = process.platform === 'win32';
-    const result = childProcess.spawnSync(
-      isWindows ? 'where' : 'which',
-      ['git'],
-      { stdio: 'pipe', windowsHide: true }
-    );
+    const result = childProcess.spawnSync(isWindows ? 'where' : 'which', ['git'], {
+      stdio: 'pipe',
+      windowsHide: true,
+    });
     if (result.status !== 0) return false;
 
     // Check if this is a git repository

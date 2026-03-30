@@ -65,7 +65,7 @@ When testing assertions via unit tests:
 
 ## Flow Validator Guidance: Integration Tests
 
-For cross-area integration assertions (VAL-INFRA-*, VAL-CROSS-*, VAL-E2E-*):
+For cross-area integration assertions (VAL-INFRA-_, VAL-CROSS-_, VAL-E2E-\*):
 
 1. Run integration tests: `node --test tests/integration/<file>.test.cjs`
 2. Each describe() block maps to a validation assertion ID
