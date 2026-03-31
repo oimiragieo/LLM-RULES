@@ -1,0 +1,49 @@
+{
+  "milestone": "hook-overhaul",
+  "round": 1,
+  "status": "pass",
+  "validatorsRun": {
+    "test": { "passed": true, "command": "cmd /c pnpm test:framework:hooks", "exitCode": 0 },
+    "typecheck": { "passed": true, "command": "n/a", "exitCode": 0 },
+    "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 }
+  },
+  "reviewsSummary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "failedFeatures": []
+  },
+  "blockingIssues": [],
+  "appliedUpdates": [],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "skills",
+      "suggestion": "Document protocol for handling already-completed features: workers should verify the previous work (tests, linting) and report success without re-implementing.",
+      "evidence": "Feature hooks-deduplication was already completed by a prior worker. The current worker correctly verified the commit and exited.",
+      "isSystemic": true
+    },
+    {
+      "target": "skills",
+      "suggestion": "Add guidance to hooks-worker skill for script consolidation: when consolidating auto-executing scripts, wrap their execution in 'if (require.main === module)' and add exports so they can be safely imported.",
+      "evidence": "In hooks-consolidation feature, the worker successfully used this pattern to make existing scripts importable into a bundle.",
+      "isSystemic": false
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Reinforce that workers must strictly follow TDD (Write tests first) as documented in their skills, and not edit implementation code before writing tests.",
+      "evidence": "In hooks-if-conditions, the transcript shows the worker edited implementation files before creating tests, violating the skill procedure.",
+      "isSystemic": true
+    }
+  ],
+  "rejectedObservations": [
+    {
+      "observation": "Existing test hook-async-classification.test.cjs failed due to hardcoded script names changed by consolidation.",
+      "reason": "Feature-specific cross-dependency, not a generalizable guideline or shared state."
+    },
+    {
+      "observation": "Feature description inaccurately claimed 3 hooks were inside user-prompt-advisory-bundle.cjs.",
+      "reason": "Feature-specific error, not a generalizable guideline or shared state."
+    }
+  ],
+  "previousRound": null
+}
