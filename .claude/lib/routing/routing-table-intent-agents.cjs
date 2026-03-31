@@ -107,8 +107,8 @@ const INTENT_TO_AGENT = {
   // Chaos Engineering intent (failure injection, resilience testing)
   chaos_engineer: 'chaos-engineer',
 
-  // Data Science intent (routes to data-engineer)
-  data_science: 'data-engineer',
+  // Data Science intent (dedicated data-scientist agent)
+  data_science: 'data-scientist',
 
   // Game development intent (routes to gamedev-pro)
   gamedev: 'gamedev-pro',

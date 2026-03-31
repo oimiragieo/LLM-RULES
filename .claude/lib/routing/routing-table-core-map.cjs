@@ -35,6 +35,24 @@ const ROUTING_TABLE = {
   cd: 'devops',
   release: 'devops',
   gitpush: 'devops',
+  // Terraform
+  terraform: 'terraform-engineer',
+  hcl: 'terraform-engineer',
+  'infra-as-code': 'terraform-engineer',
+  // Terragrunt
+  terragrunt: 'terragrunt-pro',
+  'terragrunt-module': 'terragrunt-pro',
+  // Azure
+  azure: 'azure-infra-pro',
+  'azure-devops': 'azure-infra-pro',
+  // Windows Infrastructure
+  'windows-server': 'windows-infra-pro',
+  'active-directory': 'windows-infra-pro',
+  powershell: 'windows-infra-pro',
+  // M365 / Microsoft 365
+  m365: 'm365-admin',
+  sharepoint: 'm365-admin',
+  'microsoft-teams': 'm365-admin',
   incident: 'incident-responder',
   outage: 'incident-responder',
   debugging: 'devops-troubleshooter',
@@ -93,23 +111,38 @@ const ROUTING_TABLE = {
   nestjs: 'nodejs-pro',
   // Java
   java: 'java-pro',
-  spring: 'java-pro',
-  springboot: 'java-pro',
   maven: 'java-pro',
   gradle: 'java-pro',
+  // Spring Boot
+  spring: 'spring-boot-pro',
+  springboot: 'spring-boot-pro',
   // PHP
   php: 'php-pro',
   laravel: 'php-pro',
   symfony: 'php-pro',
-  wordpress: 'php-pro',
+  // WordPress
+  wordpress: 'wordpress-master',
+  woocommerce: 'wordpress-master',
+  elementor: 'wordpress-master',
   // iOS
   ios: 'ios-pro',
   swift: 'ios-pro',
   xcode: 'ios-pro',
   apple: 'ios-pro',
+  // Swift language (server-side, multiplatform)
+  swiftui: 'swift-pro',
+  vapor: 'swift-pro',
+  swiftlang: 'swift-pro',
   // Android
   android: 'android-pro',
-  kotlin: 'android-pro',
+  // Kotlin (multiplatform / JVM)
+  kotlin: 'kotlin-pro',
+  multiplatform: 'kotlin-pro',
+  'kotlin-multiplatform': 'kotlin-pro',
+  // Angular
+  angular: 'angular-pro',
+  angularjs: 'angular-pro',
+  'ng-component': 'angular-pro',
   // Next.js
   nextjs: 'nextjs-pro',
   next: 'nextjs-pro',
@@ -125,26 +158,63 @@ const ROUTING_TABLE = {
   expo: 'expo-mobile-developer',
   reactnative: 'expo-mobile-developer',
   mobile: 'expo-mobile-developer',
+  // Django
+  django: 'django-developer',
+  'django-rest': 'django-developer',
+  drf: 'django-developer',
+  // Rails
+  rails: 'rails-pro',
+  ruby: 'rails-pro',
+  rubyonrails: 'rails-pro',
+  // .NET
+  dotnet: 'dotnet-pro',
+  csharp: 'dotnet-pro',
+  aspnet: 'dotnet-pro',
   // Data Engineering
   data: 'data-engineer',
   etl: 'data-engineer',
   pipeline: 'data-engineer',
   dataengineering: 'data-engineer',
-  // Database
+  // Data Science
+  datascience: 'data-scientist',
+  'data-science': 'data-scientist',
+  statistics: 'data-scientist',
+  // Database (general schema/design)
   database: 'database-architect',
   schema: 'database-architect',
-  sql: 'database-architect',
-  postgres: 'database-architect',
-  postgresql: 'database-architect',
   mysql: 'database-architect',
+  // SQL specialist
+  sql: 'sql-pro',
+  'sql-query': 'sql-pro',
+  tsql: 'sql-pro',
+  // PostgreSQL specialist
+  postgres: 'postgres-pro',
+  postgresql: 'postgres-pro',
+  pgql: 'postgres-pro',
   // GraphQL
   graphql: 'graphql-pro',
   apollo: 'graphql-pro',
   federation: 'graphql-pro',
+  // IoT
+  iot: 'iot-engineer',
+  embedded: 'iot-engineer',
+  firmware: 'iot-engineer',
   // Mobile UX
   mobileui: 'mobile-ux-reviewer',
   appux: 'mobile-ux-reviewer',
   mobiledesign: 'mobile-ux-reviewer',
+  // Voice Replicator
+  'voice-clone': 'voice-replicator-agent',
+  'voice-replication': 'voice-replicator-agent',
+  'voice-synthesis': 'voice-replicator-agent',
+  // Forum Monitor
+  forum: 'forum-monitor-agent',
+  'community-monitoring': 'forum-monitor-agent',
+  'forum-watch': 'forum-monitor-agent',
+  // Post Analyzer
+  'post-analysis': 'post-analyzer-agent',
+  'content-analysis': 'post-analyzer-agent',
+  'social-analysis': 'post-analyzer-agent',
   // Medical Research
   medical: 'medical-research-triage',
   symptoms: 'medical-research-triage',
@@ -165,6 +235,22 @@ const ROUTING_TABLE = {
   machinelearning: 'ai-ml-specialist',
   deeplearning: 'ai-ml-specialist',
   neural: 'ai-ml-specialist',
+  // ML Research
+  'ml-research': 'ml-researcher',
+  'model-research': 'ml-researcher',
+  'research-paper': 'ml-researcher',
+  // MLOps
+  mlops: 'mlops-engineer',
+  'model-deployment': 'mlops-engineer',
+  'model-serving': 'mlops-engineer',
+  // NLP
+  nlp: 'nlp-engineer',
+  'text-processing': 'nlp-engineer',
+  'natural-language': 'nlp-engineer',
+  // Model Benchmarking
+  'model-benchmark': 'model-benchmarker-agent',
+  'llm-benchmark': 'model-benchmarker-agent',
+  'model-eval': 'model-benchmarker-agent',
   // LLM Architecture
   llm: 'llm-architect',
   rag: 'llm-architect',
@@ -205,7 +291,7 @@ const ROUTING_TABLE = {
   context: 'context-compressor',
   summarize: 'context-compressor',
   token: 'context-compressor',
-  // PM (Product Manager)
+  // PM (Product Manager — lightweight)
   prd: 'pm',
   backlog: 'pm',
   userstory: 'pm',
@@ -213,6 +299,22 @@ const ROUTING_TABLE = {
   roadmap: 'pm',
   prioritization: 'pm',
   product: 'pm',
+  // Product Manager (dedicated specialist)
+  'product-management': 'product-manager',
+  'product-strategy': 'product-manager',
+  'go-to-market': 'product-manager',
+  // Business Analyst
+  'business-analysis': 'business-analyst',
+  requirements: 'business-analyst',
+  'process-mapping': 'business-analyst',
+  // Legal Advisor
+  legal: 'legal-advisor',
+  contract: 'legal-advisor',
+  'terms-of-service': 'legal-advisor',
+  // Quant Analyst
+  quant: 'quant-analyst',
+  quantitative: 'quant-analyst',
+  'financial-modeling': 'quant-analyst',
   // Technical Program Management
   program: 'technical-program-manager',
   tpm: 'technical-program-manager',
@@ -323,6 +425,11 @@ const ROUTING_TABLE = {
   overview: 'general-assistant',
   'general-purpose': 'general-assistant',
 
+  // Channel Responder
+  channel: 'channel-responder',
+  'slack-message': 'channel-responder',
+  'discord-message': 'channel-responder',
+
   // Task Management
   'task-hygiene': 'task-manager',
   'task-audit': 'task-manager',
@@ -347,6 +454,18 @@ const ROUTING_TABLE = {
   integrate: 'artifact-integrator',
   ingest: 'artifact-integrator',
   onboard: 'artifact-integrator',
+  // Legacy Modernization
+  legacy: 'legacy-modernizer',
+  migration: 'legacy-modernizer',
+  modernize: 'legacy-modernizer',
+  // App Generator
+  'app-generator': 'app-generator-agent',
+  scaffold: 'app-generator-agent',
+  boilerplate: 'app-generator-agent',
+  // Context Manager
+  'context-management': 'context-manager',
+  'context-window': 'context-manager',
+  'context-pruning': 'context-manager',
   // Kubernetes Specialist
   kubernetes: 'kubernetes-specialist',
   k8s: 'kubernetes-specialist',

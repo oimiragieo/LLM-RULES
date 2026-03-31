@@ -357,7 +357,7 @@
         "Skill",
         "MemoryRecord"
       ],
-      "model": "'sonnet'"
+      "model": "sonnet"
     },
     "code-reviewer": {
       "tools": [
