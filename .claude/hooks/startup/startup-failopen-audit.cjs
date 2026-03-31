@@ -15,7 +15,11 @@
 
 const HOOK_NAME = 'startup-failopen-audit';
 
-function main() {
+/**
+ * Check for active fail-open overrides and warn via stderr.
+ * Safe to call from consolidated bundles — does NOT call process.exit().
+ */
+function runCheck() {
   const failOpenVars = Object.entries(process.env)
     .filter(([k, v]) => k.endsWith('_FAIL_OPEN') && v === 'true')
     .map(([k]) => k);
@@ -25,10 +29,16 @@ function main() {
       `[${HOOK_NAME}] WARNING: ${failOpenVars.length} fail-open override(s) active: ${failOpenVars.join(', ')}\n`
     );
   }
+}
 
+function main() {
+  runCheck();
   process.exit(0);
 }
 
 if (require.main === module) {
   main();
 }
+
+// Export for programmatic use by consolidated bundles
+module.exports = { main, runCheck };

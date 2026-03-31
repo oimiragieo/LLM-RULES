@@ -116,6 +116,9 @@ function buildWarningMessage(usagePct, tokensUsed, budget) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
+// Export for programmatic use by consolidated bundles
+module.exports = { readTokenUsage, buildWarningMessage };
+
 function main() {
   const chunks = [];
   process.stdin.on('data', c => chunks.push(c));
@@ -168,4 +171,6 @@ function main() {
   });
 }
 
-main();
+if (require.main === module) {
+  main();
+}

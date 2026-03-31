@@ -142,4 +142,103 @@ function run() {
   }
 }
 
-run();
+/**
+ * Run budget watchdog as part of a consolidated bundle.
+ * Writes advisory messages to stderr instead of stdout (bundle controls stdout).
+ * Does NOT call process.exit(). Safe to call from consolidated bundles.
+ */
+function runBundled() {
+  try {
+    const projectRoot = fs.existsSync(path.join(process.cwd(), '.claude'))
+      ? process.cwd()
+      : PROJECT_ROOT;
+    const runtimeDir = path.join(projectRoot, '.claude', 'context', 'runtime');
+
+    let sessionId = 'unknown';
+    const sessionIdPath = path.join(runtimeDir, 'session-id.json');
+    if (fs.existsSync(sessionIdPath)) {
+      try {
+        const raw = fs.readFileSync(sessionIdPath, 'utf8');
+        const parsed = safeParseJSON(raw, null);
+        if (parsed && typeof parsed.sessionId === 'string') {
+          sessionId = parsed.sessionId;
+        }
+      } catch (_e) {
+        // keep default
+      }
+    }
+
+    const budgetPath = path.join(runtimeDir, 'budget-tracker.json');
+    if (!fs.existsSync(budgetPath)) return;
+
+    let budgetData;
+    try {
+      const raw = fs.readFileSync(budgetPath, 'utf8');
+      budgetData = safeParseJSON(raw, null);
+    } catch (_e) {
+      return;
+    }
+
+    if (!budgetData || typeof budgetData !== 'object') return;
+
+    const sessionEntry = budgetData[sessionId];
+    if (!sessionEntry || typeof sessionEntry.totalTokens !== 'number') return;
+
+    const totalTokens = sessionEntry.totalTokens;
+    const budget = sessionEntry.budget || 200000;
+
+    const THRESHOLDS = [
+      {
+        tierTarget: 0.9,
+        level: 'critical',
+        message: tokens =>
+          `CRITICAL [${tokens.toLocaleString()} / ~${Math.round(budget / 1000)}K tokens]: Context is near the hard limit. ` +
+          `Run \`/session-handoff\` NOW to preserve session state and spawn a fresh session.`,
+      },
+      {
+        tierTarget: 0.8,
+        level: 'strong',
+        message: tokens =>
+          `WARNING [${tokens.toLocaleString()} / ~${Math.round(budget / 1000)}K tokens]: Context is approaching the critical threshold. ` +
+          `Plan to initiate a session handoff soon.`,
+      },
+      {
+        tierTarget: 0.7,
+        level: 'advisory',
+        message: tokens =>
+          `ADVISORY [${tokens.toLocaleString()} / ~${Math.round(budget / 1000)}K tokens]: Context window is 70% full. ` +
+          `Consider running \`/session-handoff\` after completing the current task.`,
+      },
+    ];
+
+    const applicableTier = THRESHOLDS.find(t => totalTokens >= budget * t.tierTarget);
+    if (!applicableTier) return;
+
+    const sentinelThreshold = `${Math.round((budget * applicableTier.tierTarget) / 1000)}K`;
+    const sentinelPath = path.join(runtimeDir, `session-handoff-reminder-${sentinelThreshold}.txt`);
+
+    if (fs.existsSync(sentinelPath)) return;
+
+    try {
+      fs.writeFileSync(
+        sentinelPath,
+        `Fired at ${new Date().toISOString()} (${totalTokens} tokens)`,
+        'utf8'
+      );
+    } catch (_e) {
+      // Non-fatal
+    }
+
+    const message = applicableTier.message(totalTokens);
+    process.stderr.write(`[session-budget-watchdog] ${message}\n`);
+  } catch (_err) {
+    // Fail-open
+  }
+}
+
+// Export for programmatic use by consolidated bundles
+module.exports = { runBundled };
+
+if (require.main === module) {
+  run();
+}

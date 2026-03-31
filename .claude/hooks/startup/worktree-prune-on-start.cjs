@@ -62,4 +62,9 @@ function main() {
   }
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+// Export for programmatic use by consolidated bundles
+module.exports = { main, ensureSubagentClaudeMd };

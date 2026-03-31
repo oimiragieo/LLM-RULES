@@ -35,31 +35,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/ccusage-statusline.cjs",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/user-prompt-advisory-bundle.cjs",
             "async": true,
-            "timeout_ms": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/startup-failopen-audit.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/worktree-prune-on-start.cjs",
-            "async": true,
-            "timeout_ms": 10000
+            "timeout_ms": 30000
           }
         ]
       },
@@ -74,39 +52,7 @@
           }
         ]
       },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/session-budget-watchdog.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/drift-detector.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/stale-task-detector.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
+
       {
         "matcher": "",
         "hooks": [
@@ -340,27 +286,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/metrics/post-tool-metrics-unified.cjs",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/post-tool-advisory-bundle.cjs",
             "async": true,
-            "timeout_ms": 5000
-          },
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/context-window-monitor.cjs",
-            "async": true,
-            "timeout_ms": 5000
-          },
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/hook-error-detector.cjs",
-            "async": true,
-            "timeout_ms": 5000
-          },
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/recurring-issue-detector.cjs",
-            "async": true,
-            "timeout_ms": 5000
+            "timeout_ms": 30000
           }
         ]
       },

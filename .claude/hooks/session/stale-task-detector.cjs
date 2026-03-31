@@ -188,7 +188,58 @@ function detectStaleTasks(tasks, thresholdMs) {
   return warnings;
 }
 
-module.exports = { detectStaleTasks };
+/**
+ * Run stale task detection without writing to stdout (for use by consolidated bundles).
+ * Writes warnings to stderr and updates the stale-tasks queue.
+ * Does NOT call process.exit(). Safe to call from consolidated bundles.
+ */
+function runDetection() {
+  try {
+    const state = readJSON(TASKUPDATE_STATE_FILE);
+    if (!state || !state.sessions) return;
+
+    const now = Date.now();
+    const stale = [];
+
+    for (const [sessionId, entry] of Object.entries(state.sessions)) {
+      if (entry && entry.inProgress === true && entry.updatedAt) {
+        const ageMs = now - Number(entry.updatedAt);
+        if (ageMs > STALE_THRESHOLD_MS) {
+          const ageMin = Math.round(ageMs / 60000);
+          const taskId = entry.taskId || sessionId;
+          const subject = entry.subject || '';
+          stale.push({ taskId, ageMin, subject });
+        }
+      }
+    }
+
+    if (stale.length > 0) {
+      const detectedAt = new Date().toISOString();
+      const queueEntries = [];
+
+      for (const { taskId, ageMin, subject } of stale) {
+        const msg = `[STALE-TASK] Task "${taskId}" has been in_progress for ${ageMin}m — router may have forgotten to call TaskUpdate(completed)`;
+        process.stderr.write(msg + '\n');
+        appendGapLog({
+          timestamp: detectedAt,
+          type: 'missing_metadata',
+          taskId,
+          description: `Stale in_progress task detected: "${taskId}" has been in_progress for ${ageMin} minutes without completion`,
+          context:
+            'Detected by stale-task-detector.cjs on UserPromptSubmit. Router must call TaskUpdate({ status: "completed" }) when work is done.',
+          source: 'stale-task-detector',
+        });
+        queueEntries.push({ taskId, ageMin, detectedAt, subject });
+      }
+
+      writeStaleTasksQueue(queueEntries);
+    }
+  } catch (_e) {
+    // Never block on error
+  }
+}
+
+module.exports = { detectStaleTasks, runDetection };
 
 if (require.main === module) {
   main();

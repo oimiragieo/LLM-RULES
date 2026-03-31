@@ -215,4 +215,9 @@ function _run() {
   process.stderr.write(output);
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+// Export for programmatic use by consolidated bundles
+module.exports = { _run, _getMockData, _loadAdapter };
