@@ -16,5 +16,7 @@ commands:
   format: node scripts/format-tracked.mjs --write
   format:file: npx prettier --write
   lint: pnpm lint
+  test:single: node --test
+  charcount: node -e "const fs=require('fs');const p=require('path');let t=fs.readFileSync('.claude/CLAUDE.md','utf8').length;fs.readdirSync('.claude/rules').filter(f=>f.endsWith('.md')).forEach(f=>{t+=fs.readFileSync(p.join('.claude/rules',f),'utf8').length});console.log('Total:',t,t<40000?'PASS':'FAIL')"
 
 services: {}
