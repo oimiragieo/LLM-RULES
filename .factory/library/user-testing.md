@@ -72,3 +72,12 @@ For cross-area integration assertions (VAL-INFRA-_, VAL-CROSS-_, VAL-E2E-\*):
 3. Integration tests create temp workspaces and clean up after themselves
 4. Tests use mock workers (no real LLM calls) — should complete quickly
 5. Some tests (VAL-E2E-003, VAL-E2E-004) run against the real agent-studio repo
+
+## Flow Validator Guidance: CLI
+
+When testing assertions via CLI and direct file inspection:
+
+1. You can safely run Node.js scripts or shell commands to parse files like `.claude/settings.json` or `.claude/CLAUDE.md`.
+2. You can run individual tests via `node --test tests/hooks/<test-file>.test.cjs`.
+3. Since these checks are read-only or only use temporary files, they can run concurrently without isolation boundaries.
+4. Do not modify the actual codebase files while validating.

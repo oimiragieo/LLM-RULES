@@ -1,0 +1,35 @@
+{
+  "milestone": "hook-overhaul",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-HO-001",
+    "VAL-HO-004",
+    "VAL-HO-011",
+    "VAL-HO-002",
+    "VAL-HO-003",
+    "VAL-HO-005",
+    "VAL-HO-006",
+    "VAL-HO-012",
+    "VAL-HO-007",
+    "VAL-HO-008",
+    "VAL-HO-009",
+    "VAL-HO-010"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [
+    {
+      "target": "user-testing.md",
+      "description": "Added Flow Validator Guidance: CLI for validation",
+      "source": "setup"
+    }
+  ],
+  "previousRound": null
+}
