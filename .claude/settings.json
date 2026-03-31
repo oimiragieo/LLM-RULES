@@ -531,6 +531,19 @@
           }
         ]
       }
+    ],
+    "PermissionDenied": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/lifecycle/permission-denied-logger.cjs",
+            "async": true,
+            "timeout_ms": 5000
+          }
+        ]
+      }
     ]
   }
 }
