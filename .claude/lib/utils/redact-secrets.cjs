@@ -24,6 +24,46 @@ const MAX_DEPTH = 5;
 const MAX_STRING_LENGTH = 100 * 1024; // 100KB
 
 /**
+ * Exact (lowercased) key names whose values should always be redacted.
+ * Covers the canonical sensitive field names from the feature spec:
+ *   apiKey, token, password, authorization, secret, aws_secret_access_key,
+ *   github_token, jwt, connection_string — plus common aliases.
+ */
+const SENSITIVE_KEYS = new Set([
+  'apikey',
+  'api_key',
+  'api-key',
+  'token',
+  'access_token',
+  'auth_token',
+  'refresh_token',
+  'id_token',
+  'password',
+  'passwd',
+  'authorization',
+  'secret',
+  'secret_key',
+  'aws_secret_access_key',
+  'github_token',
+  'jwt',
+  'connection_string',
+  'connectionstring',
+  'connection-string',
+]);
+
+/**
+ * Returns true if the key name indicates the value should always be redacted.
+ * Case-insensitive exact match against the SENSITIVE_KEYS set.
+ *
+ * @param {string} key
+ * @returns {boolean}
+ */
+function isSensitiveKey(key) {
+  if (typeof key !== 'string') return false;
+  return SENSITIVE_KEYS.has(key.toLowerCase());
+}
+
+/**
  * Secret detection patterns ordered by specificity (most specific first).
  * Each pattern replaces the matched secret portion with REDACTED.
  */
@@ -129,7 +169,12 @@ function redactObject(obj, depth) {
       if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
         continue;
       }
-      result[key] = redactObject(obj[key], depth + 1);
+      // Key-name based redaction: always replace value for sensitive key names
+      if (isSensitiveKey(key)) {
+        result[key] = REDACTED;
+      } else {
+        result[key] = redactObject(obj[key], depth + 1);
+      }
     }
     return result;
   }
@@ -141,8 +186,10 @@ function redactObject(obj, depth) {
 module.exports = {
   redactSecrets,
   redactObject,
+  isSensitiveKey,
   REDACTED,
   MAX_DEPTH,
   MAX_STRING_LENGTH,
   PATTERNS,
+  SENSITIVE_KEYS,
 };
