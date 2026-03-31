@@ -1,35 +1,60 @@
 #!/usr/bin/env node
+'use strict';
 
 /**
  * github-mcp - Post-Execute Hook
- * Runs after the skill executes for cleanup, logging, or follow-up actions.
+ * Records execution result and logs completion of GitHub MCP operations.
  */
 
-const fs = require('fs');
-const path = require('path');
 const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
-// Parse hook input
-const result = safeParseJSON(process.argv[2] || '{}');
+// ─── Result parsing ────────────────────────────────────────────────────────────
 
-console.log('📝 [GITHUB-MCP] Post-execute processing...');
-
-/**
- * Process execution result
- */
-function processResult(_result) {
-  // TODO: Add your post-processing logic here
-
-  return { success: true };
+function parseResult() {
+  const raw = process.argv.length > 2 ? process.argv.slice(2).join(' ') : '{}';
+  try {
+    return safeParseJSON(raw) || {};
+  } catch (_err) {
+    return {};
+  }
 }
 
-// Run post-processing
-const outcome = processResult(result);
+// ─── Result assessment ─────────────────────────────────────────────────────────
 
-if (outcome.success) {
-  console.log('✅ [GITHUB-MCP] Post-processing complete');
-  process.exit(0);
-} else {
-  console.error('⚠️  [GITHUB-MCP] Post-processing had issues');
-  process.exit(0);
+function assessResult(result) {
+  const warnings = [];
+  const payload = result && typeof result === 'object' ? result : {};
+
+  // Warn if the operation reported errors
+  if (payload.error) {
+    warnings.push(`GitHub MCP reported an error: ${payload.error}`);
+  }
+
+  // Warn if authentication issues detected
+  if (payload.authError || payload.statusCode === 401 || payload.statusCode === 403) {
+    warnings.push('GitHub authentication issue detected; verify GITHUB_PERSONAL_ACCESS_TOKEN');
+  }
+
+  // Warn if rate-limited
+  if (payload.statusCode === 429 || payload.rateLimited) {
+    warnings.push('GitHub API rate limit reached; consider waiting before retrying');
+  }
+
+  return warnings;
 }
+
+// ─── Main ──────────────────────────────────────────────────────────────────────
+
+const result = parseResult();
+const warnings = assessResult(result);
+
+console.log('[GITHUB-MCP] Post-execute processing...');
+
+if (warnings.length > 0) {
+  for (const w of warnings) {
+    console.warn(`[GITHUB-MCP] Warning: ${w}`);
+  }
+}
+
+console.log('[GITHUB-MCP] Post-processing complete');
+process.exit(0);
