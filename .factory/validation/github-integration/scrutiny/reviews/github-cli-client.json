@@ -1,0 +1,15 @@
+{
+  "featureId": "github-cli-client",
+  "status": "pass",
+  "issues": [],
+  "sharedStateObservations": [],
+  "verifiedExpectedBehavior": [
+    "createPR shells out to gh pr create with correct flags",
+    "commentOnPR adds comment via gh pr comment",
+    "listPRs parses --json output into structured array",
+    "getPR parses single PR JSON",
+    "getPRDiff returns raw diff text",
+    "Errors from gh CLI throw structured errors",
+    "All methods use injected _execSync for testability"
+  ]
+}

@@ -19,3 +19,7 @@ When using `child_process.spawn` for shell commands, Windows requires using `cmd
 ## Unix Utilities Alternatives
 
 When trying to use standard Unix utilities like `wc -l` for line counting, the Windows equivalent `find /c /v ""` can sometimes fail with "Parameter format not correct". A reliable cross-platform alternative is writing a simple `node -e` script.
+
+## Running npm/pnpm Binaries (.bin)
+
+When executing `.bin` binaries like `prettier` directly from scripts on Windows, `node_modules/.bin/prettier` may fail or require `cmd /c "node_modules\\.bin\\prettier.cmd"`. For reliability, use `npx prettier` or `pnpm prettier` instead of direct path execution.
