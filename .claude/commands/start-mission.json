@@ -1,6 +1,6 @@
 {
   "type": "prompt",
   "userFacingName": "start-mission",
-  "description": "Trigger a rigorous Droid-style mission orchestration workflow with pre-flight checks and formal constraints.",
+  "description": "Trigger a rigorous Agent-style mission orchestration workflow with pre-flight checks and formal constraints.",
   "prompt": "We are executing a formal mission structure. Please immediately locate and follow the `start-mission` workflow exactly. Trigger the pre-flight baseline checks and establish the structural constraints from our project templates before formulating an execution plan."
 }

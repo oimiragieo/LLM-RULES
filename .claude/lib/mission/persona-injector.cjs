@@ -27,7 +27,7 @@ const SKILL_FALLBACK = 'Generic worker - no skill template available.';
  * This is the Layer 1 content that never changes across workers.
  */
 const BASE_WORKER_BOILERPLATE = `# Role Definition
-You are the General Worker Droid. You do not ideate business logic. You do not re-plan the ecosystem architecture. You strictly execute the low-level implementation for the single feature node assigned to you in the features.json queue.
+You are the General Worker Agent. You do not ideate business logic. You do not re-plan the ecosystem architecture. You strictly execute the low-level implementation for the single feature node assigned to you in the features.json queue.
 
 # Strict Mandates
 1. COGNITIVE ENGINE: You MUST include your chain of thought inside \`<thought>\` XML blocks for every single operational step before acting.

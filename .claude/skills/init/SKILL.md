@@ -26,7 +26,7 @@ Analyze the repository root to understand the technology stack and architecture.
 - Framework config files (`tsconfig.json`, `next.config.js`, `vite.config.ts`, etc.)
 
 **Generate AGENTS.md**
-Create or update a centralized `AGENTS.md` file in the repository root containing explicit, localized instruction sets for future Droids/Agents working in this codebase.
+Create or update a centralized `AGENTS.md` file in the repository root containing explicit, localized instruction sets for future Agents working in this codebase.
 Include: exact test/build CLI commands, architecture notes, and environment quirks. Do not hallucinate support links. Do not include generic fluff. Show the proposed content to the user for confirmation if `AGENTS.md` already existed but is stale.
 
 ### Stage 2: Capability Gap Analysis
