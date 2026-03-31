@@ -85,6 +85,11 @@ const EventTypes = {
   /** @reserved */ MCP_TOOL_COMPLETED: 'MCP_TOOL_COMPLETED',
   /** @reserved */ MCP_TOOL_FAILED: 'MCP_TOOL_FAILED',
   /** @reserved */ MCP_SERVER_CONNECTED: 'MCP_SERVER_CONNECTED',
+
+  // Webhook Events (3) — used by WebhookSimulator for GitHub integration
+  WEBHOOK_RECEIVED: 'WEBHOOK_RECEIVED',
+  PR_EVENT: 'PR_EVENT',
+  ISSUE_COMMENT: 'ISSUE_COMMENT',
 };
 
 /**
@@ -137,6 +142,8 @@ const MCP_EVENTS = [
   'MCP_TOOL_FAILED',
   'MCP_SERVER_CONNECTED',
 ];
+
+const WEBHOOK_EVENTS = ['WEBHOOK_RECEIVED', 'PR_EVENT', 'ISSUE_COMMENT'];
 
 // ============================================================================
 // JSON Schema Validation
@@ -354,5 +361,6 @@ module.exports = {
   SECURITY_EVENTS,
   LLM_EVENTS,
   MCP_EVENTS,
+  WEBHOOK_EVENTS,
   validateEvent,
 };
