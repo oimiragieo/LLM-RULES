@@ -324,3 +324,6 @@ tests/lib/memory/.test-memory-contracts-*/
 
 # Scheduled tasks lock file (runtime artifact; not source-controlled)
 .claude/scheduled_tasks.lock
+
+# ProcessRegistry default checkpoint file (runtime artifact; generated when checkpoint() called without args)
+.process-registry-checkpoint.json
