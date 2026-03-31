@@ -118,7 +118,7 @@ describe('TaskDispatcher', () => {
   describe('dispatch (injection)', () => {
     it('calls injected _dispatch with the task object', () => {
       const calls = [];
-      const _dispatch = (task) => calls.push(task);
+      const _dispatch = task => calls.push(task);
       const dispatcher = new TaskDispatcher({ _dispatch });
 
       dispatcher.dispatch(makeMention('review this'));
@@ -128,7 +128,7 @@ describe('TaskDispatcher', () => {
 
     it('dispatched task object has taskId field', () => {
       const calls = [];
-      const dispatcher = new TaskDispatcher({ _dispatch: (t) => calls.push(t) });
+      const dispatcher = new TaskDispatcher({ _dispatch: t => calls.push(t) });
 
       dispatcher.dispatch(makeMention());
 
@@ -137,7 +137,7 @@ describe('TaskDispatcher', () => {
 
     it('dispatched task object has status field', () => {
       const calls = [];
-      const dispatcher = new TaskDispatcher({ _dispatch: (t) => calls.push(t) });
+      const dispatcher = new TaskDispatcher({ _dispatch: t => calls.push(t) });
 
       dispatcher.dispatch(makeMention());
 
@@ -146,7 +146,7 @@ describe('TaskDispatcher', () => {
 
     it('calls workerPool.assign when _dispatch is not provided', () => {
       const assigned = [];
-      const workerPool = { assign: (task) => assigned.push(task) };
+      const workerPool = { assign: task => assigned.push(task) };
       const dispatcher = new TaskDispatcher({ workerPool });
 
       dispatcher.dispatch(makeMention('assign me'));
@@ -157,8 +157,8 @@ describe('TaskDispatcher', () => {
     it('prioritizes _dispatch over workerPool when both provided', () => {
       const dispatchCalls = [];
       const poolCalls = [];
-      const _dispatch = (task) => dispatchCalls.push(task);
-      const workerPool = { assign: (task) => poolCalls.push(task) };
+      const _dispatch = task => dispatchCalls.push(task);
+      const workerPool = { assign: task => poolCalls.push(task) };
       const dispatcher = new TaskDispatcher({ _dispatch, workerPool });
 
       dispatcher.dispatch(makeMention());
@@ -174,7 +174,7 @@ describe('TaskDispatcher', () => {
 
     it('passes context to the dispatch function', () => {
       const calls = [];
-      const dispatcher = new TaskDispatcher({ _dispatch: (t) => calls.push(t) });
+      const dispatcher = new TaskDispatcher({ _dispatch: t => calls.push(t) });
 
       const context = { prNumber: 42, repo: 'owner/repo' };
       dispatcher.dispatch(makeMention(), context);
@@ -186,7 +186,7 @@ describe('TaskDispatcher', () => {
 
     it('dispatches multiple tasks correctly', () => {
       const calls = [];
-      const dispatcher = new TaskDispatcher({ _dispatch: (t) => calls.push(t) });
+      const dispatcher = new TaskDispatcher({ _dispatch: t => calls.push(t) });
 
       dispatcher.dispatch(makeMention('task 1'));
       dispatcher.dispatch(makeMention('task 2'));

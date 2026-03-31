@@ -87,7 +87,7 @@ function loadConfig(projectDir) {
         gateThreshold: DEFAULT_CONFIG.gateThreshold,
         pillarWeights: { ...DEFAULT_CONFIG.pillarWeights },
         pillarThresholds: {},
-        levelBoundaries: DEFAULT_CONFIG.levelBoundaries.map((b) => ({ ...b })),
+        levelBoundaries: DEFAULT_CONFIG.levelBoundaries.map(b => ({ ...b })),
       };
     }
     userConfig = parsed;

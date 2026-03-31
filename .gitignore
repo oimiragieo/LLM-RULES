@@ -122,7 +122,7 @@ context/sessions/
 # Local Settings
 .claude/settings.local.json
 .cursor/settings.local.json
-.factory/settings.local.json
+.factory/
 
 # Ralph (runtime/cache; .cursor/.ralph/progress.md and guardrails.md are tracked)
 .cursor/.ralph/.iteration
