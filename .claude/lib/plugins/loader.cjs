@@ -3,7 +3,7 @@
 /**
  * Plugin Loader
  *
- * Runtime loading of plugin skills, hooks, and agents.
+ * Runtime loading of plugin skills, hooks, agents, tools, and messages.
  * Wraps a PluginResolver to provide content-reading on top of path resolution.
  *
  * Integration with persona-injector:
@@ -31,6 +31,18 @@
  * const agent = loader.loadAgent('my-agent');
  * // => { content: '# My Agent\n...', path: '...' } | null
  *
+ * // Load tool definitions from a plugin
+ * const tools = loader.loadTools(pluginDir);
+ * // => [{ name: 'my-tool', command: '/abs/path/to/bin/my-tool.cjs', description: '...' }, ...]
+ *
+ * // Aggregate tools from all installed plugins
+ * const allTools = loader.listPluginTools();
+ * // => [{ name: '...', command: '...', description: '...' }, ...]
+ *
+ * // Load message files from a plugin's messages/ directory
+ * const messages = loader.loadMessages(pluginDir);
+ * // => [{ filename: 'context.md', content: '...' }, ...]
+ *
  * // Integrate with persona-injector
  * const persona = composePersona({
  *   skillName: 'my-skill',
@@ -42,6 +54,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { loadManifest } = require('./manifest.cjs');
 
 class PluginLoader {
   /**
@@ -168,6 +181,105 @@ class PluginLoader {
     }
 
     return paths;
+  }
+
+  // ---------------------------------------------------------------------------
+  // loadTools — plugin tool registration
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Read the plugin manifest's tools array and return tool definitions with
+   * commands resolved to absolute paths relative to pluginDir.
+   *
+   * Returns an empty array (never throws) if:
+   * - The plugin directory does not exist
+   * - The manifest is missing or invalid
+   * - The manifest has no tools array
+   *
+   * @param {string} pluginDir - Absolute path to the plugin root directory
+   * @returns {Array<{ name: string, command: string, description: string }>}
+   *   ToolDef[] — tool definitions with absolute command paths
+   */
+  loadTools(pluginDir) {
+    const result = loadManifest(pluginDir);
+    if (!result.valid || !result.manifest || !Array.isArray(result.manifest.tools)) {
+      return [];
+    }
+    return result.manifest.tools.map(tool => ({
+      name: tool.name,
+      command: path.resolve(pluginDir, tool.command),
+      description: tool.description,
+    }));
+  }
+
+  // ---------------------------------------------------------------------------
+  // listPluginTools — aggregate tools from all installed plugins
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Aggregate tool definitions from all installed plugins across all configured scopes.
+   *
+   * Iterates every scope directory, lists all plugin subdirectories, and calls
+   * loadTools() for each. All discovered tools are collected and returned.
+   *
+   * Returns an empty array when no scopes are configured or no plugins have tools.
+   *
+   * @returns {Array<{ name: string, command: string, description: string }>}
+   *   ToolDef[] — all tools from all installed plugins
+   */
+  listPluginTools() {
+    const tools = [];
+    for (const [, scopeDir] of this.resolver._scopes()) {
+      const plugins = this.resolver._listPlugins(scopeDir);
+      for (const pluginDir of plugins) {
+        const pluginTools = this.loadTools(pluginDir);
+        tools.push(...pluginTools);
+      }
+    }
+    return tools;
+  }
+
+  // ---------------------------------------------------------------------------
+  // loadMessages — plugin message injection
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Read all files from the plugin's messages/ subdirectory and return their
+   * contents as an array of { filename, content } objects.
+   *
+   * Returns an empty array (never throws) if:
+   * - The plugin directory does not exist
+   * - The messages/ subdirectory does not exist
+   * - The messages/ subdirectory is empty
+   *
+   * Subdirectories inside messages/ are ignored — only files are returned.
+   *
+   * @param {string} pluginDir - Absolute path to the plugin root directory
+   * @returns {Array<{ filename: string, content: string }>}
+   *   MessageEntry[] — message file names and their string contents
+   */
+  loadMessages(pluginDir) {
+    const messagesDir = path.join(pluginDir, 'messages');
+    if (!fs.existsSync(messagesDir)) return [];
+
+    let entries;
+    try {
+      entries = fs.readdirSync(messagesDir, { withFileTypes: true });
+    } catch (_err) {
+      return [];
+    }
+
+    const messages = [];
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      try {
+        const content = fs.readFileSync(path.join(messagesDir, entry.name), 'utf8');
+        messages.push({ filename: entry.name, content });
+      } catch (_err) {
+        // Skip unreadable files — never throw
+      }
+    }
+    return messages;
   }
 }
 

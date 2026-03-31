@@ -23,6 +23,7 @@ const ajv = new Ajv({ allErrors: true });
 /**
  * AJV JSON schema for a plugin manifest.
  * Enforces name, description, version, and author fields.
+ * Optionally accepts a tools array where each entry has { name, command, description }.
  */
 const PLUGIN_MANIFEST_SCHEMA = {
   type: 'object',
@@ -39,6 +40,19 @@ const PLUGIN_MANIFEST_SCHEMA = {
       properties: {
         name: { type: 'string', minLength: 1 },
         email: { type: 'string' },
+      },
+    },
+    tools: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['name', 'command', 'description'],
+        additionalProperties: false,
+        properties: {
+          name: { type: 'string', minLength: 1 },
+          command: { type: 'string', minLength: 1 },
+          description: { type: 'string' },
+        },
       },
     },
   },
