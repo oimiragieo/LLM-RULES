@@ -77,5 +77,5 @@ Files that should NOT exist in the project root after a task completes:
 
 - `.claude/skills/finishing-a-development-branch/SKILL.md` — Cleanup Scan phase
 - `.claude/skills/proactive-audit/SKILL.md` — Root Cleanliness Check
-- `.claude/rules/file-deletion-safety.md` — Do not delete untracked files without confirmation
+- `.claude/rules/safety-rules.md` — Do not delete untracked files without confirmation
 - `.claude/rules/workspace-conventions.md` — Canonical file placement rules
