@@ -48,7 +48,7 @@ const PLUGIN_MANIFEST_SCHEMA = {
  * Expected subdirectory structure within a plugin directory.
  */
 const PLUGIN_STRUCTURE = {
-  subdirs: ['skills', 'hooks', 'droids', 'commands'],
+  subdirs: ['skills', 'hooks', 'agents', 'commands'],
 };
 
 const _compiledValidate = ajv.compile(PLUGIN_MANIFEST_SCHEMA);
@@ -69,13 +69,13 @@ function validateManifest(manifestObj) {
 
 /**
  * Loads and validates a plugin manifest from a plugin directory.
- * Reads `.factory-plugin/plugin.json` within the given directory.
+ * Reads `.claude-plugin/plugin.json` within the given directory.
  *
  * @param {string} pluginDir - Path to the plugin root directory
  * @returns {{ valid: boolean, errors: Array|null, manifest: object|null }}
  */
 function loadManifest(pluginDir) {
-  const pluginJsonPath = path.join(pluginDir, '.factory-plugin', 'plugin.json');
+  const pluginJsonPath = path.join(pluginDir, '.claude-plugin', 'plugin.json');
 
   let content;
   try {

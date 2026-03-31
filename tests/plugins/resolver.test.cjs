@@ -21,7 +21,7 @@ const { PluginResolver } = require('../../.claude/lib/plugins/resolver.cjs');
  * @param {string[]} [opts.skills]   - Skill names to create (as name/SKILL.md)
  * @param {string[]} [opts.skillMds] - Skill names to create as flat .md files
  * @param {string[]} [opts.hooks]    - Hook event names to create (.cjs files)
- * @param {string[]} [opts.droids]   - Droid names to create (.md files)
+ * @param {string[]} [opts.agents]   - Agent names to create (.md files)
  */
 function createPlugin(scopeDir, pluginName, opts = {}) {
   const pluginDir = path.join(scopeDir, pluginName);
@@ -58,12 +58,12 @@ function createPlugin(scopeDir, pluginName, opts = {}) {
     }
   }
 
-  // Droids as flat .md files
-  if (opts.droids && opts.droids.length > 0) {
-    const droidsDir = path.join(pluginDir, 'droids');
-    fs.mkdirSync(droidsDir, { recursive: true });
-    for (const droid of opts.droids) {
-      fs.writeFileSync(path.join(droidsDir, `${droid}.md`), `# ${droid}\n`, 'utf8');
+  // Agents as flat .md files
+  if (opts.agents && opts.agents.length > 0) {
+    const agentsDir = path.join(pluginDir, 'agents');
+    fs.mkdirSync(agentsDir, { recursive: true });
+    for (const agent of opts.agents) {
+      fs.writeFileSync(path.join(agentsDir, `${agent}.md`), `# ${agent}\n`, 'utf8');
     }
   }
 }
@@ -88,7 +88,7 @@ describe('PluginResolver', () => {
     createPlugin(projectDir, 'plugin-foo', {
       skills: ['shared-skill', 'project-only-skill'],
       hooks: ['PreToolUse'],
-      droids: ['shared-droid', 'project-droid'],
+      agents: ['shared-agent', 'project-agent'],
     });
 
     // User scope: plugin-bar with 'shared-skill' (overridden by project), 'user-skill',
@@ -96,7 +96,7 @@ describe('PluginResolver', () => {
     createPlugin(userDir, 'plugin-bar', {
       skills: ['shared-skill', 'user-skill'],
       hooks: ['PreToolUse', 'PostToolUse'],
-      droids: ['shared-droid', 'user-droid'],
+      agents: ['shared-agent', 'user-agent'],
     });
 
     // Org scope: plugin-baz with 'shared-skill' (overridden), 'org-skill', 'user-skill' (user wins),
@@ -105,7 +105,7 @@ describe('PluginResolver', () => {
       skills: ['shared-skill', 'org-skill', 'user-skill'],
       skillMds: ['org-flat-skill'],
       hooks: ['PostToolUse'],
-      droids: ['shared-droid', 'org-droid'],
+      agents: ['shared-agent', 'org-agent'],
     });
   });
 
@@ -300,53 +300,53 @@ describe('PluginResolver', () => {
   });
 
   // -------------------------------------------------------------------------
-  // resolveDroid
+  // resolveAgent
   // -------------------------------------------------------------------------
-  describe('resolveDroid()', () => {
-    it('returns null when droid is not found in any scope', () => {
+  describe('resolveAgent()', () => {
+    it('returns null when agent is not found in any scope', () => {
       const r = new PluginResolver({ projectDir, userDir, orgDir });
-      const result = r.resolveDroid('nonexistent-droid');
+      const result = r.resolveAgent('nonexistent-agent');
       assert.equal(result, null);
     });
 
-    it('returns path string for a found droid', () => {
+    it('returns path string for a found agent', () => {
       const r = new PluginResolver({ projectDir, userDir, orgDir });
-      const result = r.resolveDroid('project-droid');
+      const result = r.resolveAgent('project-agent');
       assert.ok(typeof result === 'string', 'should return a path string');
-      assert.ok(result.endsWith('.md'), 'droid path should end with .md');
+      assert.ok(result.endsWith('.md'), 'agent path should end with .md');
     });
 
-    it('project scope droid overrides user scope same-name droid', () => {
+    it('project scope agent overrides user scope same-name agent', () => {
       const r = new PluginResolver({ projectDir, userDir, orgDir });
-      const result = r.resolveDroid('shared-droid');
+      const result = r.resolveAgent('shared-agent');
       assert.ok(result !== null);
       // Must be from project scope
-      assert.ok(result.includes('plugin-foo'), 'project scope must win for droids');
+      assert.ok(result.includes('plugin-foo'), 'project scope must win for agents');
     });
 
-    it('user scope droid overrides org scope droid', () => {
+    it('user scope agent overrides org scope agent', () => {
       const r = new PluginResolver({
         projectDir: path.join(tmpDir, 'empty-project'),
         userDir,
         orgDir,
       });
-      const result = r.resolveDroid('user-droid');
+      const result = r.resolveAgent('user-agent');
       assert.ok(result !== null);
       assert.ok(result.includes('plugin-bar'), 'user scope must win over org');
     });
 
-    it('falls back to org scope when droid is only in org', () => {
+    it('falls back to org scope when agent is only in org', () => {
       const r = new PluginResolver({ projectDir, userDir, orgDir });
-      const result = r.resolveDroid('org-droid');
+      const result = r.resolveAgent('org-agent');
       assert.ok(result !== null);
-      assert.ok(result.includes('plugin-baz'), 'org scope droid should be returned');
+      assert.ok(result.includes('plugin-baz'), 'org scope agent should be returned');
     });
 
-    it('resolved droid path exists on disk', () => {
+    it('resolved agent path exists on disk', () => {
       const r = new PluginResolver({ projectDir, userDir, orgDir });
-      const result = r.resolveDroid('project-droid');
+      const result = r.resolveAgent('project-agent');
       assert.ok(result !== null);
-      assert.ok(fs.existsSync(result), 'resolved droid path must exist');
+      assert.ok(fs.existsSync(result), 'resolved agent path must exist');
     });
   });
 

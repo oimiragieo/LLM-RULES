@@ -30,11 +30,15 @@ function makeValidManifest(overrides) {
   );
 }
 
-/** Writes plugin.json under pluginDir/.factory-plugin/plugin.json */
+/** Writes plugin.json under pluginDir/.claude-plugin/plugin.json */
 function writePluginJson(pluginDir, data) {
-  const factoryDir = path.join(pluginDir, '.factory-plugin');
-  fs.mkdirSync(factoryDir, { recursive: true });
-  fs.writeFileSync(path.join(factoryDir, 'plugin.json'), JSON.stringify(data, null, 2), 'utf8');
+  const claudePluginDir = path.join(pluginDir, '.claude-plugin');
+  fs.mkdirSync(claudePluginDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(claudePluginDir, 'plugin.json'),
+    JSON.stringify(data, null, 2),
+    'utf8'
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -91,7 +95,7 @@ describe('Plugin Manifest Schema', () => {
     it('exports expected subdirs array', () => {
       assert.ok(PLUGIN_STRUCTURE, 'PLUGIN_STRUCTURE must be exported');
       assert.ok(Array.isArray(PLUGIN_STRUCTURE.subdirs));
-      for (const dir of ['skills', 'hooks', 'droids', 'commands']) {
+      for (const dir of ['skills', 'hooks', 'agents', 'commands']) {
         assert.ok(PLUGIN_STRUCTURE.subdirs.includes(dir), `subdirs must include ${dir}`);
       }
     });
@@ -235,9 +239,9 @@ describe('Plugin Manifest Schema', () => {
 
     it('returns parse error (not crash) when plugin.json has invalid JSON', () => {
       const pluginDir = path.join(tmpDir, 'invalid-json-plugin');
-      const factoryDir = path.join(pluginDir, '.factory-plugin');
-      fs.mkdirSync(factoryDir, { recursive: true });
-      fs.writeFileSync(path.join(factoryDir, 'plugin.json'), '{ invalid json !!!', 'utf8');
+      const claudePluginDir = path.join(pluginDir, '.claude-plugin');
+      fs.mkdirSync(claudePluginDir, { recursive: true });
+      fs.writeFileSync(path.join(claudePluginDir, 'plugin.json'), '{ invalid json !!!', 'utf8');
 
       const result = loadManifest(pluginDir);
       assert.equal(result.valid, false);

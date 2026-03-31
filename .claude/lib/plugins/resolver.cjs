@@ -6,7 +6,7 @@
  * 3-scope plugin discovery and resolution.
  * Scopes are checked in priority order: project → user → org.
  *
- * For exclusive resources (skills, droids), the first match wins.
+ * For exclusive resources (skills, agents), the first match wins.
  * For additive resources (hooks), ALL matches across scopes are returned.
  *
  * Directory convention within each scope:
@@ -20,15 +20,15 @@
  *         <eventName>.cjs     ← hook as flat .cjs file
  *         <eventName>/        ← hook as directory of .cjs files
  *           *.cjs
- *       droids/
- *         <name>.md           ← droid as flat .md file
+ *       agents/
+ *         <name>.md           ← agent as flat .md file
  */
 
 const fs = require('node:fs');
 const path = require('node:path');
 
 /**
- * PluginResolver resolves skills, hooks, and droids across three plugin scopes.
+ * PluginResolver resolves skills, hooks, and agents across three plugin scopes.
  *
  * @example
  * const { PluginResolver } = require('.claude/lib/plugins/resolver.cjs');
@@ -207,22 +207,22 @@ class PluginResolver {
   }
 
   /**
-   * Resolve a droid by name, checking project → user → org scopes.
-   * Returns the path to the first matching droid file found.
+   * Resolve an agent by name, checking project → user → org scopes.
+   * Returns the path to the first matching agent file found.
    *
-   * Supports: droids/<name>.md
+   * Supports: agents/<name>.md
    *
-   * @param {string} name - Droid name to resolve
-   * @returns {string | null} Absolute path to the droid file, or null
+   * @param {string} name - Agent name to resolve
+   * @returns {string | null} Absolute path to the agent file, or null
    */
-  resolveDroid(name) {
+  resolveAgent(name) {
     for (const [, scopeDir] of this._scopes()) {
       const plugins = this._listPlugins(scopeDir);
       for (const pluginDir of plugins) {
-        const droidsDir = path.join(pluginDir, 'droids');
-        if (!fs.existsSync(droidsDir)) continue;
+        const agentsDir = path.join(pluginDir, 'agents');
+        if (!fs.existsSync(agentsDir)) continue;
 
-        const mdPath = path.join(droidsDir, `${name}.md`);
+        const mdPath = path.join(agentsDir, `${name}.md`);
         if (fs.existsSync(mdPath)) return mdPath;
       }
     }

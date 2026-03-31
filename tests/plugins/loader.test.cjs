@@ -8,7 +8,7 @@
  * Tests:
  * - loadSkill(skillName) finds and reads SKILL.md from installed plugin
  * - loadHooks(eventName) collects hooks from all installed plugins
- * - loadDroid(droidName) finds and reads droid .md from plugin
+ * - loadAgent(agentName) finds and reads agent .md from plugin
  * - Missing skill returns null, not crash
  * - Plugin skills available to persona-injector via search paths
  */
@@ -35,9 +35,9 @@ const { PluginLoader } = require('../../.claude/lib/plugins/loader.cjs');
  * @param {string[]} [opts.skills]   - Skill names to create (as name/SKILL.md)
  * @param {string[]} [opts.skillMds] - Skill names to create as flat .md files
  * @param {string[]} [opts.hooks]    - Hook event names to create (.cjs files)
- * @param {string[]} [opts.droids]   - Droid names to create (.md files)
+ * @param {string[]} [opts.agents]   - Agent names to create (.md files)
  * @param {object}  [opts.skillContents] - Map of skillName -> content override
- * @param {object}  [opts.droidContents] - Map of droidName -> content override
+ * @param {object}  [opts.agentContents] - Map of agentName -> content override
  */
 function createPlugin(scopeDir, pluginName, opts = {}) {
   const pluginDir = path.join(scopeDir, pluginName);
@@ -79,15 +79,15 @@ function createPlugin(scopeDir, pluginName, opts = {}) {
     }
   }
 
-  // Droids as flat .md files
-  if (opts.droids && opts.droids.length > 0) {
-    const droidsDir = path.join(pluginDir, 'droids');
-    fs.mkdirSync(droidsDir, { recursive: true });
-    for (const droid of opts.droids) {
+  // Agents as flat .md files
+  if (opts.agents && opts.agents.length > 0) {
+    const agentsDir = path.join(pluginDir, 'agents');
+    fs.mkdirSync(agentsDir, { recursive: true });
+    for (const agent of opts.agents) {
       const content =
-        (opts.droidContents && opts.droidContents[droid]) ||
-        `# Droid: ${droid}\nThis is the ${droid} droid.\n`;
-      fs.writeFileSync(path.join(droidsDir, `${droid}.md`), content, 'utf8');
+        (opts.agentContents && opts.agentContents[agent]) ||
+        `# Agent: ${agent}\nThis is the ${agent} agent.\n`;
+      fs.writeFileSync(path.join(agentsDir, `${agent}.md`), content, 'utf8');
     }
   }
 }
@@ -110,7 +110,7 @@ describe('PluginLoader', () => {
     userDir = path.join(tmpDir, 'user');
     orgDir = path.join(tmpDir, 'org');
 
-    // Project scope: plugin-alpha with 'project-skill', shared-skill, hook 'PreToolUse', droid 'nav-droid'
+    // Project scope: plugin-alpha with 'project-skill', shared-skill, hook 'PreToolUse', agent 'nav-agent'
     createPlugin(projectDir, 'plugin-alpha', {
       skills: ['project-skill', 'shared-skill'],
       skillContents: {
@@ -118,9 +118,9 @@ describe('PluginLoader', () => {
         'shared-skill': '# Shared Skill (project wins)\n',
       },
       hooks: ['PreToolUse'],
-      droids: ['nav-droid'],
-      droidContents: {
-        'nav-droid': '# Nav Droid\nNavigates the codebase.\n',
+      agents: ['nav-agent'],
+      agentContents: {
+        'nav-agent': '# Nav Agent\nNavigates the codebase.\n',
       },
     });
 
@@ -129,15 +129,15 @@ describe('PluginLoader', () => {
     createPlugin(userDir, 'plugin-beta', {
       skills: ['user-skill', 'shared-skill'],
       hooks: ['PreToolUse', 'PostToolUse'],
-      droids: ['user-droid'],
+      agents: ['user-agent'],
     });
 
-    // Org scope: plugin-gamma with 'org-skill', hook 'PostToolUse' (additive), droid 'org-droid'
+    // Org scope: plugin-gamma with 'org-skill', hook 'PostToolUse' (additive), agent 'org-agent'
     createPlugin(orgDir, 'plugin-gamma', {
       skills: ['org-skill'],
       skillMds: ['flat-skill'],
       hooks: ['PostToolUse'],
-      droids: ['org-droid'],
+      agents: ['org-agent'],
     });
 
     resolver = new PluginResolver({ projectDir, userDir, orgDir });
@@ -295,61 +295,61 @@ describe('PluginLoader', () => {
   });
 
   // -------------------------------------------------------------------------
-  // loadDroid(droidName)
+  // loadAgent(agentName)
   // -------------------------------------------------------------------------
-  describe('loadDroid()', () => {
-    it('returns null for a droid that does not exist in any scope', () => {
-      const result = loader.loadDroid('nonexistent-droid');
-      assert.equal(result, null, 'should return null for missing droid');
+  describe('loadAgent()', () => {
+    it('returns null for an agent that does not exist in any scope', () => {
+      const result = loader.loadAgent('nonexistent-agent');
+      assert.equal(result, null, 'should return null for missing agent');
     });
 
-    it('returns null rather than throwing for a missing droid (no crash)', () => {
-      assert.doesNotThrow(() => loader.loadDroid('ghost-droid'));
-      const result = loader.loadDroid('ghost-droid');
+    it('returns null rather than throwing for a missing agent (no crash)', () => {
+      assert.doesNotThrow(() => loader.loadAgent('ghost-agent'));
+      const result = loader.loadAgent('ghost-agent');
       assert.equal(result, null);
     });
 
-    it('returns an object with content for a found droid (VAL-PM-006)', () => {
-      const result = loader.loadDroid('nav-droid');
-      assert.ok(result !== null, 'should find nav-droid');
+    it('returns an object with content for a found agent (VAL-PM-006)', () => {
+      const result = loader.loadAgent('nav-agent');
+      assert.ok(result !== null, 'should find nav-agent');
       assert.ok(typeof result.content === 'string', 'result must have content string');
       assert.ok(result.content.length > 0, 'content must not be empty');
     });
 
-    it('content matches the droid .md file contents', () => {
-      const result = loader.loadDroid('nav-droid');
+    it('content matches the agent .md file contents', () => {
+      const result = loader.loadAgent('nav-agent');
       assert.ok(result !== null);
       assert.ok(
         result.content.includes('Navigates the codebase'),
-        'content should match droid .md'
+        'content should match agent .md'
       );
     });
 
     it('result includes path metadata', () => {
-      const result = loader.loadDroid('nav-droid');
+      const result = loader.loadAgent('nav-agent');
       assert.ok(result !== null);
       assert.ok(typeof result.path === 'string', 'result must have path');
     });
 
     it('path in result points to a file that actually exists', () => {
-      const result = loader.loadDroid('nav-droid');
+      const result = loader.loadAgent('nav-agent');
       assert.ok(result !== null);
       assert.ok(fs.existsSync(result.path), 'path should point to an existing file');
     });
 
-    it('finds user-droid from user scope', () => {
-      const result = loader.loadDroid('user-droid');
-      assert.ok(result !== null, 'should find user-droid');
+    it('finds user-agent from user scope', () => {
+      const result = loader.loadAgent('user-agent');
+      assert.ok(result !== null, 'should find user-agent');
     });
 
-    it('finds org-droid from org scope', () => {
-      const result = loader.loadDroid('org-droid');
-      assert.ok(result !== null, 'should find org-droid');
+    it('finds org-agent from org scope', () => {
+      const result = loader.loadAgent('org-agent');
+      assert.ok(result !== null, 'should find org-agent');
     });
 
     it('returns null when resolver has no scopes configured', () => {
       const emptyLoader = new PluginLoader(new PluginResolver({}));
-      const result = emptyLoader.loadDroid('any-droid');
+      const result = emptyLoader.loadAgent('any-agent');
       assert.equal(result, null);
     });
   });

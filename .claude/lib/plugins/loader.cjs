@@ -3,7 +3,7 @@
 /**
  * Plugin Loader
  *
- * Runtime loading of plugin skills, hooks, and droids.
+ * Runtime loading of plugin skills, hooks, and agents.
  * Wraps a PluginResolver to provide content-reading on top of path resolution.
  *
  * Integration with persona-injector:
@@ -27,9 +27,9 @@
  * const hooks = loader.loadHooks('PreToolUse');
  * // => [{ path: '...', scope: 'project', plugin: 'plugin-foo' }, ...]
  *
- * // Load droid content
- * const droid = loader.loadDroid('my-droid');
- * // => { content: '# My Droid\n...', path: '...' } | null
+ * // Load agent content
+ * const agent = loader.loadAgent('my-agent');
+ * // => { content: '# My Agent\n...', path: '...' } | null
  *
  * // Integrate with persona-injector
  * const persona = composePersona({
@@ -110,30 +110,30 @@ class PluginLoader {
   // ---------------------------------------------------------------------------
 
   /**
-   * Resolve a droid by name and read its .md content.
+   * Resolve an agent by name and read its .md content.
    *
    * Resolution follows the 3-scope priority defined by the resolver:
-   * project → user → org. The first matching droid wins.
+   * project → user → org. The first matching agent wins.
    *
    * Returns null (never throws) if:
-   * - No droid with that name is found in any scope
+   * - No agent with that name is found in any scope
    * - The resolved path cannot be read
    *
-   * @param {string} droidName - Droid name to load
+   * @param {string} agentName - Agent name to load
    * @returns {{ content: string, path: string } | null}
    */
-  loadDroid(droidName) {
-    const droidPath = this.resolver.resolveDroid(droidName);
-    if (!droidPath) return null;
+  loadAgent(agentName) {
+    const agentPath = this.resolver.resolveAgent(agentName);
+    if (!agentPath) return null;
 
     let content;
     try {
-      content = fs.readFileSync(droidPath, 'utf8');
+      content = fs.readFileSync(agentPath, 'utf8');
     } catch (_err) {
       return null;
     }
 
-    return { content, path: droidPath };
+    return { content, path: agentPath };
   }
 
   // ---------------------------------------------------------------------------

@@ -25,7 +25,7 @@ const {
 
 /**
  * Create a minimal valid plugin directory in targetDir with:
- *   .factory-plugin/plugin.json (valid manifest)
+ *   .claude-plugin/plugin.json (valid manifest)
  *   skills/example.md
  */
 function createFakePlugin(targetDir, overrides = {}) {
@@ -35,10 +35,10 @@ function createFakePlugin(targetDir, overrides = {}) {
     version: overrides.version || '1.0.0',
     author: { name: overrides.authorName || 'Test Author' },
   };
-  const factoryPluginDir = path.join(targetDir, '.factory-plugin');
-  fs.mkdirSync(factoryPluginDir, { recursive: true });
+  const claudePluginDir = path.join(targetDir, '.claude-plugin');
+  fs.mkdirSync(claudePluginDir, { recursive: true });
   fs.writeFileSync(
-    path.join(factoryPluginDir, 'plugin.json'),
+    path.join(claudePluginDir, 'plugin.json'),
     JSON.stringify(manifest, null, 2),
     'utf8'
   );
@@ -81,7 +81,7 @@ describe('Plugin CLI', () => {
 
       const destDir = path.join(pluginsDir, 'user', 'my-plugin');
       assert.ok(fs.existsSync(destDir), 'plugin destination directory should exist');
-      const manifestPath = path.join(destDir, '.factory-plugin', 'plugin.json');
+      const manifestPath = path.join(destDir, '.claude-plugin', 'plugin.json');
       assert.ok(fs.existsSync(manifestPath), 'manifest should be copied');
       const skillsPath = path.join(destDir, 'skills', 'example.md');
       assert.ok(fs.existsSync(skillsPath), 'skills file should be copied');
