@@ -1,0 +1,65 @@
+{
+  "milestone": "new-hook-events",
+  "round": 1,
+  "status": "pass",
+  "validatorsRun": {
+    "test": { "passed": true, "command": "node --test tests/hooks/subagent-start-iron-law.test.cjs tests/hooks/permission-denied-logger.test.cjs tests/hooks/session-start-watchpaths.test.cjs tests/hooks/new-hooks-registration.test.cjs tests/integration/cross-area-phase5.test.cjs", "exitCode": 0 },
+    "typecheck": { "passed": true, "command": "skipped", "exitCode": 0 },
+    "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 }
+  },
+  "reviewsSummary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "failedFeatures": []
+  },
+  "blockingIssues": [],
+  "appliedUpdates": [
+    {
+      "target": "library",
+      "description": "Documented that the correct path for agent-registry.json is .claude/context/agent-registry.json (not .claude/config/)",
+      "sourceFeature": "new-hook-session-start"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Relax the boundary constraint preventing modifications to root-level files if they fail pnpm format:check, or explicitly instruct workers to use 'git checkout -- <file>' to revert formatting changes in out-of-scope files.",
+      "evidence": "Worker noted pnpm format:check failed on CHANGELOG.md and README.md and could not fix them due to boundary rules.",
+      "isSystemic": true
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Clarify if standard JSON.parse is acceptable instead of safeParseJSON when dealing with non-prototype-sensitive data and strict Array checks, as used in the permission-denied-logger hook.",
+      "evidence": "new-hook-permission-denied used JSON.parse and justified it in a comment.",
+      "isSystemic": false
+    },
+    {
+      "target": ".factory/skills/hooks-worker",
+      "suggestion": "Update the skill procedure to note that when writing subprocess tests on Windows, `spawnSync` with an array of arguments should be used instead of `execSync` to avoid failures with spaces in paths (like NODE_BIN).",
+      "evidence": "new-hook-subagent-start worker hit Command failed errors with execSync and had to rewrite the test to use spawnSync.",
+      "isSystemic": true
+    },
+    {
+      "target": ".factory/skills/hooks-worker",
+      "suggestion": "Update the skill procedure to warn that naive security pattern checks (e.g., checking for 'process.cwd()') might fail if the forbidden string is inside a comment. Suggest writing test assertions that strip JSDoc/inline comments first.",
+      "evidence": "new-hook-session-start and new-hooks-registration-and-patterns workers both struggled with test assertions failing because 'process.cwd()' was in a comment.",
+      "isSystemic": true
+    }
+  ],
+  "rejectedObservations": [
+    {
+      "observation": "Worker noted that the 'hooks-worker' skill focuses mainly on settings.json and hook scripts, but this feature was primarily focused on integration test authoring.",
+      "reason": "Integration tests are a necessary part of the hooks work; no skill change needed."
+    },
+    {
+      "observation": "The worker suggested adding a note to the skill procedure about running prettier formatting on new files before running tests.",
+      "reason": "already-documented in general project conventions or implicitly handled by pnpm format:check."
+    },
+    {
+      "observation": "The verification step `rg 'process\\.cwd\\(\\)' .claude/hooks/lifecycle/ returns 0` is ambiguous because ripgrep returns exit code 0 when matches ARE found.",
+      "reason": "duplicate/handled by the suggestion to strip comments and write proper tests rather than using raw ripgrep in assertions."
+    }
+  ],
+  "previousRound": null
+}
