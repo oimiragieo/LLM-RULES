@@ -203,7 +203,7 @@
         ]
       },
       {
-        "matcher": "Glob|Grep|WebSearch",
+        "matcher": "Glob|Grep|WebSearch|TaskCreate|TaskOutput",
         "hooks": [
           {
             "type": "command",
@@ -213,17 +213,7 @@
         ]
       },
       {
-        "matcher": "Edit|Write|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/write-pretool-bundle.cjs",
-            "timeout_ms": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__filesystem__write_file|mcp__filesystem__edit_file",
+        "matcher": "Edit|Write|NotebookEdit|mcp__filesystem__write_file|mcp__filesystem__edit_file",
         "hooks": [
           {
             "type": "command",
@@ -267,26 +257,7 @@
           }
         ]
       },
-      {
-        "matcher": "TaskCreate",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs",
-            "timeout_ms": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "TaskOutput",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs",
-            "timeout_ms": 5000
-          }
-        ]
-      },
+
       {
         "matcher": "Task",
         "hooks": [
@@ -466,7 +437,7 @@
         ]
       },
       {
-        "matcher": "Edit|Write|NotebookEdit",
+        "matcher": "Edit|Write|NotebookEdit|MemoryRecord",
         "hooks": [
           {
             "type": "command",
@@ -515,17 +486,7 @@
           }
         ]
       },
-      {
-        "matcher": "MemoryRecord",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/memory/sync-memory-index.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
+
       {
         "matcher": "Task|TaskUpdate|Bash|MemoryRecord",
         "hooks": [
