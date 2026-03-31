@@ -15,7 +15,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/user-prompt-unified.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/user-prompt-unified.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -24,7 +25,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/force-step0-execution.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/force-step0-execution.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -34,7 +36,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/ccusage-statusline.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 5000
           }
         ]
       },
@@ -44,7 +47,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/startup-failopen-audit.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -54,7 +58,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/worktree-prune-on-start.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -64,7 +69,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/handover-detector.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -74,7 +80,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/session-budget-watchdog.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -84,7 +91,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/drift-detector.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -94,7 +102,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/stale-task-detector.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -104,7 +113,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/channels/channel-auto-start.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -114,7 +124,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/a2a/a2a-server-autostart.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -124,7 +135,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/audit-skill-recency.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 5000
           }
         ]
       }
@@ -135,7 +147,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/pre-tool-unified.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/pre-tool-unified.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -144,7 +157,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/router-tool-lockdown.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/router-tool-lockdown.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -153,7 +167,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/external-content-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/external-content-guard.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -162,7 +177,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/dlp-pretool.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/dlp-pretool.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -171,7 +187,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/bash-pretool-bundle.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/bash-pretool-bundle.cjs",
+            "timeout_ms": 10000
           }
         ]
       },
@@ -180,7 +197,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/hybrid-search-enforcer.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/hybrid-search-enforcer.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -189,7 +207,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -198,7 +217,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/write-pretool-bundle.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/write-pretool-bundle.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -207,7 +227,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/write-pretool-bundle.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/write-pretool-bundle.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -216,7 +237,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/evolution/conflict-detector.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/evolution/conflict-detector.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -225,7 +247,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/validate-skill-invocation.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/validate-skill-invocation.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -234,11 +257,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/reflection-step0-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/reflection-step0-guard.cjs",
+            "timeout_ms": 5000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/heartbeat-step05-check.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/heartbeat-step05-check.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -247,7 +272,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -256,7 +282,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/routing-guard.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -265,15 +292,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/worktree-preflight-check.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/worktree-preflight-check.cjs",
+            "timeout_ms": 5000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/spawn-token-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/spawn-token-guard.cjs",
+            "timeout_ms": 5000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/task-pretool-orchestrator.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/task-pretool-orchestrator.cjs",
+            "timeout_ms": 10000
           }
         ]
       },
@@ -282,7 +312,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/finish-only-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/finish-only-guard.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -291,19 +322,23 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/taskupdate-contract-validator.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/taskupdate-contract-validator.cjs",
+            "timeout_ms": 5000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/pre-completion-validation.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/pre-completion-validation.cjs",
+            "timeout_ms": 10000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/evolution/quality-gate-validator.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/evolution/quality-gate-validator.cjs",
+            "timeout_ms": 10000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/creator-compliance-validator.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/creator-compliance-validator.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -312,7 +347,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/pre-spawn-hook-check.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/pre-spawn-hook-check.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -321,7 +357,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/context-monitor.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/context-monitor.cjs",
+            "timeout_ms": 5000
           }
         ]
       }
@@ -333,22 +370,26 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/metrics/post-tool-metrics-unified.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 5000
           },
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/context-window-monitor.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 5000
           },
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/hook-error-detector.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 5000
           },
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/recurring-issue-detector.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 5000
           }
         ]
       },
@@ -357,7 +398,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/post-task-unified.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/post-task-unified.cjs",
+            "timeout_ms": 10000
           }
         ]
       },
@@ -418,7 +460,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/subagent-citation-guard.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/subagent-citation-guard.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -427,22 +470,26 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/bypass-audit-hook.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/bypass-audit-hook.cjs",
+            "timeout_ms": 5000
           },
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/memory/sync-memory-index.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           },
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/agent-registry-auto-refresh.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           },
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/code-index-updater.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -452,7 +499,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/post-edit-scanner.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -462,7 +510,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/analysis-paralysis-guard.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -472,7 +521,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/memory/sync-memory-index.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       },
@@ -482,7 +532,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/unified-reflection-handler.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       }
@@ -494,7 +545,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/metrics/post-tool-metrics-unified.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 5000
           }
         ]
       },
@@ -504,7 +556,8 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/unified-reflection-handler.cjs",
-            "async": true
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       }
@@ -515,27 +568,33 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/lifecycle/session-end-memory-promotion.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/lifecycle/session-end-memory-promotion.cjs",
+            "timeout_ms": 15000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/unified-reflection-handler.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/unified-reflection-handler.cjs",
+            "timeout_ms": 15000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/reflection-queue-processor.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/reflection/reflection-queue-processor.cjs",
+            "timeout_ms": 30000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/tools/cli/sanitize-debug-log.cjs --in-place",
+            "timeout_ms": 15000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/worktree-prune-on-start.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/worktree-prune-on-start.cjs",
+            "timeout_ms": 15000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/a2a/a2a-shutdown.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/a2a/a2a-shutdown.cjs",
+            "timeout_ms": 15000
           }
         ]
       }
@@ -546,7 +605,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/pre-compact.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/pre-compact.cjs",
+            "timeout_ms": 10000
           }
         ]
       }
@@ -557,15 +617,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/check-console-log.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/check-console-log.cjs",
+            "timeout_ms": 5000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/pre-compact.cjs"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/pre-compact.cjs",
+            "timeout_ms": 5000
           },
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/tools/cli/sanitize-debug-log.cjs --in-place",
+            "timeout_ms": 5000
           }
         ]
       }
