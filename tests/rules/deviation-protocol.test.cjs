@@ -13,11 +13,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
-const RULE_FILE = path.join(PROJECT_ROOT, '.claude', 'rules', 'deviation-protocol.md');
+// deviation-protocol.md was merged into deviation-rules.md (rules-merge-deviations feature)
+const RULE_FILE = path.join(PROJECT_ROOT, '.claude', 'rules', 'deviation-rules.md');
 
 describe('F-007: Deviation Rules Protocol', () => {
-  test('rule file exists at .claude/rules/deviation-protocol.md', () => {
-    assert.ok(fs.existsSync(RULE_FILE), `Expected deviation-protocol.md to exist at ${RULE_FILE}`);
+  test('rule file exists at .claude/rules/deviation-rules.md (merged)', () => {
+    assert.ok(fs.existsSync(RULE_FILE), `Expected deviation-rules.md to exist at ${RULE_FILE}`);
   });
 
   test('rule file contains all 4 deviation rules', () => {
