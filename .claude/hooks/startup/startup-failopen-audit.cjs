@@ -15,14 +15,20 @@
 
 const HOOK_NAME = 'startup-failopen-audit';
 
-const failOpenVars = Object.entries(process.env)
-  .filter(([k, v]) => k.endsWith('_FAIL_OPEN') && v === 'true')
-  .map(([k]) => k);
+function main() {
+  const failOpenVars = Object.entries(process.env)
+    .filter(([k, v]) => k.endsWith('_FAIL_OPEN') && v === 'true')
+    .map(([k]) => k);
 
-if (failOpenVars.length > 0) {
-  process.stderr.write(
-    `[${HOOK_NAME}] WARNING: ${failOpenVars.length} fail-open override(s) active: ${failOpenVars.join(', ')}\n`
-  );
+  if (failOpenVars.length > 0) {
+    process.stderr.write(
+      `[${HOOK_NAME}] WARNING: ${failOpenVars.length} fail-open override(s) active: ${failOpenVars.join(', ')}\n`
+    );
+  }
+
+  process.exit(0);
 }
 
-process.exit(0);
+if (require.main === module) {
+  main();
+}
