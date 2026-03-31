@@ -115,9 +115,7 @@ function writeLog(entries, logFile) {
  * @returns {{ tool: string, reason: string, timestamp: string, session_id: string }}
  */
 function buildEntry(hookInput) {
-  const tool = String(
-    (hookInput && (hookInput.tool_name || hookInput.tool)) || 'unknown'
-  );
+  const tool = String((hookInput && (hookInput.tool_name || hookInput.tool)) || 'unknown');
 
   const reason = String(
     (hookInput &&

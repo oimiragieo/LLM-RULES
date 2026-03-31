@@ -76,7 +76,11 @@ test('user-prompt-advisory-bundle.cjs file exists', () => {
 test('bundle exits 0 on valid UserPromptSubmit input', () => {
   const input = JSON.stringify({ prompt: 'Hello, what can you do?', session_id: 'test-session' });
   const result = runBundle(input);
-  assert.strictEqual(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    0,
+    `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+  );
 });
 
 test('bundle exits 0 on empty stdin', () => {
@@ -86,7 +90,11 @@ test('bundle exits 0 on empty stdin', () => {
 
 test('bundle exits 0 on malformed JSON stdin', () => {
   const result = runBundle('NOT VALID JSON {{{');
-  assert.strictEqual(result.status, 0, `Expected exit 0 on malformed input. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    0,
+    `Expected exit 0 on malformed input. stderr: ${result.stderr}`
+  );
 });
 
 test('bundle outputs valid JSON on stdout', () => {
@@ -112,10 +120,7 @@ test('bundle output JSON has allow:true (or equivalent)', () => {
 
 test('bundle imports ccusage-statusline (contains reference)', () => {
   const source = fs.readFileSync(BUNDLE_PATH, 'utf8');
-  assert.ok(
-    source.includes('ccusage-statusline'),
-    'Bundle must import ccusage-statusline.cjs'
-  );
+  assert.ok(source.includes('ccusage-statusline'), 'Bundle must import ccusage-statusline.cjs');
 });
 
 test('bundle imports startup-failopen-audit (contains reference)', () => {
@@ -144,18 +149,12 @@ test('bundle imports session-budget-watchdog (contains reference)', () => {
 
 test('bundle imports drift-detector (contains reference)', () => {
   const source = fs.readFileSync(BUNDLE_PATH, 'utf8');
-  assert.ok(
-    source.includes('drift-detector'),
-    'Bundle must import drift-detector.cjs'
-  );
+  assert.ok(source.includes('drift-detector'), 'Bundle must import drift-detector.cjs');
 });
 
 test('bundle imports stale-task-detector (contains reference)', () => {
   const source = fs.readFileSync(BUNDLE_PATH, 'utf8');
-  assert.ok(
-    source.includes('stale-task-detector'),
-    'Bundle must import stale-task-detector.cjs'
-  );
+  assert.ok(source.includes('stale-task-detector'), 'Bundle must import stale-task-detector.cjs');
 });
 
 test('bundle has try/catch per sub-function for error isolation (VAL-HO-012)', () => {
@@ -171,19 +170,27 @@ test('kill-switch CCUSAGE_STATUSLINE=off skips ccusage output', () => {
   const source = fs.readFileSync(BUNDLE_PATH, 'utf8');
   assert.ok(
     source.includes('CCUSAGE_STATUSLINE'),
-    "Bundle must check CCUSAGE_STATUSLINE kill-switch env var"
+    'Bundle must check CCUSAGE_STATUSLINE kill-switch env var'
   );
 });
 
 test('bundle is marked async:true in settings.json UserPromptSubmit', () => {
-  const bundleRegs = findRegistrations(settings, 'user-prompt-advisory-bundle.cjs', 'UserPromptSubmit');
+  const bundleRegs = findRegistrations(
+    settings,
+    'user-prompt-advisory-bundle.cjs',
+    'UserPromptSubmit'
+  );
   assert.ok(bundleRegs.length > 0, 'Bundle must be registered in UserPromptSubmit');
   const asyncRegs = bundleRegs.filter(r => r.hook.async === true);
   assert.ok(asyncRegs.length > 0, 'Bundle registration must have async:true');
 });
 
 test('bundle has timeout_ms in settings.json UserPromptSubmit', () => {
-  const bundleRegs = findRegistrations(settings, 'user-prompt-advisory-bundle.cjs', 'UserPromptSubmit');
+  const bundleRegs = findRegistrations(
+    settings,
+    'user-prompt-advisory-bundle.cjs',
+    'UserPromptSubmit'
+  );
   assert.ok(bundleRegs.length > 0, 'Bundle must be registered in UserPromptSubmit');
   for (const { hook } of bundleRegs) {
     assert.ok(
@@ -194,7 +201,11 @@ test('bundle has timeout_ms in settings.json UserPromptSubmit', () => {
 });
 
 test('settings.json has exactly 1 UserPromptSubmit advisory bundle registration (VAL-HO-006)', () => {
-  const bundleRegs = findRegistrations(settings, 'user-prompt-advisory-bundle.cjs', 'UserPromptSubmit');
+  const bundleRegs = findRegistrations(
+    settings,
+    'user-prompt-advisory-bundle.cjs',
+    'UserPromptSubmit'
+  );
   assert.strictEqual(
     bundleRegs.length,
     1,
@@ -223,7 +234,9 @@ test('individual advisory UserPromptSubmit scripts are NOT separately registered
   // Check worktree-prune-on-start separately since it might be in other events (SessionEnd, etc.)
   const wpRegs = findRegistrations(settings, 'worktree-prune-on-start.cjs', 'UserPromptSubmit');
   // The startup version may still exist in UserPromptSubmit; the session version should not be separate
-  const sessionWpRegs = wpRegs.filter(r => r.hook.command && r.hook.command.includes('/startup/worktree-prune-on-start.cjs'));
+  const sessionWpRegs = wpRegs.filter(
+    r => r.hook.command && r.hook.command.includes('/startup/worktree-prune-on-start.cjs')
+  );
   assert.strictEqual(
     sessionWpRegs.length,
     0,

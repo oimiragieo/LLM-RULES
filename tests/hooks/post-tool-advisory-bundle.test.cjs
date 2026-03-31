@@ -73,9 +73,17 @@ test('post-tool-advisory-bundle.cjs file exists', () => {
 });
 
 test('bundle exits 0 on valid PostToolUse input', () => {
-  const input = JSON.stringify({ tool_name: 'Bash', tool_output: 'output here', session_id: 'test-session' });
+  const input = JSON.stringify({
+    tool_name: 'Bash',
+    tool_output: 'output here',
+    session_id: 'test-session',
+  });
   const result = runBundle(input);
-  assert.strictEqual(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    0,
+    `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+  );
 });
 
 test('bundle exits 0 on empty stdin', () => {
@@ -85,11 +93,19 @@ test('bundle exits 0 on empty stdin', () => {
 
 test('bundle exits 0 on malformed JSON stdin', () => {
   const result = runBundle('NOT VALID JSON {{{');
-  assert.strictEqual(result.status, 0, `Expected exit 0 on malformed input. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    0,
+    `Expected exit 0 on malformed input. stderr: ${result.stderr}`
+  );
 });
 
 test('bundle outputs valid JSON on stdout', () => {
-  const input = JSON.stringify({ tool_name: 'Read', tool_output: 'file content', session_id: 'test' });
+  const input = JSON.stringify({
+    tool_name: 'Read',
+    tool_output: 'file content',
+    session_id: 'test',
+  });
   const result = runBundle(input);
   assert.strictEqual(result.status, 0);
   assert.doesNotThrow(() => {
@@ -116,10 +132,7 @@ test('bundle imports context-window-monitor (contains reference)', () => {
 
 test('bundle imports hook-error-detector (contains reference)', () => {
   const source = fs.readFileSync(BUNDLE_PATH, 'utf8');
-  assert.ok(
-    source.includes('hook-error-detector'),
-    'Bundle must import hook-error-detector.cjs'
-  );
+  assert.ok(source.includes('hook-error-detector'), 'Bundle must import hook-error-detector.cjs');
 });
 
 test('bundle imports recurring-issue-detector (contains reference)', () => {

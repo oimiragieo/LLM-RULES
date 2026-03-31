@@ -270,7 +270,11 @@ describe('permission-denied-logger hook', () => {
 
       const entries = JSON.parse(fs.readFileSync(logFile, 'utf8'));
       assert.strictEqual(entries.length, max);
-      assert.strictEqual(entries[0].tool, 'tool-1', 'First entry should be tool-1 (oldest trimmed)');
+      assert.strictEqual(
+        entries[0].tool,
+        'tool-1',
+        'First entry should be tool-1 (oldest trimmed)'
+      );
       assert.strictEqual(entries[max - 1].tool, 'newest', 'Last entry should be newest');
     });
 
