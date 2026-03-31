@@ -17,6 +17,13 @@ If you want a local-first, reproducible agent stack with strict validation and h
 
 ## Recent Changes
 
+### Phase 4 — Hermes Assimilation (Competitive Parity)
+- **Intelligent runtime**: Cost pricing table with real $/MTok rates and auto-downgrade (opus->sonnet->haiku), flight recorder redaction with SENSITIVE_KEYS, mixture-of-agents consensus tool (96 tests)
+- **Autonomous skills**: Skill auto-creator from session transcripts with Jaccard similarity and security scanning, SQLite FTS5 full-text search over session JSONL logs (79 tests)
+- **Execution infrastructure**: Process registry with spawn/stop/checkpoint/restore and stdout RingBuffer, plugin tool registration with manifest schema extension (55 tests)
+- **Cross-area integration**: Budget-aware background tasks, redacted log secrets, skill creation with plugin tool refs, cost-to-budget flow (20 tests)
+- **Source**: 8 high-value features assimilated from nousresearch/hermes-agent (~20K LOC analyzed)
+
 ### Phase 3 — Self-Evolving Skills, GitHub Integration, Nomenclature & Production Audit
 - **Self-evolving skills**: Usage tracking, pattern detection, suggestion generation, evolution triggers (91 tests)
 - **GitHub integration**: CLI client wrapping `gh`, webhook simulator, mention parser, task dispatcher, CI status reporter (152 tests)
@@ -116,7 +123,7 @@ Agent Studio natively supports integrating with other headless LLM Code CLIs (Ge
 
 ## Systems Architecture
 
-Agent Studio includes several integrated subsystems built across three development phases:
+Agent Studio includes several integrated subsystems built across four development phases:
 
 | System | Path | Purpose |
 |--------|------|---------|
@@ -130,6 +137,10 @@ Agent Studio includes several integrated subsystems built across three developme
 | Observability CLI | `.claude/lib/monitoring/` | Unified log aggregation, alert management, cost tracking |
 | Self-Evolving Skills | `.claude/lib/evolution/` | Usage tracking, pattern detection, suggestion generation, evolution triggers |
 | GitHub Integration | `.claude/lib/github/` | `gh` CLI wrapper, webhook simulation, mention parsing, CI status reporting |
+| Consensus Engine | `.claude/lib/consensus/` | Mixture-of-agents fan-out, multi-model consensus synthesis |
+| Skill Auto-Creator | `.claude/lib/evolution/` | Session transcript analysis, autonomous skill generation, security scanning |
+| Session FTS Index | `.claude/lib/memory/` | SQLite FTS5 full-text search over session JSONL logs |
+| Process Registry | `.claude/lib/workers/` | Background process lifecycle, checkpoint/restore, stdout ring buffer |
 
 ## Framework Upgrade Initiative (Phase 1 Complete)
 
