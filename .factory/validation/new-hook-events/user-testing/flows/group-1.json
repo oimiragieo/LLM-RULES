@@ -1,0 +1,12 @@
+{
+  "testedAssertions": ["VAL-NE-001", "VAL-NE-002", "VAL-NE-005", "VAL-NE-006"],
+  "results": {
+    "VAL-NE-001": { "status": "pass" },
+    "VAL-NE-002": { "status": "pass" },
+    "VAL-NE-005": { "status": "pass" },
+    "VAL-NE-006": { "status": "pass" }
+  },
+  "frictions": [],
+  "blockers": [],
+  "toolsUsed": ["execute-cli"]
+}

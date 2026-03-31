@@ -1,0 +1,27 @@
+{
+  "testedAssertions": [
+    "VAL-CROSS-001",
+    "VAL-CROSS-002",
+    "VAL-CROSS-003",
+    "VAL-CROSS-004"
+  ],
+  "results": {
+    "VAL-CROSS-001": {
+      "status": "pass"
+    },
+    "VAL-CROSS-002": {
+      "status": "pass"
+    },
+    "VAL-CROSS-003": {
+      "status": "pass"
+    },
+    "VAL-CROSS-004": {
+      "status": "pass"
+    }
+  },
+  "frictions": [],
+  "blockers": [],
+  "toolsUsed": [
+    "execute-cli"
+  ]
+}

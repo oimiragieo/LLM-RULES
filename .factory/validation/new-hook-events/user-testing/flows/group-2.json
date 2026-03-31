@@ -1,0 +1,54 @@
+{
+  "groupId": "group-2",
+  "testedAt": "2026-03-31T00:00:00.000Z",
+  "isolation": {},
+  "toolsUsed": ["execute-cli"],
+  "assertions": [
+    {
+      "id": "VAL-NE-003",
+      "status": "pass",
+      "steps": [],
+      "evidence": {
+        "logs": "permission-denied-logger-test.log"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-NE-004",
+      "status": "pass",
+      "steps": [],
+      "evidence": {
+        "logs": "permission-denied-logger-test.log"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-NE-007",
+      "status": "pass",
+      "steps": [],
+      "evidence": {
+        "logs": "new-hooks-registration-test.log"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-NE-008",
+      "status": "pass",
+      "steps": [],
+      "evidence": {
+        "logs": "new-hooks-registration-test.log"
+      },
+      "issues": null
+    }
+  ],
+  "testedAssertions": ["VAL-NE-003", "VAL-NE-004", "VAL-NE-007", "VAL-NE-008"],
+  "results": {
+    "VAL-NE-003": { "status": "pass" },
+    "VAL-NE-004": { "status": "pass" },
+    "VAL-NE-007": { "status": "pass" },
+    "VAL-NE-008": { "status": "pass" }
+  },
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 4 assertions: 4 passed"
+}
