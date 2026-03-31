@@ -5,6 +5,21 @@
  * Verifies that advisory/monitoring hooks have async:true in settings.json,
  * and that security/blocking hooks do NOT have async:true.
  *
+ * After the hooks-consolidation feature, 10 advisory hooks are no longer
+ * individually registered — they are bundled into consolidated entry points:
+ *
+ *   UserPromptSubmit advisory bundle (user-prompt-advisory-bundle.cjs):
+ *     ccusage-statusline, startup-failopen-audit, worktree-prune-on-start,
+ *     session-budget-watchdog, drift-detector, stale-task-detector
+ *
+ *   PostToolUse advisory bundle (post-tool-advisory-bundle.cjs):
+ *     post-tool-metrics-unified, context-window-monitor,
+ *     hook-error-detector, recurring-issue-detector
+ *
+ * For consolidated hooks, this test verifies:
+ *   1. The bundle is registered in settings.json with async:true
+ *   2. The bundle source code references each consolidated hook script
+ *
  * Tests VAL-HO-002 and VAL-HO-003.
  */
 
@@ -17,6 +32,27 @@ const path = require('node:path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const SETTINGS_PATH = path.join(PROJECT_ROOT, '.claude', 'settings.json');
+
+// ─── Bundle file paths ────────────────────────────────────────────────────────
+
+const USER_PROMPT_BUNDLE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'session',
+  'user-prompt-advisory-bundle.cjs'
+);
+
+const POST_TOOL_BUNDLE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'monitoring',
+  'post-tool-advisory-bundle.cjs'
+);
+
+const USER_PROMPT_BUNDLE_SCRIPT = 'user-prompt-advisory-bundle.cjs';
+const POST_TOOL_BUNDLE_SCRIPT = 'post-tool-advisory-bundle.cjs';
 
 // ─── Load settings.json ───────────────────────────────────────────────────────
 
@@ -60,7 +96,7 @@ function findHookRegistrations(settings, scriptName, eventFilter) {
   return results;
 }
 
-// ─── Advisory hooks: must have async:true in advisory event categories ────────
+// ─── Advisory events ──────────────────────────────────────────────────────────
 
 /**
  * Event categories where async:true makes sense (tools are being blocked or
@@ -69,25 +105,44 @@ function findHookRegistrations(settings, scriptName, eventFilter) {
  */
 const ADVISORY_EVENTS = ['UserPromptSubmit', 'PostToolUse', 'PostToolUseFailure'];
 
+// ─── Consolidated hooks (now inside bundles) ──────────────────────────────────
+
 /**
- * The 22 advisory/monitoring hooks that should be marked async:true.
- * Keyed by display name → script filename.
+ * Hooks consolidated into user-prompt-advisory-bundle.cjs.
+ * These are no longer individually registered in settings.json.
+ * Verified by: bundle registration + bundle source referencing each script.
  */
-const ADVISORY_HOOKS = {
+const USER_PROMPT_BUNDLE_HOOKS = {
   'ccusage-statusline': 'ccusage-statusline.cjs',
   'startup-failopen-audit': 'startup-failopen-audit.cjs',
   'worktree-prune-on-start': 'worktree-prune-on-start.cjs',
   'session-budget-watchdog': 'session-budget-watchdog.cjs',
   'drift-detector': 'drift-detector.cjs',
   'stale-task-detector': 'stale-task-detector.cjs',
-  'channel-auto-start': 'channel-auto-start.cjs',
-  'a2a-server-autostart': 'a2a-server-autostart.cjs',
-  'audit-skill-recency': 'audit-skill-recency.cjs',
-  'handover-detector': 'handover-detector.cjs',
+};
+
+/**
+ * Hooks consolidated into post-tool-advisory-bundle.cjs.
+ * These are no longer individually registered in settings.json (PostToolUse).
+ */
+const POST_TOOL_BUNDLE_HOOKS = {
   'post-tool-metrics-unified': 'post-tool-metrics-unified.cjs',
   'context-window-monitor': 'context-window-monitor.cjs',
   'hook-error-detector': 'hook-error-detector.cjs',
   'recurring-issue-detector': 'recurring-issue-detector.cjs',
+};
+
+// ─── Individual advisory hooks (still registered directly) ───────────────────
+
+/**
+ * Advisory/monitoring hooks that are STILL individually registered in settings.json
+ * (not consolidated into bundles). Each must have async:true in advisory events.
+ */
+const ADVISORY_HOOKS_INDIVIDUAL = {
+  'channel-auto-start': 'channel-auto-start.cjs',
+  'a2a-server-autostart': 'a2a-server-autostart.cjs',
+  'audit-skill-recency': 'audit-skill-recency.cjs',
+  'handover-detector': 'handover-detector.cjs',
   'sync-memory-index': 'sync-memory-index.cjs',
   'agent-registry-auto-refresh': 'agent-registry-auto-refresh.cjs',
   'code-index-updater': 'code-index-updater.cjs',
@@ -129,12 +184,129 @@ test('settings.json is valid JSON', () => {
   assert.ok(settings.hooks && typeof settings.hooks === 'object', 'settings.json must have hooks');
 });
 
-// ─── Advisory hooks have async:true ──────────────────────────────────────────
+// ─── Bundle registrations ─────────────────────────────────────────────────────
 
-test('advisory hooks are registered in settings.json', () => {
+test('user-prompt-advisory-bundle.cjs is registered in UserPromptSubmit with async:true', () => {
+  const regs = findHookRegistrations(settings, USER_PROMPT_BUNDLE_SCRIPT, ['UserPromptSubmit']);
+  assert.ok(
+    regs.length > 0,
+    'user-prompt-advisory-bundle.cjs must be registered in UserPromptSubmit'
+  );
+  for (const { hook } of regs) {
+    assert.strictEqual(
+      hook.async,
+      true,
+      `user-prompt-advisory-bundle.cjs must have async:true (found: ${JSON.stringify(hook)})`
+    );
+  }
+});
+
+test('post-tool-advisory-bundle.cjs is registered in PostToolUse with async:true', () => {
+  const regs = findHookRegistrations(settings, POST_TOOL_BUNDLE_SCRIPT, ['PostToolUse']);
+  assert.ok(regs.length > 0, 'post-tool-advisory-bundle.cjs must be registered in PostToolUse');
+  for (const { hook } of regs) {
+    assert.strictEqual(
+      hook.async,
+      true,
+      `post-tool-advisory-bundle.cjs must have async:true (found: ${JSON.stringify(hook)})`
+    );
+  }
+});
+
+// ─── Consolidated hooks: verified via bundle source + bundle registration ─────
+
+test('user-prompt advisory bundle source references all 6 consolidated hooks', () => {
+  assert.ok(
+    fs.existsSync(USER_PROMPT_BUNDLE_PATH),
+    `Bundle file not found at ${USER_PROMPT_BUNDLE_PATH}`
+  );
+  const source = fs.readFileSync(USER_PROMPT_BUNDLE_PATH, 'utf8');
+
+  const missing = [];
+  for (const [name, scriptFile] of Object.entries(USER_PROMPT_BUNDLE_HOOKS)) {
+    if (!source.includes(scriptFile)) {
+      missing.push(name);
+    }
+  }
+  assert.deepStrictEqual(
+    missing,
+    [],
+    `user-prompt-advisory-bundle must reference these scripts: ${missing.join(', ')}`
+  );
+});
+
+test('post-tool advisory bundle source references all 4 consolidated hooks', () => {
+  assert.ok(
+    fs.existsSync(POST_TOOL_BUNDLE_PATH),
+    `Bundle file not found at ${POST_TOOL_BUNDLE_PATH}`
+  );
+  const source = fs.readFileSync(POST_TOOL_BUNDLE_PATH, 'utf8');
+
+  const missing = [];
+  for (const [name, scriptFile] of Object.entries(POST_TOOL_BUNDLE_HOOKS)) {
+    if (!source.includes(scriptFile)) {
+      missing.push(name);
+    }
+  }
+  assert.deepStrictEqual(
+    missing,
+    [],
+    `post-tool-advisory-bundle must reference these scripts: ${missing.join(', ')}`
+  );
+});
+
+// Individual tests for each consolidated hook in user-prompt-advisory-bundle
+for (const [name, scriptFile] of Object.entries(USER_PROMPT_BUNDLE_HOOKS)) {
+  test(`consolidated hook "${name}" is handled via user-prompt-advisory-bundle.cjs`, () => {
+    // Verify: no individual registration in UserPromptSubmit
+    const individualRegs = findHookRegistrations(settings, scriptFile, ['UserPromptSubmit']);
+    assert.strictEqual(
+      individualRegs.length,
+      0,
+      `${name} must not have a separate UserPromptSubmit registration (it is bundled)`
+    );
+
+    // Verify: the bundle IS registered with async:true
+    const bundleRegs = findHookRegistrations(settings, USER_PROMPT_BUNDLE_SCRIPT, [
+      'UserPromptSubmit',
+    ]);
+    assert.ok(bundleRegs.length > 0, 'user-prompt-advisory-bundle must be registered');
+    const hasAsync = bundleRegs.some(r => r.hook.async === true);
+    assert.ok(hasAsync, 'user-prompt-advisory-bundle must have async:true');
+
+    // Verify: bundle source code references this script
+    const source = fs.readFileSync(USER_PROMPT_BUNDLE_PATH, 'utf8');
+    assert.ok(
+      source.includes(scriptFile),
+      `user-prompt-advisory-bundle must import/reference ${scriptFile}`
+    );
+  });
+}
+
+// Individual tests for each consolidated hook in post-tool-advisory-bundle
+for (const [name, scriptFile] of Object.entries(POST_TOOL_BUNDLE_HOOKS)) {
+  test(`consolidated hook "${name}" is handled via post-tool-advisory-bundle.cjs`, () => {
+    // Verify: the bundle IS registered with async:true in PostToolUse
+    const bundleRegs = findHookRegistrations(settings, POST_TOOL_BUNDLE_SCRIPT, ['PostToolUse']);
+    assert.ok(bundleRegs.length > 0, 'post-tool-advisory-bundle must be registered in PostToolUse');
+    const hasAsync = bundleRegs.some(r => r.hook.async === true);
+    assert.ok(hasAsync, 'post-tool-advisory-bundle must have async:true');
+
+    // Verify: bundle source code references this script
+    const source = fs.readFileSync(POST_TOOL_BUNDLE_PATH, 'utf8');
+    assert.ok(
+      source.includes(scriptFile),
+      `post-tool-advisory-bundle must import/reference ${scriptFile}`
+    );
+  });
+}
+
+// ─── Individual advisory hooks have async:true ────────────────────────────────
+
+test('individual advisory hooks are registered in settings.json', () => {
   const missing = [];
 
-  for (const [name, scriptFile] of Object.entries(ADVISORY_HOOKS)) {
+  for (const [name, scriptFile] of Object.entries(ADVISORY_HOOKS_INDIVIDUAL)) {
     const registrations = findHookRegistrations(settings, scriptFile, ADVISORY_EVENTS);
     if (registrations.length === 0) {
       missing.push(name);
@@ -144,14 +316,14 @@ test('advisory hooks are registered in settings.json', () => {
   assert.deepStrictEqual(
     missing,
     [],
-    `Advisory hooks not found in settings.json advisory events: ${missing.join(', ')}`
+    `Individual advisory hooks not found in settings.json advisory events: ${missing.join(', ')}`
   );
 });
 
-test('all advisory hook registrations in advisory events have async:true', () => {
+test('all individual advisory hook registrations in advisory events have async:true', () => {
   const missing = [];
 
-  for (const [name, scriptFile] of Object.entries(ADVISORY_HOOKS)) {
+  for (const [name, scriptFile] of Object.entries(ADVISORY_HOOKS_INDIVIDUAL)) {
     const registrations = findHookRegistrations(settings, scriptFile, ADVISORY_EVENTS);
 
     for (const { eventName, matcher, hook } of registrations) {
@@ -164,13 +336,12 @@ test('all advisory hook registrations in advisory events have async:true', () =>
   assert.deepStrictEqual(
     missing,
     [],
-    `Advisory hooks missing async:true:\n  ${missing.join('\n  ')}`
+    `Individual advisory hooks missing async:true:\n  ${missing.join('\n  ')}`
   );
 });
 
-// Individual advisory hook tests for each of the 22 hooks
-
-for (const [name, scriptFile] of Object.entries(ADVISORY_HOOKS)) {
+// Individual tests for each non-consolidated advisory hook
+for (const [name, scriptFile] of Object.entries(ADVISORY_HOOKS_INDIVIDUAL)) {
   test(`advisory hook "${name}" has async:true in all advisory event registrations`, () => {
     const registrations = findHookRegistrations(settings, scriptFile, ADVISORY_EVENTS);
     assert.ok(

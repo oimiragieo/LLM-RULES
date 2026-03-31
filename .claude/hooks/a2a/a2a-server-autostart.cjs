@@ -25,11 +25,65 @@ const RUNTIME = path.join(ROOT, '.claude', 'context', 'runtime');
 const LOCKFILE = path.join(RUNTIME, 'a2a-autostart-cooldown.lock');
 const COOLDOWN_MS = 120000; // 2 minutes
 
-function main() {
-  // Drain stdin passively (prevent EPIPE) — never gate logic on it
-  process.stdin.resume();
-  process.stdin.on('data', () => {});
-  process.stdin.on('end', () => {});
+/**
+ * Sentinel file path for once-per-session guard.
+ * Does NOT persist across sessions (session-scoped by session_id).
+ */
+const A2A_SENTINEL_PATH = path.join(RUNTIME, 'a2a-server-autostart.sentinel');
+
+/**
+ * Check if this startup hook has already fired for the current session.
+ *
+ * @param {string|null} sessionId - Current session ID (from hook input stdin)
+ * @returns {boolean} true if already fired this session, false otherwise
+ */
+function hasStartupAlreadyFired(sessionId) {
+  try {
+    if (!fs.existsSync(A2A_SENTINEL_PATH)) return false;
+    const data = JSON.parse(fs.readFileSync(A2A_SENTINEL_PATH, 'utf8'));
+    if (!data) return false;
+    // Unknown session ID: use timestamp-based deduplication (1-hour window)
+    if (!sessionId) {
+      if (typeof data.firedAt === 'string') {
+        const elapsed = Date.now() - new Date(data.firedAt).getTime();
+        return elapsed < 60 * 60 * 1000; // 1 hour
+      }
+      return false;
+    }
+    return data.sessionId === sessionId;
+  } catch (_err) {
+    return false; // Fail-open
+  }
+}
+
+/**
+ * Write the session-scoped startup sentinel.
+ *
+ * @param {string|null} sessionId - Current session ID
+ */
+function writeStartupSentinel(sessionId) {
+  try {
+    fs.mkdirSync(RUNTIME, { recursive: true });
+    const tmp = A2A_SENTINEL_PATH + '.tmp.' + process.pid;
+    fs.writeFileSync(
+      tmp,
+      JSON.stringify({ sessionId: sessionId || 'unknown', firedAt: new Date().toISOString() }),
+      'utf8'
+    );
+    fs.renameSync(tmp, A2A_SENTINEL_PATH);
+  } catch (_err) {
+    // Non-fatal
+  }
+}
+
+function runMain(sessionId) {
+  // Quick sentinel check — skip if already fired this session (<50ms path)
+  if (hasStartupAlreadyFired(sessionId)) {
+    return;
+  }
+
+  // Write sentinel immediately so subsequent prompts skip fast
+  writeStartupSentinel(sessionId);
 
   try {
     // ── 1. Atomic lockfile gate ───────────────────────────────────────────────
@@ -262,6 +316,40 @@ Write-Output $proc.Id
   process.exit(0);
 }
 
+/**
+ * Main entry point — reads stdin for session_id, then calls runMain().
+ *
+ * Reads stdin asynchronously to extract session_id from hook input JSON.
+ * Falls back to null if stdin is empty or malformed.
+ */
+function main() {
+  const chunks = [];
+  process.stdin.on('data', c => chunks.push(c));
+  process.stdin.on('error', () => {
+    runMain(null);
+  });
+  process.stdin.on('end', () => {
+    let sessionId = null;
+    try {
+      const raw = Buffer.concat(chunks).toString('utf8').trim();
+      if (raw) {
+        const input = JSON.parse(raw);
+        sessionId = input && typeof input.session_id === 'string' ? input.session_id : null;
+      }
+    } catch (_err) {
+      // Malformed stdin — proceed without session_id
+    }
+    runMain(sessionId);
+  });
+}
+
 if (require.main === module) {
   main();
 }
+
+// ─── Exports for testing ──────────────────────────────────────────────────────
+module.exports = {
+  hasStartupAlreadyFired,
+  writeStartupSentinel,
+  A2A_SENTINEL_PATH,
+};
