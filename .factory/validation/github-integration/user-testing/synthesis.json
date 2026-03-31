@@ -1,0 +1,22 @@
+{
+  "milestone": "github-integration",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-GH-001",
+    "VAL-GH-002",
+    "VAL-GH-003",
+    "VAL-GH-004",
+    "VAL-GH-005"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
