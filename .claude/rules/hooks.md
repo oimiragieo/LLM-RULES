@@ -1,3 +1,10 @@
+---
+description: Hook system rules and patterns for .claude/hooks/**
+paths:
+  - '.claude/hooks/**'
+  - '.claude/settings.json'
+---
+
 # Hooks
 
 ## Core Rules

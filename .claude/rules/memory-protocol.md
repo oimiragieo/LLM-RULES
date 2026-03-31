@@ -1,3 +1,10 @@
+---
+description: Memory protocol rules for reading/writing agent memory
+paths:
+  - '.claude/context/memory/**'
+  - '.claude/lib/memory/**'
+---
+
 # Memory Protocol
 
 - Read memory context via `loadMemoryForContext()` (auto-injected into spawn prompts) or `node .claude/lib/memory/memory-manager.cjs load` before starting any task. (Note: `learnings.md` is a legacy read-only archive.)
@@ -65,77 +72,32 @@ Markdown memory files are rotated based on file size:
 - `memory-tiers.cjs` - STM/MTM/LTM session tier management
 - `contextual-memory.cjs` - Semantic search and entity query interface
 
-**Named memory API** (for topic-specific notes in `.claude/context/memory/named/`):
+**Named memory API** (`.claude/context/memory/named/`):
 
 ```javascript
 const manager = require('.claude/lib/memory/memory-manager.cjs');
-
-// Read a named memory
-const content = await manager.readMemory('topic-name');
-
-// Write a named memory
-await manager.writeMemory('topic-name', 'Content here');
-
-// List all named memories
-const names = await manager.listMemories();
-
-// Delete a named memory
-await manager.deleteMemory('topic-name');
+await manager.readMemory('topic');
+await manager.writeMemory('topic', 'content');
+await manager.listMemories();
+await manager.deleteMemory('topic');
 ```
 
-**Structured memory API** (for gotchas, patterns, discoveries):
+**Structured memory API** (gotchas/patterns/discoveries):
 
 ```javascript
-const manager = require('.claude/lib/memory/memory-manager.cjs');
-
-manager.recordGotcha({ text: 'Windows paths need normalization', area: 'platform' });
-manager.recordPattern({ text: 'Use shell: false for child_process', area: 'security' });
-manager.recordDiscovery({ text: 'BM25 indexer supports lazy IDF', area: 'search' });
+manager.recordGotcha({ text: '...', area: 'platform' });
+manager.recordPattern({ text: '...', area: 'security' });
+manager.recordDiscovery({ text: '...', area: 'search' });
 ```
 
-**Additional data stores** (in `.claude/context/memory/`):
+**Additional stores** (`.claude/context/memory/`): `gotchas.json`, `patterns.json`, `access-stats.json`, `open-findings.json`, `codebase_map.json`, `maintenance-status.json`, `active_context.md`, `reflection-log.jsonl`.
 
-- `gotchas.json` — Gotcha records
-- `patterns.json` — Pattern records
-- `access-stats.json` — Access statistics
-- `open-findings.json` — Open audit findings
-- `codebase_map.json` — File discovery tracking
-- `maintenance-status.json` — Weekly maintenance tracking
-- `active_context.md` — Current context state
-- `reflection-log.jsonl` — Reflection session log
+## Agent Teams Memory Synchronization (WAL Protocol)
+
+> **DESIGN SPEC — Not yet enforced at runtime.** During Agent Teams parallel execution, each session should write memory deltas to an isolated queue file (`.claude/context/memory/queue/session-{id}.jsonl`) to prevent concurrent write collisions. After all sessions complete, the Router spawns memory-manager to reconcile, deduplicate, and append approved entries to canonical memory files. Until the enforcement hook is implemented, agents use direct-write paths and concurrent write collisions are possible.
 
 ## Related References
 
 - Memory management rebuild architecture (documented in `.claude/docs/MEMORY_SYSTEM.md`)
 - `.claude/lib/memory/` - Memory subsystem implementation
 - `context-compressor` skill - Compression strategies
-
-## Agent Teams Memory Synchronization (WAL Protocol)
-
-> **DESIGN SPECIFICATION — Not yet enforced at runtime.** This section describes the intended WAL protocol for Agent Teams parallel execution. The protocol requires runtime enforcement (a PreToolUse hook or equivalent) to redirect memory writes during Agent Teams sessions. Until that hook is implemented, agents will continue using direct-write paths and concurrent write collisions are possible.
-
-When running Agent Teams (multi-session parallel execution), each session writes memory deltas to an isolated queue file to prevent concurrent write collisions.
-
-### Queue Files
-
-- Location: `.claude/context/memory/queue/`
-- Format: `session-{id}.jsonl` (one JSON object per line)
-- Each entry: `{ "timestamp": "ISO", "source": "session-id", "type": "learning|decision|issue|pattern|gotcha", "content": "...", "scope": "local|global", "confidence": 0.0-1.0 }`
-
-### Write Protocol
-
-1. During Agent Teams execution, agents write ONLY to their session queue file
-2. Never write directly to canonical memory files during parallel execution
-3. Each queue entry includes source session ID for traceability
-
-### Merge Protocol (Router-Mediated)
-
-1. After all Agent Teams sessions complete, Router spawns memory-manager to reconcile
-2. memory-manager reads all queue files, deduplicates, resolves conflicts by timestamp
-3. Approved entries are appended to canonical memory files
-4. Queue files are archived to `.claude/context/memory/queue/archive/`
-
-### Cleanup
-
-- Queue files older than 24 hours are auto-archived
-- Archive files older than 7 days may be deleted

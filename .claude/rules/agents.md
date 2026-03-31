@@ -54,37 +54,13 @@ See `.claude/context/agent-registry.json` for full list of 110 agents.
 | "integrate repo/onboard" | researcher | **artifact-integrator**   |
 | "debug production"       | developer  | **devops-troubleshooter** |
 
-**Why**: 110 agents exist. Specialists have domain-specific prompts, skills, and patterns. Using developer for specialist work produces inferior results.
-
-## Intent Classification (Semantic Matching)
-
-**Pattern**: Route by semantic intent, not just keywords.
-
-**Implementation**:
-
-- `fuzzy-intent-matcher.cjs` - Semantic similarity scoring
-- `routing-table.cjs` - Intent → Agent mapping
-- `routing-guard.cjs` - Enforcement hook (warns on misrouting)
-
-**Example**:
-
-```
-User: "improve code readability"
-Intent: "refactor" (semantic match)
-Agent: code-simplifier (NOT developer)
-```
-
 ## Routing Reminders
 
-- Complex request (multi-step, architecture) → **planner** (mandatory)
+- Complex/multi-step → **planner** (mandatory)
 - Code written → **code-reviewer**
-- Security-sensitive (auth, PII, integrations) → **security-architect** (mandatory)
-- Documentation needed → **technical-writer**
-- Testing strategy → **qa**
-- Multi-phase work → **master-orchestrator**
-- Infrastructure/deployment → **devops**
-- Database design → **database-architect**
-- Bug fix with unclear root cause → **developer** + **debugging** skill
+- Auth/PII/security → **security-architect** (mandatory)
+- Docs → **technical-writer** | Tests → **qa** | Multi-phase → **master-orchestrator**
+- Infra/deploy → **devops** | Database design → **database-architect**
 
 ## Router Self-Check Gates
 
@@ -98,6 +74,4 @@ Before spawning, Router checks 4 gates:
 ## Related References
 
 - `@AGENT_ROUTING_TABLE.md` - Complete agent routing matrix
-- `.claude/lib/routing/routing-table.cjs` - Source of truth for routing
-- `.claude/lib/routing/fuzzy-intent-matcher.cjs` - Semantic intent matching
 - `routing-guard.cjs` - Enforcement hook for specialist routing
