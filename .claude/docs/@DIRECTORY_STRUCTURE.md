@@ -158,7 +158,7 @@ hooks/
 
 ### lib/
 
-**Total Active Modules:** 191 modules (~32,000 LOC est.) across 21 active subdirectories
+**Total Active Modules:** 403 modules across 50 active subdirectories
 **Archived Modules:** ~80 modules (~12,600 LOC) in 10 archived subsystems (2026-02-07)
 
 ```
@@ -181,22 +181,100 @@ lib/
 ├── error-pattern-detector.cjs
 ├── error-writer.cjs
 ├── events/                 # Event bus (event-bus.cjs, event-types.cjs - 15+ consumers)
+├── evolution/              # Self-evolution system
+│   ├── evolution-request-router.cjs
+│   ├── evolution-trigger.cjs
+│   ├── pattern-detector.cjs
+│   ├── skill-usage-tracker.cjs
+│   └── suggestion-generator.cjs
 ├── evolution-state-sync.cjs
-├── memory/                 # Memory management (8/32 modules active)
+├── exec/                   # Execution engine
+│   ├── autonomy.cjs
+│   ├── engine.cjs
+│   └── output-formatter.cjs
+├── github/                 # GitHub integration
+│   ├── ci-status-reporter.cjs
+│   ├── cli-client.cjs
+│   ├── mention-parser.cjs
+│   ├── task-dispatcher.cjs
+│   └── webhook-simulator.cjs
+├── memory/                 # Memory management (50+ modules across memory/, ingestion/, prompts/)
 │   ├── memory-manager.cjs
 │   ├── memory-scheduler.cjs
 │   ├── memory-tiers.cjs
-│   └── smart-pruner.cjs
+│   ├── smart-pruner.cjs
+│   ├── knowledge-exporter.cjs
+│   ├── cross-repo-registry.cjs
+│   ├── federated-query.cjs
+│   ├── relationship-inferrer.cjs
+│   ├── contextual-memory.cjs
+│   ├── entity-extractor.cjs
+│   ├── findings-registry.cjs
+│   ├── cold-storage.cjs
+│   ├── ingestion/          # Memory ingestion pipeline
+│   └── prompts/            # Memory prompt templates
 ├── ml/                     # Machine learning utilities
-├── monitoring/             # System monitoring
+├── monitoring/             # System monitoring (15 modules)
+│   ├── alert-manager.cjs
+│   ├── cost-reporter.cjs
+│   ├── flight-recorder.cjs
+│   ├── log-aggregator.cjs
+│   ├── metrics-reader.cjs
+│   ├── metrics-schema.cjs
+│   ├── observability-cli.cjs
+│   ├── production-alerts.cjs
+│   ├── spawn-log.cjs
+│   └── violation-tracker.cjs
+├── mission/                # Mission engine (14 modules)
+│   ├── agents-parser.cjs
+│   ├── features-state-machine.cjs
+│   ├── friction-loop.cjs
+│   ├── handoff-watcher.cjs
+│   ├── milestone-gate.cjs
+│   ├── mission-parser.cjs
+│   ├── persona-injector.cjs
+│   ├── scrutiny-reviewer.cjs
+│   ├── state-mutex.cjs
+│   ├── validation-contract-parser.cjs
+│   ├── validation-state-gatekeeper.cjs
+│   ├── worker-features-dispatcher.cjs
+│   └── workspace-provisioner.cjs
 ├── plan/                   # Planning utilities
 ├── platform.cjs            # Platform detection
 ├── platform.mjs            # Platform detection (ESM)
+├── plugins/                # Plugin system (6 modules)
+│   ├── cli.cjs
+│   ├── loader.cjs
+│   ├── manifest.cjs
+│   ├── marketplace.cjs
+│   ├── registry.cjs
+│   └── resolver.cjs
 ├── qa/                     # QA utilities
 │   └── gate.mjs (relocated from tools/gates/)
-├── routing/                # Router state and routing table (core)
+├── readiness/              # Readiness assessment (5 modules)
+│   ├── readiness-cli.cjs
+│   ├── readiness-config.cjs
+│   ├── readiness-remediation.cjs
+│   ├── readiness-scorer.cjs
+│   └── report-formatter.cjs
+├── review/                 # Code review engine (4 modules)
+│   ├── adversarial-evaluator.cjs
+│   ├── diff-engine.cjs
+│   ├── pipeline.cjs
+│   └── severity.cjs
+├── routing/                # Router state and routing table (core, 29 modules)
 │   ├── routing-table.cjs   # Intent-to-agent mapping (20+ consumers)
-│   └── router-state.cjs    # Router/agent mode state machine (3 hooks)
+│   ├── router-state.cjs    # Router/agent mode state machine (3 hooks)
+│   ├── model-registry.cjs  # Model registry and configuration
+│   ├── cost-predictor.cjs  # Model cost prediction
+│   ├── provider-compat.cjs # Provider compatibility layer
+│   ├── model-router.cjs    # Model selection routing
+│   ├── budget-engine.cjs   # Token budget management
+│   ├── intent-classifier.cjs
+│   ├── a2a-dispatch.cjs
+│   ├── circuit-breaker.cjs
+│   ├── semantic-router.cjs
+│   └── sub-router-selection.cjs
 ├── safety/                 # Safety utilities
 ├── skill-build/            # Skill building utilities
 ├── spawn/                  # Agent spawning utilities
@@ -233,22 +311,28 @@ lib/
 - 10 entire subsystems archived to `_archive/` (2026-02-07)
 - All archived code preserved in git history via `git mv` (not delete)
 - Each archive has README.md with original purpose, archival reason, and ADR reference
-- Module count before archival: 233 → Current active: 191 (18% reduction post-archival)
-- LOC reduction: 66,676 → ~32,000 (52% LOC reduction)
+- Module count before archival: 233 → Current active: 403 (growth since archival due to new subsystems)
+- LOC reduction from archival preserved; new modules added across 50 subdirectories
 
 ### rules/
 
 ```
 rules/
 ├── agents.md
+├── cleanup-always.md
 ├── code-standards.md
+├── deviation-protocol.md
+├── deviation-rules.md
+├── documentation-always.md
+├── file-deletion-safety.md
 ├── git-workflow.md
 ├── hooks.md
 ├── memory-protocol.md
-├── performance.md
+├── plan-file-update.md
 ├── security.md
+├── sharp-edges.md
+├── shell-command-safety.md
 ├── task-tracking.md
-├── testing.md
 └── workspace-conventions.md
 ```
 

@@ -1,11 +1,117 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to Agent Studio are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Phase 3 — Self-Evolving Skills, GitHub Integration, Nomenclature & Production Audit
+
+#### Added
+- **Self-evolving skill system** (`.claude/lib/evolution/`)
+  - `SkillUsageTracker` — JSONL-based invocation recording with success rates, latency tracking
+  - `PatternDetector` — Analyzes usage data for frequently-failing, underutilized, high-latency, and co-occurring skill patterns
+  - `SuggestionGenerator` — Generates optimize/split/merge/deprecate suggestions from detected patterns
+  - `EvolutionTrigger` — Wires detection pipeline to evolution request router with configurable confidence thresholds
+  - 91 tests across 4 modules
+
+- **GitHub integration** (`.claude/lib/github/`)
+  - `GitHubCLI` — Wrapper around `gh` CLI for PR creation, commenting, diffing, listing, reviewing, merging
+  - `WebhookSimulator` — Synthetic GitHub webhook payload generation with EventBus dispatch (push, pull_request, issue_comment)
+  - `MentionParser` — Parses @agent-studio mentions in comments, excludes code blocks
+  - `TaskDispatcher` — Dispatches parsed mentions to worker pool with task tracking
+  - `CIStatusReporter` — Formats test results, review findings, and mission status as PR comments
+  - Extended `event-types.cjs` with WEBHOOK_RECEIVED, PR_EVENT, ISSUE_COMMENT event types
+  - 152 tests across 5 modules
+
+#### Changed
+- **Nomenclature cleanup** — Renamed `droid` → `agent` and `.factory-plugin` → `.claude-plugin` across plugin system
+  - `resolveDroid()` → `resolveAgent()` in resolver.cjs
+  - `loadDroid()` → `loadAgent()` in loader.cjs
+  - Plugin manifest subdirectory `droids/` → `agents/`
+  - Plugin manifest path `.factory-plugin/plugin.json` → `.claude-plugin/plugin.json`
+  - Persona injector: "General Worker Droid" → "General Worker Agent"
+  - All corresponding test files updated
+
+#### Fixed
+- **Missing hooks** — Created functional implementations for `context-monitor.cjs` (context window usage monitoring with 70%/85% thresholds) and `audit-skill-recency.cjs` (skill staleness detection). All 62 hooks in settings.json now exist and pass syntax validation.
+- **Stub scripts** — Replaced 6 stub scripts with functional implementations: `implementation-readiness/scripts/main.cjs`, `github-mcp` pre/post-execute hooks, `differential-review` pre/post-execute hooks, `github-ops.cjs` tool
+- **Routing wiring** — Added flat routing keywords for 32 previously unreachable agents. Fixed 7 misrouted keywords (wordpress→wordpress-master, kotlin→kotlin-pro, spring→spring-boot-pro, sql→sql-pro, postgres→postgres-pro). Fixed data_science intent routing (data-engineer→data-scientist). Fixed claude-md-auditor model config (removed embedded quotes).
+- **Broken imports** — Added `require.main === module` guards to 4 hooks that called `process.exit(0)` at module top level (startup-failopen-audit, channel-auto-start, a2a-server-autostart, a2a-shutdown). Fixed all broken require() paths.
+- **Test coverage gaps** — Added smoke tests for 14 previously untested `.claude/lib/` modules in events/ and utils/ subdirectories (67 tests)
+
+### Phase 2 — Model Routing, Readiness CLI, Knowledge Graph & Observability
+
+#### Added
+- **Model routing system** (`.claude/lib/routing/`)
+  - `ModelRegistry` — JSON-config-based model registry with shorthand aliases and capability-based selection
+  - `CostPredictor` — Token estimation and cost prediction with model suggestion and budget status
+  - `ProviderCompat` — Multi-provider compatibility layer with feature support detection
+  - `ModelRouter` — Dynamic model selection integrating intent, cost, and budget constraints
+  - `BudgetEngine` — Phase allocation, budget status thresholds, auto-downgrade chain (opus→sonnet→haiku)
+  - Model registry config at `.claude/config/model-registry.json` (3 Anthropic models with pricing/capabilities)
+  - 174 tests across 5 modules
+
+- **Readiness CLI** (`.claude/lib/readiness/`)
+  - `ReadinessCLI` — Commander-based CLI with score/report/remediate commands
+  - `ReportFormatter` — 4-format output (terminal/markdown/JSON/summary)
+  - `ReadinessConfig` — Deep-merge configuration with per-pillar thresholds
+  - 123 tests across 3 modules
+
+- **Cross-repo knowledge graph** (`.claude/lib/memory/`)
+  - `KnowledgeExporter` — Export knowledge to `~/.claude/knowledge/<hash>/export.json`
+  - `CrossRepoRegistry` — Track projects in `~/.claude/knowledge/registry.json`
+  - `FederatedQuery` — Search entities and find relationships across registered projects
+  - `RelationshipInferrer` — Infer relationships from dependencies, imports, and cross-repo links
+  - 119 tests across 4 modules
+
+- **Observability CLI** (`.claude/lib/monitoring/`)
+  - `LogAggregator` — Merge 5 JSONL log streams with time/type/component filters
+  - `AlertManager` — Alert evaluation, acknowledgment, and history with 6 threshold rules
+  - `CostReporter` — Session/daily cost tracking, model breakdown, trend analysis
+  - `ObservabilityCLI` — Commander CLI with status/events/alerts/costs commands
+  - 169 tests across 4 modules
+
+#### Fixed
+- **Readiness null JSON crash** — Added type guard for `JSON.parse('null')` in readiness-config.cjs
+- **Readiness pillarThresholds** — Fixed loadConfig to preserve user-provided pillarThresholds
+
+### Phase 1 — Mission Orchestrator, Plugin Marketplace, Headless Execution & Code Review
+
+#### Added
+- **Mission orchestrator** (`.claude/lib/mission/`)
+  - Dispatch loop with feature assignment and worker session management
+  - Handoff pipeline for structured worker return data
+  - Milestone gates with completion verification
+  - State recovery for interrupted missions
+  - E2E integration tests
+  - 100+ tests
+
+- **Plugin marketplace** (`.claude/lib/plugins/`)
+  - `PluginManifest` — Manifest validation with required structure (skills/hooks/agents/commands)
+  - `PluginResolver` — 3-scope resolution (local/user/global)
+  - `PluginLoader` — Runtime agent loading from plugin packages
+  - `PluginRegistry` — Plugin registration and discovery
+  - `PluginMarketplace` — Git-based plugin marketplace
+  - `PluginCLI` — Commander-based CLI for plugin management
+  - 160 tests across 6 modules
+
+- **Headless execution engine** (`.claude/lib/exec/`)
+  - `AutonomyTiers` — 5-tier permission enforcement (read-only through full-auto)
+  - `OutputFormatter` — Multi-format output (JSON/markdown/SARIF/JUnit)
+  - `ExecEngine` — Headless execution with autonomy enforcement
+  - 139 tests across 3 modules
+
+- **Code review pipeline** (`.claude/lib/review/`)
+  - `DiffEngine` — Git diff parsing and structured representation
+  - `SeverityCriteria` — P0-P3 severity classification
+  - `ReviewPipeline` — 2-pass review with 8-criteria bug detection
+  - 101 tests across 3 modules
+
+#### Fixed
+- **HandoffWatcher Windows polling** — Fixed re-detection after debounce with pipeline.stop()
 
 ### Phase 8 — System Repair Mission (2026-03-29)
 

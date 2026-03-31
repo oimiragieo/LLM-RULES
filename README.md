@@ -15,14 +15,32 @@ If you want a local-first, reproducible agent stack with strict validation and h
 `Memory System` · `.claude/docs/MEMORY_SYSTEM.md`  
 `Code Indexing` · `.claude/docs/CODE_INDEXING_DESIGN.md`
 
-## Recent Changes (Phase 8 — System Repair)
+## Recent Changes
 
+### Phase 3 — Self-Evolving Skills, GitHub Integration, Nomenclature & Production Audit
+- **Self-evolving skills**: Usage tracking, pattern detection, suggestion generation, evolution triggers (91 tests)
+- **GitHub integration**: CLI client wrapping `gh`, webhook simulator, mention parser, task dispatcher, CI status reporter (152 tests)
+- **Nomenclature cleanup**: `droid` → `agent`, `.factory-plugin` → `.claude-plugin` across plugin system
+- **Production audit**: Fixed all missing hooks (62 verified), replaced stub scripts, wired 32 unreachable agents to flat routing, fixed 7 misrouted keywords, fixed broken imports, added smoke tests for 14 untested modules (178 tests)
+
+### Phase 2 — Model Routing, Readiness CLI, Knowledge Graph & Observability
+- **Model routing**: Registry, cost prediction, provider compatibility, dynamic router with budget-aware auto-downgrade (opus→sonnet→haiku) (174 tests)
+- **Readiness CLI**: Score/report/remediate commands with 4-format output (terminal/markdown/JSON/summary) (123 tests)
+- **Cross-repo knowledge graph**: Federated query across repositories, relationship inference, portable exports to `~/.claude/knowledge/` (119 tests)
+- **Observability CLI**: Unified log aggregation, alert management, cost reporting with status/events/alerts/costs commands (169 tests)
+
+### Phase 1 — Mission Orchestrator, Plugin Marketplace, Headless Execution & Code Review
+- **Mission orchestrator**: Dispatch loop, handoff pipeline, milestone gates, state recovery, E2E tests (100+ tests)
+- **Plugin marketplace**: Manifest validation, 3-scope resolution, git marketplace, runtime loading (160 tests)
+- **Headless execution**: 5-tier autonomy, 4 output formats (JSON/markdown/SARIF/JUnit), permission enforcement (139 tests)
+- **Code review pipeline**: Diff parsing, P0-P3 severity, 8-criteria bug detection, 2-pass review pipeline (101 tests)
+
+### Phase 8 — System Repair (Prior)
 - **Test suite**: 201 failures → 0 (framework 3256/0, tools 462/0)
-- **Reflection system**: Fixed score normalization, registered missing hooks, token reporting with structural detection, TokenAccountant persistence
-- **A2A Protocol**: Auto-start hook, graceful shutdown, lazy client dispatch, file-IPC fallback
+- **Reflection system**: Fixed score normalization, registered missing hooks, token reporting
+- **A2A Protocol**: Auto-start hook, graceful shutdown, lazy client dispatch
 - **Skills ecosystem**: 69 low-scoring skills improved to 100; average score 87 → 96
-- **Windows platform**: YAML block scalar parsing, path resolution, glob expansion, rule-index determinism fixes
-- **All gates green**: `validate:full`, `metrics:ci`, `integration:headless` 144/144, `lint`, `format:check`
+- **Windows platform**: YAML block scalar parsing, path resolution, glob expansion fixes
 
 See [`CHANGELOG.md`](CHANGELOG.md) for full details.
 
@@ -90,11 +108,28 @@ Agent Studio natively supports integrating with other headless LLM Code CLIs (Ge
 
 ## Current Footprint
 
-- Agents: 102 files (includes 12 isolated worktree variants)
-- Skills: 630 `SKILL.md` definitions
-- Rules: 113 docs
-- Schemas: 319 `*.schema.json`
-- Commands: 263 `.claude/commands/*.md`
+- Agents: 119 files (includes 12 isolated worktree variants)
+- Skills: 476 `SKILL.md` definitions
+- Rules: 16 docs
+- Schemas: 318 `*.schema.json`
+- Commands: 262 `.claude/commands/*.md`
+
+## Systems Architecture
+
+Agent Studio includes several integrated subsystems built across three development phases:
+
+| System | Path | Purpose |
+|--------|------|---------|
+| Mission Orchestrator | `.claude/lib/mission/` | Dispatch loop, handoff pipeline, milestone gates, state recovery |
+| Plugin Marketplace | `.claude/lib/plugins/` | Manifest validation, 3-scope resolution, git marketplace, runtime loading |
+| Headless Execution | `.claude/lib/exec/` | 5-tier autonomy enforcement, multi-format output (JSON/markdown/SARIF/JUnit) |
+| Code Review Pipeline | `.claude/lib/review/` | Diff parsing, P0-P3 severity classification, 8-criteria bug detection |
+| Model Router | `.claude/lib/routing/` | Cost-aware model selection, budget engine with auto-downgrade chain |
+| Readiness CLI | `.claude/lib/readiness/` | Project readiness scoring, configurable thresholds, 4-format reporting |
+| Knowledge Graph | `.claude/lib/memory/` | Cross-repo federated query, relationship inference, portable exports |
+| Observability CLI | `.claude/lib/monitoring/` | Unified log aggregation, alert management, cost tracking |
+| Self-Evolving Skills | `.claude/lib/evolution/` | Usage tracking, pattern detection, suggestion generation, evolution triggers |
+| GitHub Integration | `.claude/lib/github/` | `gh` CLI wrapper, webhook simulation, mention parsing, CI status reporting |
 
 ## Framework Upgrade Initiative (Phase 1 Complete)
 
@@ -771,7 +806,7 @@ The `debug-log-analysis` skill (`Skill({ skill: 'debug-log-analysis' })`) docume
 
 ## Skills Catalog
 
-> **129 active skills** across 21 categories. Full details: [`.claude/context/artifacts/catalogs/skill-catalog.md`](.claude/context/artifacts/catalogs/skill-catalog.md)
+> **476 active skills** across 21 categories. Full details: [`.claude/context/artifacts/catalogs/skill-catalog.md`](.claude/context/artifacts/catalogs/skill-catalog.md)
 >
 > Invoke any skill: `Skill({ skill: 'name' })`
 
