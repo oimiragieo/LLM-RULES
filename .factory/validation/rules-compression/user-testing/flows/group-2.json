@@ -1,0 +1,58 @@
+{
+  "groupId": "group-2",
+  "testedAt": "2026-03-31T15:07:00Z",
+  "isolation": {
+    "directory": "C:\\dev\\projects\\agent-studio"
+  },
+  "toolsUsed": ["grep", "head", "stat", "ls"],
+  "results": [
+    {
+      "assertionId": "VAL-RC-007",
+      "status": "pass",
+      "evidence": "rules-compression/group-2/VAL-RC-007-head.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": ["head"]
+    },
+    {
+      "assertionId": "VAL-RC-008",
+      "status": "pass",
+      "evidence": "rules-compression/group-2/VAL-RC-008-head.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": ["head"]
+    },
+    {
+      "assertionId": "VAL-RC-009",
+      "status": "pass",
+      "evidence": "rules-compression/group-2/VAL-RC-009-size-and-grep.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": ["stat", "grep"]
+    },
+    {
+      "assertionId": "VAL-RC-010",
+      "status": "pass",
+      "evidence": "rules-compression/group-2/VAL-RC-010-size-and-content.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": ["stat", "grep"]
+    },
+    {
+      "assertionId": "VAL-RC-011",
+      "status": "pass",
+      "evidence": "rules-compression/group-2/VAL-RC-011-size-and-grep.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": ["stat", "grep"]
+    },
+    {
+      "assertionId": "VAL-RC-012",
+      "status": "pass",
+      "evidence": "rules-compression/group-2/VAL-RC-012-ls.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": ["ls"]
+    }
+  ]
+}

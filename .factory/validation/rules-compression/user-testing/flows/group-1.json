@@ -1,0 +1,89 @@
+{
+  "groupId": "group-1",
+  "testedAt": "2026-03-31T15:00:00Z",
+  "isolation": {
+    "directory": "C:\\dev\\projects\\agent-studio",
+    "network": "none"
+  },
+  "toolsUsed": [
+    "node",
+    "grep",
+    "ls",
+    "stat",
+    "rg"
+  ],
+  "results": [
+    {
+      "assertionId": "VAL-RC-001",
+      "status": "pass",
+      "evidence": "rules-compression/group-1/VAL-RC-001-character-budget.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": [
+        "node"
+      ]
+    },
+    {
+      "assertionId": "VAL-RC-002",
+      "status": "pass",
+      "evidence": "rules-compression/group-1/VAL-RC-002-router-critical-sections.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": [
+        "grep"
+      ]
+    },
+    {
+      "assertionId": "VAL-RC-003",
+      "status": "pass",
+      "evidence": "rules-compression/group-1/VAL-RC-003-claude-size.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": [
+        "stat"
+      ]
+    },
+    {
+      "assertionId": "VAL-RC-004",
+      "status": "pass",
+      "evidence": "rules-compression/group-1/VAL-RC-004-deviation-merged.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": [
+        "grep",
+        "ls"
+      ]
+    },
+    {
+      "assertionId": "VAL-RC-005",
+      "status": "pass",
+      "evidence": "rules-compression/group-1/VAL-RC-005-safety-merged.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": [
+        "grep",
+        "ls"
+      ]
+    },
+    {
+      "assertionId": "VAL-RC-006",
+      "status": "pass",
+      "evidence": "rules-compression/group-1/VAL-RC-006-cross-references.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": [
+        "grep"
+      ]
+    },
+    {
+      "assertionId": "VAL-RC-013",
+      "status": "pass",
+      "evidence": "rules-compression/group-1/VAL-RC-013-iron-law.txt",
+      "frictions": [],
+      "blockers": [],
+      "toolsUsed": [
+        "grep"
+      ]
+    }
+  ]
+}

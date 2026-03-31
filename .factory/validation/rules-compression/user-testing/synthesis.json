@@ -1,0 +1,30 @@
+{
+  "milestone": "rules-compression",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 13,
+    "passed": 13,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-RC-001",
+    "VAL-RC-002",
+    "VAL-RC-003",
+    "VAL-RC-004",
+    "VAL-RC-005",
+    "VAL-RC-006",
+    "VAL-RC-007",
+    "VAL-RC-008",
+    "VAL-RC-009",
+    "VAL-RC-010",
+    "VAL-RC-011",
+    "VAL-RC-012",
+    "VAL-RC-013"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
