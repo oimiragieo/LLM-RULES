@@ -15,10 +15,7 @@ function readRule(name) {
 // VAL-RC-009: security.md compressed retaining core concepts
 test('security.md is under 4600 chars', () => {
   const content = readRule('security.md');
-  assert.ok(
-    content.length < 4600,
-    `security.md is ${content.length} chars, expected < 4600`
-  );
+  assert.ok(content.length < 4600, `security.md is ${content.length} chars, expected < 4600`);
 });
 
 test('security.md retains shell:false rule', () => {
@@ -31,10 +28,7 @@ test('security.md retains shell:false rule', () => {
 
 test('security.md retains safeParseJSON reference', () => {
   const content = readRule('security.md');
-  assert.ok(
-    /safeParseJSON/i.test(content),
-    'security.md must contain safeParseJSON reference'
-  );
+  assert.ok(/safeParseJSON/i.test(content), 'security.md must contain safeParseJSON reference');
 });
 
 test('security.md retains ASI01 reference', () => {
@@ -70,10 +64,7 @@ test('security.md retains memory poisoning concept', () => {
 
 test('security.md retains least privilege concept', () => {
   const content = readRule('security.md');
-  assert.ok(
-    /least privilege/i.test(content),
-    'security.md must contain least privilege reference'
-  );
+  assert.ok(/least privilege/i.test(content), 'security.md must contain least privilege reference');
 });
 
 // VAL-RC-011: memory-protocol.md compressed retaining architecture
@@ -102,10 +93,7 @@ test('memory-protocol.md retains LTM reference', () => {
 
 test('memory-protocol.md retains rotation concept', () => {
   const content = readRule('memory-protocol.md');
-  assert.ok(
-    /rotation|rotated/i.test(content),
-    'memory-protocol.md must contain rotation concept'
-  );
+  assert.ok(/rotation|rotated/i.test(content), 'memory-protocol.md must contain rotation concept');
 });
 
 test('memory-protocol.md retains named memory API', () => {
@@ -135,10 +123,7 @@ test('memory-protocol.md retains budget thresholds', () => {
 // VAL-RC-008: memory-protocol.md has valid paths frontmatter
 test('memory-protocol.md has valid YAML frontmatter', () => {
   const content = readRule('memory-protocol.md');
-  assert.ok(
-    content.startsWith('---\n'),
-    'memory-protocol.md must start with --- YAML frontmatter'
-  );
+  assert.ok(content.startsWith('---\n'), 'memory-protocol.md must start with --- YAML frontmatter');
   const endOfFrontmatter = content.indexOf('\n---\n', 4);
   assert.ok(endOfFrontmatter !== -1, 'memory-protocol.md must have closing --- frontmatter');
   const frontmatter = content.slice(4, endOfFrontmatter);
@@ -155,10 +140,7 @@ test('memory-protocol.md has valid YAML frontmatter', () => {
 // VAL-RC-010: agents.md compressed retaining routing tables
 test('agents.md is under 3440 chars', () => {
   const content = readRule('agents.md');
-  assert.ok(
-    content.length < 3440,
-    `agents.md is ${content.length} chars, expected < 3440`
-  );
+  assert.ok(content.length < 3440, `agents.md is ${content.length} chars, expected < 3440`);
 });
 
 test('agents.md retains core agents table', () => {
@@ -196,10 +178,7 @@ test('agents.md retains Self-Check Gates', () => {
 // VAL-RC-007: hooks.md has valid paths frontmatter
 test('hooks.md has valid YAML frontmatter with paths scoped to hooks directory', () => {
   const content = readRule('hooks.md');
-  assert.ok(
-    content.startsWith('---\n'),
-    'hooks.md must start with --- YAML frontmatter'
-  );
+  assert.ok(content.startsWith('---\n'), 'hooks.md must start with --- YAML frontmatter');
   const endOfFrontmatter = content.indexOf('\n---\n', 4);
   assert.ok(endOfFrontmatter !== -1, 'hooks.md must have closing --- frontmatter');
   const frontmatter = content.slice(4, endOfFrontmatter);
@@ -227,9 +206,6 @@ const UNTOUCHED_FILES = [
 for (const filename of UNTOUCHED_FILES) {
   test(`untouched file exists: ${filename}`, () => {
     const filePath = path.join(RULES, filename);
-    assert.ok(
-      fs.existsSync(filePath),
-      `Expected file to exist: ${filename}`
-    );
+    assert.ok(fs.existsSync(filePath), `Expected file to exist: ${filename}`);
   });
 }

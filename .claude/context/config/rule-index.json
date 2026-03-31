@@ -1,12 +1,12 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "prebuilt": false,
-  "total_rules": 16,
-  "master_rules": 16,
+  "total_rules": 13,
+  "master_rules": 13,
   "library_rules": 0,
   "schema_version": "1.0.0",
   "versioning": {
-    "changelog": "Version 1.1.0: Added versioning metadata for skills compatibility tracking",
+    "changelog": "Version 1.2.0: Removed merged/deleted files (deviation-protocol, sharp-edges, shell-command-safety, file-deletion-safety); added safety-rules",
     "increment_guide": {
       "major": "Breaking changes to index structure (e.g., renamed fields, removed properties)",
       "minor": "New rules added, rule paths changed, or new metadata fields added",
@@ -48,17 +48,6 @@
       "line_count": 159
     },
     {
-      "path": ".claude/rules/deviation-protocol.md",
-      "name": "deviation-protocol",
-      "description": "",
-      "globs": "",
-      "priority": "",
-      "technologies": ["go"],
-      "type": "master",
-      "size": 3332,
-      "line_count": 93
-    },
-    {
       "path": ".claude/rules/deviation-rules.md",
       "name": "deviation-rules",
       "description": "",
@@ -79,17 +68,6 @@
       "type": "master",
       "size": 2673,
       "line_count": 72
-    },
-    {
-      "path": ".claude/rules/file-deletion-safety.md",
-      "name": "file-deletion-safety",
-      "description": "",
-      "globs": "",
-      "priority": "",
-      "technologies": [],
-      "type": "master",
-      "size": 1367,
-      "line_count": 33
     },
     {
       "path": ".claude/rules/git-workflow.md",
@@ -147,26 +125,15 @@
       "line_count": 208
     },
     {
-      "path": ".claude/rules/sharp-edges.md",
-      "name": "sharp-edges",
-      "description": "",
-      "globs": "",
+      "path": ".claude/rules/safety-rules.md",
+      "name": "safety-rules",
+      "description": "Safety rules — sharp edges, shell command hygiene, and file deletion discipline",
+      "globs": "['**/*']",
       "priority": "",
       "technologies": ["go", "rust"],
       "type": "master",
-      "size": 1645,
-      "line_count": 41
-    },
-    {
-      "path": ".claude/rules/shell-command-safety.md",
-      "name": "shell-command-safety",
-      "description": "Prevents agent from getting stuck on complex inline shell commands",
-      "globs": "['**/*']",
-      "priority": "",
-      "technologies": ["go"],
-      "type": "master",
-      "size": 1459,
-      "line_count": 34
+      "size": 3591,
+      "line_count": 90
     },
     {
       "path": ".claude/rules/task-tracking.md",
@@ -208,12 +175,10 @@
     ],
     "nodejs": [".claude/rules/code-standards.md"],
     "go": [
-      ".claude/rules/deviation-protocol.md",
       ".claude/rules/deviation-rules.md",
       ".claude/rules/documentation-always.md",
       ".claude/rules/hooks.md",
-      ".claude/rules/sharp-edges.md",
-      ".claude/rules/shell-command-safety.md",
+      ".claude/rules/safety-rules.md",
       ".claude/rules/workspace-conventions.md"
     ],
     "rest": [".claude/rules/git-workflow.md"],
@@ -227,7 +192,7 @@
       ".claude/rules/security.md",
       ".claude/rules/task-tracking.md"
     ],
-    "rust": [".claude/rules/security.md", ".claude/rules/sharp-edges.md"],
+    "rust": [".claude/rules/security.md", ".claude/rules/safety-rules.md"],
     "sql": [".claude/rules/workspace-conventions.md"]
   }
 }

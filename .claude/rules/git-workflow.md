@@ -2,106 +2,37 @@
 
 ## Commit Guidelines
 
-- Keep changes scoped and reviewable
-- Prefer small, focused commits (one logical change per commit)
+- Keep changes scoped and reviewable; prefer small, focused commits
 - Ensure tests and lint pass before committing
-- Use descriptive branch names and commit messages
+- Each agent task produces exactly one atomic commit (1:1 task-to-commit)
 
-## Commit Message Format
+## Commit Message Format (Conventional Commits — Strict)
 
-### Conventional Commits (Strict Enforcement)
+**Format**: `<type>: <subject>` (subject ≤72 chars, imperative mood, no period)
 
-**Required format**: `<type>: <subject>`
+**Types**: `feat`, `fix`, `refactor`, `docs`, `chore`, `test`, `perf`
 
-**Types**:
-
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `refactor:` - Code restructuring (no behavior change)
-- `docs:` - Documentation changes
-- `chore:` - Maintenance (deps, config)
-- `test:` - Test changes
-- `perf:` - Performance improvements
-
-**Rules**:
-
-- Keep subject line under 72 characters
-- Use imperative mood: "Add feature" not "Added feature"
-- No period at end of subject
-- Body (optional) separated by blank line
-
-**Example**:
-
-```
-feat: add JWT authentication middleware
-
-Implements authentication using JWT tokens with refresh capabilities.
-Includes rate limiting and token rotation.
-```
-
-### AI Commit Attribution (MANDATORY)
-
-**For ALL AI-assisted commits**, add:
+**AI Attribution (MANDATORY)**: All AI-assisted commits must include:
 
 ```
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 ```
-
-**Why**: Transparency about AI contribution, audit trail
-
-**Pattern**:
-
-```
-feat: add user authentication
-
-Implements JWT-based authentication with refresh tokens.
-
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
-```
-
-### Frequent Commits as Save Points
-
-**Pattern**: Commit every logical unit of work, not just at "done".
-
-**Benefits**:
-
-- Easy rollback to working state
-- Clear history of thought process
-- Prevents large, hard-to-review commits
-
-**Frequency**: Commit when:
-
-- Feature increment works (even if incomplete)
-- Test passes
-- Before risky refactor
-- End of work session
-
-### Per-Task Atomic Commits (from GSD methodology)
-
-Each agent task produces exactly one atomic commit. The commit captures all changes for that specific task — no more, no less. This ensures clean git history where each commit maps 1:1 to a task.
 
 ## Branch Workflow
 
-- Create feature branches from main: `git switch -c feature/auth`
+- Create branches from main: `git switch -c feature/name`
 - Never force-push to main/master
-- Use descriptive branch names: `feature/`, `fix/`, `refactor/`
+- Use `feature/`, `fix/`, `refactor/` prefixes
 
 ## Pre-Commit Requirements
 
-- Run lint: `pnpm lint:fix` (all must pass with 0 errors)
-- Run format: `pnpm format` (no changes produced)
-- Run tests: `pnpm test` (all must pass)
+- `pnpm lint:fix` — 0 errors
+- `pnpm format` — no changes
 - Validate commit messages via `commit-validator` skill
 - Security scan via pre-commit hooks
-- No console.log statements in production code
-
-## Large Changes
-
-- Create commit checkpoints for changes affecting 40+ files
-- Use `git commit -m` with clear checkpoint descriptions
-- Break large refactors into multiple commits
+- No `console.log` in production code
 
 ## Related References
 
 - `commit-validator` skill - Validates commit message format
-- Pre-commit requirements are enforced by the hook system (settings.json)
+- Pre-commit hooks enforced via `.claude/settings.json`

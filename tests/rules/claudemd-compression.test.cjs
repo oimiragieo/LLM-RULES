@@ -11,14 +11,8 @@ const DOCS_DIR = path.join(ROOT, '.claude', 'docs');
 
 test('CLAUDE.md is between 6500 and 7500 characters', () => {
   const content = fs.readFileSync(CLAUDE_MD, 'utf8');
-  assert.ok(
-    content.length >= 6500,
-    `Too short: ${content.length} chars (need >= 6500)`
-  );
-  assert.ok(
-    content.length <= 7500,
-    `Too long: ${content.length} chars (need <= 7500)`
-  );
+  assert.ok(content.length >= 6500, `Too short: ${content.length} chars (need >= 6500)`);
+  assert.ok(content.length <= 7500, `Too long: ${content.length} chars (need <= 7500)`);
 });
 
 test('All router-critical section anchors are present', () => {
@@ -41,10 +35,7 @@ test('All router-critical section anchors are present', () => {
 test('At least 3 IRON LAW markers are present', () => {
   const content = fs.readFileSync(CLAUDE_MD, 'utf8');
   const matches = content.match(/IRON LAW/g) || [];
-  assert.ok(
-    matches.length >= 3,
-    `Only ${matches.length} IRON LAW markers found (need >= 3)`
-  );
+  assert.ok(matches.length >= 3, `Only ${matches.length} IRON LAW markers found (need >= 3)`);
 });
 
 test('All @FILENAME.md references resolve to existing files in .claude/docs/', () => {

@@ -532,7 +532,7 @@ const relPath = path.relative(projectRoot, filePath).replace(/\\/g, '/');
 // ".claude/lib/routing.cjs"
 ```
 
-This is Sharp Edge SE-01 in the codebase. See `.claude/rules/sharp-edges.md` for full details.
+This is Sharp Edge SE-01 in the codebase. See `.claude/rules/safety-rules.md` for full details.
 
 ## Memory Protocol (MANDATORY)
 

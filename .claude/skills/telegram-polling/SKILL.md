@@ -1187,7 +1187,7 @@ needed.
 
 All JSON from the Telegram API MUST be parsed with `safeParseJSON()` (`.claude/lib/utils/safe-json.cjs`)
 rather than raw `JSON.parse()` to prevent prototype pollution attacks (SE-02 compliance).
-See `.claude/rules/sharp-edges.md` for SE-02 details.
+See `.claude/rules/safety-rules.md` for SE-02 details.
 
 ## Related
 

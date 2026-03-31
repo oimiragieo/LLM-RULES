@@ -321,17 +321,14 @@ rules/
 ├── agents.md
 ├── cleanup-always.md
 ├── code-standards.md
-├── deviation-protocol.md
 ├── deviation-rules.md
 ├── documentation-always.md
-├── file-deletion-safety.md
 ├── git-workflow.md
 ├── hooks.md
 ├── memory-protocol.md
 ├── plan-file-update.md
+├── safety-rules.md
 ├── security.md
-├── sharp-edges.md
-├── shell-command-safety.md
 ├── task-tracking.md
 └── workspace-conventions.md
 ```

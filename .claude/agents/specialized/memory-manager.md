@@ -72,7 +72,7 @@ The following workflows guide this agent's execution:
 | Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance       |
 | Memory Protocol       | `.claude/rules/memory-protocol.md`       | Memory tier architecture, read/write rules |
 | Cleanup Always        | `.claude/rules/cleanup-always.md`        | End-of-task cleanup scan                   |
-| Deviation Protocol    | `.claude/rules/deviation-protocol.md`    | Unexpected finding handling                |
+| Deviation Protocol    | `.claude/rules/deviation-rules.md`       | Unexpected finding handling                |
 
 **Output Standards** (from workspace-conventions):
 
