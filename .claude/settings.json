@@ -52,7 +52,6 @@
           }
         ]
       },
-
       {
         "matcher": "",
         "hooks": [
@@ -203,7 +202,6 @@
           }
         ]
       },
-
       {
         "matcher": "Task",
         "hooks": [
@@ -414,7 +412,6 @@
           }
         ]
       },
-
       {
         "matcher": "Task|TaskUpdate|Bash|MemoryRecord",
         "hooks": [
@@ -518,6 +515,19 @@
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/tools/cli/sanitize-debug-log.cjs --in-place",
             "timeout_ms": 5000
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/lifecycle/subagent-start-iron-law.cjs",
+            "async": true,
+            "timeout_ms": 10000
           }
         ]
       }
