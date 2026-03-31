@@ -108,6 +108,15 @@
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/a2a/a2a-server-autostart.cjs"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/audit-skill-recency.cjs"
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -294,6 +303,15 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/pre-spawn-hook-check.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/context-monitor.cjs"
           }
         ]
       }
