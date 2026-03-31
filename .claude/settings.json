@@ -544,6 +544,18 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/lifecycle/session-start-watchpaths.cjs",
+            "timeout_ms": 5000
+          }
+        ]
+      }
     ]
   }
 }
