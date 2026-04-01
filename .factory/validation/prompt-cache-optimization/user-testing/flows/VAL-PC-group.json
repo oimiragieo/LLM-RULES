@@ -1,0 +1,110 @@
+{
+  "groupId": "VAL-PC-group",
+  "testedAt": "2026-03-31T00:00:00.000Z",
+  "isolation": {
+    "type": "Unit testing isolation",
+    "details": "Node.js process, use temp directory if files are written. Run tests sequentially. No shared services are needed."
+  },
+  "toolsUsed": ["node --test"],
+  "assertions": [
+    {
+      "id": "VAL-PC-001",
+      "title": "Tools sorted alphabetically in filterAndDescribeTools()",
+      "status": "pass",
+      "steps": [
+        { "action": "Run prompt-sorting.test.cjs", "expected": "Tests for filterAndDescribeTools pass", "observed": "All subtests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["prompt-cache-optimization/VAL-PC-group/prompt-sorting.log"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-PC-002",
+      "title": "Skills sorted alphabetically in getSkillsByAgent()",
+      "status": "pass",
+      "steps": [
+        { "action": "Run prompt-sorting.test.cjs", "expected": "Tests for getSkillsByAgent pass", "observed": "All subtests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["prompt-cache-optimization/VAL-PC-group/prompt-sorting.log"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-PC-003",
+      "title": "Section content memoization caches formatted strings",
+      "status": "pass",
+      "steps": [
+        { "action": "Run section-memoization.test.cjs", "expected": "Tests for section memoization pass", "observed": "All subtests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["prompt-cache-optimization/VAL-PC-group/section-memoization.log"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-PC-004",
+      "title": "Safety and protocol blocks in stable prefix",
+      "status": "pass",
+      "steps": [
+        { "action": "Run section-memoization.test.cjs", "expected": "Tests for stable prefix safety/protocol pass", "observed": "All subtests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["prompt-cache-optimization/VAL-PC-group/section-memoization.log"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-PC-005",
+      "title": "Duplicate TaskUpdate contract eliminated",
+      "status": "pass",
+      "steps": [
+        { "action": "Run prompt-sorting.test.cjs", "expected": "Tests for TaskUpdate contract once pass", "observed": "All subtests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["prompt-cache-optimization/VAL-PC-group/prompt-sorting.log"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-PC-006",
+      "title": "Cache-break-detector hashes sections and logs changes",
+      "status": "pass",
+      "steps": [
+        { "action": "Run cache-break-detector.test.cjs", "expected": "Tests for changed sections trigger events pass", "observed": "All subtests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["prompt-cache-optimization/VAL-PC-group/cache-break-detector.log"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-PC-007",
+      "title": "Cache-break-detector no false positives on stable sections",
+      "status": "pass",
+      "steps": [
+        { "action": "Run cache-break-detector.test.cjs", "expected": "Tests for zero events on identical consecutive calls pass", "observed": "All subtests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["prompt-cache-optimization/VAL-PC-group/cache-break-detector.log"]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-PC-008",
+      "title": "Memoization cache invalidates on input change",
+      "status": "pass",
+      "steps": [
+        { "action": "Run section-memoization.test.cjs", "expected": "Tests for memoization miss on changed inputs pass", "observed": "All subtests passed" }
+      ],
+      "evidence": {
+        "terminalSnapshots": ["prompt-cache-optimization/VAL-PC-group/section-memoization.log"]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 8 assertions: 8 passed."
+}
