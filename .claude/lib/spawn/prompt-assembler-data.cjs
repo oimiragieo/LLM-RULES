@@ -181,69 +181,74 @@ function filterAndDescribeTools(allowedTools) {
     });
   }
 
-  return result;
+  return result.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function getSkillsByAgent(agentType, maxSkills = 20) {
   const skillIndex = getSkillIndex();
   const skills = skillIndex.skills || {};
-  const result = [];
 
   const normalizedType = agentType?.toLowerCase() || 'developer';
 
+  // === Tier 1: Primary skills (sorted alphabetically) ===
+  const primarySkills = [];
   for (const [skillName, skillData] of Object.entries(skills)) {
-    if (result.length >= maxSkills) break;
     const isPrimary = skillData.agentPrimary?.some(
       a => a.toLowerCase() === normalizedType || normalizedType.includes(a.toLowerCase())
     );
     if (!isPrimary) continue;
-    result.push({
+    primarySkills.push({
       name: skillName,
       description: skillData.description || `${skillData.displayName || skillName} skill`,
       category: skillData.category || 'General',
       requiredTools: skillData.requiredTools || [],
     });
   }
+  primarySkills.sort((a, b) => a.name.localeCompare(b.name));
 
-  if (result.length < maxSkills) {
-    for (const [skillName, skillData] of Object.entries(skills)) {
-      if (result.length >= maxSkills) break;
-      if (result.some(s => s.name === skillName)) continue;
-      const isSupporting = skillData.agentSupporting?.some(
-        a => a.toLowerCase() === normalizedType || normalizedType.includes(a.toLowerCase())
-      );
-      if (!isSupporting) continue;
-      result.push({
-        name: skillName,
-        description: skillData.description || `${skillData.displayName || skillName} skill`,
-        category: skillData.category || 'General',
-        requiredTools: skillData.requiredTools || [],
-      });
-    }
+  // === Tier 2: Supporting skills (sorted alphabetically, excluding primary) ===
+  const primaryNames = new Set(primarySkills.map(s => s.name));
+  const supportingSkills = [];
+  for (const [skillName, skillData] of Object.entries(skills)) {
+    if (primaryNames.has(skillName)) continue;
+    const isSupporting = skillData.agentSupporting?.some(
+      a => a.toLowerCase() === normalizedType || normalizedType.includes(a.toLowerCase())
+    );
+    if (!isSupporting) continue;
+    supportingSkills.push({
+      name: skillName,
+      description: skillData.description || `${skillData.displayName || skillName} skill`,
+      category: skillData.category || 'General',
+      requiredTools: skillData.requiredTools || [],
+    });
   }
+  supportingSkills.sort((a, b) => a.name.localeCompare(b.name));
 
-  if (result.length < maxSkills) {
-    const genericSkills = [
-      'tdd',
-      'debugging',
-      'code-quality-expert',
-      'git-expert',
-      'verification-before-completion',
-    ];
-    for (const skillName of genericSkills) {
-      if (result.length >= maxSkills) break;
-      if (result.some(s => s.name === skillName)) continue;
-
-      const skillData = skills[skillName];
-      if (!skillData) continue;
-      result.push({
-        name: skillName,
-        description: skillData.description || `${skillData.displayName || skillName} skill`,
-        category: skillData.category || 'General',
-        requiredTools: skillData.requiredTools || [],
-      });
-    }
+  // === Tier 3: Generic fallback skills (sorted alphabetically) ===
+  const seenNames = new Set([...primaryNames, ...supportingSkills.map(s => s.name)]);
+  const genericSkillNames = [
+    'tdd',
+    'debugging',
+    'code-quality-expert',
+    'git-expert',
+    'verification-before-completion',
+  ];
+  const genericSkills = [];
+  for (const skillName of genericSkillNames) {
+    if (seenNames.has(skillName)) continue;
+    const skillData = skills[skillName];
+    if (!skillData) continue;
+    genericSkills.push({
+      name: skillName,
+      description: skillData.description || `${skillData.displayName || skillName} skill`,
+      category: skillData.category || 'General',
+      requiredTools: skillData.requiredTools || [],
+    });
   }
+  genericSkills.sort((a, b) => a.name.localeCompare(b.name));
+
+  // Combine tiers in priority order
+  const result = [...primarySkills, ...supportingSkills, ...genericSkills];
 
   const coreSkills = CORE_AGENT_SKILLS[normalizedType] || [];
   if (coreSkills.length > 0) {
@@ -269,7 +274,7 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
     return deduped.slice(0, maxSkills);
   }
 
-  return result;
+  return result.slice(0, maxSkills);
 }
 
 function clearCaches() {

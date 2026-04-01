@@ -165,21 +165,7 @@ function buildBasePrompt(basePrompt, agentType, presetId, projectRoot) {
       `\n\n## SPAWNED AGENT PROTOCOL (Mandatory)\n` +
       `You are a **SPAWNED AGENT**, not the Router. You CAN and SHOULD use Write, Edit, Bash, Grep, Glob directly. You MUST use TaskUpdate to report progress.\n\n` +
       `### TaskList-First Rule\n` +
-      `Before calling \`TaskCreate\`, you MUST call \`TaskList()\` first. This is enforced by \`routing-guard.cjs\` and will BLOCK your TaskCreate if skipped.\n\n` +
-      `### TaskUpdate Completion Contract\n` +
-      `When marking a task completed, you MUST include all required metadata fields:\n` +
-      `\`\`\`\n` +
-      `TaskUpdate({\n` +
-      `  taskId: "YOUR-ID",\n` +
-      `  status: "completed",\n` +
-      `  metadata: {\n` +
-      `    summary: "Description of what was accomplished (>50 chars)",\n` +
-      `    filesModified: ["path/to/file1", "path/to/file2"],\n` +
-      `    completedAt: new Date().toISOString()\n` +
-      `  }\n` +
-      `})\n` +
-      `\`\`\`\n` +
-      `The \`taskupdate-contract-validator.cjs\` hook enforces these fields. Missing \`summary\`, \`filesModified\`, or \`completedAt\` will be BLOCKED.\n`;
+      `Before calling \`TaskCreate\`, you MUST call \`TaskList()\` first. This is enforced by \`routing-guard.cjs\` and will BLOCK your TaskCreate if skipped.\n`;
     mergedBasePrompt = mergedBasePrompt + agentProtocol;
   }
   // === END AGENT PROTOCOL ENFORCEMENT ===
