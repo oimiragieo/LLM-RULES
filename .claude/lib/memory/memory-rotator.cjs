@@ -35,6 +35,13 @@ const DEFAULT_KEEP_SECTIONS = 10;
 // For line-based fallback: group N lines into synthetic sections
 const LINES_PER_SYNTHETIC_SECTION = 50;
 
+// Cap constants for enforceMemoryCaps / memoryHealth
+const KB_CAP = 25;
+const LINE_CAP = 200;
+
+// Canonical memory directory (relative to project root)
+const MEMORY_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
+
 /**
  * Parse a markdown memory file into sections.
  * Sections are delimited by `---` horizontal rules or `## ` H2 headers.
@@ -293,7 +300,221 @@ function rotateIfNeeded(filePath, options = {}) {
   };
 }
 
+/**
+ * Enforce dual caps (25KB and 200 lines) on a markdown memory file.
+ *
+ * When either cap is exceeded, oldest non-[PERMANENT] sections are pruned.
+ * [PERMANENT] sections are always kept, even if the file remains slightly over cap.
+ * Pruned content is archived to `<fileDir>/archive/<basename>-YYYY-MM-DD.md`
+ * (appending to an existing same-day archive if present).
+ * A warning line is appended to the active file after pruning.
+ *
+ * @param {string} filePath - Absolute path to the markdown file
+ * @param {Object} [options]
+ * @param {number} [options.kbCap=25] - KB cap
+ * @param {number} [options.lineCap=200] - Line count cap
+ * @param {string} [options.archiveDir='archive'] - Archive subdirectory name (relative to file dir)
+ * @param {string} [options.projectRoot=PROJECT_ROOT] - Project root for path validation
+ * @returns {{ pruned: boolean, archivedBytes?: number, sectionsArchived?: number }}
+ */
+function enforceMemoryCaps(filePath, options = {}) {
+  const {
+    kbCap = KB_CAP,
+    lineCap = LINE_CAP,
+    archiveDir = 'archive',
+    projectRoot = PROJECT_ROOT,
+  } = options;
+
+  // Validate path is within project (advisory — matches existing rotateIfNeeded pattern)
+  validatePathWithinProject(filePath, projectRoot);
+
+  // Missing file → no-op
+  if (!fs.existsSync(filePath)) {
+    return { pruned: false };
+  }
+
+  // Read content
+  const content = fs.readFileSync(filePath, 'utf8');
+
+  // Empty file → no-op
+  if (!content || content.trim().length === 0) {
+    return { pruned: false };
+  }
+
+  // Check caps
+  const sizeBytes = Buffer.byteLength(content, 'utf8');
+  const lineCount = content.split('\n').length;
+  const overKBCap = sizeBytes > kbCap * 1024;
+  const overLineCap = lineCount > lineCap;
+
+  if (!overKBCap && !overLineCap) {
+    return { pruned: false };
+  }
+
+  // Parse into sections
+  const sections = parseSections(content);
+  if (sections.length === 0) {
+    return { pruned: false };
+  }
+
+  // Separate permanent from non-permanent sections
+  const permanentSections = sections.filter(s => s.isPermanent);
+  const nonPermanentSections = sections.filter(s => !s.isPermanent);
+
+  // Sort non-permanent by date, oldest first (null dates sort first → archived first)
+  const sortedNonPermanent = [...nonPermanentSections].sort((a, b) => {
+    if (!a.date && !b.date) return 0;
+    if (!a.date) return -1;
+    if (!b.date) return 1;
+    return a.date.localeCompare(b.date);
+  });
+
+  const sectionsToArchive = [];
+  // remainingNonPermanent starts oldest-first; we shift() from the front to archive oldest first
+  const remainingNonPermanent = [...sortedNonPermanent];
+
+  // Remove oldest non-permanent sections until both caps satisfied (or none remain)
+  while (remainingNonPermanent.length > 0) {
+    // Compute current content size with permanents + remaining non-permanents in original order
+    const currentSet = new Set([...permanentSections, ...remainingNonPermanent]);
+    const currentSectionsInOrder = sections.filter(s => currentSet.has(s));
+    const currentContent = currentSectionsInOrder.map(s => s.content).join('\n\n---\n\n');
+    const currentBytes = Buffer.byteLength(currentContent, 'utf8');
+    const currentLines = currentContent.split('\n').length;
+
+    if (currentBytes <= kbCap * 1024 && currentLines <= lineCap) {
+      break; // Both caps satisfied
+    }
+
+    // Remove oldest non-permanent section
+    sectionsToArchive.push(remainingNonPermanent.shift());
+  }
+
+  // If nothing was archived (can happen if only permanents exist and they're over cap)
+  if (sectionsToArchive.length === 0) {
+    return { pruned: false };
+  }
+
+  // Prepare archive path — daily: <basename>-YYYY-MM-DD.md
+  const now = new Date();
+  const dateStr = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+  ].join('-');
+
+  const fileDir = path.dirname(filePath);
+  const fileBasename = path.basename(filePath, '.md');
+  const archiveFileName = `${fileBasename}-${dateStr}.md`;
+  const archiveDirPath = path.join(fileDir, archiveDir);
+  const archiveFilePath = path.join(archiveDirPath, archiveFileName);
+
+  validatePathWithinProject(archiveFilePath, projectRoot);
+
+  // Create archive directory if needed
+  if (!fs.existsSync(archiveDirPath)) {
+    fs.mkdirSync(archiveDirPath, { recursive: true });
+  }
+
+  // Build archive content; append to existing same-day archive
+  const archivedBody = sectionsToArchive.map(s => s.content).join('\n\n---\n\n');
+  let archiveContent;
+  if (fs.existsSync(archiveFilePath)) {
+    const existing = fs.readFileSync(archiveFilePath, 'utf8');
+    archiveContent = existing + '\n\n---\n\n' + archivedBody;
+  } else {
+    archiveContent = `# ${fileBasename} Archive (${dateStr})\n\n${archivedBody}`;
+  }
+
+  atomicWriteSync(archiveFilePath, archiveContent);
+
+  // Rebuild active file in original section order
+  const keepSet = new Set([...permanentSections, ...remainingNonPermanent]);
+  const keptInOrder = sections.filter(s => keepSet.has(s));
+  const newContent = keptInOrder.map(s => s.content).join('\n\n---\n\n');
+
+  // Append warning line
+  const warningLine = `\n\n> ⚠️ Content archived to archive/${archiveFileName} on ${dateStr}`;
+  atomicWriteSync(filePath, newContent + warningLine);
+
+  const archivedBytes = sectionsToArchive.reduce(
+    (sum, s) => sum + Buffer.byteLength(s.content, 'utf8'),
+    0
+  );
+
+  return {
+    pruned: true,
+    archivedBytes,
+    sectionsArchived: sectionsToArchive.length,
+  };
+}
+
+/**
+ * Report memory health for all markdown files in the memory directory.
+ *
+ * Returns the file name, size in bytes, line count, and whether each cap
+ * (25KB / 200 lines) is exceeded.  Only top-level `.md` files are scanned
+ * (subdirectories such as archive/, stm/, mtm/ are excluded).
+ *
+ * @param {Object} [options]
+ * @param {string} [options.memoryDir] - Directory to scan (defaults to MEMORY_DIR)
+ * @returns {Array<{ file: string, sizeBytes: number, lineCount: number,
+ *                   overKBCap: boolean, overLineCap: boolean }>}
+ */
+function memoryHealth(options = {}) {
+  const { memoryDir = MEMORY_DIR } = options;
+
+  if (!fs.existsSync(memoryDir)) {
+    return [];
+  }
+
+  const results = [];
+  let entries;
+  try {
+    entries = fs.readdirSync(memoryDir);
+  } catch (_) {
+    return [];
+  }
+
+  for (const entry of entries) {
+    if (!entry.endsWith('.md')) continue;
+
+    const filePath = path.join(memoryDir, entry);
+
+    let stat;
+    try {
+      stat = fs.statSync(filePath);
+    } catch (_) {
+      continue;
+    }
+
+    if (!stat.isFile()) continue;
+
+    let fileContent = '';
+    try {
+      fileContent = fs.readFileSync(filePath, 'utf8');
+    } catch (_) {
+      continue;
+    }
+
+    const sizeBytes = stat.size;
+    const lineCount = fileContent.split('\n').length;
+
+    results.push({
+      file: entry,
+      sizeBytes,
+      lineCount,
+      overKBCap: sizeBytes > KB_CAP * 1024,
+      overLineCap: lineCount > LINE_CAP,
+    });
+  }
+
+  return results;
+}
+
 module.exports = {
   parseSections,
   rotateIfNeeded,
+  enforceMemoryCaps,
+  memoryHealth,
 };
