@@ -1,0 +1,106 @@
+{
+  "groupId": "group-3",
+  "testedAt": "2026-03-31T00:00:00Z",
+  "isolation": {
+    "type": "unit-tests",
+    "command": "node --test tests/hooks/microcompact-circuit-breaker.test.cjs"
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-CM-004",
+      "title": "Microcompact detection identifies silent token drops",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Test passes simulating token drop without snapshot",
+          "observed": "Test 'detects microcompact when token count drops >10K without recent snapshot' passed"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "context-management/group-3/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CM-005",
+      "title": "Microcompact detector no false positive on normal compaction",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Test passes verifying no microcompact detected with recent snapshot",
+          "observed": "Test 'does not detect microcompact when a recent pre-compact snapshot exists' passed"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "context-management/group-3/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CM-006",
+      "title": "Auto-compact circuit breaker detects sustained high usage",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Test passes showing trigger after 3 turns at >=93%",
+          "observed": "Test 'circuit breaker triggers after 3 consecutive turns at >=93% usage' passed"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "context-management/group-3/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CM-007",
+      "title": "Circuit breaker resets after usage drops",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Test passes showing counter resets when usage <93%",
+          "observed": "Test 'circuit breaker counter resets when usage drops below 93%' passed"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "context-management/group-3/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CM-009",
+      "title": "Circuit breaker advisory message is actionable",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit tests",
+          "expected": "Test passes verifying advisory mentions handoff and compressor",
+          "observed": "Test 'circuit breaker advisory mentions session-handoff and context-compressor' passed"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "context-management/group-3/test-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 5 assertions via node --test tests/hooks/microcompact-circuit-breaker.test.cjs. All 5 assertions passed successfully with no errors or frictions."
+}

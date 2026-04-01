@@ -1,0 +1,79 @@
+{
+  "groupId": "group-1",
+  "testedAt": "2026-03-31T00:00:00Z",
+  "isolation": {
+    "type": "local-unit-tests",
+    "directory": "tests/hooks"
+  },
+  "toolsUsed": [
+    "node"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-CM-001",
+      "title": "Pre-compact hook persists active file list",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/hooks/pre-compact-file-persistence.test.cjs",
+          "expected": "Tests execute successfully",
+          "observed": "Test 'activeFiles is saved from edit-counter.json files field' passed"
+        }
+      ],
+      "evidence": {
+        "screenshots": [],
+        "consoleErrors": "none",
+        "network": "none",
+        "terminalSnapshots": [
+          "context-management/group-1/VAL-CM-test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CM-002",
+      "title": "Pre-compact snapshot backward compatibility",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/hooks/pre-compact-file-persistence.test.cjs",
+          "expected": "Tests execute successfully",
+          "observed": "Test 'snapshot contains all 7 required fields' passed"
+        }
+      ],
+      "evidence": {
+        "screenshots": [],
+        "consoleErrors": "none",
+        "network": "none",
+        "terminalSnapshots": [
+          "context-management/group-1/VAL-CM-test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CM-010",
+      "title": "Pre-compact hook remains fail-open",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/hooks/pre-compact-file-persistence.test.cjs",
+          "expected": "Tests execute successfully",
+          "observed": "Tests for missing/malformed files and stdin passthrough passed"
+        }
+      ],
+      "evidence": {
+        "screenshots": [],
+        "consoleErrors": "none",
+        "network": "none",
+        "terminalSnapshots": [
+          "context-management/group-1/VAL-CM-test-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 3 assertions (VAL-CM-001, VAL-CM-002, VAL-CM-010): 3 passed, 0 failed. All unit tests executed successfully."
+}

@@ -1,0 +1,51 @@
+{
+  "groupId": "group-2",
+  "testedAt": "2026-03-31T00:00:00.000Z",
+  "isolation": {
+    "directory": "local repo tests"
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-CM-003",
+      "title": "Context-degradation thresholds align with CC auto-compact",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test file tests/hooks/context-threshold-alignment.test.cjs",
+          "expected": "Tests for threshold alignment pass",
+          "observed": "All 9 tests in the suite passed successfully, including threshold checks"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "context-management/group-2/test-output.txt"
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CM-008",
+      "title": "Context-degradation skill updated for post-compact behavior",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run unit test file tests/hooks/context-threshold-alignment.test.cjs",
+          "expected": "Tests for post-compact behavior pass",
+          "observed": "All tests related to post-compact behavior passed successfully"
+        }
+      ],
+      "evidence": {
+        "terminalSnapshots": [
+          "context-management/group-2/test-output.txt"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 2 assertions (VAL-CM-003, VAL-CM-008). 2 passed. Ran the provided test suite and all 9 subtests passed."
+}
