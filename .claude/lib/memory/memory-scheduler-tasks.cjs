@@ -191,8 +191,8 @@ function createMemorySchedulerTaskRunners(deps) {
       for (const file of memoryFiles) {
         const filePath = path.join(memoryDir, file);
         if (!fs.existsSync(filePath)) continue;
-        const rotateResult = memoryRotator.rotateIfNeeded(filePath, { thresholdKB: 20 });
-        if (rotateResult.rotated) totalRotated++;
+        const capResult = memoryRotator.enforceMemoryCaps(filePath);
+        if (capResult && capResult.pruned) totalRotated++;
       }
 
       result.success = true;
