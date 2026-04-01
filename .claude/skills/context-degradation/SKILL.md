@@ -25,13 +25,13 @@ Detects context window degradation and prescribes corrective actions before accu
 
 Thresholds are expressed as a percentage of the context window budget. For a 200K window, Claude Code's auto-compact fires at ~187K (~93.5%, i.e., `contextWindow - 13K`).
 
-| Zone         | Usage %   | ~Tokens (200K) | Status      | Action                                                                             |
-| ------------ | --------- | -------------- | ----------- | ---------------------------------------------------------------------------------- |
-| Green        | < 65%     | < 130K         | Healthy     | Normal operation                                                                   |
-| Yellow       | 65–80%    | 130K–160K      | Caution     | Begin selective compression                                                        |
-| Orange/Red   | 80–90%    | 160K–180K      | Warning     | Compress aggressively; summarize completed phases; spawn fresh subagent if needed  |
-| Critical     | 90–93%    | 180K–186K      | Severe      | Halt complex reasoning; compress immediately; do not attempt multi-step tasks      |
-| Auto-compact | > 93%     | > 186K         | Imminent    | Claude Code auto-compact will fire; initiate post-compact recovery (see below)     |
+| Zone         | Usage % | ~Tokens (200K) | Status   | Action                                                                            |
+| ------------ | ------- | -------------- | -------- | --------------------------------------------------------------------------------- |
+| Green        | < 65%   | < 130K         | Healthy  | Normal operation                                                                  |
+| Yellow       | 65–80%  | 130K–160K      | Caution  | Begin selective compression                                                       |
+| Orange/Red   | 80–90%  | 160K–180K      | Warning  | Compress aggressively; summarize completed phases; spawn fresh subagent if needed |
+| Critical     | 90–93%  | 180K–186K      | Severe   | Halt complex reasoning; compress immediately; do not attempt multi-step tasks     |
+| Auto-compact | > 93%   | > 186K         | Imminent | Claude Code auto-compact will fire; initiate post-compact recovery (see below)    |
 
 Reference: Claude Code constant `AUTOCOMPACT_BUFFER_TOKENS = 13,000`. Auto-compact fires at `contextWindow - 13K`, so for a 200K window that is 187K (93.5%). "Lost in the middle" effect: middle tokens have 20–40% lower recall past ~100K.
 
