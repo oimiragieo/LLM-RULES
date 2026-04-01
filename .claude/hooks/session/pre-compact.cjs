@@ -76,6 +76,9 @@ function main() {
       editCount: 0,
     });
 
+    // Extract active files list from edit counter (files field added by post-tool-metrics)
+    const activeFiles = Array.isArray(editCounter.files) ? editCounter.files : [];
+
     // Build snapshot
     const snapshot = {
       timestamp: new Date().toISOString(),
@@ -84,6 +87,7 @@ function main() {
       promptCount: sessionMetrics.prompt_count || 0,
       originalIntent: driftState.originalIntent || '',
       driftEditCount: driftState.editCount || 0,
+      activeFiles,
     };
 
     // Atomic write
