@@ -56,6 +56,36 @@ function main() {
         `[session-end-memory-promotion] Promoted session ${sessionId} STM -> MTM: ${result.mtmPath.replace(/\\/g, '/')}\n`
       );
 
+      // Append session summary to daily log (fail-open — separate try/catch so daily log
+      // failure never prevents STM→MTM promotion from completing).
+      try {
+        const { appendDailyLog } = require(path.join(LIB_DIR, 'memory', 'memory-daily-log.cjs'));
+
+        // Build summary: entry count from stmData.entries array if present, else 1
+        const entryCount = stmData && Array.isArray(stmData.entries) ? stmData.entries.length : 1;
+        let summary = `Session ended - ${entryCount} memory entr${entryCount === 1 ? 'y' : 'ies'} promoted to MTM`;
+
+        // Include session duration if start_time is available in STM data
+        if (stmData && stmData.start_time) {
+          const startMs = new Date(stmData.start_time).getTime();
+          if (!isNaN(startMs)) {
+            const durationMs = Date.now() - startMs;
+            const durationMin = Math.round(durationMs / 60000);
+            summary += ` (duration: ~${durationMin}min)`;
+          }
+        }
+
+        appendDailyLog(summary);
+        process.stderr.write(
+          `[session-end-memory-promotion] Appended session summary to daily log.\n`
+        );
+      } catch (dailyLogErr) {
+        // Daily log is non-critical — log the error and continue
+        process.stderr.write(
+          `[session-end-memory-promotion] Daily log write failed (ignored): ${dailyLogErr.message}\n`
+        );
+      }
+
       // Trigger background LanceDB re-index of the promoted MTM file.
       // Skip when running in BM25-only mode (no embedding vectors to update).
       if (process.env.LANCEDB_EMBEDDING_MODE !== 'off') {
