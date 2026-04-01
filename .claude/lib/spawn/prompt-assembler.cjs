@@ -50,6 +50,7 @@ const {
   buildSkillsSection,
   buildDiscoverySection,
   injectSections,
+  _clearSectionCache,
 } = require('./prompt-assembler-sections.cjs');
 const {
   loadAgentPromptOverrides,
@@ -136,22 +137,40 @@ function buildBasePrompt(basePrompt, agentType, presetId, projectRoot) {
   if (ruleSnippet) {
     mergedBasePrompt = `## Preset Rules\n\n${ruleSnippet}\n\n${mergedBasePrompt}`;
   }
+  return mergedBasePrompt;
+}
+
+/**
+ * Build the safety preamble, agent protocol, and token reporting sections.
+ * These are now injected as stable-prefix sections (before the volatile basePrompt)
+ * so they contribute to the cacheable region of the assembled prompt.
+ *
+ * Kill switches:
+ *   SPAWN_SAFETY_PREAMBLE=off   — disables FORBIDDEN COMMANDS block
+ *   SPAWN_AGENT_PROTOCOL=off    — disables SPAWNED AGENT PROTOCOL block
+ *   SPAWN_TOKEN_REPORTING=off   — disables TOKEN USAGE REPORTING block
+ *
+ * @param {string} mergedBasePrompt - The merged base prompt (used for guard clauses only)
+ * @param {string} agentType - The agent type (used to gate token reporting)
+ * @returns {{ safetySection?: string, protocolSection?: string, tokenSection?: string }}
+ */
+function buildSafetyProtocolSections(mergedBasePrompt, agentType) {
+  const result = {};
 
   // === DYNAMIC SAFETY PREAMBLE (Patch 3) ===
-  // Inject forbidden commands block as suffix so all spawned agents receive it.
+  // Inject forbidden commands block as a stable prefix section.
   // Guard clause prevents double-injection on pre-assembled prompts.
   // Kill switch: set SPAWN_SAFETY_PREAMBLE=off to disable (e.g. in test environments).
   const SAFETY_PREAMBLE_ENABLED =
     String(process.env.SPAWN_SAFETY_PREAMBLE || 'on').toLowerCase() !== 'off';
   if (SAFETY_PREAMBLE_ENABLED && !mergedBasePrompt.includes('FORBIDDEN COMMANDS')) {
-    const safetyPreamble =
-      `\n\n## FORBIDDEN COMMANDS (Hard Stop)\n` +
+    result.safetySection =
+      `## FORBIDDEN COMMANDS (Hard Stop)\n` +
       `- NEVER run \`rm -rf\`, \`git clean -f\`, or bulk-delete without explicit user confirmation of the exact target\n` +
       `- NEVER run \`git push --force\` or \`git reset --hard\` without explicit user authorization\n` +
       `- NEVER use \`shell: true\` with child_process — always use \`shell: false\` with array args\n` +
       `- NEVER write to \`.claude/skills/**\`, \`.claude/agents/**\`, \`.claude/hooks/**\`, \`.claude/workflows/**\` directly — these are Gate 4 creator paths\n` +
       `- When in doubt about a destructive command, stop and ask the user first\n`;
-    mergedBasePrompt = mergedBasePrompt + safetyPreamble;
   }
   // === END SAFETY PREAMBLE ===
 
@@ -161,12 +180,11 @@ function buildBasePrompt(basePrompt, agentType, presetId, projectRoot) {
   const AGENT_PROTOCOL_ENABLED =
     String(process.env.SPAWN_AGENT_PROTOCOL || 'on').toLowerCase() !== 'off';
   if (AGENT_PROTOCOL_ENABLED && !mergedBasePrompt.includes('SPAWNED AGENT PROTOCOL')) {
-    const agentProtocol =
-      `\n\n## SPAWNED AGENT PROTOCOL (Mandatory)\n` +
+    result.protocolSection =
+      `## SPAWNED AGENT PROTOCOL (Mandatory)\n` +
       `You are a **SPAWNED AGENT**, not the Router. You CAN and SHOULD use Write, Edit, Bash, Grep, Glob directly. You MUST use TaskUpdate to report progress.\n\n` +
       `### TaskList-First Rule\n` +
       `Before calling \`TaskCreate\`, you MUST call \`TaskList()\` first. This is enforced by \`routing-guard.cjs\` and will BLOCK your TaskCreate if skipped.\n`;
-    mergedBasePrompt = mergedBasePrompt + agentProtocol;
   }
   // === END AGENT PROTOCOL ENFORCEMENT ===
 
@@ -189,18 +207,17 @@ function buildBasePrompt(basePrompt, agentType, presetId, projectRoot) {
     TOKEN_REPORTING_AGENTS.includes(agentType) &&
     !mergedBasePrompt.includes('TOKEN USAGE REPORTING')
   ) {
-    const tokenReportingBlock =
-      `\n\n## TOKEN USAGE REPORTING (End-of-Task)\n` +
+    result.tokenSection =
+      `## TOKEN USAGE REPORTING (End-of-Task)\n` +
       `At the END of your task (before calling TaskUpdate(completed)), report token usage by running:\n` +
       '```\n' +
       'npx ccusage --today 2>&1 || echo "ccusage not available"\n' +
       '```\n' +
       `Include the output in your completion summary so the router can track session costs.\n`;
-    mergedBasePrompt = mergedBasePrompt + tokenReportingBlock;
   }
   // === END TOKEN REPORTING INJECTION ===
 
-  return mergedBasePrompt;
+  return result;
 }
 
 function recordMemoryChurn(projectRoot, memorySection, includeMemory) {
@@ -243,12 +260,14 @@ function assembleSpawnPrompt({
 
   const behaviourSection = formatBehaviourSection(loadBehaviourRules(projectRoot));
   const mergedBasePrompt = buildBasePrompt(basePrompt, agentType, presetId, projectRoot);
+  const safetyProtocol = buildSafetyProtocolSections(mergedBasePrompt, agentType);
 
   const enhancedPrompt = injectSections(mergedBasePrompt, {
     ...promptSections,
     memorySection,
     projectContextSection: projectContext || '',
     behaviourSection,
+    ...safetyProtocol,
   });
 
   recordMemoryChurn(projectRoot, memorySection, includeMemory);
@@ -318,12 +337,14 @@ async function assembleSpawnPromptAsync(options = {}) {
 
   const behaviourSection = formatBehaviourSection(loadBehaviourRules(projectRoot));
   const mergedBasePrompt = buildBasePrompt(basePrompt, agentType, presetId, projectRoot);
+  const safetyProtocol = buildSafetyProtocolSections(mergedBasePrompt, agentType);
 
   const enhancedPrompt = injectSections(mergedBasePrompt, {
     ...promptSections,
     memorySection,
     projectContextSection: projectContext || '',
     behaviourSection,
+    ...safetyProtocol,
   });
 
   recordMemoryChurn(projectRoot, memorySection, includeMemory);
@@ -381,5 +402,7 @@ module.exports = {
   validatePresets,
   _clearCache: () => {
     clearCaches();
+    _clearSectionCache();
   },
+  _clearSectionCache,
 };

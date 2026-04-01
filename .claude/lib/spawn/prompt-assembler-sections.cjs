@@ -3,6 +3,40 @@
 
 const DEFAULT_SKILL_SECTION_MODE = 'full';
 
+// ============================================================
+// Memoization state — keyed by JSON.stringify of inputs
+// ============================================================
+
+/** @type {Map<string,string>} */
+const _toolsSectionCache = new Map();
+/** @type {Map<string,string>} */
+const _skillsSectionCache = new Map();
+/** @type {string|null} */
+let _discoveryCache = null;
+
+/** Internal build-count tracking (for testing / observability) */
+let _buildCounts = { toolsSection: 0, skillsSection: 0, discoverySection: 0 };
+
+/**
+ * Clear all memoized section caches and reset build counters.
+ * Call this after compaction or whenever the underlying data changes.
+ */
+function _clearSectionCache() {
+  _toolsSectionCache.clear();
+  _skillsSectionCache.clear();
+  _discoveryCache = null;
+  _buildCounts = { toolsSection: 0, skillsSection: 0, discoverySection: 0 };
+}
+
+/**
+ * Return a snapshot of the build counts since last cache clear.
+ * Useful in tests to verify memoization hit/miss behaviour.
+ * @returns {{ toolsSection: number, skillsSection: number, discoverySection: number }}
+ */
+function _getSectionBuildCounts() {
+  return { ..._buildCounts };
+}
+
 function normalizeSkillSectionMode(mode) {
   const value = String(mode || DEFAULT_SKILL_SECTION_MODE)
     .trim()
@@ -13,8 +47,7 @@ function normalizeSkillSectionMode(mode) {
   return 'full';
 }
 
-function buildToolsSection(tools) {
-  const describedTools = Array.isArray(tools) ? tools : [];
+function _computeToolsSection(describedTools) {
   const totalTools = describedTools.length;
   const availableCount = describedTools.filter(t => t.status === 'available').length;
 
@@ -66,8 +99,19 @@ function buildToolsSection(tools) {
   return section;
 }
 
-function buildSkillsSection(skills, options = {}) {
-  const mode = normalizeSkillSectionMode(options.skillSectionMode);
+function buildToolsSection(tools) {
+  const describedTools = Array.isArray(tools) ? tools : [];
+  const cacheKey = JSON.stringify(describedTools);
+  if (_toolsSectionCache.has(cacheKey)) {
+    return _toolsSectionCache.get(cacheKey);
+  }
+  _buildCounts.toolsSection++;
+  const result = _computeToolsSection(describedTools);
+  _toolsSectionCache.set(cacheKey, result);
+  return result;
+}
+
+function _computeSkillsSection(skills, mode) {
   let section = '## AVAILABLE_SKILLS\n\n';
   section +=
     mode === 'names_only'
@@ -99,7 +143,19 @@ function buildSkillsSection(skills, options = {}) {
   return section;
 }
 
-function buildDiscoverySection() {
+function buildSkillsSection(skills, options = {}) {
+  const mode = normalizeSkillSectionMode(options.skillSectionMode);
+  const cacheKey = JSON.stringify({ skills, mode });
+  if (_skillsSectionCache.has(cacheKey)) {
+    return _skillsSectionCache.get(cacheKey);
+  }
+  _buildCounts.skillsSection++;
+  const result = _computeSkillsSection(skills, mode);
+  _skillsSectionCache.set(cacheKey, result);
+  return result;
+}
+
+function _computeDiscoverySection() {
   return `## SKILL DISCOVERY PROTOCOL
 
 To use a skill, invoke via Skill() tool:
@@ -137,6 +193,15 @@ For new skills: Domain experts (language-specific agents) have domain-focused sk
 `;
 }
 
+function buildDiscoverySection() {
+  if (_discoveryCache !== null) {
+    return _discoveryCache;
+  }
+  _buildCounts.discoverySection++;
+  _discoveryCache = _computeDiscoverySection();
+  return _discoveryCache;
+}
+
 function injectSections(basePrompt, sections) {
   const parts = [];
 
@@ -154,6 +219,11 @@ function injectSections(basePrompt, sections) {
   // SEMI-STATIC CONSTITUTION/BEHAVIOUR
   if (sections.behaviourSection) parts.push(sections.behaviourSection);
 
+  // STABLE SAFETY/PROTOCOL SECTIONS (injected before volatile basePrompt to extend cacheable region)
+  if (sections.safetySection) parts.push(sections.safetySection);
+  if (sections.protocolSection) parts.push(sections.protocolSection);
+  if (sections.tokenSection) parts.push(sections.tokenSection);
+
   // DYNAMIC/VOLATILE (Bottom tier - user query, task IDs, warnings)
   if (basePrompt) parts.push(basePrompt);
 
@@ -166,4 +236,6 @@ module.exports = {
   buildSkillsSection,
   buildDiscoverySection,
   injectSections,
+  _clearSectionCache,
+  _getSectionBuildCounts,
 };
