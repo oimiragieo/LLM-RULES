@@ -67,7 +67,13 @@ function stripComments(src) {
 // =============================================================================
 
 describe('VAL-CROSS-001: SubagentStart hook uses code module (not .md files) for tool whitelist', () => {
-  const IRON_LAW_PATH = path.join(ROOT, '.claude', 'hooks', 'lifecycle', 'subagent-start-iron-law.cjs');
+  const IRON_LAW_PATH = path.join(
+    ROOT,
+    '.claude',
+    'hooks',
+    'lifecycle',
+    'subagent-start-iron-law.cjs'
+  );
   const LOCKDOWN_PATH = path.join(ROOT, '.claude', 'hooks', 'routing', 'router-tool-lockdown.cjs');
 
   let hook;
@@ -95,8 +101,7 @@ describe('VAL-CROSS-001: SubagentStart hook uses code module (not .md files) for
     assert.ok(rawSrc.includes('router-tool-lockdown.cjs'), 'Must import router-tool-lockdown.cjs');
     // No fs.readFileSync/readFile calls on .md files in executable code
     const hasMdRead =
-      /readFileSync\s*\([^)]*\.md/.test(srcStripped) ||
-      /readFile\s*\([^)]*\.md/.test(srcStripped);
+      /readFileSync\s*\([^)]*\.md/.test(srcStripped) || /readFile\s*\([^)]*\.md/.test(srcStripped);
     assert.ok(!hasMdRead, 'Hook must not use fs to read .md files for the tool whitelist');
   });
 
@@ -168,7 +173,12 @@ describe('VAL-CROSS-002: Consolidated hooks coexist with new event categories', 
 
   it('post-tool-advisory-bundle.cjs imports all 4 consolidated sub-modules', () => {
     const src = fs.readFileSync(path.join(MON_DIR, 'post-tool-advisory-bundle.cjs'), 'utf8');
-    for (const m of ['post-tool-metrics-unified.cjs', 'context-window-monitor.cjs', 'hook-error-detector.cjs', 'recurring-issue-detector.cjs']) {
+    for (const m of [
+      'post-tool-metrics-unified.cjs',
+      'context-window-monitor.cjs',
+      'hook-error-detector.cjs',
+      'recurring-issue-detector.cjs',
+    ]) {
       assert.ok(src.includes(m), `Bundle must import "${m}"`);
     }
   });
@@ -176,21 +186,41 @@ describe('VAL-CROSS-002: Consolidated hooks coexist with new event categories', 
   it('UserPromptSubmit: exactly 1 advisory bundle registration for user-prompt-advisory-bundle.cjs', () => {
     const found = getAllHooks().filter(
       ({ eventName, hook }) =>
-        eventName === 'UserPromptSubmit' && (hook.command || '').includes('user-prompt-advisory-bundle.cjs')
+        eventName === 'UserPromptSubmit' &&
+        (hook.command || '').includes('user-prompt-advisory-bundle.cjs')
     );
     assert.strictEqual(found.length, 1, 'Must have exactly 1 UserPromptSubmit advisory bundle');
   });
 
   it('user-prompt-advisory-bundle.cjs imports all 6 consolidated sub-modules', () => {
     const src = fs.readFileSync(path.join(SES_DIR, 'user-prompt-advisory-bundle.cjs'), 'utf8');
-    for (const m of ['ccusage-statusline.cjs', 'startup-failopen-audit.cjs', 'worktree-prune-on-start.cjs', 'session-budget-watchdog.cjs', 'drift-detector.cjs', 'stale-task-detector.cjs']) {
+    for (const m of [
+      'ccusage-statusline.cjs',
+      'startup-failopen-audit.cjs',
+      'worktree-prune-on-start.cjs',
+      'session-budget-watchdog.cjs',
+      'drift-detector.cjs',
+      'stale-task-detector.cjs',
+    ]) {
       assert.ok(src.includes(m), `Bundle must import "${m}"`);
     }
   });
 
   it('new hook scripts do NOT appear inside the original 7 event category arrays', () => {
-    const original7 = ['UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'PostToolUseFailure', 'SessionEnd', 'PreCompact', 'Stop'];
-    const newScripts = ['subagent-start-iron-law.cjs', 'permission-denied-logger.cjs', 'session-start-watchpaths.cjs'];
+    const original7 = [
+      'UserPromptSubmit',
+      'PreToolUse',
+      'PostToolUse',
+      'PostToolUseFailure',
+      'SessionEnd',
+      'PreCompact',
+      'Stop',
+    ];
+    const newScripts = [
+      'subagent-start-iron-law.cjs',
+      'permission-denied-logger.cjs',
+      'session-start-watchpaths.cjs',
+    ];
     for (const cat of original7) {
       for (const group of getEventHooks(cat)) {
         for (const hook of group.hooks || []) {
@@ -211,16 +241,23 @@ describe('VAL-CROSS-002: Consolidated hooks coexist with new event categories', 
     ];
     const all = getAllHooks();
     for (const { event, script } of critical) {
-      const found = all.some(({ eventName, hook }) => eventName === event && (hook.command || '').includes(script));
+      const found = all.some(
+        ({ eventName, hook }) => eventName === event && (hook.command || '').includes(script)
+      );
       assert.ok(found, `Critical hook "${script}" must still be in ${event}`);
     }
   });
 
   it('routing-guard.cjs: exactly 1 PreToolUse registration covering all 5 tools', () => {
     const regs = getAllHooks().filter(
-      ({ eventName, hook }) => eventName === 'PreToolUse' && (hook.command || '').includes('routing-guard.cjs')
+      ({ eventName, hook }) =>
+        eventName === 'PreToolUse' && (hook.command || '').includes('routing-guard.cjs')
     );
-    assert.strictEqual(regs.length, 1, 'routing-guard.cjs must have exactly 1 PreToolUse registration');
+    assert.strictEqual(
+      regs.length,
+      1,
+      'routing-guard.cjs must have exactly 1 PreToolUse registration'
+    );
     const matcher = regs[0].matcher;
     for (const t of ['Glob', 'Grep', 'WebSearch', 'TaskCreate', 'TaskOutput']) {
       assert.ok(matcher.includes(t), `routing-guard matcher must include "${t}"`);
@@ -229,16 +266,26 @@ describe('VAL-CROSS-002: Consolidated hooks coexist with new event categories', 
 
   it('write-pretool-bundle.cjs: exactly 1 PreToolUse registration (deduplication)', () => {
     const regs = getAllHooks().filter(
-      ({ eventName, hook }) => eventName === 'PreToolUse' && (hook.command || '').includes('write-pretool-bundle.cjs')
+      ({ eventName, hook }) =>
+        eventName === 'PreToolUse' && (hook.command || '').includes('write-pretool-bundle.cjs')
     );
-    assert.strictEqual(regs.length, 1, 'write-pretool-bundle.cjs must have exactly 1 PreToolUse registration');
+    assert.strictEqual(
+      regs.length,
+      1,
+      'write-pretool-bundle.cjs must have exactly 1 PreToolUse registration'
+    );
   });
 
   it('sync-memory-index.cjs: exactly 1 PostToolUse registration (deduplication)', () => {
     const regs = getAllHooks().filter(
-      ({ eventName, hook }) => eventName === 'PostToolUse' && (hook.command || '').includes('sync-memory-index.cjs')
+      ({ eventName, hook }) =>
+        eventName === 'PostToolUse' && (hook.command || '').includes('sync-memory-index.cjs')
     );
-    assert.strictEqual(regs.length, 1, 'sync-memory-index.cjs must have exactly 1 PostToolUse registration');
+    assert.strictEqual(
+      regs.length,
+      1,
+      'sync-memory-index.cjs must have exactly 1 PostToolUse registration'
+    );
   });
 });
 
@@ -247,7 +294,18 @@ describe('VAL-CROSS-002: Consolidated hooks coexist with new event categories', 
 // =============================================================================
 
 describe('VAL-CROSS-003: settings.json integrity after all milestones', () => {
-  const ALL10 = ['UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'PostToolUseFailure', 'SessionEnd', 'PreCompact', 'Stop', 'SubagentStart', 'PermissionDenied', 'SessionStart'];
+  const ALL10 = [
+    'UserPromptSubmit',
+    'PreToolUse',
+    'PostToolUse',
+    'PostToolUseFailure',
+    'SessionEnd',
+    'PreCompact',
+    'Stop',
+    'SubagentStart',
+    'PermissionDenied',
+    'SessionStart',
+  ];
 
   it('settings.json parses and has exactly 10 event categories', () => {
     assert.ok(settings !== null && typeof settings === 'object');
@@ -265,14 +323,21 @@ describe('VAL-CROSS-003: settings.json integrity after all milestones', () => {
   it('every hook registration has timeout_ms set (100% coverage)', () => {
     const missing = getAllHooks()
       .filter(({ hook }) => hook.timeout_ms === undefined || hook.timeout_ms === null)
-      .map(({ eventName, matcher, hook }) => `${eventName}[${matcher}] → ${scriptName(hook.command)}`);
+      .map(
+        ({ eventName, matcher, hook }) => `${eventName}[${matcher}] → ${scriptName(hook.command)}`
+      );
     assert.deepStrictEqual(missing, [], `Hooks missing timeout_ms: ${missing.join(', ')}`);
   });
 
   it('all timeout_ms values are in bounds (2000–60000ms)', () => {
     const bad = getAllHooks()
-      .filter(({ hook }) => hook.timeout_ms !== undefined && (hook.timeout_ms < 2000 || hook.timeout_ms > 60000))
-      .map(({ eventName, hook }) => `${eventName}: ${scriptName(hook.command)}=${hook.timeout_ms}ms`);
+      .filter(
+        ({ hook }) =>
+          hook.timeout_ms !== undefined && (hook.timeout_ms < 2000 || hook.timeout_ms > 60000)
+      )
+      .map(
+        ({ eventName, hook }) => `${eventName}: ${scriptName(hook.command)}=${hook.timeout_ms}ms`
+      );
     assert.deepStrictEqual(bad, [], `Timeouts out of 2000–60000 range: ${bad.join(', ')}`);
   });
 
@@ -324,7 +389,11 @@ describe('VAL-CROSS-004: denial-log.json is consumable by routing feedback reade
   });
 
   after(() => {
-    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) { /* EBUSY on Windows */ }
+    try {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    } catch (_) {
+      /* EBUSY on Windows */
+    }
   });
 
   it('denial-feedback-reader.cjs exists and exports getDenialFeedback, readDenialLog, buildSummary', () => {
@@ -366,10 +435,30 @@ describe('VAL-CROSS-004: denial-log.json is consumable by routing feedback reade
   it('getDenialFeedback: populated log → correct summary (totalDenials, deniedTools, toolCounts)', () => {
     const p = path.join(tmpDir, 'populated.json');
     const entries = [
-      { tool: 'Edit', reason: 'router violation', timestamp: '2026-01-01T00:00:00.000Z', session_id: 'a' },
-      { tool: 'Bash', reason: 'router violation', timestamp: '2026-01-01T00:01:00.000Z', session_id: 'a' },
-      { tool: 'Edit', reason: 'router violation', timestamp: '2026-01-01T00:02:00.000Z', session_id: 'b' },
-      { tool: 'WebSearch', reason: 'router violation', timestamp: '2026-01-01T00:03:00.000Z', session_id: 'b' },
+      {
+        tool: 'Edit',
+        reason: 'router violation',
+        timestamp: '2026-01-01T00:00:00.000Z',
+        session_id: 'a',
+      },
+      {
+        tool: 'Bash',
+        reason: 'router violation',
+        timestamp: '2026-01-01T00:01:00.000Z',
+        session_id: 'a',
+      },
+      {
+        tool: 'Edit',
+        reason: 'router violation',
+        timestamp: '2026-01-01T00:02:00.000Z',
+        session_id: 'b',
+      },
+      {
+        tool: 'WebSearch',
+        reason: 'router violation',
+        timestamp: '2026-01-01T00:03:00.000Z',
+        session_id: 'b',
+      },
     ];
     fs.writeFileSync(p, JSON.stringify(entries), 'utf8');
     const s = reader.getDenialFeedback(p);
@@ -389,7 +478,13 @@ describe('VAL-CROSS-004: denial-log.json is consumable by routing feedback reade
     fs.writeFileSync(p, JSON.stringify(entries), 'utf8');
     const s = reader.getDenialFeedback(p);
     assert.strictEqual(s.mostRecentEntry.tool, 'Glob', 'mostRecentEntry must be last entry');
-    assert.ok('tool' in s.mostRecentEntry && 'reason' in s.mostRecentEntry && 'timestamp' in s.mostRecentEntry && 'session_id' in s.mostRecentEntry, 'Entry must have all 4 schema fields');
+    assert.ok(
+      'tool' in s.mostRecentEntry &&
+        'reason' in s.mostRecentEntry &&
+        'timestamp' in s.mostRecentEntry &&
+        'session_id' in s.mostRecentEntry,
+      'Entry must have all 4 schema fields'
+    );
   });
 
   it('getDenialFeedback does not throw on the real denial-log.json (if it exists)', () => {

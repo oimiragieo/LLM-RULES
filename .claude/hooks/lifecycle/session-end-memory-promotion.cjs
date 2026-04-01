@@ -118,6 +118,53 @@ function main() {
         `[session-end-memory-promotion] consolidateSession returned failure for ${sessionId}: ${reason}\n`
       );
     }
+
+    // ── Dream-equivalent: check if daily-log consolidation should run ────────
+    // Gates: 24h time gate + 5-session gate + scan throttle.
+    // Runs AFTER STM→MTM promotion so the new session counts toward the gate.
+    try {
+      const { shouldConsolidate, tryAcquireConsolidationLock, readLastConsolidatedAt } = require(
+        path.join(LIB_DIR, 'memory', 'consolidation-lock.cjs')
+      );
+
+      const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
+      const check = shouldConsolidate(memoryDir);
+
+      if (check.should) {
+        const priorMtime = tryAcquireConsolidationLock(memoryDir);
+        if (priorMtime !== null) {
+          process.stderr.write(
+            `[session-end-memory-promotion] Consolidation gates passed (${check.sessionCount} sessions, ${check.hoursSince?.toFixed(1)}h). Running...\n`
+          );
+
+          const { consolidate } = require(path.join(LIB_DIR, 'memory', 'memory-consolidator.cjs'));
+          const cutoff = readLastConsolidatedAt(memoryDir);
+          const consolidationResult = consolidate(memoryDir, cutoff);
+
+          process.stderr.write(
+            `[session-end-memory-promotion] Consolidation complete: ${consolidationResult.processed} logs processed, ${consolidationResult.extracted} items extracted.\n`
+          );
+          // Lock mtime is now stamped to Date.now() by the writeFileSync in tryAcquire.
+          // No additional stamp needed — the lock file's mtime IS the "last consolidated" time.
+        } else {
+          process.stderr.write(
+            '[session-end-memory-promotion] Consolidation lock held by another process — skipping.\n'
+          );
+        }
+      } else {
+        process.stderr.write(
+          `[session-end-memory-promotion] Consolidation skipped: ${check.reason}` +
+            (check.sessionCount != null ? ` (sessions=${check.sessionCount})` : '') +
+            (check.hoursSince != null ? ` (hours=${check.hoursSince?.toFixed(1)})` : '') +
+            '\n'
+        );
+      }
+    } catch (consolidationErr) {
+      // Consolidation is non-critical — log and continue
+      process.stderr.write(
+        `[session-end-memory-promotion] Consolidation error (ignored): ${consolidationErr.message}\n`
+      );
+    }
   } catch (err) {
     // SE-03: Lifecycle hooks must be fail-open — log and exit 0
     process.stderr.write(`[session-end-memory-promotion] Error (ignored): ${err.message}\n`);

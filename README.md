@@ -17,7 +17,15 @@ If you want a local-first, reproducible agent stack with strict validation and h
 
 ## Recent Changes
 
+### Post-Phase 8 — Audit Fixes
+
+- **Consolidation wiring**: Connected Dream-equivalent pipeline (shouldConsolidate → acquireLock → consolidate → mtime stamp) in session-end hook — modules were built but never called
+- **Flat-file rotation fix**: `parseSections()` line-based fallback prevents 572KB bloat recurrence
+- **6 unreachable agents routed**: Added 22 flat routing keywords for product/business agents
+- **Cleanup**: Deleted 2 duplicate hooks, 1 orphaned workflow, fixed stale agent count
+
 ### Phase 8 — Memory Consolidation (Dream-inspired)
+
 - **Index discipline**: 25KB/200-line dual caps on markdown memory files, [PERMANENT] section preservation, automatic archival with warning lines, memory health reporting (16 tests)
 - **Daily log + consolidation**: Append-only timestamped daily logs at `logs/YYYY/MM/YYYY-MM-DD.md`, 4-phase Dream-inspired consolidation (Orient/Gather/Consolidate/Prune), heuristic keyword extraction, idempotent processing with manifest tracking, session-end hook integration (48 tests)
 - **Mtime lock + session trigger**: CC-style mtime-as-timestamp lock file, PID-based holder tracking with 60min stale detection, 24h time gate + 5-session count gate + 10min scan throttle, rollback on failure (28 tests)
@@ -25,22 +33,26 @@ If you want a local-first, reproducible agent stack with strict validation and h
 - **Source**: 4 patterns adopted from Claude Code's Dream memory consolidation system
 
 ### Phase 7 — Security & Advanced Integration
+
 - **Security hardening**: Case-normalized path comparison for case-insensitive filesystems, UNC path blocking (NTLM leak prevention), URL-encoded/backslash traversal detection, CC dangerous-pattern alignment with word-boundary matching, compound command analysis (single `&`, `$(...)`, backtick substitutions) (76 tests)
 - **Hook enhancements**: `updatedInput` for bash safety prefixes (`set -euo pipefail` injection on unsafe multi-line scripts), `suppressOutput` on security blocks to prevent context inflation, denial-based routing feedback with agent suggestions after repeated tool denials (10 tests)
 - **Agent enhancements**: `disallowedTools` field (excludes tools from prompt assembly with conflict resolution), `mcpServers` scoping (limits MCP visibility per agent), `fork_eligible` boolean field in agent schema (29 tests)
 - **Cross-area integration**: Case-normalized blocking + cache stability, denial tracking to routing feedback end-to-end, suppressOutput context inflation prevention, agent schema round-trip (14 tests)
 
 ### Phase 6 — Prompt Cache & Context Intelligence
+
 - **Prompt cache optimization**: Alphabetical tool/skill sorting, section memoization, duplicate contract elimination, cache-break-detector with SHA-256 hashing (45 tests)
 - **Context management**: Pre-compact activeFiles persistence, threshold alignment with CC auto-compact at 93.5%, microcompact detection, circuit breaker (23 tests)
 - **Cross-area integration**: Cache stability, tool change isolation, combined monitor output, prefix hash stability (10 tests)
 
 ### Phase 5 — Foundation & Performance
+
 - **Rules compression**: CLAUDE.md + rules 66,374 to 36,679 chars (-45%), file merges, individual compression, frontmatter scoping (70 tests)
 - **Hook overhaul**: 25 hooks to async, 63 timeout_ms additions, 3 deduplications, 2 consolidation bundles, 5 startup sentinels (142 tests)
 - **New hook events**: SubagentStart (Iron Law validator), PermissionDenied (denial logger), SessionStart (watchPaths) (193 tests with cross-area)
 
 ### Phase 4 — Hermes Assimilation (Competitive Parity)
+
 - **Intelligent runtime**: Cost pricing table with real $/MTok rates and auto-downgrade (opus->sonnet->haiku), flight recorder redaction with SENSITIVE_KEYS, mixture-of-agents consensus tool (96 tests)
 - **Autonomous skills**: Skill auto-creator from session transcripts with Jaccard similarity and security scanning, SQLite FTS5 full-text search over session JSONL logs (79 tests)
 - **Execution infrastructure**: Process registry with spawn/stop/checkpoint/restore and stdout RingBuffer, plugin tool registration with manifest schema extension (55 tests)
@@ -48,24 +60,28 @@ If you want a local-first, reproducible agent stack with strict validation and h
 - **Source**: 8 high-value features assimilated from nousresearch/hermes-agent (~20K LOC analyzed)
 
 ### Phase 3 — Self-Evolving Skills, GitHub Integration, Nomenclature & Production Audit
+
 - **Self-evolving skills**: Usage tracking, pattern detection, suggestion generation, evolution triggers (91 tests)
 - **GitHub integration**: CLI client wrapping `gh`, webhook simulator, mention parser, task dispatcher, CI status reporter (152 tests)
 - **Nomenclature cleanup**: `droid` → `agent`, `.factory-plugin` → `.claude-plugin` across plugin system
 - **Production audit**: Fixed all missing hooks (62 verified), replaced stub scripts, wired 32 unreachable agents to flat routing, fixed 7 misrouted keywords, fixed broken imports, added smoke tests for 14 untested modules (178 tests)
 
 ### Phase 2 — Model Routing, Readiness CLI, Knowledge Graph & Observability
+
 - **Model routing**: Registry, cost prediction, provider compatibility, dynamic router with budget-aware auto-downgrade (opus→sonnet→haiku) (174 tests)
 - **Readiness CLI**: Score/report/remediate commands with 4-format output (terminal/markdown/JSON/summary) (123 tests)
 - **Cross-repo knowledge graph**: Federated query across repositories, relationship inference, portable exports to `~/.claude/knowledge/` (119 tests)
 - **Observability CLI**: Unified log aggregation, alert management, cost reporting with status/events/alerts/costs commands (169 tests)
 
 ### Phase 1 — Mission Orchestrator, Plugin Marketplace, Headless Execution & Code Review
+
 - **Mission orchestrator**: Dispatch loop, handoff pipeline, milestone gates, state recovery, E2E tests (100+ tests)
 - **Plugin marketplace**: Manifest validation, 3-scope resolution, git marketplace, runtime loading (160 tests)
 - **Headless execution**: 5-tier autonomy, 4 output formats (JSON/markdown/SARIF/JUnit), permission enforcement (139 tests)
 - **Code review pipeline**: Diff parsing, P0-P3 severity, 8-criteria bug detection, 2-pass review pipeline (101 tests)
 
 ### Phase 8 — System Repair (Prior)
+
 - **Test suite**: 201 failures → 0 (framework 3256/0, tools 462/0)
 - **Reflection system**: Fixed score normalization, registered missing hooks, token reporting
 - **A2A Protocol**: Auto-start hook, graceful shutdown, lazy client dispatch
@@ -148,22 +164,22 @@ Agent Studio natively supports integrating with other headless LLM Code CLIs (Ge
 
 Agent Studio includes several integrated subsystems built across four development phases:
 
-| System | Path | Purpose |
-|--------|------|---------|
-| Mission Orchestrator | `.claude/lib/mission/` | Dispatch loop, handoff pipeline, milestone gates, state recovery |
-| Plugin Marketplace | `.claude/lib/plugins/` | Manifest validation, 3-scope resolution, git marketplace, runtime loading |
-| Headless Execution | `.claude/lib/exec/` | 5-tier autonomy enforcement, multi-format output (JSON/markdown/SARIF/JUnit) |
-| Code Review Pipeline | `.claude/lib/review/` | Diff parsing, P0-P3 severity classification, 8-criteria bug detection |
-| Model Router | `.claude/lib/routing/` | Cost-aware model selection, budget engine with auto-downgrade chain |
-| Readiness CLI | `.claude/lib/readiness/` | Project readiness scoring, configurable thresholds, 4-format reporting |
-| Knowledge Graph | `.claude/lib/memory/` | Cross-repo federated query, relationship inference, portable exports |
-| Observability CLI | `.claude/lib/monitoring/` | Unified log aggregation, alert management, cost tracking |
-| Self-Evolving Skills | `.claude/lib/evolution/` | Usage tracking, pattern detection, suggestion generation, evolution triggers |
-| GitHub Integration | `.claude/lib/github/` | `gh` CLI wrapper, webhook simulation, mention parsing, CI status reporting |
-| Consensus Engine | `.claude/lib/consensus/` | Mixture-of-agents fan-out, multi-model consensus synthesis |
-| Skill Auto-Creator | `.claude/lib/evolution/` | Session transcript analysis, autonomous skill generation, security scanning |
-| Session FTS Index | `.claude/lib/memory/` | SQLite FTS5 full-text search over session JSONL logs |
-| Process Registry | `.claude/lib/workers/` | Background process lifecycle, checkpoint/restore, stdout ring buffer |
+| System               | Path                      | Purpose                                                                      |
+| -------------------- | ------------------------- | ---------------------------------------------------------------------------- |
+| Mission Orchestrator | `.claude/lib/mission/`    | Dispatch loop, handoff pipeline, milestone gates, state recovery             |
+| Plugin Marketplace   | `.claude/lib/plugins/`    | Manifest validation, 3-scope resolution, git marketplace, runtime loading    |
+| Headless Execution   | `.claude/lib/exec/`       | 5-tier autonomy enforcement, multi-format output (JSON/markdown/SARIF/JUnit) |
+| Code Review Pipeline | `.claude/lib/review/`     | Diff parsing, P0-P3 severity classification, 8-criteria bug detection        |
+| Model Router         | `.claude/lib/routing/`    | Cost-aware model selection, budget engine with auto-downgrade chain          |
+| Readiness CLI        | `.claude/lib/readiness/`  | Project readiness scoring, configurable thresholds, 4-format reporting       |
+| Knowledge Graph      | `.claude/lib/memory/`     | Cross-repo federated query, relationship inference, portable exports         |
+| Observability CLI    | `.claude/lib/monitoring/` | Unified log aggregation, alert management, cost tracking                     |
+| Self-Evolving Skills | `.claude/lib/evolution/`  | Usage tracking, pattern detection, suggestion generation, evolution triggers |
+| GitHub Integration   | `.claude/lib/github/`     | `gh` CLI wrapper, webhook simulation, mention parsing, CI status reporting   |
+| Consensus Engine     | `.claude/lib/consensus/`  | Mixture-of-agents fan-out, multi-model consensus synthesis                   |
+| Skill Auto-Creator   | `.claude/lib/evolution/`  | Session transcript analysis, autonomous skill generation, security scanning  |
+| Session FTS Index    | `.claude/lib/memory/`     | SQLite FTS5 full-text search over session JSONL logs                         |
+| Process Registry     | `.claude/lib/workers/`    | Background process lifecycle, checkpoint/restore, stdout ring buffer         |
 
 ## Framework Upgrade Initiative (Phase 1 Complete)
 

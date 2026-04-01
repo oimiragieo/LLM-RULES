@@ -88,7 +88,11 @@ describe('buildToolsSection() memoization — hits on identical inputs', () => {
       const result2 = sections.buildToolsSection(tools2);
       const count2 = sections._getSectionBuildCounts().toolsSection;
 
-      assert.strictEqual(count2, 1, 'Second call with identical content must be a cache hit (count still 1)');
+      assert.strictEqual(
+        count2,
+        1,
+        'Second call with identical content must be a cache hit (count still 1)'
+      );
       assert.strictEqual(result1, result2, 'Cached result must equal original result');
     });
   });
@@ -142,7 +146,11 @@ describe('buildDiscoverySection() memoization — hits on identical inputs', () 
       sections._clearSectionCache();
 
       const result1 = sections.buildDiscoverySection();
-      assert.strictEqual(sections._getSectionBuildCounts().discoverySection, 1, 'First call computes');
+      assert.strictEqual(
+        sections._getSectionBuildCounts().discoverySection,
+        1,
+        'First call computes'
+      );
 
       const result2 = sections.buildDiscoverySection();
       const result3 = sections.buildDiscoverySection();
@@ -217,14 +225,26 @@ describe('Memoization misses on changed inputs (VAL-PC-008)', () => {
     withFreshSections(sections => {
       sections._clearSectionCache();
 
-      const toolAvailable = [{ name: 'Alpha', description: 'A', status: 'available', category: 'T' }];
-      const toolUnavailable = [{ name: 'Alpha', description: 'A', status: 'unavailable', category: 'T' }];
+      const toolAvailable = [
+        { name: 'Alpha', description: 'A', status: 'available', category: 'T' },
+      ];
+      const toolUnavailable = [
+        { name: 'Alpha', description: 'A', status: 'unavailable', category: 'T' },
+      ];
 
       const result1 = sections.buildToolsSection(toolAvailable);
       const result2 = sections.buildToolsSection(toolUnavailable);
 
-      assert.strictEqual(sections._getSectionBuildCounts().toolsSection, 2, 'Status change must be a cache miss');
-      assert.notStrictEqual(result1, result2, 'Available vs unavailable must produce different output');
+      assert.strictEqual(
+        sections._getSectionBuildCounts().toolsSection,
+        2,
+        'Status change must be a cache miss'
+      );
+      assert.notStrictEqual(
+        result1,
+        result2,
+        'Available vs unavailable must produce different output'
+      );
     });
   });
 });
@@ -238,10 +258,18 @@ describe('_clearSectionCache() resets caches and build counters', () => {
     withFreshSections(sections => {
       const tools = makeTools(['Alpha']);
       sections.buildToolsSection(tools);
-      assert.strictEqual(sections._getSectionBuildCounts().toolsSection, 1, 'Before clear: 1 computation');
+      assert.strictEqual(
+        sections._getSectionBuildCounts().toolsSection,
+        1,
+        'Before clear: 1 computation'
+      );
 
       sections._clearSectionCache();
-      assert.strictEqual(sections._getSectionBuildCounts().toolsSection, 0, 'After clear: count reset to 0');
+      assert.strictEqual(
+        sections._getSectionBuildCounts().toolsSection,
+        0,
+        'After clear: count reset to 0'
+      );
 
       sections.buildToolsSection(tools);
       assert.strictEqual(
@@ -259,10 +287,18 @@ describe('_clearSectionCache() resets caches and build counters', () => {
       assert.strictEqual(sections._getSectionBuildCounts().skillsSection, 1);
 
       sections._clearSectionCache();
-      assert.strictEqual(sections._getSectionBuildCounts().skillsSection, 0, 'Count reset after clear');
+      assert.strictEqual(
+        sections._getSectionBuildCounts().skillsSection,
+        0,
+        'Count reset after clear'
+      );
 
       sections.buildSkillsSection(skills);
-      assert.strictEqual(sections._getSectionBuildCounts().skillsSection, 1, 'Recomputed after clear');
+      assert.strictEqual(
+        sections._getSectionBuildCounts().skillsSection,
+        1,
+        'Recomputed after clear'
+      );
     });
   });
 
@@ -435,7 +471,10 @@ describe('Safety/protocol blocks appear before basePrompt in assembled output (V
         includeMemory: false,
       });
 
-      assert.ok(!prompt.includes('FORBIDDEN COMMANDS'), 'FORBIDDEN COMMANDS must be absent when kill switch is off');
+      assert.ok(
+        !prompt.includes('FORBIDDEN COMMANDS'),
+        'FORBIDDEN COMMANDS must be absent when kill switch is off'
+      );
     } finally {
       if (origSafety === undefined) {
         delete process.env.SPAWN_SAFETY_PREAMBLE;

@@ -403,6 +403,7 @@ export default [
       '.claude/tools/cli/telegram-poll.cjs',
       '.claude/tools/cli/telegram-claude-bridge.cjs',
       '.claude/tools/cli/telegram-command-router.cjs',
+      '.claude/lib/routing/routing-table-core-map.cjs',
     ],
     rules: {
       'max-lines': ['warn', { max: 650, skipBlankLines: true, skipComments: true }],

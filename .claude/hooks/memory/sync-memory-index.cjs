@@ -362,26 +362,14 @@ async function main() {
       maybeGenerateEmbeddingsForFile(absPath);
     }
 
-    // Trigger rotation if file exceeds threshold (best-effort)
+    // Enforce 25KB / 200-line caps on markdown memory files (best-effort)
     try {
-      const stats = fs.statSync(absPath);
-      const sizeKB = stats.size / 1024;
-      if (sizeKB > 20) {
-        // File exceeds 20KB - trigger rotation
-        const rotatorPath = path.join(
-          PROJECT_ROOT,
-          '.claude',
-          'lib',
-          'memory',
-          'memory-rotator.cjs'
-        );
-        if (fs.existsSync(rotatorPath)) {
-          const { rotateIfNeeded } = require(rotatorPath);
-          rotateIfNeeded(absPath, { thresholdKB: 20 });
-        }
+      if (fileType === 'markdown') {
+        const { enforceMemoryCaps } = require('../../lib/memory/memory-rotator.cjs');
+        enforceMemoryCaps(absPath);
       }
     } catch (_e) {
-      // Rotation is best-effort in hooks
+      // Cap enforcement is best-effort in hooks
     }
 
     output = {

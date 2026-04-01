@@ -159,7 +159,7 @@ function createSectionObject(content, explicitTitle = '') {
  *
  * @param {string} filePath - Absolute path to memory file
  * @param {Object} options - Rotation options
- * @param {number} [options.thresholdKB=20] - Size threshold in KB
+ * @param {number} [options.thresholdKB=25] - Size threshold in KB
  * @param {number} [options.keepSections=10] - Number of recent sections to keep
  * @param {string} [options.archiveDir='archive'] - Archive directory name (relative to file)
  * @param {string} [options.projectRoot=PROJECT_ROOT] - Project root for path validation

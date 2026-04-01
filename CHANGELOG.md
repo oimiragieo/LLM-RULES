@@ -7,9 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Post-Phase 8 — Audit Fixes & Consolidation Wiring
+
+#### Fixed
+
+- **Memory consolidation pipeline wiring**: Connected `shouldConsolidate()` → `tryAcquireConsolidationLock()` → `consolidate()` in `session-end-memory-promotion.cjs` — modules existed but were dead code (never called from any hook)
+- **`parseSections()` flat-file fallback**: Added line-based synthetic sectioning (50 lines/section) for flat bullet-point files that escaped rotation (root cause of 572KB `issues.md` bloat)
+- **`sync-memory-index.cjs` cap enforcement**: Replaced `rotateIfNeeded(thresholdKB: 20)` with `enforceMemoryCaps()` using new 25KB/200-line dual caps
+- **Memory file caps**: Lowered all thresholds from 40KB to 25KB (matches Claude Code's 200-line/25KB MEMORY.md discipline)
+- **LTM eviction**: Ran `evictOldLTMSummaries()` — pruned 41→21 files (cap is 20)
+- **6 unreachable agents**: Added 22 flat routing keywords for `aso-specialist`, `brand-guardian`, `compliance-checker`, `feedback-synthesizer`, `marketing-strategist`, `ux-researcher` — previously only reachable with `HIERARCHICAL_ROUTING=on`
+- **Duplicate hook files**: Deleted unwired `safety/startup-failopen-audit.cjs` and `session/worktree-prune-on-start.cjs` (canonical copies in `startup/`)
+- **Orphaned workflow**: Deleted `skill-creator-reference-skill-workflow.md` (references non-existent skill)
+- **Stale agent count**: Updated `agents.md` from "110 agents" to "119 agents"
+- **Duplicate routing key**: Fixed `go-to-market` duplicate in `routing-table-core-map.cjs`
+
+#### Added
+
+- **`enforceMemoryCaps()`** in `memory-rotator.cjs` — dual 25KB + 200-line cap with iterative pruning, [PERMANENT] preservation, daily archive append
+- **`memoryHealth()`** in `memory-rotator.cjs` — scanner for all `.md` files reporting over-cap status
+- **26 integration tests** in `memory-dream-consolidation.test.cjs` — daily log, extraction, consolidation pipeline, lock lifecycle, gate logic, parseSections fallback, enforceMemoryCaps, memoryHealth
+
 ### Phase 3 — Self-Evolving Skills, GitHub Integration, Nomenclature & Production Audit
 
 #### Added
+
 - **Self-evolving skill system** (`.claude/lib/evolution/`)
   - `SkillUsageTracker` — JSONL-based invocation recording with success rates, latency tracking
   - `PatternDetector` — Analyzes usage data for frequently-failing, underutilized, high-latency, and co-occurring skill patterns
@@ -27,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 152 tests across 5 modules
 
 #### Changed
+
 - **Nomenclature cleanup** — Renamed `droid` → `agent` and `.factory-plugin` → `.claude-plugin` across plugin system
   - `resolveDroid()` → `resolveAgent()` in resolver.cjs
   - `loadDroid()` → `loadAgent()` in loader.cjs
@@ -36,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - All corresponding test files updated
 
 #### Fixed
+
 - **Missing hooks** — Created functional implementations for `context-monitor.cjs` (context window usage monitoring with 70%/85% thresholds) and `audit-skill-recency.cjs` (skill staleness detection). All 62 hooks in settings.json now exist and pass syntax validation.
 - **Stub scripts** — Replaced 6 stub scripts with functional implementations: `implementation-readiness/scripts/main.cjs`, `github-mcp` pre/post-execute hooks, `differential-review` pre/post-execute hooks, `github-ops.cjs` tool
 - **Routing wiring** — Added flat routing keywords for 32 previously unreachable agents. Fixed 7 misrouted keywords (wordpress→wordpress-master, kotlin→kotlin-pro, spring→spring-boot-pro, sql→sql-pro, postgres→postgres-pro). Fixed data_science intent routing (data-engineer→data-scientist). Fixed claude-md-auditor model config (removed embedded quotes).
@@ -45,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Phase 2 — Model Routing, Readiness CLI, Knowledge Graph & Observability
 
 #### Added
+
 - **Model routing system** (`.claude/lib/routing/`)
   - `ModelRegistry` — JSON-config-based model registry with shorthand aliases and capability-based selection
   - `CostPredictor` — Token estimation and cost prediction with model suggestion and budget status
@@ -75,12 +100,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 169 tests across 4 modules
 
 #### Fixed
+
 - **Readiness null JSON crash** — Added type guard for `JSON.parse('null')` in readiness-config.cjs
 - **Readiness pillarThresholds** — Fixed loadConfig to preserve user-provided pillarThresholds
 
 ### Phase 1 — Mission Orchestrator, Plugin Marketplace, Headless Execution & Code Review
 
 #### Added
+
 - **Mission orchestrator** (`.claude/lib/mission/`)
   - Dispatch loop with feature assignment and worker session management
   - Handoff pipeline for structured worker return data
@@ -111,6 +138,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 101 tests across 3 modules
 
 #### Fixed
+
 - **HandoffWatcher Windows polling** — Fixed re-detection after debounce with pipeline.stop()
 
 ### Phase 8 — System Repair Mission (2026-03-29)
