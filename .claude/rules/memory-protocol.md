@@ -23,9 +23,9 @@ paths:
 - **MTM** (`.claude/context/memory/mtm/`) — Last 10 sessions; STM promotes to MTM on session end
 - **LTM** (`.claude/context/memory/ltm/`) — Permanent compressed summaries
 
-### File-Based Rotation
+### File-Based Rotation (25KB Cap)
 
-Active markdown files (`learnings.md`, `decisions.md`, `issues.md`) rotate to `.claude/context/memory/archive/` when they exceed size thresholds (`LEARNINGS_ARCHIVE_THRESHOLD_KB`, `DECISIONS_WARN_THRESHOLD_KB` env vars). `codebase_map.json` max 500 entries (`CODEBASE_MAP_MAX_ENTRIES`). Rotation is size-based, not time-based.
+**Hard cap: 25KB per markdown memory file** (matches Claude Code's 200-line/25KB MEMORY.md discipline). Active files (`learnings.md`, `decisions.md`, `issues.md`) rotate to `.claude/context/memory/archive/` when they exceed 25KB. Rotation handles both section-delimited (`---`/`## `) and flat bullet-point formats via synthetic sectioning. `codebase_map.json` max 500 entries. JSON files (`patterns.json`, `gotchas.json`) capped at 20 items each.
 
 ## Memory APIs
 

@@ -29,9 +29,11 @@ const DATE_REGEX = /\*\*Date:\*\*\s*(\d{4}-\d{2}-\d{2})/i;
 const PERMANENT_TAG_REGEX = /\[PERMANENT\]/i;
 const RESOLVED_STATUS_REGEX = /\*\*Status:\s*RESOLVED\*\*/i;
 
-// Default options
-const DEFAULT_THRESHOLD_KB = 40;
+// Default options — 25KB matches Claude Code's memory discipline (200 lines / 25KB cap)
+const DEFAULT_THRESHOLD_KB = 25;
 const DEFAULT_KEEP_SECTIONS = 10;
+// For line-based fallback: group N lines into synthetic sections
+const LINES_PER_SYNTHETIC_SECTION = 50;
 
 /**
  * Parse a markdown memory file into sections.
@@ -86,9 +88,27 @@ function parseSections(content) {
       sections.push(createSectionObject(currentSection.join('\n'), currentTitle));
     }
   }
-  // No delimiters found - treat entire content as single section
+  // No delimiters found — line-based fallback: group into synthetic sections
+  // This handles flat bullet-point files (e.g., issues.md with [ROUTING WARN] lines)
+  // that previously escaped rotation because parseSections returned a single section.
   else if (content.trim().length > 0) {
-    sections = [createSectionObject(content)];
+    const lines = content.split('\n').filter(l => l.trim().length > 0);
+    if (lines.length > LINES_PER_SYNTHETIC_SECTION) {
+      for (let i = 0; i < lines.length; i += LINES_PER_SYNTHETIC_SECTION) {
+        const chunk = lines.slice(i, i + LINES_PER_SYNTHETIC_SECTION);
+        const chunkContent = chunk.join('\n');
+        // Try to extract a date from the chunk for sorting
+        const section = createSectionObject(chunkContent);
+        // Also try ISO timestamp pattern common in log-style entries
+        if (!section.date) {
+          const isoMatch = chunkContent.match(/(\d{4}-\d{2}-\d{2})T/);
+          if (isoMatch) section.date = isoMatch[1];
+        }
+        sections.push(section);
+      }
+    } else {
+      sections = [createSectionObject(content)];
+    }
   }
 
   return sections;

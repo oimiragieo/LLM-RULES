@@ -76,16 +76,17 @@ const CONFIG = {
     sessions: parseInt(process.env.MEMORY_MAX_ITEMS_SESSIONS || '5', 10),
   },
   MAX_SESSIONS: parseInt(process.env.MEMORY_MAX_SESSIONS || '50', 10),
+  // 25KB cap matches Claude Code's memory discipline (200 lines / 25KB)
   LEARNINGS_ARCHIVE_THRESHOLD_KB: parseInt(
-    process.env.MEMORY_LEARNINGS_ARCHIVE_THRESHOLD_KB || '40',
+    process.env.MEMORY_LEARNINGS_ARCHIVE_THRESHOLD_KB || '25',
     10
   ),
   LEARNINGS_KEEP_LINES: parseInt(process.env.MEMORY_LEARNINGS_KEEP_LINES || '50', 10),
   CODEBASE_MAP_TTL_DAYS: parseInt(process.env.MEMORY_CODEBASE_MAP_TTL_DAYS || '90', 10),
   CODEBASE_MAP_MAX_ENTRIES: parseInt(process.env.MEMORY_CODEBASE_MAP_MAX_ENTRIES || '500', 10),
-  LEARNINGS_WARN_THRESHOLD_KB: parseInt(process.env.MEMORY_LEARNINGS_WARN_THRESHOLD_KB || '40', 10),
+  LEARNINGS_WARN_THRESHOLD_KB: parseInt(process.env.MEMORY_LEARNINGS_WARN_THRESHOLD_KB || '20', 10),
   CODEBASE_MAP_WARN_ENTRIES: parseInt(process.env.MEMORY_CODEBASE_MAP_WARN_ENTRIES || '400', 10),
-  DECISIONS_WARN_THRESHOLD_KB: parseInt(process.env.MEMORY_DECISIONS_WARN_THRESHOLD_KB || '80', 10),
+  DECISIONS_WARN_THRESHOLD_KB: parseInt(process.env.MEMORY_DECISIONS_WARN_THRESHOLD_KB || '20', 10),
 };
 
 function getMemoryDir(projectRoot = PROJECT_ROOT) {
