@@ -29,6 +29,15 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
+const {
+  CLAUDE_CODE_DANGEROUS_PATTERNS,
+  splitCompoundCommand,
+  normalizeCommandToken,
+  getLeadingCommandTokens,
+  findClaudeCodeDangerousPattern,
+  formatDangerousPatternWarning,
+  analyzeClaudeCodeDangerousPatterns,
+} = require('./validators/claude-code-dangerous-patterns.cjs');
 
 // SEC-AUDIT-020: Import emitBlockVerdict for bypass audit trail
 let _emitBlockVerdict;
@@ -509,6 +518,24 @@ async function main() {
       process.exit(2);
     }
 
+    const dangerousPatternAnalysis = analyzeClaudeCodeDangerousPatterns(command);
+    if (dangerousPatternAnalysis.blocked) {
+      const reason =
+        `Compound command segment ${dangerousPatternAnalysis.blocked.segmentIndex} blocked: ` +
+        dangerousPatternAnalysis.blocked.error;
+      emitBashBlockVerdict(command, reason);
+      console.error(formatBlockedMessage(command, reason));
+      process.exit(2);
+    }
+
+    if (dangerousPatternAnalysis.matches.length > 0) {
+      process.stdout.write(
+        JSON.stringify({
+          additionalContext: formatDangerousPatternWarning(dangerousPatternAnalysis.matches),
+        })
+      );
+    }
+
     // Command is safe - allow
     process.exit(0);
   } catch (err) {
@@ -566,5 +593,12 @@ module.exports = {
   detectReflectionBypass,
   detectWorktreeMutation,
   isBypassPermissionsMode,
+  CLAUDE_CODE_DANGEROUS_PATTERNS,
+  splitCompoundCommand,
+  normalizeCommandToken,
+  getLeadingCommandTokens,
+  findClaudeCodeDangerousPattern,
+  formatDangerousPatternWarning,
+  analyzeClaudeCodeDangerousPatterns,
   parseHookInput: parseHookInputAsync,
 };
