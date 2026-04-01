@@ -1,0 +1,33 @@
+{
+  "featureId": "agent-schema-enhancements",
+  "reviewedAt": "2026-04-01T06:10:09.174Z",
+  "commitId": "a198864f",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The implementation correctly adds disallowedTools, mcpServers, and fork_eligible to the schema, updates prompt assembly to filter disallowed tools (with a logged warning) and scopes MCP tools appropriately. Test coverage is comprehensive.",
+    "issues": [
+      {
+        "file": ".claude/lib/spawn/prompt-assembler-data.cjs",
+        "line": 180,
+        "severity": "non_blocking",
+        "description": "If an MCP tool is missing the mcp_server property (falsy), it bypasses the mcpServers scoping check and is included even if the agent defines an mcpServers list. Consider using `if (!server || !mcpServers.includes(server))` instead of `if (server && !mcpServers.includes(server))`."
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "Worker did not read at least 2 existing agent files to understand frontmatter patterns as instructed in SKILL.md, but instead read AGENTS.md, services.yaml and tool-manifest.json. skillFeedback.followedProcedure is incorrectly true.",
+      "evidence": "Transcript shows no tool calls reading files like .claude/agents/*.md or similar, but shows reads to .factory/services.yaml and .claude/config/tool-manifest.json."
+    },
+    {
+      "area": "knowledge",
+      "observation": "Worker needed to understand the MCP tools data structure and read .claude/config/tool-manifest.json to find the mcp_server field. This knowledge was required to implement mcpServers scoping correctly but wasn't documented in AGENTS.md.",
+      "evidence": "Transcript shows: 'Now let me check the tool manifest to understand the MCP tools data structure...' followed by a read to .claude/config/tool-manifest.json."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review of agent-schema-enhancements confirms all feature requirements were successfully implemented and tests cover the requirements. A minor edge case regarding missing mcp_server properties was noted. Some deviations from the SKILL.md procedure were found and documented as shared state gaps."
+}

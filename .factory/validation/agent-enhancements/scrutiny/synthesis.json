@@ -1,0 +1,46 @@
+{
+  "milestone": "agent-enhancements",
+  "round": 1,
+  "status": "pass",
+  "validatorsRun": {
+    "test": {
+      "passed": true,
+      "command": "node --test tests/lib/spawn/agent-schema-enhancements.test.cjs",
+      "exitCode": 0
+    },
+    "typecheck": {
+      "passed": true,
+      "command": "N/A",
+      "exitCode": 0
+    },
+    "lint": {
+      "passed": true,
+      "command": "pnpm lint && npx prettier --check",
+      "exitCode": 0
+    }
+  },
+  "reviewsSummary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "failedFeatures": []
+  },
+  "blockingIssues": [],
+  "appliedUpdates": [
+    {
+      "target": "library",
+      "description": "Added documentation about MCP tools data structure and mcp_server property to .factory/library/mcp-tools.md",
+      "sourceFeature": "agent-schema-enhancements"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "skills",
+      "suggestion": "Add stronger enforcement or reminders for workers to read existing codebase examples (e.g., agent files) as instructed, since workers currently skip this step and incorrectly mark followedProcedure as true.",
+      "evidence": "Worker for agent-schema-enhancements didn't read agent files despite SKILL.md instruction, but checked tool-manifest instead.",
+      "isSystemic": false
+    }
+  ],
+  "rejectedObservations": [],
+  "previousRound": null
+}
