@@ -1,0 +1,27 @@
+{
+  "milestone": "memory-index-discipline",
+  "round": 1,
+  "status": "pass",
+  "validatorsRun": {
+    "test": { "passed": true, "command": "node --test tests/lib/memory/memory-cap-enforcement.test.cjs tests/lib/memory/memory-rotator.test.cjs", "exitCode": 0 },
+    "typecheck": { "passed": true, "command": "skipped", "exitCode": 0 },
+    "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 }
+  },
+  "reviewsSummary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "failedFeatures": []
+  },
+  "blockingIssues": [],
+  "appliedUpdates": [
+    {
+      "target": "library",
+      "description": "Added security-patterns.md to document that validatePathWithinProject returns an object instead of throwing.",
+      "sourceFeature": "memory-cap-enforcement"
+    }
+  ],
+  "suggestedGuidanceUpdates": [],
+  "rejectedObservations": [],
+  "previousRound": null
+}
