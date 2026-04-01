@@ -1,0 +1,17 @@
+{
+  "testedAssertions": {
+    "VAL-SH-005": {
+      "status": "pass",
+      "evidence": "Tests executed successfully. Found 25 subtests for dangerous patterns returning block/warning. See evidence file: security-hardening/bash-security/VAL-SH-005-006-bash-pattern-alignment.txt"
+    },
+    "VAL-SH-006": {
+      "status": "pass",
+      "evidence": "Tests executed successfully. Safe substrings pass without blocks (5 subtests). Compound bypass check tests pass (4 subtests). See evidence files: security-hardening/bash-security/VAL-SH-005-006-bash-pattern-alignment.txt and security-hardening/bash-security/VAL-SH-006-bash-compound-bypass-fix.txt"
+    }
+  },
+  "frictions": [],
+  "blockers": [],
+  "toolsUsed": [
+    "node --test"
+  ]
+}

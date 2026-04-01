@@ -1,0 +1,25 @@
+{
+  "milestone": "security-hardening",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-SH-001",
+    "VAL-SH-002",
+    "VAL-SH-003",
+    "VAL-SH-004",
+    "VAL-SH-005",
+    "VAL-SH-006",
+    "VAL-SH-007",
+    "VAL-SH-008"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}

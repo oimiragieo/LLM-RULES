@@ -1,0 +1,41 @@
+{
+  "groupId": "paths-security",
+  "testedAt": "2026-04-01T00:00:00.000Z",
+  "isolation": {
+    "type": "programmatic",
+    "runner": "Node.js test runner",
+    "directory": "C:\\dev\\projects\\agent-studio"
+  },
+  "toolsUsed": [
+    "node --test"
+  ],
+  "testedAssertions": {
+    "VAL-SH-001": {
+      "status": "pass",
+      "evidence": "security-hardening/paths-security/case-normalized-paths.test.txt"
+    },
+    "VAL-SH-002": {
+      "status": "pass",
+      "evidence": "security-hardening/paths-security/case-normalized-paths.test.txt"
+    },
+    "VAL-SH-003": {
+      "status": "pass",
+      "evidence": "security-hardening/paths-security/unc-path-blocking.test.txt"
+    },
+    "VAL-SH-004": {
+      "status": "pass",
+      "evidence": "security-hardening/paths-security/unc-path-blocking.test.txt"
+    },
+    "VAL-SH-007": {
+      "status": "pass",
+      "evidence": "security-hardening/paths-security/case-normalized-paths.test.txt"
+    },
+    "VAL-SH-008": {
+      "status": "pass",
+      "evidence": "security-hardening/paths-security/case-normalized-paths.test.txt"
+    }
+  },
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 6 assertions: 6 passed, 0 failed."
+}
