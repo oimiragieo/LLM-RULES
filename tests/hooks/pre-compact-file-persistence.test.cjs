@@ -79,7 +79,11 @@ test('activeFiles is saved from edit-counter.json files field', () => {
   );
 
   const result = runHook('{"hook_event_name":"PreCompact"}');
-  assert.strictEqual(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    0,
+    `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+  );
   assert.ok(fs.existsSync(SNAPSHOT_FILE), 'Snapshot file must exist');
 
   const snapshot = readJson(SNAPSHOT_FILE);
@@ -92,11 +96,7 @@ test('activeFiles is saved from edit-counter.json files field', () => {
 
 // VAL-CM-002: all 7 fields present in snapshot
 test('snapshot contains all 7 required fields', () => {
-  fs.writeFileSync(
-    EDIT_COUNTER_FILE,
-    JSON.stringify({ count: 5, files: ['foo.ts'] }),
-    'utf8'
-  );
+  fs.writeFileSync(EDIT_COUNTER_FILE, JSON.stringify({ count: 5, files: ['foo.ts'] }), 'utf8');
   fs.writeFileSync(
     SESSION_METRICS_FILE,
     JSON.stringify({ corrections_count: 2, prompt_count: 10 }),
@@ -128,7 +128,11 @@ test('snapshot contains all 7 required fields', () => {
   assert.strictEqual(snapshot.correctionCount, 2, 'correctionCount must match corrections_count');
   assert.strictEqual(snapshot.promptCount, 10, 'promptCount must match prompt_count');
   assert.strictEqual(snapshot.originalIntent, 'Build feature X', 'originalIntent must match');
-  assert.strictEqual(snapshot.driftEditCount, 3, 'driftEditCount must match editCount from drift-state');
+  assert.strictEqual(
+    snapshot.driftEditCount,
+    3,
+    'driftEditCount must match editCount from drift-state'
+  );
   assert.deepStrictEqual(snapshot.activeFiles, ['foo.ts'], 'activeFiles must match files array');
 });
 
@@ -136,11 +140,22 @@ test('snapshot contains all 7 required fields', () => {
 test('activeFiles defaults to [] when edit-counter.json is missing', () => {
   // No files at all — fully missing state
   const result = runHook('{"hook_event_name":"PreCompact"}');
-  assert.strictEqual(result.status, 0, `Hook must exit 0 with missing files. stderr: ${result.stderr}`);
-  assert.ok(fs.existsSync(SNAPSHOT_FILE), 'Snapshot file must be written even with missing sources');
+  assert.strictEqual(
+    result.status,
+    0,
+    `Hook must exit 0 with missing files. stderr: ${result.stderr}`
+  );
+  assert.ok(
+    fs.existsSync(SNAPSHOT_FILE),
+    'Snapshot file must be written even with missing sources'
+  );
 
   const snapshot = readJson(SNAPSHOT_FILE);
-  assert.deepStrictEqual(snapshot.activeFiles, [], 'activeFiles must default to [] when file missing');
+  assert.deepStrictEqual(
+    snapshot.activeFiles,
+    [],
+    'activeFiles must default to [] when file missing'
+  );
 });
 
 test('activeFiles defaults to [] when edit-counter.json has no files field', () => {
@@ -151,17 +166,29 @@ test('activeFiles defaults to [] when edit-counter.json has no files field', () 
   assert.strictEqual(result.status, 0, `Expected exit 0. stderr: ${result.stderr}`);
 
   const snapshot = readJson(SNAPSHOT_FILE);
-  assert.deepStrictEqual(snapshot.activeFiles, [], 'activeFiles must default to [] when files field absent');
+  assert.deepStrictEqual(
+    snapshot.activeFiles,
+    [],
+    'activeFiles must default to [] when files field absent'
+  );
 });
 
 test('activeFiles defaults to [] when edit-counter.json is malformed JSON', () => {
   fs.writeFileSync(EDIT_COUNTER_FILE, '{not valid json', 'utf8');
 
   const result = runHook('{"hook_event_name":"PreCompact"}');
-  assert.strictEqual(result.status, 0, `Hook must exit 0 with malformed JSON. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    0,
+    `Hook must exit 0 with malformed JSON. stderr: ${result.stderr}`
+  );
 
   const snapshot = readJson(SNAPSHOT_FILE);
-  assert.deepStrictEqual(snapshot.activeFiles, [], 'activeFiles must default to [] on malformed JSON');
+  assert.deepStrictEqual(
+    snapshot.activeFiles,
+    [],
+    'activeFiles must default to [] on malformed JSON'
+  );
 });
 
 test('activeFiles defaults to [] when files field is not an array', () => {
@@ -171,7 +198,11 @@ test('activeFiles defaults to [] when files field is not an array', () => {
   assert.strictEqual(result.status, 0, `Expected exit 0. stderr: ${result.stderr}`);
 
   const snapshot = readJson(SNAPSHOT_FILE);
-  assert.deepStrictEqual(snapshot.activeFiles, [], 'activeFiles must default to [] when files is not an array');
+  assert.deepStrictEqual(
+    snapshot.activeFiles,
+    [],
+    'activeFiles must default to [] when files is not an array'
+  );
 });
 
 // Stdin passthrough unchanged

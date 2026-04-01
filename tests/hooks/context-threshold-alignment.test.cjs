@@ -14,13 +14,7 @@ const path = require('path');
 
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 
-const SKILL_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'skills',
-  'context-degradation',
-  'SKILL.md'
-);
+const SKILL_PATH = path.join(PROJECT_ROOT, '.claude', 'skills', 'context-degradation', 'SKILL.md');
 
 const MONITOR_PATH = path.join(
   PROJECT_ROOT,
@@ -52,9 +46,7 @@ test('Post-Compact Recovery section has >= 3 numbered actionable steps', () => {
   const afterSection = content.slice(sectionStart);
   const nextHeadingMatch = afterSection.slice(1).search(/^## /m);
   const sectionContent =
-    nextHeadingMatch === -1
-      ? afterSection
-      : afterSection.slice(0, nextHeadingMatch + 1);
+    nextHeadingMatch === -1 ? afterSection : afterSection.slice(0, nextHeadingMatch + 1);
 
   // Count numbered list items (lines starting with a digit followed by '. ')
   const numberedItems = sectionContent.match(/^\d+\.\s+\*\*\S/gm);
