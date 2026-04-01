@@ -31,7 +31,190 @@ const CLAUDE_CODE_DANGEROUS_PATTERNS = [
   { label: 'ssh', tokens: ['ssh'] },
 ];
 
-function splitCompoundCommand(command) {
+function isCommandSubstitutionStart(command, index) {
+  return command[index] === '$' && command[index + 1] === '(' && command[index + 2] !== '(';
+}
+
+function isSingleAmpersandSeparator(command, index) {
+  if (command[index] !== '&') {
+    return false;
+  }
+
+  const prevChar = command[index - 1] || '';
+  const nextChar = command[index + 1] || '';
+
+  if (prevChar === '&' || nextChar === '&') {
+    return false;
+  }
+
+  if (prevChar === '>' || prevChar === '<' || nextChar === '>' || nextChar === '<') {
+    return false;
+  }
+
+  return true;
+}
+
+function readDollarCommandSubstitution(command, startIndex) {
+  let content = '';
+  let depth = 1;
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
+  let inBacktickSubstitution = false;
+  let escaped = false;
+
+  for (let i = startIndex + 2; i < command.length; i++) {
+    const char = command[i];
+
+    if (escaped) {
+      content += char;
+      escaped = false;
+      continue;
+    }
+
+    if (char === '\\' && !inSingleQuote) {
+      content += char;
+      escaped = true;
+      continue;
+    }
+
+    if (!inBacktickSubstitution && char === "'" && !inDoubleQuote) {
+      inSingleQuote = !inSingleQuote;
+      content += char;
+      continue;
+    }
+
+    if (!inBacktickSubstitution && char === '"' && !inSingleQuote) {
+      inDoubleQuote = !inDoubleQuote;
+      content += char;
+      continue;
+    }
+
+    if (!inSingleQuote && char === '`') {
+      inBacktickSubstitution = !inBacktickSubstitution;
+      content += char;
+      continue;
+    }
+
+    if (!inSingleQuote && !inBacktickSubstitution && isCommandSubstitutionStart(command, i)) {
+      depth++;
+      content += '$(';
+      i++;
+      continue;
+    }
+
+    if (!inSingleQuote && !inDoubleQuote && !inBacktickSubstitution && char === ')') {
+      depth--;
+      if (depth === 0) {
+        return {
+          content,
+          endIndex: i,
+        };
+      }
+    }
+
+    content += char;
+  }
+
+  return null;
+}
+
+function readBacktickCommandSubstitution(command, startIndex) {
+  let content = '';
+  let escaped = false;
+
+  for (let i = startIndex + 1; i < command.length; i++) {
+    const char = command[i];
+
+    if (escaped) {
+      content += char;
+      escaped = false;
+      continue;
+    }
+
+    if (char === '\\') {
+      content += char;
+      escaped = true;
+      continue;
+    }
+
+    if (char === '`') {
+      return {
+        content,
+        endIndex: i,
+      };
+    }
+
+    content += char;
+  }
+
+  return null;
+}
+
+function extractCommandSubstitutions(command) {
+  if (!command || typeof command !== 'string') {
+    return [];
+  }
+
+  const substitutions = [];
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
+  let escaped = false;
+
+  for (let i = 0; i < command.length; i++) {
+    const char = command[i];
+
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+
+    if (char === '\\' && !inSingleQuote) {
+      escaped = true;
+      continue;
+    }
+
+    if (char === "'" && !inDoubleQuote) {
+      inSingleQuote = !inSingleQuote;
+      continue;
+    }
+
+    if (char === '"' && !inSingleQuote) {
+      inDoubleQuote = !inDoubleQuote;
+      continue;
+    }
+
+    if (inSingleQuote) {
+      continue;
+    }
+
+    if (isCommandSubstitutionStart(command, i)) {
+      const substitution = readDollarCommandSubstitution(command, i);
+      if (substitution) {
+        const content = substitution.content.trim();
+        if (content) {
+          substitutions.push(content);
+        }
+        i = substitution.endIndex;
+      }
+      continue;
+    }
+
+    if (char === '`') {
+      const substitution = readBacktickCommandSubstitution(command, i);
+      if (substitution) {
+        const content = substitution.content.trim();
+        if (content) {
+          substitutions.push(content);
+        }
+        i = substitution.endIndex;
+      }
+    }
+  }
+
+  return substitutions;
+}
+
+function splitTopLevelCompoundCommand(command) {
   if (!command || typeof command !== 'string') {
     return [];
   }
@@ -78,10 +261,33 @@ function splitCompoundCommand(command) {
       continue;
     }
 
+    if (!inSingleQuote && isCommandSubstitutionStart(command, i)) {
+      const substitution = readDollarCommandSubstitution(command, i);
+      if (substitution) {
+        current += `$(${substitution.content})`;
+        i = substitution.endIndex;
+        continue;
+      }
+    }
+
+    if (!inSingleQuote && char === '`') {
+      const substitution = readBacktickCommandSubstitution(command, i);
+      if (substitution) {
+        current += `\`${substitution.content}\``;
+        i = substitution.endIndex;
+        continue;
+      }
+    }
+
     if (!inSingleQuote && !inDoubleQuote) {
       if ((char === '&' || char === '|') && nextChar === char) {
         pushCurrent();
         i++;
+        continue;
+      }
+
+      if (isSingleAmpersandSeparator(command, i)) {
+        pushCurrent();
         continue;
       }
 
@@ -109,6 +315,21 @@ function splitCompoundCommand(command) {
 
   pushCurrent();
   return segments;
+}
+
+function splitCompoundCommand(command) {
+  const segments = splitTopLevelCompoundCommand(command);
+  const expandedSegments = [];
+
+  for (const segment of segments) {
+    expandedSegments.push(segment);
+
+    for (const substitution of extractCommandSubstitutions(segment)) {
+      expandedSegments.push(...splitCompoundCommand(substitution));
+    }
+  }
+
+  return expandedSegments;
 }
 
 function normalizeCommandToken(token) {
@@ -216,6 +437,12 @@ function analyzeClaudeCodeDangerousPatterns(command) {
 
 module.exports = {
   CLAUDE_CODE_DANGEROUS_PATTERNS,
+  isCommandSubstitutionStart,
+  isSingleAmpersandSeparator,
+  readDollarCommandSubstitution,
+  readBacktickCommandSubstitution,
+  extractCommandSubstitutions,
+  splitTopLevelCompoundCommand,
   splitCompoundCommand,
   normalizeCommandToken,
   getLeadingCommandTokens,
