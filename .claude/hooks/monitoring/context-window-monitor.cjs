@@ -6,9 +6,10 @@
  * Monitors agent context window usage and injects advisory warnings when
  * context is running low. Modelled after GSD context-monitor.md.
  *
- * Thresholds (percentage of budget used):
- *   - >= 65% used: inject WARNING additionalContext
- *   - >= 75% used: inject CRITICAL additionalContext
+ * Thresholds (percentage of budget used) — aligned with SKILL.md severity zones
+ * and Claude Code's auto-compact constant (contextWindow - 13K = ~93.5% for 200K):
+ *   - >= 65% used: inject WARNING additionalContext  (Yellow zone start)
+ *   - >= 90% used: inject CRITICAL additionalContext (Critical zone start, 90–93%)
  *
  * Reads token usage from .claude/context/runtime/budget-tracker.json
  * and the current session ID from .claude/context/runtime/session-id.json.
@@ -23,11 +24,14 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // ─── Threshold constants ─────────────────────────────────────────────────────
 
-/** At 65% context used, inject a warning */
+/** At 65% context used, inject a warning (Yellow zone start per context-degradation SKILL.md) */
 const WARN_THRESHOLD_PCT = 0.65;
 
-/** At 75% context used, inject a critical warning */
-const CRITICAL_THRESHOLD_PCT = 0.75;
+/**
+ * At 90% context used, inject a critical warning (Critical zone start per context-degradation SKILL.md).
+ * Claude Code auto-compact fires at ~93.5% (contextWindow - 13K for a 200K window).
+ */
+const CRITICAL_THRESHOLD_PCT = 0.9;
 
 /** Default context window budget (tokens) used if budget not in tracker */
 const DEFAULT_BUDGET = 200_000;
