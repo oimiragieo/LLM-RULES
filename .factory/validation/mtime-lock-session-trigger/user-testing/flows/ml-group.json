@@ -1,0 +1,71 @@
+{
+  "groupId": "ml-group",
+  "testedAt": "2026-04-01T12:00:00.000Z",
+  "isolation": {
+    "appDir": "C:\\dev\\projects\\agent-studio",
+    "missionDir": "C:\\Users\\oimir\\.factory\\missions\\42d5e99b-7997-4270-bf28-3f7c4b903e0d"
+  },
+  "toolsUsed": [
+    "CLI",
+    "node"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-ML-001",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-002",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-003",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-004",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-005",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-006",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-007",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-008",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-009",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-010",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    },
+    {
+      "id": "VAL-ML-011",
+      "status": "pass",
+      "evidence": "mtime-lock-session-trigger/ml-group/test-output.txt"
+    }
+  ],
+  "frictions": [],
+  "blockers": []
+}

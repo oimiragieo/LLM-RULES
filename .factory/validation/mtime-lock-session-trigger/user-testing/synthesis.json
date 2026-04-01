@@ -1,0 +1,28 @@
+{
+  "milestone": "mtime-lock-session-trigger",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-ML-001",
+    "VAL-ML-002",
+    "VAL-ML-003",
+    "VAL-ML-004",
+    "VAL-ML-005",
+    "VAL-ML-006",
+    "VAL-ML-007",
+    "VAL-ML-008",
+    "VAL-ML-009",
+    "VAL-ML-010",
+    "VAL-ML-011"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
