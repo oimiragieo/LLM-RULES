@@ -1,0 +1,45 @@
+{
+  "featureId": "bash-pattern-alignment",
+  "reviewedAt": "2026-04-01T04:10:00.000Z",
+  "commitId": "57284f35cfc8f885ace9ae9124db4e3c1006f12a",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The implementation correctly identifies exact Claude Code dangerous patterns and avoids substring false-positives by tokenizing the input. However, the compound command parser (splitCompoundCommand) completely misses single ampersands (&) and does not recursively parse command substitutions like $(...) or `...`. Because validateCommand checks only the first word of these unsplit strings, these bugs allow trivial bypasses for background lists (e.g., 'echo a & sudo whoami') and command substitutions.",
+    "issues": [
+      {
+        "file": ".claude/hooks/safety/validators/claude-code-dangerous-patterns.cjs",
+        "line": 88,
+        "severity": "blocking",
+        "description": "The `splitCompoundCommand` function does not split commands on a single ampersand (`&`). This allows dangerous commands to be bypassed entirely when executed as an asynchronous list (e.g., `echo a & sudo whoami`). The loop currently only checks for `&&`, `|`, `||`, `;`, and `\\n`, completely missing the single `&` operator."
+      },
+      {
+        "file": ".claude/hooks/safety/validators/claude-code-dangerous-patterns.cjs",
+        "line": 34,
+        "severity": "blocking",
+        "description": "The `splitCompoundCommand` function does not parse or track command substitutions (like `$(...)` or `` `...` ``). As a result, dangerous commands embedded inside a substitution (e.g., `echo $(sudo whoami)`) are not evaluated as separate segments and evade detection."
+      },
+      {
+        "file": ".claude/hooks/safety/validators/claude-code-dangerous-patterns.cjs",
+        "line": 141,
+        "severity": "non_blocking",
+        "description": "The `getLeadingCommandTokens` function relies on `parseCommand` which returns `{ tokens: null }` for inputs with complex or obfuscated quoting (e.g., `'py'thon`). This results in `[]` tokens being checked, bypassing the pattern match. While `validateCommand` serves as a fallback net, this limits the effectiveness of the targeted Claude Code dangerous patterns check."
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "The worker's skillFeedback notes that they bypassed `commands.test` from `.factory/services.yaml` during baseline validation because `AGENTS.md` marks `pnpm test` as a known timeout. This indicates the `worker-base` skill's baseline validation procedure conflicts with the repository's documented reality.",
+      "evidence": "Handoff skillFeedback.deviations[0]: 'Ran the existing bash/shell validator suites instead of commands.test from .factory/services.yaml.'"
+    },
+    {
+      "area": "skills",
+      "observation": "The worker batched test creation and implementation, deviating from the 'Write tests first (red)' step in the `security-worker` skill. They justified this by stating the target hook exceeded the repository's max-lines lint threshold, requiring them to extract helpers into a new module during the initial pass to maintain a lint-clean state. This indicates the step-by-step TDD procedure in the skill may be too rigid when modifying files near their lint limits.",
+      "evidence": "Handoff skillFeedback.deviations[1]: 'Added the focused test file and the implementation in the same coding pass, then validated green with the new and existing suites.'"
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review complete. The code has blocking issues. The parsing of compound commands fails to split on single '&' and command substitutions, leading to trivial bypasses of the new patterns check for commands like 'echo a & sudo whoami' and 'echo $(sudo)'. Shared state observations logged regarding outdated validation commands in skills."
+}

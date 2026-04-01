@@ -1,0 +1,26 @@
+{
+  "featureId": "case-normalized-paths",
+  "reviewedAt": "2026-04-01T04:00:00.000Z",
+  "commitId": "d4c7191f08ac601a5453d15112c9123a9f461548",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The worker successfully implemented case-normalized path comparisons for all path-based write guards in unified-pre-write-hook.cjs. A robust normalization pipeline (normalize, decode, check variants) was added to ensure all path variants and traversals (%2e, ..\\\\) are detected. Disallowed paths cover the entire AGENTS.md list and tests are comprehensive.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "knowledge",
+      "observation": "WSL bash environment uses a different Node version (v12.x) than the Windows host. Running .factory/init.sh via bash skipped dependency installation due to version mismatch.",
+      "evidence": "Handoff verification notes: 'Init script ran via bash, but its bash-side Node was v12.22.7, so it warned that Node 18+ is required and skipped dependency install.'"
+    },
+    {
+      "area": "skills",
+      "observation": "The worker-base skill requires full commands.test validation, but AGENTS.md explicitly states pnpm test times out on this repository. The worker deviated to follow AGENTS.md.",
+      "evidence": "Handoff skillFeedback notes deviation from 'worker-base 1.3 Baseline Validation' because 'mission AGENTS.md explicitly says full pnpm test times out on this repo'."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Feature case-normalized-paths passes review. Security checks correctly normalize paths and handle edge-case traversals."
+}
