@@ -1,0 +1,40 @@
+{
+  "milestone": "hook-enhancements",
+  "round": 1,
+  "status": "pass",
+  "validatorsRun": {
+    "test": { "passed": true, "command": "node --test tests/hooks/bash-updated-input.test.cjs tests/lib/routing/denial-routing-feedback.test.cjs", "exitCode": 0 },
+    "typecheck": { "passed": true, "command": "npx prettier --check", "exitCode": 0 },
+    "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 }
+  },
+  "reviewsSummary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "failedFeatures": []
+  },
+  "blockingIssues": [],
+  "appliedUpdates": [
+    {
+      "target": "library",
+      "description": "Added .factory/library/hook-bundle-architecture.md to document that hook output fields (updatedInput, suppressOutput) must be forwarded through bash-pretool-bundle.cjs.",
+      "sourceFeature": "bash-updated-input"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "scrutiny-validator",
+      "suggestion": "Update the scrutiny-validator skill procedure to not mandate running the generic `test` command from services.yaml. AGENTS.md explicitly states that `pnpm test` times out, which causes validators to either fail or deviate from procedure. The skill should allow targeted testing or rely on specific fast test commands.",
+      "evidence": "Features bash-updated-input and denial-routing-feedback both flagged that running the generic test suite times out as warned in AGENTS.md, causing procedural deviations.",
+      "isSystemic": true
+    },
+    {
+      "target": "services.yaml",
+      "suggestion": "Consider pointing `commands.test` to a faster test suite (e.g., `pnpm test:framework`) instead of the full `pnpm test` to avoid timeouts for generic validators.",
+      "evidence": "Features bash-updated-input and denial-routing-feedback both flagged that the default test command times out.",
+      "isSystemic": true
+    }
+  ],
+  "rejectedObservations": [],
+  "previousRound": null
+}
