@@ -35,7 +35,7 @@ function tryParseJson(text) {
 
 function applyHookOutput(currentInput, hookStdout) {
   const parsed = tryParseJson(hookStdout);
-  if (!parsed || !parsed.tool_input || typeof parsed.tool_input !== 'object') {
+  if (!parsed) {
     return currentInput;
   }
 
@@ -44,8 +44,75 @@ function applyHookOutput(currentInput, hookStdout) {
     return currentInput;
   }
 
-  parent.tool_input = parsed.tool_input;
+  if (parsed.tool_input && typeof parsed.tool_input === 'object') {
+    parent.tool_input = parsed.tool_input;
+    return JSON.stringify(parent);
+  }
+
+  const updatedInput = parsed.hookSpecificOutput?.updatedInput;
+  if (!updatedInput || typeof updatedInput !== 'object') {
+    return currentInput;
+  }
+
+  parent.tool_input = {
+    ...(parent.tool_input || {}),
+    ...updatedInput,
+  };
   return JSON.stringify(parent);
+}
+
+function formatBlockedOutput(parsed, hookPath) {
+  const message =
+    parsed?.hookSpecificOutput?.permissionDecisionReason ||
+    parsed?.permissionDecisionReason ||
+    parsed?.message ||
+    `Command blocked by safety sub-hook (${path.basename(hookPath)}). See debug trace for details.`;
+
+  return {
+    ...(parsed && typeof parsed === 'object' ? parsed : {}),
+    permissionDecision: 'deny',
+    permissionDecisionReason: message,
+    result: 'block',
+    message,
+  };
+}
+
+function formatUpdatedInputOutput(originalInput, transformedInput) {
+  const original = tryParseJson(originalInput);
+  const transformed = tryParseJson(transformedInput);
+
+  if (
+    !original ||
+    !transformed ||
+    typeof original !== 'object' ||
+    typeof transformed !== 'object'
+  ) {
+    return transformedInput;
+  }
+
+  const originalToolInput = original.tool_input;
+  const transformedToolInput = transformed.tool_input;
+
+  if (
+    !originalToolInput ||
+    !transformedToolInput ||
+    typeof originalToolInput !== 'object' ||
+    typeof transformedToolInput !== 'object'
+  ) {
+    return transformedInput;
+  }
+
+  if (JSON.stringify(originalToolInput) === JSON.stringify(transformedToolInput)) {
+    return transformedInput;
+  }
+
+  return JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      permissionDecision: 'allow',
+      updatedInput: transformedToolInput,
+    },
+  });
 }
 
 function main() {
@@ -56,8 +123,11 @@ function main() {
     process.exit(0);
   }
 
+  const originalInput = currentInput;
+
   for (const hookPath of HOOKS) {
     const res = runHook(hookPath, currentInput);
+    const parsedStdout = tryParseJson(res.stdout);
 
     if (res.error) {
       console.error(`[bash-pretool-bundle] Failed to run hook: ${hookPath}`);
@@ -66,14 +136,8 @@ function main() {
     }
 
     if (res.status !== 0) {
-      if (res.stdout) process.stderr.write(res.stdout);
       if (res.stderr) process.stderr.write(res.stderr);
-      console.log(
-        JSON.stringify({
-          allow: false,
-          message: `Command blocked by safety sub-hook (${path.basename(hookPath)}). See debug trace for details.`,
-        })
-      );
+      process.stdout.write(JSON.stringify(formatBlockedOutput(parsedStdout, hookPath)));
       process.exit(2);
     }
 
@@ -81,7 +145,7 @@ function main() {
   }
 
   // Preserve hook chain behavior by returning potentially transformed input.
-  process.stdout.write(currentInput);
+  process.stdout.write(formatUpdatedInputOutput(originalInput, currentInput));
 }
 
 if (require.main === module) {
@@ -92,5 +156,7 @@ module.exports = {
   HOOKS,
   tryParseJson,
   applyHookOutput,
+  formatBlockedOutput,
+  formatUpdatedInputOutput,
   main,
 };

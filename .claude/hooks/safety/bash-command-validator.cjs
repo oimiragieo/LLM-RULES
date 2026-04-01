@@ -108,6 +108,7 @@ function detectBadSubstitutionRisk(command) {
 }
 
 let cachedRipgrepAvailable = null;
+const SAFETY_PREFIX = 'set -euo pipefail';
 
 function buildVersionProbeSpawnOptions() {
   return {
@@ -263,6 +264,61 @@ function detectSearchBypassPattern(command) {
     'Broad shell scanning detected. Use hybrid search first (`pnpm search:code "<query>" --limit 10`) ' +
     'or `rg` for targeted regex, then run bounded reads.'
   );
+}
+
+function isMultilineCommand(command) {
+  return typeof command === 'string' && /[\r\n]/.test(command);
+}
+
+function hasExplicitShellErrorHandling(command) {
+  if (!command || typeof command !== 'string') return false;
+
+  return /(?:^|[\r\n;])\s*set(?:\s+-[A-Za-z]*e[A-Za-z]*\b|\s+-o\s+errexit\b)/im.test(command);
+}
+
+function buildUpdatedCommand(command) {
+  if (!isMultilineCommand(command) || hasExplicitShellErrorHandling(command)) {
+    return null;
+  }
+
+  return `${SAFETY_PREFIX}\n${command}`;
+}
+
+function writeBlockResponse(reason) {
+  process.stdout.write(
+    JSON.stringify({
+      suppressOutput: true,
+      hookSpecificOutput: {
+        hookEventName: 'PreToolUse',
+        permissionDecision: 'deny',
+        permissionDecisionReason: reason,
+      },
+    })
+  );
+}
+
+function writeAllowResponse({ additionalContext, updatedCommand }) {
+  if (!additionalContext && !updatedCommand) {
+    return;
+  }
+
+  const output = {};
+
+  if (additionalContext) {
+    output.additionalContext = additionalContext;
+  }
+
+  if (updatedCommand) {
+    output.hookSpecificOutput = {
+      hookEventName: 'PreToolUse',
+      permissionDecision: 'allow',
+      updatedInput: {
+        command: updatedCommand,
+      },
+    };
+  }
+
+  process.stdout.write(JSON.stringify(output));
 }
 
 /**
@@ -428,6 +484,7 @@ async function main() {
     if (badSubstitutionReason) {
       emitBashBlockVerdict(command, badSubstitutionReason);
       console.error(formatBlockedMessage(command, badSubstitutionReason));
+      writeBlockResponse(badSubstitutionReason);
       process.exit(2);
     }
 
@@ -435,6 +492,7 @@ async function main() {
     if (ripgrepTypeReason) {
       emitBashBlockVerdict(command, ripgrepTypeReason);
       console.error(formatBlockedMessage(command, ripgrepTypeReason));
+      writeBlockResponse(ripgrepTypeReason);
       process.exit(2);
     }
 
@@ -442,6 +500,7 @@ async function main() {
     if (ripgrepMissingReason) {
       emitBashBlockVerdict(command, ripgrepMissingReason);
       console.error(formatBlockedMessage(command, ripgrepMissingReason));
+      writeBlockResponse(ripgrepMissingReason);
       process.exit(2);
     }
 
@@ -449,6 +508,7 @@ async function main() {
     if (reportWriteReason) {
       emitBashBlockVerdict(command, reportWriteReason);
       console.error(formatBlockedMessage(command, reportWriteReason));
+      writeBlockResponse(reportWriteReason);
       process.exit(2);
     }
 
@@ -462,6 +522,7 @@ async function main() {
       }
       emitBashBlockVerdict(command, brittleCountReason);
       console.error(formatBlockedMessage(command, brittleCountReason));
+      writeBlockResponse(brittleCountReason);
       process.exit(2);
     }
 
@@ -475,6 +536,7 @@ async function main() {
       }
       emitBashBlockVerdict(command, searchBypassReason);
       console.error(formatBlockedMessage(command, searchBypassReason));
+      writeBlockResponse(searchBypassReason);
       process.exit(2);
     }
 
@@ -488,6 +550,7 @@ async function main() {
       }
       emitBashBlockVerdict(command, reflectionBypassReason);
       console.error(formatBlockedMessage(command, reflectionBypassReason));
+      writeBlockResponse(reflectionBypassReason);
       process.exit(2);
     }
 
@@ -495,6 +558,7 @@ async function main() {
     if (worktreeMutationReason) {
       emitBashBlockVerdict(command, worktreeMutationReason);
       console.error(formatBlockedMessage(command, worktreeMutationReason));
+      writeBlockResponse(worktreeMutationReason);
       process.exit(2);
     }
 
@@ -515,6 +579,7 @@ async function main() {
       }
       emitBashBlockVerdict(command, result.error || 'Unknown safety violation');
       console.error(formatBlockedMessage(command, result.error || 'Unknown safety violation'));
+      writeBlockResponse(result.error || 'Unknown safety violation');
       process.exit(2);
     }
 
@@ -525,16 +590,17 @@ async function main() {
         dangerousPatternAnalysis.blocked.error;
       emitBashBlockVerdict(command, reason);
       console.error(formatBlockedMessage(command, reason));
+      writeBlockResponse(reason);
       process.exit(2);
     }
 
-    if (dangerousPatternAnalysis.matches.length > 0) {
-      process.stdout.write(
-        JSON.stringify({
-          additionalContext: formatDangerousPatternWarning(dangerousPatternAnalysis.matches),
-        })
-      );
-    }
+    writeAllowResponse({
+      additionalContext:
+        dangerousPatternAnalysis.matches.length > 0
+          ? formatDangerousPatternWarning(dangerousPatternAnalysis.matches)
+          : undefined,
+      updatedCommand: buildUpdatedCommand(command),
+    });
 
     // Command is safe - allow
     process.exit(0);
@@ -569,6 +635,7 @@ async function main() {
       // Best-effort
     }
     emitBashBlockVerdict('', `error_fail_closed: ${err.message}`);
+    writeBlockResponse(`Bash command validator failed closed: ${err.message}`);
     process.exit(2);
   }
 }
@@ -592,6 +659,11 @@ module.exports = {
   detectSearchBypassPattern,
   detectReflectionBypass,
   detectWorktreeMutation,
+  isMultilineCommand,
+  hasExplicitShellErrorHandling,
+  buildUpdatedCommand,
+  writeBlockResponse,
+  writeAllowResponse,
   isBypassPermissionsMode,
   CLAUDE_CODE_DANGEROUS_PATTERNS,
   splitCompoundCommand,
