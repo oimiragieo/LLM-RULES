@@ -17,6 +17,22 @@ If you want a local-first, reproducible agent stack with strict validation and h
 
 ## Recent Changes
 
+### Phase 7 — Security & Advanced Integration
+- **Security hardening**: Case-normalized path comparison for case-insensitive filesystems, UNC path blocking (NTLM leak prevention), URL-encoded/backslash traversal detection, CC dangerous-pattern alignment with word-boundary matching, compound command analysis (single `&`, `$(...)`, backtick substitutions) (76 tests)
+- **Hook enhancements**: `updatedInput` for bash safety prefixes (`set -euo pipefail` injection on unsafe multi-line scripts), `suppressOutput` on security blocks to prevent context inflation, denial-based routing feedback with agent suggestions after repeated tool denials (10 tests)
+- **Agent enhancements**: `disallowedTools` field (excludes tools from prompt assembly with conflict resolution), `mcpServers` scoping (limits MCP visibility per agent), `fork_eligible` boolean field in agent schema (29 tests)
+- **Cross-area integration**: Case-normalized blocking + cache stability, denial tracking to routing feedback end-to-end, suppressOutput context inflation prevention, agent schema round-trip (14 tests)
+
+### Phase 6 — Prompt Cache & Context Intelligence
+- **Prompt cache optimization**: Alphabetical tool/skill sorting, section memoization, duplicate contract elimination, cache-break-detector with SHA-256 hashing (45 tests)
+- **Context management**: Pre-compact activeFiles persistence, threshold alignment with CC auto-compact at 93.5%, microcompact detection, circuit breaker (23 tests)
+- **Cross-area integration**: Cache stability, tool change isolation, combined monitor output, prefix hash stability (10 tests)
+
+### Phase 5 — Foundation & Performance
+- **Rules compression**: CLAUDE.md + rules 66,374 to 36,679 chars (-45%), file merges, individual compression, frontmatter scoping (70 tests)
+- **Hook overhaul**: 25 hooks to async, 63 timeout_ms additions, 3 deduplications, 2 consolidation bundles, 5 startup sentinels (142 tests)
+- **New hook events**: SubagentStart (Iron Law validator), PermissionDenied (denial logger), SessionStart (watchPaths) (193 tests with cross-area)
+
 ### Phase 4 — Hermes Assimilation (Competitive Parity)
 - **Intelligent runtime**: Cost pricing table with real $/MTok rates and auto-downgrade (opus->sonnet->haiku), flight recorder redaction with SENSITIVE_KEYS, mixture-of-agents consensus tool (96 tests)
 - **Autonomous skills**: Skill auto-creator from session transcripts with Jaccard similarity and security scanning, SQLite FTS5 full-text search over session JSONL logs (79 tests)
