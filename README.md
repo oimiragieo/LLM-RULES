@@ -17,6 +17,13 @@ If you want a local-first, reproducible agent stack with strict validation and h
 
 ## Recent Changes
 
+### Phase 8 — Memory Consolidation (Dream-inspired)
+- **Index discipline**: 25KB/200-line dual caps on markdown memory files, [PERMANENT] section preservation, automatic archival with warning lines, memory health reporting (16 tests)
+- **Daily log + consolidation**: Append-only timestamped daily logs at `logs/YYYY/MM/YYYY-MM-DD.md`, 4-phase Dream-inspired consolidation (Orient/Gather/Consolidate/Prune), heuristic keyword extraction, idempotent processing with manifest tracking, session-end hook integration (48 tests)
+- **Mtime lock + session trigger**: CC-style mtime-as-timestamp lock file, PID-based holder tracking with 60min stale detection, 24h time gate + 5-session count gate + 10min scan throttle, rollback on failure (28 tests)
+- **Cross-area integration**: Full cycle (log/trigger/consolidate/prune), lock contention, failure rollback, MemoryRecord coexistence, STM/MTM/LTM backward compatibility, first-run scenario (13 tests)
+- **Source**: 4 patterns adopted from Claude Code's Dream memory consolidation system
+
 ### Phase 7 — Security & Advanced Integration
 - **Security hardening**: Case-normalized path comparison for case-insensitive filesystems, UNC path blocking (NTLM leak prevention), URL-encoded/backslash traversal detection, CC dangerous-pattern alignment with word-boundary matching, compound command analysis (single `&`, `$(...)`, backtick substitutions) (76 tests)
 - **Hook enhancements**: `updatedInput` for bash safety prefixes (`set -euo pipefail` injection on unsafe multi-line scripts), `suppressOutput` on security blocks to prevent context inflation, denial-based routing feedback with agent suggestions after repeated tool denials (10 tests)
