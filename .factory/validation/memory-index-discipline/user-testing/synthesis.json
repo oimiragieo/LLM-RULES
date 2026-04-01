@@ -1,0 +1,26 @@
+{
+  "milestone": "memory-index-discipline",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-ID-001",
+    "VAL-ID-002",
+    "VAL-ID-003",
+    "VAL-ID-004",
+    "VAL-ID-005",
+    "VAL-ID-006",
+    "VAL-ID-007",
+    "VAL-ID-008",
+    "VAL-ID-009"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
