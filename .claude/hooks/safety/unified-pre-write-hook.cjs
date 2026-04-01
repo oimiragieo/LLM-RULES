@@ -87,6 +87,11 @@ function normalizePathForComparison(filePath) {
     .toLowerCase();
 }
 
+function isUncPath(filePath) {
+  const rawPath = String(filePath || '');
+  return rawPath.startsWith('\\\\') || rawPath.startsWith('//');
+}
+
 function decodePathVariant(filePath) {
   try {
     return decodeURIComponent(filePath);
@@ -190,6 +195,14 @@ CHECKS.push({
 
     const enforcement = getEnforcementMode('FILE_PLACEMENT_GUARD', 'block');
     if (enforcement === 'off') return { pass: true };
+
+    if (isUncPath(filePath)) {
+      return {
+        pass: false,
+        result: 'block',
+        message: `[FILE-PLACEMENT-GUARD] UNC/network paths are not allowed: ${filePath}`,
+      };
+    }
 
     if (hasPathTraversal(filePath)) {
       return {
@@ -637,7 +650,8 @@ async function main() {
     if (process.env.HOOK_FAIL_OPEN === 'true') {
       // SECURITY: Never fail-open for security-critical paths
       const targetPath = targetFilePath;
-      const isSecurityCritical = matchesProtectedPattern(targetPath, SECURITY_CRITICAL_PATTERNS);
+      const isSecurityCritical =
+        isUncPath(targetPath) || matchesProtectedPattern(targetPath, SECURITY_CRITICAL_PATTERNS);
       if (isSecurityCritical) {
         process.stdout.write(
           JSON.stringify({ allowed: false, reason: 'Security-critical path: fail-open disabled' })
@@ -664,6 +678,7 @@ module.exports = {
   main,
   isRouterInvocation,
   normalizePathForComparison,
+  isUncPath,
   getPathComparisonVariants,
   matchesProtectedPattern,
   hasPathTraversal,
