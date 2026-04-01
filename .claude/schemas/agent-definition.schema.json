@@ -107,6 +107,19 @@
           "format": "date-time",
           "description": "ISO timestamp of when the agent was last verified or updated"
         },
+        "mcpServers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "description": "MCP servers this agent is scoped to; limits which MCP tools appear in the prompt"
+        },
+        "fork_eligible": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this agent is eligible for fork-based subagent execution"
+        },
         "hooks": {
           "type": "object",
           "properties": {

@@ -69,9 +69,11 @@ try {
   // Schema validator not available -- skip schema validation
 }
 
-function buildToolsSection(tools) {
+function buildToolsSection(tools, options = {}) {
   const describedTools =
-    Array.isArray(tools) && typeof tools[0] === 'string' ? filterAndDescribeTools(tools) : tools;
+    Array.isArray(tools) && typeof tools[0] === 'string'
+      ? filterAndDescribeTools(tools, options)
+      : tools;
   return buildToolsSectionInternal(describedTools || []);
 }
 
@@ -83,9 +85,18 @@ function buildPromptSections({
   skillSectionMode,
   presetId,
   projectRoot,
+  disallowedTools,
+  mcpServers,
 }) {
   const toolsToShow = allowedTools.slice(0, maxToolsInPrompt);
-  const describedTools = filterAndDescribeTools(toolsToShow);
+  const filterOptions = {};
+  if (Array.isArray(disallowedTools) && disallowedTools.length > 0) {
+    filterOptions.disallowedTools = disallowedTools;
+  }
+  if (mcpServers !== null && mcpServers !== undefined) {
+    filterOptions.mcpServers = mcpServers;
+  }
+  const describedTools = filterAndDescribeTools(toolsToShow, filterOptions);
 
   let skills = getSkillsByAgent(agentType, maxSkillsInPrompt);
   if (presetId) {
@@ -241,6 +252,8 @@ function assembleSpawnPrompt({
   includeMemory = true,
   presetId = null,
   projectRoot = PROJECT_ROOT,
+  disallowedTools = [],
+  mcpServers = null,
 } = {}) {
   const promptSections = buildPromptSections({
     agentType,
@@ -250,6 +263,8 @@ function assembleSpawnPrompt({
     skillSectionMode,
     presetId,
     projectRoot,
+    disallowedTools,
+    mcpServers,
   });
 
   let memorySection = '';
@@ -301,6 +316,8 @@ async function assembleSpawnPromptAsync(options = {}) {
     ragLimit = null,
     ragThreshold = null,
     searchMemoryFn = null,
+    disallowedTools = [],
+    mcpServers = null,
   } = options;
 
   const normalizedQuery = String(memoryQuery || '').trim();
@@ -315,6 +332,8 @@ async function assembleSpawnPromptAsync(options = {}) {
       includeMemory,
       presetId,
       projectRoot,
+      disallowedTools,
+      mcpServers,
     });
   }
 
@@ -326,6 +345,8 @@ async function assembleSpawnPromptAsync(options = {}) {
     skillSectionMode,
     presetId,
     projectRoot,
+    disallowedTools,
+    mcpServers,
   });
 
   let memorySection = '';

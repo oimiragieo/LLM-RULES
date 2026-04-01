@@ -135,11 +135,23 @@ function getSkillsByName(skillNames, maxSkills = 20) {
   return result;
 }
 
-function filterAndDescribeTools(allowedTools) {
+function filterAndDescribeTools(allowedTools, options = {}) {
+  const { disallowedTools = [], mcpServers = null } = options;
   const { coreMap, mcpMap } = getToolLookupCache();
   const result = [];
 
+  // Build set for O(1) lookup of disallowed tools
+  const disallowedSet = new Set(Array.isArray(disallowedTools) ? disallowedTools : []);
+
   for (const toolName of allowedTools) {
+    // Conflict detection: tool appears in both allowedTools and disallowedTools
+    if (disallowedSet.has(toolName)) {
+      console.warn(
+        `[prompt-assembler] Tool "${toolName}" appears in both tools and disallowedTools — excluding (disallowedTools wins)`
+      );
+      continue;
+    }
+
     const coreTool = coreMap.get(toolName);
     if (coreTool) {
       result.push({
@@ -163,6 +175,13 @@ function filterAndDescribeTools(allowedTools) {
       }
     }
     if (mcpTool) {
+      // Apply mcpServers scoping: if specified, only include tools from listed servers
+      if (mcpServers !== null && Array.isArray(mcpServers)) {
+        const server = mcpTool.mcp_server;
+        if (server && !mcpServers.includes(server)) {
+          continue; // Server not in this agent's mcpServers scope — exclude
+        }
+      }
       result.push({
         name: toolName,
         description: mcpTool.description || `${toolName} MCP tool`,
