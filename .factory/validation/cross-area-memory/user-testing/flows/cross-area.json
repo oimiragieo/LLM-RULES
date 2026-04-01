@@ -1,0 +1,30 @@
+{
+  "assertions": {
+    "VAL-CROSS-016": {
+      "status": "pass"
+    },
+    "VAL-CROSS-017": {
+      "status": "pass"
+    },
+    "VAL-CROSS-018": {
+      "status": "pass"
+    },
+    "VAL-CROSS-019": {
+      "status": "pass"
+    },
+    "VAL-CROSS-020": {
+      "status": "pass"
+    },
+    "VAL-CROSS-021": {
+      "status": "pass"
+    },
+    "VAL-CROSS-022": {
+      "status": "pass"
+    }
+  },
+  "frictions": [],
+  "blockers": [],
+  "toolsUsed": [
+    "node --test"
+  ]
+}

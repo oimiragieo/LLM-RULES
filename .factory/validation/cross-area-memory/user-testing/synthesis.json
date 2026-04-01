@@ -1,0 +1,24 @@
+{
+  "milestone": "cross-area-memory",
+  "round": 1,
+  "status": "pass",
+  "assertionsSummary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-CROSS-016",
+    "VAL-CROSS-017",
+    "VAL-CROSS-018",
+    "VAL-CROSS-019",
+    "VAL-CROSS-020",
+    "VAL-CROSS-021",
+    "VAL-CROSS-022"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
