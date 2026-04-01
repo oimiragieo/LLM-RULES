@@ -32,3 +32,8 @@ setImmediate(() => this.emit('event', payload));
 ## AJV Schema Validation
 
 AJV does not support the 'date-time' format natively. When validating schemas that use formats like 'date-time', you must install and require the `ajv-formats` plugin and apply it to your AJV instance via `addFormats(ajv)`.
+
+## Integration Tests with memory-manager-core
+
+When testing `memory-manager-core` API functions like `recordPattern` in isolated temp directories, the `validateProjectRoot` check will enforce the actual repository root and cause the test to fail.
+To bypass this in integration tests, require `createRecordingOps` directly instead of using the high-level `memory-manager-core` API.
