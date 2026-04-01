@@ -58,6 +58,7 @@ const {
   formatBehaviourSection,
 } = require('./prompt-assembler-agent.cjs');
 const { loadProjectContext } = require('./prompt-assembler-context.cjs');
+const { detectCacheBreak, _resetHashes } = require('./cache-break-detector.cjs');
 
 const DEFAULT_SKILL_SECTION_MODE = 'full';
 
@@ -271,6 +272,17 @@ function assembleSpawnPrompt({
   });
 
   recordMemoryChurn(projectRoot, memorySection, includeMemory);
+
+  // Detect cache breaks: hash assembled sections and log changes to flight recorder.
+  detectCacheBreak({
+    toolsSection: promptSections.toolsSection,
+    skillsSection: promptSections.skillsSection,
+    discoverySection: promptSections.discoverySection,
+    memorySection,
+    behaviourSection,
+    basePrompt: mergedBasePrompt,
+  });
+
   return enhancedPrompt;
 }
 
@@ -348,6 +360,17 @@ async function assembleSpawnPromptAsync(options = {}) {
   });
 
   recordMemoryChurn(projectRoot, memorySection, includeMemory);
+
+  // Detect cache breaks: hash assembled sections and log changes to flight recorder.
+  detectCacheBreak({
+    toolsSection: promptSections.toolsSection,
+    skillsSection: promptSections.skillsSection,
+    discoverySection: promptSections.discoverySection,
+    memorySection,
+    behaviourSection,
+    basePrompt: mergedBasePrompt,
+  });
+
   return enhancedPrompt;
 }
 
@@ -403,6 +426,8 @@ module.exports = {
   _clearCache: () => {
     clearCaches();
     _clearSectionCache();
+    _resetHashes();
   },
   _clearSectionCache,
+  _resetHashes,
 };
