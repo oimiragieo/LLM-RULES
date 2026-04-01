@@ -1,0 +1,26 @@
+{
+  "featureId": "fix-bash-compound-bypass",
+  "reviewedAt": "2026-04-01T04:26:00.000Z",
+  "commitId": "6618530a539d2391cae3b7cac39485be6e67ed2a",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "The implementation correctly and elegantly addresses the bash parser bypasses. It implements a recursive-descent parser for command substitutions (`$(...)` and backticks) that correctly tracks quote states (single, double, and backticks) and nested substitutions. It recursively flattens extracted substitutions into segments for analysis, ensuring deeply nested bypasses like `echo $(echo \\`sudo\\`)` are caught. It also adds robust handling for single ampersand `&` separators while avoiding false positives on redirects (`>&`, `&>`). The added tests properly cover the failure scenarios from the previous run.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "Worker bypassed the manifest's `pnpm test` command during baseline validation, noting that `AGENTS.md` documents it as a known timeout. They substituted a targeted test file. The worker-base skill does not explicitly authorize substituting scoped baseline validators based on AGENTS.md timeout warnings.",
+      "evidence": "Transcript skillFeedback.deviations[0] and handoff note: 'Ran the existing targeted regression file... instead of commands.test... Mission AGENTS.md explicitly says not to run pnpm test because the full suite times out'."
+    },
+    {
+      "area": "services",
+      "observation": "The worker discovered an environment quirk where `.factory/init.sh` runs via WSL bash on Windows, which resolves an older Node version (v12) and skips dependency installation, despite the main Windows environment having Node v22.",
+      "evidence": "Handoff discoveredIssues[1]: '.factory/init.sh used WSL bash/Node v12.22.7 on this Windows host, so it skipped dependency installation...'"
+    }
+  ],
+  "addressesFailureFrom": ".factory/validation/security-hardening/scrutiny/reviews/bash-pattern-alignment.json",
+  "summary": "Review complete. The fix successfully and comprehensively resolves the compound-command bypass vulnerabilities identified in the original review. The parsing logic correctly handles quote contexts, nested substitutions, and single-ampersand separators. Shared state observations logged regarding `pnpm test` timeouts and WSL bash Node version mismatches."
+}

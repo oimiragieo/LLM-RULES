@@ -1,48 +1,37 @@
 {
   "milestone": "security-hardening",
-  "round": 1,
-  "status": "fail",
+  "round": 2,
+  "status": "pass",
   "validatorsRun": {
     "test": { "passed": true, "command": "pnpm test:all", "exitCode": 0 },
     "typecheck": { "passed": true, "command": "N/A", "exitCode": 0 },
     "lint": { "passed": true, "command": "pnpm lint", "exitCode": 0 }
   },
   "reviewsSummary": {
-    "total": 3,
-    "passed": 2,
-    "failed": 1,
-    "failedFeatures": ["bash-pattern-alignment"]
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "failedFeatures": []
   },
-  "blockingIssues": [
-    {
-      "featureId": "bash-pattern-alignment",
-      "severity": "blocking",
-      "description": "The `splitCompoundCommand` function does not split commands on a single ampersand (`&`). This allows dangerous commands to be bypassed entirely when executed as an asynchronous list (e.g., `echo a & sudo whoami`). The loop currently only checks for `&&`, `|`, `||`, `;`, and `\\n`, completely missing the single `&` operator."
-    },
-    {
-      "featureId": "bash-pattern-alignment",
-      "severity": "blocking",
-      "description": "The `splitCompoundCommand` function does not parse or track command substitutions (like `$(...)` or `` `...` ``). As a result, dangerous commands embedded inside a substitution (e.g., `echo $(sudo whoami)`) are not evaluated as separate segments and evade detection."
-    }
-  ],
+  "blockingIssues": [],
   "appliedUpdates": [],
   "suggestedGuidanceUpdates": [
     {
       "target": "skills",
-      "suggestion": "Update the worker-base skill's baseline validation procedure to respect repository-specific constraints documented in AGENTS.md, such as known timeouts for `pnpm test`, rather than rigidly enforcing `commands.test` from `.factory/services.yaml`.",
-      "evidence": "Multiple workers (case-normalized-paths, unc-path-blocking, bash-pattern-alignment) reported conflicts between the worker-base skill and AGENTS.md regarding test execution timeouts.",
+      "suggestion": "Update the worker-base skill's baseline validation procedure to authorize running targeted regression tests instead of the full `commands.test` when the full test suite is known to time out, as documented in AGENTS.md.",
+      "evidence": "Worker for fix-bash-compound-bypass bypassed commands.test for a tailored regression suite because commands.test times out.",
       "isSystemic": true
     },
     {
       "target": "AGENTS.md",
-      "suggestion": "Clarify that workers may batch test creation and implementation (deviating from strict TDD) when dealing with files near max-lines lint thresholds to avoid intermediate linting failures.",
-      "evidence": "Worker for bash-pattern-alignment reported having to deviate from 'Write tests first' to handle linting constraints.",
+      "suggestion": "Document expectations for mission artifacts (e.g., .claude/context/memory/*) being present as dirty/untracked files in the git working tree so workers don't mistakenly clean them up or flag them as issues.",
+      "evidence": "Carried over from previous round synthesis.",
       "isSystemic": false
     },
     {
       "target": "AGENTS.md",
-      "suggestion": "Document expectations for mission artifacts (e.g., .claude/context/memory/*) being present as dirty/untracked files in the git working tree so workers don't mistakenly clean them up or flag them as issues.",
-      "evidence": "Worker for unc-path-blocking reported dirty git state with mission artifacts.",
+      "suggestion": "Clarify that workers may batch test creation and implementation (deviating from strict TDD) when dealing with files near max-lines lint thresholds to avoid intermediate linting failures.",
+      "evidence": "Carried over from previous round synthesis.",
       "isSystemic": false
     }
   ],
@@ -52,5 +41,5 @@
       "reason": "ambiguous; WSL configuration is user-specific and shouldn't be universally applied to services.yaml or guidance."
     }
   ],
-  "previousRound": null
+  "previousRound": ".factory/validation/security-hardening/scrutiny/synthesis_round1.json"
 }
