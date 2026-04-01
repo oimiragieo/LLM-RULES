@@ -25,7 +25,7 @@ paths:
 
 ### File-Based Rotation (25KB Cap)
 
-**Hard cap: 25KB per markdown memory file** (matches Claude Code's 200-line/25KB MEMORY.md discipline). Active files (`learnings.md`, `decisions.md`, `issues.md`) rotate to `.claude/context/memory/archive/` when they exceed 25KB. Rotation handles both section-delimited (`---`/`## `) and flat bullet-point formats via synthetic sectioning. `codebase_map.json` max 500 entries. JSON files (`patterns.json`, `gotchas.json`) capped at 20 items each.
+**Hard cap: 25KB per markdown memory file** (matches Claude Code's 200-line/25KB MEMORY.md discipline). Active files (`learnings.md`, `decisions.md`, `issues.md`) rotate to `.claude/context/memory/archive/` when they exceed 25KB. Rotation handles both section-delimited (`---`/`##`) and flat bullet-point formats via synthetic sectioning. `codebase_map.json` max 500 entries. JSON files (`patterns.json`, `gotchas.json`) capped at 20 items each.
 
 ## Memory APIs
 
