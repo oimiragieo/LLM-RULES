@@ -1,0 +1,112 @@
+{
+  "groupId": "cross-area-flow",
+  "testedAt": "2026-03-31T12:00:00Z",
+  "isolation": {
+    "type": "programmatic",
+    "context": "local integration tests"
+  },
+  "toolsUsed": [
+    "programmatic integration tests (Node.js)"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-CROSS-006",
+      "title": "Cache stability under repeated identical calls",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/integration/cross-area-phase6.test.cjs",
+          "expected": "Tests for VAL-CROSS-006 pass",
+          "observed": "10 identical calls produce byte-identical output and zero cache-break events"
+        }
+      ],
+      "evidence": {
+        "testOutput": "cross-area-cache/cross-area-flow/VAL-CROSS-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CROSS-007",
+      "title": "Cache invalidation on tool list change propagates correctly",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/integration/cross-area-phase6.test.cjs",
+          "expected": "Tests for VAL-CROSS-007 pass",
+          "observed": "changing allowedTools emits exactly one cache-break event listing only toolsSection"
+        }
+      ],
+      "evidence": {
+        "testOutput": "cross-area-cache/cross-area-flow/VAL-CROSS-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CROSS-008",
+      "title": "Compaction cycle does not corrupt prompt assembly",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/integration/cross-area-phase6.test.cjs",
+          "expected": "Tests for VAL-CROSS-008 pass",
+          "observed": "all section markers present after _clearSectionCache() + new snapshot"
+        }
+      ],
+      "evidence": {
+        "testOutput": "cross-area-cache/cross-area-flow/VAL-CROSS-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CROSS-009",
+      "title": "Circuit breaker integrates with context-window-monitor",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/integration/cross-area-phase6.test.cjs",
+          "expected": "Tests for VAL-CROSS-009 pass",
+          "observed": "3 consecutive turns at >=93% trips circuit breaker and returns advisory, CRITICAL threshold warning + circuit breaker advisory combine into additionalContext, circuit breaker counter resets after usage drops below 93%"
+        }
+      ],
+      "evidence": {
+        "testOutput": "cross-area-cache/cross-area-flow/VAL-CROSS-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CROSS-010",
+      "title": "Alphabetical sorting produces deterministic prefix hash",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/integration/cross-area-phase6.test.cjs",
+          "expected": "Tests for VAL-CROSS-010 pass",
+          "observed": "prompt SHA-256 hash is identical before and after cache clear, shuffled tool input produces same hash as sorted input"
+        }
+      ],
+      "evidence": {
+        "testOutput": "cross-area-cache/cross-area-flow/VAL-CROSS-output.txt"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-CROSS-011",
+      "title": "End-to-end prompt assembly under context pressure",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run node --test tests/integration/cross-area-phase6.test.cjs",
+          "expected": "Tests for VAL-CROSS-011 pass",
+          "observed": "full sequence: assemble -> 3 turns >93% -> circuit breaker -> pre-compact -> clear -> reassemble"
+        }
+      ],
+      "evidence": {
+        "testOutput": "cross-area-cache/cross-area-flow/VAL-CROSS-output.txt"
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 6 assertions: 6 passed (VAL-CROSS-006 through VAL-CROSS-011) via programmatic integration test."
+}
