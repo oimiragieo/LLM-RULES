@@ -81,6 +81,67 @@ function isRouterInvocation(hookInput = {}) {
   return true;
 }
 
+function normalizePathForComparison(filePath) {
+  return String(filePath || '')
+    .replace(/\\/g, '/')
+    .toLowerCase();
+}
+
+function decodePathVariant(filePath) {
+  try {
+    return decodeURIComponent(filePath);
+  } catch {
+    return filePath;
+  }
+}
+
+function getPathComparisonVariants(filePath) {
+  const variants = new Set();
+  let current = normalizePathForComparison(filePath);
+
+  for (let index = 0; index < 3 && current; index++) {
+    variants.add(current);
+    const decoded = normalizePathForComparison(decodePathVariant(current));
+    if (decoded === current) {
+      break;
+    }
+    current = decoded;
+  }
+
+  return [...variants];
+}
+
+const DISALLOWED_PATTERNS = [
+  /(^|\/)\.git(?:\/|$)/,
+  /(^|\/)node_modules(?:\/|$)/,
+  /(^|\/)\.claude(?:\/|$)/,
+  /(^|\/)\.vscode(?:\/|$)/,
+  /(^|\/)\.idea(?:\/|$)/,
+  /(^|\/)\.gitconfig$/,
+  /(^|\/)\.gitmodules$/,
+  /(^|\/)\.bashrc$/,
+  /(^|\/)\.bash_profile$/,
+  /(^|\/)\.zshrc$/,
+  /(^|\/)\.zprofile$/,
+  /(^|\/)\.profile$/,
+  /(^|\/)\.ripgreprc$/,
+  /(^|\/)\.mcp\.json$/,
+  /(^|\/)\.claude\.json$/,
+];
+
+const SECURITY_CRITICAL_PATTERNS = [...DISALLOWED_PATTERNS, /(^|\/)\.env$/, /(^|\/)\.env\./];
+
+const TRAVERSAL_PATTERNS = [/(^|\/)\.\.(?:\/|$)/, /(^|\/|%2f|%5c)%2e%2e(?:\/|$|%2f|%5c)/];
+
+function matchesProtectedPattern(filePath, patterns) {
+  const variants = getPathComparisonVariants(filePath);
+  return variants.some(currentPath => patterns.some(pattern => pattern.test(currentPath)));
+}
+
+function hasPathTraversal(filePath) {
+  return matchesProtectedPattern(filePath, TRAVERSAL_PATTERNS);
+}
+
 // =============================================================================
 // CHECK MODULES (loaded in-process instead of forked)
 // =============================================================================
@@ -130,28 +191,20 @@ CHECKS.push({
     const enforcement = getEnforcementMode('FILE_PLACEMENT_GUARD', 'block');
     if (enforcement === 'off') return { pass: true };
 
-    // Path traversal defense: reject .. segments
-    if (filePath.includes('..')) {
+    if (hasPathTraversal(filePath)) {
       return {
         pass: false,
         result: 'block',
-        message: 'Path traversal detected: .. segments not allowed',
+        message: 'Path traversal detected: parent-directory segments are not allowed',
       };
     }
 
-    // Disallowed directories
-    const disallowedPatterns = [/\/\.git\//, /\/node_modules\//, /\.claude\/context\/code-index/];
-
-    const normalizedPath = filePath.replace(/\\/g, '/');
-
-    for (const pattern of disallowedPatterns) {
-      if (pattern.test(normalizedPath)) {
-        return {
-          pass: false,
-          result: 'block',
-          message: `[FILE-PLACEMENT-GUARD] Cannot write to protected path: ${filePath}`,
-        };
-      }
+    if (matchesProtectedPattern(filePath, DISALLOWED_PATTERNS)) {
+      return {
+        pass: false,
+        result: 'block',
+        message: `[FILE-PLACEMENT-GUARD] Cannot write to protected path: ${filePath}`,
+      };
     }
 
     return { pass: true };
@@ -256,14 +309,15 @@ CHECKS.push({
 
     // Check if this is implementation code without tests
     const filePath = toolInput.file_path || toolInput.target_file || '';
+    const normalizedFilePath = normalizePathForComparison(filePath);
     const isTestFile =
-      /\.(test|spec)\.(js|ts|jsx|tsx|cjs|mjs)$/.test(filePath) ||
-      /\/__tests__\//.test(filePath) ||
-      /\/test\//.test(filePath);
+      /\.(test|spec)\.(js|ts|jsx|tsx|cjs|mjs)$/.test(normalizedFilePath) ||
+      /\/__tests__\//.test(normalizedFilePath) ||
+      /\/test\//.test(normalizedFilePath);
 
     const isImplementationFile =
-      /^(src|lib|app|pages|components|api)\//.test(filePath) ||
-      /\.(js|ts|jsx|tsx|cjs|mjs)$/.test(filePath);
+      /^(src|lib|app|pages|components|api)\//.test(normalizedFilePath) ||
+      /\.(js|ts|jsx|tsx|cjs|mjs)$/.test(normalizedFilePath);
 
     // If writing implementation, check if tests exist
     if (isImplementationFile && !isTestFile) {
@@ -330,11 +384,14 @@ CHECKS.push({
     if (enforcement === 'off') return { pass: true };
 
     const filePath = toolInput.file_path || toolInput.target_file || '';
+    const normalizedFilePath = normalizePathForComparison(filePath);
 
     // Check if trying to create certain protected file types without proper context
-    const isSkillCreation = /\.claude\/skills\/[^/]+\/SKILL\.md$/.test(filePath);
-    const isAgentCreation = /\.claude\/agents\/.+\.md$/.test(filePath);
-    const isWorkflowCreation = /\.claude\/workflows\/[^/]+\.(md|yaml)$/.test(filePath);
+    const isSkillCreation = /(^|\/)\.claude\/skills\/[^/]+\/skill\.md$/.test(normalizedFilePath);
+    const isAgentCreation = /(^|\/)\.claude\/agents\/.+\.md$/.test(normalizedFilePath);
+    const isWorkflowCreation = /(^|\/)\.claude\/workflows\/[^/]+\.(md|yaml)$/.test(
+      normalizedFilePath
+    );
 
     if (isSkillCreation || isAgentCreation || isWorkflowCreation) {
       // Check if running in creator workflow context
@@ -483,7 +540,7 @@ CHECKS.push({
     if (enforcement === 'off') return { pass: true };
 
     // Normalize path for cross-platform checking
-    const normalizedPath = filePath.replace(/\\/g, '/');
+    const normalizedPath = normalizePathForComparison(filePath);
     const isReflectionJson =
       normalizedPath.endsWith('.claude/context/runtime/reflection-spawn-request.json') ||
       normalizedPath === 'reflection-spawn-request.json';
@@ -579,15 +636,8 @@ async function main() {
     // Fail closed
     if (process.env.HOOK_FAIL_OPEN === 'true') {
       // SECURITY: Never fail-open for security-critical paths
-      // SE-01: Use [/\\] to match both Unix and Windows path separators
-      const SECURITY_CRITICAL_PATTERNS = [
-        /[/\\]\.claude[/\\]hooks[/\\]/,
-        /[/\\]\.claude[/\\]agents[/\\]/,
-        /\.env$/,
-        /\.env\./,
-      ];
       const targetPath = targetFilePath;
-      const isSecurityCritical = SECURITY_CRITICAL_PATTERNS.some(p => p.test(targetPath));
+      const isSecurityCritical = matchesProtectedPattern(targetPath, SECURITY_CRITICAL_PATTERNS);
       if (isSecurityCritical) {
         process.stdout.write(
           JSON.stringify({ allowed: false, reason: 'Security-critical path: fail-open disabled' })
@@ -609,4 +659,14 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { CHECKS, main, isRouterInvocation };
+module.exports = {
+  CHECKS,
+  main,
+  isRouterInvocation,
+  normalizePathForComparison,
+  getPathComparisonVariants,
+  matchesProtectedPattern,
+  hasPathTraversal,
+  DISALLOWED_PATTERNS,
+  SECURITY_CRITICAL_PATTERNS,
+};
