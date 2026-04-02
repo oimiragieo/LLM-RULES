@@ -17,6 +17,11 @@ If you want a local-first, reproducible agent stack with strict validation and h
 
 ## Recent Changes
 
+### Phase 10 — Paper-Inspired: Dual-Level Indexing + Memory Versioning
+
+- **Dual-level skill+agent index**: 339 skill + 119 agent prototypes in shared vector space. Retrieve N=50, collapse to K=5 unique agents via skill-to-agent owner trace (+19.4% recall, arXiv:2511.01854)
+- **Memory version links**: `supersedes` + `archived` fields on pattern/gotcha entries. Semantic matches create version chains instead of silent drops (arXiv:2603.19595)
+
 ### Phase 9 — Routing Recalibration
 
 - **Semantic-first routing**: Embedding-based routing promoted to primary (`ROUTING_PRIORITY=semantic`); keyword classification demoted to metadata/tiebreaker

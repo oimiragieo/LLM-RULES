@@ -40,13 +40,14 @@ function isDuplicateEntry(entries, candidateText, threshold) {
     const text = getEntryText(entry);
     if (!text) continue;
     if (text.toLowerCase() === normalizedCandidate) {
-      return { duplicate: true, reason: 'exact' };
+      return { duplicate: true, reason: 'exact', matchedEntry: entry };
     }
-    if (similarityScore(text, normalizedCandidate) >= threshold) {
-      return { duplicate: true, reason: 'semantic' };
+    const score = similarityScore(text, normalizedCandidate);
+    if (score >= threshold) {
+      return { duplicate: true, reason: 'semantic', matchedEntry: entry, similarity: score };
     }
   }
-  return { duplicate: false, reason: 'none' };
+  return { duplicate: false, reason: 'none', matchedEntry: null };
 }
 
 function createRecordingOps({
@@ -126,19 +127,30 @@ function createRecordingOps({
         const candidateText = getEntryText(gotcha);
         let dedupStatus = 'dedup_disabled_create';
         let isDuplicate = false;
+        let supersedesId = null;
         try {
           if (dedupEnabled) {
             if (process.env.MEMORY_DEDUP_FORCE_ERROR === '1') {
               throw new Error('forced dedup failure');
             }
             const decision = isDuplicateEntry(gotchas, candidateText, dedupThreshold);
-            isDuplicate = decision.duplicate;
-            dedupStatus =
-              decision.reason === 'exact'
-                ? 'duplicate_skipped'
-                : decision.reason === 'semantic'
-                  ? 'semantic_duplicate_skipped'
-                  : 'create';
+            if (decision.reason === 'exact') {
+              isDuplicate = true;
+              dedupStatus = 'duplicate_skipped';
+            } else if (decision.reason === 'semantic') {
+              // Semantic match: supersede instead of dropping (All-Mem pattern)
+              // Archive old entry, write new with supersedes link
+              if (decision.matchedEntry && decision.matchedEntry.id) {
+                decision.matchedEntry.archived = true;
+                supersedesId = decision.matchedEntry.id;
+                dedupStatus = 'superseded';
+              } else {
+                isDuplicate = true;
+                dedupStatus = 'semantic_duplicate_skipped';
+              }
+            } else {
+              dedupStatus = 'create';
+            }
           } else {
             const decision = isDuplicateEntry(gotchas, candidateText, 1);
             isDuplicate = decision.duplicate;
@@ -166,7 +178,11 @@ function createRecordingOps({
             ...entryBase,
             writeSource,
             dedupStatus,
+            archived: false,
           };
+          if (supersedesId) {
+            entry.supersedes = supersedesId;
+          }
           entry.id = buildEntryId(entry);
 
           try {
@@ -263,19 +279,28 @@ function createRecordingOps({
         const candidateText = getEntryText(pattern);
         let dedupStatus = 'dedup_disabled_create';
         let isDuplicate = false;
+        let patternSupersedesId = null;
         try {
           if (dedupEnabled) {
             if (process.env.MEMORY_DEDUP_FORCE_ERROR === '1') {
               throw new Error('forced dedup failure');
             }
             const decision = isDuplicateEntry(patterns, candidateText, dedupThreshold);
-            isDuplicate = decision.duplicate;
-            dedupStatus =
-              decision.reason === 'exact'
-                ? 'duplicate_skipped'
-                : decision.reason === 'semantic'
-                  ? 'semantic_duplicate_skipped'
-                  : 'create';
+            if (decision.reason === 'exact') {
+              isDuplicate = true;
+              dedupStatus = 'duplicate_skipped';
+            } else if (decision.reason === 'semantic') {
+              if (decision.matchedEntry && decision.matchedEntry.id) {
+                decision.matchedEntry.archived = true;
+                patternSupersedesId = decision.matchedEntry.id;
+                dedupStatus = 'superseded';
+              } else {
+                isDuplicate = true;
+                dedupStatus = 'semantic_duplicate_skipped';
+              }
+            } else {
+              dedupStatus = 'create';
+            }
           } else {
             const decision = isDuplicateEntry(patterns, candidateText, 1);
             isDuplicate = decision.duplicate;
@@ -303,7 +328,11 @@ function createRecordingOps({
             ...entryBase,
             writeSource,
             dedupStatus,
+            archived: false,
           };
+          if (patternSupersedesId) {
+            entry.supersedes = patternSupersedesId;
+          }
           entry.id = buildEntryId(entry);
 
           try {

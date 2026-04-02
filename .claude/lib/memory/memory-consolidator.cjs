@@ -34,6 +34,7 @@ const crypto = require('node:crypto');
 const { MEMORY_DIR } = require('./memory-paths.cjs');
 const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 const { enforceMemoryCaps } = require('./memory-rotator.cjs');
+const { jaccardSimilarity } = require('./smart-pruner.cjs');
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -265,6 +266,39 @@ function findLogsSince(memoryDir, sinceTimestamp) {
   return results;
 }
 
+// ── Semantic Match Helper ─────────────────────────────────────────────────
+
+/**
+ * Strip common classification prefixes from consolidated log entries.
+ * E.g., "Found a gotcha: X" → "X", "Discovered a pattern: Y" → "Y"
+ */
+function stripClassificationPrefix(text) {
+  return String(text || '')
+    .replace(
+      /^(found\s+a\s+gotcha:\s*|discovered\s+a?\s*pattern:\s*|made\s+a\s+decision\s*(to\s+)?|found\s+an?\s+issue:\s*|learned\s+(that\s+)?)/i,
+      ''
+    )
+    .trim();
+}
+
+/**
+ * Find a semantically similar entry in an array (Jaccard >= 0.7).
+ * Returns the matched entry object (mutable reference) or null.
+ */
+function findSemanticMatch(entries, candidateText, threshold = 0.7) {
+  const candidate = stripClassificationPrefix(candidateText).toLowerCase();
+  if (!candidate) return null;
+  for (const entry of entries) {
+    if (entry.archived) continue;
+    const text = String(entry.text || '').toLowerCase();
+    if (!text) continue;
+    if (jaccardSimilarity(text, candidate) >= threshold) {
+      return entry;
+    }
+  }
+  return null;
+}
+
 // ── Structured File Writers ───────────────────────────────────────────────────
 
 /**
@@ -280,7 +314,14 @@ function appendToPatterns(patternsFile, item) {
     text: item.text,
     area: item.area || 'main',
     timestamp: item.timestamp,
+    archived: false,
   };
+  // Check for semantic duplicates and supersede instead of blindly appending
+  const matched = findSemanticMatch(patterns, item.text);
+  if (matched) {
+    matched.archived = true;
+    entry.supersedes = matched.id;
+  }
   patterns.push(entry);
   atomicWriteJSONSync(patternsFile, patterns);
 }
@@ -298,7 +339,13 @@ function appendToGotchas(gotchasFile, item) {
     text: item.text,
     area: item.area || 'main',
     timestamp: item.timestamp,
+    archived: false,
   };
+  const matched = findSemanticMatch(gotchas, item.text);
+  if (matched) {
+    matched.archived = true;
+    entry.supersedes = matched.id;
+  }
   gotchas.push(entry);
   atomicWriteJSONSync(gotchasFile, gotchas);
 }

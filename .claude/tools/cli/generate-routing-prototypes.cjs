@@ -20,6 +20,14 @@ const {
 const { EmbeddingGenerator } = require('../../lib/code-indexing/embedding-generator.cjs');
 
 const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
+const SKILL_INDEX_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'skill-index.json');
+const AGENT_SKILL_MATRIX_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'config',
+  'agent-skill-matrix.json'
+);
 
 function addPhrases(byAgent, agentId, phrases = []) {
   const normalizedAgentId = String(agentId || '').trim();
@@ -144,6 +152,131 @@ function collectSubRouterPhrases(byAgent) {
   }
 }
 
+/**
+ * Collect skill description phrases per agent from skill-index + agent-skill-matrix.
+ * Primary skills are weighted 2x (description added twice), secondary/always 1x.
+ * This enriches agent prototypes with fine-grained skill capabilities.
+ */
+function collectSkillPhrases(byAgent) {
+  let skillIndex, matrix;
+  try {
+    if (!fs.existsSync(SKILL_INDEX_PATH) || !fs.existsSync(AGENT_SKILL_MATRIX_PATH)) return;
+    skillIndex = safeParseJSON(fs.readFileSync(SKILL_INDEX_PATH, 'utf8'));
+    matrix = safeParseJSON(fs.readFileSync(AGENT_SKILL_MATRIX_PATH, 'utf8'));
+    if (!skillIndex?.skills || !matrix?.agents) return;
+  } catch (_e) {
+    return;
+  }
+
+  const skills = skillIndex.skills;
+
+  // Flatten matrix: { category: { agentId: { primary, secondary, always } } } → per-agent skill tiers
+  for (const category of Object.values(matrix.agents)) {
+    if (!category || typeof category !== 'object') continue;
+    for (const [agentId, tiers] of Object.entries(category)) {
+      if (!tiers || typeof tiers !== 'object') continue;
+
+      const primarySkills = Array.isArray(tiers.primary) ? tiers.primary : [];
+      const secondarySkills = Array.isArray(tiers.secondary) ? tiers.secondary : [];
+      const alwaysSkills = Array.isArray(tiers.always) ? tiers.always : [];
+
+      // Primary skills: description added 2x for weighting
+      for (const skillName of primarySkills) {
+        const skill = skills[skillName];
+        if (skill?.description) {
+          addPhrases(byAgent, agentId, [skill.description, skill.description]);
+        }
+      }
+
+      // Secondary + always: description added 1x
+      for (const skillName of [...secondarySkills, ...alwaysSkills]) {
+        const skill = skills[skillName];
+        if (skill?.description) {
+          addPhrases(byAgent, agentId, [skill.description]);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Generate per-skill prototype vectors with owner metadata.
+ * Each skill is embedded from its description + category + domain + tags.
+ * Returns: { skillName: { vector: number[], owners: string[] } }
+ */
+async function generateSkillPrototypes(generator) {
+  let skillIndex, matrix;
+  try {
+    if (!fs.existsSync(SKILL_INDEX_PATH)) return {};
+    skillIndex = safeParseJSON(fs.readFileSync(SKILL_INDEX_PATH, 'utf8'));
+    if (!skillIndex?.skills) return {};
+  } catch (_e) {
+    return {};
+  }
+  try {
+    matrix = fs.existsSync(AGENT_SKILL_MATRIX_PATH)
+      ? safeParseJSON(fs.readFileSync(AGENT_SKILL_MATRIX_PATH, 'utf8'))
+      : null;
+  } catch (_e) {
+    matrix = null;
+  }
+
+  // Build owner map from matrix: skillName → [agentIds]
+  const ownerMap = new Map();
+  if (matrix?.agents) {
+    for (const category of Object.values(matrix.agents)) {
+      if (!category || typeof category !== 'object') continue;
+      for (const [agentId, tiers] of Object.entries(category)) {
+        const allSkills = [
+          ...(Array.isArray(tiers.primary) ? tiers.primary : []),
+          ...(Array.isArray(tiers.secondary) ? tiers.secondary : []),
+          ...(Array.isArray(tiers.always) ? tiers.always : []),
+        ];
+        for (const s of allSkills) {
+          if (!ownerMap.has(s)) ownerMap.set(s, new Set());
+          ownerMap.get(s).add(agentId);
+        }
+      }
+    }
+  }
+
+  // Also use agentPrimary from skill-index as fallback owners
+  const skills = skillIndex.skills;
+  const skillPrototypes = {};
+  const entries = Object.entries(skills);
+  console.error(`Embedding ${entries.length} skill prototypes...`);
+
+  for (const [skillName, skill] of entries) {
+    if (!skill.description) continue;
+    const text = [
+      skill.description,
+      skill.category ? `Category: ${skill.category}` : '',
+      skill.domain ? `Domain: ${skill.domain}` : '',
+      Array.isArray(skill.tags) ? `Tags: ${skill.tags.join(', ')}` : '',
+    ]
+      .filter(Boolean)
+      .join('. ');
+
+    try {
+      const embedding = await generator.embed(text);
+      const owners = ownerMap.has(skillName)
+        ? Array.from(ownerMap.get(skillName))
+        : Array.isArray(skill.agentPrimary)
+          ? skill.agentPrimary
+          : [];
+
+      skillPrototypes[skillName] = {
+        vector: normalizeL2(embedding),
+        owners,
+      };
+    } catch (_e) {
+      // Skip skills that fail to embed
+    }
+  }
+
+  return skillPrototypes;
+}
+
 function collectPhrasesPerAgent() {
   const byAgent = new Map();
   const registry = loadAgentRegistry();
@@ -151,6 +284,7 @@ function collectPhrasesPerAgent() {
   collectRegistryPhrases(byAgent, registry);
   collectFlatRoutingPhrases(byAgent);
   collectSubRouterPhrases(byAgent);
+  collectSkillPhrases(byAgent);
 
   for (const [agentId, phrases] of byAgent.entries()) {
     byAgent.set(agentId, Array.from(new Set(phrases)));
@@ -203,12 +337,18 @@ async function generateRoutingPrototypes(outputPath) {
     prototypes[agentId] = normalizeL2(mean);
   }
 
+  // Generate per-skill prototypes with owner metadata (dual-level indexing)
+  console.error(`Agent prototypes: ${Object.keys(prototypes).length}`);
+  const skillPrototypes = await generateSkillPrototypes(generator);
+  console.error(`Skill prototypes: ${Object.keys(skillPrototypes).length}`);
+
   const payload = {
-    version: '1.0.0',
+    version: '2.0.0',
     dimensions,
     model: 'Xenova/all-MiniLM-L6-v2',
     generatedAt: new Date().toISOString(),
     prototypes,
+    skillPrototypes,
   };
 
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });

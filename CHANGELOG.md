@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 10 — Paper-Inspired: Dual-Level Indexing + Memory Versioning
+
+#### Added
+
+- **Dual-level skill+agent routing index** — 339 skill prototypes embedded alongside 119 agent prototypes in shared 384-dim vector space. Semantic router uses Algorithm 1 (retrieve N=50 from combined index, collapse to K=5 unique agents via owner trace). Skill descriptions weighted by relationship tier: primary 2x, secondary/always 1x. Paper: Tool-to-Agent Retrieval (arXiv:2511.01854), validated +19.4% Recall@5.
+- **Memory version links (supersession tracking)** — Pattern/gotcha entries gain `supersedes` and `archived` fields. Semantic dedup matches (Jaccard ≥ 0.7) create version links instead of silently dropping entries. Old entries preserved with `archived: true`. Consolidator strips classification prefixes before matching. Pattern follows `observations.cjs` precedent. Paper: All-Mem (arXiv:2603.19595).
+
+#### Changed
+
+- **`generate-routing-prototypes.cjs`** — v2.0.0: outputs `prototypes` (119 agents) + `skillPrototypes` (339 skills with owner metadata). Skill descriptions loaded from `skill-index.json`, ownership from `agent-skill-matrix.json`.
+- **`semantic-router.cjs`** — `predict()` now scores both agent and skill prototypes, traces skill hits to owner agents, domain boost preserved.
+- **`memory-manager-core-recording.cjs`** — `isDuplicateEntry()` returns matched entry for supersession. `recordGotcha`/`recordPattern` create supersedes links on semantic matches.
+- **`memory-consolidator.cjs`** — `appendToPatterns`/`appendToGotchas` check for semantic duplicates before appending, archive old entries with supersedes links.
+
 ### Phase 9 — Routing System Recalibration
 
 #### Changed

@@ -59,6 +59,8 @@ function loadPrototypes(prototypesPath) {
       dimensions: parsed.dimensions,
       model: parsed.model || null,
       prototypes: parsed.prototypes,
+      // v2.0.0: skill prototypes with owner metadata for dual-level indexing
+      skillPrototypes: parsed.skillPrototypes || null,
     };
     return cachedPrototypes;
   } catch (_err) {
@@ -66,8 +68,15 @@ function loadPrototypes(prototypesPath) {
   }
 }
 
+/**
+ * Dual-level predict: scores prompt against BOTH agent prototypes and skill prototypes,
+ * then collapses skill hits to their owner agents (Algorithm 1 from Tool-to-Agent paper).
+ *
+ * Retrieve N candidates from combined index, collapse to K unique agents.
+ * A skill hit with score 0.8 promotes its owner agent even if the agent prototype only scored 0.4.
+ */
 async function predict(prompt, options = {}) {
-  const { topK = 5, minScore = 0.2, prototypesPath } = options;
+  const { topK = 5, minScore = 0.2, prototypesPath, retrieveN = 50 } = options;
   const loaded = loadPrototypes(prototypesPath);
   if (!loaded || !prompt) return [];
 
@@ -85,15 +94,63 @@ async function predict(prompt, options = {}) {
       process.stderr.write(`[semantic-router] predict latency: ${Date.now() - startMs}ms\n`);
     }
 
-    const results = [];
+    // Stage 1: Score ALL entities (agents + skills) against prompt embedding
+    const allHits = [];
+
+    // Agent prototype hits
     for (const [agent, vector] of Object.entries(loaded.prototypes)) {
       if (!Array.isArray(vector) || vector.length !== embedding.length) continue;
       const score = cosineSimilarity(embedding, vector);
       if (score >= minScore) {
-        results.push({ agent, score });
+        allHits.push({ type: 'agent', name: agent, agent, score });
       }
     }
 
+    // Skill prototype hits (dual-level indexing)
+    if (loaded.skillPrototypes) {
+      for (const [skillName, skillData] of Object.entries(loaded.skillPrototypes)) {
+        const vector = skillData.vector;
+        if (!Array.isArray(vector) || vector.length !== embedding.length) continue;
+        const score = cosineSimilarity(embedding, vector);
+        if (score >= minScore) {
+          const owners = Array.isArray(skillData.owners) ? skillData.owners : [];
+          allHits.push({ type: 'skill', name: skillName, owners, score });
+        }
+      }
+    }
+
+    // Sort all hits by score descending
+    allHits.sort((a, b) => b.score - a.score);
+
+    // Stage 2: Collapse to K unique agents (Algorithm 1 from paper)
+    // Walk the ranked list, trace skill hits to owner agents, deduplicate
+    const agentScores = new Map(); // agent → best score (from agent hit or skill hit)
+    const agentSources = new Map(); // agent → source ('agent' or 'skill:skillName')
+
+    for (const hit of allHits.slice(0, retrieveN)) {
+      if (hit.type === 'agent') {
+        if (!agentScores.has(hit.agent) || agentScores.get(hit.agent) < hit.score) {
+          agentScores.set(hit.agent, hit.score);
+          agentSources.set(hit.agent, 'agent');
+        }
+      } else if (hit.type === 'skill') {
+        // Trace skill hit to owner agents
+        for (const owner of hit.owners) {
+          if (!agentScores.has(owner) || agentScores.get(owner) < hit.score) {
+            agentScores.set(owner, hit.score);
+            agentSources.set(owner, `skill:${hit.name}`);
+          }
+        }
+      }
+    }
+
+    // Build result array from collapsed agent scores
+    const results = [];
+    for (const [agent, score] of agentScores) {
+      results.push({ agent, score, source: agentSources.get(agent) || 'agent' });
+    }
+
+    // Domain boost (same as before)
     const domainMatch = classifyDomain(prompt);
     if (domainMatch?.type === 'domain' && domainMatch.router) {
       const routerVector = loaded.prototypes[domainMatch.router];
@@ -110,10 +167,7 @@ async function predict(prompt, options = {}) {
         if (existing) {
           existing.score = Math.max(existing.score, boostedScore);
         } else {
-          results.push({
-            agent: domainMatch.router,
-            score: boostedScore,
-          });
+          results.push({ agent: domainMatch.router, score: boostedScore, source: 'domain-boost' });
         }
       }
     }
