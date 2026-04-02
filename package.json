@@ -241,7 +241,10 @@
       "tar": ">=7.5.10",
       "minimatch": ">=10.2.1",
       "ajv@^6": "^6.14.0",
-      "flatted": ">=3.4.2"
+      "flatted": ">=3.4.2",
+      "path-to-regexp": ">=8.4.0",
+      "picomatch": ">=4.0.4",
+      "brace-expansion": ">=5.0.5"
     },
     "onlyBuiltDependencies": [
       "@vscode/ripgrep",
