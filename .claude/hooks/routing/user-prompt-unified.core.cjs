@@ -1131,7 +1131,8 @@ function recordUserPromptResult(result) {
  *
  * @param {Object} hookInput - Parsed hook input
  * @returns {Object} Result with skipped, candidates, planningReq
- */ async function checkRouterEnforcement(hookInput, options = {}) {
+ */ // eslint-disable-next-line complexity
+async function checkRouterEnforcement(hookInput, options = {}) {
   const result = { skipped: false, candidates: [], planningReq: null, intent: 'general' };
   const userPrompt = hookInput?.prompt || hookInput?.message || '';
   // Skip for very short prompts
@@ -1215,6 +1216,14 @@ function recordUserPromptResult(result) {
     return result;
   }
 
+  const conservativeMode = Boolean(options.conservativeMode);
+  if (conservativeMode) {
+    result.conservativeMode = true;
+  }
+  const semanticDisabled = process.env.SEMANTIC_ROUTING === 'off' || conservativeMode;
+  const routingPriority = String(process.env.ROUTING_PRIORITY || 'semantic').toLowerCase();
+
+  // Always run keyword classification for metadata (intent name, capability, disambiguation)
   const classification = classifyIntent(userPrompt);
   const { candidates: candidates, intent: intent } = scoreAgents(
     userPrompt,
@@ -1224,6 +1233,15 @@ function recordUserPromptResult(result) {
 
   result.candidates = candidates;
   result.intent = classification.intent || intent;
+  // Store last classified intent in router state for feedback loop
+  try {
+    const routerState = require(path.join(LIB_DIR, 'routing', 'router-state.cjs'));
+    if (routerState.setLastClassifiedIntent) {
+      routerState.setLastClassifiedIntent(result.intent);
+    }
+  } catch (_e) {
+    /* best-effort */
+  }
   result.intentConfidence = classification.confidence;
   result.intentSource = classification.source;
   result.capability = classification.capability;
@@ -1231,12 +1249,41 @@ function recordUserPromptResult(result) {
     classification.defaultAgent ||
     (classification.capability ? getAgentForCapability(classification.capability) : null);
   const topScore = candidates.length > 0 ? candidates[0].score : 0;
-  const conservativeMode = Boolean(options.conservativeMode);
-  if (conservativeMode) {
-    result.conservativeMode = true;
-  }
-  const semanticDisabled = process.env.SEMANTIC_ROUTING === 'off' || conservativeMode;
-  if (!semanticDisabled && (classification.intent === 'general' || topScore <= 2)) {
+
+  if (!semanticDisabled && routingPriority === 'semantic') {
+    // SEMANTIC-PRIMARY mode: embedding-based routing runs first, keywords are tiebreaker
+    const semanticCandidates = await semanticRouter.predict(userPrompt, {
+      topK: 5,
+      minScore: 0.25,
+    });
+    if (semanticCandidates.length > 0) {
+      result.semanticCandidates = semanticCandidates;
+      const semanticTop = semanticCandidates[0];
+      if (semanticTop.score > 0.5) {
+        const semanticAgent = agents.find(agent => agent.name === semanticTop.agent);
+        if (semanticAgent) {
+          // Semantic winner goes to position 0 with high score
+          result.candidates.unshift({
+            agent: semanticAgent,
+            score: 10 + semanticTop.score,
+            intent: 'semantic',
+            source: 'semantic-primary',
+          });
+        }
+      } else if (semanticCandidates.length >= 2) {
+        // Weak semantic signal — use keyword as tiebreaker if semantic top-2 are close
+        const scoreDelta = semanticCandidates[0].score - semanticCandidates[1].score;
+        if (scoreDelta < 0.05 && topScore > 2) {
+          // Keyword classifier has a clear winner and semantic is ambiguous — keep keyword result
+          result.intentSource = 'keyword-tiebreaker';
+        }
+      }
+      console.error(
+        `[user-prompt-unified] Semantic-primary: ${semanticCandidates.map(candidate => `${candidate.agent} (${candidate.score.toFixed(2)})`).join(', ')}`
+      );
+    }
+  } else if (!semanticDisabled && (classification.intent === 'general' || topScore <= 2)) {
+    // KEYWORD-PRIMARY mode (old behavior): semantic runs only as fallback
     const semanticCandidates = await semanticRouter.predict(userPrompt, {
       topK: 5,
       minScore: 0.25,
@@ -1251,7 +1298,7 @@ function recordUserPromptResult(result) {
             agent: semanticAgent,
             score: semanticTop.score,
             intent: 'semantic',
-            source: 'semantic',
+            source: 'semantic-fallback',
           });
         }
       }

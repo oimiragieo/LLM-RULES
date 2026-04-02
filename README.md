@@ -17,6 +17,14 @@ If you want a local-first, reproducible agent stack with strict validation and h
 
 ## Recent Changes
 
+### Phase 9 — Routing Recalibration
+
+- **Semantic-first routing**: Embedding-based routing promoted to primary (`ROUTING_PRIORITY=semantic`); keyword classification demoted to metadata/tiebreaker
+- **Hierarchical routing ON by default**: 119 agents grouped into 9 domain sub-routers (`HIERARCHICAL_ROUTING=on`)
+- **Model router wired**: Dynamic haiku/sonnet/opus selection based on complexity + budget (`MODEL_ROUTER_ENABLED=on`)
+- **Intent feedback loop closed**: Success/failure recorded per intent, read back into routing weights
+- **Guard overhead reduced**: 2 redundant checks removed, 5 advisory hooks converted to async
+
 ### Post-Phase 8 — Audit Fixes
 
 - **Consolidation wiring**: Connected Dream-equivalent pipeline (shouldConsolidate → acquireLock → consolidate → mtime stamp) in session-end hook — modules were built but never called

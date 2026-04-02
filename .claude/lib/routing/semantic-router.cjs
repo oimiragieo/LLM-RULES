@@ -9,6 +9,30 @@ const { classifyDomain } = require('./intent-classifier.cjs');
 
 let cachedPrototypes = null;
 
+// LRU embedding cache — avoids redundant embedding generation when semantic router is primary
+const EMBEDDING_CACHE_MAX = 10;
+const _embeddingCache = new Map();
+
+function _getCachedEmbedding(prompt) {
+  const cached = _embeddingCache.get(prompt);
+  if (cached) {
+    // Move to end (most recent)
+    _embeddingCache.delete(prompt);
+    _embeddingCache.set(prompt, cached);
+    return cached;
+  }
+  return null;
+}
+
+function _setCachedEmbedding(prompt, embedding) {
+  if (_embeddingCache.size >= EMBEDDING_CACHE_MAX) {
+    // Evict oldest (first key)
+    const oldest = _embeddingCache.keys().next().value;
+    _embeddingCache.delete(oldest);
+  }
+  _embeddingCache.set(prompt, embedding);
+}
+
 function normalizeL2(vec) {
   const norm = Math.sqrt(vec.reduce((sum, value) => sum + value * value, 0));
   if (!norm) return vec;
@@ -47,11 +71,19 @@ async function predict(prompt, options = {}) {
   const loaded = loadPrototypes(prototypesPath);
   if (!loaded || !prompt) return [];
 
-  const generator = new EmbeddingGenerator({ cacheEnabled: false });
+  const startMs = Date.now();
   try {
-    await generator.initialize();
-    let embedding = await generator.embed(prompt, false);
-    embedding = normalizeL2(embedding);
+    let embedding = _getCachedEmbedding(prompt);
+    if (!embedding) {
+      const generator = new EmbeddingGenerator({ cacheEnabled: false });
+      await generator.initialize();
+      embedding = await generator.embed(prompt, false);
+      embedding = normalizeL2(embedding);
+      _setCachedEmbedding(prompt, embedding);
+    }
+    if (process.env.ROUTER_DEBUG === 'true') {
+      process.stderr.write(`[semantic-router] predict latency: ${Date.now() - startMs}ms\n`);
+    }
 
     const results = [];
     for (const [agent, vector] of Object.entries(loaded.prototypes)) {
@@ -102,4 +134,7 @@ module.exports = {
   cosineSimilarity,
   predict,
   _clearPrototypeCache,
+  _clearEmbeddingCache() {
+    _embeddingCache.clear();
+  },
 };

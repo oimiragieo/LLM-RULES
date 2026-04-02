@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 9 — Routing System Recalibration
+
+#### Changed
+
+- **Semantic router promoted to primary** (`ROUTING_PRIORITY=semantic`, default). Embedding-based routing now runs first; keyword classification demoted to metadata enrichment and tiebreaker. Rollback: `ROUTING_PRIORITY=keyword`
+- **Hierarchical routing enabled by default** (`HIERARCHICAL_ROUTING=on`). 119 agents grouped into 9 domain sub-routers. Rollback: `HIERARCHICAL_ROUTING=off`
+- **5 advisory hooks converted to async** — `context-monitor`, `bypass-audit-hook`, `artifact-scoring-ledger-hook`, `post-pipeline-self-review`, `subagent-citation-guard` now run in background without blocking tool execution
+- **2 redundant guard checks wrapped in delegation guard** — `checkTaskListFirstGate` and `checkHierarchicalSubRouterDispatch` in routing-guard-core skip when pre-task-unified handles them (default). Rollback: `ROUTING_GUARD_LEGACY_CHECKS=on`
+
+#### Added
+
+- **Model router wiring** in `pre-task-unified-core.cjs` — dynamic haiku/sonnet/opus selection based on complexity and budget. Gate: `MODEL_ROUTER_ENABLED` (default `off` for safe rollout)
+- **Intent feedback loop** — `loadIntentFeedback()` in `intent-classifier.cjs` reads historical success rates; `post-task-unified.cjs` records success/failure per intent; `router-state.cjs` propagates classified intent across the pipeline
+- **Semantic router embedding cache** — LRU (10 entries) avoids redundant embedding generation when semantic routing is primary
+
 ### Post-Phase 8 — Audit Fixes & Consolidation Wiring
 
 #### Fixed

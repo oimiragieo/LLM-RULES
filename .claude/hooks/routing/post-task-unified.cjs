@@ -67,6 +67,22 @@ const TASK_ARTIFACT_AUDIT_PATH =
   process.env.TASK_ARTIFACT_AUDIT_PATH ||
   path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'task-artifact-audit.jsonl');
 
+/** Best-effort intent feedback recording (extracted to reduce nesting depth) */
+function _recordIntentSuccess(routerState) {
+  try {
+    const lastIntent = routerState.getLastClassifiedIntent
+      ? routerState.getLastClassifiedIntent()
+      : null;
+    if (!lastIntent) return;
+    const { recordIntentFeedback } = require(
+      path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'intent-classifier.cjs')
+    );
+    recordIntentFeedback(lastIntent, true);
+  } catch (_e) {
+    // Best-effort — never block task completion
+  }
+}
+
 const helpers = createPostTaskUnifiedHelpers({
   fs,
   path,
@@ -307,6 +323,8 @@ async function main() {
             routerState.recordTaskUpdate(String(taskId), 'completed');
             await lifecycleState.writeTaskStatus(String(taskId), 'completed');
             performWorktreeCleanupIfCompleted('completed');
+            // Intent feedback loop (best-effort, extracted to reduce nesting)
+            _recordIntentSuccess(routerState);
           } catch (_trackErr) {
             // Best-effort status reconciliation only.
           }

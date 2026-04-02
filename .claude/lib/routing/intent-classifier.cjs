@@ -258,6 +258,47 @@ function recordIntentFeedback(intentId, success, options = {}) {
   }
 }
 
+/**
+ * Load intent feedback data and compute per-intent success rates.
+ * Returns a Map<intentId, { successRate: number, total: number }>.
+ * Gate: INTENT_FEEDBACK_ENABLED (default 'on'). Returns empty map when disabled.
+ *
+ * @param {Object} [options]
+ * @param {string} [options.feedbackPath] - Override feedback file path
+ * @returns {Map<string, { successRate: number, total: number }>}
+ */
+function loadIntentFeedback(options = {}) {
+  if (String(process.env.INTENT_FEEDBACK_ENABLED || 'on').toLowerCase() === 'off') {
+    return new Map();
+  }
+  const feedbackPath =
+    options.feedbackPath || process.env.INTENT_FEEDBACK_PATH || INTENT_FEEDBACK_PATH;
+  try {
+    if (!fs.existsSync(feedbackPath)) return new Map();
+    const raw = fs.readFileSync(feedbackPath, 'utf8');
+    const parsed = safeParseJSON(raw);
+    if (!parsed || !Array.isArray(parsed.entries)) return new Map();
+
+    const counts = new Map();
+    for (const entry of parsed.entries) {
+      if (!entry.intentId) continue;
+      const id = String(entry.intentId);
+      const prev = counts.get(id) || { successes: 0, total: 0 };
+      prev.total++;
+      if (entry.success) prev.successes++;
+      counts.set(id, prev);
+    }
+
+    const result = new Map();
+    for (const [id, { successes, total }] of counts) {
+      result.set(id, { successRate: total > 0 ? successes / total : 0, total });
+    }
+    return result;
+  } catch (_err) {
+    return new Map();
+  }
+}
+
 function resolvePrimaryIntent(promptLower) {
   const routingMatch = matchIntentFromRoutingTable(promptLower);
   if (routingMatch) {
@@ -469,15 +510,15 @@ function classifyDomain(prompt) {
   };
 }
 
-function getHierarchicalRoutingMode(defaultMode = 'off') {
-  const normalized = String(process.env.HIERARCHICAL_ROUTING || defaultMode || 'off')
+function getHierarchicalRoutingMode(defaultMode = 'on') {
+  const normalized = String(process.env.HIERARCHICAL_ROUTING || defaultMode || 'on')
     .trim()
     .toLowerCase();
 
   return normalized === 'on' ? 'on' : 'off';
 }
 
-function isHierarchicalRoutingEnabled(defaultMode = 'off') {
+function isHierarchicalRoutingEnabled(defaultMode = 'on') {
   return getHierarchicalRoutingMode(defaultMode) === 'on';
 }
 
@@ -489,4 +530,5 @@ module.exports = {
   isHierarchicalRoutingEnabled,
   loadCapabilityRoutingForClassifier,
   recordIntentFeedback,
+  loadIntentFeedback,
 };

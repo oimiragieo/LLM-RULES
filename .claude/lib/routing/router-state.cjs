@@ -753,6 +753,25 @@ function clearCurrentSpawnTaskId() {
 }
 
 /**
+ * Set the last classified intent from the routing pipeline.
+ * Used by the intent-feedback loop to record success/failure per intent.
+ * @param {string} intent - Intent identifier (e.g. 'security', 'testing', 'general')
+ * @returns {Object} Updated state
+ */
+function setLastClassifiedIntent(intent) {
+  return saveStateWithRetry({ lastClassifiedIntent: String(intent || 'general') });
+}
+
+/**
+ * Get the last classified intent.
+ * @returns {string|null}
+ */
+function getLastClassifiedIntent() {
+  const state = getState();
+  return state.lastClassifiedIntent || null;
+}
+
+/**
  * Update state directly (useful for testing or bulk updates)
  * @param {Object} updates - Fields to update
  */
@@ -803,6 +822,9 @@ module.exports = {
   setCurrentSpawnTaskId,
   getCurrentSpawnTaskId,
   clearCurrentSpawnTaskId,
+  // Intent feedback loop
+  setLastClassifiedIntent,
+  getLastClassifiedIntent,
   // Optimistic concurrency
   saveStateWithRetry,
   MAX_RETRIES,

@@ -102,7 +102,7 @@ Task({ task_id: 'task-N', subagent_type, prompt, model? })
 
 ## ROUTING TABLE (Section 3)
 
-Default: flat routing (`HIERARCHICAL_ROUTING=off`). When `on`, route to specialists or domain sub-routers.
+Default: hierarchical routing (`HIERARCHICAL_ROUTING=on`). Set `HIERARCHICAL_ROUTING=off` for flat routing. Semantic embedding-based routing is primary (`ROUTING_PRIORITY=semantic`); set `ROUTING_PRIORITY=keyword` to restore keyword-first. Dynamic model selection available via `MODEL_ROUTER_ENABLED=on`.
 
 | Task Type                  | Agent                         |
 | -------------------------- | ----------------------------- |

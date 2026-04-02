@@ -104,17 +104,24 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
       });
     };
 
-    const taskListCheck = checkTaskListFirstGate(toolName, hookInput);
-    if (!taskListCheck.pass) {
-      return {
-        pass: false,
-        result: taskListCheck.result,
-        message: taskListCheck.message,
-        checkName: 'tasklist-first-gate',
-        warnings,
-      };
+    // TaskList-first and hierarchical dispatch are checked in pre-task-unified-core.cjs
+    // when delegation is active (default). Only run here when delegation is off or
+    // ROUTING_GUARD_LEGACY_CHECKS=on forces them.
+    const forceLegacy =
+      String(process.env.ROUTING_GUARD_LEGACY_CHECKS || 'off').toLowerCase() === 'on';
+    if (forceLegacy || !shouldDelegateTaskChecksToPreTaskUnified(toolName)) {
+      const taskListCheck = checkTaskListFirstGate(toolName, hookInput);
+      if (!taskListCheck.pass) {
+        return {
+          pass: false,
+          result: taskListCheck.result,
+          message: taskListCheck.message,
+          checkName: 'tasklist-first-gate',
+          warnings,
+        };
+      }
+      captureWarn('tasklist-first-gate', taskListCheck);
     }
-    captureWarn('tasklist-first-gate', taskListCheck);
 
     const payloadCheck = checkTaskPayloadContract(toolName, toolInput, hookInput);
     if (!payloadCheck.pass) {
@@ -128,21 +135,23 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
     }
     captureWarn('task-payload-contract', payloadCheck);
 
-    const hierarchicalDispatchCheck = checkHierarchicalSubRouterDispatch(
-      toolName,
-      toolInput,
-      hookInput
-    );
-    if (!hierarchicalDispatchCheck.pass) {
-      return {
-        pass: false,
-        result: hierarchicalDispatchCheck.result,
-        message: hierarchicalDispatchCheck.message,
-        checkName: 'hierarchical-sub-router-dispatch',
-        warnings,
-      };
+    if (forceLegacy || !shouldDelegateTaskChecksToPreTaskUnified(toolName)) {
+      const hierarchicalDispatchCheck = checkHierarchicalSubRouterDispatch(
+        toolName,
+        toolInput,
+        hookInput
+      );
+      if (!hierarchicalDispatchCheck.pass) {
+        return {
+          pass: false,
+          result: hierarchicalDispatchCheck.result,
+          message: hierarchicalDispatchCheck.message,
+          checkName: 'hierarchical-sub-router-dispatch',
+          warnings,
+        };
+      }
+      captureWarn('hierarchical-sub-router-dispatch', hierarchicalDispatchCheck);
     }
-    captureWarn('hierarchical-sub-router-dispatch', hierarchicalDispatchCheck);
 
     const bashCheck = checkRouterBash(toolName, toolInput, hookInput);
     if (!bashCheck.pass) {

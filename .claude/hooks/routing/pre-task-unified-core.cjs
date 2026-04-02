@@ -705,6 +705,41 @@ async function runAllChecks(hookInput) {
     };
   }
 
+  // ── Dynamic model selection (MODEL_ROUTER_ENABLED, default off) ──────────
+  if (
+    String(process.env.MODEL_ROUTER_ENABLED || 'off').toLowerCase() === 'on' &&
+    toolName === 'Task' &&
+    !toolInput.model // Don't override user-specified model
+  ) {
+    try {
+      const { ModelRouter } = libRequire('routing/model-router.cjs');
+      const { ModelRegistry } = libRequire('routing/model-registry.cjs');
+      const { CostPredictor } = libRequire('routing/cost-predictor.cjs');
+      const { classifyIntent } = libRequire('routing/intent-classifier.cjs');
+
+      const router = new ModelRouter({
+        registry: new ModelRegistry(),
+        costPredictor: new CostPredictor(),
+        intentClassifier: { classifyIntent },
+      });
+
+      const selection = router.selectModel(toolInput.prompt || '', {
+        agentType: toolInput.subagent_type,
+      });
+
+      if (selection && selection.model) {
+        toolInput.model = selection.shorthand || selection.model;
+        console.error(
+          `[pre-task-unified] Model router selected: ${selection.shorthand || selection.model}` +
+            ` (reason: ${selection.reason}, source: ${selection.source})`
+        );
+      }
+    } catch (modelErr) {
+      // Model router is best-effort — never block on failure
+      console.error(`[pre-task-unified] Model router error (ignored): ${modelErr.message}`);
+    }
+  }
+
   const spawnGuardrailResult = checkSpawnRoleGuardrails(toolInput);
   if (!spawnGuardrailResult.pass) {
     return {
