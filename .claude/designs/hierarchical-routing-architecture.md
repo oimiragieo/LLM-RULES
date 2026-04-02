@@ -265,9 +265,9 @@ These are "connected routes" in network terms — agents the core router knows i
 | `architecture-data` | Sub-router      | 11                                       |
 | `product-business`  | Sub-router      | 15                                       |
 | `specialized-niche` | Sub-router      | 7                                        |
-| **Total**           |                 | **110** (1 duplicate: `context-manager`) |
+| **Total**           |                 | **119** (1 duplicate: `context-manager`) |
 
-Core router now only needs to distinguish **~12 routing targets** instead of 109 individual agents.
+Core router now only needs to distinguish **~12 routing targets** instead of 118 individual agents.
 
 ---
 

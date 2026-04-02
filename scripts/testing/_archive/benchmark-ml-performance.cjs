@@ -1,8 +1,17 @@
 /**
  * ML Performance Benchmark Script
  * Measures latency for Pattern Detector, Cost Predictor, and Adaptive Executor
+ *
+ * ARCHIVED: 2026-02-07
+ * STATUS: BROKEN — The 3 modules imported below do not exist:
+ *   - .claude/lib/ml/pattern-detector.cjs  (never created or since removed)
+ *   - .claude/lib/ml/cost-predictor.cjs    (never created or since removed)
+ *   - .claude/lib/ml/adaptive-executor.cjs (never created or since removed)
+ * Only .claude/lib/ml/index.cjs and .claude/lib/ml/patterns.json exist in the ML directory.
+ * See scripts/testing/_archive/README.md for restoration guidance.
  */
 
+// NOTE: These imports will fail — modules do not exist. See header comment.
 const { PatternDetector } = require('./.claude/lib/ml/pattern-detector.cjs');
 const { CostPredictor } = require('./.claude/lib/ml/cost-predictor.cjs');
 const { AdaptiveExecutor } = require('./.claude/lib/ml/adaptive-executor.cjs');

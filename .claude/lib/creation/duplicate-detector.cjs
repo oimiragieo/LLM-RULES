@@ -251,7 +251,7 @@ function checkAgentRegistry(name, root) {
  */
 function checkSkillRegistry(name, root) {
   const skillIndexPath = normalizePath(
-    `${root}/.claude/context/artifacts/catalogs/skill-index.json`
+    `${root}/.claude/config/skill-index.json`
   );
   const normalizedName = String(name).toLowerCase();
 

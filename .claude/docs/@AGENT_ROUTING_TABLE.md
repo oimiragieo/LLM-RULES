@@ -38,7 +38,7 @@ Router MUST check this table before defaulting to developer. Developer is ALWAYS
 
 ## PURPOSE
 
-Complete agent routing matrix mapping request types to agent definitions across 4 categories: core agents, specialized agents, domain agents, and orchestrators. Registry contains 110 agents.
+Complete agent routing matrix mapping request types to agent definitions across 4 categories: core agents, specialized agents, domain agents, and orchestrators. Registry contains 119 agents.
 
 ---
 

@@ -420,8 +420,8 @@
         },
         {
           "action": "update-skill-index",
-          "target": ".claude/context/artifacts/catalogs/skill-index.md",
-          "description": "Add to skill index if it exists"
+          "target": ".claude/config/skill-index.json",
+          "description": "Add to skill index (regenerated via generate-skill-index.cjs)"
         }
       ],
       "shouldHave": [
