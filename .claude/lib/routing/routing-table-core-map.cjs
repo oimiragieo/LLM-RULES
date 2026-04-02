@@ -598,6 +598,17 @@ const ROUTING_TABLE = {
   'usability-testing': 'ux-researcher',
   'user-interview': 'ux-researcher',
   'persona-development': 'ux-researcher',
+
+  // Orchestrators — keyword routes
+  'claude-md-audit': 'claude-md-auditor',
+  'audit-claude-md': 'claude-md-auditor',
+  'audit-rules': 'claude-md-auditor',
+  heartbeat: 'heartbeat-orchestrator',
+  'heartbeat-loop': 'heartbeat-orchestrator',
+  'heartbeat-start': 'heartbeat-orchestrator',
+  loop: 'loop-operator',
+  'loop-operator': 'loop-operator',
+  'autonomous-loop': 'loop-operator',
 };
 
 module.exports = { ROUTING_TABLE };

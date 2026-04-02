@@ -108,7 +108,7 @@ function executeVerificationStep(command, options = {}) {
 
     // Spawn the process
     const args = isWindows ? ['/s', '/c', command] : ['-c', command];
-    const child = spawn(actualCommand, args, spawnOptions);
+    const child = spawn(actualCommand, args, { ...spawnOptions, windowsHide: true });
 
     // Capture stdout
     child.stdout.on('data', data => {
@@ -125,7 +125,7 @@ function executeVerificationStep(command, options = {}) {
       timedOut = true;
       // On Windows, use taskkill for forceful termination
       if (isWindows) {
-        spawn('taskkill', ['/pid', child.pid, '/f', '/t']);
+        spawn('taskkill', ['/pid', child.pid, '/f', '/t'], { windowsHide: true });
       } else {
         child.kill('SIGKILL');
       }

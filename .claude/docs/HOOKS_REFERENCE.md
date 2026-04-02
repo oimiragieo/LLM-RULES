@@ -20,12 +20,15 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 
 ## Hook Events
 
-| Event              | When It Fires        | Common Uses                                                         |
-| ------------------ | -------------------- | ------------------------------------------------------------------- |
-| `UserPromptSubmit` | User sends message   | Router analysis, memory reminder, session context reset             |
-| `PreToolUse`       | Before tool executes | Command validation, routing enforcement, blocking unsafe operations |
-| `PostToolUse`      | After tool executes  | Memory/index sync, telemetry, task/reflection recording             |
-| `SessionEnd`       | Session ends         | Persist session insights, create session files                      |
+| Event              | When It Fires                 | Common Uses                                                         |
+| ------------------ | ----------------------------- | ------------------------------------------------------------------- |
+| `UserPromptSubmit` | User sends message            | Router analysis, memory reminder, session context reset             |
+| `PreToolUse`       | Before tool executes          | Command validation, routing enforcement, blocking unsafe operations |
+| `PostToolUse`      | After tool executes           | Memory/index sync, telemetry, task/reflection recording             |
+| `SessionEnd`       | Session ends                  | Persist session insights, create session files                      |
+| `SessionStart`     | Session starts                | Register watch paths, initialize session-scoped state               |
+| `SubagentStart`    | Subagent is spawned           | Validate spawn compliance, enforce iron-law tool restrictions       |
+| `PermissionDenied` | Tool permission is denied     | Log denial events, routing feedback analysis                        |
 
 ## Active Hook Inventory
 
@@ -45,6 +48,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `ccusage-statusline.cjs`: Displays real-time token usage and cost from ccusage CLI on each prompt. Fail-open (advisory).
 - `channel-auto-start.cjs`: Starts configured channel infrastructure on prompt submit when needed.
 - `a2a-server-autostart.cjs`: Launches the A2A Express server as a detached background subprocess on session start. Uses lockfile cooldown to prevent duplicate spawns. Records PID in terminal-pids.json.
+- `user-prompt-advisory-bundle.cjs`: Consolidated advisory bundle that runs 6 sub-checks per prompt (ccusage statusline, fail-open audit, worktree prune, session budget watchdog, drift detector, stale task detector). Fail-open (async).
 
 ### PreToolUse
 
@@ -70,6 +74,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `adaptive-quality-gate.cjs`: Non-blocking edit counter; suggests quality checkpoints at adaptive thresholds based on correction rate.
 - `spawn-token-guard.cjs`: Estimates spawn prompt token count on every `Task` call. Writes `compression-reminder.txt` and warns at 80K tokens; blocks the spawn at 120K tokens to prevent "Prompt is too long" failures. Fail-open (advisory).
 - `finish-only-guard.cjs`: Blocks `TaskCreate` and `Task` calls when the session is in drain mode (finishing state). Prevents new work from being started while existing tasks are being completed. Fail-open (advisory).
+- `context-monitor.cjs`: Monitors agent context window usage before each tool call and injects advisory warnings at 70% (WARNING) and 85% (CRITICAL) thresholds. Reads token budget from `budget-tracker.json`. Fail-open (advisory).
 
 ### PostToolUse
 
@@ -98,6 +103,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `task-pretool-orchestrator.cjs`: Orchestrates pretool tasks.
 - `workflow-watchdog-hook.cjs`: Watchdog for workflows.
 - `analysis-paralysis-guard.cjs`: Prevents infinite looping on reads.
+- `post-tool-advisory-bundle.cjs`: Consolidated advisory bundle that runs 4 PostToolUse sub-checks per tool call (metrics/error tracking, context window monitoring, stale worktree hook detection, recurring issue detection). Fail-open (async).
 
 ### SessionEnd
 
@@ -113,6 +119,18 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `check-console-log.cjs`: Scans for console.log statements in production code.
 - `pre-compact.cjs`: Snapshots state before session compaction.
 - `sanitize-debug-log.cjs`: Final log cleanup.
+
+### SessionStart
+
+- `session-start-watchpaths.cjs`: Returns a `watchPaths` array of runtime-critical files for Claude Code to monitor (agent registry, settings.json, runtime state directory). Paths are validated for existence before inclusion. Fail-open (sync).
+
+### SubagentStart
+
+- `subagent-start-iron-law.cjs`: Validates that subagent spawn prompts from router sessions do not reference router-banned tools (Bash, Edit, Write, Glob, Grep, WebSearch). Emits a stderr warning on violation but never blocks. Fail-open (async).
+
+### PermissionDenied
+
+- `permission-denied-logger.cjs`: Appends a structured JSON entry (tool, reason, timestamp, session_id) to `denial-log.json` when a tool permission is denied. Bounded at 500 entries with FIFO eviction on overflow. Fail-open (async).
 
 ## Key Safety Hooks
 

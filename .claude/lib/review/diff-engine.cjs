@@ -39,6 +39,7 @@ function runGit(cmd, cwd) {
     cwd,
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
+    windowsHide: true,
   });
 }
 

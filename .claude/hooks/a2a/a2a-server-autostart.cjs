@@ -161,6 +161,24 @@ function runMain(sessionId) {
       }
     }
 
+    // ── 4b. TCP port probe — secondary guard ─────────────────────────────────
+    // Even if PID tracker is stale/missing, check if the port is already bound.
+    const probePort = parseInt(process.env.A2A_PORT || '3100', 10) || 3100;
+    try {
+      execFileSync(
+        'node',
+        [
+          '-e',
+          `const s=require("net").createConnection(${probePort},"127.0.0.1");s.on("connect",()=>{s.destroy();process.exit(0)});s.on("error",()=>process.exit(1))`,
+        ],
+        { timeout: 2000, stdio: 'ignore', windowsHide: true, shell: false }
+      );
+      // If we reach here (exit 0), port is in use — server already running
+      process.exit(0);
+    } catch (_) {
+      // Port not in use (exit 1 from probe) — continue to spawn
+    }
+
     // ── 5. Determine port ─────────────────────────────────────────────────────
     const port = parseInt(process.env.A2A_PORT || '3100', 10);
     const validPort = isNaN(port) ? 3100 : port;

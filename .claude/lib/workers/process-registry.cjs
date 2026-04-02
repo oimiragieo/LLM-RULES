@@ -121,6 +121,7 @@ class ProcessRegistry {
     const child = nodeSpawn(command, args, {
       ...spawnOpts,
       stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
     });
 
     const pid = child.pid;

@@ -16,9 +16,11 @@
  */
 
 const path = require('path');
+const net = require('net');
 const { createA2aServer } = require('./server.cjs');
 const { getDb, runMigrations } = require('../db/sqlite-manager.cjs');
 const { WorkerPool } = require('../workers/worker-pool.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 
@@ -69,12 +71,29 @@ async function main() {
   const db = getDb(dbPath);
   runMigrations(db);
 
-  // Create worker pool (optional - enables task queue processing)
+  // Create worker pool (enables task queue processing)
   let pool = null;
   try {
-    pool = new WorkerPool(db, { numWorkers: 2, workerIdleTtlMs: 60000 });
+    pool = new WorkerPool({
+      db,
+      concurrency: 2,
+      processFn: async (row) => {
+        // row contains: id, chat_id, user_id, text, attachments, timestamp, status, attempt_count
+        // text is JSON.stringify(a2aTaskParams) from server.cjs enqueueMessage call
+        const parsed = safeParseJSON(row.text);
+        const taskParams = parsed.success ? parsed.data : { raw: row.text };
+        process.stderr.write(
+          `[A2A] Processing queued message ${row.id} (attempt ${row.attempt_count || 1})\n`
+        );
+        // TODO: Wire to agent dispatch (e.g., spawn Claude CLI subprocess for the task)
+        // For now, log the task params so the queue drains correctly
+        process.stderr.write(
+          `[A2A] Task params: ${JSON.stringify(taskParams).slice(0, 200)}\n`
+        );
+      },
+    });
   } catch (e) {
-    process.stderr.write(`[A2A] WorkerPool initialization skipped: ${e.message}\n`);
+    process.stderr.write(`[A2A] WorkerPool initialization failed: ${e.message}\n`);
   }
 
   // Create and start server
@@ -96,6 +115,24 @@ async function main() {
 
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));
+
+  // Check if port is already in use before attempting to start
+  const portInUse = await new Promise(resolve => {
+    const tester = net
+      .createServer()
+      .once('error', err => {
+        resolve(err.code === 'EADDRINUSE');
+      })
+      .once('listening', () => {
+        tester.close(() => resolve(false));
+      })
+      .listen(port);
+  });
+  if (portInUse) {
+    process.stderr.write(`[A2A] Port ${port} already in use, exiting cleanly\n`);
+    if (pool) pool.stop();
+    process.exit(0);
+  }
 
   // Start the server
   try {

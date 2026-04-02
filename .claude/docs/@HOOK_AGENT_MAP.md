@@ -53,6 +53,12 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `post-pipeline-token-report.cjs`    | x      | x           | x        | x          | x            | x          |
 | `post-pipeline-self-review.cjs`     | x      | x           | x        | x          | x            | x          |
 | `pre-spawn-hook-check.cjs`          |        | x           |          |            | x            |            |
+| `context-monitor.cjs`               | x      | x           | x        | x          | x            | x          |
+| `permission-denied-logger.cjs`      | x      | x           | x        | x          | x            | x          |
+| `post-tool-advisory-bundle.cjs`     | x      | x           | x        | x          | x            | x          |
+| `session-start-watchpaths.cjs`      | x      |             |          |            |              |            |
+| `subagent-start-iron-law.cjs`       | x      | x           | x        | x          | x            | x          |
+| `user-prompt-advisory-bundle.cjs`   | x      |             |          |            |              |            |
 
 **Agent Archetype Definitions:**
 
@@ -67,6 +73,18 @@ This document provides a comprehensive mapping between enforcement hooks and age
 
 ## Section 2: Hook Execution Order (Canonical)
 
+### SessionStart (all agents)
+
+1. `session-start-watchpaths.cjs` — registers watch paths for runtime-critical files (sync)
+
+### SubagentStart (all agents)
+
+1. `subagent-start-iron-law.cjs` — warns when router-banned tools appear in spawn prompts (async)
+
+### PermissionDenied (all agents)
+
+1. `permission-denied-logger.cjs` — appends denial event to denial-log.json (async)
+
 ### UserPromptSubmit (Router only)
 
 1. `step0-reflection-enforcer.cjs`
@@ -79,6 +97,11 @@ This document provides a comprehensive mapping between enforcement hooks and age
 8. `handover-detector.cjs` (matcher: all prompts — fires on fresh session start)
 9. `startup-failopen-audit.cjs`
 10. `session-budget-watchdog.cjs`
+11. `user-prompt-advisory-bundle.cjs` (async — consolidated: ccusage statusline, fail-open audit, worktree prune, budget watchdog, drift detector, stale task detector)
+
+### PreToolUse (all tools)
+
+1. `context-monitor.cjs` — injects advisory warnings at 70%/85% context budget (async)
 
 ### PreToolUse (Bash)
 
@@ -109,6 +132,10 @@ This document provides a comprehensive mapping between enforcement hooks and age
 2. `pre-completion-validation.cjs`
 3. `creator-compliance-validator.cjs`
 4. `quality-gate-validator.cjs`
+
+### PostToolUse (all tools)
+
+1. `post-tool-advisory-bundle.cjs` — consolidated: metrics, context window, hook error detection, recurring issue detection (async)
 
 ### PostToolUse (TaskUpdate)
 

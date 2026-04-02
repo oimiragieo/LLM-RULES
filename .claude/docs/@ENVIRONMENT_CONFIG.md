@@ -66,6 +66,7 @@ All environment-specific settings are managed through the `.env` file located at
 | `TASKUPDATE_FIRST_ENFORCEMENT`   | block/warn/off | block   | Require explicit `TaskUpdate(in_progress)` before other subagent tools                                             |
 | `TASKUPDATE_FIRST_AUTOMARK`      | true/false     | false   | Auto-mark in-progress when TaskUpdate is missing (legacy fallback)                                                 |
 | `TASKUPDATE_FIRST_BOOTSTRAP`     | true/false     | false   | Allow router-state bootstrap to satisfy TaskUpdate-first (legacy fallback)                                         |
+| `ROUTING_GUARD_LEGACY_CHECKS`    | on/off         | off     | Enable legacy routing guard checks (deprecated, off by default)                                                    |
 | `STATE_STALE_THRESHOLD_MS`       | number         | 600000  | State staleness threshold in ms (10 minutes)                                                                       |
 | `STALE_TASK_AUTO_QUEUE`          | on/off         | on      | Enable stale-task-detector queue writes to `stale-tasks.json`; when off, Step 0.4 is a no-op                       |
 | `SPAWN_SAFETY_PREAMBLE`          | on/off         | on      | Append `FORBIDDEN COMMANDS` safety suffix to spawn prompts via `prompt-assembler.cjs`; when off, suffix is omitted |

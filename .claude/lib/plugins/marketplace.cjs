@@ -62,7 +62,7 @@ function cloneMarketplace({ name, gitUrl, marketplacesDir }) {
   // Clone the repository into marketplacesDir/<name>.
   // q() wraps each argument in double-quotes and escapes internal quotes,
   // making the command safe for cmd.exe on Windows and POSIX shells alike.
-  execSync('git clone ' + q(gitUrl) + ' ' + q(targetDir), { stdio: 'pipe' });
+  execSync('git clone ' + q(gitUrl) + ' ' + q(targetDir), { stdio: 'pipe', windowsHide: true });
 
   // Register the marketplace in known_marketplaces.json
   const registry = new PluginRegistry(marketplacesDir);
@@ -87,7 +87,7 @@ function updateMarketplace({ name, marketplacesDir }) {
     throw new Error(`Marketplace "${name}" not found at: ${marketplaceDir}`);
   }
 
-  execSync('git pull', { cwd: marketplaceDir, stdio: 'pipe' });
+  execSync('git pull', { cwd: marketplaceDir, stdio: 'pipe', windowsHide: true });
 
   // Refresh lastUpdated in the registry
   const registry = new PluginRegistry(marketplacesDir);

@@ -1,12 +1,12 @@
 {
-  "version": "1.2.0",
+  "version": "1.1.0",
   "prebuilt": false,
   "total_rules": 13,
   "master_rules": 13,
   "library_rules": 0,
   "schema_version": "1.0.0",
   "versioning": {
-    "changelog": "Version 1.2.0: Removed merged/deleted files (deviation-protocol, sharp-edges, shell-command-safety, file-deletion-safety); added safety-rules",
+    "changelog": "Version 1.1.0: Added versioning metadata for skills compatibility tracking",
     "increment_guide": {
       "major": "Breaking changes to index structure (e.g., renamed fields, removed properties)",
       "minor": "New rules added, rule paths changed, or new metadata fields added",
@@ -22,8 +22,8 @@
       "priority": "",
       "technologies": ["python", "typescript"],
       "type": "master",
-      "size": 4273,
-      "line_count": 104
+      "size": 3375,
+      "line_count": 78
     },
     {
       "path": ".claude/rules/cleanup-always.md",
@@ -31,10 +31,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["jest", "rails", "vitest"],
+      "technologies": [],
       "type": "master",
-      "size": 3467,
-      "line_count": 82
+      "size": 1764,
+      "line_count": 33
     },
     {
       "path": ".claude/rules/code-standards.md",
@@ -44,8 +44,8 @@
       "priority": "",
       "technologies": ["api", "nodejs", "typescript"],
       "type": "master",
-      "size": 5952,
-      "line_count": 159
+      "size": 2871,
+      "line_count": 74
     },
     {
       "path": ".claude/rules/deviation-rules.md",
@@ -53,10 +53,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go"],
+      "technologies": [],
       "type": "master",
-      "size": 2316,
-      "line_count": 45
+      "size": 2222,
+      "line_count": 47
     },
     {
       "path": ".claude/rules/documentation-always.md",
@@ -66,8 +66,8 @@
       "priority": "",
       "technologies": ["go"],
       "type": "master",
-      "size": 2673,
-      "line_count": 72
+      "size": 1646,
+      "line_count": 33
     },
     {
       "path": ".claude/rules/git-workflow.md",
@@ -75,32 +75,32 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["rest"],
+      "technologies": [],
       "type": "master",
-      "size": 2789,
-      "line_count": 108
+      "size": 1092,
+      "line_count": 39
     },
     {
       "path": ".claude/rules/hooks.md",
       "name": "hooks",
-      "description": "",
+      "description": "Hook system rules and patterns for .claude/hooks/**",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "java", "javascript"],
+      "technologies": ["go"],
       "type": "master",
-      "size": 4378,
-      "line_count": 110
+      "size": 2344,
+      "line_count": 60
     },
     {
       "path": ".claude/rules/memory-protocol.md",
       "name": "memory-protocol",
-      "description": "",
+      "description": "Memory protocol rules for reading/writing agent memory",
       "globs": "",
       "priority": "",
-      "technologies": ["api"],
+      "technologies": ["api", "go"],
       "type": "master",
-      "size": 5737,
-      "line_count": 142
+      "size": 2162,
+      "line_count": 42
     },
     {
       "path": ".claude/rules/plan-file-update.md",
@@ -110,19 +110,8 @@
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 3258,
-      "line_count": 95
-    },
-    {
-      "path": ".claude/rules/security.md",
-      "name": "security",
-      "description": "",
-      "globs": "",
-      "priority": "",
-      "technologies": ["java", "javascript", "rust"],
-      "type": "master",
-      "size": 6545,
-      "line_count": 208
+      "size": 1442,
+      "line_count": 40
     },
     {
       "path": ".claude/rules/safety-rules.md",
@@ -133,7 +122,18 @@
       "technologies": ["go", "rust"],
       "type": "master",
       "size": 3591,
-      "line_count": 90
+      "line_count": 95
+    },
+    {
+      "path": ".claude/rules/security.md",
+      "name": "security",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": ["go", "java", "javascript", "rust"],
+      "type": "master",
+      "size": 3827,
+      "line_count": 95
     },
     {
       "path": ".claude/rules/task-tracking.md",
@@ -141,10 +141,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript", "typescript"],
+      "technologies": [],
       "type": "master",
-      "size": 2765,
-      "line_count": 90
+      "size": 1099,
+      "line_count": 22
     },
     {
       "path": ".claude/rules/workspace-conventions.md",
@@ -152,47 +152,27 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "sql"],
+      "technologies": ["sql"],
       "type": "master",
-      "size": 3255,
-      "line_count": 88
+      "size": 1987,
+      "line_count": 38
     }
   ],
   "technology_map": {
     "python": [".claude/rules/agents.md"],
-    "typescript": [
-      ".claude/rules/agents.md",
-      ".claude/rules/code-standards.md",
-      ".claude/rules/task-tracking.md"
-    ],
-    "jest": [".claude/rules/cleanup-always.md"],
-    "rails": [".claude/rules/cleanup-always.md"],
-    "vitest": [".claude/rules/cleanup-always.md"],
-    "api": [
-      ".claude/rules/code-standards.md",
-      ".claude/rules/deviation-rules.md",
-      ".claude/rules/memory-protocol.md"
-    ],
+    "typescript": [".claude/rules/agents.md", ".claude/rules/code-standards.md"],
+    "api": [".claude/rules/code-standards.md", ".claude/rules/memory-protocol.md"],
     "nodejs": [".claude/rules/code-standards.md"],
     "go": [
-      ".claude/rules/deviation-rules.md",
       ".claude/rules/documentation-always.md",
       ".claude/rules/hooks.md",
+      ".claude/rules/memory-protocol.md",
       ".claude/rules/safety-rules.md",
-      ".claude/rules/workspace-conventions.md"
+      ".claude/rules/security.md"
     ],
-    "rest": [".claude/rules/git-workflow.md"],
-    "java": [
-      ".claude/rules/hooks.md",
-      ".claude/rules/security.md",
-      ".claude/rules/task-tracking.md"
-    ],
-    "javascript": [
-      ".claude/rules/hooks.md",
-      ".claude/rules/security.md",
-      ".claude/rules/task-tracking.md"
-    ],
-    "rust": [".claude/rules/security.md", ".claude/rules/safety-rules.md"],
+    "rust": [".claude/rules/safety-rules.md", ".claude/rules/security.md"],
+    "java": [".claude/rules/security.md"],
+    "javascript": [".claude/rules/security.md"],
     "sql": [".claude/rules/workspace-conventions.md"]
   }
 }
