@@ -17,6 +17,12 @@ If you want a local-first, reproducible agent stack with strict validation and h
 
 ## Recent Changes
 
+### Prompt Cache Optimization (Zylos-inspired)
+
+- **Envelope fingerprint**: Stable hash across spawns of same agent type (excludes per-spawn basePrompt). Enables cache hits for tools/skills/safety prefix.
+- **Memory query batch cache**: 60s file-based cache prevents redundant LanceDB/SQLite queries on burst spawns
+- **Configurable memory cap**: `MEMORY_INJECTION_MAX_CHARS` env var (default 3600, raise to 8000+)
+
 ### Phase 10 — Paper-Inspired: Dual-Level Indexing + Memory Versioning
 
 - **Dual-level skill+agent index**: 339 skill + 119 agent prototypes in shared vector space. Retrieve N=50, collapse to K=5 unique agents via skill-to-agent owner trace (+19.4% recall, arXiv:2511.01854)

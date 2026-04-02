@@ -86,6 +86,10 @@ function createPerfRecorder(enabled) {
   return { mark, done };
 }
 
+/**
+ * Compute the full prompt fingerprint (includes per-spawn basePrompt).
+ * Returns a single hash string for backward compatibility.
+ */
 function getPromptFingerprint(input) {
   const hash = crypto.createHash('sha1');
   hash.update(
@@ -95,6 +99,28 @@ function getPromptFingerprint(input) {
       allowedTools: Array.isArray(input.allowedTools) ? [...input.allowedTools].sort() : [],
       basePrompt: input.basePrompt || '',
       contextFragment: input.contextFragment || '',
+      semanticEnabled: input.semanticEnabled !== false,
+      entityGraphEnabled: input.entityGraphEnabled !== false,
+      skillSectionMode: input.skillSectionMode || 'full',
+      configModel: input.configModel || null,
+    })
+  );
+  return hash.digest('hex');
+}
+
+/**
+ * Compute envelope fingerprint: stable across spawns of same agent type.
+ * Excludes basePrompt and contextFragment (per-spawn content).
+ * Used for caching the stable prefix (tools, skills, safety) across spawns.
+ * TTL: 5 minutes (vs 2 minutes for full fingerprint).
+ */
+function getEnvelopeFingerprint(input) {
+  const hash = crypto.createHash('sha1');
+  hash.update(
+    JSON.stringify({
+      agentType: input.agentType || 'developer',
+      presetId: input.presetId || null,
+      allowedTools: Array.isArray(input.allowedTools) ? [...input.allowedTools].sort() : [],
       semanticEnabled: input.semanticEnabled !== false,
       entityGraphEnabled: input.entityGraphEnabled !== false,
       skillSectionMode: input.skillSectionMode || 'full',
@@ -462,6 +488,7 @@ module.exports = {
   isPerfHarnessEnabled,
   createPerfRecorder,
   getPromptFingerprint,
+  getEnvelopeFingerprint,
   resolveSkillSectionMode,
   getCachedAssembly,
   putCachedAssembly,

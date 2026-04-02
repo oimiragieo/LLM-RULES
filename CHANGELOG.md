@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Prompt Cache Optimization (Zylos-inspired)
+
+#### Fixed
+
+- **Assembly cache key split** — New `getEnvelopeFingerprint()` computes stable hash excluding per-spawn `basePrompt`. Same agent type with different task prompts now share the envelope key. Full fingerprint retained for exact-match caching.
+- **Memory query batch cache** — 60-second file-based cache (`memory-query-cache.json`) for memory search results. Burst spawns (3-5 agents in rapid succession) reuse the first spawn's memory query instead of re-querying LanceDB/SQLite independently.
+- **Memory injection cap configurable** — Library-level `MAX_MEMORY_SECTION_CHARS` now reads `MEMORY_INJECTION_MAX_CHARS` env var (default 3600). Both hook-level and library-level caps are aligned. Raise to 8000+ when context is cheap.
+
 ### Phase 10 — Paper-Inspired: Dual-Level Indexing + Memory Versioning
 
 #### Added

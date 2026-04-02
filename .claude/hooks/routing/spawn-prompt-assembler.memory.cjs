@@ -1,5 +1,7 @@
 'use strict';
 
+const crypto = require('crypto');
+const fs = require('fs');
 const path = require('path');
 
 const {
@@ -40,6 +42,54 @@ const _parsedMemoryInjectionMaxChars = parseInt(
 const MEMORY_INJECTION_MAX_CHARS = Number.isFinite(_parsedMemoryInjectionMaxChars)
   ? _parsedMemoryInjectionMaxChars
   : 3600;
+
+// Memory query batch cache: avoids re-querying LanceDB/SQLite when burst-spawning agents
+const MEMORY_QUERY_CACHE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'memory-query-cache.json'
+);
+const MEMORY_QUERY_CACHE_TTL_MS = Number(process.env.MEMORY_QUERY_CACHE_TTL_MS || 60000);
+
+function getMemoryQueryCache(queryKey) {
+  try {
+    if (!fs.existsSync(MEMORY_QUERY_CACHE_PATH)) return null;
+    const raw = fs.readFileSync(MEMORY_QUERY_CACHE_PATH, 'utf8');
+    const cache = JSON.parse(raw);
+    if (!cache || typeof cache !== 'object') return null;
+    const entry = cache[queryKey];
+    if (!entry || Date.now() - entry.ts > MEMORY_QUERY_CACHE_TTL_MS) return null;
+    return entry.results;
+  } catch (_e) {
+    return null;
+  }
+}
+
+function setMemoryQueryCache(queryKey, results) {
+  try {
+    let cache = {};
+    if (fs.existsSync(MEMORY_QUERY_CACHE_PATH)) {
+      try {
+        cache = JSON.parse(fs.readFileSync(MEMORY_QUERY_CACHE_PATH, 'utf8')) || {};
+      } catch (_e) {
+        cache = {};
+      }
+    }
+    // Prune expired entries
+    const now = Date.now();
+    for (const key of Object.keys(cache)) {
+      if (now - (cache[key]?.ts || 0) > MEMORY_QUERY_CACHE_TTL_MS) delete cache[key];
+    }
+    cache[queryKey] = { results, ts: now };
+    const dir = path.dirname(MEMORY_QUERY_CACHE_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(MEMORY_QUERY_CACHE_PATH, JSON.stringify(cache), 'utf8');
+  } catch (_e) {
+    // Best-effort cache write
+  }
+}
 
 /**
  * Sanitize memory content by removing lines that match known prompt injection
@@ -325,7 +375,15 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, std
     process.env.MEMORY_INTENT_ANALYSIS !== '0' && process.env.MEMORY_INTENT_ANALYSIS !== 'off';
   let results = [];
 
-  if (intentAnalysisEnabled) {
+  // Check memory query batch cache (avoids re-querying on burst spawns)
+  const queryCacheKey = crypto.createHash('md5').update(query).digest('hex').slice(0, 16);
+  const cachedResults = getMemoryQueryCache(queryCacheKey);
+  if (cachedResults) {
+    stderrLog('memory_query_cache_hit', { queryLen: query.length });
+    results = cachedResults;
+  }
+
+  if (results.length === 0 && intentAnalysisEnabled) {
     try {
       results = await runIntentAnalysis({
         memoryManager,
@@ -333,6 +391,7 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, std
         threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
         projectRoot: PROJECT_ROOT,
       });
+      if (results.length > 0) setMemoryQueryCache(queryCacheKey, results);
     } catch (err) {
       debugLog('spawn-prompt-assembler', 'Intent analysis failed (ignored)', err);
       stderrLog('hook_failed', { error: err?.message, reason: 'intent_analysis' });
@@ -346,6 +405,7 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, std
         threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
         filters: `metadata NOT LIKE '%"source":"ltm_archive"%'`,
       });
+      if (results.length > 0) setMemoryQueryCache(queryCacheKey, results);
     } catch (err) {
       debugLog('spawn-prompt-assembler', 'Hot-only filter failed, using unfiltered search', err);
       try {
@@ -353,6 +413,7 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, std
           limit: 3,
           threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
         });
+        if (results.length > 0) setMemoryQueryCache(queryCacheKey, results);
       } catch (fallbackErr) {
         debugLog(
           'spawn-prompt-assembler',

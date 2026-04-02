@@ -12,7 +12,9 @@ const logger = createLogger('prompt-assembler');
 
 const MAX_MEMORY_ITEMS_PER_SECTION = 3;
 const MAX_MEMORY_ITEM_CHARS = 220;
-const MAX_MEMORY_SECTION_CHARS = 3500;
+// Configurable via MEMORY_INJECTION_MAX_CHARS (default 3600, raise to 8000+ when context is cheap)
+const MAX_MEMORY_SECTION_CHARS =
+  parseInt(process.env.MEMORY_INJECTION_MAX_CHARS || '3600', 10) || 3600;
 const DEFAULT_RAG_AT_SPAWN_LIMIT = 5;
 const DEFAULT_RAG_AT_SPAWN_MAX_ITEMS = 5;
 const DEFAULT_RAG_AT_SPAWN_MAX_CHARS = 1800;
