@@ -84,6 +84,61 @@
             "timeout_ms": 5000
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/stale-task-detector.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/session-budget-watchdog.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/drift-detector.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/ccusage-statusline.cjs",
+            "async": true,
+            "timeout_ms": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/startup-failopen-audit.cjs",
+            "async": true,
+            "timeout_ms": 5000
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -277,6 +332,37 @@
             "async": true
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/adaptive-quality-gate.cjs",
+            "timeout_ms": 5000,
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/evolution/evolution-state-guard.cjs",
+            "timeout_ms": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/evolution/research-enforcement.cjs",
+            "timeout_ms": 5000
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -427,6 +513,39 @@
             "timeout_ms": 10000
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/hook-error-detector.cjs",
+            "async": true,
+            "timeout_ms": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/recurring-issue-detector.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/context-window-monitor.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
@@ -519,6 +638,11 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/tools/cli/sanitize-debug-log.cjs --in-place",
+            "timeout_ms": 5000
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/slo-alert-gate.cjs",
             "timeout_ms": 5000
           }
         ]

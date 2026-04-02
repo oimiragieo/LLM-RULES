@@ -15,15 +15,25 @@ const os = require('node:os');
 
 // ── Modules under test ──────────────────────────────────────────────────────
 
-const { appendDailyLog, getDailyLogPath } = require('../../../.claude/lib/memory/memory-daily-log.cjs');
-const { consolidate, extractActionableItems } = require('../../../.claude/lib/memory/memory-consolidator.cjs');
+const {
+  appendDailyLog,
+  getDailyLogPath,
+} = require('../../../.claude/lib/memory/memory-daily-log.cjs');
+const {
+  consolidate,
+  extractActionableItems,
+} = require('../../../.claude/lib/memory/memory-consolidator.cjs');
 const {
   readLastConsolidatedAt,
   tryAcquireConsolidationLock,
   rollbackConsolidationLock,
   shouldConsolidate,
 } = require('../../../.claude/lib/memory/consolidation-lock.cjs');
-const { enforceMemoryCaps, parseSections, memoryHealth } = require('../../../.claude/lib/memory/memory-rotator.cjs');
+const {
+  enforceMemoryCaps,
+  parseSections,
+  memoryHealth,
+} = require('../../../.claude/lib/memory/memory-rotator.cjs');
 
 // ── Test Fixture Helpers ────────────────────────────────────────────────────
 
@@ -170,9 +180,7 @@ describe('Consolidation Pipeline (4-phase)', () => {
   });
 
   it('is idempotent — second run extracts nothing', () => {
-    seedDailyLog(memDir, '2026-04-01', [
-      '- [10:00:00] Found a gotcha: test idempotency',
-    ]);
+    seedDailyLog(memDir, '2026-04-01', ['- [10:00:00] Found a gotcha: test idempotency']);
 
     consolidate(memDir, 0);
     const result2 = consolidate(memDir, 0);
@@ -181,13 +189,9 @@ describe('Consolidation Pipeline (4-phase)', () => {
 
   it('respects sinceTimestamp cutoff', () => {
     // Log from March 15 — before cutoff
-    seedDailyLog(memDir, '2026-03-15', [
-      '- [10:00:00] Old pattern that should be skipped',
-    ]);
+    seedDailyLog(memDir, '2026-03-15', ['- [10:00:00] Old pattern that should be skipped']);
     // Log from April 1 — after cutoff
-    seedDailyLog(memDir, '2026-04-01', [
-      '- [10:00:00] New pattern that should be included',
-    ]);
+    seedDailyLog(memDir, '2026-04-01', ['- [10:00:00] New pattern that should be included']);
 
     // Cutoff: March 20 midnight UTC
     const cutoff = new Date('2026-03-20T00:00:00Z').getTime();
@@ -200,14 +204,15 @@ describe('Consolidation Pipeline (4-phase)', () => {
     const bigContent = '# Decisions\n' + '## Old\n**Date:** 2020-01-01\nx'.repeat(24000) + '\n';
     fs.writeFileSync(path.join(memDir, 'decisions.md'), bigContent);
 
-    seedDailyLog(memDir, '2026-04-01', [
-      '- [10:00:00] Made a decision to add more content',
-    ]);
+    seedDailyLog(memDir, '2026-04-01', ['- [10:00:00] Made a decision to add more content']);
 
     consolidate(memDir, 0);
 
     const size = fs.statSync(path.join(memDir, 'decisions.md')).size;
-    assert.ok(size <= 25 * 1024 + 200, `decisions.md should be ≤25KB after cap enforcement, got ${(size/1024).toFixed(1)}KB`);
+    assert.ok(
+      size <= 25 * 1024 + 200,
+      `decisions.md should be ≤25KB after cap enforcement, got ${(size / 1024).toFixed(1)}KB`
+    );
   });
 });
 
@@ -285,8 +290,9 @@ describe('shouldConsolidate gates', () => {
 
 describe('parseSections line-based fallback', () => {
   it('groups flat bullet lines into synthetic sections of 50 lines', () => {
-    const lines = Array.from({ length: 200 }, (_, i) =>
-      `- [WARN] entry ${i} Date: 2026-03-${String((i % 28) + 1).padStart(2, '0')}T00:00Z`
+    const lines = Array.from(
+      { length: 200 },
+      (_, i) => `- [WARN] entry ${i} Date: 2026-03-${String((i % 28) + 1).padStart(2, '0')}T00:00Z`
     );
     const content = lines.join('\n');
     const sections = parseSections(content);
@@ -294,8 +300,9 @@ describe('parseSections line-based fallback', () => {
   });
 
   it('extracts ISO dates from flat bullet entries', () => {
-    const content = Array.from({ length: 60 }, () =>
-      '- [WARN] test Date: 2026-03-15T14:00:00Z'
+    const content = Array.from(
+      { length: 60 },
+      () => '- [WARN] test Date: 2026-03-15T14:00:00Z'
     ).join('\n');
     const sections = parseSections(content);
     assert.ok(sections.length >= 1);
@@ -328,8 +335,10 @@ describe('enforceMemoryCaps', () => {
 
   it('prunes files over KB cap', () => {
     const f = path.join(memDir, 'big.md');
-    const content = Array.from({ length: 20 }, (_, i) =>
-      `## Section ${i}\n**Date:** 2026-03-${String(i + 1).padStart(2, '0')}\n${'x'.repeat(2000)}`
+    const content = Array.from(
+      { length: 20 },
+      (_, i) =>
+        `## Section ${i}\n**Date:** 2026-03-${String(i + 1).padStart(2, '0')}\n${'x'.repeat(2000)}`
     ).join('\n\n---\n\n');
     fs.writeFileSync(f, content);
     const result = enforceMemoryCaps(f, { projectRoot: tmpDir });
@@ -339,7 +348,9 @@ describe('enforceMemoryCaps', () => {
 
   it('preserves [PERMANENT] sections during pruning', () => {
     const f = path.join(memDir, 'perm.md');
-    const content = '## Old\n**Date:** 2020-01-01\n' + 'x'.repeat(20000) +
+    const content =
+      '## Old\n**Date:** 2020-01-01\n' +
+      'x'.repeat(20000) +
       '\n\n---\n\n## Keep [PERMANENT]\nImportant\n\n---\n\n## Recent\n**Date:** 2026-03-30\nNew';
     fs.writeFileSync(f, content);
     enforceMemoryCaps(f, { projectRoot: tmpDir });

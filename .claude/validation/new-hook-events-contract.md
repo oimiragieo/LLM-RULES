@@ -8,7 +8,7 @@
 
 ### VAL-NE-001: SubagentStart hook validates Iron Law compliance without blocking legitimate spawns
 
-The SubagentStart hook inspects the subagent prompt for Iron Law violations (router session attempting to execute tools directly rather than delegating via Task). When a subagent prompt contains only routing/delegation instructions (Task, TaskCreate, TaskList, Read, AskUserQuestion, etc. — the whitelist from `router-tool-lockdown.cjs`), the hook exits 0 with `{ allow: true }`. When the prompt instructs a subagent spawned by the router to directly call banned tools (Bash, Edit, Write, Glob, Grep, WebSearch, WebFetch, mcp__filesystem__*), the hook emits a warning to stderr but still exits 0 (advisory). The hook MUST NOT exit 2 or return `{ allow: false }` for any subagent spawn — it is strictly advisory to avoid blocking legitimate worker agents that are expected to use tools.
+The SubagentStart hook inspects the subagent prompt for Iron Law violations (router session attempting to execute tools directly rather than delegating via Task). When a subagent prompt contains only routing/delegation instructions (Task, TaskCreate, TaskList, Read, AskUserQuestion, etc. — the whitelist from `router-tool-lockdown.cjs`), the hook exits 0 with `{ allow: true }`. When the prompt instructs a subagent spawned by the router to directly call banned tools (Bash, Edit, Write, Glob, Grep, WebSearch, WebFetch, mcp**filesystem**\*), the hook emits a warning to stderr but still exits 0 (advisory). The hook MUST NOT exit 2 or return `{ allow: false }` for any subagent spawn — it is strictly advisory to avoid blocking legitimate worker agents that are expected to use tools.
 Evidence: Unit test feeds the hook with (a) a clean delegation prompt → assert exit 0, no warning; (b) a prompt with "run `Bash(rm -rf /)`" from a router context → assert exit 0 with stderr warning containing "Iron Law"; (c) a worker-agent prompt with Bash/Edit usage → assert exit 0, no warning (workers are allowed tools). Confirm hook script exists at `.claude/hooks/lifecycle/subagent-start-iron-law.cjs` and is registered under `SubagentStart` in `settings.json`.
 
 ### VAL-NE-002: SubagentStart hook gracefully handles malformed or missing input
@@ -62,7 +62,7 @@ Evidence: `rg 'process\\.cwd\\(\\)' .claude/hooks/lifecycle/subagent-start-iron-
 
 ### VAL-CROSS-NE-001: Hook overhaul consolidation coexists with new event hooks
 
-After the hook-overhaul milestone (VAL-HO-*) consolidates and deduplicates existing hooks, adding 3 new event categories (`SubagentStart`, `PermissionDenied`, `SessionStart`) must not regress any overhaul changes. Specifically: (a) consolidated PostToolUse wildcard hook still fires all 4 sub-functions; (b) consolidated UserPromptSubmit advisory hook still fires all 6 sub-functions; (c) deduplicated `routing-guard.cjs`, `write-pretool-bundle.cjs`, `sync-memory-index.cjs` each have exactly 1 registration; (d) all `timeout_ms` values remain set on existing hooks. The new event categories must be appended after the existing ones in the JSON structure — they do not alter existing arrays.
+After the hook-overhaul milestone (VAL-HO-\*) consolidates and deduplicates existing hooks, adding 3 new event categories (`SubagentStart`, `PermissionDenied`, `SessionStart`) must not regress any overhaul changes. Specifically: (a) consolidated PostToolUse wildcard hook still fires all 4 sub-functions; (b) consolidated UserPromptSubmit advisory hook still fires all 6 sub-functions; (c) deduplicated `routing-guard.cjs`, `write-pretool-bundle.cjs`, `sync-memory-index.cjs` each have exactly 1 registration; (d) all `timeout_ms` values remain set on existing hooks. The new event categories must be appended after the existing ones in the JSON structure — they do not alter existing arrays.
 Evidence: Parse `settings.json` after both milestones complete. Assert VAL-HO-001 through VAL-HO-015 still pass. Assert VAL-NE-009 passes. Run `pnpm test:framework:hooks` → exit 0. Diff `settings.json` before and after new-event-hooks milestone — only additions under `SubagentStart`, `PermissionDenied`, `SessionStart` keys; zero modifications to existing event category arrays.
 
 ### VAL-CROSS-NE-002: Rules compression does not break SubagentStart Iron Law references
@@ -84,19 +84,19 @@ Evidence: `node -e "const s=JSON.parse(require('fs').readFileSync('.claude/setti
 
 ## Summary Matrix
 
-| ID | Title | Key Risk | Key Files |
-|----|-------|----------|-----------|
-| VAL-NE-001 | SubagentStart Iron Law compliance | Blocks legitimate spawns | `subagent-start-iron-law.cjs`, `router-tool-lockdown.cjs` |
-| VAL-NE-002 | SubagentStart malformed input | Uncaught exception kills spawn | `subagent-start-iron-law.cjs` |
-| VAL-NE-003 | PermissionDenied logs denials | Missing denial data | `permission-denied-logger.cjs`, `denial-log.json` |
-| VAL-NE-004 | Denial log bounded growth | Unbounded file size | `permission-denied-logger.cjs`, `denial-log.json` |
-| VAL-NE-005 | PermissionDenied fail-open | Hook blocks denial flow | `permission-denied-logger.cjs` |
-| VAL-NE-006 | SessionStart watchPaths | Invalid paths crash watcher | `session-start-watchpaths.cjs`, `settings.json` |
-| VAL-NE-007 | SessionStart crash safety | Session fails to start | `session-start-watchpaths.cjs` |
-| VAL-NE-008 | watchPaths validity | Non-existent paths | `session-start-watchpaths.cjs` |
-| VAL-NE-009 | Registration in settings.json | Missing/malformed registration | `settings.json` |
-| VAL-NE-010 | Security patterns (project-root, safeParseJSON) | Injection / wrong cwd | All 3 new hook scripts |
-| VAL-CROSS-NE-001 | Hook overhaul + new events coexistence | Overhaul regressions | `settings.json`, all consolidated hooks |
-| VAL-CROSS-NE-002 | Rules compression + SubagentStart | Broken Iron Law references | `subagent-start-iron-law.cjs`, `.claude/rules/` |
-| VAL-CROSS-NE-003 | Denial log → routing feedback | Schema mismatch, crash on empty | `denial-log.json`, `user-prompt-unified.core.cjs` |
-| VAL-CROSS-NE-004 | settings.json integrity post-Mission 5 | Structural corruption | `settings.json` |
+| ID               | Title                                           | Key Risk                        | Key Files                                                 |
+| ---------------- | ----------------------------------------------- | ------------------------------- | --------------------------------------------------------- |
+| VAL-NE-001       | SubagentStart Iron Law compliance               | Blocks legitimate spawns        | `subagent-start-iron-law.cjs`, `router-tool-lockdown.cjs` |
+| VAL-NE-002       | SubagentStart malformed input                   | Uncaught exception kills spawn  | `subagent-start-iron-law.cjs`                             |
+| VAL-NE-003       | PermissionDenied logs denials                   | Missing denial data             | `permission-denied-logger.cjs`, `denial-log.json`         |
+| VAL-NE-004       | Denial log bounded growth                       | Unbounded file size             | `permission-denied-logger.cjs`, `denial-log.json`         |
+| VAL-NE-005       | PermissionDenied fail-open                      | Hook blocks denial flow         | `permission-denied-logger.cjs`                            |
+| VAL-NE-006       | SessionStart watchPaths                         | Invalid paths crash watcher     | `session-start-watchpaths.cjs`, `settings.json`           |
+| VAL-NE-007       | SessionStart crash safety                       | Session fails to start          | `session-start-watchpaths.cjs`                            |
+| VAL-NE-008       | watchPaths validity                             | Non-existent paths              | `session-start-watchpaths.cjs`                            |
+| VAL-NE-009       | Registration in settings.json                   | Missing/malformed registration  | `settings.json`                                           |
+| VAL-NE-010       | Security patterns (project-root, safeParseJSON) | Injection / wrong cwd           | All 3 new hook scripts                                    |
+| VAL-CROSS-NE-001 | Hook overhaul + new events coexistence          | Overhaul regressions            | `settings.json`, all consolidated hooks                   |
+| VAL-CROSS-NE-002 | Rules compression + SubagentStart               | Broken Iron Law references      | `subagent-start-iron-law.cjs`, `.claude/rules/`           |
+| VAL-CROSS-NE-003 | Denial log → routing feedback                   | Schema mismatch, crash on empty | `denial-log.json`, `user-prompt-unified.core.cjs`         |
+| VAL-CROSS-NE-004 | settings.json integrity post-Mission 5          | Structural corruption           | `settings.json`                                           |

@@ -4,6 +4,7 @@
 > **Date**: 2026-03-31
 > **Scope**: Testable assertions for prompt cache optimization, context management, and cross-area integration
 > **Source Files**:
+>
 > - `.claude/lib/spawn/prompt-assembler.cjs`
 > - `.claude/lib/spawn/prompt-assembler-sections.cjs`
 > - `.claude/lib/spawn/prompt-assembler-data.cjs`
@@ -309,38 +310,38 @@ Full pipeline test: assemble a prompt, simulate 3 turns at >93% usage, trigger c
 
 ## Summary
 
-| Milestone | ID Range | Count |
-|-----------|----------|-------|
-| Prompt Cache Optimization | VAL-PC-001 – VAL-PC-008 | 8 |
-| Context Management | VAL-CM-001 – VAL-CM-010 | 10 |
-| Cross-Area Integration | VAL-CROSS-006 – VAL-CROSS-011 | 6 |
-| **Total** | | **24** |
+| Milestone                 | ID Range                      | Count  |
+| ------------------------- | ----------------------------- | ------ |
+| Prompt Cache Optimization | VAL-PC-001 – VAL-PC-008       | 8      |
+| Context Management        | VAL-CM-001 – VAL-CM-010       | 10     |
+| Cross-Area Integration    | VAL-CROSS-006 – VAL-CROSS-011 | 6      |
+| **Total**                 |                               | **24** |
 
 ### ID Registry
 
-| ID | Title |
-|----|-------|
-| VAL-PC-001 | Tools sorted alphabetically in filterAndDescribeTools() |
-| VAL-PC-002 | Skills sorted alphabetically in getSkillsByAgent() |
-| VAL-PC-003 | Section content memoization caches formatted strings |
-| VAL-PC-004 | Safety and protocol blocks in stable prefix |
-| VAL-PC-005 | Duplicate TaskUpdate contract eliminated |
-| VAL-PC-006 | Cache-break-detector hashes and logs changes |
-| VAL-PC-007 | Cache-break-detector no false positives on stable sections |
-| VAL-PC-008 | Memoization cache invalidates on input change |
-| VAL-CM-001 | Pre-compact hook persists active file list |
-| VAL-CM-002 | Pre-compact snapshot backward compatibility |
-| VAL-CM-003 | Context-degradation thresholds align with CC auto-compact |
-| VAL-CM-004 | Microcompact detection identifies silent token drops |
-| VAL-CM-005 | Microcompact detector no false positive on normal compaction |
-| VAL-CM-006 | Auto-compact circuit breaker detects sustained high usage |
-| VAL-CM-007 | Circuit breaker resets after usage drops |
-| VAL-CM-008 | Context-degradation skill updated for post-compact behavior |
-| VAL-CM-009 | Circuit breaker advisory message is actionable |
-| VAL-CM-010 | Pre-compact hook remains fail-open |
-| VAL-CROSS-006 | Cache stability under repeated identical calls |
-| VAL-CROSS-007 | Cache invalidation on tool list change propagates correctly |
-| VAL-CROSS-008 | Compaction cycle does not corrupt prompt assembly |
-| VAL-CROSS-009 | Circuit breaker integrates with context-window-monitor |
-| VAL-CROSS-010 | Alphabetical sorting produces deterministic prefix hash |
-| VAL-CROSS-011 | End-to-end prompt assembly under context pressure |
+| ID            | Title                                                        |
+| ------------- | ------------------------------------------------------------ |
+| VAL-PC-001    | Tools sorted alphabetically in filterAndDescribeTools()      |
+| VAL-PC-002    | Skills sorted alphabetically in getSkillsByAgent()           |
+| VAL-PC-003    | Section content memoization caches formatted strings         |
+| VAL-PC-004    | Safety and protocol blocks in stable prefix                  |
+| VAL-PC-005    | Duplicate TaskUpdate contract eliminated                     |
+| VAL-PC-006    | Cache-break-detector hashes and logs changes                 |
+| VAL-PC-007    | Cache-break-detector no false positives on stable sections   |
+| VAL-PC-008    | Memoization cache invalidates on input change                |
+| VAL-CM-001    | Pre-compact hook persists active file list                   |
+| VAL-CM-002    | Pre-compact snapshot backward compatibility                  |
+| VAL-CM-003    | Context-degradation thresholds align with CC auto-compact    |
+| VAL-CM-004    | Microcompact detection identifies silent token drops         |
+| VAL-CM-005    | Microcompact detector no false positive on normal compaction |
+| VAL-CM-006    | Auto-compact circuit breaker detects sustained high usage    |
+| VAL-CM-007    | Circuit breaker resets after usage drops                     |
+| VAL-CM-008    | Context-degradation skill updated for post-compact behavior  |
+| VAL-CM-009    | Circuit breaker advisory message is actionable               |
+| VAL-CM-010    | Pre-compact hook remains fail-open                           |
+| VAL-CROSS-006 | Cache stability under repeated identical calls               |
+| VAL-CROSS-007 | Cache invalidation on tool list change propagates correctly  |
+| VAL-CROSS-008 | Compaction cycle does not corrupt prompt assembly            |
+| VAL-CROSS-009 | Circuit breaker integrates with context-window-monitor       |
+| VAL-CROSS-010 | Alphabetical sorting produces deterministic prefix hash      |
+| VAL-CROSS-011 | End-to-end prompt assembly under context pressure            |

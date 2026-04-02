@@ -4,11 +4,12 @@
 > **Date**: 2026-03-31
 > **Scope**: Security hardening, hook input/routing features, and agent frontmatter enhancements
 > **Source Files**:
+>
 > - `.claude/hooks/safety/unified-pre-write-hook.cjs` (write validation hook)
 > - `.claude/hooks/safety/bash-command-validator.cjs` (bash validation)
 > - `.claude/schemas/agent-definition.schema.json` (agent frontmatter schema)
 > - `.claude/lib/routing/denial-feedback-reader.cjs` (denial log reader)
-> **Reference**: `claude-code-main/feature-review2026.md` §12, §30, §37
+>   **Reference**: `claude-code-main/feature-review2026.md` §12, §30, §37
 
 ---
 
@@ -298,38 +299,38 @@ End-to-end: an agent definition file with all three new frontmatter fields (`dis
 
 ## Summary
 
-| Milestone | ID Range | Count |
-|-----------|----------|-------|
-| Security Hardening | VAL-SH-001 – VAL-SH-008 | 8 |
-| Hook Input & Routing | VAL-HR-001 – VAL-HR-006 | 6 |
-| Agent Enhancements | VAL-AE-001 – VAL-AE-005 | 5 |
-| Cross-Area Integration | VAL-CROSS-012 – VAL-CROSS-015 | 4 |
-| **Total** | | **23** |
+| Milestone              | ID Range                      | Count  |
+| ---------------------- | ----------------------------- | ------ |
+| Security Hardening     | VAL-SH-001 – VAL-SH-008       | 8      |
+| Hook Input & Routing   | VAL-HR-001 – VAL-HR-006       | 6      |
+| Agent Enhancements     | VAL-AE-001 – VAL-AE-005       | 5      |
+| Cross-Area Integration | VAL-CROSS-012 – VAL-CROSS-015 | 4      |
+| **Total**              |                               | **23** |
 
 ### ID Registry
 
-| ID | Title |
-|----|-------|
-| VAL-SH-001 | Case-normalized path comparison in write hook |
-| VAL-SH-002 | Case normalization covers all protected-path regexes |
-| VAL-SH-003 | UNC path blocking in write hook |
-| VAL-SH-004 | UNC blocking covers forward-slash variant |
-| VAL-SH-005 | Bash validator patterns aligned with CC dangerousPatterns |
-| VAL-SH-006 | Bash validator does not over-block safe substrings |
-| VAL-SH-007 | Write hook protected paths aligned with CC filesystem.ts |
-| VAL-SH-008 | Path traversal blocks cover encoded variants |
-| VAL-HR-001 | Bash hook returns updatedInput to inject safety prefixes |
-| VAL-HR-002 | updatedInput preserves original command when no prefix needed |
-| VAL-HR-003 | Denial feedback integrated into routing suggestions |
-| VAL-HR-004 | Denial feedback gracefully handles empty or missing log |
-| VAL-HR-005 | suppressOutput on verbose security hooks |
-| VAL-HR-006 | suppressOutput not set on allow decisions |
-| VAL-AE-001 | disallowedTools enforced in prompt assembler |
-| VAL-AE-002 | disallowedTools and tools do not conflict silently |
-| VAL-AE-003 | mcpServers field in agent frontmatter schema |
-| VAL-AE-004 | mcpServers scoping propagated to spawn prompt |
-| VAL-AE-005 | fork_eligible field in agent frontmatter schema |
-| VAL-CROSS-012 | Case-normalized paths + prompt cache stability |
-| VAL-CROSS-013 | Denial tracking feeds routing after security blocks |
-| VAL-CROSS-014 | suppressOutput prevents security noise in context budget |
-| VAL-CROSS-015 | Agent schema new fields round-trip |
+| ID            | Title                                                         |
+| ------------- | ------------------------------------------------------------- |
+| VAL-SH-001    | Case-normalized path comparison in write hook                 |
+| VAL-SH-002    | Case normalization covers all protected-path regexes          |
+| VAL-SH-003    | UNC path blocking in write hook                               |
+| VAL-SH-004    | UNC blocking covers forward-slash variant                     |
+| VAL-SH-005    | Bash validator patterns aligned with CC dangerousPatterns     |
+| VAL-SH-006    | Bash validator does not over-block safe substrings            |
+| VAL-SH-007    | Write hook protected paths aligned with CC filesystem.ts      |
+| VAL-SH-008    | Path traversal blocks cover encoded variants                  |
+| VAL-HR-001    | Bash hook returns updatedInput to inject safety prefixes      |
+| VAL-HR-002    | updatedInput preserves original command when no prefix needed |
+| VAL-HR-003    | Denial feedback integrated into routing suggestions           |
+| VAL-HR-004    | Denial feedback gracefully handles empty or missing log       |
+| VAL-HR-005    | suppressOutput on verbose security hooks                      |
+| VAL-HR-006    | suppressOutput not set on allow decisions                     |
+| VAL-AE-001    | disallowedTools enforced in prompt assembler                  |
+| VAL-AE-002    | disallowedTools and tools do not conflict silently            |
+| VAL-AE-003    | mcpServers field in agent frontmatter schema                  |
+| VAL-AE-004    | mcpServers scoping propagated to spawn prompt                 |
+| VAL-AE-005    | fork_eligible field in agent frontmatter schema               |
+| VAL-CROSS-012 | Case-normalized paths + prompt cache stability                |
+| VAL-CROSS-013 | Denial tracking feeds routing after security blocks           |
+| VAL-CROSS-014 | suppressOutput prevents security noise in context budget      |
+| VAL-CROSS-015 | Agent schema new fields round-trip                            |

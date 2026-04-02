@@ -1,59 +1,74 @@
 ### VAL-HO-001: settings.json remains valid JSON after all changes
+
 After every modification to `.claude/settings.json`, the file must parse without error via `JSON.parse(fs.readFileSync('.claude/settings.json', 'utf8'))`. The parsed object must retain all top-level keys (`version`, `max_tokens`, `env`, `rag_enabled`, `rag_threshold`, `auto_context_pruning`, `mcpServers`, `hooks`) and all 7 hook event categories (`UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `SessionEnd`, `PreCompact`, `Stop`).
 Evidence: Run `node -e "JSON.parse(require('fs').readFileSync('.claude/settings.json','utf8'))"` exits 0; diff the event category keys before/after.
 
 ### VAL-HO-002: Security/blocking PreToolUse hooks remain synchronous
+
 The following hooks use exit code 2 to BLOCK dangerous operations and MUST NOT have `async: true` added: `dlp-pretool.cjs`, `external-content-guard.cjs`, `bash-pretool-bundle.cjs`, `write-pretool-bundle.cjs`, `routing-guard.cjs`, `router-tool-lockdown.cjs`, `hybrid-search-enforcer.cjs`, `validate-skill-invocation.cjs`, `context-monitor.cjs`, `worktree-preflight-check.cjs`, `spawn-token-guard.cjs`, `finish-only-guard.cjs`. If any of these were converted to async, a malicious or erroneous tool call could execute before the guard returns exit 2, creating a security vulnerability.
 Evidence: For each hook listed, verify its registration object does NOT contain `"async": true`. Verify each can still block by running the hook with known-bad input and confirming exit code 2 and tool rejection.
 
 ### VAL-HO-003: All PreToolUse validation/gating hooks remain synchronous
+
 The following PreToolUse hooks gate task creation, updates, or completion and MUST remain sync: `pre-tool-unified.cjs`, `conflict-detector.cjs`, `reflection-step0-guard.cjs`, `heartbeat-step05-check.cjs`, `task-pretool-orchestrator.cjs`, `taskupdate-contract-validator.cjs`, `pre-completion-validation.cjs`, `quality-gate-validator.cjs`, `creator-compliance-validator.cjs`, `pre-spawn-hook-check.cjs`. These hooks return structured JSON results (via `formatResult`) that influence tool execution decisions.
 Evidence: Confirm no `"async": true` on these registrations. Run one gating hook (e.g., `taskupdate-contract-validator.cjs`) with invalid input and verify it blocks (exit 2) with descriptive error.
 
 ### VAL-HO-004: Advisory hooks converted to async: true (~22 hooks)
+
 The following advisory/monitoring hooks should gain `async: true` since they never block (always exit 0) and only perform logging, metrics, or background maintenance: `ccusage-statusline.cjs`, `startup-failopen-audit.cjs`, `worktree-prune-on-start.cjs` (UserPromptSubmit), `session-budget-watchdog.cjs`, `drift-detector.cjs`, `stale-task-detector.cjs`, `channel-auto-start.cjs`, `a2a-server-autostart.cjs`, `audit-skill-recency.cjs`, `handover-detector.cjs`, `post-tool-metrics-unified.cjs`, `context-window-monitor.cjs`, `hook-error-detector.cjs`, `recurring-issue-detector.cjs`, `sync-memory-index.cjs`, `agent-registry-auto-refresh.cjs`, `code-index-updater.cjs`, `post-edit-scanner.cjs`, `analysis-paralysis-guard.cjs`, `reflection-cleanup.cjs`, `reflection-data-aggregator.cjs`, `unified-reflection-handler.cjs`. Pass condition: each registration object for these hooks contains `"async": true`. Fail condition: any advisory hook is left sync, needlessly blocking the prompt pipeline.
 Evidence: Parse settings.json, extract all hook command strings, match against advisory list, verify `async` field is `true` on each.
 
 ### VAL-HO-005: All hooks have timeout_ms set
+
 Every hook registration object in settings.json must include a `timeout_ms` field. Currently only 9 of ~49 hooks have it. After the overhaul, 100% must have it. Recommended ranges: security/blocking PreToolUse hooks 5000–10000ms; advisory async hooks 10000–30000ms; SessionEnd/cleanup hooks 15000–30000ms. Pass condition: no hook object lacks `timeout_ms`. Fail condition: any hook missing `timeout_ms` could hang indefinitely and stall the entire session.
 Evidence: Parse settings.json, walk all hook arrays, count objects with and without `timeout_ms`. Assert count-without === 0. Verify no timeout is below 2000ms (too aggressive) or above 60000ms (too lenient).
 
 ### VAL-HO-006: PostToolUse wildcard consolidation (4→1) preserves all logic
+
 The 4 scripts under `PostToolUse` empty-matcher (`post-tool-metrics-unified.cjs`, `context-window-monitor.cjs`, `hook-error-detector.cjs`, `recurring-issue-detector.cjs`) must be consolidated into 1 unified entry point. Pass conditions: (a) the consolidated hook invokes all 4 logical functions; (b) failure in one function does not prevent the others from executing (error isolation with try/catch per sub-function); (c) metrics/monitoring output matches pre-consolidation behavior. Fail condition: one of the 4 behaviors silently drops because the consolidated script doesn't call it, or an uncaught exception in one kills all four.
 Evidence: Read the consolidated script source and verify it imports/calls all 4 modules. Run with a PostToolUse event and confirm all 4 produce their expected stderr/file outputs. Intentionally fail one sub-module and verify the other 3 still execute.
 
 ### VAL-HO-007: UserPromptSubmit advisory consolidation (6→1) preserves all logic
+
 The 6 advisory UserPromptSubmit hooks (`ccusage-statusline.cjs`, `startup-failopen-audit.cjs`, `worktree-prune-on-start.cjs`, `session-budget-watchdog.cjs`, `drift-detector.cjs`, `stale-task-detector.cjs`) must be consolidated into 1 entry point. Pass conditions: (a) consolidated hook calls all 6 sub-functions; (b) each sub-function's kill-switch env var still works (e.g., `CCUSAGE_STATUSLINE=off`); (c) error isolation: one sub-function throwing does not prevent the remaining 5 from running; (d) consolidated hook exits 0 (advisory). Fail condition: any sub-function's behavior is lost, or the consolidated hook exits non-zero and blocks prompts.
 Evidence: Source inspection for 6 require/call sites. Test each kill switch individually. Inject a throw in one sub-function and verify the others still run.
 
 ### VAL-HO-008: routing-guard.cjs deduplication retains full matcher coverage
+
 `routing-guard.cjs` is currently registered 3 times under PreToolUse with matchers: `Glob|Grep|WebSearch`, `TaskCreate`, and `TaskOutput`. After deduplication, a single registration must cover all 5 tool names. Pass condition: the deduplicated matcher is `Glob|Grep|WebSearch|TaskCreate|TaskOutput` (or equivalent). Fail condition: any of the 5 tools no longer triggers routing-guard, creating an enforcement gap.
 Evidence: Parse PreToolUse registrations, find all entries whose command ends with `routing-guard.cjs`, verify exactly 1 remains, and its matcher includes all 5 tool names. Test with a `TaskCreate` event and confirm routing-guard fires.
 
 ### VAL-HO-009: write-pretool-bundle.cjs deduplication retains full matcher coverage
+
 `write-pretool-bundle.cjs` is registered twice under PreToolUse: once for `Edit|Write|NotebookEdit` and once for `mcp__filesystem__write_file|mcp__filesystem__edit_file`. After deduplication, a single registration must cover all 5 tool names. Pass condition: the deduplicated matcher is `Edit|Write|NotebookEdit|mcp__filesystem__write_file|mcp__filesystem__edit_file`. Fail condition: MCP filesystem writes bypass the write safety bundle.
 Evidence: Parse PreToolUse, find entries with `write-pretool-bundle.cjs`, verify exactly 1 remains with all 5 tools in the matcher.
 
 ### VAL-HO-010: sync-memory-index.cjs deduplication retains trigger coverage
+
 `sync-memory-index.cjs` is registered twice under PostToolUse: once in the `Edit|Write|NotebookEdit` group and once under `MemoryRecord`. After deduplication, a single registration must fire for all 4 tools. Pass condition: the deduplicated matcher is `Edit|Write|NotebookEdit|MemoryRecord` (or the hook appears once with a combined matcher). Fail condition: memory index stops syncing on MemoryRecord events, causing stale memory state.
 Evidence: Parse PostToolUse, find entries with `sync-memory-index.cjs`, verify exactly 1 registration covers all 4 tool names.
 
 ### VAL-HO-011: High-false-positive hooks gain correct if-conditions
+
 5 UserPromptSubmit hooks fire on every prompt but only need to run once per session or at startup: `startup-failopen-audit.cjs`, `worktree-prune-on-start.cjs`, `channel-auto-start.cjs`, `a2a-server-autostart.cjs`, `audit-skill-recency.cjs`. Each must gain an `if` condition (e.g., checking a session-start sentinel file or prompt count) to skip execution after initial run. Pass conditions: (a) hook fires on the first prompt of a session; (b) hook is skipped (fast exit 0) on subsequent prompts; (c) the if-condition does not accidentally prevent firing on the first prompt of a NEW session. Fail conditions: (i) if-condition is always false → hook never fires; (ii) if-condition is always true → no improvement; (iii) sentinel file persists across sessions → hook never fires in new sessions.
 Evidence: Start a fresh session, verify each hook runs on first prompt (check stderr/file output), submit a second prompt, verify hook produces no output or exits immediately. Kill and restart session, verify hook runs again on first prompt.
 
 ### VAL-HO-012: Hook registration order preserved for security-critical sequences
+
 Within each hook event category, the relative execution order of security hooks must be preserved. Specifically in PreToolUse: `pre-tool-unified.cjs` must execute before `router-tool-lockdown.cjs` (it provides routing context); `worktree-preflight-check.cjs` and `spawn-token-guard.cjs` must execute before `task-pretool-orchestrator.cjs` (they gate task spawning). In PostToolUse under TaskUpdate: `post-completion-chain.cjs` must execute before `reflection-cleanup.cjs` and `reflection-data-aggregator.cjs` (chain triggers reflection which cleanup and aggregator depend on).
 Evidence: Parse settings.json, extract hook arrays for each event, verify the relative order of critical hooks matches the pre-overhaul order. Any reordering must have explicit justification documented.
 
 ### VAL-HO-013: Duplicate removal does not remove the sole valid registration
+
 For each deduplication (routing-guard, write-pretool-bundle, sync-memory-index): after consolidation, exactly 1 registration must remain in settings.json for that script under its hook event. Zero registrations = the hook is silently lost. Pass condition: `grep -c` for each script name in settings.json returns exactly 1 per hook event (routing-guard in PreToolUse, write-pretool-bundle in PreToolUse, sync-memory-index in PostToolUse). Fail condition: count is 0 for any of them.
 Evidence: `node -e "const s=JSON.parse(require('fs').readFileSync('.claude/settings.json','utf8')); const pre=JSON.stringify(s.hooks.PreToolUse); const post=JSON.stringify(s.hooks.PostToolUse); console.log('routing-guard PreToolUse:', (pre.match(/routing-guard\\.cjs/g)||[]).length); console.log('write-pretool-bundle PreToolUse:', (pre.match(/write-pretool-bundle\\.cjs/g)||[]).length); console.log('sync-memory-index PostToolUse:', (post.match(/sync-memory-index\\.cjs/g)||[]).length);"` — each should output exactly 1.
 
 ### VAL-HO-014: Consolidated hooks have error isolation
+
 Both consolidated hooks (PostToolUse wildcard, UserPromptSubmit advisory) must implement try/catch around each sub-function call. If sub-function N throws, sub-functions N+1 through end must still execute. The consolidated hook must always exit 0 (advisory behavior). Pass condition: inject a `throw new Error('test')` in one sub-function, run the consolidated hook, verify all other sub-functions produce their expected output and the hook exits 0. Fail condition: an uncaught exception in one sub-function causes the consolidated hook to exit non-zero or skip remaining sub-functions.
 Evidence: Modify one sub-module to throw, run consolidated hook, check stderr for the error message AND verify other sub-modules' side effects (file writes, metrics) are present.
 
 ### VAL-HO-015: Timeout values do not kill legitimate long-running hooks
+
 Hooks with legitimate long-running operations need appropriate timeouts. Specifically: `post-pipeline-token-report.cjs` (currently 15000ms — involves file scanning) must keep ≥15000ms; `worktree-auto-cleanup.cjs` (currently 10000ms — git operations) must keep ≥10000ms; SessionEnd hooks (memory promotion, reflection processing) need ≥15000ms as they write to disk. Advisory hooks that only read env vars or write one line to stderr (e.g., `startup-failopen-audit.cjs`, `ccusage-statusline.cjs`) can have lower timeouts (5000ms). Pass condition: no hook is killed by its timeout during normal operation over 10 consecutive sessions. Fail condition: any hook produces timeout-killed errors in `.claude/debug.log` during normal use.
 Evidence: Set each hook's timeout_ms to its assigned value, run 10 full sessions with typical workloads, grep `.claude/debug.log` for "timeout" or "killed" messages related to hooks.
