@@ -76,10 +76,38 @@ function writeStartupSentinel(sessionId) {
   }
 }
 
+function isChannelProcessAlive() {
+  const trackerPath = path.join(RUNTIME, 'terminal-pids.json');
+  if (!fs.existsSync(trackerPath)) return false;
+  try {
+    const raw = fs.readFileSync(trackerPath, 'utf8');
+    const tracker = safeParseJSON(raw);
+    const session = (tracker.sessions || []).find(
+      s => s.purpose === 'channel-session' && s.status === 'active'
+    );
+    if (session && session.pid) {
+      process.kill(session.pid, 0); // signal 0 = check alive
+      return true;
+    }
+  } catch (_) {
+    // PID dead or tracker corrupt
+  }
+  return false;
+}
+
 function runMain(sessionId) {
-  // Quick sentinel check — skip if already fired this session (<50ms path)
+  // Sentinel check — skip if already fired AND the channel is actually alive.
+  // If sentinel exists but channel process is dead, clear sentinel and retry.
   if (hasStartupAlreadyFired(sessionId)) {
-    return;
+    if (isChannelProcessAlive()) {
+      return; // genuinely running — skip
+    }
+    // Channel not running despite sentinel — clear and retry
+    try { fs.unlinkSync(CHANNEL_SENTINEL_PATH); } catch (_) {}
+    try { fs.unlinkSync(LOCKFILE); } catch (_) {}
+    process.stderr.write(
+      '[channel-auto-start] Sentinel exists but channel not running — retrying\n'
+    );
   }
 
   // Write sentinel immediately so subsequent prompts skip fast
@@ -185,7 +213,7 @@ function runMain(sessionId) {
     fs.writeFileSync(
       vbsPath,
       [
-        'WScript.Sleep 4000',
+        'WScript.Sleep 10000',
         'Set wmi = GetObject("winmgmts:\\\\.\\root\\cimv2")',
         "Set procs = wmi.ExecQuery(\"SELECT ProcessId FROM Win32_Process WHERE Name='cmd.exe' AND CommandLine LIKE '%TelegramChannel%'\")",
         'Dim targetPid: targetPid = 0',

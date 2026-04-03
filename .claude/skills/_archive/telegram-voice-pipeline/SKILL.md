@@ -2,7 +2,6 @@
 name: telegram-voice-pipeline
 description: End-to-end voice message pipeline for Telegram — download OGG attachment, transcribe with Whisper, generate a text response, convert to MP3 via ElevenLabs TTS, and reply with the audio file.
 version: 1.0.0
-model: sonnet
 invoked_by: both
 user_invocable: false
 tools: [Bash, Read, TaskUpdate]
@@ -67,7 +66,7 @@ Call the Telegram MCP download tool with the `file_id` from the channel tag:
 
 ```javascript
 // MCP tool call (agent uses this directly)
-mcp__plugin_telegram_telegram__download_attachment({ file_id: '<attachment_file_id>' });
+mcp__telegram-relay__download_attachment({ file_id: '<attachment_file_id>' });
 // Returns: local file path, e.g. /tmp/voice_abc123.ogg
 ```
 
@@ -186,7 +185,7 @@ else:
 
 ```javascript
 // MCP tool call
-mcp__plugin_telegram_telegram__reply({
+mcp__telegram-relay__reply({
   chat_id: '<chat_id from channel tag>',
   text: response_text, // Also send the transcript so user can read it
   files: ['/tmp/tg_voice_response.mp3'],
@@ -261,13 +260,13 @@ Total time for 10-second voice message: ~15-25 seconds (download 1s + transcribe
 
 ## Related Skills
 
-- `channel-management` — Start/stop/status of the Telegram channel session
+- `enable-telegram` — Start the channel daemon for background Telegram monitoring
 - `transcription` — Whisper transcription workflow (used in Step 2)
 - `tts-generation` — ElevenLabs and OpenAI TTS (used in Step 4)
 
 ## References
 
-- Telegram MCP tools: `mcp__plugin_telegram_telegram__download_attachment`, `mcp__plugin_telegram_telegram__reply`
+- Telegram MCP tools: `mcp__telegram-relay__download_attachment`, `mcp__telegram-relay__reply`
 - `transcribe-anything`: <https://github.com/modal-labs/transcribe-anything>
 - ElevenLabs Python SDK: <https://github.com/elevenlabs/elevenlabs-python>
 - OpenAI TTS docs: <https://platform.openai.com/docs/guides/text-to-speech>

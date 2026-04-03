@@ -13,7 +13,55 @@ If you want a local-first, reproducible agent stack with strict validation and h
 `Developer Workflow` · `.claude/docs/DEVELOPER_WORKFLOW.md`  
 `Hooks Reference` · `.claude/docs/HOOKS_REFERENCE.md`  
 `Memory System` · `.claude/docs/MEMORY_SYSTEM.md`  
-`Code Indexing` · `.claude/docs/CODE_INDEXING_DESIGN.md`
+`Code Indexing` · `.claude/docs/CODE_INDEXING_DESIGN.md`  
+`Telegram Integration` · `.claude/docs/TELEGRAM_ARCHITECTURE.md`
+
+## Telegram Integration
+
+Agent Studio includes a background channel daemon that monitors Telegram and responds to messages using Claude. Inspired by [clawhip](https://github.com/Yeachan-Heo/clawhip) and Claude Code's KAIROS assistant mode.
+
+### Quick Start
+
+```bash
+# 1. Configure (one-time)
+# Add to your .env:
+TELEGRAM_BOT_TOKEN=<token from @BotFather>
+TELEGRAM_OWNER_ID=<your user ID from @userinfobot>
+TELEGRAM_ALLOWED_USERS=<your user ID>
+CHANNEL_AUTO_START=true
+
+# 2. Verify config
+/setup-telegram
+
+# 3. Start monitoring
+/enable-telegram
+
+# 4. Stop monitoring
+/disable-telegram
+```
+
+### Features
+
+- **Zero-cost idle** — long-polls Telegram, only calls Claude when a message arrives
+- **3-tier memory** — chat history, session summaries, persistent user profiles
+- **Dream consolidation** — KAIROS-style 4-phase memory synthesis (Orient → Gather → Consolidate → Prune)
+- **Context rot protection** — auto-detects and rotates sessions transparently
+- **Task execution** — ask the bot to run code, check git, run tests via headless Claude
+- **Bot command menu** — `/help`, `/status`, `/memory`, `/dream`, `/tasks`, `/new`, `/compress`
+- **"While you were away" recap** — summarizes what happened when you return after being idle
+- **HTTP API** — `http://127.0.0.1:3101/status`, `/send`, `/history`, `/memory`, `/dream`
+- **A2A ready** — router can send messages and delegate tasks via the daemon's HTTP API
+
+### Voice Pipeline (Optional)
+
+```bash
+# Add TTS keys to .env:
+ELEVENLABS_API_KEY=<key>      # or OPENAI_API_KEY for fallback
+# Verify: /setup-telegram-voice
+# Enable: /enable-telegram-voice
+```
+
+Full docs: `.claude/docs/TELEGRAM_ARCHITECTURE.md`
 
 ## Recent Changes
 

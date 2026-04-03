@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-04-02T05:01:19.002Z",
+  "generatedAt": "2026-04-03T15:27:00.912Z",
   "metadata": {
-    "totalSkills": 339,
+    "totalSkills": 342,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-04-02T05:01:19.003Z",
+    "lastValidated": "2026-04-03T15:27:00.913Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7549,6 +7549,28 @@
       "priority": 1,
       "aliasOf": null
     },
+    "check-telegram-voice": {
+      "name": "check-telegram-voice",
+      "displayName": "Check Telegram Voice",
+      "category": "Other",
+      "domain": "other",
+      "description": "Check voice message pipeline config — verify Whisper, ElevenLabs/OpenAI TTS keys and dependencies.",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "TaskUpdate"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "check-telegram-voice"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "claude-api": {
       "name": "claude-api",
       "displayName": "Claude Api",
@@ -7903,6 +7925,26 @@
       "priority": 3,
       "aliasOf": null
     },
+    "disable-telegram": {
+      "name": "disable-telegram",
+      "displayName": "Disable Telegram",
+      "category": "Other",
+      "domain": "other",
+      "description": "Stop the Telegram channel daemon.",
+      "requiredTools": [
+        "Agent"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "disable-telegram"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "doc-coauthoring": {
       "name": "doc-coauthoring",
       "displayName": "Doc Coauthoring",
@@ -7944,6 +7986,27 @@
       "tags": [
         "other",
         "electron-pro"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "enable-telegram": {
+      "name": "enable-telegram",
+      "displayName": "Enable Telegram",
+      "category": "Other",
+      "domain": "other",
+      "description": "Start Telegram monitoring. Auto-enables voice pipeline if ElevenLabs or OpenAI TTS keys are detected.",
+      "requiredTools": [
+        "Agent",
+        "Read"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "enable-telegram"
       ],
       "priority": 3,
       "aliasOf": null
@@ -8902,6 +8965,46 @@
       "priority": 3,
       "aliasOf": null
     },
+    "setup-telegram": {
+      "name": "setup-telegram",
+      "displayName": "Setup Telegram",
+      "category": "Other",
+      "domain": "other",
+      "description": "Check Telegram bot configuration and guide setup if anything is missing.",
+      "requiredTools": [
+        "Read"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "setup-telegram"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "setup-telegram-voice": {
+      "name": "setup-telegram-voice",
+      "displayName": "Setup Telegram Voice",
+      "category": "Other",
+      "domain": "other",
+      "description": "Check if voice message handling is configured — verify Whisper, ElevenLabs/OpenAI TTS keys, and required tools.",
+      "requiredTools": [
+        "Read"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "setup-telegram-voice"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "slack-expert": {
       "name": "slack-expert",
       "displayName": "Slack Expert",
@@ -8997,55 +9100,6 @@
         "team-orchestration"
       ],
       "priority": 1,
-      "aliasOf": null
-    },
-    "telegram-polling": {
-      "name": "telegram-polling",
-      "displayName": "Telegram Polling",
-      "category": "Other",
-      "domain": "other",
-      "description": "Poll Telegram Bot API for new messages and route commands to agents. Implements 10-command bot with fail-closed allowlist, owner-only tier, two-step approve, audit logging, and replay-prevention offset tracking.",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Bash",
-        "TaskCreate",
-        "TaskUpdate",
-        "TaskList",
-        "TaskGet",
-        "Skill"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "telegram-polling"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
-    "telegram-voice-pipeline": {
-      "name": "telegram-voice-pipeline",
-      "displayName": "Telegram Voice Pipeline",
-      "category": "Other",
-      "domain": "other",
-      "description": "End-to-end voice message pipeline for Telegram — download OGG attachment, transcribe with Whisper, generate a text response, convert to MP3 via ElevenLabs TTS, and reply with the audio file.",
-      "requiredTools": [
-        "Bash",
-        "Read",
-        "TaskUpdate"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "telegram-voice-pipeline"
-      ],
-      "priority": 3,
       "aliasOf": null
     },
     "token-saver-adaptive-ratio": {
@@ -9620,6 +9674,7 @@
         "brand-compliance",
         "browser-automation",
         "channel-management",
+        "check-telegram-voice",
         "claude-api",
         "cloud-run",
         "cloudflare-workers",
@@ -9635,8 +9690,10 @@
         "de-sloppify",
         "deep-research",
         "design-systems",
+        "disable-telegram",
         "doc-coauthoring",
         "electron-pro",
+        "enable-telegram",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -9676,12 +9733,12 @@
         "security-scanning",
         "seo-optimization",
         "session-log-analyzer",
+        "setup-telegram",
+        "setup-telegram-voice",
         "slack-expert",
         "style-analyzer",
         "task-delegation",
         "team-orchestration",
-        "telegram-polling",
-        "telegram-voice-pipeline",
         "token-saver-adaptive-ratio",
         "token-saver-context-compression",
         "token-saver-memory-dedup",
@@ -10065,6 +10122,7 @@
         "brand-compliance",
         "browser-automation",
         "channel-management",
+        "check-telegram-voice",
         "claude-api",
         "cloud-run",
         "cloudflare-workers",
@@ -10080,8 +10138,10 @@
         "de-sloppify",
         "deep-research",
         "design-systems",
+        "disable-telegram",
         "doc-coauthoring",
         "electron-pro",
+        "enable-telegram",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -10121,12 +10181,12 @@
         "security-scanning",
         "seo-optimization",
         "session-log-analyzer",
+        "setup-telegram",
+        "setup-telegram-voice",
         "slack-expert",
         "style-analyzer",
         "task-delegation",
         "team-orchestration",
-        "telegram-polling",
-        "telegram-voice-pipeline",
         "token-saver-adaptive-ratio",
         "token-saver-context-compression",
         "token-saver-memory-dedup",
@@ -10493,6 +10553,7 @@
         "brand-compliance",
         "browser-automation",
         "channel-management",
+        "check-telegram-voice",
         "claude-api",
         "cloud-run",
         "cloudflare-workers",
@@ -10510,6 +10571,7 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
+        "enable-telegram",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -10549,12 +10611,12 @@
         "security-scanning",
         "seo-optimization",
         "session-log-analyzer",
+        "setup-telegram",
+        "setup-telegram-voice",
         "slack-expert",
         "style-analyzer",
         "task-delegation",
         "team-orchestration",
-        "telegram-polling",
-        "telegram-voice-pipeline",
         "token-saver-adaptive-ratio",
         "token-saver-context-compression",
         "token-saver-memory-dedup",
@@ -10832,7 +10894,6 @@
         "style-analyzer",
         "task-delegation",
         "team-orchestration",
-        "telegram-polling",
         "token-saver-adaptive-ratio",
         "token-saver-context-compression",
         "token-saver-memory-dedup",
@@ -11219,6 +11280,7 @@
         "behavioral-loop-detection",
         "browser-automation",
         "channel-management",
+        "check-telegram-voice",
         "claude-api",
         "cloud-run",
         "cloudflare-workers",
@@ -11258,8 +11320,6 @@
         "session-log-analyzer",
         "slack-expert",
         "team-orchestration",
-        "telegram-polling",
-        "telegram-voice-pipeline",
         "transcription",
         "tts-generation",
         "user-flow-validator",
@@ -11585,7 +11645,6 @@
         "outcome-reflection",
         "regulatory-compliance",
         "team-orchestration",
-        "telegram-polling",
         "user-research"
       ],
       "AskUserQuestion": [
@@ -11668,16 +11727,14 @@
         "cron-decision",
         "heartbeat",
         "scheduled-tasks",
-        "team-orchestration",
-        "telegram-polling"
+        "team-orchestration"
       ],
       "TaskList": [
         "task-management-protocol",
         "error-recovery-escalation",
         "heartbeat",
         "scheduled-tasks",
-        "team-orchestration",
-        "telegram-polling"
+        "team-orchestration"
       ],
       "TaskGet": [
         "task-management-protocol",
@@ -11685,14 +11742,14 @@
         "error-recovery-escalation",
         "judge-verification",
         "outcome-reflection",
-        "team-orchestration",
-        "telegram-polling"
+        "team-orchestration"
       ],
       "TaskUpdate": [
         "task-management-protocol",
         "adversarial-debate",
         "behavioral-loop-detection",
         "channel-management",
+        "check-telegram-voice",
         "compaction-detector",
         "context-attribution",
         "error-recovery-escalation",
@@ -11703,8 +11760,6 @@
         "scheduled-tasks",
         "session-log-analyzer",
         "team-orchestration",
-        "telegram-polling",
-        "telegram-voice-pipeline",
         "user-research"
       ],
       "mcp__Exa__web_search_exa": [
@@ -11736,6 +11791,10 @@
         "exa-monitor",
         "heartbeat",
         "scheduled-tasks"
+      ],
+      "Agent": [
+        "disable-telegram",
+        "enable-telegram"
       ]
     },
     "byAgent": {
@@ -11909,6 +11968,7 @@
         "atlassian-integration",
         "azure-devops",
         "brand-compliance",
+        "check-telegram-voice",
         "claude-api",
         "cloud-run",
         "cloudflare-workers",
@@ -11920,8 +11980,10 @@
         "cron-decision",
         "cron-runner",
         "design-systems",
+        "disable-telegram",
         "doc-coauthoring",
         "electron-pro",
+        "enable-telegram",
         "exa-monitor",
         "figma",
         "frontend-design",
@@ -11944,10 +12006,10 @@
         "pptx",
         "reddit-researcher",
         "session-log-analyzer",
+        "setup-telegram",
+        "setup-telegram-voice",
         "slack-expert",
         "task-delegation",
-        "telegram-polling",
-        "telegram-voice-pipeline",
         "token-saver-adaptive-ratio",
         "token-saver-memory-dedup",
         "transcription",
@@ -13793,6 +13855,7 @@
         "atlassian-integration",
         "azure-devops",
         "brand-compliance",
+        "check-telegram-voice",
         "claude-api",
         "cloud-run",
         "cloudflare-workers",
@@ -13804,8 +13867,10 @@
         "cron-decision",
         "cron-runner",
         "design-systems",
+        "disable-telegram",
         "doc-coauthoring",
         "electron-pro",
+        "enable-telegram",
         "exa-monitor",
         "figma",
         "frontend-design",
@@ -13828,10 +13893,10 @@
         "pptx",
         "reddit-researcher",
         "session-log-analyzer",
+        "setup-telegram",
+        "setup-telegram-voice",
         "slack-expert",
         "task-delegation",
-        "telegram-polling",
-        "telegram-voice-pipeline",
         "token-saver-adaptive-ratio",
         "token-saver-memory-dedup",
         "transcription",

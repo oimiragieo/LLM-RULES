@@ -3,7 +3,10 @@
   "mcpServers": {
     "telegram-relay": {
       "command": "node",
-      "args": ["scripts/channels/telegram-relay.mjs"]
+      "args": ["scripts/channels/telegram-relay.mjs"],
+      "env": {
+        "TELEGRAM_DISABLE_POLLING": "1"
+      }
     },
     "filesystem": {
       "command": "npx",

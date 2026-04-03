@@ -16,12 +16,28 @@ if (!token && fs.existsSync(envPath)) {
   if (match) token = match[1].trim();
 }
 
+// Build allowed users set from multiple sources (like OpenClaw/Hermes pattern):
+//   1. access.json allowFrom array
+//   2. TELEGRAM_ALLOWED_USERS env var (comma-separated IDs or usernames)
+//   3. TELEGRAM_OWNER_ID env var
+// Empty set = allow nobody (secure default). Set TELEGRAM_ALLOW_ALL=true to open.
 const accessPath = path.join(os.homedir(), '.claude', 'channels', 'telegram', 'access.json');
 let allowed = new Set();
 if (fs.existsSync(accessPath)) {
   const accessData = JSON.parse(fs.readFileSync(accessPath, 'utf8'));
-  allowed = new Set(accessData.allowFrom || []);
+  for (const id of (accessData.allowFrom || [])) allowed.add(String(id));
 }
+// Env-based allowlist (matches OpenClaw/Hermes pattern)
+const envAllowed = (process.env.TELEGRAM_ALLOWED_USERS || '').trim();
+if (envAllowed) {
+  for (const id of envAllowed.split(',')) {
+    const clean = id.trim();
+    if (clean) allowed.add(clean);
+  }
+}
+const ownerId = (process.env.TELEGRAM_OWNER_ID || '').trim();
+if (ownerId) allowed.add(ownerId);
+const allowAll = (process.env.TELEGRAM_ALLOW_ALL || '').trim().toLowerCase() === 'true';
 
 if (!token) {
   console.error('No TELEGRAM_BOT_TOKEN found in ' + envPath);
@@ -97,6 +113,17 @@ async function sendTelegramMessage(chatId, text, opts = {}) {
     }
   }
   return firstMessageId;
+}
+
+// 1b. Message queue for pull-based polling (check_messages tool)
+// When channel notifications are unavailable (no KAIROS gate / no --channels flag),
+// Claude can call check_messages to drain this queue instead.
+const messageQueue = [];
+const MAX_QUEUE_SIZE = 100;
+
+function enqueueMessage(msg) {
+  messageQueue.push(msg);
+  if (messageQueue.length > MAX_QUEUE_SIZE) messageQueue.shift();
 }
 
 // 2. Initialize MCP Server
@@ -185,6 +212,22 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
         required: ['file_id'],
       },
     },
+    {
+      name: 'check_messages',
+      description:
+        'Check for new Telegram messages. Returns all messages received since last check. ' +
+        'Call this periodically (every 10-30s) to monitor Telegram. Returns empty array if no new messages. ' +
+        'Each message has: chat_id, message_id, user, text, and optionally attachment_file_id.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          limit: {
+            type: 'number',
+            description: 'Max messages to return (default: all pending)',
+          },
+        },
+      },
+    },
   ],
 }));
 
@@ -253,6 +296,19 @@ mcp.setRequestHandler(CallToolRequestSchema, async req => {
       return { content: [{ type: 'text', text: `Error downloading attachment: ${e.message}` }] };
     }
   }
+  if (req.params.name === 'check_messages') {
+    const limit = req.params.arguments?.limit;
+    const count = limit && limit > 0 ? Math.min(limit, messageQueue.length) : messageQueue.length;
+    const messages = messageQueue.splice(0, count);
+    return {
+      content: [{
+        type: 'text',
+        text: messages.length === 0
+          ? 'No new messages'
+          : JSON.stringify(messages, null, 2),
+      }],
+    };
+  }
   throw new Error(`unknown tool: ${req.params.name}`);
 });
 
@@ -300,7 +356,9 @@ async function pollTelegram() {
       if (!update.message) continue;
 
       const senderId = String(update.message.from?.id);
-      if (!allowed.has(senderId)) continue;
+      const senderUsername = update.message.from?.username || '';
+      // Check allowlist: by user ID, by username, or allow-all mode
+      if (!allowAll && !allowed.has(senderId) && !allowed.has(senderUsername)) continue;
 
       let text = update.message.text || '';
       let attachment_file_id = null;
@@ -339,10 +397,7 @@ async function pollTelegram() {
         continue;
       }
 
-      // Otherwise, forward as normal chat (auto-routing to channel-responder if no @ is present, and keeping / commands intact)
-      const routedText =
-        text.includes('@') || text.startsWith('/') ? text : `@channel-responder ${text}`;
-
+      // Build message metadata
       const meta = {
         chat_id: chatId,
         message_id: String(update.message.message_id),
@@ -353,10 +408,20 @@ async function pollTelegram() {
         meta.attachment_file_id = attachment_file_id;
       }
 
-      await mcp.notification({
-        method: 'notifications/claude/channel',
-        params: { content: routedText, meta: meta },
-      });
+      // Pass message through as-is — no @ prefix needed.
+      // The consuming agent decides how to handle it.
+      // Always enqueue for pull-based check_messages tool
+      enqueueMessage({ ...meta, text });
+
+      // Also try push-based notification (works when channel feature gate is on)
+      try {
+        await mcp.notification({
+          method: 'notifications/claude/channel',
+          params: { content: text, meta: meta },
+        });
+      } catch {
+        // Channel notifications unavailable — messages still queued for check_messages
+      }
     }
   } catch (_e) {
     // Suppress network errors to keep the polling loop alive
@@ -365,5 +430,10 @@ async function pollTelegram() {
   }
 }
 
-// Begin polling
-pollTelegram();
+// Begin polling — unless TELEGRAM_DISABLE_POLLING is set (e.g., when a standalone
+// poller handles Telegram API directly and this MCP server only serves tools).
+if (process.env.TELEGRAM_DISABLE_POLLING !== '1') {
+  pollTelegram();
+} else {
+  console.error('[telegram-relay] Polling disabled (TELEGRAM_DISABLE_POLLING=1). Tools-only mode.');
+}

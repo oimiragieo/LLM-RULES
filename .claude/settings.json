@@ -57,17 +57,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/channels/channel-auto-start.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/a2a/a2a-server-autostart.cjs",
             "async": true,
             "timeout_ms": 10000
