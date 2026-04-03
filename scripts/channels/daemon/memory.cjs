@@ -210,36 +210,29 @@ class DaemonMemory {
     const context = allContext.join('\n---\n').slice(0, 5000);
     const existing = existingProfiles.join('\n').slice(0, 1500);
 
-    // KAIROS-style 4-phase consolidation prompt
+    // Build a simple flat prompt — avoid JSON in the command line to prevent shell escaping issues
     const dreamPrompt = [
-      'You are performing a DREAM — a reflective pass over chat conversations to consolidate memory.',
-      '',
-      existing ? `EXISTING KNOWLEDGE (may be stale — verify against recent messages):\n${existing}\n` : '',
-      `RECENT CONVERSATIONS:\n${context}`,
-      '',
-      'INSTRUCTIONS:',
-      'Phase 1 (Orient): Review existing facts. Which are still true? Which are contradicted?',
-      'Phase 2 (Gather): What NEW durable facts can you extract? Focus on:',
-      '  - User identity (name, role, timezone, preferences)',
-      '  - Projects they work on and their goals',
-      '  - Communication style preferences',
-      '  - Technical stack and expertise level',
-      '  - Recurring topics or concerns',
-      '  - Corrections they made (what NOT to do)',
-      'Phase 3 (Consolidate): Merge new with existing, resolve conflicts (prefer newer info)',
-      'Phase 4 (Prune): Remove duplicates, stale facts, and trivial conversation details',
-      '',
-      'Return ONLY a JSON array: [{"chatId":"<id>","facts":["fact1","fact2"],"pruned":["old fact to remove"]}]',
-      'Include ALL facts (existing valid ones + new ones). Pruned = facts that should be REMOVED.',
-      'Max 50 facts per chat. Only genuinely useful durable facts, not conversation details.',
-    ].filter(Boolean).join(' ').replace(/"/g, '\\"');
+      'Extract durable facts about users from these chat conversations.',
+      'Return ONLY a JSON array. Format: [{"chatId":"CHAT_ID_HERE","facts":["fact 1","fact 2"]}]',
+      'Focus on: user name, role, projects, preferences, technical expertise, corrections.',
+      'Only genuinely useful permanent facts. Not conversation details.',
+      existing ? `\nExisting facts to keep if still valid:\n${existing}` : '',
+      `\nConversations:\n${context}`,
+    ].filter(Boolean).join('\n');
+
+    // Escape for shell — replace problematic chars
+    const safePrompt = dreamPrompt
+      .replace(/"/g, "'")  // Replace double quotes with single
+      .replace(/\n/g, ' ') // Flatten newlines
+      .replace(/\\/g, '')  // Remove backslashes
+      .slice(0, 6000);
 
     try {
       const env = { ...process.env };
       delete env.ANTHROPIC_API_KEY;
 
       const result = execSync(
-        `claude -p "${dreamPrompt}" --dangerously-skip-permissions --model sonnet --max-turns 1`,
+        `claude -p "${safePrompt}" --dangerously-skip-permissions --model sonnet --max-turns 1`,
         { encoding: 'utf8', timeout: 90000, env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'] }
       ).trim();
 

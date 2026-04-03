@@ -110,35 +110,7 @@ class Dispatcher {
           if (!response) continue; // skip on error
         } else {
           this.log(`[dispatcher] Rendering response for ${event.type} from ${event.data.user}...`);
-
-          // Use streaming if sink supports it
-          const streamSink = this.sinks[route.sink || event.source];
-          if (streamSink?.createStreamSession && this.renderer.renderStream) {
-            const session = streamSink.createStreamSession(event.data.chatId, {
-              replyTo: event.data.messageId,
-            });
-            response = await this.renderer.renderStream(event, (chunk) => {
-              session.update(chunk).catch(() => {});
-            });
-            // Finalize only if not a [TASK] (task flow handles its own messaging)
-            if (!response.startsWith('[TASK]')) {
-              await session.finalize(response);
-              // Record in history and skip the normal sink.send below
-              this.history.push({
-                timestamp: event.timestamp,
-                user: event.data.user,
-                message: event.data.text,
-                response: response.slice(0, 500),
-                sink: route.sink || event.source,
-              });
-              if (this.history.length > this.maxHistory) this.history.shift();
-              this.log(`[dispatcher] Streamed to ${route.sink || event.source}`);
-              continue; // skip normal delivery — already streamed
-            }
-          } else {
-            // Fallback: sync render
-            response = this.renderer.render(event);
-          }
+          response = this.renderer.render(event);
         }
         this.log(`[dispatcher] Response: ${response.slice(0, 80)}...`);
       } else if (route.handler === 'echo') {
@@ -176,11 +148,25 @@ class Dispatcher {
           });
         } catch {}
 
-        // Execute the task
+        // Execute the task — try A2A router first for delegation tasks
         this.log(`[dispatcher] Executing task ${taskId}: ${taskDesc.slice(0, 80)}`);
         let result;
         try {
-          result = this.executor.executeTask(taskDesc);
+          const isRouterTask = /router|a2a|delegate|spawn.*agent|hand.?off/i.test(taskDesc);
+          if (isRouterTask && this.executor.sendToRouter) {
+            const routerAvail = await this.executor.isRouterAvailable();
+            if (routerAvail) {
+              this.log(`[dispatcher] Delegating to A2A router...`);
+              const a2aResult = await this.executor.sendToRouter(taskDesc);
+              result = a2aResult.result
+                ? JSON.stringify(a2aResult.result, null, 2)
+                : a2aResult.error || 'Router accepted task (check router session for results)';
+            } else {
+              result = this.executor.executeTask(taskDesc);
+            }
+          } else {
+            result = this.executor.executeTask(taskDesc);
+          }
           this.activeTasks.get(taskId).status = 'completed';
         } catch (err) {
           result = `Task failed: ${err.message}`;
