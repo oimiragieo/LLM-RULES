@@ -57,7 +57,11 @@ function loadConfig(root) {
     (data.allowFrom || []).forEach(id => allowed.add(String(id)));
   } catch {}
 
+  // Mode: 'developer' (default) or 'business'
+  const mode = process.env.CHANNEL_MODE || fileConfig.mode || 'developer';
+
   return {
+    mode,
     daemon: {
       port:
         parseInt(process.env.CHANNEL_DAEMON_PORT || '', 10) ||
@@ -69,6 +73,13 @@ function loadConfig(root) {
       model: process.env.CHANNEL_MODEL || fileConfig.renderer?.model || DEFAULT_MODEL,
       authToken: process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_OAUTH_TOKEN || '',
       projectRoot: root,
+      mode,
+    },
+    business: fileConfig.business || {
+      companyName: process.env.CHANNEL_COMPANY_NAME || 'Our Company',
+      knowledgeBase: process.env.CHANNEL_KNOWLEDGE_BASE || '',
+      handoffEmail: process.env.CHANNEL_HANDOFF_EMAIL || '',
+      canExecuteTasks: false,
     },
     sources: {
       telegram: {

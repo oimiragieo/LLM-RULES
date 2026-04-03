@@ -85,12 +85,69 @@ For document analysis, use [TASK] and mention using markitdown to process the fi
 - Do NOT mention "I don't have access to tools" — you DO, via [TASK].
 - Do NOT tell users to "use the main Claude Code session" — you can handle it.`;
 
+const BUSINESS_PROMPT = `You are a customer service AI assistant for {COMPANY_NAME}, communicating via Telegram.
+
+## Output Rules
+- Respond with ONLY your message text. No tool calls, no code blocks, no metadata.
+- Be professional, helpful, and concise.
+- Always represent {COMPANY_NAME} positively.
+
+## What You Can Do
+- Answer questions about our products and services
+- Provide pricing information and quotes when asked
+- Help customers understand our offerings
+- Collect customer information for follow-up
+- Schedule callbacks or meetings
+
+## What You Cannot Do
+- Execute code or access file systems
+- Make commitments beyond standard policies
+- Share internal company information
+
+## Handoff
+If the customer has a complex issue you cannot resolve, or needs to speak with a human,
+start your response with [HANDOFF] followed by a summary of the issue.
+The daemon will notify the support team.
+
+## Knowledge Base
+{KNOWLEDGE_BASE}
+
+## Memory
+You remember previous conversations with this customer. Reference past context naturally.`;
+
 class ClaudeRenderer {
   constructor(config, memory) {
     this.model = config.model || 'sonnet';
     this.projectRoot = config.projectRoot || process.cwd();
     this.memory = memory || null;
-    this.persona = config.persona || SYSTEM_PROMPT;
+    this.mode = config.mode || 'developer';
+    this.businessConfig = config.business || {};
+
+    if (this.mode === 'business') {
+      this.persona = (config.persona || BUSINESS_PROMPT)
+        .replace(/\{COMPANY_NAME\}/g, this.businessConfig.companyName || 'Our Company')
+        .replace(/\{KNOWLEDGE_BASE\}/g, this._loadKnowledgeBase());
+    } else {
+      this.persona = config.persona || SYSTEM_PROMPT;
+    }
+  }
+
+  _loadKnowledgeBase() {
+    const kbPath = this.businessConfig.knowledgeBase;
+    if (!kbPath) return '(No knowledge base configured)';
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const fullPath = path.resolve(this.projectRoot, kbPath);
+      if (fs.statSync(fullPath).isDirectory()) {
+        // Load all .md files from directory
+        const files = fs.readdirSync(fullPath).filter(f => f.endsWith('.md'));
+        return files.map(f => fs.readFileSync(path.join(fullPath, f), 'utf8')).join('\n\n').slice(0, 4000);
+      }
+      return fs.readFileSync(fullPath, 'utf8').slice(0, 4000);
+    } catch {
+      return '(Knowledge base not found)';
+    }
   }
 
   /**

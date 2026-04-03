@@ -173,6 +173,27 @@ class Dispatcher {
         continue; // Don't execute — wait for user's answer
       }
 
+      // Check if Claude wants to hand off to a human (business mode)
+      if (response.startsWith('[HANDOFF]')) {
+        const summary = response.slice(9).trim();
+        this.log(`[dispatcher] Handoff requested: ${summary.slice(0, 80)}`);
+        try {
+          await sink.send(event.data.chatId,
+            `🤝 I'm connecting you with our support team. A human will follow up shortly.\n\nI've shared this summary with them: "${summary.slice(0, 200)}"`,
+            { replyTo: event.data.messageId });
+        } catch {}
+        // Log handoff for audit
+        this.history.push({
+          timestamp: event.timestamp,
+          user: event.data.user,
+          message: event.data.text,
+          response: `[HANDOFF] ${summary}`,
+          sink: route.sink || event.source,
+        });
+        if (this.history.length > this.maxHistory) this.history.shift();
+        continue;
+      }
+
       // Check if Claude wants to execute a task
       if (response.startsWith('[TASK]')) {
         const taskDesc = response.slice(6).trim();
