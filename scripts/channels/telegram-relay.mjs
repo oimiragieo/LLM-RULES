@@ -22,7 +22,7 @@ if (!token && fs.existsSync(envPath)) {
 //   3. TELEGRAM_OWNER_ID env var
 // Empty set = allow nobody (secure default). Set TELEGRAM_ALLOW_ALL=true to open.
 const accessPath = path.join(os.homedir(), '.claude', 'channels', 'telegram', 'access.json');
-let allowed = new Set();
+const allowed = new Set();
 if (fs.existsSync(accessPath)) {
   const accessData = JSON.parse(fs.readFileSync(accessPath, 'utf8'));
   for (const id of (accessData.allowFrom || [])) allowed.add(String(id));

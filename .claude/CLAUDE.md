@@ -174,27 +174,27 @@ Navigate the codebase using the detailed CLAUDE.md guides in each directory. The
 
 ### Framework Core (`.claude/`)
 
-| Directory | Guide | Description |
-|-----------|-------|-------------|
-| `.claude/agents/` | [CLAUDE.md](agents/CLAUDE.md) | 119 specialized AI agents organized into 4 tiers (core, domain, orchestrators, specialized) |
-| `.claude/agents/core/` | [CLAUDE.md](agents/core/CLAUDE.md) | 10 essential pipeline agents — planner, developer, QA, architect, etc. |
-| `.claude/agents/domain/` | [CLAUDE.md](agents/domain/CLAUDE.md) | 68 technology-specific specialists grouped by category |
-| `.claude/agents/orchestrators/` | [CLAUDE.md](agents/orchestrators/CLAUDE.md) | 16 multi-agent coordinators and domain routers |
-| `.claude/agents/specialized/` | [CLAUDE.md](agents/specialized/CLAUDE.md) | 25 cross-cutting specialists — security, devops, code review, etc. |
-| `.claude/hooks/` | [CLAUDE.md](hooks/CLAUDE.md) | Pre/Post tool enforcement hooks across 17 categories (119 total) |
-| `.claude/lib/` | [CLAUDE.md](lib/CLAUDE.md) | 50+ shared library modules — routing, memory, utils, orchestration, etc. |
-| `.claude/skills/` | [CLAUDE.md](skills/CLAUDE.md) | 330+ reusable capabilities invoked via `Skill()` |
-| `.claude/context/` | [CLAUDE.md](context/CLAUDE.md) | Runtime data — memory tiers, artifacts, metrics, session state |
-| `.claude/config/` | [CLAUDE.md](config/CLAUDE.md) | 15 runtime configuration files — agent config, routing, model registry |
-| `.claude/schemas/` | [CLAUDE.md](schemas/CLAUDE.md) | 250+ JSON Schema validation files for all framework artifacts |
-| `.claude/docs/` | [CLAUDE.md](docs/CLAUDE.md) | Reference documentation — 16 key @ files plus topic deep-dives |
-| `.claude/rules/` | [CLAUDE.md](rules/CLAUDE.md) | 14 auto-loaded behavioral rules governing all agents |
-| `.claude/workflows/` | [CLAUDE.md](workflows/CLAUDE.md) | 300+ multi-agent workflow definitions |
-| `.claude/commands/` | [CLAUDE.md](commands/CLAUDE.md) | 200+ user-facing slash commands |
+| Directory                       | Guide                                       | Description                                                                                 |
+| ------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `.claude/agents/`               | [CLAUDE.md](agents/CLAUDE.md)               | 119 specialized AI agents organized into 4 tiers (core, domain, orchestrators, specialized) |
+| `.claude/agents/core/`          | [CLAUDE.md](agents/core/CLAUDE.md)          | 10 essential pipeline agents — planner, developer, QA, architect, etc.                      |
+| `.claude/agents/domain/`        | [CLAUDE.md](agents/domain/CLAUDE.md)        | 68 technology-specific specialists grouped by category                                      |
+| `.claude/agents/orchestrators/` | [CLAUDE.md](agents/orchestrators/CLAUDE.md) | 16 multi-agent coordinators and domain routers                                              |
+| `.claude/agents/specialized/`   | [CLAUDE.md](agents/specialized/CLAUDE.md)   | 25 cross-cutting specialists — security, devops, code review, etc.                          |
+| `.claude/hooks/`                | [CLAUDE.md](hooks/CLAUDE.md)                | Pre/Post tool enforcement hooks across 17 categories (119 total)                            |
+| `.claude/lib/`                  | [CLAUDE.md](lib/CLAUDE.md)                  | 50+ shared library modules — routing, memory, utils, orchestration, etc.                    |
+| `.claude/skills/`               | [CLAUDE.md](skills/CLAUDE.md)               | 330+ reusable capabilities invoked via `Skill()`                                            |
+| `.claude/context/`              | [CLAUDE.md](context/CLAUDE.md)              | Runtime data — memory tiers, artifacts, metrics, session state                              |
+| `.claude/config/`               | [CLAUDE.md](config/CLAUDE.md)               | 15 runtime configuration files — agent config, routing, model registry                      |
+| `.claude/schemas/`              | [CLAUDE.md](schemas/CLAUDE.md)              | 250+ JSON Schema validation files for all framework artifacts                               |
+| `.claude/docs/`                 | [CLAUDE.md](docs/CLAUDE.md)                 | Reference documentation — 16 key @ files plus topic deep-dives                              |
+| `.claude/rules/`                | [CLAUDE.md](rules/CLAUDE.md)                | 14 auto-loaded behavioral rules governing all agents                                        |
+| `.claude/workflows/`            | [CLAUDE.md](workflows/CLAUDE.md)            | 300+ multi-agent workflow definitions                                                       |
+| `.claude/commands/`             | [CLAUDE.md](commands/CLAUDE.md)             | 200+ user-facing slash commands                                                             |
 
 ### Project Root
 
-| Directory | Guide | Description |
-|-----------|-------|-------------|
+| Directory  | Guide                             | Description                                                              |
+| ---------- | --------------------------------- | ------------------------------------------------------------------------ |
 | `scripts/` | [CLAUDE.md](../scripts/CLAUDE.md) | Build, validation, and maintenance scripts (setup, validate, heal, etc.) |
-| `tests/` | [CLAUDE.md](../tests/CLAUDE.md) | Test suite mirroring source structure (node --test runner) |
+| `tests/`   | [CLAUDE.md](../tests/CLAUDE.md)   | Test suite mirroring source structure (node --test runner)               |

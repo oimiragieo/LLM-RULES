@@ -4,12 +4,12 @@ The agent system contains 119 specialized AI agents organized into 4 tiers. Each
 
 ## Subdirectories
 
-| Directory | Count | Purpose |
-|-----------|-------|---------|
-| [`core/`](core/CLAUDE.md) | 10 | Essential agents used in every pipeline — router, planner, developer, QA, architect, etc. |
-| [`domain/`](domain/CLAUDE.md) | 68 | Technology-specific specialists — one per language, framework, or domain (python-pro, kubernetes-specialist, etc.) |
-| [`orchestrators/`](orchestrators/CLAUDE.md) | 16 | Multi-agent coordinators — domain routers, swarm coordinator, master orchestrator, etc. |
-| [`specialized/`](specialized/CLAUDE.md) | 25 | Cross-cutting concern specialists — code-reviewer, security-architect, devops, researcher, etc. |
+| Directory                                   | Count | Purpose                                                                                                            |
+| ------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------ |
+| [`core/`](core/CLAUDE.md)                   | 10    | Essential agents used in every pipeline — router, planner, developer, QA, architect, etc.                          |
+| [`domain/`](domain/CLAUDE.md)               | 68    | Technology-specific specialists — one per language, framework, or domain (python-pro, kubernetes-specialist, etc.) |
+| [`orchestrators/`](orchestrators/CLAUDE.md) | 16    | Multi-agent coordinators — domain routers, swarm coordinator, master orchestrator, etc.                            |
+| [`specialized/`](specialized/CLAUDE.md)     | 25    | Cross-cutting concern specialists — code-reviewer, security-architect, devops, researcher, etc.                    |
 
 ## How Agents Work
 

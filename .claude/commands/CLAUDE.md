@@ -7,6 +7,7 @@ User-facing slash commands that can be invoked from the Claude Code CLI. Each `.
 Commands are organized as markdown files with frontmatter defining their trigger, description, and expanded prompt. There are approximately 200+ command files covering:
 
 ### Development Commands
+
 - `debug.md` — Debug a specific issue
 - `build-fix.md` — Fix build errors
 - `refactor-clean.md` — Refactor and clean code
@@ -15,12 +16,14 @@ Commands are organized as markdown files with frontmatter defining their trigger
 - `verify.md` — Verify implementation
 
 ### Planning & Analysis
+
 - `analyze.md` — Analyze codebase or feature
 - `write-plan.md` — Write an implementation plan
 - `setup-pm.md` — Set up project management
 - `learn.md` — Learn about a topic
 
 ### Operations
+
 - `compress.md` — Compress context
 - `tokens.md` — Check token usage
 - `correct-course.md` — Course correction when off-track
@@ -28,6 +31,7 @@ Commands are organized as markdown files with frontmatter defining their trigger
 - `start-mission.json` — Start a long-running mission
 
 ### Skill/Agent Management
+
 - `skill-creator.md` — Create a new skill
 - `agent-creator.md` — Create a new agent
 - `hook-creator.md` — Create a new hook
@@ -37,6 +41,7 @@ Commands are organized as markdown files with frontmatter defining their trigger
 - `recommend-evolution.md` — Recommend framework evolution
 
 ### Research & Documentation
+
 - `security-review.md` — Security review
 - `medusa-scan.md` — Security scan with Medusa
 - `readme.md` — Generate/update README

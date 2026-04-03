@@ -31,7 +31,10 @@ function loadEnv() {
     const eq = t.indexOf('=');
     if (eq === -1) continue;
     const key = t.slice(0, eq).trim();
-    const val = t.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
+    const val = t
+      .slice(eq + 1)
+      .trim()
+      .replace(/^["']|["']$/g, '');
     if (!process.env[key]) process.env[key] = val;
   }
 }
@@ -51,11 +54,14 @@ function isDaemonRunning() {
     const port = process.env.CHANNEL_DAEMON_PORT || 3101;
     const req = http.get(`http://127.0.0.1:${port}/health`, res => {
       let data = '';
-      res.on('data', c => data += c);
+      res.on('data', c => (data += c));
       res.on('end', () => resolve(data.includes('"ok"')));
     });
     req.on('error', () => resolve(false));
-    req.setTimeout(2000, () => { req.destroy(); resolve(false); });
+    req.setTimeout(2000, () => {
+      req.destroy();
+      resolve(false);
+    });
   });
 }
 
@@ -65,7 +71,9 @@ async function main() {
   const botToken = (process.env.TELEGRAM_BOT_TOKEN || '').trim();
   const autoStart = (process.env.CHANNEL_AUTO_START || 'false').trim().toLowerCase();
   if (!botToken || autoStart !== 'true') {
-    process.stderr.write(`[telegram-start] Skipped: token=${botToken ? 'SET' : 'MISSING'} autoStart=${autoStart}\n`);
+    process.stderr.write(
+      `[telegram-start] Skipped: token=${botToken ? 'SET' : 'MISSING'} autoStart=${autoStart}\n`
+    );
     return;
   }
 
@@ -85,23 +93,36 @@ async function main() {
 
   // Write launcher bat
   const batPath = path.join(RUNTIME, 'channel-daemon-launch.bat').replace(/\//g, '\\');
-  fs.writeFileSync(batPath, [
-    '@echo off',
-    `set TELEGRAM_HEADLESS_SESSION=1`,
-    `set TELEGRAM_BOT_TOKEN=${botToken}`,
-    'rem auth via OAuth session (no API key needed)',
-    process.env.TELEGRAM_ALLOWED_USERS ? `set TELEGRAM_ALLOWED_USERS=${process.env.TELEGRAM_ALLOWED_USERS}` : '',
-    process.env.TELEGRAM_OWNER_ID ? `set TELEGRAM_OWNER_ID=${process.env.TELEGRAM_OWNER_ID}` : '',
-    `cd /d "${rootWin}"`,
-    `node "${daemonWin}"`,
-  ].filter(Boolean).join('\r\n'), 'utf8');
+  fs.writeFileSync(
+    batPath,
+    [
+      '@echo off',
+      `set TELEGRAM_HEADLESS_SESSION=1`,
+      `set TELEGRAM_BOT_TOKEN=${botToken}`,
+      'rem auth via OAuth session (no API key needed)',
+      process.env.TELEGRAM_ALLOWED_USERS
+        ? `set TELEGRAM_ALLOWED_USERS=${process.env.TELEGRAM_ALLOWED_USERS}`
+        : '',
+      process.env.TELEGRAM_OWNER_ID ? `set TELEGRAM_OWNER_ID=${process.env.TELEGRAM_OWNER_ID}` : '',
+      `cd /d "${rootWin}"`,
+      `node "${daemonWin}"`,
+    ]
+      .filter(Boolean)
+      .join('\r\n'),
+    'utf8'
+  );
 
   // Launch hidden via PowerShell
   try {
-    execFileSync('powershell', [
-      '-NoProfile', '-Command',
-      `Start-Process -WindowStyle Hidden -FilePath cmd.exe -ArgumentList '/c,"${batPath}"'`,
-    ], { timeout: 5000, stdio: 'ignore', windowsHide: true });
+    execFileSync(
+      'powershell',
+      [
+        '-NoProfile',
+        '-Command',
+        `Start-Process -WindowStyle Hidden -FilePath cmd.exe -ArgumentList '/c,"${batPath}"'`,
+      ],
+      { timeout: 5000, stdio: 'ignore', windowsHide: true }
+    );
 
     process.stderr.write('[telegram-start] Channel daemon started\n');
   } catch (err) {

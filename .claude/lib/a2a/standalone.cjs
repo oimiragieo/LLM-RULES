@@ -77,7 +77,7 @@ async function main() {
     pool = new WorkerPool({
       db,
       concurrency: 2,
-      processFn: async (row) => {
+      processFn: async row => {
         // row contains: id, chat_id, user_id, text, attachments, timestamp, status, attempt_count
         // text is JSON.stringify(a2aTaskParams) from server.cjs enqueueMessage call
         const parsed = safeParseJSON(row.text);
@@ -87,9 +87,7 @@ async function main() {
         );
         // TODO: Wire to agent dispatch (e.g., spawn Claude CLI subprocess for the task)
         // For now, log the task params so the queue drains correctly
-        process.stderr.write(
-          `[A2A] Task params: ${JSON.stringify(taskParams).slice(0, 200)}\n`
-        );
+        process.stderr.write(`[A2A] Task params: ${JSON.stringify(taskParams).slice(0, 200)}\n`);
       },
     });
   } catch (e) {

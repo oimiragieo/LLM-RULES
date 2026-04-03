@@ -68,7 +68,7 @@ function telegramApi(token, method, body) {
       method: data ? 'POST' : 'GET',
       headers: data ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } : {},
     }, res => {
-      let chunks = [];
+      const chunks = [];
       res.on('data', c => chunks.push(c));
       res.on('end', () => {
         try { resolve(JSON.parse(Buffer.concat(chunks).toString())); }

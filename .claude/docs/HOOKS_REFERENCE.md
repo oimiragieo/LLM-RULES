@@ -20,15 +20,15 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 
 ## Hook Events
 
-| Event              | When It Fires                 | Common Uses                                                         |
-| ------------------ | ----------------------------- | ------------------------------------------------------------------- |
-| `UserPromptSubmit` | User sends message            | Router analysis, memory reminder, session context reset             |
-| `PreToolUse`       | Before tool executes          | Command validation, routing enforcement, blocking unsafe operations |
-| `PostToolUse`      | After tool executes           | Memory/index sync, telemetry, task/reflection recording             |
-| `SessionEnd`       | Session ends                  | Persist session insights, create session files                      |
-| `SessionStart`     | Session starts                | Register watch paths, initialize session-scoped state               |
-| `SubagentStart`    | Subagent is spawned           | Validate spawn compliance, enforce iron-law tool restrictions       |
-| `PermissionDenied` | Tool permission is denied     | Log denial events, routing feedback analysis                        |
+| Event              | When It Fires             | Common Uses                                                         |
+| ------------------ | ------------------------- | ------------------------------------------------------------------- |
+| `UserPromptSubmit` | User sends message        | Router analysis, memory reminder, session context reset             |
+| `PreToolUse`       | Before tool executes      | Command validation, routing enforcement, blocking unsafe operations |
+| `PostToolUse`      | After tool executes       | Memory/index sync, telemetry, task/reflection recording             |
+| `SessionEnd`       | Session ends              | Persist session insights, create session files                      |
+| `SessionStart`     | Session starts            | Register watch paths, initialize session-scoped state               |
+| `SubagentStart`    | Subagent is spawned       | Validate spawn compliance, enforce iron-law tool restrictions       |
+| `PermissionDenied` | Tool permission is denied | Log denial events, routing feedback analysis                        |
 
 ## Active Hook Inventory
 

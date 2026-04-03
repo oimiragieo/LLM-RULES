@@ -5,70 +5,76 @@ JSON Schema validation files (`.schema.json`) that define the structure and cons
 ## Categories
 
 ### Core Framework Schemas
-| Schema | Validates |
-|--------|----------|
-| `agent-definition.schema.json` | Agent `.md` file frontmatter (model, tools, description) |
-| `agent-config.schema.json` | Agent runtime configuration |
-| `agent-identity.schema.json` | Agent identity cards (name, tier, capabilities) |
-| `agent-capability-card.schema.json` | Agent capability declarations for routing |
-| `agent-mcp-allowlist.schema.json` | MCP tool access allowlists per agent |
-| `agent-skill-matrix.schema.json` | Agent-to-skill mapping matrix |
-| `skill-definition.schema.json` | Skill SKILL.md frontmatter and structure |
-| `skill-index.schema.json` | Skill registry index entries |
-| `skill-manifest.schema.json` | Skill package manifests |
-| `hook-definition.schema.json` | Hook registration and configuration |
-| `rule-definition.schema.json` | Rule file structure |
-| `workflow-definition.schema.json` | Workflow YAML/JSON structure |
-| `workflow-state.schema.json` | Workflow runtime state |
-| `workflow-snapshot.schema.json` | Workflow execution snapshots |
-| `template-definition.schema.json` | Template file structure |
-| `command-definition.schema.json` | Command file structure |
-| `tool-manifest.schema.json` | Tool registration manifests |
+
+| Schema                              | Validates                                                |
+| ----------------------------------- | -------------------------------------------------------- |
+| `agent-definition.schema.json`      | Agent `.md` file frontmatter (model, tools, description) |
+| `agent-config.schema.json`          | Agent runtime configuration                              |
+| `agent-identity.schema.json`        | Agent identity cards (name, tier, capabilities)          |
+| `agent-capability-card.schema.json` | Agent capability declarations for routing                |
+| `agent-mcp-allowlist.schema.json`   | MCP tool access allowlists per agent                     |
+| `agent-skill-matrix.schema.json`    | Agent-to-skill mapping matrix                            |
+| `skill-definition.schema.json`      | Skill SKILL.md frontmatter and structure                 |
+| `skill-index.schema.json`           | Skill registry index entries                             |
+| `skill-manifest.schema.json`        | Skill package manifests                                  |
+| `hook-definition.schema.json`       | Hook registration and configuration                      |
+| `rule-definition.schema.json`       | Rule file structure                                      |
+| `workflow-definition.schema.json`   | Workflow YAML/JSON structure                             |
+| `workflow-state.schema.json`        | Workflow runtime state                                   |
+| `workflow-snapshot.schema.json`     | Workflow execution snapshots                             |
+| `template-definition.schema.json`   | Template file structure                                  |
+| `command-definition.schema.json`    | Command file structure                                   |
+| `tool-manifest.schema.json`         | Tool registration manifests                              |
 
 ### Pipeline & Task Schemas
-| Schema | Validates |
-|--------|----------|
-| `plan.schema.json` | Implementation plans |
-| `plan-format.schema.json` | Plan file format constraints |
-| `implementation-plan.schema.json` | Detailed implementation plans |
-| `task-output.schema.json` | Task completion outputs |
-| `task-output-guardrails.schema.json` | Task output safety checks |
-| `phase-advance.schema.json` | Pipeline phase advancement requests |
-| `phase-models.schema.json` | Model assignments per phase |
-| `pipeline-evaluation.schema.json` | Pipeline quality scoring |
+
+| Schema                               | Validates                           |
+| ------------------------------------ | ----------------------------------- |
+| `plan.schema.json`                   | Implementation plans                |
+| `plan-format.schema.json`            | Plan file format constraints        |
+| `implementation-plan.schema.json`    | Detailed implementation plans       |
+| `task-output.schema.json`            | Task completion outputs             |
+| `task-output-guardrails.schema.json` | Task output safety checks           |
+| `phase-advance.schema.json`          | Pipeline phase advancement requests |
+| `phase-models.schema.json`           | Model assignments per phase         |
+| `pipeline-evaluation.schema.json`    | Pipeline quality scoring            |
 
 ### Evolution & Creation
-| Schema | Validates |
-|--------|----------|
-| `evolution-request.schema.json` | Evolution workflow requests |
-| `evolution-state.schema.json` | Evolution pipeline state |
-| `artifact-manifest.schema.json` | Artifact package manifests |
-| `artifact-graph.schema.json` | Artifact dependency graphs |
-| `artifact-score-entry.schema.json` | Artifact quality scores |
+
+| Schema                             | Validates                   |
+| ---------------------------------- | --------------------------- |
+| `evolution-request.schema.json`    | Evolution workflow requests |
+| `evolution-state.schema.json`      | Evolution pipeline state    |
+| `artifact-manifest.schema.json`    | Artifact package manifests  |
+| `artifact-graph.schema.json`       | Artifact dependency graphs  |
+| `artifact-score-entry.schema.json` | Artifact quality scores     |
 
 ### Runtime & Session
-| Schema | Validates |
-|--------|----------|
-| `session-gap-log-entry.schema.json` | Session gap log entries |
-| `session-handoff.schema.json` | Session handoff payloads |
+
+| Schema                                 | Validates                |
+| -------------------------------------- | ------------------------ |
+| `session-gap-log-entry.schema.json`    | Session gap log entries  |
+| `session-handoff.schema.json`          | Session handoff payloads |
 | `reflection-spawn-request.schema.json` | Reflection queue entries |
-| `router-state.schema.json` | Router runtime state |
-| `shift-change-log.schema.json` | Shift change records |
+| `router-state.schema.json`             | Router runtime state     |
+| `shift-change-log.schema.json`         | Shift change records     |
 
 ### Skill Output Schemas
+
 There are 200+ `skill-*-output.schema.json` files — one per skill — defining the expected output structure for each skill invocation. These are auto-generated by the `schema-creator` skill.
 
 ### Other
-| Schema | Validates |
-|--------|----------|
-| `adr-template.schema.json` | Architecture Decision Records |
-| `capability-routing.schema.json` | Routing capability maps |
-| `code-index-config.schema.json` | Code search configuration |
-| `database_architecture.schema.json` | Database design documents |
-| `product-requirements.schema.json` | PRD documents |
-| `project-analysis.schema.json` | Project analysis reports |
-| `project-brief.schema.json` | Project briefs |
-| `system-architecture.schema.json` | System architecture docs |
-| `test-plan.schema.json` | Test plans |
-| `test-results.schema.json` | Test result reports |
-| `ux-spec.schema.json` | UX specifications |
+
+| Schema                              | Validates                     |
+| ----------------------------------- | ----------------------------- |
+| `adr-template.schema.json`          | Architecture Decision Records |
+| `capability-routing.schema.json`    | Routing capability maps       |
+| `code-index-config.schema.json`     | Code search configuration     |
+| `database_architecture.schema.json` | Database design documents     |
+| `product-requirements.schema.json`  | PRD documents                 |
+| `project-analysis.schema.json`      | Project analysis reports      |
+| `project-brief.schema.json`         | Project briefs                |
+| `system-architecture.schema.json`   | System architecture docs      |
+| `test-plan.schema.json`             | Test plans                    |
+| `test-results.schema.json`          | Test result reports           |
+| `ux-spec.schema.json`               | UX specifications             |
