@@ -186,6 +186,74 @@ describe('Dispatcher', () => {
     });
   });
 
+  describe('Clarification loop', () => {
+    it('[CLARIFY] response stores pending and sends question', async () => {
+      renderer = createMockRenderer('[CLARIFY] Which environment — staging or production?');
+      dispatcher = new Dispatcher(router, renderer, sinks, () => {}, memory, {});
+
+      dispatcher.enqueue({
+        type: 'telegram.message',
+        source: 'telegram',
+        data: { chatId: '123', text: 'deploy the app', user: 'omar', messageId: 1 },
+        timestamp: new Date().toISOString(),
+      });
+
+      await new Promise(r => setTimeout(r, 100));
+
+      // Should have sent the clarification question
+      const clarifyMsg = sinks.telegram.sent.find(m => m.text.includes('Which environment'));
+      assert.ok(clarifyMsg, 'Should send clarification question');
+
+      // Should have stored pending clarification
+      assert.ok(dispatcher.pendingClarifications.has('123'));
+      const pending = dispatcher.pendingClarifications.get('123');
+      assert.equal(pending.originalText, 'deploy the app');
+    });
+
+    it('next message from same chat resolves clarification', async () => {
+      // Set up a pending clarification
+      dispatcher.pendingClarifications.set('123', {
+        originalText: 'deploy the app',
+        question: 'Which environment?',
+        timestamp: Date.now(),
+      });
+
+      dispatcher.enqueue({
+        type: 'telegram.message',
+        source: 'telegram',
+        data: { chatId: '123', text: 'production', user: 'omar', messageId: 2 },
+        timestamp: new Date().toISOString(),
+      });
+
+      await new Promise(r => setTimeout(r, 100));
+
+      // Clarification should be resolved
+      assert.equal(dispatcher.pendingClarifications.has('123'), false);
+      // Response should have been rendered with context
+      assert.equal(dispatcher.stats.processed, 1);
+    });
+
+    it('clarification expires after 5 minutes', async () => {
+      dispatcher.pendingClarifications.set('123', {
+        originalText: 'deploy the app',
+        question: 'Which environment?',
+        timestamp: Date.now() - 400000, // 6+ minutes ago
+      });
+
+      dispatcher.enqueue({
+        type: 'telegram.message',
+        source: 'telegram',
+        data: { chatId: '123', text: 'hello', user: 'omar', messageId: 3 },
+        timestamp: new Date().toISOString(),
+      });
+
+      await new Promise(r => setTimeout(r, 100));
+
+      // Expired clarification should be deleted, message processed normally
+      assert.equal(dispatcher.pendingClarifications.has('123'), false);
+    });
+  });
+
   describe('Stats', () => {
     it('getStats() returns correct shape', () => {
       const stats = dispatcher.getStats();

@@ -23,6 +23,7 @@ class Dispatcher {
     this.maxHistory = 100;
     this.activeTasks = new Map(); // taskId → { status, description, startTime, chatId }
     this.taskCounter = 0;
+    this.pendingClarifications = new Map(); // chatId → { originalText, question, timestamp }
     this.stats = { received: 0, processed: 0, errors: 0, tasksExecuted: 0, lastEvent: null };
   }
 
@@ -92,6 +93,21 @@ class Dispatcher {
       }
     }
 
+    // Check for pending clarification — if user is answering a previous [CLARIFY] question
+    const chatId = event.data.chatId;
+    if (this.pendingClarifications.has(chatId)) {
+      const pending = this.pendingClarifications.get(chatId);
+      // Timeout: 5 minutes
+      if (Date.now() - pending.timestamp > 300000) {
+        this.pendingClarifications.delete(chatId);
+      } else {
+        // Inject the clarification answer as context
+        this.pendingClarifications.delete(chatId);
+        event.data.text = `Context: You previously asked "${pending.question}" and the user answered: "${event.data.text}". Now proceed with the original request. Original message was: "${pending.originalText}"`;
+        this.log(`[dispatcher] Clarification answered for ${chatId}`);
+      }
+    }
+
     // Send typing indicator before rendering (cosmetic, fire-and-forget)
     const typingSink = this.sinks[event.source];
     if (typingSink?.sendTyping) {
@@ -128,6 +144,32 @@ class Dispatcher {
       if (!sink) {
         this.log(`[dispatcher] No sink for "${route.sink || event.source}"`);
         continue;
+      }
+
+      // Check if Claude wants to clarify before executing
+      if (response.startsWith('[CLARIFY]')) {
+        const question = response.slice(9).trim();
+        this.pendingClarifications.set(event.data.chatId, {
+          originalText: event.data.text,
+          question,
+          timestamp: Date.now(),
+        });
+        this.log(`[dispatcher] Clarification requested for ${event.data.chatId}: ${question.slice(0, 60)}`);
+        try {
+          await sink.send(event.data.chatId, `❓ ${question}`, {
+            replyTo: event.data.messageId,
+          });
+        } catch {}
+        // Record in history but skip further processing
+        this.history.push({
+          timestamp: event.timestamp,
+          user: event.data.user,
+          message: event.data.text,
+          response: `[CLARIFY] ${question}`,
+          sink: route.sink || event.source,
+        });
+        if (this.history.length > this.maxHistory) this.history.shift();
+        continue; // Don't execute — wait for user's answer
       }
 
       // Check if Claude wants to execute a task
