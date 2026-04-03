@@ -211,6 +211,31 @@ class CommandHandler {
       case '/ping':
         return this._reply(chatId, messageId, '🏓 Pong!');
 
+      case '/title': {
+        if (!args) return this._reply(chatId, messageId, '📌 Usage: /title <name>');
+        this.memory.saveNamedSession(chatId, args);
+        return this._reply(chatId, messageId, `📌 Session saved as "${args}". Resume later with /resume ${args}`);
+      }
+
+      case '/resume': {
+        if (!args) {
+          const sessions = this.memory.listNamedSessions();
+          if (sessions.length === 0) return this._reply(chatId, messageId, '📂 No saved sessions. Use /title <name> to save one.');
+          const list = sessions.map(s => `• ${s.name} (${s.messageCount} msgs, ${s.savedAt.split('T')[0]})`).join('\n');
+          return this._reply(chatId, messageId, `📂 Saved sessions:\n\n${list}\n\nUsage: /resume <name>`);
+        }
+        const loaded = this.memory.loadNamedSession(chatId, args);
+        if (loaded) return this._reply(chatId, messageId, `📂 Resumed session "${args}". Your conversation history is restored.`);
+        return this._reply(chatId, messageId, `📂 Session "${args}" not found. Use /resume to list available sessions.`);
+      }
+
+      case '/sessions': {
+        const sessions = this.memory.listNamedSessions();
+        if (sessions.length === 0) return this._reply(chatId, messageId, '📂 No saved sessions.');
+        const list = sessions.map(s => `• ${s.name} (${s.messageCount} msgs, ${s.savedAt.split('T')[0]})`).join('\n');
+        return this._reply(chatId, messageId, `📂 Saved sessions:\n\n${list}`);
+      }
+
       case '/approve': {
         const pending = this.dispatcher.pendingApprovals.get(chatId);
         if (!pending) {

@@ -238,6 +238,21 @@ class Dispatcher {
           sink: route.sink || event.source,
         });
         if (this.history.length > this.maxHistory) this.history.shift();
+        // Daily activity log (append-only, feeds dream consolidation)
+        if (this.memory?.appendDailyLog) {
+          this.memory.appendDailyLog(event.data.chatId, event.data.user, event.data.text, response);
+        }
+        // Prompt suggestions (async, non-blocking — failure doesn't affect response)
+        if (this.renderer.generateSuggestions && !response.startsWith('[') && event.data.text.length > 10) {
+          setImmediate(async () => {
+            try {
+              const suggestions = this.renderer.generateSuggestions(event.data.text, response);
+              if (suggestions.length > 0) {
+                await sink.send(event.data.chatId, '💡 ' + suggestions.map(s => `• ${s}`).join('\n'));
+              }
+            } catch {}
+          });
+        }
       } catch (err) {
         this.log(`[dispatcher] Sink error: ${err.message}`);
       }

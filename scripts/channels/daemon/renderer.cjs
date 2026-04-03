@@ -294,6 +294,24 @@ class ClaudeRenderer {
       return null;
     }
   }
+  /**
+   * Generate 2-3 follow-up prompt suggestions based on the conversation.
+   * Uses haiku for speed/cost. Returns array of strings or empty.
+   */
+  generateSuggestions(userText, response) {
+    try {
+      const env = { ...process.env };
+      delete env.ANTHROPIC_API_KEY;
+      const prompt = `Given this exchange - User said: '${userText.slice(0, 200).replace(/'/g, '')}' and you replied: '${response.slice(0, 200).replace(/'/g, '')}' - suggest 2-3 short follow-up prompts the user might want to send next. Return ONLY a JSON array of strings, nothing else. Example: ['Check test results','Show git log','Explain the error']`;
+      const result = execSync(
+        `claude -p "${prompt.replace(/"/g, "'")}" --dangerously-skip-permissions --model haiku --max-turns 1`,
+        { encoding: 'utf8', timeout: 30000, env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'] }
+      ).trim();
+      const match = result.match(/\[[\s\S]*\]/);
+      if (match) return JSON.parse(match[0]).slice(0, 3);
+    } catch {}
+    return [];
+  }
 }
 
 module.exports = { ClaudeRenderer };

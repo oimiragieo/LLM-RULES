@@ -50,7 +50,11 @@ class DaemonMemory {
     this.messagesSinceDream = 0;
 
     // Session rotation tracking (per chat)
-    this.compactionCounts = new Map(); // chatId → number of compactions
+    this.compactionCounts = new Map();
+
+    // Named sessions for /title + /resume
+    this.namedSessionsPath = path.join(storageDir, 'named-sessions.json');
+    this.namedSessions = new Map();
 
     this._load();
   }
@@ -146,8 +150,19 @@ class DaemonMemory {
       const env = { ...process.env };
       delete env.ANTHROPIC_API_KEY;
 
+      const compactPrompt = [
+        'Summarize this conversation into these sections (omit empty ones, keep each section to 1-2 lines):',
+        '# Topic: (what is being discussed)',
+        '# Current State: (what is actively happening, pending items)',
+        '# Key Facts: (important decisions, facts about the user)',
+        '# Errors & Corrections: (what went wrong, what the user corrected)',
+        '# Learnings: (what worked, what to avoid)',
+        'Conversation:',
+        transcript,
+      ].join(' ').replace(/"/g, "'").replace(/\n/g, ' ').slice(0, 5000);
+
       const summary = execSync(
-        `claude -p "Summarize this conversation in 2-3 sentences, noting key topics, decisions, and any facts about the user: ${transcript.replace(/"/g, '\\"').replace(/\n/g, ' ')}" --dangerously-skip-permissions --model haiku --max-turns 1`,
+        `claude -p "${compactPrompt}" --dangerously-skip-permissions --model haiku --max-turns 1`,
         {
           encoding: 'utf8',
           timeout: 30000,
@@ -299,6 +314,62 @@ class DaemonMemory {
     }
   }
 
+  // ── Named Sessions ───────────────────────────────────────────────────────
+
+  saveNamedSession(chatId, name) {
+    const history = this.chats.get(chatId) || [];
+    const summary = this.summaries.get(chatId) || '';
+    this.namedSessions.set(name, {
+      chatId,
+      history: history.slice(-20), // Keep last 20 messages
+      summary,
+      savedAt: new Date().toISOString(),
+    });
+    this._saveNamedSessions();
+  }
+
+  loadNamedSession(chatId, name) {
+    const session = this.namedSessions.get(name);
+    if (!session) return false;
+    this.chats.set(chatId, [...session.history]);
+    this.summaries.set(chatId, session.summary);
+    this._saveHistory();
+    this._saveSummaries();
+    return true;
+  }
+
+  listNamedSessions() {
+    return [...this.namedSessions.entries()].map(([name, s]) => ({
+      name,
+      savedAt: s.savedAt,
+      messageCount: s.history.length,
+    }));
+  }
+
+  _saveNamedSessions() {
+    try {
+      fs.mkdirSync(this.storageDir, { recursive: true });
+      const obj = {};
+      for (const [k, v] of this.namedSessions) obj[k] = v;
+      fs.writeFileSync(this.namedSessionsPath, JSON.stringify(obj), 'utf8');
+    } catch {}
+  }
+
+  // ── Daily Activity Log ────────────────────────────────────────────────────
+
+  appendDailyLog(chatId, user, text, response) {
+    try {
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+      const logDir = path.join(this.storageDir, 'logs', dateStr.slice(0, 4), dateStr.slice(5, 7));
+      fs.mkdirSync(logDir, { recursive: true });
+      const logFile = path.join(logDir, `${dateStr}.md`);
+      const ts = now.toISOString().slice(11, 19); // HH:MM:SS
+      const entry = `\n### ${ts} — ${user} (${chatId})\n**User:** ${text.slice(0, 200)}\n**Assistant:** ${response.slice(0, 200)}\n`;
+      fs.appendFileSync(logFile, entry, 'utf8');
+    } catch {}
+  }
+
   // ── Accessors ────────────────────────────────────────────────────────────
 
   getChatIds() {
@@ -336,6 +407,11 @@ class DaemonMemory {
       if (fs.existsSync(this.profilePath))
         for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.profilePath, 'utf8'))))
           this.profiles.set(k, v);
+    } catch {}
+    try {
+      if (fs.existsSync(this.namedSessionsPath))
+        for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.namedSessionsPath, 'utf8'))))
+          this.namedSessions.set(k, v);
     } catch {}
   }
 

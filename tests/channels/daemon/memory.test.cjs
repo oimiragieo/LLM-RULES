@@ -192,6 +192,84 @@ describe('DaemonMemory', () => {
     });
   });
 
+  describe('Named Sessions', () => {
+    it('saveNamedSession stores and loadNamedSession restores', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      mem.addMessage('chat1', 'user', 'hello from session', 'omar');
+      mem.addMessage('chat1', 'assistant', 'hi there');
+      mem.summaries.set('chat1', 'Discussed greetings');
+
+      mem.saveNamedSession('chat1', 'greetings');
+
+      // Clear current chat
+      mem.chats.delete('chat1');
+      mem.summaries.delete('chat1');
+      assert.equal(mem.getContext('chat1'), '');
+
+      // Load named session
+      const loaded = mem.loadNamedSession('chat1', 'greetings');
+      assert.equal(loaded, true);
+      const ctx = mem.getContext('chat1');
+      assert.ok(ctx.includes('hello from session'));
+      assert.ok(ctx.includes('Discussed greetings'));
+    });
+
+    it('loadNamedSession returns false for unknown name', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      assert.equal(mem.loadNamedSession('chat1', 'nonexistent'), false);
+    });
+
+    it('listNamedSessions returns saved sessions', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      mem.addMessage('chat1', 'user', 'msg', 'omar');
+      mem.saveNamedSession('chat1', 'test-session');
+      const list = mem.listNamedSessions();
+      assert.equal(list.length, 1);
+      assert.equal(list[0].name, 'test-session');
+      assert.ok(list[0].savedAt);
+    });
+
+    it('named sessions persist across instances', () => {
+      const mem1 = new DaemonMemory(tmpDir, {});
+      mem1.addMessage('chat1', 'user', 'persistent', 'omar');
+      mem1.saveNamedSession('chat1', 'persist-test');
+
+      const mem2 = new DaemonMemory(tmpDir, {});
+      const list = mem2.listNamedSessions();
+      assert.equal(list.length, 1);
+      assert.equal(list[0].name, 'persist-test');
+    });
+  });
+
+  describe('Daily Activity Log', () => {
+    it('appendDailyLog creates a log file', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      mem.appendDailyLog('chat1', 'omar', 'hello', 'hi there');
+
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0];
+      const logDir = path.join(tmpDir, 'logs', dateStr.slice(0, 4), dateStr.slice(5, 7));
+      const logFile = path.join(logDir, `${dateStr}.md`);
+      assert.ok(fs.existsSync(logFile), 'Log file should exist');
+      const content = fs.readFileSync(logFile, 'utf8');
+      assert.ok(content.includes('omar'));
+      assert.ok(content.includes('hello'));
+    });
+
+    it('appendDailyLog appends without overwriting', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      mem.appendDailyLog('chat1', 'omar', 'first', 'reply1');
+      mem.appendDailyLog('chat1', 'omar', 'second', 'reply2');
+
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0];
+      const logFile = path.join(tmpDir, 'logs', dateStr.slice(0, 4), dateStr.slice(5, 7), `${dateStr}.md`);
+      const content = fs.readFileSync(logFile, 'utf8');
+      assert.ok(content.includes('first'));
+      assert.ok(content.includes('second'));
+    });
+  });
+
   describe('Stats', () => {
     it('getStats() returns correct shape', () => {
       const mem = new DaemonMemory(tmpDir, {});
