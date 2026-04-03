@@ -327,3 +327,12 @@ tests/lib/memory/.test-memory-contracts-*/
 
 # ProcessRegistry default checkpoint file (runtime artifact; generated when checkpoint() called without args)
 .process-registry-checkpoint.json
+
+# Memory daily logs (auto-generated, not source-controlled)
+.claude/context/memory/logs/
+
+# Channel daemon conversation memory (runtime data)
+.claude/context/runtime/channel-memory/
+
+# Consolidation lock (runtime artifact)
+.claude/context/memory/.consolidate-lock
