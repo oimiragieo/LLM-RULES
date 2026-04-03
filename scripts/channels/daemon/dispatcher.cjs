@@ -90,6 +90,12 @@ class Dispatcher {
       }
     }
 
+    // Send typing indicator before rendering (cosmetic, fire-and-forget)
+    const typingSink = this.sinks[event.source];
+    if (typingSink?.sendTyping) {
+      typingSink.sendTyping(event.data.chatId).catch(() => {});
+    }
+
     // Route: find matching routes
     const routes = this.router.resolve(event);
 

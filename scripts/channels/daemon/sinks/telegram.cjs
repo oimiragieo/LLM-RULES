@@ -13,6 +13,17 @@ class TelegramSink {
     this.token = token;
   }
 
+  async sendTyping(chatId) {
+    try {
+      await telegramApi(this.token, 'sendChatAction', {
+        chat_id: chatId,
+        action: 'typing',
+      });
+    } catch {
+      // Fire-and-forget — typing indicator is cosmetic
+    }
+  }
+
   async send(chatId, text, opts = {}) {
     const { replyTo, format } = opts;
     const body = {
