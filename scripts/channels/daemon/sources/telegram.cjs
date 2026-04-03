@@ -83,8 +83,31 @@ class TelegramSource {
           const senderUsername = update.message.from?.username || '';
           if (!this.allowAll && !this.allowed.has(senderId) && !this.allowed.has(senderUsername)) continue;
 
-          const text = update.message.text || '';
-          if (!text) continue;
+          let text = update.message.text || '';
+          let attachmentFileId = null;
+          let attachmentType = null;
+
+          // Handle voice/audio messages
+          if (update.message.voice) {
+            attachmentFileId = update.message.voice.file_id;
+            attachmentType = 'voice';
+            if (!text) text = '[Voice message]';
+          } else if (update.message.audio) {
+            attachmentFileId = update.message.audio.file_id;
+            attachmentType = 'audio';
+            if (!text) text = '[Audio message]';
+          } else if (update.message.document) {
+            attachmentFileId = update.message.document.file_id;
+            attachmentType = 'document';
+            if (!text) text = `[Document: ${update.message.document.file_name || 'file'}]`;
+          } else if (update.message.photo && update.message.photo.length > 0) {
+            const best = update.message.photo[update.message.photo.length - 1];
+            attachmentFileId = best.file_id;
+            attachmentType = 'photo';
+            if (!text) text = '[Photo]';
+          }
+
+          if (!text && !attachmentFileId) continue;
 
           const chatId = String(update.message.chat?.id || '');
           const msgData = {
@@ -93,6 +116,8 @@ class TelegramSource {
             user: senderUsername || senderId,
             userId: senderId,
             text,
+            attachmentFileId,
+            attachmentType,
           };
 
           // Route / commands to the command handler

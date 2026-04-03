@@ -75,6 +75,17 @@ class ClaudeRenderer {
 
     const parts = [this.persona];
     if (context) parts.push(`\nRecent chat history:\n${context}`);
+
+    // Handle attachments
+    const { attachmentType, attachmentFileId } = event.data;
+    if (attachmentType === 'voice' || attachmentType === 'audio') {
+      parts.push(`\n${user} sent a voice/audio message. You cannot listen to it directly. Tell them you received their voice message but can only process text right now. Ask them to type their message instead, or suggest they enable the voice pipeline (/check-telegram-voice) for voice transcription support.`);
+    } else if (attachmentType === 'photo') {
+      parts.push(`\n${user} sent a photo. You cannot see images. Acknowledge you received it and ask them to describe what they need help with.`);
+    } else if (attachmentType === 'document') {
+      parts.push(`\n${user} sent a document. You cannot read files directly. Acknowledge receipt and ask what they need help with regarding the document.`);
+    }
+
     parts.push(`\nNew message from ${user}: ${text}`);
 
     return parts.join('\n').replace(/"/g, '\\"').replace(/\n/g, ' ');
