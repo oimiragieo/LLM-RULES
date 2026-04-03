@@ -40,6 +40,7 @@ If neither is set, just say:
 ## Step 4: Confirm
 
 Tell the user what's active:
+
 - Daemon status (running on port 3101)
 - Text messaging: active
 - Voice pipeline: active/inactive

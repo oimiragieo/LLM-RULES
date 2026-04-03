@@ -25,11 +25,14 @@ function httpGet(urlPath) {
   return new Promise((resolve, reject) => {
     const req = http.get(`http://127.0.0.1:${PORT}${urlPath}`, res => {
       let data = '';
-      res.on('data', c => data += c);
+      res.on('data', c => (data += c));
       res.on('end', () => resolve(data));
     });
     req.on('error', () => resolve(null));
-    req.setTimeout(3000, () => { req.destroy(); resolve(null); });
+    req.setTimeout(3000, () => {
+      req.destroy();
+      resolve(null);
+    });
   });
 }
 
@@ -59,7 +62,9 @@ async function main() {
         console.log('Telegram daemon started');
         console.log(check);
       } else {
-        console.log('Daemon may still be starting. Check: curl http://127.0.0.1:' + PORT + '/status');
+        console.log(
+          'Daemon may still be starting. Check: curl http://127.0.0.1:' + PORT + '/status'
+        );
       }
       break;
     }

@@ -31,6 +31,10 @@
     "sqlite": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sqlite@0", "--db", ".claude/data/memory.db"]
+    },
+    "markitdown": {
+      "command": "npx",
+      "args": ["-y", "markitdown-mcp-npx"]
     }
   }
 }

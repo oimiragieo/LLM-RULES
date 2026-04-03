@@ -55,16 +55,16 @@ node scripts/channels/daemon/index.cjs --stop     # stop
 
 Default port: `3101` (configurable via `CHANNEL_DAEMON_PORT`)
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/health` | GET | Health check |
-| `/status` | GET | Full stats |
-| `/send` | POST | Send message: `{"chat_id":"...","text":"..."}` |
-| `/history` | GET | Conversation history (`?limit=N`) |
-| `/memory` | GET | Memory stats + profiles |
-| `/dream` | GET | Trigger memory consolidation |
-| `/event` | POST | Inject custom event |
-| `/stop` | GET | Shutdown |
+| Endpoint   | Method | Description                                    |
+| ---------- | ------ | ---------------------------------------------- |
+| `/health`  | GET    | Health check                                   |
+| `/status`  | GET    | Full stats                                     |
+| `/send`    | POST   | Send message: `{"chat_id":"...","text":"..."}` |
+| `/history` | GET    | Conversation history (`?limit=N`)              |
+| `/memory`  | GET    | Memory stats + profiles                        |
+| `/dream`   | GET    | Trigger memory consolidation                   |
+| `/event`   | POST   | Inject custom event                            |
+| `/stop`    | GET    | Shutdown                                       |
 
 ### Examples
 
@@ -88,33 +88,37 @@ curl http://127.0.0.1:3101/dream
 
 Type `/` in Telegram to see the command menu:
 
-| Command | Description |
-|---------|-------------|
-| `/start` | Welcome + command list |
-| `/help` | All commands |
-| `/status` | Daemon stats |
-| `/memory` | What I remember about you |
-| `/tasks` | Task execution history |
-| `/dream` | Consolidate memories |
-| `/new` | Fresh conversation (keeps profile) |
-| `/compress` | Manual compaction |
-| `/forget` | Clear all data |
-| `/ping` | Alive check |
+| Command     | Description                        |
+| ----------- | ---------------------------------- |
+| `/start`    | Welcome + command list             |
+| `/help`     | All commands                       |
+| `/status`   | Daemon stats                       |
+| `/memory`   | What I remember about you          |
+| `/tasks`    | Task execution history             |
+| `/dream`    | Consolidate memories               |
+| `/new`      | Fresh conversation (keeps profile) |
+| `/compress` | Manual compaction                  |
+| `/forget`   | Clear all data                     |
+| `/ping`     | Alive check                        |
 
 Regular messages (no `/` prefix) go to Claude for a response.
 
 ## Memory System
 
 ### Tier 1: Chat History
+
 Recent messages (max 30). Auto-compacts by summarizing older half.
 
 ### Tier 2: Session Summaries
+
 Built from compactions. Wiped after 5 compactions (session rotation).
 
 ### Tier 3: User Profiles
+
 Permanent facts (name, preferences, projects). Survives everything. Extracted during dream consolidation.
 
 ### Dream Consolidation
+
 4-phase KAIROS process: Orient → Gather → Consolidate → Prune. Runs automatically (every hour if 5+ messages) or manually via `/dream`.
 
 ## Adding New Platforms

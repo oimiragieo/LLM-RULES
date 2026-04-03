@@ -8,8 +8,12 @@ const { Router } = require('../../../scripts/channels/daemon/router.cjs');
 // Mock renderer
 function createMockRenderer(response = 'Mock response') {
   return {
-    render(event) { return response; },
-    renderProactive(event) { return 'Proactive message'; },
+    render(event) {
+      return response;
+    },
+    renderProactive(event) {
+      return 'Proactive message';
+    },
   };
 }
 
@@ -29,8 +33,12 @@ function createMockSink() {
 function createMockMemory() {
   return {
     chats: new Map(),
-    shouldDream() { return false; },
-    dream() { return null; },
+    shouldDream() {
+      return false;
+    },
+    dream() {
+      return null;
+    },
   };
 }
 
@@ -103,7 +111,12 @@ describe('Dispatcher', () => {
       assert.ok(sinks.telegram.sent.length >= 1);
       // First message should be the task notification
       const taskNotification = sinks.telegram.sent.find(m => m.text.includes('Running task'));
-      assert.ok(taskNotification || sinks.telegram.sent.find(m => m.text.includes('Task complete') || m.text.includes('Error')));
+      assert.ok(
+        taskNotification ||
+          sinks.telegram.sent.find(
+            m => m.text.includes('Task complete') || m.text.includes('Error')
+          )
+      );
       assert.equal(dispatcher.stats.tasksExecuted, 1);
     });
 

@@ -23,6 +23,7 @@ tests/channels/daemon/config.test.cjs
 **Tests to write:**
 
 **router.test.cjs:**
+
 - `resolve()` matches exact event type
 - `resolve()` matches glob pattern (`telegram.*`)
 - `resolve()` applies filter correctly
@@ -30,6 +31,7 @@ tests/channels/daemon/config.test.cjs
 - `resolve()` returns multiple routes when multiple match
 
 **memory.test.cjs:**
+
 - `addMessage()` stores message in chat history
 - `addMessage()` auto-compacts at threshold (mock execSync)
 - `getContext()` returns Tier 3 profile + Tier 2 summary + Tier 1 recent
@@ -42,6 +44,7 @@ tests/channels/daemon/config.test.cjs
 - Persistence: save → reload → data intact
 
 **commands.test.cjs:**
+
 - Each command returns `true` (handled)
 - Unknown `/` command returns `false` (pass to Claude)
 - `/forget` clears all tiers
@@ -50,6 +53,7 @@ tests/channels/daemon/config.test.cjs
 - `/status` includes all stat fields
 
 **dispatcher.test.cjs:**
+
 - `enqueue()` increments received counter
 - Events process sequentially
 - `[TASK]` tag triggers executor (mock)
@@ -59,12 +63,14 @@ tests/channels/daemon/config.test.cjs
 - `getStats()` returns correct counts
 
 **config.test.cjs:**
+
 - Loads from .env correctly
 - Builds allowed users from all sources
 - Default port is 3101
 - Default model is sonnet
 
 **Regression benchmark:** All existing tests pass. Record baseline:
+
 - `node --test tests/channels/daemon/*.test.cjs` → 0 failures
 
 ### Slice 0.2: Integration smoke test
@@ -93,6 +99,7 @@ tests/channels/daemon/smoke.test.cjs
 The simplest possible improvement. Send `sendChatAction("typing")` before rendering.
 
 **Test first:**
+
 ```
 tests/channels/daemon/sinks/telegram.test.cjs
 - sendTyping() calls Telegram API with correct params
@@ -100,6 +107,7 @@ tests/channels/daemon/sinks/telegram.test.cjs
 ```
 
 **Implementation:**
+
 1. Add `sendTyping(chatId)` to `sinks/telegram.cjs`
 2. Call it in `dispatcher._handleEvent()` before `renderer.render()`
 3. Regression: all Slice 0 tests still pass
@@ -115,6 +123,7 @@ tests/channels/daemon/sinks/telegram.test.cjs
 Replace blocking `execSync` renderer with async streaming that progressively updates the Telegram message using Bot API 9.5 `sendMessageDraft`.
 
 **Test first:**
+
 ```
 tests/channels/daemon/renderer.test.cjs
 - renderStream() yields chunks as they arrive
@@ -132,6 +141,7 @@ tests/channels/daemon/sinks/telegram.test.cjs
 **Implementation (4 sub-steps):**
 
 **1.2a: Add `sendDraft()` and `finalizeDraft()` to telegram sink**
+
 ```javascript
 // sinks/telegram.cjs
 async sendDraft(chatId, text, draftId) {
@@ -147,6 +157,7 @@ async finalizeDraft(chatId, text, draftId, opts) {
 ```
 
 **1.2b: Convert renderer from `execSync` to async `execFile` with stdout piping**
+
 ```javascript
 // renderer.cjs
 async renderStream(event, onChunk) {
@@ -158,13 +169,15 @@ async renderStream(event, onChunk) {
 ```
 
 **1.2c: Update dispatcher to use streaming render + draft updates**
+
 ```javascript
 // dispatcher.cjs — in _handleEvent()
 const draftId = crypto.randomUUID();
 let lastDraftTime = 0;
-const response = await renderer.renderStream(event, (chunk) => {
+const response = await renderer.renderStream(event, chunk => {
   const now = Date.now();
-  if (now - lastDraftTime > 500) { // Rate limit: max 2 edits/sec
+  if (now - lastDraftTime > 500) {
+    // Rate limit: max 2 edits/sec
     sink.sendDraft(chatId, chunk + ' ▉', draftId);
     lastDraftTime = now;
   }
@@ -174,17 +187,20 @@ sink.finalizeDraft(chatId, response, draftId, { replyTo: messageId });
 
 **1.2d: Fallback for older Bot API (pre-9.5)**
 If `sendMessageDraft` returns 400/404, fall back to:
+
 1. `sendMessage` (initial)
 2. `editMessageText` every 1s
 3. Final `editMessageText` (remove cursor)
 
 **Regression:**
+
 - All Slice 0 tests pass
 - Memory still records messages correctly
 - `[TASK]` detection still works (check first line of streamed output)
 - Commands still intercept before rendering
 
 **Benchmark:**
+
 - Before: user waits 30-60s with no feedback
 - After: first text visible within 2-3s, streaming updates every 500ms
 - Measure: time-to-first-visible-text (TTFVT)
@@ -198,6 +214,7 @@ If `sendMessageDraft` returns 400/404, fall back to:
 Before blindly executing tasks, the daemon should ask 1-2 clarifying questions. This matches what users want from agentic AI — "ask questions, THEN execute."
 
 **Test first:**
+
 ```
 tests/channels/daemon/renderer.test.cjs
 - Detects [CLARIFY] tag in response
@@ -215,6 +232,7 @@ tests/channels/daemon/dispatcher.test.cjs
 **Implementation:**
 
 **1.3a: Update system prompt to support `[CLARIFY]` tag**
+
 ```
 If the user asks you to DO something complex or ambiguous, ask ONE clarifying
 question first. Start your response with [CLARIFY] followed by your question.
@@ -227,11 +245,13 @@ Examples:
 ```
 
 **1.3b: Add pending clarifications map to dispatcher**
+
 ```javascript
 this.pendingClarifications = new Map(); // chatId → { task, question, timestamp }
 ```
 
-**1.3c: In _handleEvent(), check for pending clarification before routing**
+**1.3c: In \_handleEvent(), check for pending clarification before routing**
+
 ```javascript
 if (this.pendingClarifications.has(chatId)) {
   // User is answering a clarification — inject their answer as context
@@ -252,6 +272,7 @@ if (this.pendingClarifications.has(chatId)) {
 When the task executor's `claude -p` needs permission for a dangerous command, relay the approval request to Telegram.
 
 **Test first:**
+
 ```
 tests/channels/daemon/executor.test.cjs
 - executeTask() detects permission prompt in stderr
@@ -271,12 +292,14 @@ tests/channels/daemon/commands.test.cjs
 
 **1.4a: Switch executor from `execSync` to async `execFile` with stderr monitoring**
 Monitor stderr for patterns like:
+
 ```
 Do you want to allow? (y/n)
 Allow Bash(rm -rf ...)?
 ```
 
 **1.4b: Add permission relay to dispatcher**
+
 ```javascript
 this.pendingPermissions = new Map(); // chatId → { resolve, reject, command, timestamp }
 ```
@@ -289,6 +312,7 @@ The callback sends the permission prompt to Telegram and returns a Promise that 
 **Regression:** All previous tests pass. Non-dangerous tasks still execute without permission relay.
 
 **Benchmark:**
+
 - Before: dangerous tasks fail silently (timeout)
 - After: user approves/denies from phone, task completes
 
@@ -303,6 +327,7 @@ The callback sends the permission prompt to Telegram and returns a Promise that 
 Replace flat Tier 2 summaries with KAIROS 9-section markdown template.
 
 **Test first:**
+
 ```
 tests/channels/daemon/memory.test.cjs
 - _compactChat() produces structured summary with sections
@@ -311,6 +336,7 @@ tests/channels/daemon/memory.test.cjs
 ```
 
 **Implementation:**
+
 - Update `_compactChat()` prompt to use KAIROS template:
   ```
   Summarize into these sections (omit empty ones):
@@ -333,6 +359,7 @@ tests/channels/daemon/memory.test.cjs
 Append-only daily log for richer dream input.
 
 **Test first:**
+
 ```
 tests/channels/daemon/memory.test.cjs
 - appendDailyLog() creates date-stamped file
@@ -341,6 +368,7 @@ tests/channels/daemon/memory.test.cjs
 ```
 
 **Implementation:**
+
 - Add `appendDailyLog(chatId, user, text, response)` to memory
 - Call after each message/response pair in dispatcher
 - Update dream prompt to read recent daily logs
@@ -356,6 +384,7 @@ tests/channels/daemon/memory.test.cjs
 After responding, generate 2-3 suggested follow-ups.
 
 **Test first:**
+
 ```
 tests/channels/daemon/renderer.test.cjs
 - generateSuggestions() returns 2-3 short strings
@@ -364,6 +393,7 @@ tests/channels/daemon/renderer.test.cjs
 ```
 
 **Implementation:**
+
 - Add `generateSuggestions(event, response)` to renderer
 - Call after successful render in dispatcher
 - Send as a separate message: "💡 Suggestions:\n• ...\n• ...\n• ..."
@@ -380,6 +410,7 @@ tests/channels/daemon/renderer.test.cjs
 Named sessions that persist and can be resumed.
 
 **Test first:**
+
 ```
 tests/channels/daemon/commands.test.cjs
 - /title saves session name
@@ -389,6 +420,7 @@ tests/channels/daemon/commands.test.cjs
 ```
 
 **Implementation:**
+
 - Add `namedSessions` map to memory (persisted)
 - `/title <name>` saves current chat state under that name
 - `/resume <name>` loads named session into current chat
@@ -407,6 +439,7 @@ tests/channels/daemon/commands.test.cjs
 Add `mode` field to config with developer/business presets.
 
 **Test first:**
+
 ```
 tests/channels/daemon/config.test.cjs
 - Default mode is "developer"
@@ -416,6 +449,7 @@ tests/channels/daemon/config.test.cjs
 ```
 
 **Implementation:**
+
 - Add `mode` to config schema
 - Renderer switches persona based on mode
 - Executor respects `canExecuteTasks` flag
@@ -429,6 +463,7 @@ tests/channels/daemon/config.test.cjs
 Load business docs into renderer context for customer-facing mode.
 
 **Test first:**
+
 ```
 tests/channels/daemon/renderer.test.cjs
 - In business mode, knowledge base files are loaded into prompt
@@ -437,6 +472,7 @@ tests/channels/daemon/renderer.test.cjs
 ```
 
 **Implementation:**
+
 - Read `*.md` files from configured `knowledgeBase` directory
 - Inject as "## Business Context" section in system prompt
 - Cache with mtime invalidation
@@ -450,6 +486,7 @@ tests/channels/daemon/renderer.test.cjs
 When the bot can't confidently handle a request, escalate to a human.
 
 **Test first:**
+
 ```
 tests/channels/daemon/renderer.test.cjs
 - Detects [HANDOFF] tag in response
@@ -458,6 +495,7 @@ tests/channels/daemon/renderer.test.cjs
 ```
 
 **Implementation:**
+
 - Add `[HANDOFF]` tag support (like `[TASK]` and `[CLARIFY]`)
 - Send handoff notification via configured channel (email, Telegram group, etc.)
 - Log handoff in history for audit trail
@@ -469,6 +507,7 @@ tests/channels/daemon/renderer.test.cjs
 ### Slice 4.1: Discord Source + Sink
 
 **Test first:**
+
 ```
 tests/channels/daemon/sources/discord.test.cjs
 tests/channels/daemon/sinks/discord.test.cjs
@@ -504,15 +543,15 @@ tests/channels/daemon/sinks/discord.test.cjs
 
 ## Benchmarks
 
-| Metric | Baseline (current) | Phase 1 Target | Phase 2 Target |
-|--------|-------------------|----------------|----------------|
-| Time to first visible text | 30-60s | 2-3s (streaming) | 2-3s |
-| Time to complete response | 30-60s | 30-60s (same) | 30-60s |
-| Memory load time | <100ms | <100ms | <200ms |
-| Dream consolidation time | 30-60s | 30-60s | 30-60s |
-| Command response time | <50ms | <50ms | <50ms |
-| Max concurrent chats | untested | 10+ | 10+ |
-| Context quality (subjective) | 6/10 | 7/10 | 9/10 |
+| Metric                       | Baseline (current) | Phase 1 Target   | Phase 2 Target |
+| ---------------------------- | ------------------ | ---------------- | -------------- |
+| Time to first visible text   | 30-60s             | 2-3s (streaming) | 2-3s           |
+| Time to complete response    | 30-60s             | 30-60s (same)    | 30-60s         |
+| Memory load time             | <100ms             | <100ms           | <200ms         |
+| Dream consolidation time     | 30-60s             | 30-60s           | 30-60s         |
+| Command response time        | <50ms              | <50ms            | <50ms          |
+| Max concurrent chats         | untested           | 10+              | 10+            |
+| Context quality (subjective) | 6/10               | 7/10             | 9/10           |
 
 ---
 

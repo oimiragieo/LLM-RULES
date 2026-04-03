@@ -8,17 +8,18 @@ The directory contains 300+ workflow files organized into:
 
 ### Subdirectories
 
-| Directory | Purpose |
-|-----------|---------|
-| `core/` | Core router workflows — `router-decision.md` (the primary routing logic), phase gate definitions |
-| `enterprise/` | Enterprise pipeline workflows — multi-phase delivery, approval gates, stakeholder coordination |
-| `operations/` | Operational workflows — monitoring, incident response, maintenance |
-| `creators/` | Creator workflows — how skill-creator, agent-creator, etc. operate |
-| `updaters/` | Updater workflows — how skill-updater, agent-updater, etc. refresh existing artifacts |
+| Directory     | Purpose                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| `core/`       | Core router workflows — `router-decision.md` (the primary routing logic), phase gate definitions |
+| `enterprise/` | Enterprise pipeline workflows — multi-phase delivery, approval gates, stakeholder coordination   |
+| `operations/` | Operational workflows — monitoring, incident response, maintenance                               |
+| `creators/`   | Creator workflows — how skill-creator, agent-creator, etc. operate                               |
+| `updaters/`   | Updater workflows — how skill-updater, agent-updater, etc. refresh existing artifacts            |
 
 ### Skill Workflows (Top Level)
 
 The majority of files follow the pattern `{skill-name}-skill-workflow.md`. Each defines:
+
 - Which agent(s) execute the skill
 - Input/output contracts
 - Phase sequence (research → plan → implement → review → validate)
@@ -26,14 +27,14 @@ The majority of files follow the pattern `{skill-name}-skill-workflow.md`. Each 
 
 ### Key Workflows
 
-| File | Purpose |
-|------|---------|
-| `core/router-decision.md` | **Primary routing logic** — the decision tree the router uses to select agents |
-| `code-review-workflow.md` | Two-stage code review process |
-| `conductor-setup-workflow.md` | Conductor project validation setup |
-| `start-mission.md` | Long-running mission initialization |
-| `tdd-skill-workflow.md` | Test-driven development cycle |
-| `team-orchestration-skill-workflow.md` | 6-phase multi-agent pipeline |
+| File                                   | Purpose                                                                        |
+| -------------------------------------- | ------------------------------------------------------------------------------ |
+| `core/router-decision.md`              | **Primary routing logic** — the decision tree the router uses to select agents |
+| `code-review-workflow.md`              | Two-stage code review process                                                  |
+| `conductor-setup-workflow.md`          | Conductor project validation setup                                             |
+| `start-mission.md`                     | Long-running mission initialization                                            |
+| `tdd-skill-workflow.md`                | Test-driven development cycle                                                  |
+| `team-orchestration-skill-workflow.md` | 6-phase multi-agent pipeline                                                   |
 
 ## How Workflows Execute
 

@@ -55,6 +55,7 @@ Telegram Setup Status:
 For any `[ ]` items, tell the user exactly what to add and where.
 
 **If both ANTHROPIC_API_KEY and CLAUDE_CODE_OAUTH_TOKEN are missing**, tell the user:
+
 - "The headless Telegram monitor needs auth credentials to run independently."
 - "Option 1: Run `! claude setup-token` in your terminal, then add `CLAUDE_CODE_OAUTH_TOKEN=<token>` to `.env`"
 - "Option 2: Add `ANTHROPIC_API_KEY=sk-ant-...` to `.env` (get one from console.anthropic.com)"

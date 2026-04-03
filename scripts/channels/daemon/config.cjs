@@ -25,7 +25,10 @@ function loadDotenv(root) {
     const eq = t.indexOf('=');
     if (eq === -1) continue;
     const key = t.slice(0, eq).trim();
-    const val = t.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
+    const val = t
+      .slice(eq + 1)
+      .trim()
+      .replace(/^["']|["']$/g, '');
     if (!process.env[key]) process.env[key] = val;
   }
 }
@@ -36,7 +39,9 @@ function loadConfig(root) {
   // Base config from file
   let fileConfig = {};
   if (fs.existsSync(CONFIG_PATH)) {
-    try { fileConfig = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8')); } catch {}
+    try {
+      fileConfig = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+    } catch {}
   }
 
   // Build allowed users set
@@ -54,7 +59,10 @@ function loadConfig(root) {
 
   return {
     daemon: {
-      port: parseInt(process.env.CHANNEL_DAEMON_PORT || '', 10) || fileConfig.daemon?.port || DEFAULT_PORT,
+      port:
+        parseInt(process.env.CHANNEL_DAEMON_PORT || '', 10) ||
+        fileConfig.daemon?.port ||
+        DEFAULT_PORT,
       host: process.env.CHANNEL_DAEMON_HOST || fileConfig.daemon?.host || '127.0.0.1',
     },
     renderer: {
@@ -68,7 +76,8 @@ function loadConfig(root) {
         token: (process.env.TELEGRAM_BOT_TOKEN || '').trim(),
         allowedUsers: allowed,
         allowAll: (process.env.TELEGRAM_ALLOW_ALL || '').toLowerCase() === 'true',
-        pollInterval: parseInt(process.env.TELEGRAM_POLL_INTERVAL || '', 10) || DEFAULT_POLL_INTERVAL,
+        pollInterval:
+          parseInt(process.env.TELEGRAM_POLL_INTERVAL || '', 10) || DEFAULT_POLL_INTERVAL,
       },
       // Future: discord, slack, webhook
       discord: { enabled: false },

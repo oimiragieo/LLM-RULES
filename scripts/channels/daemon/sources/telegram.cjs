@@ -11,21 +11,32 @@ const https = require('https');
 function telegramApi(token, method, body) {
   return new Promise((resolve, reject) => {
     const data = body ? JSON.stringify(body) : null;
-    const req = https.request({
-      hostname: 'api.telegram.org',
-      path: `/bot${token}/${method}`,
-      method: data ? 'POST' : 'GET',
-      headers: data ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } : {},
-    }, res => {
-      const chunks = [];
-      res.on('data', c => chunks.push(c));
-      res.on('end', () => {
-        try { resolve(JSON.parse(Buffer.concat(chunks).toString())); }
-        catch { resolve({ ok: false }); }
-      });
-    });
+    const req = https.request(
+      {
+        hostname: 'api.telegram.org',
+        path: `/bot${token}/${method}`,
+        method: data ? 'POST' : 'GET',
+        headers: data
+          ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) }
+          : {},
+      },
+      res => {
+        const chunks = [];
+        res.on('data', c => chunks.push(c));
+        res.on('end', () => {
+          try {
+            resolve(JSON.parse(Buffer.concat(chunks).toString()));
+          } catch {
+            resolve({ ok: false });
+          }
+        });
+      }
+    );
     req.on('error', reject);
-    req.setTimeout(35000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.setTimeout(35000, () => {
+      req.destroy();
+      reject(new Error('timeout'));
+    });
     if (data) req.write(data);
     req.end();
   });
@@ -65,11 +76,16 @@ class TelegramSource {
     } catch {}
 
     // Clear competing connections
-    try { await telegramApi(this.token, 'getUpdates?timeout=0'); } catch {}
+    try {
+      await telegramApi(this.token, 'getUpdates?timeout=0');
+    } catch {}
 
     while (this.running) {
       try {
-        const data = await telegramApi(this.token, `getUpdates?offset=${this.lastUpdateId}&timeout=30`);
+        const data = await telegramApi(
+          this.token,
+          `getUpdates?offset=${this.lastUpdateId}&timeout=30`
+        );
         if (!data.ok || !data.result) {
           await this._sleep(5000);
           continue;
@@ -81,7 +97,8 @@ class TelegramSource {
 
           const senderId = String(update.message.from?.id || '');
           const senderUsername = update.message.from?.username || '';
-          if (!this.allowAll && !this.allowed.has(senderId) && !this.allowed.has(senderUsername)) continue;
+          if (!this.allowAll && !this.allowed.has(senderId) && !this.allowed.has(senderUsername))
+            continue;
 
           let text = update.message.text || '';
           let attachmentFileId = null;

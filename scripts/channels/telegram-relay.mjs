@@ -25,7 +25,7 @@ const accessPath = path.join(os.homedir(), '.claude', 'channels', 'telegram', 'a
 const allowed = new Set();
 if (fs.existsSync(accessPath)) {
   const accessData = JSON.parse(fs.readFileSync(accessPath, 'utf8'));
-  for (const id of (accessData.allowFrom || [])) allowed.add(String(id));
+  for (const id of accessData.allowFrom || []) allowed.add(String(id));
 }
 // Env-based allowlist (matches OpenClaw/Hermes pattern)
 const envAllowed = (process.env.TELEGRAM_ALLOWED_USERS || '').trim();
@@ -301,12 +301,12 @@ mcp.setRequestHandler(CallToolRequestSchema, async req => {
     const count = limit && limit > 0 ? Math.min(limit, messageQueue.length) : messageQueue.length;
     const messages = messageQueue.splice(0, count);
     return {
-      content: [{
-        type: 'text',
-        text: messages.length === 0
-          ? 'No new messages'
-          : JSON.stringify(messages, null, 2),
-      }],
+      content: [
+        {
+          type: 'text',
+          text: messages.length === 0 ? 'No new messages' : JSON.stringify(messages, null, 2),
+        },
+      ],
     };
   }
   throw new Error(`unknown tool: ${req.params.name}`);

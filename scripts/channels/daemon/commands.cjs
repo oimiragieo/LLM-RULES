@@ -26,31 +26,37 @@ class CommandHandler {
 
     switch (cmd) {
       case '/start':
-        return this._reply(chatId, messageId,
-          '👋 Hey! I\'m the Agent Studio bot.\n\n' +
-          'Just type naturally and I\'ll respond. I remember our conversations.\n\n' +
-          'Commands:\n' +
-          '/status — daemon & memory stats\n' +
-          '/memory — what I remember about you\n' +
-          '/dream — consolidate learnings\n' +
-          '/forget — clear your chat history\n' +
-          '/help — show all commands');
+        return this._reply(
+          chatId,
+          messageId,
+          "👋 Hey! I'm the Agent Studio bot.\n\n" +
+            "Just type naturally and I'll respond. I remember our conversations.\n\n" +
+            'Commands:\n' +
+            '/status — daemon & memory stats\n' +
+            '/memory — what I remember about you\n' +
+            '/dream — consolidate learnings\n' +
+            '/forget — clear your chat history\n' +
+            '/help — show all commands'
+        );
 
       case '/help':
-        return this._reply(chatId, messageId,
+        return this._reply(
+          chatId,
+          messageId,
           '📋 Available commands:\n\n' +
-          '📊 /status — daemon stats & uptime\n' +
-          '🧠 /memory — what I remember about you\n' +
-          '📜 /history — recent conversations\n' +
-          '📋 /tasks — executed task history\n' +
-          '💭 /dream — consolidate learnings\n' +
-          '🆕 /new — fresh conversation (keeps profile)\n' +
-          '🗜 /compress — compact chat memory\n' +
-          '🔄 /retry — show last message to resend\n' +
-          '🗑 /forget — clear all data about you\n' +
-          '🤖 /model — current AI model\n' +
-          '🏓 /ping — alive check\n\n' +
-          '💡 I can also DO things — ask me to run code, check git, run tests, etc.');
+            '📊 /status — daemon stats & uptime\n' +
+            '🧠 /memory — what I remember about you\n' +
+            '📜 /history — recent conversations\n' +
+            '📋 /tasks — executed task history\n' +
+            '💭 /dream — consolidate learnings\n' +
+            '🆕 /new — fresh conversation (keeps profile)\n' +
+            '🗜 /compress — compact chat memory\n' +
+            '🔄 /retry — show last message to resend\n' +
+            '🗑 /forget — clear all data about you\n' +
+            '🤖 /model — current AI model\n' +
+            '🏓 /ping — alive check\n\n' +
+            '💡 I can also DO things — ask me to run code, check git, run tests, etc.'
+        );
 
       case '/status': {
         const stats = this.dispatcher.getStats();
@@ -58,28 +64,36 @@ class CommandHandler {
         const uptime = Math.round((Date.now() - this.startTime) / 1000);
         const hours = Math.floor(uptime / 3600);
         const mins = Math.floor((uptime % 3600) / 60);
-        return this._reply(chatId, messageId,
+        return this._reply(
+          chatId,
+          messageId,
           `📊 Status\n\n` +
-          `⏱ Uptime: ${hours}h ${mins}m\n` +
-          `📨 Messages: ${stats.received} received, ${stats.processed} processed\n` +
-          `⚙️ Tasks: ${stats.tasksExecuted || 0} executed\n` +
-          `❌ Errors: ${stats.errors}\n` +
-          `🧠 Memory: ${memStats.chats} chats, ${memStats.totalMessages} messages\n` +
-          `👤 Profiles: ${memStats.profiles} users known\n` +
-          `💭 Dream: ${memStats.lastDream} (${memStats.messagesSinceDream} msgs since)\n` +
-          `🤖 Model: sonnet`);
+            `⏱ Uptime: ${hours}h ${mins}m\n` +
+            `📨 Messages: ${stats.received} received, ${stats.processed} processed\n` +
+            `⚙️ Tasks: ${stats.tasksExecuted || 0} executed\n` +
+            `❌ Errors: ${stats.errors}\n` +
+            `🧠 Memory: ${memStats.chats} chats, ${memStats.totalMessages} messages\n` +
+            `👤 Profiles: ${memStats.profiles} users known\n` +
+            `💭 Dream: ${memStats.lastDream} (${memStats.messagesSinceDream} msgs since)\n` +
+            `🤖 Model: sonnet`
+        );
       }
 
       case '/memory': {
         const profile = this.memory.getProfile(chatId);
         if (profile.facts.length === 0) {
-          return this._reply(chatId, messageId,
-            '🧠 I don\'t have any long-term memories about you yet.\n\n' +
-            'Chat with me more and run /dream to consolidate learnings.');
+          return this._reply(
+            chatId,
+            messageId,
+            "🧠 I don't have any long-term memories about you yet.\n\n" +
+              'Chat with me more and run /dream to consolidate learnings.'
+          );
         }
-        return this._reply(chatId, messageId,
-          '🧠 What I remember about you:\n\n' +
-          profile.facts.map(f => `• ${f}`).join('\n'));
+        return this._reply(
+          chatId,
+          messageId,
+          '🧠 What I remember about you:\n\n' + profile.facts.map(f => `• ${f}`).join('\n')
+        );
       }
 
       case '/history': {
@@ -87,24 +101,34 @@ class CommandHandler {
         if (recent.length === 0) {
           return this._reply(chatId, messageId, '📜 No recent conversation history.');
         }
-        const lines = recent.map(e =>
-          `👤 ${e.user}: ${e.message.slice(0, 60)}${e.message.length > 60 ? '…' : ''}\n` +
-          `🤖 ${e.response.slice(0, 80)}${e.response.length > 80 ? '…' : ''}`
+        const lines = recent.map(
+          e =>
+            `👤 ${e.user}: ${e.message.slice(0, 60)}${e.message.length > 60 ? '…' : ''}\n` +
+            `🤖 ${e.response.slice(0, 80)}${e.response.length > 80 ? '…' : ''}`
         );
         return this._reply(chatId, messageId, '📜 Recent:\n\n' + lines.join('\n\n'));
       }
 
       case '/dream': {
-        await this._reply(chatId, messageId, '💭 Dreaming... consolidating memories across conversations...');
+        await this._reply(
+          chatId,
+          messageId,
+          '💭 Dreaming... consolidating memories across conversations...'
+        );
         const result = this.memory.dream(true); // force=true to bypass gate
         if (result) {
           const profile = this.memory.getProfile(chatId);
-          const factsList = profile.facts.length > 0
-            ? '\n\nUpdated profile:\n' + profile.facts.map(f => `• ${f}`).join('\n')
-            : '';
+          const factsList =
+            profile.facts.length > 0
+              ? '\n\nUpdated profile:\n' + profile.facts.map(f => `• ${f}`).join('\n')
+              : '';
           return this._reply(chatId, messageId, `💭 ${result}${factsList}`);
         }
-        return this._reply(chatId, messageId, '💭 Nothing to consolidate — no conversations found.');
+        return this._reply(
+          chatId,
+          messageId,
+          '💭 Nothing to consolidate — no conversations found.'
+        );
       }
 
       case '/forget': {
@@ -114,8 +138,11 @@ class CommandHandler {
         this.memory._saveHistory();
         this.memory._saveSummaries();
         this.memory._saveProfiles();
-        return this._reply(chatId, messageId,
-          '🗑 Done. Your chat history, summaries, and profile have been cleared.');
+        return this._reply(
+          chatId,
+          messageId,
+          '🗑 Done. Your chat history, summaries, and profile have been cleared.'
+        );
       }
 
       case '/tasks': {
@@ -128,8 +155,11 @@ class CommandHandler {
           const icon = t.status === 'completed' ? '✅' : t.status === 'failed' ? '❌' : '⏳';
           return `${icon} ${id}: ${t.description.slice(0, 60)} (${dur})`;
         });
-        return this._reply(chatId, messageId,
-          `📋 Recent tasks:\n\n${lines.join('\n')}\n\nTotal: ${this.dispatcher.stats.tasksExecuted}`);
+        return this._reply(
+          chatId,
+          messageId,
+          `📋 Recent tasks:\n\n${lines.join('\n')}\n\nTotal: ${this.dispatcher.stats.tasksExecuted}`
+        );
       }
 
       case '/new': {
@@ -140,18 +170,24 @@ class CommandHandler {
           this.memory._saveHistory();
           this.memory._saveSummaries();
         }
-        return this._reply(chatId, messageId,
-          '🆕 Fresh conversation started. Your long-term profile is preserved — I still remember who you are.');
+        return this._reply(
+          chatId,
+          messageId,
+          '🆕 Fresh conversation started. Your long-term profile is preserved — I still remember who you are.'
+        );
       }
 
       case '/compress': {
         if (this.memory) {
           this.memory._compactChat(chatId);
           const summary = this.memory.summaries.get(chatId);
-          return this._reply(chatId, messageId,
+          return this._reply(
+            chatId,
+            messageId,
             summary
               ? `🗜 Compressed. Summary:\n\n${summary.slice(0, 500)}`
-              : '🗜 Nothing to compress yet.');
+              : '🗜 Nothing to compress yet.'
+          );
         }
         return this._reply(chatId, messageId, '🗜 No memory system available.');
       }
@@ -160,8 +196,11 @@ class CommandHandler {
         const history = this.memory?.chats.get(chatId) || [];
         const lastUser = [...history].reverse().find(m => m.role === 'user');
         if (lastUser) {
-          return this._reply(chatId, messageId,
-            `🔄 To retry, send your last message again:\n\n"${lastUser.text.slice(0, 200)}"`);
+          return this._reply(
+            chatId,
+            messageId,
+            `🔄 To retry, send your last message again:\n\n"${lastUser.text.slice(0, 200)}"`
+          );
         }
         return this._reply(chatId, messageId, '🔄 No previous message to retry.');
       }

@@ -80,9 +80,11 @@ class Dispatcher {
             if (sink) {
               const hours = Math.round(idleMs / 3600000);
               try {
-                await sink.send(event.data.chatId,
+                await sink.send(
+                  event.data.chatId,
                   `👋 Welcome back! (${hours}h since last chat)\n\nWhere we left off: ${summary.slice(-300)}`,
-                  { replyTo: event.data.messageId });
+                  { replyTo: event.data.messageId }
+                );
               } catch {}
             }
           }
@@ -175,9 +177,8 @@ class Dispatcher {
         this.activeTasks.get(taskId).endTime = Date.now();
 
         // Send the result (truncate for Telegram's 4096 char limit)
-        const truncatedResult = result.length > 3500
-          ? result.slice(0, 3500) + '\n\n... (truncated)'
-          : result;
+        const truncatedResult =
+          result.length > 3500 ? result.slice(0, 3500) + '\n\n... (truncated)' : result;
         response = `✅ Task complete:\n\n${truncatedResult}`;
       }
 

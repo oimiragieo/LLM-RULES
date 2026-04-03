@@ -23,9 +23,7 @@ class TaskExecutor {
    * Returns the result text.
    */
   executeTask(task, context = '') {
-    const prompt = context
-      ? `Context: ${context}\n\nTask: ${task}`
-      : task;
+    const prompt = context ? `Context: ${context}\n\nTask: ${task}` : task;
 
     const safePrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, ' ').slice(0, 4000);
 
@@ -73,31 +71,37 @@ class TaskExecutor {
         },
       });
 
-      const req = http.request({
-        hostname: '127.0.0.1',
-        port: this.a2aPort,
-        path: '/a2a',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(body),
+      const req = http.request(
+        {
+          hostname: '127.0.0.1',
+          port: this.a2aPort,
+          path: '/a2a',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(body),
+          },
+          timeout: 10000,
         },
-        timeout: 10000,
-      }, res => {
-        let data = '';
-        res.on('data', c => data += c);
-        res.on('end', () => {
-          try {
-            const result = JSON.parse(data);
-            resolve(result);
-          } catch {
-            resolve({ error: data });
-          }
-        });
-      });
+        res => {
+          let data = '';
+          res.on('data', c => (data += c));
+          res.on('end', () => {
+            try {
+              const result = JSON.parse(data);
+              resolve(result);
+            } catch {
+              resolve({ error: data });
+            }
+          });
+        }
+      );
 
       req.on('error', err => resolve({ error: `A2A server not available: ${err.message}` }));
-      req.on('timeout', () => { req.destroy(); resolve({ error: 'A2A server timeout' }); });
+      req.on('timeout', () => {
+        req.destroy();
+        resolve({ error: 'A2A server timeout' });
+      });
       req.write(body);
       req.end();
     });
@@ -112,7 +116,10 @@ class TaskExecutor {
         resolve(res.statusCode === 200);
       });
       req.on('error', () => resolve(false));
-      req.setTimeout(2000, () => { req.destroy(); resolve(false); });
+      req.setTimeout(2000, () => {
+        req.destroy();
+        resolve(false);
+      });
     });
   }
 }

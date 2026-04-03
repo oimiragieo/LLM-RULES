@@ -79,11 +79,17 @@ class ClaudeRenderer {
     // Handle attachments
     const { attachmentType, attachmentFileId } = event.data;
     if (attachmentType === 'voice' || attachmentType === 'audio') {
-      parts.push(`\n${user} sent a voice/audio message. You cannot listen to it directly. Tell them you received their voice message but can only process text right now. Ask them to type their message instead, or suggest they enable the voice pipeline (/check-telegram-voice) for voice transcription support.`);
+      parts.push(
+        `\n${user} sent a voice/audio message. You cannot listen to it directly. Tell them you received their voice message but can only process text right now. Ask them to type their message instead, or suggest they enable the voice pipeline (/check-telegram-voice) for voice transcription support.`
+      );
     } else if (attachmentType === 'photo') {
-      parts.push(`\n${user} sent a photo. You cannot see images. Acknowledge you received it and ask them to describe what they need help with.`);
+      parts.push(
+        `\n${user} sent a photo. You cannot see images. Acknowledge you received it and ask them to describe what they need help with.`
+      );
     } else if (attachmentType === 'document') {
-      parts.push(`\n${user} sent a document. You cannot read files directly. Acknowledge receipt and ask what they need help with regarding the document.`);
+      parts.push(
+        `\n${user} sent a document. You cannot read files directly. Acknowledge receipt and ask what they need help with regarding the document.`
+      );
     }
 
     parts.push(`\nNew message from ${user}: ${text}`);
@@ -103,8 +109,13 @@ class ClaudeRenderer {
       const result = execSync(
         `claude -p "${prompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 3`,
         {
-          cwd: this.projectRoot, encoding: 'utf8', timeout: 120000,
-          env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'],
+          cwd: this.projectRoot,
+          encoding: 'utf8',
+          timeout: 120000,
+          env,
+          windowsHide: true,
+          shell: true,
+          stdio: ['pipe', 'pipe', 'pipe'],
         }
       ).trim();
 
@@ -138,8 +149,19 @@ class ClaudeRenderer {
       const child = execFile(
         process.platform === 'win32' ? 'cmd' : 'claude',
         process.platform === 'win32'
-          ? ['/c', `claude -p "${prompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 3`]
-          : ['-p', prompt, '--dangerously-skip-permissions', '--model', this.model, '--max-turns', '3'],
+          ? [
+              '/c',
+              `claude -p "${prompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 3`,
+            ]
+          : [
+              '-p',
+              prompt,
+              '--dangerously-skip-permissions',
+              '--model',
+              this.model,
+              '--max-turns',
+              '3',
+            ],
         {
           cwd: this.projectRoot,
           env,
@@ -157,7 +179,7 @@ class ClaudeRenderer {
       let lastChunkTime = 0;
       let resolved = false;
 
-      child.stdout.on('data', (data) => {
+      child.stdout.on('data', data => {
         accumulated += data.toString();
         const now = Date.now();
         // Rate-limit chunk callbacks to avoid flooding Telegram API
@@ -167,11 +189,11 @@ class ClaudeRenderer {
         }
       });
 
-      child.stderr.on('data', (data) => {
+      child.stderr.on('data', data => {
         // Ignore stderr (debug output from claude)
       });
 
-      child.on('close', (code) => {
+      child.on('close', code => {
         if (resolved) return;
         resolved = true;
         const response = accumulated.trim() || 'Sorry, I could not generate a response.';
@@ -184,7 +206,7 @@ class ClaudeRenderer {
         resolve(response);
       });
 
-      child.on('error', (err) => {
+      child.on('error', err => {
         if (resolved) return;
         resolved = true;
         resolve(`Error: ${err.message?.slice(0, 300)}`);
@@ -194,7 +216,9 @@ class ClaudeRenderer {
       setTimeout(() => {
         if (!resolved) {
           resolved = true;
-          try { child.kill(); } catch {}
+          try {
+            child.kill();
+          } catch {}
           const response = accumulated.trim() || 'Response timed out.';
           if (this.memory && event.data.chatId) {
             this.memory.addMessage(event.data.chatId, 'assistant', response);
@@ -216,7 +240,15 @@ class ClaudeRenderer {
       delete env.ANTHROPIC_API_KEY;
       return execSync(
         `claude -p "${fullPrompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 1`,
-        { cwd: this.projectRoot, encoding: 'utf8', timeout: 60000, env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'] }
+        {
+          cwd: this.projectRoot,
+          encoding: 'utf8',
+          timeout: 60000,
+          env,
+          windowsHide: true,
+          shell: true,
+          stdio: ['pipe', 'pipe', 'pipe'],
+        }
       ).trim();
     } catch {
       return null;

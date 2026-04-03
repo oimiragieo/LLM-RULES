@@ -67,7 +67,7 @@ Call the Telegram MCP download tool with the `file_id` from the channel tag:
 
 ```javascript
 // MCP tool call (agent uses this directly)
-mcp__telegram-relay__download_attachment({ file_id: '<attachment_file_id>' });
+mcp__telegram - relay__download_attachment({ file_id: '<attachment_file_id>' });
 // Returns: local file path, e.g. /tmp/voice_abc123.ogg
 ```
 
@@ -186,11 +186,12 @@ else:
 
 ```javascript
 // MCP tool call
-mcp__telegram-relay__reply({
-  chat_id: '<chat_id from channel tag>',
-  text: response_text, // Also send the transcript so user can read it
-  files: ['/tmp/tg_voice_response.mp3'],
-});
+mcp__telegram -
+  relay__reply({
+    chat_id: '<chat_id from channel tag>',
+    text: response_text, // Also send the transcript so user can read it
+    files: ['/tmp/tg_voice_response.mp3'],
+  });
 ```
 
 **Note:** Including `text` alongside the audio file gives the user both a readable transcript and the audio reply — useful for accessibility and noisy environments.

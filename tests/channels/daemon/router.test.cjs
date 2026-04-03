@@ -17,18 +17,14 @@ describe('Router', () => {
     });
 
     it('matches glob pattern (telegram.*)', () => {
-      const router = new Router([
-        { event: 'telegram.*', handler: 'claude', sink: 'telegram' },
-      ]);
+      const router = new Router([{ event: 'telegram.*', handler: 'claude', sink: 'telegram' }]);
       const routes = router.resolve({ type: 'telegram.message', source: 'telegram', data: {} });
       assert.equal(routes.length, 1);
       assert.equal(routes[0].handler, 'claude');
     });
 
     it('does not match wrong glob prefix', () => {
-      const router = new Router([
-        { event: 'discord.*', handler: 'claude', sink: 'discord' },
-      ]);
+      const router = new Router([{ event: 'discord.*', handler: 'claude', sink: 'discord' }]);
       const routes = router.resolve({ type: 'telegram.message', source: 'telegram', data: {} });
       // Should fall back to default route
       assert.equal(routes.length, 1);
@@ -36,9 +32,7 @@ describe('Router', () => {
     });
 
     it('matches wildcard (*) pattern', () => {
-      const router = new Router([
-        { event: '*', handler: 'echo', sink: 'telegram' },
-      ]);
+      const router = new Router([{ event: '*', handler: 'echo', sink: 'telegram' }]);
       const routes = router.resolve({ type: 'anything.here', source: 'telegram', data: {} });
       assert.equal(routes.length, 1);
       assert.equal(routes[0].handler, 'echo');
@@ -49,20 +43,26 @@ describe('Router', () => {
         { event: 'telegram.*', handler: 'claude', sink: 'telegram', filter: { user: 'omar' } },
       ]);
       // Matching filter
-      const matched = router.resolve({ type: 'telegram.message', source: 'telegram', data: { user: 'omar' } });
+      const matched = router.resolve({
+        type: 'telegram.message',
+        source: 'telegram',
+        data: { user: 'omar' },
+      });
       assert.equal(matched.length, 1);
       assert.equal(matched[0].handler, 'claude');
 
       // Non-matching filter — falls to default
-      const unmatched = router.resolve({ type: 'telegram.message', source: 'telegram', data: { user: 'other' } });
+      const unmatched = router.resolve({
+        type: 'telegram.message',
+        source: 'telegram',
+        data: { user: 'other' },
+      });
       assert.equal(unmatched.length, 1);
       assert.equal(unmatched[0].event, '*'); // default route
     });
 
     it('returns default route when no match', () => {
-      const router = new Router([
-        { event: 'discord.message', handler: 'claude', sink: 'discord' },
-      ]);
+      const router = new Router([{ event: 'discord.message', handler: 'claude', sink: 'discord' }]);
       const routes = router.resolve({ type: 'telegram.message', source: 'telegram', data: {} });
       assert.equal(routes.length, 1);
       assert.equal(routes[0].handler, 'claude');

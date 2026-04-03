@@ -101,9 +101,7 @@ class DaemonMemory {
       let recent = '';
       for (let i = history.length - 1; i >= 0; i--) {
         const msg = history[i];
-        const line = msg.role === 'user'
-          ? `[${msg.user}]: ${msg.text}`
-          : `[You]: ${msg.text}`;
+        const line = msg.role === 'user' ? `[${msg.user}]: ${msg.text}` : `[You]: ${msg.text}`;
         if (recent.length + line.length > MAX_CONTEXT_CHARS - parts.join('\n').length) break;
         recent = line + '\n' + recent;
       }
@@ -150,7 +148,14 @@ class DaemonMemory {
 
       const summary = execSync(
         `claude -p "Summarize this conversation in 2-3 sentences, noting key topics, decisions, and any facts about the user: ${transcript.replace(/"/g, '\\"').replace(/\n/g, ' ')}" --dangerously-skip-permissions --model haiku --max-turns 1`,
-        { encoding: 'utf8', timeout: 30000, env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'] }
+        {
+          encoding: 'utf8',
+          timeout: 30000,
+          env,
+          windowsHide: true,
+          shell: true,
+          stdio: ['pipe', 'pipe', 'pipe'],
+        }
       ).trim();
 
       // Update Tier 2 summary (cap total length to prevent rot)
@@ -194,9 +199,10 @@ class DaemonMemory {
     for (const [chatId, history] of this.chats) {
       const summary = this.summaries.get(chatId) || '';
       const profile = this.profiles.get(chatId);
-      const recent = history.slice(-15).map(m =>
-        `${m.role === 'user' ? m.user : 'Assistant'}: ${m.text}`
-      ).join('\n');
+      const recent = history
+        .slice(-15)
+        .map(m => `${m.role === 'user' ? m.user : 'Assistant'}: ${m.text}`)
+        .join('\n');
 
       allContext.push(`Chat ${chatId}:\nRecent messages:\n${recent}`);
       if (summary) allContext.push(`Previous summary: ${summary}`);
@@ -218,13 +224,15 @@ class DaemonMemory {
       'Only genuinely useful permanent facts. Not conversation details.',
       existing ? `\nExisting facts to keep if still valid:\n${existing}` : '',
       `\nConversations:\n${context}`,
-    ].filter(Boolean).join('\n');
+    ]
+      .filter(Boolean)
+      .join('\n');
 
     // Escape for shell — replace problematic chars
     const safePrompt = dreamPrompt
-      .replace(/"/g, "'")  // Replace double quotes with single
+      .replace(/"/g, "'") // Replace double quotes with single
       .replace(/\n/g, ' ') // Flatten newlines
-      .replace(/\\/g, '')  // Remove backslashes
+      .replace(/\\/g, '') // Remove backslashes
       .slice(0, 6000);
 
     try {
@@ -233,7 +241,14 @@ class DaemonMemory {
 
       const result = execSync(
         `claude -p "${safePrompt}" --dangerously-skip-permissions --model sonnet --max-turns 1`,
-        { encoding: 'utf8', timeout: 90000, env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'] }
+        {
+          encoding: 'utf8',
+          timeout: 90000,
+          env,
+          windowsHide: true,
+          shell: true,
+          stdio: ['pipe', 'pipe', 'pipe'],
+        }
       ).trim();
 
       const jsonMatch = result.match(/\[[\s\S]*\]/);
@@ -286,9 +301,13 @@ class DaemonMemory {
 
   // ── Accessors ────────────────────────────────────────────────────────────
 
-  getChatIds() { return [...this.chats.keys()]; }
+  getChatIds() {
+    return [...this.chats.keys()];
+  }
 
-  getProfile(chatId) { return this.profiles.get(chatId) || { facts: [] }; }
+  getProfile(chatId) {
+    return this.profiles.get(chatId) || { facts: [] };
+  }
 
   getStats() {
     return {
@@ -323,7 +342,8 @@ class DaemonMemory {
   _saveHistory() {
     try {
       fs.mkdirSync(this.storageDir, { recursive: true });
-      const obj = {}; for (const [k, v] of this.chats) obj[k] = v;
+      const obj = {};
+      for (const [k, v] of this.chats) obj[k] = v;
       fs.writeFileSync(this.historyPath, JSON.stringify(obj), 'utf8');
     } catch {}
   }
@@ -331,7 +351,8 @@ class DaemonMemory {
   _saveSummaries() {
     try {
       fs.mkdirSync(this.storageDir, { recursive: true });
-      const obj = {}; for (const [k, v] of this.summaries) obj[k] = v;
+      const obj = {};
+      for (const [k, v] of this.summaries) obj[k] = v;
       fs.writeFileSync(this.summaryPath, JSON.stringify(obj), 'utf8');
     } catch {}
   }
@@ -339,7 +360,8 @@ class DaemonMemory {
   _saveProfiles() {
     try {
       fs.mkdirSync(this.storageDir, { recursive: true });
-      const obj = {}; for (const [k, v] of this.profiles) obj[k] = v;
+      const obj = {};
+      for (const [k, v] of this.profiles) obj[k] = v;
       fs.writeFileSync(this.profilePath, JSON.stringify(obj), 'utf8');
     } catch {}
   }

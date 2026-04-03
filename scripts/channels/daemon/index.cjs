@@ -50,7 +50,9 @@ const LOG_FILE = path.join(RUNTIME, 'channel-daemon.log');
 function log(msg) {
   const line = `[${new Date().toISOString()}] ${msg}`;
   console.log(line);
-  try { fs.appendFileSync(LOG_FILE, line + '\n'); } catch {}
+  try {
+    fs.appendFileSync(LOG_FILE, line + '\n');
+  } catch {}
 }
 
 // ── CLI Commands ��───────────────────────────────��────────────────────────────
@@ -62,11 +64,16 @@ if (args.includes('--status')) {
     process.kill(pid, 0);
     console.log(`Channel daemon running (PID: ${pid})`);
     // Try to fetch status from HTTP API
-    http.get(`http://127.0.0.1:${process.env.CHANNEL_DAEMON_PORT || 3100}/status`, res => {
-      let data = '';
-      res.on('data', c => data += c);
-      res.on('end', () => { console.log(data); process.exit(0); });
-    }).on('error', () => process.exit(0));
+    http
+      .get(`http://127.0.0.1:${process.env.CHANNEL_DAEMON_PORT || 3100}/status`, res => {
+        let data = '';
+        res.on('data', c => (data += c));
+        res.on('end', () => {
+          console.log(data);
+          process.exit(0);
+        });
+      })
+      .on('error', () => process.exit(0));
   } catch {
     console.log('Channel daemon not running');
     process.exit(1);
@@ -130,12 +137,11 @@ async function main() {
     // Command handler for /slash commands in Telegram
     const cmdHandler = new CommandHandler(sinks.telegram, memory, dispatcher, log);
 
-    const telegramSource = new TelegramSource(
-      config.sources.telegram,
-      event => dispatcher.enqueue(event)
+    const telegramSource = new TelegramSource(config.sources.telegram, event =>
+      dispatcher.enqueue(event)
     );
     // Wire command handler — intercepts / commands before they reach Claude
-    telegramSource.onCommand = (msgData) => cmdHandler.handle(msgData);
+    telegramSource.onCommand = msgData => cmdHandler.handle(msgData);
 
     sources.push(telegramSource);
     telegramSource.start().catch(err => log(`Telegram source error: ${err.message}`));
@@ -172,16 +178,22 @@ async function main() {
 
     // Status
     if (url.pathname === '/status' || url.pathname === '/api/status') {
-      res.end(JSON.stringify({
-        status: 'running',
-        pid: process.pid,
-        startTime,
-        uptime: Math.round(process.uptime()),
-        sources: Object.keys(config.sources).filter(k => config.sources[k].enabled),
-        sinks: Object.keys(sinks),
-        dispatcher: dispatcher.getStats(),
-        model: config.renderer.model,
-      }, null, 2));
+      res.end(
+        JSON.stringify(
+          {
+            status: 'running',
+            pid: process.pid,
+            startTime,
+            uptime: Math.round(process.uptime()),
+            sources: Object.keys(config.sources).filter(k => config.sources[k].enabled),
+            sinks: Object.keys(sinks),
+            dispatcher: dispatcher.getStats(),
+            model: config.renderer.model,
+          },
+          null,
+          2
+        )
+      );
       return;
     }
 
@@ -193,7 +205,7 @@ async function main() {
         return;
       }
       let body = '';
-      req.on('data', c => body += c);
+      req.on('data', c => (body += c));
       req.on('end', () => {
         try {
           const event = JSON.parse(body);
@@ -214,7 +226,7 @@ async function main() {
     // Send message — router calls this to send a message to a Telegram user
     if ((url.pathname === '/send' || url.pathname === '/api/send') && req.method === 'POST') {
       let body = '';
-      req.on('data', c => body += c);
+      req.on('data', c => (body += c));
       req.on('end', async () => {
         try {
           const { chat_id, text, reply_to } = JSON.parse(body);
@@ -234,10 +246,16 @@ async function main() {
 
     // Memory status and management
     if (url.pathname === '/memory' || url.pathname === '/api/memory') {
-      res.end(JSON.stringify({
-        memory: memory.getStats(),
-        profiles: Object.fromEntries([...memory.profiles].map(([k, v]) => [k, v.facts])),
-      }, null, 2));
+      res.end(
+        JSON.stringify(
+          {
+            memory: memory.getStats(),
+            profiles: Object.fromEntries([...memory.profiles].map(([k, v]) => [k, v.facts])),
+          },
+          null,
+          2
+        )
+      );
       return;
     }
 
@@ -252,10 +270,16 @@ async function main() {
     // History — recent events processed by the daemon
     if (url.pathname === '/history' || url.pathname === '/api/history') {
       const limit = parseInt(url.searchParams.get('limit') || '20', 10);
-      res.end(JSON.stringify({
-        events: dispatcher.getHistory(limit),
-        stats: dispatcher.getStats(),
-      }, null, 2));
+      res.end(
+        JSON.stringify(
+          {
+            events: dispatcher.getHistory(limit),
+            stats: dispatcher.getStats(),
+          },
+          null,
+          2
+        )
+      );
       return;
     }
 
@@ -267,10 +291,12 @@ async function main() {
     }
 
     res.statusCode = 404;
-    res.end(JSON.stringify({
-      error: 'not found',
-      routes: ['/health', '/status', '/send', '/history', '/memory', '/dream', '/event', '/stop'],
-    }));
+    res.end(
+      JSON.stringify({
+        error: 'not found',
+        routes: ['/health', '/status', '/send', '/history', '/memory', '/dream', '/event', '/stop'],
+      })
+    );
   });
 
   server.listen(config.daemon.port, config.daemon.host, () => {
@@ -283,7 +309,9 @@ async function main() {
     log('Shutting down...');
     sources.forEach(s => s.stop());
     server.close();
-    try { fs.unlinkSync(PID_FILE); } catch {}
+    try {
+      fs.unlinkSync(PID_FILE);
+    } catch {}
     log('Daemon stopped');
     process.exit(0);
   }

@@ -17,27 +17,39 @@ function httpGet(port, urlPath) {
   return new Promise((resolve, reject) => {
     const req = http.get(`http://127.0.0.1:${port}${urlPath}`, res => {
       let data = '';
-      res.on('data', c => data += c);
+      res.on('data', c => (data += c));
       res.on('end', () => resolve({ status: res.statusCode, data }));
     });
     req.on('error', reject);
-    req.setTimeout(3000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.setTimeout(3000, () => {
+      req.destroy();
+      reject(new Error('timeout'));
+    });
   });
 }
 
 function httpPost(port, urlPath, body) {
   return new Promise((resolve, reject) => {
     const json = JSON.stringify(body);
-    const req = http.request({
-      hostname: '127.0.0.1', port, path: urlPath, method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(json) },
-    }, res => {
-      let data = '';
-      res.on('data', c => data += c);
-      res.on('end', () => resolve({ status: res.statusCode, data }));
-    });
+    const req = http.request(
+      {
+        hostname: '127.0.0.1',
+        port,
+        path: urlPath,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(json) },
+      },
+      res => {
+        let data = '';
+        res.on('data', c => (data += c));
+        res.on('end', () => resolve({ status: res.statusCode, data }));
+      }
+    );
     req.on('error', reject);
-    req.setTimeout(3000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.setTimeout(3000, () => {
+      req.destroy();
+      reject(new Error('timeout'));
+    });
     req.write(json);
     req.end();
   });
@@ -55,7 +67,11 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
     const router = new Router([{ event: '*', handler: 'echo', sink: 'test' }]);
     const memory = new DaemonMemory(tmpDir, {});
     const mockRenderer = { render: () => 'mock response', renderProactive: () => 'proactive' };
-    const mockSink = { async send() { return 1; } };
+    const mockSink = {
+      async send() {
+        return 1;
+      },
+    };
     dispatcher = new Dispatcher(router, mockRenderer, { test: mockSink }, () => {}, memory, {});
 
     server = http.createServer((req, res) => {
@@ -67,16 +83,19 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
         return;
       }
       if (url.pathname === '/status') {
-        res.end(JSON.stringify({
-          status: 'running', pid: process.pid,
-          dispatcher: dispatcher.getStats(),
-          memory: memory.getStats(),
-        }));
+        res.end(
+          JSON.stringify({
+            status: 'running',
+            pid: process.pid,
+            dispatcher: dispatcher.getStats(),
+            memory: memory.getStats(),
+          })
+        );
         return;
       }
       if (url.pathname === '/event' && req.method === 'POST') {
         let body = '';
-        req.on('data', c => body += c);
+        req.on('data', c => (body += c));
         req.on('end', () => {
           try {
             const event = JSON.parse(body);
@@ -110,7 +129,9 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
 
   after(async () => {
     if (server) await new Promise(resolve => server.close(resolve));
-    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+    try {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    } catch {}
   });
 
   it('/health returns ok', async () => {

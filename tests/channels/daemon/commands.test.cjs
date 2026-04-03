@@ -32,7 +32,9 @@ function createMockMemory() {
     getStats() {
       return { chats: 0, totalMessages: 0, profiles: 0, messagesSinceDream: 0, lastDream: 'never' };
     },
-    dream() { return 'Dream complete: 2 facts added'; },
+    dream() {
+      return 'Dream complete: 2 facts added';
+    },
   };
 }
 
@@ -40,10 +42,26 @@ function createMockMemory() {
 function createMockDispatcher() {
   return {
     getStats() {
-      return { received: 10, processed: 9, errors: 1, tasksExecuted: 3, lastEvent: null, queueLength: 0, processing: false };
+      return {
+        received: 10,
+        processed: 9,
+        errors: 1,
+        tasksExecuted: 3,
+        lastEvent: null,
+        queueLength: 0,
+        processing: false,
+      };
     },
     getHistory(limit) {
-      return [{ timestamp: '2026-01-01', user: 'omar', message: 'hello', response: 'hi', sink: 'telegram' }];
+      return [
+        {
+          timestamp: '2026-01-01',
+          user: 'omar',
+          message: 'hello',
+          response: 'hi',
+          sink: 'telegram',
+        },
+      ];
     },
     activeTasks: new Map(),
     stats: { tasksExecuted: 3 },
@@ -115,7 +133,7 @@ describe('CommandHandler', () => {
   describe('/memory', () => {
     it('shows empty message when no profile', async () => {
       await handler.handle({ text: '/memory', chatId: '123', messageId: 1 });
-      assert.ok(sink.sent[0].text.includes('don\'t have'));
+      assert.ok(sink.sent[0].text.includes("don't have"));
     });
 
     it('shows facts when profile exists', async () => {

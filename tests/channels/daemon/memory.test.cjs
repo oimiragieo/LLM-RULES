@@ -17,7 +17,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+  try {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  } catch {}
 });
 
 describe('DaemonMemory', () => {
@@ -75,7 +77,10 @@ describe('DaemonMemory', () => {
 
     it('getContext() includes Tier 3 profile when present', () => {
       const mem = new DaemonMemory(tmpDir, {});
-      mem.profiles.set('chat1', { facts: ['User is Omar', 'Works on agent-studio'], lastDream: '' });
+      mem.profiles.set('chat1', {
+        facts: ['User is Omar', 'Works on agent-studio'],
+        lastDream: '',
+      });
       mem.addMessage('chat1', 'user', 'hello', 'omar');
       const ctx = mem.getContext('chat1');
       assert.ok(ctx.includes('User is Omar'));
@@ -135,10 +140,17 @@ describe('DaemonMemory', () => {
       // Fill enough messages to trigger compaction
       for (let i = 0; i < 25; i++) {
         mem.chats.set('chat1', mem.chats.get('chat1') || []);
-        mem.chats.get('chat1').push({ role: 'user', user: 'omar', text: `msg ${i}`, timestamp: new Date().toISOString() });
+        mem.chats
+          .get('chat1')
+          .push({
+            role: 'user',
+            user: 'omar',
+            text: `msg ${i}`,
+            timestamp: new Date().toISOString(),
+          });
       }
       // Manually call compact (it would normally use execSync which we don't want in tests)
-      const count = (mem.compactionCounts.get('chat1') || 0);
+      const count = mem.compactionCounts.get('chat1') || 0;
       mem.compactionCounts.set('chat1', count + 1);
       assert.equal(mem.compactionCounts.get('chat1'), 1);
     });

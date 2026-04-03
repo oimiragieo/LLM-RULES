@@ -108,7 +108,9 @@ describe('TelegramSink', () => {
   it('sendTyping() does not throw on API error', async () => {
     const { TelegramSink } = require('../../../../scripts/channels/daemon/sinks/telegram.cjs');
     // Temporarily make API fail
-    originalModule.telegramApi = async () => { throw new Error('network error'); };
+    originalModule.telegramApi = async () => {
+      throw new Error('network error');
+    };
     const sink = new TelegramSink('test-token');
 
     // Should not throw
