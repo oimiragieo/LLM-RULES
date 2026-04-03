@@ -211,4 +211,42 @@ describe('CommandHandler', () => {
       assert.ok(sink.sent[1].text.includes('Dream complete'));
     });
   });
+
+  describe('/approve + /deny', () => {
+    it('/approve resolves pending approval', async () => {
+      let resolved = null;
+      dispatcher.pendingApprovals = new Map();
+      dispatcher.pendingApprovals.set('123', {
+        resolve: (v) => { resolved = v; },
+        command: 'rm -rf /tmp/test',
+        timestamp: Date.now(),
+      });
+
+      await handler.handle({ text: '/approve', chatId: '123', messageId: 1 });
+      assert.equal(resolved, 'approve');
+      assert.equal(dispatcher.pendingApprovals.has('123'), false);
+      assert.ok(sink.sent[0].text.includes('Approved'));
+    });
+
+    it('/deny resolves pending approval as deny', async () => {
+      let resolved = null;
+      dispatcher.pendingApprovals = new Map();
+      dispatcher.pendingApprovals.set('123', {
+        resolve: (v) => { resolved = v; },
+        command: 'rm -rf /tmp/test',
+        timestamp: Date.now(),
+      });
+
+      await handler.handle({ text: '/deny', chatId: '123', messageId: 1 });
+      assert.equal(resolved, 'deny');
+      assert.equal(dispatcher.pendingApprovals.has('123'), false);
+      assert.ok(sink.sent[0].text.includes('Denied'));
+    });
+
+    it('/approve with nothing pending says so', async () => {
+      dispatcher.pendingApprovals = new Map();
+      await handler.handle({ text: '/approve', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('Nothing pending'));
+    });
+  });
 });

@@ -24,6 +24,7 @@ class Dispatcher {
     this.activeTasks = new Map(); // taskId → { status, description, startTime, chatId }
     this.taskCounter = 0;
     this.pendingClarifications = new Map(); // chatId → { originalText, question, timestamp }
+    this.pendingApprovals = new Map(); // chatId → { resolve, reject, command, timestamp }
     this.stats = { received: 0, processed: 0, errors: 0, tasksExecuted: 0, lastEvent: null };
   }
 
@@ -253,6 +254,44 @@ class Dispatcher {
 
   getHistory(limit = 20) {
     return this.history.slice(-limit);
+  }
+
+  /**
+   * Request approval from the user via Telegram.
+   * Returns a promise that resolves to 'approve' or 'deny'.
+   * Times out after 5 minutes with 'deny'.
+   */
+  requestApproval(chatId, commandPreview) {
+    return new Promise(resolve => {
+      // Store the resolver so /approve and /deny can call it
+      this.pendingApprovals.set(chatId, {
+        resolve,
+        command: commandPreview,
+        timestamp: Date.now(),
+      });
+
+      // Send the approval prompt
+      const sink = this.sinks.telegram || Object.values(this.sinks)[0];
+      if (sink) {
+        sink
+          .send(
+            chatId,
+            `⚠️ **Dangerous command requires approval:**\n\`\`\`\n${commandPreview.slice(0, 200)}\n\`\`\`\nReply /approve to execute or /deny to cancel.`
+          )
+          .catch(() => {});
+      }
+
+      // 5-minute timeout → auto-deny
+      setTimeout(() => {
+        if (this.pendingApprovals.has(chatId)) {
+          this.pendingApprovals.delete(chatId);
+          resolve('deny');
+          if (sink) {
+            sink.send(chatId, '⏰ Approval timed out. Command cancelled.').catch(() => {});
+          }
+        }
+      }, 300000);
+    });
   }
 }
 

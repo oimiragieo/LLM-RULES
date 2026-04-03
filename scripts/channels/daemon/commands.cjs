@@ -211,6 +211,26 @@ class CommandHandler {
       case '/ping':
         return this._reply(chatId, messageId, '🏓 Pong!');
 
+      case '/approve': {
+        const pending = this.dispatcher.pendingApprovals.get(chatId);
+        if (!pending) {
+          return this._reply(chatId, messageId, '✅ Nothing pending approval.');
+        }
+        pending.resolve('approve');
+        this.dispatcher.pendingApprovals.delete(chatId);
+        return this._reply(chatId, messageId, '✅ Approved. Executing...');
+      }
+
+      case '/deny': {
+        const pending = this.dispatcher.pendingApprovals.get(chatId);
+        if (!pending) {
+          return this._reply(chatId, messageId, '❌ Nothing pending to deny.');
+        }
+        pending.resolve('deny');
+        this.dispatcher.pendingApprovals.delete(chatId);
+        return this._reply(chatId, messageId, '❌ Denied. Task cancelled.');
+      }
+
       default:
         // Unknown / command — let Claude handle it
         return false;
