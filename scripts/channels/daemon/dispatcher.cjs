@@ -110,7 +110,35 @@ class Dispatcher {
           if (!response) continue; // skip on error
         } else {
           this.log(`[dispatcher] Rendering response for ${event.type} from ${event.data.user}...`);
-          response = this.renderer.render(event);
+
+          // Use streaming if sink supports it
+          const streamSink = this.sinks[route.sink || event.source];
+          if (streamSink?.createStreamSession && this.renderer.renderStream) {
+            const session = streamSink.createStreamSession(event.data.chatId, {
+              replyTo: event.data.messageId,
+            });
+            response = await this.renderer.renderStream(event, (chunk) => {
+              session.update(chunk).catch(() => {});
+            });
+            // Finalize only if not a [TASK] (task flow handles its own messaging)
+            if (!response.startsWith('[TASK]')) {
+              await session.finalize(response);
+              // Record in history and skip the normal sink.send below
+              this.history.push({
+                timestamp: event.timestamp,
+                user: event.data.user,
+                message: event.data.text,
+                response: response.slice(0, 500),
+                sink: route.sink || event.source,
+              });
+              if (this.history.length > this.maxHistory) this.history.shift();
+              this.log(`[dispatcher] Streamed to ${route.sink || event.source}`);
+              continue; // skip normal delivery — already streamed
+            }
+          } else {
+            // Fallback: sync render
+            response = this.renderer.render(event);
+          }
         }
         this.log(`[dispatcher] Response: ${response.slice(0, 80)}...`);
       } else if (route.handler === 'echo') {

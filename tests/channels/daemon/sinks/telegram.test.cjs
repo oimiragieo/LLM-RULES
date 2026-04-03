@@ -50,6 +50,61 @@ describe('TelegramSink', () => {
     assert.equal(apiCalls[0].body.action, 'typing');
   });
 
+  it('createStreamSession() returns a StreamSession', () => {
+    const { TelegramSink } = require('../../../../scripts/channels/daemon/sinks/telegram.cjs');
+    const sink = new TelegramSink('test-token');
+    const session = sink.createStreamSession('123', { replyTo: 456 });
+    assert.ok(session);
+    assert.equal(session.chatId, '123');
+    assert.equal(session.replyTo, 456);
+    assert.equal(session.finalized, false);
+    assert.ok(session.draftId);
+  });
+
+  it('StreamSession.update() calls API (fallback mode)', async () => {
+    const { TelegramSink } = require('../../../../scripts/channels/daemon/sinks/telegram.cjs');
+    const sink = new TelegramSink('test-token');
+    sink._draftSupported = false; // Force fallback
+    apiCalls.length = 0;
+
+    const session = sink.createStreamSession('123');
+    session.minInterval = 0;
+    await session.update('Hello');
+    assert.ok(apiCalls.length >= 1);
+    assert.equal(apiCalls[0].method, 'sendMessage');
+    assert.ok(apiCalls[0].body.text.includes('Hello'));
+  });
+
+  it('StreamSession.finalize() sends final text', async () => {
+    const { TelegramSink } = require('../../../../scripts/channels/daemon/sinks/telegram.cjs');
+    const sink = new TelegramSink('test-token');
+    sink._draftSupported = false;
+    apiCalls.length = 0;
+
+    const session = sink.createStreamSession('123');
+    session.messageId = 999;
+    await session.finalize('Final response');
+
+    const editCall = apiCalls.find(c => c.method === 'editMessageText');
+    assert.ok(editCall);
+    assert.equal(editCall.body.text, 'Final response');
+    assert.equal(session.finalized, true);
+  });
+
+  it('StreamSession.finalize() is idempotent', async () => {
+    const { TelegramSink } = require('../../../../scripts/channels/daemon/sinks/telegram.cjs');
+    const sink = new TelegramSink('test-token');
+    sink._draftSupported = false;
+    apiCalls.length = 0;
+
+    const session = sink.createStreamSession('123');
+    session.messageId = 999;
+    await session.finalize('First');
+    const count = apiCalls.length;
+    await session.finalize('Second');
+    assert.equal(apiCalls.length, count);
+  });
+
   it('sendTyping() does not throw on API error', async () => {
     const { TelegramSink } = require('../../../../scripts/channels/daemon/sinks/telegram.cjs');
     // Temporarily make API fail

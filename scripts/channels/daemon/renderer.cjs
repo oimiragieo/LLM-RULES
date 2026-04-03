@@ -1,14 +1,12 @@
 /**
- * renderer.cjs — Claude-powered response renderer with conversation memory
+ * renderer.cjs — Claude-powered response renderer with streaming + memory
  *
  * KAIROS-style: maintains conversation context across interactions.
- * Each render includes recent chat history so Claude knows what
- * was discussed previously.
+ * Supports both sync (render) and async streaming (renderStream) modes.
  */
 'use strict';
 
-const { execSync } = require('child_process');
-const { TaskExecutor } = require('./executor.cjs');
+const { execSync, execFile } = require('child_process');
 
 const SYSTEM_PROMPT = `You are Agent Studio — an AI assistant running as a persistent background daemon, communicating via Telegram.
 
@@ -55,37 +53,38 @@ class ClaudeRenderer {
     this.persona = config.persona || SYSTEM_PROMPT;
   }
 
-  render(event) {
+  /**
+   * Build the prompt from event + memory context.
+   * Shared between sync and async render paths.
+   */
+  _buildPrompt(event) {
     const { text, user, chatId } = event.data;
 
-    // Build context from conversation memory
     let context = '';
     if (this.memory && chatId) {
       context = this.memory.getContext(chatId);
-
-      // Auto-detect context rot: if context is getting too large, compact before rendering.
-      // KAIROS compacts at ~93% of context window. Our effective limit is ~6000 chars
-      // for the context portion (MAX_CONTEXT_CHARS in memory.cjs). If we're over 80%,
-      // force a compaction so the user never notices degradation.
       if (context.length > 4800) {
         this.memory._compactChat(chatId);
-        context = this.memory.getContext(chatId); // Re-fetch after compaction
+        context = this.memory.getContext(chatId);
       }
     }
 
-    // Record the user message
     if (this.memory && chatId) {
       this.memory.addMessage(chatId, 'user', text, user);
     }
 
     const parts = [this.persona];
-    if (context) {
-      parts.push(`\nRecent chat history:\n${context}`);
-    }
+    if (context) parts.push(`\nRecent chat history:\n${context}`);
     parts.push(`\nNew message from ${user}: ${text}`);
 
-    const prompt = parts.join('\n').replace(/"/g, '\\"').replace(/\n/g, ' ');
+    return parts.join('\n').replace(/"/g, '\\"').replace(/\n/g, ' ');
+  }
 
+  /**
+   * Synchronous render — blocks until complete. Used as fallback.
+   */
+  render(event) {
+    const prompt = this._buildPrompt(event);
     try {
       const env = { ...process.env };
       delete env.ANTHROPIC_API_KEY;
@@ -93,58 +92,123 @@ class ClaudeRenderer {
       const result = execSync(
         `claude -p "${prompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 3`,
         {
-          cwd: this.projectRoot,
-          encoding: 'utf8',
-          timeout: 120000,
-          env,
-          windowsHide: true,
-          shell: true,
-          stdio: ['pipe', 'pipe', 'pipe'],
+          cwd: this.projectRoot, encoding: 'utf8', timeout: 120000,
+          env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'],
         }
       ).trim();
 
       const response = result || 'Sorry, I could not generate a response.';
-
-      // Record assistant response
-      if (this.memory && chatId) {
-        this.memory.addMessage(chatId, 'assistant', response);
+      if (this.memory && event.data.chatId) {
+        this.memory.addMessage(event.data.chatId, 'assistant', response);
       }
-
       return response;
     } catch (err) {
       const stderr = err.stderr?.toString()?.trim() || '';
       const stdout = err.stdout?.toString()?.trim() || '';
-      const detail = stderr || stdout || err.message || 'unknown';
-      return `Error: ${detail.slice(0, 300)}`;
+      return `Error: ${(stderr || stdout || err.message || 'unknown').slice(0, 300)}`;
     }
   }
 
   /**
+   * Async streaming render — calls onChunk as text accumulates.
+   * Returns the full response when complete.
+   *
+   * @param {Object} event — the event to render
+   * @param {Function} onChunk — called with (accumulatedText) periodically
+   * @returns {Promise<string>} — the full response
+   */
+  renderStream(event, onChunk) {
+    const prompt = this._buildPrompt(event);
+    const env = { ...process.env };
+    delete env.ANTHROPIC_API_KEY;
+
+    return new Promise((resolve, reject) => {
+      // Use shell=true on Windows for .cmd wrappers
+      const child = execFile(
+        process.platform === 'win32' ? 'cmd' : 'claude',
+        process.platform === 'win32'
+          ? ['/c', `claude -p "${prompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 3`]
+          : ['-p', prompt, '--dangerously-skip-permissions', '--model', this.model, '--max-turns', '3'],
+        {
+          cwd: this.projectRoot,
+          env,
+          windowsHide: true,
+          timeout: 120000,
+          maxBuffer: 1024 * 1024, // 1MB
+        },
+        (error, stdout, stderr) => {
+          // This fires when the process exits — we use it as final fallback
+          // but normally resolve from the stream handler below
+        }
+      );
+
+      let accumulated = '';
+      let lastChunkTime = 0;
+      let resolved = false;
+
+      child.stdout.on('data', (data) => {
+        accumulated += data.toString();
+        const now = Date.now();
+        // Rate-limit chunk callbacks to avoid flooding Telegram API
+        if (now - lastChunkTime >= 500 && onChunk) {
+          onChunk(accumulated);
+          lastChunkTime = now;
+        }
+      });
+
+      child.stderr.on('data', (data) => {
+        // Ignore stderr (debug output from claude)
+      });
+
+      child.on('close', (code) => {
+        if (resolved) return;
+        resolved = true;
+        const response = accumulated.trim() || 'Sorry, I could not generate a response.';
+
+        // Record in memory
+        if (this.memory && event.data.chatId) {
+          this.memory.addMessage(event.data.chatId, 'assistant', response);
+        }
+
+        resolve(response);
+      });
+
+      child.on('error', (err) => {
+        if (resolved) return;
+        resolved = true;
+        resolve(`Error: ${err.message?.slice(0, 300)}`);
+      });
+
+      // Safety timeout
+      setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          try { child.kill(); } catch {}
+          const response = accumulated.trim() || 'Response timed out.';
+          if (this.memory && event.data.chatId) {
+            this.memory.addMessage(event.data.chatId, 'assistant', response);
+          }
+          resolve(response);
+        }
+      }, 125000);
+    });
+  }
+
+  /**
    * Render a proactive message (timer events, check-ins).
-   * No user message — Claude generates based on context/prompt.
    */
   renderProactive(event) {
-    const { prompt, chatIds } = event.data;
+    const { prompt } = event.data;
     const fullPrompt = `${this.persona}\n\n${prompt}`.replace(/"/g, '\\"').replace(/\n/g, ' ');
-
     try {
       const env = { ...process.env };
       delete env.ANTHROPIC_API_KEY;
-
       return execSync(
         `claude -p "${fullPrompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 1`,
-        {
-          cwd: this.projectRoot,
-          encoding: 'utf8',
-          timeout: 60000,
-          env,
-          windowsHide: true,
-          shell: true,
-          stdio: ['pipe', 'pipe', 'pipe'],
-        }
+        { cwd: this.projectRoot, encoding: 'utf8', timeout: 60000, env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'] }
       ).trim();
     } catch {
-      return null; // Silently skip proactive messages on error
+      return null;
     }
   }
 }
