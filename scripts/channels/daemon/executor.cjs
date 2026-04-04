@@ -1,9 +1,10 @@
 /**
  * executor.cjs — Task executor for the channel daemon
  *
- * When the user asks the bot to DO something (run code, edit files, check status),
- * the executor spawns a headless claude -p session to handle it and returns the result.
- * Can also talk to the A2A server (router) on port 3100 to delegate to specialized agents.
+ * Supports:
+ *   - Single-shot task execution (executeTask)
+ *   - Ralph loop execution (executeRalphLoop) — persistent verify/fix cycles
+ *   - A2A router delegation (sendToRouter)
  */
 'use strict';
 
@@ -19,12 +20,10 @@ class TaskExecutor {
   }
 
   /**
-   * Execute a coding/file task via headless claude -p (has tool access).
-   * Returns the result text.
+   * Single-shot task execution via headless claude -p.
    */
   executeTask(task, context = '') {
     const prompt = context ? `Context: ${context}\n\nTask: ${task}` : task;
-
     const safePrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, ' ').slice(0, 4000);
 
     try {
@@ -36,7 +35,7 @@ class TaskExecutor {
         {
           cwd: this.projectRoot,
           encoding: 'utf8',
-          timeout: 300000, // 5 min for real tasks
+          timeout: 300000,
           env,
           windowsHide: true,
           shell: true,
@@ -53,11 +52,77 @@ class TaskExecutor {
   }
 
   /**
+   * Ralph loop — persistent verify/fix execution.
+   * Runs task repeatedly until completion criteria are met or max iterations reached.
+   *
+   * Based on the Ralph Wiggum technique (oh-my-claudecode) and OMC's PRD-driven loops.
+   * Each iteration feeds the previous result as context so Claude can build on prior work.
+   *
+   * @param {string} task — the task to complete
+   * @param {object} opts — { maxIterations, verifyCommand, onProgress }
+   * @returns {string} — final result with iteration count
+   */
+  executeRalphLoop(task, opts = {}) {
+    const maxIterations = opts.maxIterations || 5;
+    const verifyCommand = opts.verifyCommand || null;
+    const onProgress = opts.onProgress || (() => {});
+
+    let context = '';
+    let lastResult = '';
+    let iteration = 0;
+
+    while (iteration < maxIterations) {
+      iteration++;
+      onProgress(`🔄 Ralph iteration ${iteration}/${maxIterations}...`);
+      this.log(`[executor] Ralph iteration ${iteration}: ${task.slice(0, 60)}`);
+
+      // Build prompt — first iteration is clean, subsequent get prior context
+      const prompt = iteration === 1
+        ? task
+        : `Previous iteration result:\n${lastResult.slice(0, 2000)}\n\nContinue working on: ${task}\n\nFix any remaining issues. If everything passes, say RALPH_COMPLETE.`;
+
+      lastResult = this.executeTask(prompt, context);
+
+      // Check for explicit completion signal
+      if (lastResult.includes('RALPH_COMPLETE') || lastResult.includes('All tests pass')) {
+        this.log(`[executor] Ralph completed at iteration ${iteration}`);
+        break;
+      }
+
+      // If verify command provided, run it to check completion
+      if (verifyCommand) {
+        try {
+          const env = { ...process.env };
+          delete env.ANTHROPIC_API_KEY;
+          const verifyResult = execSync(verifyCommand, {
+            cwd: this.projectRoot, encoding: 'utf8', timeout: 60000,
+            env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'],
+          }).trim();
+
+          if (verifyResult.includes('PASS') || verifyResult.includes('0 fail') || verifyResult.includes(' 0 errors')) {
+            this.log(`[executor] Ralph verify passed at iteration ${iteration}`);
+            lastResult += `\n\nVerification: ${verifyResult.slice(0, 500)}`;
+            break;
+          }
+          context = `Verification output (failed):\n${verifyResult.slice(0, 1000)}`;
+        } catch (err) {
+          context = `Verification error: ${(err.stderr?.toString() || err.message || '').slice(0, 500)}`;
+        }
+      } else {
+        // No verify command — accumulate context for next iteration
+        context = `Previous result:\n${lastResult.slice(0, 1500)}`;
+      }
+    }
+
+    const status = iteration >= maxIterations ? '⚠️ Max iterations reached' : `✅ Completed in ${iteration} iteration(s)`;
+    return `${status}\n\n${lastResult}`;
+  }
+
+  /**
    * Send a task to the A2A server (router) for agent-based execution.
-   * Returns a promise with the task result.
    */
   async sendToRouter(prompt, agentType = 'developer') {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const body = JSON.stringify({
         jsonrpc: '2.0',
         id: Date.now().toString(),
@@ -71,37 +136,27 @@ class TaskExecutor {
         },
       });
 
-      const req = http.request(
-        {
-          hostname: '127.0.0.1',
-          port: this.a2aPort,
-          path: '/a2a',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(body),
-          },
-          timeout: 10000,
+      const req = http.request({
+        hostname: '127.0.0.1',
+        port: this.a2aPort,
+        path: '/a2a',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(body),
         },
-        res => {
-          let data = '';
-          res.on('data', c => (data += c));
-          res.on('end', () => {
-            try {
-              const result = JSON.parse(data);
-              resolve(result);
-            } catch {
-              resolve({ error: data });
-            }
-          });
-        }
-      );
+        timeout: 10000,
+      }, res => {
+        let data = '';
+        res.on('data', c => data += c);
+        res.on('end', () => {
+          try { resolve(JSON.parse(data)); }
+          catch { resolve({ error: data }); }
+        });
+      });
 
       req.on('error', err => resolve({ error: `A2A server not available: ${err.message}` }));
-      req.on('timeout', () => {
-        req.destroy();
-        resolve({ error: 'A2A server timeout' });
-      });
+      req.on('timeout', () => { req.destroy(); resolve({ error: 'A2A server timeout' }); });
       req.write(body);
       req.end();
     });
@@ -116,10 +171,7 @@ class TaskExecutor {
         resolve(res.statusCode === 200);
       });
       req.on('error', () => resolve(false));
-      req.setTimeout(2000, () => {
-        req.destroy();
-        resolve(false);
-      });
+      req.setTimeout(2000, () => { req.destroy(); resolve(false); });
     });
   }
 }

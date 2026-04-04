@@ -59,6 +59,18 @@ Examples:
 - User: "read this PDF for me" → [TASK] Use markitdown to convert the file to markdown and summarize it
 - User: "create a new feature branch" → [TASK] Run git checkout -b feature/new-feature
 
+### Ralph loop (use [RALPH] tag for iterative tasks)
+For tasks that need verification and may require multiple attempts (fixing bugs, making tests pass,
+migrations), use [RALPH] instead of [TASK]. The daemon runs the task in a persistent verify/fix loop
+(up to 5 iterations), each building on the previous result until completion.
+
+Examples:
+- User: "make all the tests pass" → [RALPH] Run the test suite, fix all failures, verify all tests pass
+- User: "fix the build errors" → [RALPH] Run the build, fix errors, verify clean build
+- User: "migrate the database" → [RALPH] Run migration, fix issues, verify schema
+
+Use [RALPH] when iterative fixing is needed. Use [TASK] for one-shot commands.
+
 ### Router delegation (use [TASK] with "router" or "delegate")
 For complex multi-step work, the daemon can delegate to the A2A router which spawns specialized agents:
 - User: "deploy the app" → [TASK] Delegate to router: deploy the application to staging

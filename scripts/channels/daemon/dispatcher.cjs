@@ -224,6 +224,51 @@ class Dispatcher {
       }
 
       // Check if Claude wants to execute a task
+      // Check if Claude wants a Ralph loop (iterative verify/fix)
+      if (response.startsWith('[RALPH]')) {
+        const taskDesc = response.slice(7).trim();
+        const taskId = `ralph-${++this.taskCounter}`;
+        this.activeTasks.set(taskId, {
+          status: 'running',
+          description: `[RALPH] ${taskDesc}`,
+          startTime: Date.now(),
+          chatId: event.data.chatId,
+          user: event.data.user,
+        });
+        this.stats.tasksExecuted++;
+
+        try {
+          await sink.send(event.data.chatId, `🔄 Starting Ralph loop: ${taskDesc.slice(0, 100)}...`, {
+            replyTo: event.data.messageId,
+          });
+        } catch {}
+
+        let progressTimer = setInterval(async () => {
+          try { await sink.send(event.data.chatId, '⏳ Ralph still working...'); } catch {}
+        }, 20000);
+
+        this.log(`[dispatcher] Ralph loop ${taskId}: ${taskDesc.slice(0, 80)}`);
+        let result;
+        try {
+          result = this.executor.executeRalphLoop(taskDesc, {
+            maxIterations: 5,
+            onProgress: async (msg) => {
+              try { await sink.send(event.data.chatId, msg); } catch {}
+            },
+          });
+          this.activeTasks.get(taskId).status = 'completed';
+        } catch (err) {
+          result = `Ralph failed: ${err.message}`;
+          this.activeTasks.get(taskId).status = 'failed';
+        }
+        clearInterval(progressTimer);
+        this.activeTasks.get(taskId).endTime = Date.now();
+
+        const truncatedResult = result.length > 3500 ? result.slice(0, 3500) + '\n\n... (truncated)' : result;
+        response = truncatedResult;
+      }
+
+      // Check if Claude wants to execute a single task
       if (response.startsWith('[TASK]')) {
         const taskDesc = response.slice(6).trim();
         const taskId = `task-${++this.taskCounter}`;
