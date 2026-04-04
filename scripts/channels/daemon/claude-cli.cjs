@@ -14,8 +14,9 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-// Windows cmd.exe has 8191 char limit. Leave headroom for the command + flags.
-const WIN_CMD_LIMIT = 7000;
+// Windows cmd.exe has 8191 char limit. Leave generous headroom for
+// the claude command, flags, shell quoting overhead, and env vars.
+const WIN_CMD_LIMIT = 5000;
 
 /**
  * Build the args array for claude CLI.
@@ -91,8 +92,9 @@ function claudeSync(prompt, opts = {}) {
 }
 
 /**
- * Long-prompt fallback: use --append-system-prompt-file for the system prompt
- * and stdin piping for the user prompt when they exceed Windows limits.
+ * Long-prompt fallback: write prompt to temp file and pass via
+ * --append-system-prompt-file. Uses a short placeholder for -p
+ * and puts the real prompt in a file to avoid cmd.exe limits.
  */
 function _claudeSyncViaFile(
   prompt,
@@ -100,27 +102,37 @@ function _claudeSyncViaFile(
 ) {
   const tmpDir = path.join(os.tmpdir(), 'daemon-claude');
   fs.mkdirSync(tmpDir, { recursive: true });
-  const tmpSysFile = path.join(tmpDir, `sys-${Date.now()}-${process.pid}.txt`);
+  const ts = Date.now();
+  const tmpPromptFile = path.join(tmpDir, `prompt-${ts}-${process.pid}.txt`);
+  const tmpSysFile = path.join(tmpDir, `sys-${ts}-${process.pid}.txt`);
 
   try {
-    // If we have an inline system prompt, write it to a temp file
-    let sysFile = appendSystemPromptFile;
-    if (appendSystemPrompt && !appendSystemPromptFile) {
-      fs.writeFileSync(tmpSysFile, appendSystemPrompt, 'utf8');
-      sysFile = tmpSysFile;
-    }
+    // Write prompt to temp file — combined with system prompt if inline
+    const promptContent = appendSystemPrompt
+      ? `${appendSystemPrompt}\n\n---\n\nUser request:\n${prompt}`
+      : prompt;
+    fs.writeFileSync(tmpPromptFile, promptContent, 'utf8');
 
     const args = [
       '-p',
-      prompt,
+      'Follow the instructions in the appended system prompt file.',
       '--dangerously-skip-permissions',
       '--model',
       model,
       '--max-turns',
       maxTurns,
+      '--append-system-prompt-file',
+      appendSystemPromptFile || tmpPromptFile,
     ];
-    if (sysFile) {
-      args.push('--append-system-prompt-file', sysFile);
+
+    // If we have both a file-based system prompt AND a long user prompt,
+    // combine them into a single temp file
+    if (appendSystemPromptFile && prompt.length > WIN_CMD_LIMIT) {
+      const sysContent = fs.existsSync(appendSystemPromptFile)
+        ? fs.readFileSync(appendSystemPromptFile, 'utf8')
+        : '';
+      fs.writeFileSync(tmpSysFile, `${sysContent}\n\n---\n\nUser request:\n${prompt}`, 'utf8');
+      args[args.length - 1] = tmpSysFile;
     }
 
     const result = spawnSync('claude', args, {
@@ -136,6 +148,7 @@ function _claudeSyncViaFile(
     if (result.error) throw result.error;
     return (result.stdout || '').trim();
   } finally {
+    try { fs.unlinkSync(tmpPromptFile); } catch { /* ignored */ }
     try {
       fs.unlinkSync(tmpSysFile);
     } catch {
