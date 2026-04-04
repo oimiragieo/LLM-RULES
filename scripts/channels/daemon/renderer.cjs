@@ -130,6 +130,19 @@ class ClaudeRenderer {
     } else {
       this.persona = config.persona || SYSTEM_PROMPT;
     }
+    this.personalityOverride = null; // Set by /personality command via dispatcher
+  }
+
+  _getPersona() {
+    const PERSONALITY_MODIFIERS = {
+      professional: '\n\nIMPORTANT: Use a professional, formal tone. No slang, no emoji.',
+      creative: '\n\nIMPORTANT: Be creative, playful, use metaphors and humor. Make it fun!',
+      concise: '\n\nIMPORTANT: Be EXTREMELY brief. 1-2 sentences max. No filler.',
+      technical: '\n\nIMPORTANT: Use technical depth, code examples, precise terminology.',
+      friendly: '\n\nIMPORTANT: Be warm, encouraging, use emoji freely 😊. Extra friendly!',
+    };
+    const mod = this.personalityOverride ? PERSONALITY_MODIFIERS[this.personalityOverride] : '';
+    return this.persona + (mod || '');
   }
 
   _loadKnowledgeBase() {
@@ -179,7 +192,7 @@ class ClaudeRenderer {
       this.memory.addMessage(chatId, 'user', text, user);
     }
 
-    const parts = [this.persona];
+    const parts = [this._getPersona()];
     if (context) parts.push(`\nRecent chat history:\n${context}`);
 
     // Handle attachments — tell Claude what was received so it can use [TASK] to process

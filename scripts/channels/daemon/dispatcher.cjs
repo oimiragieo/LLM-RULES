@@ -156,6 +156,8 @@ class Dispatcher {
           if (!response) continue; // skip on error
         } else {
           this.log(`[dispatcher] Rendering response for ${event.type} from ${event.data.user}...`);
+          // Apply personality override if set
+          if (this._personality) this.renderer.personalityOverride = this._personality;
           response = this.renderer.render(event);
         }
         this.log(`[dispatcher] Response: ${response.slice(0, 80)}...`);

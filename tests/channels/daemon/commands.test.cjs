@@ -267,6 +267,49 @@ describe('CommandHandler', () => {
     });
   });
 
+  describe('/personality', () => {
+    it('lists personalities without args', async () => {
+      await handler.handle({ text: '/personality', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('professional'));
+      assert.ok(sink.sent[0].text.includes('creative'));
+    });
+
+    it('sets personality with valid name', async () => {
+      await handler.handle({ text: '/personality concise', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('concise'));
+      assert.equal(dispatcher._personality, 'concise');
+    });
+
+    it('rejects unknown personality', async () => {
+      await handler.handle({ text: '/personality alien', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('Unknown'));
+    });
+  });
+
+  describe('/insights', () => {
+    it('shows analytics', async () => {
+      await handler.handle({ text: '/insights', chatId: '123', messageId: 1 });
+      const text = sink.sent[0].text;
+      assert.ok(text.includes('Volume'));
+      assert.ok(text.includes('Tasks'));
+      assert.ok(text.includes('Errors'));
+    });
+  });
+
+  describe('/schedule', () => {
+    it('shows empty schedule list', async () => {
+      await handler.handle({ text: '/schedule', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('No scheduled'));
+    });
+
+    it('adds a schedule', async () => {
+      dispatcher._userSchedules = new Map();
+      await handler.handle({ text: '/schedule 0 9 * * 1-5 Good morning!', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('Scheduled'));
+      assert.equal(dispatcher._userSchedules.get('123').length, 1);
+    });
+  });
+
   describe('/pair', () => {
     it('shows usage without args', async () => {
       await handler.handle({ text: '/pair', chatId: '123', messageId: 1 });

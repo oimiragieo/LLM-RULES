@@ -55,6 +55,13 @@ class CommandHandler {
             '🗑 /forget — clear all data about you\n' +
             '🤖 /model — current AI model\n' +
             '🏓 /ping — alive check\n\n' +
+            '📈 /insights — usage analytics\n' +
+            '💰 /usage — your token costs\n' +
+            '⏰ /schedule — manage recurring prompts\n' +
+            '🎭 /personality — switch response style\n' +
+            '📄 /export — download chat as markdown\n' +
+            '🔑 /pair — device pairing for new users\n' +
+            '✅ /approve · ❌ /deny — approve pending commands\n\n' +
             '💡 I can also DO things — ask me to run code, check git, run tests, etc.'
         );
 
@@ -208,6 +215,29 @@ class CommandHandler {
       case '/model':
         return this._reply(chatId, messageId, '🤖 Current model: sonnet (Sonnet 4.6)');
 
+      case '/insights': {
+        const stats = this.dispatcher.getStats();
+        const memStats = this.memory.getStats();
+        const usage = this.memory?.getUsage?.(chatId);
+        const uptime = Math.round((Date.now() - this.startTime) / 1000);
+        const days = Math.max(1, Math.floor(uptime / 86400));
+        const msgsPerDay = Math.round(stats.received / days * 10) / 10;
+        const taskRate = stats.tasksExecuted > 0 ? `${Math.round(stats.tasksExecuted / stats.received * 100)}%` : '0%';
+
+        let insights = `📈 Insights\n\n`;
+        insights += `📊 Volume: ${stats.received} messages (${msgsPerDay}/day avg)\n`;
+        insights += `⚙️ Tasks: ${stats.tasksExecuted} executed (${taskRate} of messages)\n`;
+        insights += `❌ Errors: ${stats.errors} (${stats.received > 0 ? Math.round(stats.errors / stats.received * 100) : 0}% error rate)\n`;
+        insights += `🚫 Rate limited: ${stats.rateLimited || 0}\n`;
+        insights += `🧠 Memory: ${memStats.totalMessages} msgs across ${memStats.chats} chats\n`;
+        insights += `👤 Known users: ${memStats.profiles}\n`;
+        insights += `💭 Dreams: ${memStats.lastDream === 'never' ? '0' : 'active'}\n`;
+        if (usage?.month) {
+          insights += `\n💰 This month: ~$${usage.month.cost.toFixed(3)} (${Math.round(usage.month.tokens / 1000)}K tokens)`;
+        }
+        return this._reply(chatId, messageId, insights);
+      }
+
       case '/usage': {
         if (!this.memory?.getUsage) return this._reply(chatId, messageId, '📊 Usage tracking not available.');
         const usage = this.memory.getUsage(chatId);
@@ -269,6 +299,53 @@ class CommandHandler {
           return this._reply(chatId, messageId, `✅ User ${pending.chatId} approved!`);
         }
         return this._reply(chatId, messageId, '🔑 Usage: /pair request | /pair approve <code>');
+      }
+
+      case '/schedule': {
+        if (!args) {
+          // List schedules
+          const schedules = this.dispatcher._userSchedules?.get(chatId) || [];
+          if (schedules.length === 0) return this._reply(chatId, messageId, '⏰ No scheduled tasks.\n\nUsage: /schedule <cron> <prompt>\nExample: /schedule 0 9 * * 1-5 Good morning! What should I work on?');
+          const list = schedules.map((s, i) => `${i + 1}. \`${s.cron}\` → ${s.prompt.slice(0, 50)}`).join('\n');
+          return this._reply(chatId, messageId, `⏰ Your schedules:\n\n${list}\n\nRemove: /schedule remove <number>`);
+        }
+        if (args.startsWith('remove ')) {
+          const idx = parseInt(args.slice(7), 10) - 1;
+          const schedules = this.dispatcher._userSchedules?.get(chatId) || [];
+          if (idx < 0 || idx >= schedules.length) return this._reply(chatId, messageId, '⏰ Invalid schedule number.');
+          schedules.splice(idx, 1);
+          return this._reply(chatId, messageId, '⏰ Schedule removed.');
+        }
+        // Parse: first 5 tokens are cron, rest is prompt
+        const tokens = args.split(/\s+/);
+        if (tokens.length < 6) return this._reply(chatId, messageId, '⏰ Usage: /schedule <min> <hour> <dom> <month> <dow> <prompt>');
+        const cron = tokens.slice(0, 5).join(' ');
+        const prompt = tokens.slice(5).join(' ');
+        if (!this.dispatcher._userSchedules) this.dispatcher._userSchedules = new Map();
+        if (!this.dispatcher._userSchedules.has(chatId)) this.dispatcher._userSchedules.set(chatId, []);
+        this.dispatcher._userSchedules.get(chatId).push({ cron, prompt, chatId });
+        return this._reply(chatId, messageId, `⏰ Scheduled: \`${cron}\` → ${prompt.slice(0, 80)}`);
+      }
+
+      case '/personality': {
+        const personalities = {
+          default: 'Casual, helpful AI assistant',
+          professional: 'Professional and formal business tone',
+          creative: 'Creative, playful, uses metaphors and humor',
+          concise: 'Extremely brief — 1-2 sentences max',
+          technical: 'Technical depth, code examples, precise terminology',
+          friendly: 'Warm, encouraging, uses emoji freely 😊',
+        };
+        if (!args) {
+          const current = this.dispatcher._personality || 'default';
+          const list = Object.entries(personalities).map(([k, v]) => `${k === current ? '→' : '•'} ${k}: ${v}`).join('\n');
+          return this._reply(chatId, messageId, `🎭 Personalities:\n\n${list}\n\nUsage: /personality <name>`);
+        }
+        if (!personalities[args]) {
+          return this._reply(chatId, messageId, `🎭 Unknown personality: ${args}. Use /personality to see options.`);
+        }
+        this.dispatcher._personality = args;
+        return this._reply(chatId, messageId, `🎭 Personality set to: ${args} — ${personalities[args]}`);
       }
 
       case '/export': {
