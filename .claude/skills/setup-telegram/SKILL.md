@@ -47,6 +47,7 @@ Telegram Setup Status:
   [x] .env: CHANNEL_AUTO_START=true
   [x] .env: Allowed users: 6521653928
   [x] .env: Auth token configured (API key or OAuth token)
+  [x] Voice: transcribe-anything installed (pip)
   [x] MCP: telegram-relay registered
   [x] access.json: 1 allowed user
   [x] channels/.env: token present
@@ -62,6 +63,11 @@ For any `[ ]` items, tell the user exactly what to add and where.
 - "Without one of these, the monitor can't authenticate and will fail to start."
 
 If everything passes: "All configured! Run `/enable-telegram` to start monitoring."
+
+**Voice message support (optional):** If the user wants voice messages to be transcribed, they need:
+- `pip install transcribe-anything` — Whisper-based speech-to-text (required for voice)
+- `ELEVENLABS_API_KEY` or `OPENAI_API_KEY` in `.env` — for TTS audio responses (optional)
+- Without `transcribe-anything`, voice messages get a "please type instead" fallback
 
 ## Important
 
