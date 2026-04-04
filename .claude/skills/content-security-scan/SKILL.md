@@ -1,7 +1,7 @@
 ---
 name: content-security-scan
 description: 'Automated security scanner for external skill/agent content fetched from GitHub or web sources. Runs a 7-step PASS/FAIL security gate against fetched markdown/text content.'
-version: 1.2.0
+version: 1.3.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -349,6 +349,39 @@ Load `trusted_sources_config` from `.claude/config/trusted-sources.json` (SEC-EX
 ```
 
 Trust affects **response to FAIL**, not the scan itself. Even trusted sources must be scanned.
+
+## Composable Scan Stages (Inspired by Skill_Seekers Workflow YAML)
+
+The 7-step gate can be extended with custom scan stages for domain-specific threats. Each stage follows a composable definition:
+
+```json
+{
+  "name": "custom_api_key_scan",
+  "type": "custom",
+  "target": "all",
+  "enabled": true,
+  "usesHistory": false,
+  "patterns": [
+    { "regex": "sk-[a-zA-Z0-9]{32,}", "label": "OpenAI API key", "severity": "CRITICAL" },
+    { "regex": "ghp_[a-zA-Z0-9]{36}", "label": "GitHub PAT", "severity": "CRITICAL" },
+    { "regex": "AKIA[0-9A-Z]{16}", "label": "AWS Access Key", "severity": "CRITICAL" }
+  ],
+  "action": "FAIL"
+}
+```
+
+**Stage properties:**
+- `name`: unique identifier for the stage
+- `type`: `builtin` (use existing Steps 1-6) or `custom` (regex-based pattern matching)
+- `target`: `all` (full content), `prose` (outside code fences), `code` (inside code fences only)
+- `enabled`: toggle stages on/off without removing them
+- `usesHistory`: if true, receives findings from previous stages for chained analysis
+- `patterns`: array of regex patterns with labels and severity levels
+- `action`: `FAIL` (block), `WARN` (log but allow with flag), `INFO` (log only)
+
+**Custom stage registration**: Write custom stages to `.claude/config/security-scan-stages.json`. The scanner loads builtin stages (Steps 1-6) first, then appends custom stages in order. Custom stages run AFTER all builtin stages.
+
+**Stage chaining**: When `usesHistory: true`, the stage receives a `previousFindings` array containing all findings from earlier stages. This enables escalation logic — e.g., a "combination threat" stage that FAILs when both tool invocation AND exfiltration patterns are found in the same file.
 
 ## OWASP Agentic AI Coverage
 

@@ -17,6 +17,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Workflow template extraction** — when external projects use composable workflow definitions (YAML/JSON), extracts stage patterns, history chaining, and post-processing for gap analysis
 - **Two new iron laws** — mandatory injection scan before analysis; mandatory source auto-detection for ambiguous inputs
 
+### Skill_Seekers-Inspired Skill Upgrades (5 skills)
+
+#### Changed
+
+- **project-analyzer v1.1.0** — added weighted keyword scoring for smart categorization (3/2/1 point system with threshold), three-stream analysis (code + documentation + operations), and GoF design pattern recognition with confidence scoring
+- **content-security-scan v1.3.0** — added composable scan stage definitions allowing custom regex-based stages with chaining support, registered via `security-scan-stages.json`
+- **model-benchmark** — added structured JSON report format with typed timing/memory/dimension objects and ComparisonReport for CI regression gates
+- **mcp-builder v1.2.0** — added cross-IDE agent detection protocol (Claude Code, Cursor, Windsurf, Cline, IntelliJ) with auto-config generation per platform
+- **research-synthesis v1.2.0** — added multi-source conflict detection with claim matrix, pairwise contradiction detection, and mandatory conflicts section in synthesis reports
+
 ### Channel Daemon Fixes
 
 #### Fixed

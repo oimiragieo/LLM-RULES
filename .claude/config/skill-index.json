@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-04-04T15:53:18.248Z",
+  "generatedAt": "2026-04-04T16:26:28.982Z",
   "metadata": {
     "totalSkills": 342,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-04-04T15:53:18.250Z",
+    "lastValidated": "2026-04-04T16:26:28.983Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -6902,7 +6902,7 @@
       "displayName": "Project Analyzer",
       "category": "Other",
       "domain": "memory",
-      "description": "Automated brownfield codebase analysis. Detects project type, frameworks, dependencies, architecture patterns, and generates comprehensive project profile. Essential for Conductor integration and onboarding existing projects.",
+      "description": "Automated brownfield codebase analysis with weighted keyword scoring, three-stream analysis, and design pattern recognition. Detects project type, frameworks, dependencies, architecture patterns, and generates comprehensive project profile.",
       "requiredTools": [
         "Read",
         "Glob",

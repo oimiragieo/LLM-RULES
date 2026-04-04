@@ -1,7 +1,7 @@
 ---
 name: research-synthesis
 description: Research best practices and synthesize into design decisions for artifact creation. Invoke BEFORE any creator skill to ensure research-backed decisions.
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -69,6 +69,34 @@ NO ARTIFACT CREATION WITHOUT RESEARCH FIRST
 ```
 
 If you haven't executed the research protocol, you cannot proceed with artifact creation.
+
+## Multi-Source Conflict Detection (Inspired by Skill_Seekers unified_scraper)
+
+When synthesizing from 2+ sources, actively detect and flag contradictions. This prevents silent adoption of conflicting advice.
+
+**Conflict types to detect:**
+
+| Conflict Type | Example | Resolution Strategy |
+|---------------|---------|-------------------|
+| Version mismatch | Source A says "use v2 API", Source B says "v3 is required" | Flag with dates, prefer most recent |
+| Contradictory advice | Source A says "always use ORM", Source B says "raw SQL for performance" | Flag both with context, let decision-maker choose |
+| Deprecated patterns | Source A recommends pattern that Source B marks deprecated | Flag with deprecation notice, prefer Source B |
+| Incompatible implementations | Source A uses callbacks, Source B uses async/await | Flag with migration path if available |
+
+**Detection protocol:**
+1. After collecting findings from all sources, build a **claim matrix** — extract factual claims from each source
+2. Compare claims pairwise for contradictions using semantic overlap (same topic, different recommendation)
+3. For each conflict, record: `{ claim_a, source_a, claim_b, source_b, conflictType, suggestedResolution }`
+4. Include a `conflicts` section in the synthesis report — **never silently pick one side**
+
+**Conflict output in report:**
+```markdown
+### Conflicts Detected (2)
+
+1. **Version requirement** — React Router docs (2026-03) say v7 required for data loading; Stack Overflow answer (2025-11) assumes v6. **Resolution:** Use v7 (docs are authoritative and more recent).
+
+2. **State management approach** — Official docs recommend Context API for simple state; community blog recommends Zustand universally. **Resolution:** Flag for architect — depends on app complexity.
+```
 
 ## Query Limits (IRON LAW)
 

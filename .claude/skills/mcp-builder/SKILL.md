@@ -4,7 +4,7 @@ verified: true
 lastVerifiedAt: 2026-03-15T00:00:00.000Z
 name: mcp-builder
 description: Guide developers in creating Model Context Protocol (MCP) servers. Use for building MCP tools that enable LLMs to interact with external services. Covers TypeScript (primary) and Python FastMCP (secondary), tool annotations, Zod/Pydantic validation, and evaluation question creation.
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -437,6 +437,41 @@ npx -y @modelcontextprotocol/server-github
 | Leaking auth tokens in errors | Logging API key in error message  | Sanitize error messages             |
 | No pagination                 | Returning all results at once     | Add cursor/limit to list operations |
 | Blocking event loop           | Synchronous I/O in Node.js        | Always use async/await              |
+
+## Cross-IDE Agent Detection (Inspired by Skill_Seekers AgentDetector)
+
+After building an MCP server, auto-detect which AI coding agents are installed on the user's system and generate the correct configuration for each. This eliminates the manual "copy this JSON into your settings" step.
+
+**Supported agents and their config locations:**
+
+| Agent | Transport | Config Path (Windows) | Config Path (macOS/Linux) |
+|-------|-----------|----------------------|--------------------------|
+| Claude Code | stdio | `~/.claude.json` | `~/.claude.json` |
+| Cursor | HTTP | `%APPDATA%\Cursor\mcp_settings.json` | `~/Library/Application Support/Cursor/mcp_settings.json` |
+| Windsurf | HTTP | `%APPDATA%\Windsurf\mcp_config.json` | `~/Library/Application Support/Windsurf/mcp_config.json` |
+| VS Code + Cline | stdio | `%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json` | `~/.config/Code/User/globalStorage/...` |
+| IntelliJ IDEA | HTTP | `%APPDATA%\JetBrains\IntelliJIdea2024.3\mcp.xml` | `~/Library/Application Support/JetBrains/...` |
+
+**Detection protocol:**
+1. Check if each config file exists at the platform-appropriate path
+2. For each detected agent, generate the MCP server config snippet in the agent's format
+3. Present all detected agents to the user with one-click install instructions
+4. For agents using HTTP transport, include the default port and health check URL
+
+**Config generation template** (Claude Code stdio example):
+```json
+{
+  "mcpServers": {
+    "<server-name>": {
+      "command": "node",
+      "args": ["<path-to-server>/dist/index.js"],
+      "env": {}
+    }
+  }
+}
+```
+
+This step should be part of Phase 4 (Testing & Deployment) — after the server is built and tested, offer to install it into all detected agents.
 
 ## Reference Documentation
 

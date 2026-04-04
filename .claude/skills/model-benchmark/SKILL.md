@@ -198,6 +198,62 @@ node .claude/tools/cli/model-benchmark.cjs --model "gpt-4o" --dimensions "accura
 node .claude/tools/cli/model-benchmark.cjs --model "gemini-2.5-pro" --output results.json --json
 ```
 
+## Structured JSON Report Format (Inspired by Skill_Seekers BenchmarkRunner)
+
+In addition to the markdown report, generate a machine-readable JSON report at the same location with `.json` extension. This enables programmatic comparison across runs and automated regression detection.
+
+```json
+{
+  "name": "<model-name>",
+  "startedAt": "<ISO-8601>",
+  "finishedAt": "<ISO-8601>",
+  "totalDuration": 45.2,
+  "baseline": "claude-sonnet-4-6",
+  "timings": [
+    {
+      "operation": "task_completion_10",
+      "duration": 12.5,
+      "iterations": 10,
+      "avgDuration": 1.25,
+      "minDuration": 0.8,
+      "maxDuration": 2.1
+    }
+  ],
+  "memory": [
+    {
+      "operation": "inference",
+      "contextWindow": 200000,
+      "maxOutputTokens": 8192,
+      "peakRamMb": 0
+    }
+  ],
+  "dimensions": {
+    "accuracy": { "score": 0.85, "weight": 0.30, "weighted": 0.255 },
+    "latency": { "score": 0.72, "weight": 0.20, "weighted": 0.144 },
+    "memory": { "score": 0.90, "weight": 0.15, "weighted": 0.135 },
+    "cost": { "score": 0.60, "weight": 0.20, "weighted": 0.120 },
+    "safety": { "score": 0.95, "weight": 0.15, "weighted": 0.1425 }
+  },
+  "composite": 0.7965,
+  "comparison": {
+    "baselineComposite": 0.82,
+    "speedupFactor": 0.97,
+    "improvements": ["Lower cost per token", "Larger context window"],
+    "regressions": ["Slower time to first token"],
+    "verdict": "EVALUATE"
+  },
+  "systemInfo": {
+    "platform": "win32",
+    "nodeVersion": "22.x",
+    "evaluatorVersion": "1.0.0"
+  }
+}
+```
+
+**ComparisonReport** (when `--compare` is used): Generates a separate `comparison-<model>-vs-<baseline>-<date>.json` with side-by-side dimension scores, improvements, regressions, and a `hasRegressions` boolean flag. This enables CI gates that block model adoption when regressions are detected.
+
+**Baseline management**: Store baselines in `.claude/context/data/benchmark-baselines.json` as an array of past reports. The `--compare` flag looks up the most recent baseline for the specified model. Require 3+ independent runs (iron law #4) before updating baselines.
+
 ## Iron Laws
 
 1. **ALWAYS** evaluate all 5 dimensions -- partial benchmarks produce misleading recommendations

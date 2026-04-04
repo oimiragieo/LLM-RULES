@@ -1,7 +1,7 @@
 ---
 name: project-analyzer
-description: Automated brownfield codebase analysis. Detects project type, frameworks, dependencies, architecture patterns, and generates comprehensive project profile. Essential for Conductor integration and onboarding existing projects.
-version: 1.0.0
+description: Automated brownfield codebase analysis with weighted keyword scoring, three-stream analysis, and design pattern recognition. Detects project type, frameworks, dependencies, architecture patterns, and generates comprehensive project profile.
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -541,6 +541,77 @@ Quick project type detection
 
 </formatting_example>
 </examples>
+
+## Smart Categorization Scoring (Inspired by Skill_Seekers smart_categorize)
+
+When classifying files, directories, or components into categories, use weighted keyword scoring instead of simple string matching to prevent false positives:
+
+| Signal Source | Score Weight | Example |
+|---------------|-------------|---------|
+| File path/URL | 3 points | `/api/routes/` matches "API" category |
+| File/class name | 2 points | `AuthService.ts` matches "Authentication" |
+| File content/imports | 1 point | `import express` matches "Backend" |
+
+**Threshold**: Require 2+ total points before assigning a category. Falls back to "other" if no category scores above threshold. This prevents weak single-signal matches from misclassifying components.
+
+**Category keywords** (extend per project type):
+- **API**: route, endpoint, controller, handler, middleware, api, rest, graphql
+- **Auth**: auth, login, session, jwt, oauth, token, credential, permission
+- **Database**: model, schema, migration, seed, repository, entity, query
+- **Testing**: test, spec, fixture, mock, stub, e2e, integration
+- **Config**: config, env, setting, constant, option, feature-flag
+- **UI**: component, view, page, layout, template, style, theme
+
+## Three-Stream Analysis (Inspired by Skill_Seekers unified_codebase_analyzer)
+
+For comprehensive project understanding, analyze three parallel streams:
+
+**Stream 1 — Code Analysis**: AST patterns, framework detection, dependency graph, architecture classification. This is the existing core workflow (Steps 1-11).
+
+**Stream 2 — Documentation**: README quality, API docs existence, inline doc coverage, changelog maintenance, contribution guides. Score: `docFiles / totalFiles` weighted by type.
+
+**Stream 3 — Community/Operations**: Git activity (commit frequency, contributor count), CI/CD configuration, issue templates, PR templates, release workflow, Docker/container setup.
+
+Combine all three streams into the output JSON under `analysis.streams`:
+```json
+{
+  "streams": {
+    "code": { "score": 0.85, "findings": [...] },
+    "documentation": { "score": 0.60, "findings": [...] },
+    "operations": { "score": 0.75, "findings": [...] }
+  },
+  "compositeHealth": 0.73
+}
+```
+
+## Design Pattern Recognition (Inspired by Skill_Seekers C3.1 PatternRecognizer)
+
+Detect common design patterns with confidence scoring:
+
+| Pattern | Detection Signal | Confidence Threshold |
+|---------|-----------------|---------------------|
+| Singleton | Private constructor + static instance | 0.80 |
+| Factory | `create*` methods returning interface types | 0.70 |
+| Observer | `subscribe`/`on`/`emit`/`addEventListener` | 0.70 |
+| Strategy | Interface + multiple implementations | 0.60 |
+| Decorator | Wrapper classes with same interface | 0.60 |
+| Repository | Data access layer abstraction | 0.70 |
+| Middleware | Chain-of-responsibility in request pipeline | 0.70 |
+
+Output detected patterns in the analysis JSON with location, confidence, and evidence:
+```json
+{
+  "patterns": [
+    {
+      "type": "Factory",
+      "category": "Creational",
+      "confidence": 0.85,
+      "location": "src/services/UserFactory.ts",
+      "evidence": ["createUser method", "returns IUser interface"]
+    }
+  ]
+}
+```
 
 ## References
 
