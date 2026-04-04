@@ -267,8 +267,12 @@ class ClaudeRenderer {
       const env = { ...process.env };
       delete env.ANTHROPIC_API_KEY;
 
+      // Cap prompt at 7500 chars to fit within Windows cmd.exe 8191 char limit
+      // (leaves room for the claude command + flags + shell quoting overhead)
+      const safePrompt = prompt.slice(0, 7500);
+
       const result = execSync(
-        `claude -p "${prompt}" --dangerously-skip-permissions --model ${model} --max-turns 3`,
+        `claude -p "${safePrompt}" --dangerously-skip-permissions --model ${model} --max-turns 3`,
         {
           cwd: this.projectRoot,
           encoding: 'utf8',
