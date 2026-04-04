@@ -7,11 +7,17 @@ Background messaging daemon for Agent Studio. Monitors Telegram (and future plat
 Inspired by [clawhip](https://github.com/Yeachan-Heo/clawhip) (event router) and Claude Code's KAIROS (persistent assistant with memory).
 
 ```
-[Telegram] → [Source: long-poll] → [Dispatcher] → [Renderer: Claude -p] → [Sink: Telegram API]
-                                        ↕                   ↕
-                                   [Commands]          [3-Tier Memory]
-                                   [Executor]          [Dream Engine]
+[Telegram/Webhook] → [Source] → [Dispatcher] → [Renderer: Claude -p] → [Sink: Telegram API]
+                                     ↕                ↕          ↕
+                                [Commands]      [Model Router] [Skills Engine]
+                                [Rate Limit]    [Personality]  [3-Tier Memory]
+                                [Executor]      [Skill Inject] [Dream Engine]
+                                 (TASK/RALPH/
+                                  ULTRAWORK/
+                                  INTERVIEW)
 ```
+
+Future sources (Discord, Slack, Web widget) follow the same pattern — the dispatcher, renderer, memory, and executor are platform-agnostic.
 
 ## Setup
 
@@ -84,24 +90,77 @@ curl http://127.0.0.1:3101/memory
 curl http://127.0.0.1:3101/dream
 ```
 
-## Bot Commands
+## Bot Commands (24 total)
 
 Type `/` in Telegram to see the command menu:
 
-| Command     | Description                        |
-| ----------- | ---------------------------------- |
-| `/start`    | Welcome + command list             |
-| `/help`     | All commands                       |
-| `/status`   | Daemon stats                       |
-| `/memory`   | What I remember about you          |
-| `/tasks`    | Task execution history             |
-| `/dream`    | Consolidate memories               |
-| `/new`      | Fresh conversation (keeps profile) |
-| `/compress` | Manual compaction                  |
-| `/forget`   | Clear all data                     |
-| `/ping`     | Alive check                        |
+| Command       | Description                                  |
+| ------------- | -------------------------------------------- |
+| `/start`      | Welcome + command list                       |
+| `/help`       | All commands (updated for all phases)        |
+| `/status`     | Daemon stats                                 |
+| `/ping`       | Alive check                                  |
+| `/model`      | View/switch AI model                         |
+| `/memory`     | What I remember about you                    |
+| `/dream`      | Consolidate memories                         |
+| `/new`        | Fresh conversation (keeps profile)           |
+| `/compress`   | Manual compaction                            |
+| `/forget`     | Clear all data                               |
+| `/title`      | Set conversation title                       |
+| `/resume`     | Resume a previous session                    |
+| `/sessions`   | List saved sessions                          |
+| `/export`     | Export conversation as markdown file          |
+| `/tasks`      | Task execution history                       |
+| `/approve`    | Approve a pending task                       |
+| `/deny`       | Deny a pending task                          |
+| `/usage`      | Per-user cost tracking                       |
+| `/insights`   | Usage analytics and statistics               |
+| `/personality`| Switch personality (6 presets)               |
+| `/schedule`   | User-managed cron scheduling                 |
+| `/pair`       | Device pairing (request + `/pair approve`)   |
 
 Regular messages (no `/` prefix) go to Claude for a response.
+
+## Execution Tags
+
+Claude's responses can include execution tags that trigger different processing modes:
+
+| Tag           | Mode              | Description                                                        |
+| ------------- | ----------------- | ------------------------------------------------------------------ |
+| `[TASK]`      | One-shot          | Single headless execution with full tool access                    |
+| `[RALPH]`     | Iterative loop    | Persistent verify/fix cycle, max 5 iterations                      |
+| `[CLARIFY]`   | Single question   | One clarifying question before proceeding                          |
+| `[INTERVIEW]` | Multi-round       | Deep Socratic interview, collects answers before executing         |
+| `[ULTRAWORK]` | Parallel          | Splits task into concurrent subtasks                               |
+| `[HANDOFF]`   | Human escalation  | Escalates to human, no automated execution                         |
+
+## Multi-Model Routing
+
+The renderer automatically selects the appropriate model based on message complexity:
+
+| Complexity | Model  | Examples                              |
+| ---------- | ------ | ------------------------------------- |
+| Simple     | Haiku  | Greetings, casual chat, quick answers |
+| Medium     | Sonnet | Coding tasks, analysis, debugging     |
+| Complex    | Opus   | Architecture, deep reasoning, design  |
+
+Users can override via `/model`.
+
+## Proactive Mode (KAIROS Tick Engine)
+
+The timer source drives scheduled proactive messages with a 15-second heartbeat tick. Supports morning check-ins, reminders, and custom schedules configured via `/schedule`.
+
+## Skill Extraction
+
+The daemon learns from completed tasks. After successful execution, it extracts reusable patterns (command sequences, file structures, solution approaches) and stores them. On future messages, matching skills are auto-injected into the prompt context.
+
+## Rate Limiting
+
+Per-user rate limiting at 10 messages/minute (configurable). Excess messages receive a polite rate-limit response without consuming API calls.
+
+## Webhook Source
+
+External systems can push events via `POST /webhook`. Supports GitHub webhooks, CI pipeline events, and custom payloads. Events are routed through the standard dispatcher pipeline.
 
 ## Memory System
 
@@ -138,16 +197,18 @@ daemon/
 ├── index.cjs        # Main daemon + HTTP server
 ├── config.cjs       # Config loader
 ├── router.cjs       # Event → route matching
-├── dispatcher.cjs   # Queue + deliver + idle recap + dream
-├── renderer.cjs     # Claude -p response generation
-├── executor.cjs     # Task execution (headless Claude)
-├── commands.cjs     # Bot /slash commands
+├── dispatcher.cjs   # Queue + deliver + tags + rate limit + interviews
+├── renderer.cjs     # Claude -p + model routing + personality + skill inject
+├── executor.cjs     # Task/Ralph/Ultrawork execution + rate limit retry
+├── commands.cjs     # Bot /slash commands (24 commands)
 ├── memory.cjs       # 3-tier KAIROS memory
+├── skills.cjs       # Skill extraction engine (learns from tasks)
 ├── sources/
 │   ├── telegram.cjs # Telegram polling
-│   └── timer.cjs    # Scheduled events
+│   ├── webhook.cjs  # Webhook source (POST /webhook)
+│   └── timer.cjs    # KAIROS tick/heartbeat engine
 └── sinks/
-    └── telegram.cjs # Telegram delivery
+    └── telegram.cjs # Telegram delivery (sendMessage + sendDocument)
 
 telegram-relay.mjs   # MCP server (tools-only in main session)
 telegram-ctl.cjs     # CLI: start/stop/status/restart

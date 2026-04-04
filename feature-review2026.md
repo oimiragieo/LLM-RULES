@@ -1370,6 +1370,51 @@ When users ask the bot to DO something (run code, check git, etc.):
 | `.claude/hooks/channels/telegram-start.cjs` | Daemon launcher (PowerShell hidden window)                                                    |
 | `.claude/docs/TELEGRAM_ARCHITECTURE.md`     | Full architecture documentation                                                               |
 
+### Execution Tags (Phases 5-9)
+
+The daemon supports 6 execution tags for different processing modes:
+
+| Tag           | Mode              | Description                                                        |
+| ------------- | ----------------- | ------------------------------------------------------------------ |
+| `[TASK]`      | One-shot          | Single headless execution with full tool access                    |
+| `[RALPH]`     | Iterative loop    | Persistent verify/fix cycle, max 5 iterations (Phase 8)            |
+| `[CLARIFY]`   | Single question   | One clarifying question before proceeding                          |
+| `[INTERVIEW]` | Multi-round       | Deep Socratic interview, collects answers before executing (Ph. 9) |
+| `[ULTRAWORK]` | Parallel          | Splits task into concurrent subtasks (Phase 9)                     |
+| `[HANDOFF]`   | Human escalation  | Escalates to human, no automated execution                         |
+
+### Multi-Model Routing (Phase 5)
+
+Renderer automatically selects model by message complexity: **Haiku** for simple/casual, **Sonnet** for coding/analysis, **Opus** for architecture/deep reasoning. Users can override via `/model`.
+
+### Skill Extraction Engine (Phase 9)
+
+Learns from completed tasks by analyzing successful execution patterns. Extracts reusable patterns (command sequences, file structures, solution approaches) and stores them. On future messages, matching skills are auto-injected into the prompt context.
+
+### Proactive Mode — KAIROS Tick Engine (Phase 5)
+
+Timer source drives proactive scheduled messages with a 15-second heartbeat tick. Task progress streaming keeps users informed during long-running tasks. User-managed cron scheduling via `/schedule` (Phase 7).
+
+### Rate Limiting & Cost Tracking (Phases 5-6)
+
+- **Per-user rate limiting:** 10 messages/minute default (Phase 6)
+- **Per-user cost tracking:** `/usage` shows token usage breakdown by model (Phase 5)
+- **Usage analytics:** `/insights` provides message frequency, popular commands, peak times (Phase 7)
+- **Rate limit auto-retry:** Exponential backoff on Claude API rate limits (Phase 9)
+
+### Additional Features (Phases 5-9)
+
+- **File sending:** Telegram `sendDocument` for exporting files (Phase 5)
+- **Conversation export:** `/export` sends conversation as markdown file (Phase 6)
+- **Webhook source:** `POST /webhook` endpoint for GitHub/CI event ingestion (Phase 6)
+- **Device pairing:** `/pair request` + `/pair approve` for multi-device access (Phase 6)
+- **Personality system:** `/personality` switches between 6 communication presets (Phase 7)
+- **User-managed cron:** `/schedule` for creating custom scheduled tasks (Phase 7)
+
+### Bot Commands (24 total, Phases 1-9)
+
+`/start`, `/help`, `/status`, `/ping`, `/model`, `/memory`, `/dream`, `/new`, `/compress`, `/forget`, `/title`, `/resume`, `/sessions`, `/export`, `/tasks`, `/approve`, `/deny`, `/usage`, `/insights`, `/personality`, `/schedule`, `/pair` + regular text messages.
+
 ### What Replaced
 
 The old system (326-line `channel-auto-start.cjs` with VBScript + BAT + WMI PID tracking + separate Claude session with `--dangerously-load-development-channels`) was archived. The daemon approach eliminates: VBScript, BAT files, WMI queries, confirmation dialog hacks, PID tracking, and the need for a separate Claude session.

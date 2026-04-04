@@ -47,10 +47,17 @@ CHANNEL_AUTO_START=true
 - **Dream consolidation** — KAIROS-style 4-phase memory synthesis (Orient → Gather → Consolidate → Prune)
 - **Context rot protection** — auto-detects and rotates sessions transparently
 - **Task execution** — ask the bot to run code, check git, run tests via headless Claude
-- **Bot command menu** — `/help`, `/status`, `/memory`, `/dream`, `/tasks`, `/new`, `/compress`
+- **24 bot commands** — `/help`, `/status`, `/memory`, `/dream`, `/tasks`, `/usage`, `/insights`, `/personality`, `/schedule`, `/export`, `/pair`, and more
+- **Skill extraction** — learns from completed tasks, auto-injects matching patterns into future prompts
+- **Ralph loops** — iterative verify/fix execution (`[RALPH]` tag), max 5 iterations
+- **Ultrawork parallel** — splits tasks into concurrent subtasks (`[ULTRAWORK]` tag)
+- **Multi-model routing** — haiku/sonnet/opus selected automatically by message complexity
 - **"While you were away" recap** — summarizes what happened when you return after being idle
 - **HTTP API** — `http://127.0.0.1:3101/status`, `/send`, `/history`, `/memory`, `/dream`
 - **A2A ready** — router can send messages and delegate tasks via the daemon's HTTP API
+- **Webhook source** — `POST /webhook` endpoint for GitHub, CI, and external event ingestion
+- **Proactive mode** — KAIROS tick engine with 15s heartbeat for scheduled messages and task progress streaming
+- **Multi-platform ready** — Discord, Slack, and Web widget sources planned (platform-agnostic core)
 
 ### Voice Pipeline (Optional)
 
