@@ -36,8 +36,8 @@ class TaskExecutor {
       const result = claudeSync(prompt, {
         model: this.model,
         maxTurns: 10,
-        cwd: this.projectRoot,
         timeout: 300000,
+        useWorkspace: true,
         appendSystemPromptFile: TASK_EXECUTOR_PROMPT,
       });
 
