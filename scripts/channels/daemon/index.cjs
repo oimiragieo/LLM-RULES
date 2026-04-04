@@ -37,6 +37,12 @@ const { Dispatcher } = require('./dispatcher.cjs');
 const { ClaudeRenderer } = require('./renderer.cjs');
 const { TelegramSource } = require('./sources/telegram.cjs');
 const { TelegramSink } = require('./sinks/telegram.cjs');
+const { DiscordSource } = require('./sources/discord.cjs');
+const { DiscordSink } = require('./sinks/discord.cjs');
+const { SlackSource } = require('./sources/slack.cjs');
+const { SlackSink } = require('./sinks/slack.cjs');
+const { WebSource } = require('./sources/web.cjs');
+const { WebSink } = require('./sinks/web.cjs');
 const { DaemonMemory } = require('./memory.cjs');
 const { TimerSource } = require('./sources/timer.cjs');
 const { CommandHandler } = require('./commands.cjs');
@@ -148,8 +154,35 @@ async function main() {
     log('Telegram source started (long-polling + /commands)');
   }
 
+  // Discord
+  if (config.sources.discord.enabled) {
+    sinks.discord = new DiscordSink(config.sources.discord.token);
+    const discordSource = new DiscordSource(config.sources.discord, event => dispatcher.enqueue(event));
+    sources.push(discordSource);
+    discordSource.start().catch(err => log(`Discord source error: ${err.message}`));
+    log('Discord source started (gateway WebSocket)');
+  }
+
+  // Slack
+  if (config.sources.slack.enabled) {
+    sinks.slack = new SlackSink(config.sources.slack);
+    const slackSource = new SlackSource(config.sources.slack, event => dispatcher.enqueue(event));
+    sources.push(slackSource);
+    slackSource.start().catch(err => log(`Slack source error: ${err.message}`));
+    log('Slack source started (polling)');
+  }
+
+  // Web widget
+  let webSource = null;
+  if (config.sources.web.enabled) {
+    webSource = new WebSource(config.sources.web, event => dispatcher.enqueue(event));
+    sinks.web = new WebSink(webSource);
+    sources.push(webSource);
+    log('Web widget enabled (HTTP + SSE)');
+  }
+
   if (sources.length === 0) {
-    log('No sources enabled! Set TELEGRAM_BOT_TOKEN in .env');
+    log('No sources enabled! Set TELEGRAM_BOT_TOKEN, DISCORD_BOT_TOKEN, or SLACK_BOT_TOKEN in .env');
     process.exit(1);
   }
 
@@ -290,11 +323,14 @@ async function main() {
       return;
     }
 
+    // Web widget routes
+    if (webSource && webSource.handleHttp(req, res, url)) return;
+
     res.statusCode = 404;
     res.end(
       JSON.stringify({
         error: 'not found',
-        routes: ['/health', '/status', '/send', '/history', '/memory', '/dream', '/event', '/stop'],
+        routes: ['/health', '/status', '/send', '/history', '/memory', '/dream', '/event', '/stop', '/web/message', '/web/stream/:id'],
       })
     );
   });

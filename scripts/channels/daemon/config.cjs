@@ -90,10 +90,24 @@ function loadConfig(root) {
         pollInterval:
           parseInt(process.env.TELEGRAM_POLL_INTERVAL || '', 10) || DEFAULT_POLL_INTERVAL,
       },
-      // Future: discord, slack, webhook
-      discord: { enabled: false },
-      slack: { enabled: false },
-      webhook: { enabled: false },
+      discord: {
+        enabled: !!(process.env.DISCORD_BOT_TOKEN || '').trim(),
+        token: (process.env.DISCORD_BOT_TOKEN || '').trim(),
+        allowedUsers: new Set((process.env.DISCORD_ALLOWED_USERS || '').split(',').filter(Boolean)),
+        allowAll: (process.env.DISCORD_ALLOW_ALL || '').toLowerCase() === 'true',
+      },
+      slack: {
+        enabled: !!(process.env.SLACK_BOT_TOKEN || '').trim(),
+        botToken: (process.env.SLACK_BOT_TOKEN || '').trim(),
+        appToken: (process.env.SLACK_APP_TOKEN || '').trim(),
+        webhookUrl: (process.env.SLACK_WEBHOOK_URL || '').trim(),
+        channels: (process.env.SLACK_CHANNELS || '').split(',').filter(Boolean),
+        allowedUsers: new Set((process.env.SLACK_ALLOWED_USERS || '').split(',').filter(Boolean)),
+        allowAll: (process.env.SLACK_ALLOW_ALL || '').toLowerCase() === 'true',
+      },
+      web: {
+        enabled: (process.env.CHANNEL_WEB_WIDGET || '').toLowerCase() === 'true',
+      },
     },
     routes: fileConfig.routes || [
       // Default: all telegram messages get a Claude response
