@@ -97,6 +97,33 @@ describe('TaskExecutor', () => {
     });
   });
 
+  describe('executeParallel (ultrawork)', () => {
+    it('method exists', () => {
+      const exec = new TaskExecutor({});
+      assert.equal(typeof exec.executeParallel, 'function');
+    });
+
+    it('runs subtasks when split succeeds', async () => {
+      const exec = new TaskExecutor({});
+      let callCount = 0;
+      exec.executeTask = (prompt) => {
+        callCount++;
+        if (prompt.includes('Split this task')) return '["fix file A", "fix file B"]';
+        return `Fixed: ${prompt.slice(0, 30)}`;
+      };
+      const result = await exec.executeParallel('fix all files');
+      assert.ok(callCount >= 3); // 1 split + 2 subtasks
+      assert.ok(result.includes('Subtask 1'));
+    });
+
+    it('falls back to sequential when split fails', async () => {
+      const exec = new TaskExecutor({});
+      exec.executeTask = () => 'Single result';
+      const result = await exec.executeParallel('simple task');
+      assert.equal(result, 'Single result');
+    });
+  });
+
   describe('Rate limit handling', () => {
     it('_isRateLimitError detects rate limits', () => {
       const exec = new TaskExecutor({});

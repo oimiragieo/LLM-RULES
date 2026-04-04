@@ -143,6 +143,57 @@ class TaskExecutor {
   }
 
   /**
+   * Ultrawork — parallel task execution.
+   * Splits task into independent subtasks via haiku, runs them concurrently.
+   */
+  async executeParallel(task, opts = {}) {
+    const maxParallel = opts.maxParallel || 3;
+    const onProgress = opts.onProgress || (() => {});
+
+    // Step 1: Split task into subtasks using haiku
+    onProgress('🔀 Splitting task into parallel subtasks...');
+    const splitPrompt = `Split this task into ${maxParallel} independent subtasks that can run in parallel. Return ONLY a JSON array of task description strings. Task: ${task.slice(0, 500)}`;
+    const splitResult = this.executeTask(splitPrompt.replace(/"/g, "'"));
+
+    let subtasks;
+    try {
+      const match = splitResult.match(/\[[\s\S]*\]/);
+      subtasks = match ? JSON.parse(match[0]) : null;
+    } catch {}
+
+    if (!subtasks || subtasks.length <= 1) {
+      onProgress('📝 Task not parallelizable, running sequentially');
+      return this.executeTask(task);
+    }
+
+    // Step 2: Run subtasks concurrently
+    onProgress(`⚡ Running ${subtasks.length} subtasks in parallel...`);
+    this.log(`[executor] Ultrawork: ${subtasks.length} parallel subtasks`);
+
+    const results = await Promise.allSettled(
+      subtasks.slice(0, maxParallel).map((st, i) =>
+        new Promise(resolve => {
+          try {
+            const result = this.executeTask(st);
+            resolve({ subtask: st, result });
+          } catch (err) {
+            resolve({ subtask: st, result: `FAILED: ${err.message}` });
+          }
+        })
+      )
+    );
+
+    // Step 3: Merge results
+    const merged = results.map((r, i) => {
+      const data = r.status === 'fulfilled' ? r.value : { subtask: subtasks[i], result: 'FAILED' };
+      return `### Subtask ${i + 1}: ${data.subtask?.slice(0, 80)}\n${data.result?.slice(0, 800)}`;
+    }).join('\n\n');
+
+    const succeeded = results.filter(r => r.status === 'fulfilled' && !r.value?.result?.startsWith('FAILED')).length;
+    return `⚡ Ultrawork: ${succeeded}/${subtasks.length} subtasks completed\n\n${merged}`;
+  }
+
+  /**
    * Send a task to the A2A server (router) for agent-based execution.
    */
   async sendToRouter(prompt, agentType = 'developer') {

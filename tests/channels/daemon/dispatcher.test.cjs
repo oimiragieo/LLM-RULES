@@ -254,6 +254,71 @@ describe('Dispatcher', () => {
     });
   });
 
+  describe('Interview (multi-round)', () => {
+    it('[INTERVIEW] starts multi-round questioning', async () => {
+      renderer = createMockRenderer('[INTERVIEW]\n1. What modules?\n2. What pattern?\n3. Test coverage?');
+      dispatcher = new Dispatcher(router, renderer, sinks, () => {}, memory, {});
+
+      dispatcher.enqueue({
+        type: 'telegram.message',
+        source: 'telegram',
+        data: { chatId: '123', text: 'refactor everything', user: 'omar', messageId: 1 },
+        timestamp: new Date().toISOString(),
+      });
+
+      await new Promise(r => setTimeout(r, 100));
+
+      assert.ok(dispatcher.pendingInterviews.has('123'));
+      const interview = dispatcher.pendingInterviews.get('123');
+      assert.equal(interview.questions.length, 3);
+      assert.equal(interview.currentRound, 0);
+      assert.ok(sinks.telegram.sent.find(m => m.text.includes('What modules')));
+    });
+
+    it('interview collects answers and proceeds', async () => {
+      // Set up pending interview mid-way
+      dispatcher.pendingInterviews.set('123', {
+        originalText: 'refactor',
+        questions: ['Q1?', 'Q2?'],
+        answers: ['answer1'],
+        currentRound: 1,
+        timestamp: Date.now(),
+      });
+
+      dispatcher.enqueue({
+        type: 'telegram.message',
+        source: 'telegram',
+        data: { chatId: '123', text: 'answer2', user: 'omar', messageId: 2 },
+        timestamp: new Date().toISOString(),
+      });
+
+      await new Promise(r => setTimeout(r, 100));
+
+      // Interview should be complete and deleted
+      assert.equal(dispatcher.pendingInterviews.has('123'), false);
+    });
+
+    it('"just do it" skips remaining questions', async () => {
+      dispatcher.pendingInterviews.set('123', {
+        originalText: 'refactor',
+        questions: ['Q1?', 'Q2?', 'Q3?'],
+        answers: ['answer1'],
+        currentRound: 1,
+        timestamp: Date.now(),
+      });
+
+      dispatcher.enqueue({
+        type: 'telegram.message',
+        source: 'telegram',
+        data: { chatId: '123', text: 'just do it', user: 'omar', messageId: 3 },
+        timestamp: new Date().toISOString(),
+      });
+
+      await new Promise(r => setTimeout(r, 100));
+      assert.equal(dispatcher.pendingInterviews.has('123'), false);
+    });
+  });
+
   describe('Rate Limiting', () => {
     it('allows messages under limit', () => {
       assert.equal(dispatcher._checkRateLimit('123'), true);

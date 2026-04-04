@@ -59,6 +59,20 @@ Examples:
 - User: "read this PDF for me" → [TASK] Use markitdown to convert the file to markdown and summarize it
 - User: "create a new feature branch" → [TASK] Run git checkout -b feature/new-feature
 
+### Deep interview (use [INTERVIEW] tag for complex/vague requests)
+For tasks that are vague, have multiple interpretations, or could go wrong without
+thorough understanding, use [INTERVIEW] followed by 3-5 numbered questions (one per line).
+The daemon will ask each question one at a time and collect answers before executing.
+
+Examples:
+- User: "refactor the codebase" → [INTERVIEW]
+  1. Which modules should I focus on?
+  2. What architecture pattern are you targeting?
+  3. Should I preserve the current API surface?
+  4. What is the test coverage requirement?
+
+Use [INTERVIEW] for complex ambiguous tasks. Use [CLARIFY] for single questions. Use [TASK] when intent is clear.
+
 ### Ralph loop (use [RALPH] tag for iterative tasks)
 For tasks that need verification and may require multiple attempts (fixing bugs, making tests pass,
 migrations), use [RALPH] instead of [TASK]. The daemon runs the task in a persistent verify/fix loop
@@ -70,6 +84,14 @@ Examples:
 - User: "migrate the database" → [RALPH] Run migration, fix issues, verify schema
 
 Use [RALPH] when iterative fixing is needed. Use [TASK] for one-shot commands.
+
+### Ultrawork parallel execution (use [ULTRAWORK] tag)
+For tasks with multiple independent parts that can run simultaneously:
+- User: "fix lint in all service files" → [ULTRAWORK] Fix lint errors in each service file
+- User: "add error handling to all API routes" → [ULTRAWORK] Add try/catch to each route
+- User: "update all test fixtures" → [ULTRAWORK] Update test fixtures for each module
+
+The daemon splits the task into subtasks and runs up to 3 in parallel. 3-5x faster than sequential.
 
 ### Router delegation (use [TASK] with "router" or "delegate")
 For complex multi-step work, the daemon can delegate to the A2A router which spawns specialized agents:

@@ -25,6 +25,7 @@ class Dispatcher {
     this.activeTasks = new Map(); // taskId → { status, description, startTime, chatId }
     this.taskCounter = 0;
     this.pendingClarifications = new Map(); // chatId → { originalText, question, timestamp }
+    this.pendingInterviews = new Map(); // chatId → { originalText, questions, answers, currentRound, timestamp }
     this.pendingApprovals = new Map(); // chatId → { resolve, reject, command, timestamp }
     this.rateLimits = new Map(); // chatId → [timestamp1, timestamp2, ...]
     this.rateLimitMax = 10; // max messages per minute per user
@@ -122,8 +123,44 @@ class Dispatcher {
       }
     }
 
-    // Check for pending clarification — if user is answering a previous [CLARIFY] question
     const chatId = event.data.chatId;
+
+    // Check for pending interview — multi-round Socratic questioning
+    if (this.pendingInterviews.has(chatId)) {
+      const interview = this.pendingInterviews.get(chatId);
+      // Timeout: 10 min
+      if (Date.now() - interview.timestamp > 600000) {
+        this.pendingInterviews.delete(chatId);
+      } else if (event.data.text.toLowerCase() === 'just do it' || event.data.text.toLowerCase() === 'skip') {
+        // Skip remaining questions, execute with what we have
+        const context = interview.answers.map((a, i) => `Q: ${interview.questions[i]}\nA: ${a}`).join('\n');
+        this.pendingInterviews.delete(chatId);
+        event.data.text = `Original request: ${interview.originalText}\n\nInterview answers:\n${context}\n\nNow execute the task.`;
+        this.log(`[dispatcher] Interview skipped for ${chatId}, executing with ${interview.answers.length} answers`);
+      } else {
+        // Store answer and ask next question
+        interview.answers.push(event.data.text);
+        interview.currentRound++;
+        if (interview.currentRound >= interview.questions.length) {
+          // All questions answered — synthesize and execute
+          const context = interview.answers.map((a, i) => `Q: ${interview.questions[i]}\nA: ${a}`).join('\n');
+          this.pendingInterviews.delete(chatId);
+          event.data.text = `Original request: ${interview.originalText}\n\nInterview answers:\n${context}\n\nNow execute the task based on these clarifications.`;
+          this.log(`[dispatcher] Interview complete for ${chatId}, executing with full context`);
+        } else {
+          // Ask next question
+          const nextQ = interview.questions[interview.currentRound];
+          const remaining = interview.questions.length - interview.currentRound;
+          const sink = this.sinks[event.source];
+          if (sink) {
+            try { await sink.send(chatId, `❓ ${nextQ}\n\n(${remaining} questions remaining, or say "just do it" to skip)`); } catch {}
+          }
+          return; // Wait for next answer
+        }
+      }
+    }
+
+    // Check for pending clarification — if user is answering a previous [CLARIFY] question
     if (this.pendingClarifications.has(chatId)) {
       const pending = this.pendingClarifications.get(chatId);
       // Timeout: 5 minutes
@@ -178,6 +215,29 @@ class Dispatcher {
       }
 
       // Check if Claude wants to clarify before executing
+      // Check if Claude wants a multi-round interview
+      if (response.startsWith('[INTERVIEW]')) {
+        const lines = response.slice(11).trim().split('\n').filter(l => l.trim());
+        const questions = lines.map(l => l.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
+        if (questions.length > 0) {
+          this.pendingInterviews.set(event.data.chatId, {
+            originalText: event.data.text,
+            questions,
+            answers: [],
+            currentRound: 0,
+            timestamp: Date.now(),
+          });
+          this.log(`[dispatcher] Interview started for ${event.data.chatId}: ${questions.length} questions`);
+          const remaining = questions.length - 1;
+          try {
+            await sink.send(event.data.chatId,
+              `🎓 Before I proceed, let me ask a few questions:\n\n❓ ${questions[0]}\n\n(${remaining} more questions after this, or say "just do it" to skip)`,
+              { replyTo: event.data.messageId });
+          } catch {}
+          continue;
+        }
+      }
+
       if (response.startsWith('[CLARIFY]')) {
         const question = response.slice(9).trim();
         this.pendingClarifications.set(event.data.chatId, {
@@ -274,6 +334,50 @@ class Dispatcher {
 
         const truncatedResult = result.length > 3500 ? result.slice(0, 3500) + '\n\n... (truncated)' : result;
         response = truncatedResult;
+      }
+
+      // Check if Claude wants ultrawork (parallel execution)
+      if (response.startsWith('[ULTRAWORK]')) {
+        const taskDesc = response.slice(11).trim();
+        const taskId = `ultra-${++this.taskCounter}`;
+        this.activeTasks.set(taskId, {
+          status: 'running',
+          description: `[ULTRA] ${taskDesc}`,
+          startTime: Date.now(),
+          chatId: event.data.chatId,
+          user: event.data.user,
+        });
+        this.stats.tasksExecuted++;
+
+        try {
+          await sink.send(event.data.chatId, `⚡ Starting ultrawork: ${taskDesc.slice(0, 100)}...`, {
+            replyTo: event.data.messageId,
+          });
+        } catch {}
+
+        this.log(`[dispatcher] Ultrawork ${taskId}: ${taskDesc.slice(0, 80)}`);
+        let result;
+        try {
+          result = await this.executor.executeParallel(taskDesc, {
+            maxParallel: 3,
+            onProgress: async (msg) => {
+              try { await sink.send(event.data.chatId, msg); } catch {}
+            },
+          });
+          this.activeTasks.get(taskId).status = 'completed';
+          if (this.skillStore) {
+            setImmediate(() => {
+              const skillName = this.skillStore.extractSkill(taskDesc, result);
+              if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+            });
+          }
+        } catch (err) {
+          result = `Ultrawork failed: ${err.message}`;
+          this.activeTasks.get(taskId).status = 'failed';
+        }
+        this.activeTasks.get(taskId).endTime = Date.now();
+        const truncated = result.length > 3500 ? result.slice(0, 3500) + '\n\n...' : result;
+        response = truncated;
       }
 
       // Check if Claude wants to execute a single task
