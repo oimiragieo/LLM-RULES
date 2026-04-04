@@ -195,6 +195,19 @@ async function main() {
     }
   }, 600000); // Check every 10 minutes
 
+  // KAIROS tick engine — proactive scheduled messages
+  if (config.proactive?.enabled && config.proactive.schedules?.length > 0) {
+    const proactiveConfig = config.proactive;
+    const tickEngine = new TimerSource(
+      proactiveConfig,
+      event => dispatcher.enqueue(event),
+      () => dispatcher.stats.lastEvent ? Date.now() - new Date(dispatcher.stats.lastEvent).getTime() : Infinity
+    );
+    sources.push(tickEngine);
+    tickEngine.start();
+    log(`Tick engine started (${proactiveConfig.schedules.length} schedules)`);
+  }
+
   // ── HTTP Server (like clawhip's axum routes) ─────────────────────────────
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);

@@ -113,6 +113,11 @@ function loadConfig(root) {
       // Default: all telegram messages get a Claude response
       { event: 'telegram.*', handler: 'claude', sink: 'telegram' },
     ],
+    proactive: fileConfig.proactive || {
+      enabled: (process.env.CHANNEL_PROACTIVE || '').toLowerCase() === 'true',
+      tickIntervalMs: 60000,
+      schedules: [],
+    },
   };
 }
 
