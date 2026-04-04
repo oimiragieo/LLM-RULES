@@ -115,7 +115,9 @@ class Dispatcher {
       return;
     }
 
-    // Session gap detection — mark stale history so Claude knows time has passed
+    // Session gap detection — clear stale Tier 1 history on long idle gaps.
+    // Old conversation is preserved in Tier 2 summaries and Tier 3 profiles.
+    // Tier 1 gets a clean slate so Claude doesn't continue old topics.
     if (this.memory && event.data.chatId) {
       const history = this.memory.chats.get(event.data.chatId) || [];
       if (history.length > 0) {
@@ -124,12 +126,21 @@ class Dispatcher {
         const IDLE_THRESHOLD = 3600000; // 1 hour
         if (idleMs > IDLE_THRESHOLD && !event.data.text.startsWith('/')) {
           const hours = Math.round(idleMs / 3600000);
-          // Insert a session boundary marker into the chat history so Claude
-          // knows there was a time gap and doesn't continue old topics unprompted
+          // Compact the old history into Tier 2 summary before clearing
+          if (history.length >= 4) {
+            this.memory._compactChat(event.data.chatId);
+          }
+          // Clear Tier 1 — old messages were just compacted into summary
+          const chatHistory = this.memory.chats.get(event.data.chatId);
+          if (chatHistory) chatHistory.length = 0;
+          // Add a minimal session boundary marker
           this.memory.addMessage(
             event.data.chatId,
             'system',
-            `[Session gap: ${hours}h since last message. The user is starting a new interaction — respond to their current message, not the previous topic.]`
+            `[New session after ${hours}h gap. Respond to the user's current message naturally. Their profile and conversation summary are available for context if needed.]`
+          );
+          this.log(
+            `[dispatcher] Session gap: ${hours}h for chat ${event.data.chatId} — Tier 1 cleared, old context compacted to Tier 2`
           );
         }
       }
