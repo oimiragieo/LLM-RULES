@@ -43,7 +43,7 @@ function claudeSync(prompt, opts = {}) {
 
   const model = opts.model || 'sonnet';
   const maxTurns = String(opts.maxTurns || 3);
-  const cwd = opts.useWorkspace ? TASK_WORKSPACE : (opts.cwd || process.cwd());
+  const cwd = opts.useWorkspace ? TASK_WORKSPACE : opts.cwd || process.cwd();
   const timeout = opts.timeout || 120000;
 
   // Ensure workspace exists
@@ -52,11 +52,12 @@ function claudeSync(prompt, opts = {}) {
   }
 
   // Build args — `-p` must be LAST (no value) so stdin is read as the prompt
-  const args = [
-    '--dangerously-skip-permissions',
-    '--model', model,
-    '--max-turns', maxTurns,
-  ];
+  const args = ['--dangerously-skip-permissions', '--model', model, '--max-turns', maxTurns];
+
+  // When using workspace isolation, add the project dir for file access
+  if (opts.useWorkspace && opts.projectRoot) {
+    args.push('--add-dir', opts.projectRoot);
+  }
 
   // Handle system prompt append
   let tmpSysFile = null;
@@ -90,7 +91,11 @@ function claudeSync(prompt, opts = {}) {
     return (result.stdout || '').trim();
   } finally {
     if (tmpSysFile) {
-      try { fs.unlinkSync(tmpSysFile); } catch { /* ignored */ }
+      try {
+        fs.unlinkSync(tmpSysFile);
+      } catch {
+        /* ignored */
+      }
     }
   }
 }

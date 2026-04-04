@@ -38,6 +38,7 @@ class TaskExecutor {
         maxTurns: 10,
         timeout: 300000,
         useWorkspace: true,
+        projectRoot: this.projectRoot,
         appendSystemPromptFile: TASK_EXECUTOR_PROMPT,
       });
 

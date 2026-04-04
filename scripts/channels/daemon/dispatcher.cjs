@@ -621,10 +621,21 @@ class Dispatcher {
         await sink.send(event.data.chatId, response, {
           replyTo: event.data.messageId,
         });
-        // Record task/ralph/ultrawork results in chat memory
-        // (the renderer recorded the [TAG] message; now record the actual result)
-        if (this.memory && event.data.chatId) {
-          this.memory.addMessage(event.data.chatId, 'assistant', response.slice(0, 2000));
+        // Record task/ralph/ultrawork results in chat memory.
+        // The renderer already recorded the [TAG] response — only add if response
+        // was overridden by a task result (starts with common task output patterns).
+        if (this.memory && event.data.chatId && !response.startsWith('[')) {
+          // Check if this is a task result that replaced the original [TAG] response
+          const chatHistory = this.memory.chats.get(event.data.chatId) || [];
+          const lastMsg = chatHistory[chatHistory.length - 1];
+          if (
+            lastMsg &&
+            lastMsg.role === 'assistant' &&
+            /^\[(?:TASK|RALPH|ULTRAWORK)]/.test(lastMsg.text)
+          ) {
+            lastMsg.text = response.slice(0, 2000);
+            this.memory._saveHistory();
+          }
         }
         this.log(`[dispatcher] Delivered to ${route.sink || event.source}`);
         this.history.push({
