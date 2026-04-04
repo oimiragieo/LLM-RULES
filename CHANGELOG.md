@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Channel Daemon Audit — 18 Bug Fixes
+
+#### Fixed
+
+- **[C1] Windows prompt length regression** — stdin piping fallback for prompts exceeding cmd.exe 8191 char limit
+- **[C2] renderStream SEC-011 + model routing** — replaced string interpolation with spawn array args; fixed Unix path using wrong model variable
+- **[C3] renderProactive crash** — wrapped in try-catch to prevent unhandled throw from crashing event loop
+- **[H1] Atomic file writes** — all memory persistence uses write-to-temp-then-rename to prevent corruption
+- **[H2] Persist compaction counts** — session rotation now survives daemon restarts via daemon-metadata.json
+- **[H3] System message labels** — compaction transcript now correctly labels system messages instead of misattributing as "Assistant"
+- **[H4] Dream chatId mismatch** — dream prompt now includes explicit list of valid chatIds
+- **[H5] _personalities Map init** — initialized in Dispatcher constructor instead of lazily
+- **[H6] setImmediate error guards** — all 3 skill extraction callbacks wrapped in try-catch
+- **[H7] Discord reconnect leak** — reconnect timeout cancelled on stop()
+- **[H8] Error stack logging** — dispatcher now logs full stack traces for event processing errors
+- **[M1] Dream state persistence** — lastDream, messagesSinceDream persisted across restarts
+- **[M2] Compaction during render** — _buildPrompt no longer triggers claudeSync mid-render; truncates context instead
+- **[M3] Event mutation on voice** — voice transcription no longer mutates event.data.text
+- **[M4] Summary slicing** — ACC-style full replacement when summary exceeds budget instead of mid-sentence cut
+- **[M5] Corrupt JSON detection** — _load now logs errors for corrupt memory files instead of silent failure
+- **[M6] HTTP body size limit** — 1MB cap on /event, /send, and other POST endpoints
+- **[M7] Rate limit off-by-one** — boundary condition fixed (> to >=)
+
 ### Assimilate Skill v2.0.0 (Skill_Seekers Benchmarking)
 
 #### Added

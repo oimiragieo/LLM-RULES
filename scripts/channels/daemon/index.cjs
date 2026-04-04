@@ -274,6 +274,22 @@ async function main() {
   }, 60000);
 
   // ── HTTP Server (like clawhip's axum routes) ─────────────────────────────
+  const MAX_BODY_SIZE = 1024 * 1024; // 1MB request body limit
+
+  function readBody(req, callback) {
+    let body = '';
+    let size = 0;
+    req.on('data', c => {
+      size += c.length;
+      if (size > MAX_BODY_SIZE) {
+        req.destroy();
+        return;
+      }
+      body += c;
+    });
+    req.on('end', () => callback(body));
+  }
+
   // eslint-disable-next-line complexity
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
@@ -316,9 +332,7 @@ async function main() {
         res.end(JSON.stringify({ error: 'POST only' }));
         return;
       }
-      let body = '';
-      req.on('data', c => (body += c));
-      req.on('end', () => {
+      readBody(req, body => {
         try {
           const event = JSON.parse(body);
           if (!event.type) throw new Error('event.type required');
@@ -400,9 +414,7 @@ async function main() {
       (url.pathname === '/webhook' || url.pathname.startsWith('/webhook/')) &&
       req.method === 'POST'
     ) {
-      let body = '';
-      req.on('data', c => (body += c));
-      req.on('end', () => {
+      readBody(req, body => {
         try {
           const payload = JSON.parse(body);
           const source = url.pathname.split('/').pop() || 'webhook';

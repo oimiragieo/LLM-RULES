@@ -60,6 +60,7 @@ class DiscordSource {
     this.running = false;
     this.ws = null;
     this.heartbeatInterval = null;
+    this.reconnectTimeout = null;
     this.lastSequence = null;
     this.botId = null;
   }
@@ -101,7 +102,9 @@ class DiscordSource {
     this.ws.on('close', () => {
       if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
       // Reconnect after 5s
-      if (this.running) setTimeout(() => this._connect(url), 5000);
+      if (this.running) {
+        this.reconnectTimeout = setTimeout(() => this._connect(url), 5000);
+      }
     });
 
     this.ws.on('error', () => {
@@ -181,6 +184,7 @@ class DiscordSource {
 
   stop() {
     this.running = false;
+    if (this.reconnectTimeout) clearTimeout(this.reconnectTimeout);
     if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
     if (this.ws) {
       try {

@@ -28,6 +28,16 @@ const DREAM_INTERVAL_MS = 3600000; // 1 hour
 const SESSION_ROT_THRESHOLD = 5; // After N compactions, auto-rotate session
 const MAX_SUMMARY_LENGTH = 3000;
 
+/**
+ * Atomic file write — write to temp file then rename.
+ * Prevents data corruption from crashes mid-write.
+ */
+function atomicWriteSync(filePath, data) {
+  const tmpPath = filePath + '.tmp';
+  fs.writeFileSync(tmpPath, data, 'utf8');
+  fs.renameSync(tmpPath, filePath);
+}
+
 class DaemonMemory {
   constructor(storageDir, rendererConfig) {
     this.storageDir = storageDir;
@@ -45,11 +55,10 @@ class DaemonMemory {
     this.profilePath = path.join(storageDir, 'user-profiles.json');
     this.profiles = new Map();
 
-    // Dream state
+    // Daemon metadata (persisted across restarts)
+    this.metadataPath = path.join(storageDir, 'daemon-metadata.json');
     this.lastDream = 0;
     this.messagesSinceDream = 0;
-
-    // Session rotation tracking (per chat)
     this.compactionCounts = new Map();
 
     // Named sessions for /title + /resume
@@ -143,6 +152,7 @@ class DaemonMemory {
       history.length = 0; // Clear all history
       this._saveHistory();
       this._saveSummaries();
+      this._saveMetadata();
       return; // Fresh session — profile facts carry over automatically
     }
 
@@ -151,7 +161,11 @@ class DaemonMemory {
     const oldMessages = history.slice(0, cutoff);
 
     const transcript = oldMessages
-      .map(m => `${m.role === 'user' ? m.user : 'Assistant'}: ${m.text}`)
+      .map(m => {
+        if (m.role === 'user') return `${m.user}: ${m.text}`;
+        if (m.role === 'system') return `[System]: ${m.text}`;
+        return `Assistant: ${m.text}`;
+      })
       .join('\n')
       .slice(0, 4000);
 
@@ -173,14 +187,22 @@ class DaemonMemory {
         timeout: 30000,
       });
 
-      // Update Tier 2 summary (cap total length to prevent rot)
+      // Update Tier 2 summary — replace old summary with new combined one.
+      // If combined text exceeds budget, keep only the latest summary (ACC-style full replacement).
       const existing = this.summaries.get(chatId) || '';
-      this.summaries.set(chatId, (existing + '\n' + summary).trim().slice(-MAX_SUMMARY_LENGTH));
+      const combined = (existing + '\n---\n' + summary).trim();
+      this.summaries.set(
+        chatId,
+        combined.length > MAX_SUMMARY_LENGTH
+          ? summary.trim().slice(0, MAX_SUMMARY_LENGTH)
+          : combined
+      );
       this._saveSummaries();
 
       // Remove compacted messages from Tier 1
       history.splice(0, cutoff);
       this._saveHistory();
+      this._saveMetadata();
     } catch {
       history.splice(0, cutoff);
       this._saveHistory();
@@ -235,7 +257,8 @@ class DaemonMemory {
     // Build a simple flat prompt — avoid JSON in the command line to prevent shell escaping issues
     const dreamPrompt = [
       'Extract durable facts about users from these chat conversations.',
-      'Return ONLY a JSON array. Format: [{"chatId":"CHAT_ID_HERE","facts":["fact 1","fact 2"]}]',
+      `Return ONLY a JSON array. Use EXACT chatId values from below. Format: [{"chatId":"<exact chatId>","facts":["fact 1","fact 2"]}]`,
+      `Valid chatIds: ${[...this.chats.keys()].join(', ')}`,
       'Focus on: user name, role, projects, preferences, technical expertise, corrections.',
       'Only genuinely useful permanent facts. Not conversation details.',
       existing ? `\nExisting facts to keep if still valid:\n${existing}` : '',
@@ -287,15 +310,18 @@ class DaemonMemory {
 
         this.lastDream = Date.now();
         this.messagesSinceDream = 0;
+        this._saveMetadata();
 
         return `Dream complete: ${factsAdded} facts added, ${factsPruned} pruned across ${extracted.length} chat(s)`;
       }
 
       this.lastDream = Date.now();
       this.messagesSinceDream = 0;
+      this._saveMetadata();
       return 'Dream complete (no structured output extracted)';
     } catch (err) {
       this.lastDream = Date.now();
+      this._saveMetadata();
       return `Dream failed: ${err.message?.slice(0, 100)}`;
     }
   }
@@ -360,7 +386,7 @@ class DaemonMemory {
       fs.mkdirSync(this.storageDir, { recursive: true });
       const obj = {};
       for (const [k, v] of this.usage) obj[k] = v;
-      fs.writeFileSync(this.usagePath, JSON.stringify(obj), 'utf8');
+      atomicWriteSync(this.usagePath, JSON.stringify(obj));
     } catch {
       /* ignored */
     }
@@ -403,7 +429,7 @@ class DaemonMemory {
       fs.mkdirSync(this.storageDir, { recursive: true });
       const obj = {};
       for (const [k, v] of this.namedSessions) obj[k] = v;
-      fs.writeFileSync(this.namedSessionsPath, JSON.stringify(obj), 'utf8');
+      atomicWriteSync(this.namedSessionsPath, JSON.stringify(obj));
     } catch {
       /* ignored */
     }
@@ -448,43 +474,37 @@ class DaemonMemory {
 
   // ── Persistence ──────────────────────────────────────────────────────────
 
+  _loadJsonFile(filePath, mapTarget) {
+    if (!fs.existsSync(filePath)) return;
+    try {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      for (const [k, v] of Object.entries(data)) mapTarget.set(k, v);
+    } catch (err) {
+      console.error(`[memory] Corrupt or unreadable file: ${filePath} — ${err.message}`);
+    }
+  }
+
   _load() {
+    this._loadJsonFile(this.historyPath, this.chats);
+    this._loadJsonFile(this.summaryPath, this.summaries);
+    this._loadJsonFile(this.profilePath, this.profiles);
+    this._loadJsonFile(this.namedSessionsPath, this.namedSessions);
+    this._loadJsonFile(this.usagePath, this.usage);
+
+    // Restore daemon metadata (dream state, compaction counts)
     try {
-      if (fs.existsSync(this.historyPath))
-        for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.historyPath, 'utf8'))))
-          this.chats.set(k, v);
-    } catch {
-      /* ignored */
-    }
-    try {
-      if (fs.existsSync(this.summaryPath))
-        for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.summaryPath, 'utf8'))))
-          this.summaries.set(k, v);
-    } catch {
-      /* ignored */
-    }
-    try {
-      if (fs.existsSync(this.profilePath))
-        for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.profilePath, 'utf8'))))
-          this.profiles.set(k, v);
-    } catch {
-      /* ignored */
-    }
-    try {
-      if (fs.existsSync(this.namedSessionsPath))
-        for (const [k, v] of Object.entries(
-          JSON.parse(fs.readFileSync(this.namedSessionsPath, 'utf8'))
-        ))
-          this.namedSessions.set(k, v);
-    } catch {
-      /* ignored */
-    }
-    try {
-      if (fs.existsSync(this.usagePath))
-        for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.usagePath, 'utf8'))))
-          this.usage.set(k, v);
-    } catch {
-      /* ignored */
+      if (fs.existsSync(this.metadataPath)) {
+        const meta = JSON.parse(fs.readFileSync(this.metadataPath, 'utf8'));
+        this.lastDream = meta.lastDream || 0;
+        this.messagesSinceDream = meta.messagesSinceDream || 0;
+        if (meta.compactionCounts) {
+          for (const [k, v] of Object.entries(meta.compactionCounts)) {
+            this.compactionCounts.set(k, v);
+          }
+        }
+      }
+    } catch (err) {
+      console.error(`[memory] Corrupt metadata: ${err.message}`);
     }
   }
 
@@ -493,7 +513,7 @@ class DaemonMemory {
       fs.mkdirSync(this.storageDir, { recursive: true });
       const obj = {};
       for (const [k, v] of this.chats) obj[k] = v;
-      fs.writeFileSync(this.historyPath, JSON.stringify(obj), 'utf8');
+      atomicWriteSync(this.historyPath, JSON.stringify(obj));
     } catch {
       /* ignored */
     }
@@ -504,7 +524,7 @@ class DaemonMemory {
       fs.mkdirSync(this.storageDir, { recursive: true });
       const obj = {};
       for (const [k, v] of this.summaries) obj[k] = v;
-      fs.writeFileSync(this.summaryPath, JSON.stringify(obj), 'utf8');
+      atomicWriteSync(this.summaryPath, JSON.stringify(obj));
     } catch {
       /* ignored */
     }
@@ -515,7 +535,25 @@ class DaemonMemory {
       fs.mkdirSync(this.storageDir, { recursive: true });
       const obj = {};
       for (const [k, v] of this.profiles) obj[k] = v;
-      fs.writeFileSync(this.profilePath, JSON.stringify(obj), 'utf8');
+      atomicWriteSync(this.profilePath, JSON.stringify(obj));
+    } catch {
+      /* ignored */
+    }
+  }
+
+  _saveMetadata() {
+    try {
+      fs.mkdirSync(this.storageDir, { recursive: true });
+      const compactionObj = {};
+      for (const [k, v] of this.compactionCounts) compactionObj[k] = v;
+      atomicWriteSync(
+        this.metadataPath,
+        JSON.stringify({
+          lastDream: this.lastDream,
+          messagesSinceDream: this.messagesSinceDream,
+          compactionCounts: compactionObj,
+        })
+      );
     } catch {
       /* ignored */
     }

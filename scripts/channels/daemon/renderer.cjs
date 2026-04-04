@@ -6,7 +6,7 @@
  */
 'use strict';
 
-const { execSync, execFile } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const { claudeSync, nodeSync } = require('./claude-cli.cjs');
 
 const SYSTEM_PROMPT = `You are Agent Studio — an AI assistant running as a persistent background daemon, communicating via Telegram.
@@ -325,9 +325,10 @@ main().catch(() => process.exit(1));
     let context = '';
     if (this.memory && chatId) {
       context = this.memory.getContext(chatId);
+      // If context is too large, truncate it rather than triggering compaction mid-render
+      // (compaction calls claudeSync which would block this render cycle)
       if (context.length > 4800) {
-        this.memory._compactChat(chatId);
-        context = this.memory.getContext(chatId);
+        context = context.slice(-4800);
       }
     }
 
@@ -348,8 +349,8 @@ main().catch(() => process.exit(1));
       }
       if (transcription) {
         parts.push(`\n${user} sent a voice message. Transcription: "${transcription}"`);
-        // Override the text with the transcription so Claude responds to it
-        event.data.text = transcription;
+        // Use transcription as the message text for context (don't mutate event.data)
+        // The transcription is already in the prompt via parts above
       } else {
         parts.push(
           `\n${user} sent a voice/audio message. Voice transcription is not available. Ask them to type their message instead.`
@@ -422,35 +423,23 @@ main().catch(() => process.exit(1));
     delete env.ANTHROPIC_API_KEY;
 
     return new Promise((resolve, _reject) => {
-      // Use shell=true on Windows for .cmd wrappers
-      const child = execFile(
-        process.platform === 'win32' ? 'cmd' : 'claude',
-        process.platform === 'win32'
-          ? [
-              '/c',
-              `claude -p "${prompt}" --dangerously-skip-permissions --model ${model} --max-turns 3`,
-            ]
-          : [
-              '-p',
-              prompt,
-              '--dangerously-skip-permissions',
-              '--model',
-              this.model,
-              '--max-turns',
-              '3',
-            ],
-        {
-          cwd: this.projectRoot,
-          env,
-          windowsHide: true,
-          timeout: 120000,
-          maxBuffer: 1024 * 1024, // 1MB
-        },
-        (_error, _stdout, _stderr) => {
-          // This fires when the process exits — we use it as final fallback
-          // but normally resolve from the stream handler below
-        }
-      );
+      const args = [
+        '-p',
+        prompt,
+        '--dangerously-skip-permissions',
+        '--model',
+        model,
+        '--max-turns',
+        '3',
+      ];
+
+      const child = spawn('claude', args, {
+        cwd: this.projectRoot,
+        env,
+        windowsHide: true,
+        shell: true,
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
 
       let accumulated = '';
       let lastChunkTime = 0;

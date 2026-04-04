@@ -28,6 +28,7 @@ class Dispatcher {
     this.pendingClarifications = new Map(); // chatId → { originalText, question, timestamp }
     this.pendingInterviews = new Map(); // chatId → { originalText, questions, answers, currentRound, timestamp }
     this.pendingApprovals = new Map(); // chatId → { resolve, reject, command, timestamp }
+    this._personalities = new Map(); // chatId → personality name
     this.rateLimits = new Map(); // chatId → [timestamp1, timestamp2, ...]
     this.rateLimitMax = 10; // max messages per minute per user
     this.rateLimitWindowMs = 60000;
@@ -73,7 +74,7 @@ class Dispatcher {
         }
       } catch (err) {
         this.stats.errors++;
-        this.log(`[dispatcher] Error handling ${event.type}: ${err.message}`);
+        this.log(`[dispatcher] Error handling ${event.type}: ${err.message}\n${err.stack || ''}`);
       }
     }
 
@@ -85,7 +86,7 @@ class Dispatcher {
     if (!this.rateLimits.has(chatId)) this.rateLimits.set(chatId, []);
     const timestamps = this.rateLimits.get(chatId);
     // Clean old entries
-    while (timestamps.length > 0 && now - timestamps[0] > this.rateLimitWindowMs)
+    while (timestamps.length > 0 && now - timestamps[0] >= this.rateLimitWindowMs)
       timestamps.shift();
     if (timestamps.length >= this.rateLimitMax) {
       this.stats.rateLimited++;
@@ -218,7 +219,12 @@ class Dispatcher {
         if (event.type.startsWith('timer.')) {
           // Proactive/scheduled event — use proactive renderer
           this.log(`[dispatcher] Proactive render for ${event.type}...`);
-          response = this.renderer.renderProactive(event);
+          try {
+            response = this.renderer.renderProactive(event);
+          } catch (err) {
+            this.log(`[dispatcher] Proactive render error: ${err.message}`);
+            continue;
+          }
           if (!response) continue; // skip on error
         } else {
           this.log(`[dispatcher] Rendering response for ${event.type} from ${event.data.user}...`);
@@ -382,8 +388,12 @@ class Dispatcher {
           // Extract skill from successful ralph execution
           if (this.skillStore) {
             setImmediate(() => {
-              const skillName = this.skillStore.extractSkill(taskDesc, result);
-              if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+              try {
+                const skillName = this.skillStore.extractSkill(taskDesc, result);
+                if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+              } catch (err) {
+                this.log(`[dispatcher] Skill extraction error: ${err.message}`);
+              }
             });
           }
         } catch (err) {
@@ -439,8 +449,12 @@ class Dispatcher {
           this.activeTasks.get(taskId).status = 'completed';
           if (this.skillStore) {
             setImmediate(() => {
-              const skillName = this.skillStore.extractSkill(taskDesc, result);
-              if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+              try {
+                const skillName = this.skillStore.extractSkill(taskDesc, result);
+                if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+              } catch (err) {
+                this.log(`[dispatcher] Skill extraction error: ${err.message}`);
+              }
             });
           }
         } catch (err) {
@@ -509,8 +523,12 @@ class Dispatcher {
           // Extract skill from successful task
           if (this.skillStore && !result.startsWith('Error')) {
             setImmediate(() => {
-              const skillName = this.skillStore.extractSkill(taskDesc, result);
-              if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+              try {
+                const skillName = this.skillStore.extractSkill(taskDesc, result);
+                if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+              } catch (err) {
+                this.log(`[dispatcher] Skill extraction error: ${err.message}`);
+              }
             });
           }
         } catch (err) {
