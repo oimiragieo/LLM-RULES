@@ -14,7 +14,7 @@ class SlackSink {
     this.webhookUrl = config.webhookUrl; // Optional: for incoming webhook mode
   }
 
-  async sendTyping(chatId) {
+  async sendTyping(_chatId) {
     // Slack doesn't have a typing indicator API for bots
   }
 
@@ -36,20 +36,27 @@ class SlackSink {
     return result.ok ? result.ts : null;
   }
 
+  // eslint-disable-next-line require-await
   async _sendViaWebhook(text) {
     return new Promise((resolve, reject) => {
       const url = new URL(this.webhookUrl);
       const data = JSON.stringify({ text });
-      const req = https.request({
-        hostname: url.hostname,
-        path: url.pathname,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) },
-      }, res => {
-        let body = '';
-        res.on('data', c => body += c);
-        res.on('end', () => resolve(res.statusCode === 200 ? 'ok' : null));
-      });
+      const req = https.request(
+        {
+          hostname: url.hostname,
+          path: url.pathname,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(data),
+          },
+        },
+        res => {
+          let body = '';
+          res.on('data', c => (body += c));
+          res.on('end', () => resolve(res.statusCode === 200 ? 'ok' : null));
+        }
+      );
       req.on('error', reject);
       req.write(data);
       req.end();

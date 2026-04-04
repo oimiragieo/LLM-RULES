@@ -33,6 +33,7 @@ function loadDotenv(root) {
   }
 }
 
+// eslint-disable-next-line complexity
 function loadConfig(root) {
   loadDotenv(root);
 
@@ -41,7 +42,9 @@ function loadConfig(root) {
   if (fs.existsSync(CONFIG_PATH)) {
     try {
       fileConfig = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 
   // Build allowed users set
@@ -55,7 +58,9 @@ function loadConfig(root) {
   try {
     const data = JSON.parse(fs.readFileSync(accessPath, 'utf8'));
     (data.allowFrom || []).forEach(id => allowed.add(String(id)));
-  } catch {}
+  } catch {
+    /* ignored */
+  }
 
   // Mode: 'developer' (default) or 'business'
   const mode = process.env.CHANNEL_MODE || fileConfig.mode || 'developer';

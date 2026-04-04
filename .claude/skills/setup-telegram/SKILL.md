@@ -65,6 +65,7 @@ For any `[ ]` items, tell the user exactly what to add and where.
 If everything passes: "All configured! Run `/enable-telegram` to start monitoring."
 
 **Voice message support (optional):** If the user wants voice messages to be transcribed, they need:
+
 - `pip install transcribe-anything` — Whisper-based speech-to-text (required for voice)
 - `ELEVENLABS_API_KEY` or `OPENAI_API_KEY` in `.env` — for TTS audio responses (optional)
 - Without `transcribe-anything`, voice messages get a "please type instead" fallback

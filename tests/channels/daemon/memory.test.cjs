@@ -19,7 +19,9 @@ beforeEach(() => {
 afterEach(() => {
   try {
     fs.rmSync(tmpDir, { recursive: true, force: true });
-  } catch {}
+  } catch {
+    /* ignored */
+  }
 });
 
 describe('DaemonMemory', () => {
@@ -140,14 +142,12 @@ describe('DaemonMemory', () => {
       // Fill enough messages to trigger compaction
       for (let i = 0; i < 25; i++) {
         mem.chats.set('chat1', mem.chats.get('chat1') || []);
-        mem.chats
-          .get('chat1')
-          .push({
-            role: 'user',
-            user: 'omar',
-            text: `msg ${i}`,
-            timestamp: new Date().toISOString(),
-          });
+        mem.chats.get('chat1').push({
+          role: 'user',
+          user: 'omar',
+          text: `msg ${i}`,
+          timestamp: new Date().toISOString(),
+        });
       }
       // Manually call compact (it would normally use execSync which we don't want in tests)
       const count = mem.compactionCounts.get('chat1') || 0;
@@ -263,7 +263,13 @@ describe('DaemonMemory', () => {
 
       const now = new Date();
       const dateStr = now.toISOString().split('T')[0];
-      const logFile = path.join(tmpDir, 'logs', dateStr.slice(0, 4), dateStr.slice(5, 7), `${dateStr}.md`);
+      const logFile = path.join(
+        tmpDir,
+        'logs',
+        dateStr.slice(0, 4),
+        dateStr.slice(5, 7),
+        `${dateStr}.md`
+      );
       const content = fs.readFileSync(logFile, 'utf8');
       assert.ok(content.includes('first'));
       assert.ok(content.includes('second'));
@@ -302,7 +308,7 @@ describe('DaemonMemory', () => {
       const mem = new DaemonMemory(tmpDir, {});
       mem.trackUsage('chat1', 'haiku', 1_000_000); // 1M tokens
       const usage = mem.getUsage('chat1');
-      assert.ok(Math.abs(usage.today.cost - 0.80) < 0.01); // haiku: $0.80/MTok
+      assert.ok(Math.abs(usage.today.cost - 0.8) < 0.01); // haiku: $0.80/MTok
     });
   });
 

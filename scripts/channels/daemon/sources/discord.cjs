@@ -18,25 +18,34 @@ function discordApi(token, method, path, body) {
   return new Promise((resolve, reject) => {
     const data = body ? JSON.stringify(body) : null;
     const url = new URL(API_BASE + path);
-    const req = https.request({
-      hostname: url.hostname,
-      path: url.pathname,
-      method: method,
-      headers: {
-        'Authorization': `Bot ${token}`,
-        'Content-Type': 'application/json',
-        ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {}),
+    const req = https.request(
+      {
+        hostname: url.hostname,
+        path: url.pathname,
+        method: method,
+        headers: {
+          Authorization: `Bot ${token}`,
+          'Content-Type': 'application/json',
+          ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {}),
+        },
       },
-    }, res => {
-      const chunks = [];
-      res.on('data', c => chunks.push(c));
-      res.on('end', () => {
-        try { resolve(JSON.parse(Buffer.concat(chunks).toString())); }
-        catch { resolve({ ok: false }); }
-      });
-    });
+      res => {
+        const chunks = [];
+        res.on('data', c => chunks.push(c));
+        res.on('end', () => {
+          try {
+            resolve(JSON.parse(Buffer.concat(chunks).toString()));
+          } catch {
+            resolve({ ok: false });
+          }
+        });
+      }
+    );
     req.on('error', reject);
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.setTimeout(10000, () => {
+      req.destroy();
+      reject(new Error('timeout'));
+    });
     if (data) req.write(data);
     req.end();
   });
@@ -80,11 +89,13 @@ class DiscordSource {
       return;
     }
 
-    this.ws.on('message', (data) => {
+    this.ws.on('message', data => {
       try {
         const payload = JSON.parse(data.toString());
         this._handlePayload(payload);
-      } catch {}
+      } catch {
+        /* ignored */
+      }
     });
 
     this.ws.on('close', () => {
@@ -126,14 +137,16 @@ class DiscordSource {
 
   _identify() {
     if (this.ws?.readyState !== 1) return;
-    this.ws.send(JSON.stringify({
-      op: 2,
-      d: {
-        token: this.token,
-        intents: 512 + 4096, // GUILD_MESSAGES + MESSAGE_CONTENT
-        properties: { os: process.platform, browser: 'agent-studio', device: 'daemon' },
-      },
-    }));
+    this.ws.send(
+      JSON.stringify({
+        op: 2,
+        d: {
+          token: this.token,
+          intents: 512 + 4096, // GUILD_MESSAGES + MESSAGE_CONTENT
+          properties: { os: process.platform, browser: 'agent-studio', device: 'daemon' },
+        },
+      })
+    );
   }
 
   _handleDispatch(type, data) {
@@ -170,7 +183,11 @@ class DiscordSource {
     this.running = false;
     if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
     if (this.ws) {
-      try { this.ws.close(); } catch {}
+      try {
+        this.ws.close();
+      } catch {
+        /* ignored */
+      }
       this.ws = null;
     }
   }

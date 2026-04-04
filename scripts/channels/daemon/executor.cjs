@@ -10,6 +10,7 @@
 
 const { execSync } = require('child_process');
 const http = require('http');
+const { claudeSync } = require('./claude-cli.cjs');
 
 class TaskExecutor {
   constructor(config, log) {
@@ -24,24 +25,14 @@ class TaskExecutor {
    */
   executeTask(task, context = '') {
     const prompt = context ? `Context: ${context}\n\nTask: ${task}` : task;
-    const safePrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, ' ').slice(0, 4000);
 
     try {
-      const env = { ...process.env };
-      delete env.ANTHROPIC_API_KEY;
-
-      const result = execSync(
-        `claude -p "${safePrompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 10`,
-        {
-          cwd: this.projectRoot,
-          encoding: 'utf8',
-          timeout: 300000,
-          env,
-          windowsHide: true,
-          shell: true,
-          stdio: ['pipe', 'pipe', 'pipe'],
-        }
-      ).trim();
+      const result = claudeSync(prompt, {
+        model: this.model,
+        maxTurns: 10,
+        cwd: this.projectRoot,
+        timeout: 300000,
+      });
 
       return result || 'Task completed but produced no output.';
     } catch (err) {
@@ -77,9 +68,10 @@ class TaskExecutor {
       this.log(`[executor] Ralph iteration ${iteration}: ${task.slice(0, 60)}`);
 
       // Build prompt — first iteration is clean, subsequent get prior context
-      const prompt = iteration === 1
-        ? task
-        : `Previous iteration result:\n${lastResult.slice(0, 2000)}\n\nContinue working on: ${task}\n\nFix any remaining issues. If everything passes, say RALPH_COMPLETE.`;
+      const prompt =
+        iteration === 1
+          ? task
+          : `Previous iteration result:\n${lastResult.slice(0, 2000)}\n\nContinue working on: ${task}\n\nFix any remaining issues. If everything passes, say RALPH_COMPLETE.`;
 
       lastResult = this.executeTask(prompt, context);
 
@@ -95,11 +87,20 @@ class TaskExecutor {
           const env = { ...process.env };
           delete env.ANTHROPIC_API_KEY;
           const verifyResult = execSync(verifyCommand, {
-            cwd: this.projectRoot, encoding: 'utf8', timeout: 60000,
-            env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'],
+            cwd: this.projectRoot,
+            encoding: 'utf8',
+            timeout: 60000,
+            env,
+            windowsHide: true,
+            shell: true,
+            stdio: ['pipe', 'pipe', 'pipe'],
           }).trim();
 
-          if (verifyResult.includes('PASS') || verifyResult.includes('0 fail') || verifyResult.includes(' 0 errors')) {
+          if (
+            verifyResult.includes('PASS') ||
+            verifyResult.includes('0 fail') ||
+            verifyResult.includes(' 0 errors')
+          ) {
             this.log(`[executor] Ralph verify passed at iteration ${iteration}`);
             lastResult += `\n\nVerification: ${verifyResult.slice(0, 500)}`;
             break;
@@ -114,7 +115,10 @@ class TaskExecutor {
       }
     }
 
-    const status = iteration >= maxIterations ? '⚠️ Max iterations reached' : `✅ Completed in ${iteration} iteration(s)`;
+    const status =
+      iteration >= maxIterations
+        ? '⚠️ Max iterations reached'
+        : `✅ Completed in ${iteration} iteration(s)`;
     return `${status}\n\n${lastResult}`;
   }
 
@@ -122,7 +126,9 @@ class TaskExecutor {
    * Check if output indicates a rate limit error.
    */
   _isRateLimitError(output) {
-    return /rate.limit|429|too many requests|overloaded|Extra usage is required/i.test(output || '');
+    return /rate.limit|429|too many requests|overloaded|Extra usage is required/i.test(
+      output || ''
+    );
   }
 
   /**
@@ -134,9 +140,13 @@ class TaskExecutor {
       if (!this._isRateLimitError(result)) return result;
       if (attempt < maxRetries) {
         const delaySec = 30 * Math.pow(2, attempt); // 30s, 60s, 120s
-        this.log(`[executor] Rate limited, waiting ${delaySec}s before retry ${attempt + 2}/${maxRetries + 1}...`);
+        this.log(
+          `[executor] Rate limited, waiting ${delaySec}s before retry ${attempt + 2}/${maxRetries + 1}...`
+        );
         const start = Date.now();
-        while (Date.now() - start < delaySec * 1000) {} // Sync wait
+        while (Date.now() - start < delaySec * 1000) {
+          /* sync wait */
+        }
       }
     }
     return 'Rate limit exceeded after retries. Try again later.';
@@ -159,7 +169,9 @@ class TaskExecutor {
     try {
       const match = splitResult.match(/\[[\s\S]*\]/);
       subtasks = match ? JSON.parse(match[0]) : null;
-    } catch {}
+    } catch {
+      /* ignored */
+    }
 
     if (!subtasks || subtasks.length <= 1) {
       onProgress('📝 Task not parallelizable, running sequentially');
@@ -171,33 +183,40 @@ class TaskExecutor {
     this.log(`[executor] Ultrawork: ${subtasks.length} parallel subtasks`);
 
     const results = await Promise.allSettled(
-      subtasks.slice(0, maxParallel).map((st, i) =>
-        new Promise(resolve => {
-          try {
-            const result = this.executeTask(st);
-            resolve({ subtask: st, result });
-          } catch (err) {
-            resolve({ subtask: st, result: `FAILED: ${err.message}` });
-          }
-        })
+      subtasks.slice(0, maxParallel).map(
+        (st, _i) =>
+          new Promise(resolve => {
+            try {
+              const result = this.executeTask(st);
+              resolve({ subtask: st, result });
+            } catch (err) {
+              resolve({ subtask: st, result: `FAILED: ${err.message}` });
+            }
+          })
       )
     );
 
     // Step 3: Merge results
-    const merged = results.map((r, i) => {
-      const data = r.status === 'fulfilled' ? r.value : { subtask: subtasks[i], result: 'FAILED' };
-      return `### Subtask ${i + 1}: ${data.subtask?.slice(0, 80)}\n${data.result?.slice(0, 800)}`;
-    }).join('\n\n');
+    const merged = results
+      .map((r, i) => {
+        const data =
+          r.status === 'fulfilled' ? r.value : { subtask: subtasks[i], result: 'FAILED' };
+        return `### Subtask ${i + 1}: ${data.subtask?.slice(0, 80)}\n${data.result?.slice(0, 800)}`;
+      })
+      .join('\n\n');
 
-    const succeeded = results.filter(r => r.status === 'fulfilled' && !r.value?.result?.startsWith('FAILED')).length;
+    const succeeded = results.filter(
+      r => r.status === 'fulfilled' && !r.value?.result?.startsWith('FAILED')
+    ).length;
     return `⚡ Ultrawork: ${succeeded}/${subtasks.length} subtasks completed\n\n${merged}`;
   }
 
   /**
    * Send a task to the A2A server (router) for agent-based execution.
    */
+  // eslint-disable-next-line require-await
   async sendToRouter(prompt, agentType = 'developer') {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const body = JSON.stringify({
         jsonrpc: '2.0',
         id: Date.now().toString(),
@@ -211,27 +230,36 @@ class TaskExecutor {
         },
       });
 
-      const req = http.request({
-        hostname: '127.0.0.1',
-        port: this.a2aPort,
-        path: '/a2a',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(body),
+      const req = http.request(
+        {
+          hostname: '127.0.0.1',
+          port: this.a2aPort,
+          path: '/a2a',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(body),
+          },
+          timeout: 10000,
         },
-        timeout: 10000,
-      }, res => {
-        let data = '';
-        res.on('data', c => data += c);
-        res.on('end', () => {
-          try { resolve(JSON.parse(data)); }
-          catch { resolve({ error: data }); }
-        });
-      });
+        res => {
+          let data = '';
+          res.on('data', c => (data += c));
+          res.on('end', () => {
+            try {
+              resolve(JSON.parse(data));
+            } catch {
+              resolve({ error: data });
+            }
+          });
+        }
+      );
 
       req.on('error', err => resolve({ error: `A2A server not available: ${err.message}` }));
-      req.on('timeout', () => { req.destroy(); resolve({ error: 'A2A server timeout' }); });
+      req.on('timeout', () => {
+        req.destroy();
+        resolve({ error: 'A2A server timeout' });
+      });
       req.write(body);
       req.end();
     });
@@ -240,13 +268,17 @@ class TaskExecutor {
   /**
    * Check if the A2A server is available.
    */
+  // eslint-disable-next-line require-await
   async isRouterAvailable() {
     return new Promise(resolve => {
       const req = http.get(`http://127.0.0.1:${this.a2aPort}/.well-known/agent.json`, res => {
         resolve(res.statusCode === 200);
       });
       req.on('error', () => resolve(false));
-      req.setTimeout(2000, () => { req.destroy(); resolve(false); });
+      req.setTimeout(2000, () => {
+        req.destroy();
+        resolve(false);
+      });
     });
   }
 }

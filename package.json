@@ -231,6 +231,7 @@
     "tree-sitter-python": "^0.25.0",
     "tree-sitter-rust": "^0.24.0",
     "tree-sitter-typescript": "^0.23.2",
+    "ws": "^8.20.0",
     "zod": "^4.3.6"
   },
   "optionalDependencies": {

@@ -30,7 +30,7 @@ describe('TaskExecutor', () => {
 
       const result = exec.executeRalphLoop('test task', {
         maxIterations: 3,
-        onProgress: (msg) => progressCalls.push(msg),
+        onProgress: msg => progressCalls.push(msg),
       });
 
       assert.ok(progressCalls.length >= 1);
@@ -71,7 +71,7 @@ describe('TaskExecutor', () => {
       const exec = new TaskExecutor({ model: 'sonnet' });
       const prompts = [];
 
-      exec.executeTask = (prompt) => {
+      exec.executeTask = prompt => {
         prompts.push(prompt);
         if (prompts.length >= 2) return 'RALPH_COMPLETE';
         return 'Error: missing semicolon on line 42';
@@ -106,7 +106,7 @@ describe('TaskExecutor', () => {
     it('runs subtasks when split succeeds', async () => {
       const exec = new TaskExecutor({});
       let callCount = 0;
-      exec.executeTask = (prompt) => {
+      exec.executeTask = prompt => {
         callCount++;
         if (prompt.includes('Split this task')) return '["fix file A", "fix file B"]';
         return `Fixed: ${prompt.slice(0, 30)}`;

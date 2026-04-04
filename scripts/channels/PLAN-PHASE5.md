@@ -24,14 +24,15 @@ These are the features that separate a chatbot from an autonomous agent.
 
 Route messages to the cheapest model that can handle them.
 
-| Message Type | Model | Cost/MTok |
-|---|---|---|
-| Greetings, simple chat (<30 chars) | haiku | $0.80 |
-| Regular conversation | sonnet | $3.00 |
-| Complex tasks, code, analysis | opus | $15.00 |
-| Compaction, suggestions, dream | haiku | $0.80 |
+| Message Type                       | Model  | Cost/MTok |
+| ---------------------------------- | ------ | --------- |
+| Greetings, simple chat (<30 chars) | haiku  | $0.80     |
+| Regular conversation               | sonnet | $3.00     |
+| Complex tasks, code, analysis      | opus   | $15.00    |
+| Compaction, suggestions, dream     | haiku  | $0.80     |
 
 **Test first:**
+
 ```
 tests/channels/daemon/renderer.test.cjs
 - _selectModel('hello') → 'haiku'
@@ -45,6 +46,7 @@ tests/channels/daemon/renderer.test.cjs
 **Implementation:**
 
 **5.1a: Add `_selectModel(text)` to renderer**
+
 ```javascript
 _selectModel(text) {
   if (!text || text.length < 30) return 'haiku';
@@ -58,6 +60,7 @@ _selectModel(text) {
 Replace hardcoded `--model ${this.model}` with `--model ${this._selectModel(text)}`.
 
 **5.1c: Log model selection for cost visibility**
+
 ```
 [dispatcher] Using haiku for "hello" (5 chars)
 [dispatcher] Using sonnet for "explain the reactor..." (89 chars)
@@ -66,6 +69,7 @@ Replace hardcoded `--model ${this.model}` with `--model ${this._selectModel(text
 **Regression:** 79 tests pass. Existing behavior unchanged for sonnet-length messages.
 
 **Benchmark:**
+
 - Before: 100% sonnet ($3/MTok)
 - After: ~40% haiku ($0.80), ~55% sonnet ($3), ~5% opus ($15)
 - Estimated cost reduction: 35-60%
@@ -81,6 +85,7 @@ Replace hardcoded `--model ${this.model}` with `--model ${this._selectModel(text
 When a [TASK] executes, send periodic progress updates to the user.
 
 **Test first:**
+
 ```
 tests/channels/daemon/executor.test.cjs
 - executeTaskAsync() returns an async iterator of progress events
@@ -93,20 +98,23 @@ tests/channels/daemon/executor.test.cjs
 
 **5.2a: Add `executeTaskAsync(task, onProgress)` to executor**
 Switch from `execSync` to `execFile` (async). Monitor stderr for:
+
 ```
 Tool: Reading file.js
 Tool: Running bash command
 Tool: Writing output.ts
 ```
+
 Call `onProgress(text)` for each detected tool call.
 
 **5.2b: Update dispatcher [TASK] handler to use async executor**
+
 ```javascript
 // Send initial notification
 await sink.send(chatId, '⚙️ Starting task...');
 let lastProgress = Date.now();
 
-const result = await executor.executeTaskAsync(taskDesc, async (progress) => {
+const result = await executor.executeTaskAsync(taskDesc, async progress => {
   // Rate limit: max 1 update per 5 seconds
   if (Date.now() - lastProgress > 5000) {
     await sink.send(chatId, `⏳ ${progress}`);
@@ -121,6 +129,7 @@ If the task completes in <5 seconds, skip progress updates (not worth the noise)
 **Regression:** 79 tests pass. `executeTask` (sync) preserved as fallback.
 
 **Benchmark:**
+
 - Before: user waits 30-60s with "⚙️ Running task..." and no feedback
 - After: progress updates every 5s ("⏳ Reading 3 files...", "⏳ Running tests...")
 
@@ -135,6 +144,7 @@ If the task completes in <5 seconds, skip progress updates (not worth the noise)
 Wire the existing `TimerSource` with a KAIROS-style tick engine.
 
 **Test first:**
+
 ```
 tests/channels/daemon/sources/timer.test.cjs
 - TimerSource fires events at configured intervals
@@ -147,14 +157,23 @@ tests/channels/daemon/sources/timer.test.cjs
 **Implementation:**
 
 **5.3a: Define tick schedules in config**
+
 ```json
 {
   "proactive": {
     "enabled": true,
     "tickIntervalMs": 60000,
     "schedules": [
-      { "name": "morning-checkin", "cron": "0 9 * * 1-5", "prompt": "Send a brief good morning and ask what to work on today." },
-      { "name": "eod-summary", "cron": "0 17 * * 1-5", "prompt": "Summarize what was accomplished today." }
+      {
+        "name": "morning-checkin",
+        "cron": "0 9 * * 1-5",
+        "prompt": "Send a brief good morning and ask what to work on today."
+      },
+      {
+        "name": "eod-summary",
+        "cron": "0 17 * * 1-5",
+        "prompt": "Summarize what was accomplished today."
+      }
     ],
     "budgetMs": 15000
   }
@@ -163,6 +182,7 @@ tests/channels/daemon/sources/timer.test.cjs
 
 **5.3b: Implement TickEngine in timer source**
 On each tick:
+
 1. Check if user is active (last message < 5 min ago → sleep)
 2. Check if any cron schedule matches current time
 3. If schedule matches → render proactive message via renderer
@@ -170,6 +190,7 @@ On each tick:
 5. Enforce 15s budget — abort if exceeded
 
 **5.3c: Wire into daemon index**
+
 ```javascript
 if (config.proactive?.enabled) {
   const tickEngine = new TimerSource(config.proactive, event => dispatcher.enqueue(event));
@@ -193,6 +214,7 @@ Add file sending to all sinks. When a [TASK] result includes a file path,
 send it as a document attachment.
 
 **Test first:**
+
 ```
 tests/channels/daemon/sinks/telegram.test.cjs
 - sendFile() calls sendDocument API with file path
@@ -207,6 +229,7 @@ tests/channels/daemon/dispatcher.test.cjs
 **Implementation:**
 
 **5.4a: Add `sendFile(chatId, filePath, opts)` to telegram sink**
+
 ```javascript
 async sendFile(chatId, filePath, opts = {}) {
   const FormData = require('form-data');
@@ -218,10 +241,12 @@ async sendFile(chatId, filePath, opts = {}) {
 
 **5.4c: Detect file paths in [TASK] results**
 After task execution, scan result for file paths:
+
 ```javascript
 const filePaths = result.match(/(?:\/[\w.-]+)+\.(?:md|pdf|csv|txt|json|png|jpg)/g);
 if (filePaths?.length > 0) {
-  for (const fp of filePaths.slice(0, 3)) { // max 3 files
+  for (const fp of filePaths.slice(0, 3)) {
+    // max 3 files
     await sink.sendFile(chatId, fp);
   }
 }
@@ -240,6 +265,7 @@ if (filePaths?.length > 0) {
 Track estimated token usage and cost per user per day.
 
 **Test first:**
+
 ```
 tests/channels/daemon/memory.test.cjs
 - trackUsage() increments user's token count
@@ -251,6 +277,7 @@ tests/channels/daemon/memory.test.cjs
 **Implementation:**
 
 **5.5a: Add usage tracking to DaemonMemory**
+
 ```javascript
 // Per-user usage tracking
 this.usagePath = path.join(storageDir, 'usage.json');
@@ -272,6 +299,7 @@ getUsage(chatId) {
 Estimate tokens from response length (response.length / 4).
 
 **5.5c: Add `/usage` command**
+
 ```
 📊 Your usage:
   Today: 12 messages, ~24K tokens, ~$0.07
@@ -301,12 +329,14 @@ Do 5.1 first — all other slices benefit from model routing.
 ## Regression Protocol
 
 **After EVERY slice:**
+
 1. `node --test tests/channels/daemon/*.test.cjs tests/channels/daemon/**/*.test.cjs`
 2. Verify: 79+ tests, 0 failures
 3. Manual: start daemon, send Telegram message, verify response
 4. Manual: `curl http://127.0.0.1:3101/status` returns valid JSON
 
 **After Phase 5 complete:**
+
 1. Full: `pnpm test` (all tests)
 2. Cost audit: check haiku vs sonnet routing works
 3. Task progress: run a [TASK] and verify updates appear
@@ -317,20 +347,21 @@ Do 5.1 first — all other slices benefit from model routing.
 
 ## Benchmarks
 
-| Metric | Phase 4 (current) | Phase 5 Target |
-|--------|-------------------|----------------|
-| API cost per message (avg) | ~$0.003 (all sonnet) | ~$0.0012 (mixed routing) |
-| Task feedback latency | 30-60s (zero feedback) | 5s between updates |
-| Proactive messages/day | 0 | 2-4 (morning + EOD) |
-| File delivery | text only | PDF/CSV/MD/PNG |
-| Cost visibility | none | /usage per user |
-| Test count | 79 | 90+ |
+| Metric                     | Phase 4 (current)      | Phase 5 Target           |
+| -------------------------- | ---------------------- | ------------------------ |
+| API cost per message (avg) | ~$0.003 (all sonnet)   | ~$0.0012 (mixed routing) |
+| Task feedback latency      | 30-60s (zero feedback) | 5s between updates       |
+| Proactive messages/day     | 0                      | 2-4 (morning + EOD)      |
+| File delivery              | text only              | PDF/CSV/MD/PNG           |
+| Cost visibility            | none                   | /usage per user          |
+| Test count                 | 79                     | 90+                      |
 
 ---
 
 ## Rollback Points
 
 Each slice is atomic. If a slice breaks:
+
 1. `git stash` the changes
 2. Verify 79 tests pass
 3. Debug in isolation

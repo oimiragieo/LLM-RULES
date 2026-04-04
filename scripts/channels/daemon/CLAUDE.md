@@ -33,6 +33,7 @@ Event-to-route matcher. `Router.resolve(event)` finds matching routes using glob
 Event queue processor. Receives events from sources, routes them, renders responses via Claude, delivers via sinks. Sequential processing (one event at a time to avoid concurrent `claude -p` issues). Features: "while you were away" idle recap (1hr threshold), auto-dream trigger after events, conversation history tracking, active task map, per-user rate limiting (10 msg/min default).
 
 **Execution tag detection:** Parses Claude's response for execution tags and routes to the appropriate handler:
+
 - `[TASK]` — one-shot task execution via executor
 - `[RALPH]` — iterative verify/fix loop (max 5 iterations) via executor
 - `[CLARIFY]` — single clarification question (no execution)
@@ -114,11 +115,11 @@ Webhook source for external integrations. Exposes `POST /webhook` endpoint for G
 
 The daemon supports 6 execution tags that Claude includes in its responses to trigger different execution modes:
 
-| Tag           | Mode              | Description                                                        |
-| ------------- | ----------------- | ------------------------------------------------------------------ |
-| `[TASK]`      | One-shot          | Single headless claude -p execution with tools                     |
-| `[RALPH]`     | Iterative loop    | Persistent verify/fix cycle, max 5 iterations                      |
-| `[CLARIFY]`   | Single question   | Asks one clarifying question, no execution                         |
-| `[INTERVIEW]` | Multi-round       | Deep Socratic interview, collects multiple answers before executing |
-| `[ULTRAWORK]` | Parallel          | Splits task into concurrent subtasks                               |
-| `[HANDOFF]`   | Human escalation  | Escalates to human, no automated execution                         |
+| Tag           | Mode             | Description                                                         |
+| ------------- | ---------------- | ------------------------------------------------------------------- |
+| `[TASK]`      | One-shot         | Single headless claude -p execution with tools                      |
+| `[RALPH]`     | Iterative loop   | Persistent verify/fix cycle, max 5 iterations                       |
+| `[CLARIFY]`   | Single question  | Asks one clarifying question, no execution                          |
+| `[INTERVIEW]` | Multi-round      | Deep Socratic interview, collects multiple answers before executing |
+| `[ULTRAWORK]` | Parallel         | Splits task into concurrent subtasks                                |
+| `[HANDOFF]`   | Human escalation | Escalates to human, no automated execution                          |

@@ -14,25 +14,34 @@ const https = require('https');
 function slackApi(token, method, body) {
   return new Promise((resolve, reject) => {
     const data = body ? JSON.stringify(body) : null;
-    const req = https.request({
-      hostname: 'slack.com',
-      path: `/api/${method}`,
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {}),
+    const req = https.request(
+      {
+        hostname: 'slack.com',
+        path: `/api/${method}`,
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {}),
+        },
       },
-    }, res => {
-      const chunks = [];
-      res.on('data', c => chunks.push(c));
-      res.on('end', () => {
-        try { resolve(JSON.parse(Buffer.concat(chunks).toString())); }
-        catch { resolve({ ok: false }); }
-      });
-    });
+      res => {
+        const chunks = [];
+        res.on('data', c => chunks.push(c));
+        res.on('end', () => {
+          try {
+            resolve(JSON.parse(Buffer.concat(chunks).toString()));
+          } catch {
+            resolve({ ok: false });
+          }
+        });
+      }
+    );
     req.on('error', reject);
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.setTimeout(10000, () => {
+      req.destroy();
+      reject(new Error('timeout'));
+    });
     if (data) req.write(data);
     req.end();
   });
@@ -67,10 +76,13 @@ class SlackSource {
 
           // Process newest first, update timestamp
           for (const msg of result.messages.reverse()) {
+            // eslint-disable-next-line max-depth
             if (msg.subtype) continue; // Skip system messages
+            // eslint-disable-next-line max-depth
             if (msg.bot_id) continue; // Skip bot messages
 
             const userId = msg.user || '';
+            // eslint-disable-next-line max-depth
             if (!this.allowAll && !this.allowed.has(userId)) continue;
 
             this.lastTimestamp[channel] = msg.ts;
@@ -89,7 +101,9 @@ class SlackSource {
               timestamp: new Date().toISOString(),
             });
           }
-        } catch {}
+        } catch {
+          /* ignored */
+        }
       }
 
       await this._sleep(5000); // Poll every 5s

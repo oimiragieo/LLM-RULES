@@ -15,7 +15,9 @@ class DiscordSink {
   async sendTyping(chatId) {
     try {
       await discordApi(this.token, 'POST', `/channels/${chatId}/typing`);
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 
   async send(chatId, text, opts = {}) {

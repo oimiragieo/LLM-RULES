@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * dispatcher.cjs — Event dispatcher
  *
@@ -30,7 +31,14 @@ class Dispatcher {
     this.rateLimits = new Map(); // chatId → [timestamp1, timestamp2, ...]
     this.rateLimitMax = 10; // max messages per minute per user
     this.rateLimitWindowMs = 60000;
-    this.stats = { received: 0, processed: 0, errors: 0, tasksExecuted: 0, rateLimited: 0, lastEvent: null };
+    this.stats = {
+      received: 0,
+      processed: 0,
+      errors: 0,
+      tasksExecuted: 0,
+      rateLimited: 0,
+      lastEvent: null,
+    };
   }
 
   /**
@@ -77,7 +85,8 @@ class Dispatcher {
     if (!this.rateLimits.has(chatId)) this.rateLimits.set(chatId, []);
     const timestamps = this.rateLimits.get(chatId);
     // Clean old entries
-    while (timestamps.length > 0 && now - timestamps[0] > this.rateLimitWindowMs) timestamps.shift();
+    while (timestamps.length > 0 && now - timestamps[0] > this.rateLimitWindowMs)
+      timestamps.shift();
     if (timestamps.length >= this.rateLimitMax) {
       this.stats.rateLimited++;
       return false; // Over limit
@@ -86,18 +95,26 @@ class Dispatcher {
     return true; // Under limit
   }
 
+  // eslint-disable-next-line complexity
   async _handleEvent(event) {
     // Rate limiting — per-user throttle
     if (event.data?.chatId && !this._checkRateLimit(event.data.chatId)) {
       const sink = this.sinks[event.source];
       if (sink) {
-        try { await sink.send(event.data.chatId, '⏳ Slow down! Rate limit reached. Try again in a minute.'); } catch {}
+        try {
+          await sink.send(
+            event.data.chatId,
+            '⏳ Slow down! Rate limit reached. Try again in a minute.'
+          );
+        } catch {
+          /* ignored */
+        }
       }
       this.log(`[dispatcher] Rate limited ${event.data.chatId}`);
       return;
     }
 
-    // "While you were away" recap (KAIROS-style)
+    // Session gap detection — mark stale history so Claude knows time has passed
     if (this.memory && event.data.chatId) {
       const history = this.memory.chats.get(event.data.chatId) || [];
       if (history.length > 0) {
@@ -105,20 +122,14 @@ class Dispatcher {
         const idleMs = Date.now() - new Date(lastMsg.timestamp).getTime();
         const IDLE_THRESHOLD = 3600000; // 1 hour
         if (idleMs > IDLE_THRESHOLD && !event.data.text.startsWith('/')) {
-          const summary = this.memory.summaries.get(event.data.chatId);
-          if (summary) {
-            const sink = this.sinks[event.source];
-            if (sink) {
-              const hours = Math.round(idleMs / 3600000);
-              try {
-                await sink.send(
-                  event.data.chatId,
-                  `👋 Welcome back! (${hours}h since last chat)\n\nWhere we left off: ${summary.slice(-300)}`,
-                  { replyTo: event.data.messageId }
-                );
-              } catch {}
-            }
-          }
+          const hours = Math.round(idleMs / 3600000);
+          // Insert a session boundary marker into the chat history so Claude
+          // knows there was a time gap and doesn't continue old topics unprompted
+          this.memory.addMessage(
+            event.data.chatId,
+            'system',
+            `[Session gap: ${hours}h since last message. The user is starting a new interaction — respond to their current message, not the previous topic.]`
+          );
         }
       }
     }
@@ -131,19 +142,28 @@ class Dispatcher {
       // Timeout: 10 min
       if (Date.now() - interview.timestamp > 600000) {
         this.pendingInterviews.delete(chatId);
-      } else if (event.data.text.toLowerCase() === 'just do it' || event.data.text.toLowerCase() === 'skip') {
+      } else if (
+        event.data.text.toLowerCase() === 'just do it' ||
+        event.data.text.toLowerCase() === 'skip'
+      ) {
         // Skip remaining questions, execute with what we have
-        const context = interview.answers.map((a, i) => `Q: ${interview.questions[i]}\nA: ${a}`).join('\n');
+        const context = interview.answers
+          .map((a, i) => `Q: ${interview.questions[i]}\nA: ${a}`)
+          .join('\n');
         this.pendingInterviews.delete(chatId);
         event.data.text = `Original request: ${interview.originalText}\n\nInterview answers:\n${context}\n\nNow execute the task.`;
-        this.log(`[dispatcher] Interview skipped for ${chatId}, executing with ${interview.answers.length} answers`);
+        this.log(
+          `[dispatcher] Interview skipped for ${chatId}, executing with ${interview.answers.length} answers`
+        );
       } else {
         // Store answer and ask next question
         interview.answers.push(event.data.text);
         interview.currentRound++;
         if (interview.currentRound >= interview.questions.length) {
           // All questions answered — synthesize and execute
-          const context = interview.answers.map((a, i) => `Q: ${interview.questions[i]}\nA: ${a}`).join('\n');
+          const context = interview.answers
+            .map((a, i) => `Q: ${interview.questions[i]}\nA: ${a}`)
+            .join('\n');
           this.pendingInterviews.delete(chatId);
           event.data.text = `Original request: ${interview.originalText}\n\nInterview answers:\n${context}\n\nNow execute the task based on these clarifications.`;
           this.log(`[dispatcher] Interview complete for ${chatId}, executing with full context`);
@@ -153,7 +173,15 @@ class Dispatcher {
           const remaining = interview.questions.length - interview.currentRound;
           const sink = this.sinks[event.source];
           if (sink) {
-            try { await sink.send(chatId, `❓ ${nextQ}\n\n(${remaining} questions remaining, or say "just do it" to skip)`); } catch {}
+            // eslint-disable-next-line max-depth
+            try {
+              await sink.send(
+                chatId,
+                `❓ ${nextQ}\n\n(${remaining} questions remaining, or say "just do it" to skip)`
+              );
+            } catch {
+              /* ignored */
+            }
           }
           return; // Wait for next answer
         }
@@ -218,7 +246,11 @@ class Dispatcher {
       // Check if Claude wants to clarify before executing
       // Check if Claude wants a multi-round interview
       if (response.startsWith('[INTERVIEW]')) {
-        const lines = response.slice(11).trim().split('\n').filter(l => l.trim());
+        const lines = response
+          .slice(11)
+          .trim()
+          .split('\n')
+          .filter(l => l.trim());
         const questions = lines.map(l => l.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
         if (questions.length > 0) {
           this.pendingInterviews.set(event.data.chatId, {
@@ -228,13 +260,19 @@ class Dispatcher {
             currentRound: 0,
             timestamp: Date.now(),
           });
-          this.log(`[dispatcher] Interview started for ${event.data.chatId}: ${questions.length} questions`);
+          this.log(
+            `[dispatcher] Interview started for ${event.data.chatId}: ${questions.length} questions`
+          );
           const remaining = questions.length - 1;
           try {
-            await sink.send(event.data.chatId,
+            await sink.send(
+              event.data.chatId,
               `🎓 Before I proceed, let me ask a few questions:\n\n❓ ${questions[0]}\n\n(${remaining} more questions after this, or say "just do it" to skip)`,
-              { replyTo: event.data.messageId });
-          } catch {}
+              { replyTo: event.data.messageId }
+            );
+          } catch {
+            /* ignored */
+          }
           continue;
         }
       }
@@ -246,12 +284,16 @@ class Dispatcher {
           question,
           timestamp: Date.now(),
         });
-        this.log(`[dispatcher] Clarification requested for ${event.data.chatId}: ${question.slice(0, 60)}`);
+        this.log(
+          `[dispatcher] Clarification requested for ${event.data.chatId}: ${question.slice(0, 60)}`
+        );
         try {
           await sink.send(event.data.chatId, `❓ ${question}`, {
             replyTo: event.data.messageId,
           });
-        } catch {}
+        } catch {
+          /* ignored */
+        }
         // Record in history but skip further processing
         this.history.push({
           timestamp: event.timestamp,
@@ -269,10 +311,14 @@ class Dispatcher {
         const summary = response.slice(9).trim();
         this.log(`[dispatcher] Handoff requested: ${summary.slice(0, 80)}`);
         try {
-          await sink.send(event.data.chatId,
+          await sink.send(
+            event.data.chatId,
             `🤝 I'm connecting you with our support team. A human will follow up shortly.\n\nI've shared this summary with them: "${summary.slice(0, 200)}"`,
-            { replyTo: event.data.messageId });
-        } catch {}
+            { replyTo: event.data.messageId }
+          );
+        } catch {
+          /* ignored */
+        }
         // Log handoff for audit
         this.history.push({
           timestamp: event.timestamp,
@@ -300,13 +346,23 @@ class Dispatcher {
         this.stats.tasksExecuted++;
 
         try {
-          await sink.send(event.data.chatId, `🔄 Starting Ralph loop: ${taskDesc.slice(0, 100)}...`, {
-            replyTo: event.data.messageId,
-          });
-        } catch {}
+          await sink.send(
+            event.data.chatId,
+            `🔄 Starting Ralph loop: ${taskDesc.slice(0, 100)}...`,
+            {
+              replyTo: event.data.messageId,
+            }
+          );
+        } catch {
+          /* ignored */
+        }
 
-        let progressTimer = setInterval(async () => {
-          try { await sink.send(event.data.chatId, '⏳ Ralph still working...'); } catch {}
+        const progressTimer = setInterval(async () => {
+          try {
+            await sink.send(event.data.chatId, '⏳ Ralph still working...');
+          } catch {
+            /* ignored */
+          }
         }, 20000);
 
         this.log(`[dispatcher] Ralph loop ${taskId}: ${taskDesc.slice(0, 80)}`);
@@ -314,8 +370,12 @@ class Dispatcher {
         try {
           result = this.executor.executeRalphLoop(taskDesc, {
             maxIterations: 5,
-            onProgress: async (msg) => {
-              try { await sink.send(event.data.chatId, msg); } catch {}
+            onProgress: async msg => {
+              try {
+                await sink.send(event.data.chatId, msg);
+              } catch {
+                /* ignored */
+              }
             },
           });
           this.activeTasks.get(taskId).status = 'completed';
@@ -333,7 +393,8 @@ class Dispatcher {
         clearInterval(progressTimer);
         this.activeTasks.get(taskId).endTime = Date.now();
 
-        const truncatedResult = result.length > 3500 ? result.slice(0, 3500) + '\n\n... (truncated)' : result;
+        const truncatedResult =
+          result.length > 3500 ? result.slice(0, 3500) + '\n\n... (truncated)' : result;
         response = truncatedResult;
       }
 
@@ -351,18 +412,28 @@ class Dispatcher {
         this.stats.tasksExecuted++;
 
         try {
-          await sink.send(event.data.chatId, `⚡ Starting ultrawork: ${taskDesc.slice(0, 100)}...`, {
-            replyTo: event.data.messageId,
-          });
-        } catch {}
+          await sink.send(
+            event.data.chatId,
+            `⚡ Starting ultrawork: ${taskDesc.slice(0, 100)}...`,
+            {
+              replyTo: event.data.messageId,
+            }
+          );
+        } catch {
+          /* ignored */
+        }
 
         this.log(`[dispatcher] Ultrawork ${taskId}: ${taskDesc.slice(0, 80)}`);
         let result;
         try {
           result = await this.executor.executeParallel(taskDesc, {
             maxParallel: 3,
-            onProgress: async (msg) => {
-              try { await sink.send(event.data.chatId, msg); } catch {}
+            onProgress: async msg => {
+              try {
+                await sink.send(event.data.chatId, msg);
+              } catch {
+                /* ignored */
+              }
             },
           });
           this.activeTasks.get(taskId).status = 'completed';
@@ -399,7 +470,9 @@ class Dispatcher {
           await sink.send(event.data.chatId, `⚙️ Running task: ${taskDesc.slice(0, 100)}...`, {
             replyTo: event.data.messageId,
           });
-        } catch {}
+        } catch {
+          /* ignored */
+        }
 
         // Progress timer — send "still working" every 15s while task runs
         let progressCount = 0;
@@ -408,7 +481,9 @@ class Dispatcher {
           const elapsed = progressCount * 15;
           try {
             await sink.send(event.data.chatId, `⏳ Still working... (${elapsed}s)`);
-          } catch {}
+          } catch {
+            /* ignored */
+          }
         }, 15000);
 
         // Execute the task — try A2A router first for delegation tasks
@@ -452,13 +527,17 @@ class Dispatcher {
 
         // Detect file paths in result and send as attachments
         if (sink.sendFile) {
-          const filePaths = result.match(/(?:\/[\w./-]+|[A-Z]:\\[\w.\\/-]+)\.(?:md|pdf|csv|txt|json|png|jpg|svg|html|xlsx|docx)/gi);
+          const filePaths = result.match(
+            /(?:\/[\w./-]+|[A-Z]:\\[\w.\\/-]+)\.(?:md|pdf|csv|txt|json|png|jpg|svg|html|xlsx|docx)/gi
+          );
           if (filePaths) {
             for (const fp of [...new Set(filePaths)].slice(0, 3)) {
               try {
                 const sent = await sink.sendFile(event.data.chatId, fp.trim());
                 if (sent) this.log(`[dispatcher] Sent file: ${fp}`);
-              } catch {}
+              } catch {
+                /* ignored */
+              }
             }
           }
         }
@@ -482,14 +561,23 @@ class Dispatcher {
           this.memory.appendDailyLog(event.data.chatId, event.data.user, event.data.text, response);
         }
         // Prompt suggestions (async, non-blocking — failure doesn't affect response)
-        if (this.renderer.generateSuggestions && !response.startsWith('[') && event.data.text.length > 10) {
+        if (
+          this.renderer.generateSuggestions &&
+          !response.startsWith('[') &&
+          event.data.text.length > 10
+        ) {
           setImmediate(async () => {
             try {
               const suggestions = this.renderer.generateSuggestions(event.data.text, response);
               if (suggestions.length > 0) {
-                await sink.send(event.data.chatId, '💡 ' + suggestions.map(s => `• ${s}`).join('\n'));
+                await sink.send(
+                  event.data.chatId,
+                  '💡 ' + suggestions.map(s => `• ${s}`).join('\n')
+                );
               }
-            } catch {}
+            } catch {
+              /* ignored */
+            }
           });
         }
       } catch (err) {

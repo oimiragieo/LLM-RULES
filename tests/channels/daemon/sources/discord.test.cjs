@@ -21,7 +21,9 @@ describe('DiscordSource', () => {
       assert.equal(source.token, 'test');
       assert.ok(source.allowed.has('123'));
       assert.equal(source.running, false);
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   });
 });
 
@@ -32,6 +34,8 @@ describe('DiscordSink', () => {
       assert.ok(DiscordSink);
       const sink = new DiscordSink('test-token');
       assert.equal(sink.token, 'test-token');
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   });
 });

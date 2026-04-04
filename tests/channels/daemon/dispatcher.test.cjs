@@ -8,10 +8,10 @@ const { Router } = require('../../../scripts/channels/daemon/router.cjs');
 // Mock renderer
 function createMockRenderer(response = 'Mock response') {
   return {
-    render(event) {
+    render(_event) {
       return response;
     },
-    renderProactive(event) {
+    renderProactive(_event) {
       return 'Proactive message';
     },
   };
@@ -256,7 +256,9 @@ describe('Dispatcher', () => {
 
   describe('Interview (multi-round)', () => {
     it('[INTERVIEW] starts multi-round questioning', async () => {
-      renderer = createMockRenderer('[INTERVIEW]\n1. What modules?\n2. What pattern?\n3. Test coverage?');
+      renderer = createMockRenderer(
+        '[INTERVIEW]\n1. What modules?\n2. What pattern?\n3. Test coverage?'
+      );
       dispatcher = new Dispatcher(router, renderer, sinks, () => {}, memory, {});
 
       dispatcher.enqueue({
@@ -336,7 +338,7 @@ describe('Dispatcher', () => {
       dispatcher._checkRateLimit('a');
       dispatcher._checkRateLimit('a');
       assert.equal(dispatcher._checkRateLimit('a'), false); // a blocked
-      assert.equal(dispatcher._checkRateLimit('b'), true);  // b not blocked
+      assert.equal(dispatcher._checkRateLimit('b'), true); // b not blocked
     });
   });
 

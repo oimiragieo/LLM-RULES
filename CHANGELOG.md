@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Channel Daemon Fixes
+
+#### Fixed
+
+- **Voice transcription pipeline** — replaced fragile `node -e` shell one-liners with temp script file for Telegram voice download; upgraded Whisper model from `tiny` to `base` with CUDA acceleration; added error logging instead of silent failure
+- **Stale context on session resume** — daemon no longer responds to previous session's topic after restart; injects session gap marker into chat history so Claude treats resumed conversations as fresh interactions
+- **Memory context formatting** — `getContext()` now properly formats `system` role messages in chat history
+
+#### Added
+
+- **`/restart-telegram` command** — restart the Telegram channel daemon without killing the Claude Code session; wraps `telegram-ctl.cjs restart`
+
 ### Prompt Cache Optimization (Zylos-inspired)
 
 #### Fixed

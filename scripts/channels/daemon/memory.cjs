@@ -19,7 +19,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { claudeSync } = require('./claude-cli.cjs');
 
 const MAX_MESSAGES_PER_CHAT = 30;
 const MAX_CONTEXT_CHARS = 6000;
@@ -109,7 +109,12 @@ class DaemonMemory {
       let recent = '';
       for (let i = history.length - 1; i >= 0; i--) {
         const msg = history[i];
-        const line = msg.role === 'user' ? `[${msg.user}]: ${msg.text}` : `[You]: ${msg.text}`;
+        const line =
+          msg.role === 'user'
+            ? `[${msg.user}]: ${msg.text}`
+            : msg.role === 'system'
+              ? `[System]: ${msg.text}`
+              : `[You]: ${msg.text}`;
         if (recent.length + line.length > MAX_CONTEXT_CHARS - parts.join('\n').length) break;
         recent = line + '\n' + recent;
       }
@@ -151,9 +156,6 @@ class DaemonMemory {
       .slice(0, 4000);
 
     try {
-      const env = { ...process.env };
-      delete env.ANTHROPIC_API_KEY;
-
       const compactPrompt = [
         'Summarize this conversation into these sections (omit empty ones, keep each section to 1-2 lines):',
         '# Topic: (what is being discussed)',
@@ -163,19 +165,13 @@ class DaemonMemory {
         '# Learnings: (what worked, what to avoid)',
         'Conversation:',
         transcript,
-      ].join(' ').replace(/"/g, "'").replace(/\n/g, ' ').slice(0, 5000);
+      ].join('\n');
 
-      const summary = execSync(
-        `claude -p "${compactPrompt}" --dangerously-skip-permissions --model haiku --max-turns 1`,
-        {
-          encoding: 'utf8',
-          timeout: 30000,
-          env,
-          windowsHide: true,
-          shell: true,
-          stdio: ['pipe', 'pipe', 'pipe'],
-        }
-      ).trim();
+      const summary = claudeSync(compactPrompt, {
+        model: 'haiku',
+        maxTurns: 1,
+        timeout: 30000,
+      });
 
       // Update Tier 2 summary (cap total length to prevent rot)
       const existing = this.summaries.get(chatId) || '';
@@ -209,6 +205,7 @@ class DaemonMemory {
    * @param {boolean} force — skip the shouldDream gate
    * @returns {string|null} — result message or null if skipped
    */
+  // eslint-disable-next-line complexity
   dream(force = false) {
     if (!force && !this.shouldDream()) return null;
 
@@ -247,28 +244,12 @@ class DaemonMemory {
       .filter(Boolean)
       .join('\n');
 
-    // Escape for shell — replace problematic chars
-    const safePrompt = dreamPrompt
-      .replace(/"/g, "'") // Replace double quotes with single
-      .replace(/\n/g, ' ') // Flatten newlines
-      .replace(/\\/g, '') // Remove backslashes
-      .slice(0, 6000);
-
     try {
-      const env = { ...process.env };
-      delete env.ANTHROPIC_API_KEY;
-
-      const result = execSync(
-        `claude -p "${safePrompt}" --dangerously-skip-permissions --model sonnet --max-turns 1`,
-        {
-          encoding: 'utf8',
-          timeout: 90000,
-          env,
-          windowsHide: true,
-          shell: true,
-          stdio: ['pipe', 'pipe', 'pipe'],
-        }
-      ).trim();
+      const result = claudeSync(dreamPrompt, {
+        model: 'sonnet',
+        maxTurns: 1,
+        timeout: 90000,
+      });
 
       const jsonMatch = result.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
@@ -291,6 +272,7 @@ class DaemonMemory {
           // Phase 3: Consolidate — merge new facts
           const allFacts = new Set(existing.facts);
           for (const fact of facts) {
+            // eslint-disable-next-line max-depth
             if (!allFacts.has(fact)) {
               allFacts.add(fact);
               factsAdded++;
@@ -322,8 +304,8 @@ class DaemonMemory {
 
   trackUsage(chatId, model, estimatedTokens) {
     const today = new Date().toISOString().split('T')[0];
-    const costRates = { haiku: 0.80, sonnet: 3.00, opus: 15.00 };
-    const rate = costRates[model] || 3.00;
+    const costRates = { haiku: 0.8, sonnet: 3.0, opus: 15.0 };
+    const rate = costRates[model] || 3.0;
     const cost = (estimatedTokens / 1_000_000) * rate;
 
     if (!this.usage.has(chatId)) this.usage.set(chatId, { dates: {} });
@@ -346,12 +328,24 @@ class DaemonMemory {
 
     // Aggregate week + month
     const now = Date.now();
-    let weekTokens = 0, weekCost = 0, weekMsgs = 0;
-    let monthTokens = 0, monthCost = 0, monthMsgs = 0;
+    let weekTokens = 0,
+      weekCost = 0,
+      weekMsgs = 0;
+    let monthTokens = 0,
+      monthCost = 0,
+      monthMsgs = 0;
     for (const [date, stats] of Object.entries(data.dates)) {
       const age = now - new Date(date).getTime();
-      if (age < 7 * 86400000) { weekTokens += stats.tokens; weekCost += stats.cost; weekMsgs += stats.messages; }
-      if (age < 30 * 86400000) { monthTokens += stats.tokens; monthCost += stats.cost; monthMsgs += stats.messages; }
+      if (age < 7 * 86400000) {
+        weekTokens += stats.tokens;
+        weekCost += stats.cost;
+        weekMsgs += stats.messages;
+      }
+      if (age < 30 * 86400000) {
+        monthTokens += stats.tokens;
+        monthCost += stats.cost;
+        monthMsgs += stats.messages;
+      }
     }
 
     return {
@@ -367,7 +361,9 @@ class DaemonMemory {
       const obj = {};
       for (const [k, v] of this.usage) obj[k] = v;
       fs.writeFileSync(this.usagePath, JSON.stringify(obj), 'utf8');
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 
   // ── Named Sessions ───────────────────────────────────────────────────────
@@ -408,7 +404,9 @@ class DaemonMemory {
       const obj = {};
       for (const [k, v] of this.namedSessions) obj[k] = v;
       fs.writeFileSync(this.namedSessionsPath, JSON.stringify(obj), 'utf8');
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 
   // ── Daily Activity Log ────────────────────────────────────────────────────
@@ -423,7 +421,9 @@ class DaemonMemory {
       const ts = now.toISOString().slice(11, 19); // HH:MM:SS
       const entry = `\n### ${ts} — ${user} (${chatId})\n**User:** ${text.slice(0, 200)}\n**Assistant:** ${response.slice(0, 200)}\n`;
       fs.appendFileSync(logFile, entry, 'utf8');
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 
   // ── Accessors ────────────────────────────────────────────────────────────
@@ -453,27 +453,39 @@ class DaemonMemory {
       if (fs.existsSync(this.historyPath))
         for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.historyPath, 'utf8'))))
           this.chats.set(k, v);
-    } catch {}
+    } catch {
+      /* ignored */
+    }
     try {
       if (fs.existsSync(this.summaryPath))
         for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.summaryPath, 'utf8'))))
           this.summaries.set(k, v);
-    } catch {}
+    } catch {
+      /* ignored */
+    }
     try {
       if (fs.existsSync(this.profilePath))
         for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.profilePath, 'utf8'))))
           this.profiles.set(k, v);
-    } catch {}
+    } catch {
+      /* ignored */
+    }
     try {
       if (fs.existsSync(this.namedSessionsPath))
-        for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.namedSessionsPath, 'utf8'))))
+        for (const [k, v] of Object.entries(
+          JSON.parse(fs.readFileSync(this.namedSessionsPath, 'utf8'))
+        ))
           this.namedSessions.set(k, v);
-    } catch {}
+    } catch {
+      /* ignored */
+    }
     try {
       if (fs.existsSync(this.usagePath))
         for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.usagePath, 'utf8'))))
           this.usage.set(k, v);
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 
   _saveHistory() {
@@ -482,7 +494,9 @@ class DaemonMemory {
       const obj = {};
       for (const [k, v] of this.chats) obj[k] = v;
       fs.writeFileSync(this.historyPath, JSON.stringify(obj), 'utf8');
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 
   _saveSummaries() {
@@ -491,7 +505,9 @@ class DaemonMemory {
       const obj = {};
       for (const [k, v] of this.summaries) obj[k] = v;
       fs.writeFileSync(this.summaryPath, JSON.stringify(obj), 'utf8');
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 
   _saveProfiles() {
@@ -500,7 +516,9 @@ class DaemonMemory {
       const obj = {};
       for (const [k, v] of this.profiles) obj[k] = v;
       fs.writeFileSync(this.profilePath, JSON.stringify(obj), 'utf8');
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 }
 

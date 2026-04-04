@@ -29,6 +29,7 @@ pattern as a reusable skill file. On future messages, auto-inject matching
 skills as context so Claude doesn't re-solve the same problem.
 
 **Test first:**
+
 ```
 tests/channels/daemon/skills.test.cjs
 - extractSkill() creates a skill file with pattern + solution
@@ -43,6 +44,7 @@ tests/channels/daemon/skills.test.cjs
 **Implementation:**
 
 **9.1a: Create `scripts/channels/daemon/skills.cjs` module**
+
 ```javascript
 class SkillStore {
   constructor(storageDir) {
@@ -66,22 +68,26 @@ class SkillStore {
   getSkillContext(text) {
     const matches = this.findMatchingSkills(text);
     if (matches.length === 0) return '';
-    return '\n\nRelevant skills from previous sessions:\n' +
-      matches.map(s => `- ${s.name}: ${s.solution}`).join('\n');
+    return (
+      '\n\nRelevant skills from previous sessions:\n' +
+      matches.map(s => `- ${s.name}: ${s.solution}`).join('\n')
+    );
   }
 }
 ```
 
 **9.1b: Extract skills after successful [TASK]/[RALPH] in dispatcher**
 After a task completes successfully (no error), call:
+
 ```javascript
 if (result && !result.startsWith('Error') && skillStore) {
   setImmediate(() => skillStore.extractSkill(taskDesc, result));
 }
 ```
 
-**9.1c: Inject matching skills in renderer._buildPrompt()**
+**9.1c: Inject matching skills in renderer.\_buildPrompt()**
 Before building the prompt, check for matching skills:
+
 ```javascript
 const skillContext = this.skillStore?.getSkillContext(text) || '';
 if (skillContext) parts.push(skillContext);
@@ -91,6 +97,7 @@ if (skillContext) parts.push(skillContext);
 doesn't affect response delivery. Skill injection is additive context.
 
 **Benchmark:**
+
 - First time solving "fix the CORS issue": full claude -p execution (~30s)
 - Second time: skill auto-injected, solution in 5s (cached pattern)
 
@@ -108,6 +115,7 @@ asks 3-5 probing questions, one at a time, then synthesizes the answers into
 a clear task specification before executing.
 
 **Test first:**
+
 ```
 tests/channels/daemon/dispatcher.test.cjs (additions)
 - [INTERVIEW] response starts multi-round interview
@@ -121,6 +129,7 @@ tests/channels/daemon/dispatcher.test.cjs (additions)
 **Implementation:**
 
 **9.2a: Add pendingInterviews map to dispatcher**
+
 ```javascript
 this.pendingInterviews = new Map();
 // chatId → { questions: [], answers: [], currentRound: 0, originalTask: '', maxRounds: 5 }
@@ -128,6 +137,7 @@ this.pendingInterviews = new Map();
 
 **9.2b: Add [INTERVIEW] detection in dispatcher**
 When renderer returns `[INTERVIEW]`:
+
 1. Parse questions (one per line after tag)
 2. Store in pendingInterviews
 3. Send first question to user
@@ -135,6 +145,7 @@ When renderer returns `[INTERVIEW]`:
 5. After all questions answered, synthesize into [TASK] and execute
 
 **9.2c: Update system prompt with [INTERVIEW] tag**
+
 ```
 ### Deep interview (use [INTERVIEW] tag for complex/vague requests)
 For tasks that are vague, have multiple interpretations, or could go wrong
@@ -165,6 +176,7 @@ claude -p calls, merge results. For tasks like "fix lint in 5 files" or
 "add error handling to all API routes", this is 3-5x faster than sequential.
 
 **Test first:**
+
 ```
 tests/channels/daemon/executor.test.cjs (additions)
 - executeParallel() splits task into subtasks via haiku
@@ -178,6 +190,7 @@ tests/channels/daemon/executor.test.cjs (additions)
 **Implementation:**
 
 **9.3a: Add `executeParallel(task, opts)` to executor**
+
 ```javascript
 async executeParallel(task, opts = {}) {
   const maxParallel = opts.maxParallel || 3;
@@ -207,6 +220,7 @@ When renderer returns `[ULTRAWORK]`, route to `executeParallel()` instead
 of `executeTask()`.
 
 **9.3c: Update system prompt**
+
 ```
 ### Ultrawork parallel execution (use [ULTRAWORK] tag)
 For tasks with multiple independent parts that can run simultaneously:
@@ -229,6 +243,7 @@ When `claude -p` fails with a rate limit error, instead of failing the task,
 wait for the rate limit to reset and retry automatically.
 
 **Test first:**
+
 ```
 tests/channels/daemon/executor.test.cjs (additions)
 - _isRateLimitError() detects rate limit in stderr/output
@@ -240,6 +255,7 @@ tests/channels/daemon/executor.test.cjs (additions)
 **Implementation:**
 
 **9.4a: Add rate limit detection to executor**
+
 ```javascript
 _isRateLimitError(output) {
   return /rate.limit|429|too many requests|overloaded/i.test(output);
@@ -247,6 +263,7 @@ _isRateLimitError(output) {
 ```
 
 **9.4b: Wrap executeTask with retry logic**
+
 ```javascript
 executeTaskWithRetry(task, context, maxRetries = 3) {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -285,12 +302,14 @@ Recommend: 9.1 → 9.4 → 9.2 → 9.3 (value order, risk ascending).
 ## Regression Protocol
 
 **After EVERY slice:**
+
 1. Run all 120+ tests
 2. Manual: send Telegram message, verify response
 3. Manual: `curl http://127.0.0.1:3101/status`
 4. Verify no new files break existing skill/memory/command paths
 
 **After Phase 9 complete:**
+
 1. Full `pnpm test`
 2. Trigger skill extraction: solve a problem, verify skill file created
 3. Trigger interview: send ambiguous request, verify multi-round questions
@@ -301,14 +320,14 @@ Recommend: 9.1 → 9.4 → 9.2 → 9.3 (value order, risk ascending).
 
 ## Benchmarks
 
-| Metric | Phase 8 (current) | Phase 9 Target |
-|--------|-------------------|----------------|
-| Repeated problem-solving | Full execution each time | Auto-inject cached skill (5s vs 30s) |
-| Ambiguous task waste | Wrong interpretation → redo | Interview catches ambiguity upfront |
-| Multi-file task speed | Sequential (N × 30s) | Parallel (30s for 3 concurrent) |
-| Rate limit failures | Task fails, user retries manually | Auto-retry with backoff |
-| Skill count | 0 | Growing library per project |
-| Test count | 120 | 135+ |
+| Metric                   | Phase 8 (current)                 | Phase 9 Target                       |
+| ------------------------ | --------------------------------- | ------------------------------------ |
+| Repeated problem-solving | Full execution each time          | Auto-inject cached skill (5s vs 30s) |
+| Ambiguous task waste     | Wrong interpretation → redo       | Interview catches ambiguity upfront  |
+| Multi-file task speed    | Sequential (N × 30s)              | Parallel (30s for 3 concurrent)      |
+| Rate limit failures      | Task fails, user retries manually | Auto-retry with backoff              |
+| Skill count              | 0                                 | Growing library per project          |
+| Test count               | 120                               | 135+                                 |
 
 ---
 

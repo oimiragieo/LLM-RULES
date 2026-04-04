@@ -52,6 +52,7 @@ class TelegramSource {
     this.running = false;
   }
 
+  // eslint-disable-next-line complexity
   async start() {
     this.running = true;
 
@@ -78,12 +79,16 @@ class TelegramSource {
           { command: 'ping', description: 'Check if alive' },
         ],
       });
-    } catch {}
+    } catch {
+      /* ignored */
+    }
 
     // Clear competing connections
     try {
       await telegramApi(this.token, 'getUpdates?timeout=0');
-    } catch {}
+    } catch {
+      /* ignored */
+    }
 
     while (this.running) {
       try {
@@ -113,19 +118,23 @@ class TelegramSource {
           if (update.message.voice) {
             attachmentFileId = update.message.voice.file_id;
             attachmentType = 'voice';
+            // eslint-disable-next-line max-depth
             if (!text) text = '[Voice message]';
           } else if (update.message.audio) {
             attachmentFileId = update.message.audio.file_id;
             attachmentType = 'audio';
+            // eslint-disable-next-line max-depth
             if (!text) text = '[Audio message]';
           } else if (update.message.document) {
             attachmentFileId = update.message.document.file_id;
             attachmentType = 'document';
+            // eslint-disable-next-line max-depth
             if (!text) text = `[Document: ${update.message.document.file_name || 'file'}]`;
           } else if (update.message.photo && update.message.photo.length > 0) {
             const best = update.message.photo[update.message.photo.length - 1];
             attachmentFileId = best.file_id;
             attachmentType = 'photo';
+            // eslint-disable-next-line max-depth
             if (!text) text = '[Photo]';
           }
 
@@ -155,7 +164,7 @@ class TelegramSource {
             timestamp: new Date().toISOString(),
           });
         }
-      } catch (err) {
+      } catch (_err) {
         if (this.running) await this._sleep(5000);
       }
     }

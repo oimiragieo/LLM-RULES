@@ -18,6 +18,7 @@ class CommandHandler {
   /**
    * Handle a / command. Returns true if handled, false if should pass to Claude.
    */
+  // eslint-disable-next-line complexity
   async handle(msgData) {
     const { text, chatId, messageId } = msgData;
     const parts = text.trim().split(/\s+/);
@@ -221,13 +222,16 @@ class CommandHandler {
         const usage = this.memory?.getUsage?.(chatId);
         const uptime = Math.round((Date.now() - this.startTime) / 1000);
         const days = Math.max(1, Math.floor(uptime / 86400));
-        const msgsPerDay = Math.round(stats.received / days * 10) / 10;
-        const taskRate = stats.tasksExecuted > 0 ? `${Math.round(stats.tasksExecuted / stats.received * 100)}%` : '0%';
+        const msgsPerDay = Math.round((stats.received / days) * 10) / 10;
+        const taskRate =
+          stats.tasksExecuted > 0
+            ? `${Math.round((stats.tasksExecuted / stats.received) * 100)}%`
+            : '0%';
 
         let insights = `📈 Insights\n\n`;
         insights += `📊 Volume: ${stats.received} messages (${msgsPerDay}/day avg)\n`;
         insights += `⚙️ Tasks: ${stats.tasksExecuted} executed (${taskRate} of messages)\n`;
-        insights += `❌ Errors: ${stats.errors} (${stats.received > 0 ? Math.round(stats.errors / stats.received * 100) : 0}% error rate)\n`;
+        insights += `❌ Errors: ${stats.errors} (${stats.received > 0 ? Math.round((stats.errors / stats.received) * 100) : 0}% error rate)\n`;
         insights += `🚫 Rate limited: ${stats.rateLimited || 0}\n`;
         insights += `🧠 Memory: ${memStats.totalMessages} msgs across ${memStats.chats} chats\n`;
         insights += `👤 Known users: ${memStats.profiles}\n`;
@@ -239,14 +243,21 @@ class CommandHandler {
       }
 
       case '/usage': {
-        if (!this.memory?.getUsage) return this._reply(chatId, messageId, '📊 Usage tracking not available.');
+        if (!this.memory?.getUsage)
+          return this._reply(chatId, messageId, '📊 Usage tracking not available.');
         const usage = this.memory.getUsage(chatId);
-        const fmt = (s) => s ? `${s.messages} msgs, ~${Math.round(s.tokens / 1000)}K tokens, ~$${s.cost.toFixed(3)}` : 'none';
-        return this._reply(chatId, messageId,
+        const fmt = s =>
+          s
+            ? `${s.messages} msgs, ~${Math.round(s.tokens / 1000)}K tokens, ~$${s.cost.toFixed(3)}`
+            : 'none';
+        return this._reply(
+          chatId,
+          messageId,
           `📊 Your usage:\n\n` +
-          `Today: ${fmt(usage.today)}\n` +
-          `This week: ${fmt(usage.week)}\n` +
-          `This month: ${fmt(usage.month)}`);
+            `Today: ${fmt(usage.today)}\n` +
+            `This week: ${fmt(usage.week)}\n` +
+            `This month: ${fmt(usage.month)}`
+        );
       }
 
       case '/ping':
@@ -255,41 +266,77 @@ class CommandHandler {
       case '/title': {
         if (!args) return this._reply(chatId, messageId, '📌 Usage: /title <name>');
         this.memory.saveNamedSession(chatId, args);
-        return this._reply(chatId, messageId, `📌 Session saved as "${args}". Resume later with /resume ${args}`);
+        return this._reply(
+          chatId,
+          messageId,
+          `📌 Session saved as "${args}". Resume later with /resume ${args}`
+        );
       }
 
       case '/resume': {
         if (!args) {
           const sessions = this.memory.listNamedSessions();
-          if (sessions.length === 0) return this._reply(chatId, messageId, '📂 No saved sessions. Use /title <name> to save one.');
-          const list = sessions.map(s => `• ${s.name} (${s.messageCount} msgs, ${s.savedAt.split('T')[0]})`).join('\n');
-          return this._reply(chatId, messageId, `📂 Saved sessions:\n\n${list}\n\nUsage: /resume <name>`);
+          if (sessions.length === 0)
+            return this._reply(
+              chatId,
+              messageId,
+              '📂 No saved sessions. Use /title <name> to save one.'
+            );
+          const list = sessions
+            .map(s => `• ${s.name} (${s.messageCount} msgs, ${s.savedAt.split('T')[0]})`)
+            .join('\n');
+          return this._reply(
+            chatId,
+            messageId,
+            `📂 Saved sessions:\n\n${list}\n\nUsage: /resume <name>`
+          );
         }
         const loaded = this.memory.loadNamedSession(chatId, args);
-        if (loaded) return this._reply(chatId, messageId, `📂 Resumed session "${args}". Your conversation history is restored.`);
-        return this._reply(chatId, messageId, `📂 Session "${args}" not found. Use /resume to list available sessions.`);
+        if (loaded)
+          return this._reply(
+            chatId,
+            messageId,
+            `📂 Resumed session "${args}". Your conversation history is restored.`
+          );
+        return this._reply(
+          chatId,
+          messageId,
+          `📂 Session "${args}" not found. Use /resume to list available sessions.`
+        );
       }
 
       case '/sessions': {
         const sessions = this.memory.listNamedSessions();
         if (sessions.length === 0) return this._reply(chatId, messageId, '📂 No saved sessions.');
-        const list = sessions.map(s => `• ${s.name} (${s.messageCount} msgs, ${s.savedAt.split('T')[0]})`).join('\n');
+        const list = sessions
+          .map(s => `• ${s.name} (${s.messageCount} msgs, ${s.savedAt.split('T')[0]})`)
+          .join('\n');
         return this._reply(chatId, messageId, `📂 Saved sessions:\n\n${list}`);
       }
 
       case '/pair': {
         if (!args) {
-          return this._reply(chatId, messageId,
+          return this._reply(
+            chatId,
+            messageId,
             '🔑 Device Pairing\n\n' +
-            'New users request access by running: /pair request\n' +
-            'Owner approves with: /pair approve <code>');
+              'New users request access by running: /pair request\n' +
+              'Owner approves with: /pair approve <code>'
+          );
         }
         if (args === 'request') {
           const code = Math.random().toString(36).slice(2, 8);
           if (!this.dispatcher._pendingPairings) this.dispatcher._pendingPairings = new Map();
-          this.dispatcher._pendingPairings.set(code, { chatId, userId: msgData.userId, timestamp: Date.now() });
-          return this._reply(chatId, messageId,
-            `🔑 Your pairing code: ${code}\n\nAsk the bot owner to run: /pair approve ${code}`);
+          this.dispatcher._pendingPairings.set(code, {
+            chatId,
+            userId: msgData.userId,
+            timestamp: Date.now(),
+          });
+          return this._reply(
+            chatId,
+            messageId,
+            `🔑 Your pairing code: ${code}\n\nAsk the bot owner to run: /pair approve ${code}`
+          );
         }
         if (args.startsWith('approve ')) {
           const code = args.slice(8).trim();
@@ -305,24 +352,42 @@ class CommandHandler {
         if (!args) {
           // List schedules
           const schedules = this.dispatcher._userSchedules?.get(chatId) || [];
-          if (schedules.length === 0) return this._reply(chatId, messageId, '⏰ No scheduled tasks.\n\nUsage: /schedule <cron> <prompt>\nExample: /schedule 0 9 * * 1-5 Good morning! What should I work on?');
-          const list = schedules.map((s, i) => `${i + 1}. \`${s.cron}\` → ${s.prompt.slice(0, 50)}`).join('\n');
-          return this._reply(chatId, messageId, `⏰ Your schedules:\n\n${list}\n\nRemove: /schedule remove <number>`);
+          if (schedules.length === 0)
+            return this._reply(
+              chatId,
+              messageId,
+              '⏰ No scheduled tasks.\n\nUsage: /schedule <cron> <prompt>\nExample: /schedule 0 9 * * 1-5 Good morning! What should I work on?'
+            );
+          const list = schedules
+            .map((s, i) => `${i + 1}. \`${s.cron}\` → ${s.prompt.slice(0, 50)}`)
+            .join('\n');
+          return this._reply(
+            chatId,
+            messageId,
+            `⏰ Your schedules:\n\n${list}\n\nRemove: /schedule remove <number>`
+          );
         }
         if (args.startsWith('remove ')) {
           const idx = parseInt(args.slice(7), 10) - 1;
           const schedules = this.dispatcher._userSchedules?.get(chatId) || [];
-          if (idx < 0 || idx >= schedules.length) return this._reply(chatId, messageId, '⏰ Invalid schedule number.');
+          if (idx < 0 || idx >= schedules.length)
+            return this._reply(chatId, messageId, '⏰ Invalid schedule number.');
           schedules.splice(idx, 1);
           return this._reply(chatId, messageId, '⏰ Schedule removed.');
         }
         // Parse: first 5 tokens are cron, rest is prompt
         const tokens = args.split(/\s+/);
-        if (tokens.length < 6) return this._reply(chatId, messageId, '⏰ Usage: /schedule <min> <hour> <dom> <month> <dow> <prompt>');
+        if (tokens.length < 6)
+          return this._reply(
+            chatId,
+            messageId,
+            '⏰ Usage: /schedule <min> <hour> <dom> <month> <dow> <prompt>'
+          );
         const cron = tokens.slice(0, 5).join(' ');
         const prompt = tokens.slice(5).join(' ');
         if (!this.dispatcher._userSchedules) this.dispatcher._userSchedules = new Map();
-        if (!this.dispatcher._userSchedules.has(chatId)) this.dispatcher._userSchedules.set(chatId, []);
+        if (!this.dispatcher._userSchedules.has(chatId))
+          this.dispatcher._userSchedules.set(chatId, []);
         this.dispatcher._userSchedules.get(chatId).push({ cron, prompt, chatId });
         return this._reply(chatId, messageId, `⏰ Scheduled: \`${cron}\` → ${prompt.slice(0, 80)}`);
       }
@@ -339,11 +404,21 @@ class CommandHandler {
         if (!args) {
           if (!this.dispatcher._personalities) this.dispatcher._personalities = new Map();
           const current = this.dispatcher._personalities.get(chatId) || 'default';
-          const list = Object.entries(personalities).map(([k, v]) => `${k === current ? '→' : '•'} ${k}: ${v}`).join('\n');
-          return this._reply(chatId, messageId, `🎭 Personalities:\n\n${list}\n\nUsage: /personality <name>`);
+          const list = Object.entries(personalities)
+            .map(([k, v]) => `${k === current ? '→' : '•'} ${k}: ${v}`)
+            .join('\n');
+          return this._reply(
+            chatId,
+            messageId,
+            `🎭 Personalities:\n\n${list}\n\nUsage: /personality <name>`
+          );
         }
         if (!personalities[args]) {
-          return this._reply(chatId, messageId, `🎭 Unknown personality: ${args}. Use /personality to see options.`);
+          return this._reply(
+            chatId,
+            messageId,
+            `🎭 Unknown personality: ${args}. Use /personality to see options.`
+          );
         }
         if (!this.dispatcher._personalities) this.dispatcher._personalities = new Map();
         if (args === 'default') {
@@ -351,12 +426,17 @@ class CommandHandler {
         } else {
           this.dispatcher._personalities.set(chatId, args);
         }
-        return this._reply(chatId, messageId, `🎭 Personality set to: ${args} — ${personalities[args]}`);
+        return this._reply(
+          chatId,
+          messageId,
+          `🎭 Personality set to: ${args} — ${personalities[args]}`
+        );
       }
 
       case '/export': {
         const history = this.memory?.chats.get(chatId) || [];
-        if (history.length === 0) return this._reply(chatId, messageId, '📄 No conversation to export.');
+        if (history.length === 0)
+          return this._reply(chatId, messageId, '📄 No conversation to export.');
 
         const fs = require('fs');
         const path = require('path');
@@ -364,14 +444,16 @@ class CommandHandler {
         const summary = this.memory.summaries.get(chatId) || '';
 
         let md = `# Chat Export\n\n**Date:** ${new Date().toISOString().split('T')[0]}\n**Messages:** ${history.length}\n\n`;
-        if (profile.facts.length > 0) md += `## Profile\n${profile.facts.map(f => `- ${f}`).join('\n')}\n\n`;
+        if (profile.facts.length > 0)
+          md += `## Profile\n${profile.facts.map(f => `- ${f}`).join('\n')}\n\n`;
         if (summary) md += `## Summary\n${summary}\n\n`;
         md += `## Conversation\n\n`;
         for (const msg of history) {
           const ts = msg.timestamp ? msg.timestamp.slice(11, 19) : '';
-          md += msg.role === 'user'
-            ? `**${msg.user}** (${ts}): ${msg.text}\n\n`
-            : `**Assistant** (${ts}): ${msg.text}\n\n`;
+          md +=
+            msg.role === 'user'
+              ? `**${msg.user}** (${ts}): ${msg.text}\n\n`
+              : `**Assistant** (${ts}): ${msg.text}\n\n`;
         }
 
         const tmpDir = path.join(require('os').tmpdir(), 'daemon-export');
@@ -382,11 +464,19 @@ class CommandHandler {
         // Send as file if sink supports it
         if (this.sink.sendFile) {
           await this.sink.sendFile(chatId, filePath, { caption: '📄 Chat export' });
-          try { fs.unlinkSync(filePath); } catch {}
+          try {
+            fs.unlinkSync(filePath);
+          } catch {
+            /* ignored */
+          }
           return true;
         }
         // Fallback: send as text (truncated)
-        try { fs.unlinkSync(filePath); } catch {}
+        try {
+          fs.unlinkSync(filePath);
+        } catch {
+          /* ignored */
+        }
         return this._reply(chatId, messageId, md.slice(0, 4000));
       }
 

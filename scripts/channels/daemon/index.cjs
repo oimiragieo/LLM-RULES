@@ -59,7 +59,9 @@ function log(msg) {
   console.log(line);
   try {
     fs.appendFileSync(LOG_FILE, line + '\n');
-  } catch {}
+  } catch {
+    /* ignored */
+  }
 }
 
 // ── CLI Commands ��───────────────────────────────��────────────────────────────
@@ -85,7 +87,7 @@ if (args.includes('--status')) {
     console.log('Channel daemon not running');
     process.exit(1);
   }
-  return;
+  process.exit(0);
 }
 
 if (args.includes('--stop')) {
@@ -101,6 +103,7 @@ if (args.includes('--stop')) {
 }
 
 // ── Main Daemon ──────────────────────────────────────────────────────────────
+// eslint-disable-next-line require-await
 async function main() {
   fs.mkdirSync(RUNTIME, { recursive: true });
 
@@ -110,7 +113,9 @@ async function main() {
     process.kill(existingPid, 0);
     log(`Another daemon already running (PID: ${existingPid}). Exiting.`);
     process.exit(1);
-  } catch {}
+  } catch {
+    /* ignored */
+  }
 
   // Write PID file
   fs.writeFileSync(PID_FILE, String(process.pid), 'utf8');
@@ -141,7 +146,15 @@ async function main() {
 
   const renderer = new ClaudeRenderer(config.renderer, memory, skillStore);
   const router = new Router(config.routes);
-  const dispatcher = new Dispatcher(router, renderer, sinks, log, memory, config.renderer, skillStore);
+  const dispatcher = new Dispatcher(
+    router,
+    renderer,
+    sinks,
+    log,
+    memory,
+    config.renderer,
+    skillStore
+  );
 
   // Start sources
   if (config.sources.telegram.enabled) {
@@ -162,7 +175,9 @@ async function main() {
   // Discord
   if (config.sources.discord.enabled) {
     sinks.discord = new DiscordSink(config.sources.discord.token);
-    const discordSource = new DiscordSource(config.sources.discord, event => dispatcher.enqueue(event));
+    const discordSource = new DiscordSource(config.sources.discord, event =>
+      dispatcher.enqueue(event)
+    );
     sources.push(discordSource);
     discordSource.start().catch(err => log(`Discord source error: ${err.message}`));
     log('Discord source started (gateway WebSocket)');
@@ -187,7 +202,9 @@ async function main() {
   }
 
   if (sources.length === 0) {
-    log('No sources enabled! Set TELEGRAM_BOT_TOKEN, DISCORD_BOT_TOKEN, or SLACK_BOT_TOKEN in .env');
+    log(
+      'No sources enabled! Set TELEGRAM_BOT_TOKEN, DISCORD_BOT_TOKEN, or SLACK_BOT_TOKEN in .env'
+    );
     process.exit(1);
   }
 
@@ -206,7 +223,10 @@ async function main() {
     const tickEngine = new TimerSource(
       proactiveConfig,
       event => dispatcher.enqueue(event),
-      () => dispatcher.stats.lastEvent ? Date.now() - new Date(dispatcher.stats.lastEvent).getTime() : Infinity
+      () =>
+        dispatcher.stats.lastEvent
+          ? Date.now() - new Date(dispatcher.stats.lastEvent).getTime()
+          : Infinity
     );
     sources.push(tickEngine);
     tickEngine.start();
@@ -220,7 +240,7 @@ async function main() {
     const now = new Date();
     const hour = now.getHours();
     const minute = now.getMinutes();
-    const dow = now.getDay();
+    const _dow = now.getDay();
     for (const [chatId, schedules] of userSchedules) {
       for (const sched of schedules) {
         // Simple cron check (reuse TimerSource logic)
@@ -238,7 +258,13 @@ async function main() {
           dispatcher.enqueue({
             type: 'timer.user-schedule',
             source: 'telegram',
-            data: { chatId, messageId: 0, user: 'scheduler', userId: 'scheduler', text: sched.prompt },
+            data: {
+              chatId,
+              messageId: 0,
+              user: 'scheduler',
+              userId: 'scheduler',
+              text: sched.prompt,
+            },
             timestamp: now.toISOString(),
           });
           log(`[schedule] Fired user schedule for ${chatId}: ${sched.prompt.slice(0, 50)}`);
@@ -248,6 +274,7 @@ async function main() {
   }, 60000);
 
   // ── HTTP Server (like clawhip's axum routes) ─────────────────────────────
+  // eslint-disable-next-line complexity
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
 
@@ -369,9 +396,12 @@ async function main() {
     }
 
     // Webhook endpoint — accept GitHub, CI/CD, or custom webhook events
-    if ((url.pathname === '/webhook' || url.pathname.startsWith('/webhook/')) && req.method === 'POST') {
+    if (
+      (url.pathname === '/webhook' || url.pathname.startsWith('/webhook/')) &&
+      req.method === 'POST'
+    ) {
       let body = '';
-      req.on('data', c => body += c);
+      req.on('data', c => (body += c));
       req.on('end', () => {
         try {
           const payload = JSON.parse(body);
@@ -427,7 +457,18 @@ async function main() {
     res.end(
       JSON.stringify({
         error: 'not found',
-        routes: ['/health', '/status', '/send', '/history', '/memory', '/dream', '/event', '/stop', '/web/message', '/web/stream/:id'],
+        routes: [
+          '/health',
+          '/status',
+          '/send',
+          '/history',
+          '/memory',
+          '/dream',
+          '/event',
+          '/stop',
+          '/web/message',
+          '/web/stream/:id',
+        ],
       })
     );
   });
@@ -444,7 +485,9 @@ async function main() {
     server.close();
     try {
       fs.unlinkSync(PID_FILE);
-    } catch {}
+    } catch {
+      /* ignored */
+    }
     log('Daemon stopped');
     process.exit(0);
   }

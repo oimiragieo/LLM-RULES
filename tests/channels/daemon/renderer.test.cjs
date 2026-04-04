@@ -24,12 +24,18 @@ describe('ClaudeRenderer', () => {
     it('selects sonnet for regular conversation', () => {
       const r = new ClaudeRenderer({ model: 'sonnet' });
       assert.equal(r._selectModel('explain how the event loop works in Node.js'), 'sonnet');
-      assert.equal(r._selectModel('what is the best approach for handling state management in React'), 'sonnet');
+      assert.equal(
+        r._selectModel('what is the best approach for handling state management in React'),
+        'sonnet'
+      );
     });
 
     it('uses config model as default for medium messages', () => {
       const r = new ClaudeRenderer({ model: 'opus' });
-      assert.equal(r._selectModel('explain the reactor pattern in distributed systems with examples'), 'opus');
+      assert.equal(
+        r._selectModel('explain the reactor pattern in distributed systems with examples'),
+        'opus'
+      );
     });
 
     it('selects haiku for empty/null text', () => {

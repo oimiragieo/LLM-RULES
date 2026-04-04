@@ -7,6 +7,7 @@
 'use strict';
 
 const { execSync, execFile } = require('child_process');
+const { claudeSync, nodeSync } = require('./claude-cli.cjs');
 
 const SYSTEM_PROMPT = `You are Agent Studio — an AI assistant running as a persistent background daemon, communicating via Telegram.
 
@@ -183,54 +184,105 @@ class ClaudeRenderer {
   _canTranscribe() {
     try {
       // Check if transcribe-anything is on PATH using 'where' (Windows) or 'which' (Unix)
-      const cmd = process.platform === 'win32' ? 'where transcribe-anything' : 'which transcribe-anything';
+      const cmd =
+        process.platform === 'win32' ? 'where transcribe-anything' : 'which transcribe-anything';
       const result = execSync(cmd, { encoding: 'utf8', stdio: 'pipe', timeout: 5000 }).trim();
       return result.length > 0;
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   }
 
   _transcribeVoice(fileId) {
     try {
       const token = process.env.TELEGRAM_BOT_TOKEN;
       if (!token) return null;
-      const https = require('https');
       const fs = require('fs');
       const os = require('os');
       const path = require('path');
 
-      // Get file path from Telegram
-      const fileInfo = JSON.parse(execSync(
-        `node -e "const https=require('https');https.get('https://api.telegram.org/bot${token}/getFile?file_id=${fileId}',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>console.log(d))})"`,
-        { encoding: 'utf8', timeout: 10000, shell: true }
-      ).trim());
-      if (!fileInfo.ok) return null;
-      const filePath = fileInfo.result.file_path;
-
-      // Download file
       const tmpDir = path.join(os.tmpdir(), 'daemon-voice');
       fs.mkdirSync(tmpDir, { recursive: true });
+
+      // Write a temp script that downloads the voice file via Telegram API.
+      // This avoids fragile node -e one-liners that break on Windows shell escaping.
+      const scriptPath = path.join(tmpDir, '_download.cjs');
       const localPath = path.join(tmpDir, `voice-${Date.now()}.ogg`);
-      execSync(
-        `node -e "const https=require('https');const fs=require('fs');const f=fs.createWriteStream('${localPath.replace(/\\/g, '/')}');https.get('https://api.telegram.org/file/bot${token}/${filePath}',r=>r.pipe(f).on('finish',()=>{f.close();console.log('done')}))"`,
-        { encoding: 'utf8', timeout: 30000, shell: true }
+      fs.writeFileSync(
+        scriptPath,
+        `
+'use strict';
+const https = require('https');
+const fs = require('fs');
+
+function httpGet(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, res => {
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => resolve(Buffer.concat(chunks)));
+    }).on('error', reject);
+  });
+}
+
+async function main() {
+  const fileInfoBuf = await httpGet(
+    'https://api.telegram.org/bot${token}/getFile?file_id=${fileId}'
+  );
+  const fileInfo = JSON.parse(fileInfoBuf.toString());
+  if (!fileInfo.ok) { process.exit(1); }
+  const filePath = fileInfo.result.file_path;
+
+  const fileData = await httpGet(
+    'https://api.telegram.org/file/bot${token}/' + filePath
+  );
+  fs.writeFileSync(${JSON.stringify(localPath.replace(/\\/g, '/'))}, fileData);
+  console.log('ok');
+}
+
+main().catch(() => process.exit(1));
+`
       );
+
+      const dlResult = nodeSync(scriptPath, { timeout: 30000 });
+
+      // Clean up download script
+      try {
+        fs.unlinkSync(scriptPath);
+      } catch {
+        /* best-effort cleanup */
+      }
+
+      if (dlResult !== 'ok' || !fs.existsSync(localPath)) return null;
 
       // Transcribe with Whisper
       const outDir = path.join(tmpDir, 'out');
-      execSync(`transcribe-anything "${localPath}" --model tiny --output_dir "${outDir}"`, {
-        encoding: 'utf8', timeout: 60000, shell: true
+      const transcribeCmd = `transcribe-anything "${localPath.replace(/\\/g, '/')}" --model base --device cuda --output_dir "${outDir.replace(/\\/g, '/')}"`;
+      execSync(transcribeCmd, {
+        encoding: 'utf8',
+        timeout: 120000,
+        windowsHide: true,
       });
 
-      // Read transcript
+      // Read transcript — transcribe-anything outputs .txt, .srt, .vtt files
+      if (!fs.existsSync(outDir)) return null;
       const txtFiles = fs.readdirSync(outDir).filter(f => f.endsWith('.txt'));
       if (txtFiles.length === 0) return null;
       const transcript = fs.readFileSync(path.join(outDir, txtFiles[0]), 'utf8').trim();
 
       // Cleanup
-      try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+      try {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+      } catch {
+        /* best-effort cleanup */
+      }
 
       return transcript || null;
-    } catch { return null; }
+    } catch (err) {
+      // Log transcription errors instead of silently swallowing
+      console.error('[renderer] Voice transcription failed:', err.message || err);
+      return null;
+    }
   }
 
   _loadKnowledgeBase() {
@@ -243,7 +295,10 @@ class ClaudeRenderer {
       if (fs.statSync(fullPath).isDirectory()) {
         // Load all .md files from directory
         const files = fs.readdirSync(fullPath).filter(f => f.endsWith('.md'));
-        return files.map(f => fs.readFileSync(path.join(fullPath, f), 'utf8')).join('\n\n').slice(0, 4000);
+        return files
+          .map(f => fs.readFileSync(path.join(fullPath, f), 'utf8'))
+          .join('\n\n')
+          .slice(0, 4000);
       }
       return fs.readFileSync(fullPath, 'utf8').slice(0, 4000);
     } catch {
@@ -318,7 +373,7 @@ class ClaudeRenderer {
 
     parts.push(`\nNew message from ${user}: ${text}`);
 
-    return parts.join('\n').replace(/"/g, '\\"').replace(/\n/g, ' ');
+    return parts.join('\n');
   }
 
   /**
@@ -328,25 +383,12 @@ class ClaudeRenderer {
     const prompt = this._buildPrompt(event);
     const model = this._selectModel(event.data?.text);
     try {
-      const env = { ...process.env };
-      delete env.ANTHROPIC_API_KEY;
-
-      // Cap prompt at 7500 chars to fit within Windows cmd.exe 8191 char limit
-      // (leaves room for the claude command + flags + shell quoting overhead)
-      const safePrompt = prompt.slice(0, 7500);
-
-      const result = execSync(
-        `claude -p "${safePrompt}" --dangerously-skip-permissions --model ${model} --max-turns 3`,
-        {
-          cwd: this.projectRoot,
-          encoding: 'utf8',
-          timeout: 120000,
-          env,
-          windowsHide: true,
-          shell: true,
-          stdio: ['pipe', 'pipe', 'pipe'],
-        }
-      ).trim();
+      const result = claudeSync(prompt, {
+        model,
+        maxTurns: 3,
+        cwd: this.projectRoot,
+        timeout: 120000,
+      });
 
       const response = result || 'Sorry, I could not generate a response.';
       if (this.memory && event.data.chatId) {
@@ -379,7 +421,7 @@ class ClaudeRenderer {
     const env = { ...process.env };
     delete env.ANTHROPIC_API_KEY;
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       // Use shell=true on Windows for .cmd wrappers
       const child = execFile(
         process.platform === 'win32' ? 'cmd' : 'claude',
@@ -404,7 +446,7 @@ class ClaudeRenderer {
           timeout: 120000,
           maxBuffer: 1024 * 1024, // 1MB
         },
-        (error, stdout, stderr) => {
+        (_error, _stdout, _stderr) => {
           // This fires when the process exits — we use it as final fallback
           // but normally resolve from the stream handler below
         }
@@ -424,11 +466,11 @@ class ClaudeRenderer {
         }
       });
 
-      child.stderr.on('data', data => {
+      child.stderr.on('data', _data => {
         // Ignore stderr (debug output from claude)
       });
 
-      child.on('close', code => {
+      child.on('close', _code => {
         if (resolved) return;
         resolved = true;
         const response = accumulated.trim() || 'Sorry, I could not generate a response.';
@@ -453,7 +495,9 @@ class ClaudeRenderer {
           resolved = true;
           try {
             child.kill();
-          } catch {}
+          } catch {
+            /* ignored */
+          }
           const response = accumulated.trim() || 'Response timed out.';
           if (this.memory && event.data.chatId) {
             this.memory.addMessage(event.data.chatId, 'assistant', response);
@@ -469,22 +513,14 @@ class ClaudeRenderer {
    */
   renderProactive(event) {
     const { prompt } = event.data;
-    const fullPrompt = `${this.persona}\n\n${prompt}`.replace(/"/g, '\\"').replace(/\n/g, ' ');
+    const fullPrompt = `${this.persona}\n\n${prompt}`;
     try {
-      const env = { ...process.env };
-      delete env.ANTHROPIC_API_KEY;
-      return execSync(
-        `claude -p "${fullPrompt}" --dangerously-skip-permissions --model haiku --max-turns 1`,
-        {
-          cwd: this.projectRoot,
-          encoding: 'utf8',
-          timeout: 60000,
-          env,
-          windowsHide: true,
-          shell: true,
-          stdio: ['pipe', 'pipe', 'pipe'],
-        }
-      ).trim();
+      return claudeSync(fullPrompt, {
+        model: 'haiku',
+        maxTurns: 1,
+        cwd: this.projectRoot,
+        timeout: 60000,
+      });
     } catch {
       return null;
     }
@@ -495,16 +531,17 @@ class ClaudeRenderer {
    */
   generateSuggestions(userText, response) {
     try {
-      const env = { ...process.env };
-      delete env.ANTHROPIC_API_KEY;
-      const prompt = `Given this exchange - User said: '${userText.slice(0, 200).replace(/'/g, '')}' and you replied: '${response.slice(0, 200).replace(/'/g, '')}' - suggest 2-3 short follow-up prompts the user might want to send next. Return ONLY a JSON array of strings, nothing else. Example: ['Check test results','Show git log','Explain the error']`;
-      const result = execSync(
-        `claude -p "${prompt.replace(/"/g, "'")}" --dangerously-skip-permissions --model haiku --max-turns 1`,
-        { encoding: 'utf8', timeout: 30000, env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'] }
-      ).trim();
+      const prompt = `Given this exchange - User said: '${userText.slice(0, 200)}' and you replied: '${response.slice(0, 200)}' - suggest 2-3 short follow-up prompts the user might want to send next. Return ONLY a JSON array of strings, nothing else. Example: ["Check test results","Show git log","Explain the error"]`;
+      const result = claudeSync(prompt, {
+        model: 'haiku',
+        maxTurns: 1,
+        timeout: 30000,
+      });
       const match = result.match(/\[[\s\S]*\]/);
       if (match) return JSON.parse(match[0]).slice(0, 3);
-    } catch {}
+    } catch {
+      /* ignored */
+    }
     return [];
   }
 }

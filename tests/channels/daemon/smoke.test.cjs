@@ -131,7 +131,9 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
     if (server) await new Promise(resolve => server.close(resolve));
     try {
       fs.rmSync(tmpDir, { recursive: true, force: true });
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   });
 
   it('/health returns ok', async () => {

@@ -14,7 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { claudeSync } = require('./claude-cli.cjs');
 
 const MAX_SKILLS = 50;
 
@@ -65,21 +65,19 @@ class SkillStore {
     if (!task || !result || result.length < 50) return;
 
     try {
-      const env = { ...process.env };
-      delete env.ANTHROPIC_API_KEY;
-
       const prompt = [
         'Extract a reusable skill from this completed task.',
         'Return ONLY JSON: {"name":"short-kebab-name","triggers":["keyword1","keyword2"],"description":"one line","solution":"the pattern/fix"}',
         'Triggers should be 2-5 lowercase keywords that would appear in similar future requests.',
         `Task: ${task.slice(0, 500)}`,
         `Result: ${result.slice(0, 500)}`,
-      ].join(' ').replace(/"/g, "'").slice(0, 2000);
+      ].join('\n');
 
-      const output = execSync(
-        `claude -p "${prompt}" --dangerously-skip-permissions --model haiku --max-turns 1`,
-        { encoding: 'utf8', timeout: 30000, env, windowsHide: true, shell: true, stdio: ['pipe', 'pipe', 'pipe'] }
-      ).trim();
+      const output = claudeSync(prompt, {
+        model: 'haiku',
+        maxTurns: 1,
+        timeout: 30000,
+      });
 
       const match = output.match(/\{[\s\S]*\}/);
       if (match) {
@@ -89,7 +87,9 @@ class SkillStore {
           return skill.name;
         }
       }
-    } catch {}
+    } catch {
+      /* ignored */
+    }
     return null;
   }
 
@@ -99,9 +99,7 @@ class SkillStore {
   findMatchingSkills(text) {
     if (!text) return [];
     const lower = text.toLowerCase();
-    return this.skills.filter(skill =>
-      skill.triggers.some(trigger => lower.includes(trigger))
-    );
+    return this.skills.filter(skill => skill.triggers.some(trigger => lower.includes(trigger)));
   }
 
   /**
@@ -111,8 +109,13 @@ class SkillStore {
   getSkillContext(text) {
     const matches = this.findMatchingSkills(text);
     if (matches.length === 0) return '';
-    return '\n\nRelevant skills from previous sessions:\n' +
-      matches.slice(0, 3).map(s => `- ${s.name}: ${s.solution.slice(0, 300)}`).join('\n');
+    return (
+      '\n\nRelevant skills from previous sessions:\n' +
+      matches
+        .slice(0, 3)
+        .map(s => `- ${s.name}: ${s.solution.slice(0, 300)}`)
+        .join('\n')
+    );
   }
 
   _load() {
@@ -120,13 +123,17 @@ class SkillStore {
       if (fs.existsSync(this.indexPath)) {
         this.skills = JSON.parse(fs.readFileSync(this.indexPath, 'utf8'));
       }
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 
   _save() {
     try {
       fs.writeFileSync(this.indexPath, JSON.stringify(this.skills, null, 2), 'utf8');
-    } catch {}
+    } catch {
+      /* ignored */
+    }
   }
 }
 

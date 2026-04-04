@@ -10,10 +10,13 @@ describe('TimerSource', () => {
   });
 
   it('constructor accepts config with schedules', () => {
-    const source = new TimerSource({
-      schedules: [{ name: 'test', cron: '0 9 * * *', prompt: 'hello' }],
-      tickIntervalMs: 1000,
-    }, () => {});
+    const source = new TimerSource(
+      {
+        schedules: [{ name: 'test', cron: '0 9 * * *', prompt: 'hello' }],
+        tickIntervalMs: 1000,
+      },
+      () => {}
+    );
     assert.equal(source.schedules.length, 1);
     assert.equal(source.running, false);
   });
@@ -34,8 +37,8 @@ describe('TimerSource', () => {
 
   it('_matchesCron matches day-of-week range (1-5 = Mon-Fri)', () => {
     const source = new TimerSource({ schedules: [] }, () => {});
-    assert.equal(source._matchesCron('0 9 * * 1-5', 9, 0, 1), true);  // Monday
-    assert.equal(source._matchesCron('0 9 * * 1-5', 9, 0, 5), true);  // Friday
+    assert.equal(source._matchesCron('0 9 * * 1-5', 9, 0, 1), true); // Monday
+    assert.equal(source._matchesCron('0 9 * * 1-5', 9, 0, 5), true); // Friday
     assert.equal(source._matchesCron('0 9 * * 1-5', 9, 0, 0), false); // Sunday
     assert.equal(source._matchesCron('0 9 * * 1-5', 9, 0, 6), false); // Saturday
   });
@@ -50,15 +53,21 @@ describe('TimerSource', () => {
   it('fires dispatch when cron matches', (t, done) => {
     const now = new Date();
     const dispatched = [];
-    const source = new TimerSource({
-      schedules: [{
-        name: 'test-fire',
-        cron: `${now.getMinutes()} ${now.getHours()} * * *`,
-        prompt: 'test prompt',
-        chatIds: ['123'],
-      }],
-      tickIntervalMs: 100,
-    }, (event) => dispatched.push(event), () => Infinity); // Infinity = very idle
+    const source = new TimerSource(
+      {
+        schedules: [
+          {
+            name: 'test-fire',
+            cron: `${now.getMinutes()} ${now.getHours()} * * *`,
+            prompt: 'test prompt',
+            chatIds: ['123'],
+          },
+        ],
+        tickIntervalMs: 100,
+      },
+      event => dispatched.push(event),
+      () => Infinity
+    ); // Infinity = very idle
 
     source.start();
     setTimeout(() => {
@@ -73,14 +82,20 @@ describe('TimerSource', () => {
   it('does not fire when user is active (<5min idle)', (t, done) => {
     const now = new Date();
     const dispatched = [];
-    const source = new TimerSource({
-      schedules: [{
-        name: 'test-suppress',
-        cron: `${now.getMinutes()} ${now.getHours()} * * *`,
-        prompt: 'should not fire',
-      }],
-      tickIntervalMs: 100,
-    }, (event) => dispatched.push(event), () => 60000); // 1 min idle — too active
+    const source = new TimerSource(
+      {
+        schedules: [
+          {
+            name: 'test-suppress',
+            cron: `${now.getMinutes()} ${now.getHours()} * * *`,
+            prompt: 'should not fire',
+          },
+        ],
+        tickIntervalMs: 100,
+      },
+      event => dispatched.push(event),
+      () => 60000
+    ); // 1 min idle — too active
 
     source.start();
     setTimeout(() => {
@@ -93,14 +108,20 @@ describe('TimerSource', () => {
   it('deduplicates — fires only once per schedule per day', (t, done) => {
     const now = new Date();
     const dispatched = [];
-    const source = new TimerSource({
-      schedules: [{
-        name: 'test-dedup',
-        cron: `${now.getMinutes()} ${now.getHours()} * * *`,
-        prompt: 'dedup test',
-      }],
-      tickIntervalMs: 50,
-    }, (event) => dispatched.push(event), () => Infinity);
+    const source = new TimerSource(
+      {
+        schedules: [
+          {
+            name: 'test-dedup',
+            cron: `${now.getMinutes()} ${now.getHours()} * * *`,
+            prompt: 'dedup test',
+          },
+        ],
+        tickIntervalMs: 50,
+      },
+      event => dispatched.push(event),
+      () => Infinity
+    );
 
     source.start();
     setTimeout(() => {

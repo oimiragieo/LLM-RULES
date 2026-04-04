@@ -1374,14 +1374,14 @@ When users ask the bot to DO something (run code, check git, etc.):
 
 The daemon supports 6 execution tags for different processing modes:
 
-| Tag           | Mode              | Description                                                        |
-| ------------- | ----------------- | ------------------------------------------------------------------ |
-| `[TASK]`      | One-shot          | Single headless execution with full tool access                    |
-| `[RALPH]`     | Iterative loop    | Persistent verify/fix cycle, max 5 iterations (Phase 8)            |
-| `[CLARIFY]`   | Single question   | One clarifying question before proceeding                          |
-| `[INTERVIEW]` | Multi-round       | Deep Socratic interview, collects answers before executing (Ph. 9) |
-| `[ULTRAWORK]` | Parallel          | Splits task into concurrent subtasks (Phase 9)                     |
-| `[HANDOFF]`   | Human escalation  | Escalates to human, no automated execution                         |
+| Tag           | Mode             | Description                                                        |
+| ------------- | ---------------- | ------------------------------------------------------------------ |
+| `[TASK]`      | One-shot         | Single headless execution with full tool access                    |
+| `[RALPH]`     | Iterative loop   | Persistent verify/fix cycle, max 5 iterations (Phase 8)            |
+| `[CLARIFY]`   | Single question  | One clarifying question before proceeding                          |
+| `[INTERVIEW]` | Multi-round      | Deep Socratic interview, collects answers before executing (Ph. 9) |
+| `[ULTRAWORK]` | Parallel         | Splits task into concurrent subtasks (Phase 9)                     |
+| `[HANDOFF]`   | Human escalation | Escalates to human, no automated execution                         |
 
 ### Multi-Model Routing (Phase 5)
 

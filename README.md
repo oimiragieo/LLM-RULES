@@ -38,6 +38,9 @@ CHANNEL_AUTO_START=true
 
 # 4. Stop monitoring
 /disable-telegram
+
+# 5. Restart daemon (without killing Claude session)
+/restart-telegram
 ```
 
 ### Features

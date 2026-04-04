@@ -36,7 +36,7 @@ class WebSource {
     // POST /web/message — receive a message from the widget
     if (url.pathname === '/web/message' && req.method === 'POST') {
       let body = '';
-      req.on('data', c => body += c);
+      req.on('data', c => (body += c));
       req.on('end', () => {
         try {
           const { text, sessionId: reqSessionId, user } = JSON.parse(body);
@@ -79,7 +79,7 @@ class WebSource {
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
       });
 
@@ -124,16 +124,26 @@ class WebSource {
     const clients = this.sseClients.get(sessionId) || [];
     const data = `data: ${JSON.stringify(response)}\n\n`;
     for (const client of clients) {
-      try { client.write(data); } catch {}
+      try {
+        client.write(data);
+      } catch {
+        /* ignored */
+      }
     }
   }
 
-  start() { /* No polling needed — HTTP-driven */ }
+  start() {
+    /* No polling needed — HTTP-driven */
+  }
   stop() {
     // Close all SSE connections
     for (const clients of this.sseClients.values()) {
       for (const client of clients) {
-        try { client.end(); } catch {}
+        try {
+          client.end();
+        } catch {
+          /* ignored */
+        }
       }
     }
     this.sseClients.clear();

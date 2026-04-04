@@ -94,30 +94,30 @@ curl http://127.0.0.1:3101/dream
 
 Type `/` in Telegram to see the command menu:
 
-| Command       | Description                                  |
-| ------------- | -------------------------------------------- |
-| `/start`      | Welcome + command list                       |
-| `/help`       | All commands (updated for all phases)        |
-| `/status`     | Daemon stats                                 |
-| `/ping`       | Alive check                                  |
-| `/model`      | View/switch AI model                         |
-| `/memory`     | What I remember about you                    |
-| `/dream`      | Consolidate memories                         |
-| `/new`        | Fresh conversation (keeps profile)           |
-| `/compress`   | Manual compaction                            |
-| `/forget`     | Clear all data                               |
-| `/title`      | Set conversation title                       |
-| `/resume`     | Resume a previous session                    |
-| `/sessions`   | List saved sessions                          |
-| `/export`     | Export conversation as markdown file          |
-| `/tasks`      | Task execution history                       |
-| `/approve`    | Approve a pending task                       |
-| `/deny`       | Deny a pending task                          |
-| `/usage`      | Per-user cost tracking                       |
-| `/insights`   | Usage analytics and statistics               |
-| `/personality`| Switch personality (6 presets)               |
-| `/schedule`   | User-managed cron scheduling                 |
-| `/pair`       | Device pairing (request + `/pair approve`)   |
+| Command        | Description                                |
+| -------------- | ------------------------------------------ |
+| `/start`       | Welcome + command list                     |
+| `/help`        | All commands (updated for all phases)      |
+| `/status`      | Daemon stats                               |
+| `/ping`        | Alive check                                |
+| `/model`       | View/switch AI model                       |
+| `/memory`      | What I remember about you                  |
+| `/dream`       | Consolidate memories                       |
+| `/new`         | Fresh conversation (keeps profile)         |
+| `/compress`    | Manual compaction                          |
+| `/forget`      | Clear all data                             |
+| `/title`       | Set conversation title                     |
+| `/resume`      | Resume a previous session                  |
+| `/sessions`    | List saved sessions                        |
+| `/export`      | Export conversation as markdown file       |
+| `/tasks`       | Task execution history                     |
+| `/approve`     | Approve a pending task                     |
+| `/deny`        | Deny a pending task                        |
+| `/usage`       | Per-user cost tracking                     |
+| `/insights`    | Usage analytics and statistics             |
+| `/personality` | Switch personality (6 presets)             |
+| `/schedule`    | User-managed cron scheduling               |
+| `/pair`        | Device pairing (request + `/pair approve`) |
 
 Regular messages (no `/` prefix) go to Claude for a response.
 
@@ -125,14 +125,14 @@ Regular messages (no `/` prefix) go to Claude for a response.
 
 Claude's responses can include execution tags that trigger different processing modes:
 
-| Tag           | Mode              | Description                                                        |
-| ------------- | ----------------- | ------------------------------------------------------------------ |
-| `[TASK]`      | One-shot          | Single headless execution with full tool access                    |
-| `[RALPH]`     | Iterative loop    | Persistent verify/fix cycle, max 5 iterations                      |
-| `[CLARIFY]`   | Single question   | One clarifying question before proceeding                          |
-| `[INTERVIEW]` | Multi-round       | Deep Socratic interview, collects answers before executing         |
-| `[ULTRAWORK]` | Parallel          | Splits task into concurrent subtasks                               |
-| `[HANDOFF]`   | Human escalation  | Escalates to human, no automated execution                         |
+| Tag           | Mode             | Description                                                |
+| ------------- | ---------------- | ---------------------------------------------------------- |
+| `[TASK]`      | One-shot         | Single headless execution with full tool access            |
+| `[RALPH]`     | Iterative loop   | Persistent verify/fix cycle, max 5 iterations              |
+| `[CLARIFY]`   | Single question  | One clarifying question before proceeding                  |
+| `[INTERVIEW]` | Multi-round      | Deep Socratic interview, collects answers before executing |
+| `[ULTRAWORK]` | Parallel         | Splits task into concurrent subtasks                       |
+| `[HANDOFF]`   | Human escalation | Escalates to human, no automated execution                 |
 
 ## Multi-Model Routing
 
