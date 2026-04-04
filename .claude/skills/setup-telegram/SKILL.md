@@ -24,6 +24,7 @@ Read each of these files and verify the required values:
    - `TELEGRAM_BOT_TOKEN` — must exist and be non-empty
    - `TELEGRAM_OWNER_ID` — must exist (numeric Telegram user ID)
    - `CHANNEL_AUTO_START` — must be `true`
+   - `CHANNEL_PROJECT_ROOT` — the absolute path to the project the daemon works with (e.g., `C:\dev\projects\agent-studio`). Task executors use this as their working directory for git, file, and code operations. If missing, defaults to the daemon's startup directory.
    - `TELEGRAM_ALLOWED_USERS` — recommended (comma-separated user IDs)
    - `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` — needed for headless monitor auth
 
@@ -45,6 +46,7 @@ Telegram Setup Status:
   [x] .env: Bot token configured
   [x] .env: Owner ID: 6521653928
   [x] .env: CHANNEL_AUTO_START=true
+  [x] .env: CHANNEL_PROJECT_ROOT=C:\dev\projects\agent-studio
   [x] .env: Allowed users: 6521653928
   [x] .env: Auth token configured (API key or OAuth token)
   [x] Voice: transcribe-anything installed (pip)

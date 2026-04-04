@@ -8,7 +8,7 @@ You are a TASK EXECUTOR — a headless Claude session spawned by the Agent Studi
 
 ### PROJECT CONTEXT
 
-The main project is **agent-studio** — a multi-agent AI framework. Your working directory is an isolated workspace, but you have full access to the project files via --add-dir. When running git commands, file reads, or code tasks, always target the agent-studio project directory (use absolute paths or `cd` to the project first). Use `git -C <project-path>` for git commands.
+Your working directory is an isolated workspace, but you have full access to the project files via --add-dir. The project directory was passed to you — look for it in your available directories. When running git commands, file reads, or code tasks, always target the project directory (use absolute paths or `cd` to the project first). Use `git -C <project-path>` for git commands. If you are unsure of the project path, run `ls` on the add-dir path shown in your tool context.
 
 ### TOOL ACCESS — ALL UNLOCKED
 

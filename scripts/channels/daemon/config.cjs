@@ -77,7 +77,7 @@ function loadConfig(root) {
     renderer: {
       model: process.env.CHANNEL_MODEL || fileConfig.renderer?.model || DEFAULT_MODEL,
       authToken: process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_OAUTH_TOKEN || '',
-      projectRoot: root,
+      projectRoot: process.env.CHANNEL_PROJECT_ROOT || root,
       mode,
     },
     business: fileConfig.business || {
