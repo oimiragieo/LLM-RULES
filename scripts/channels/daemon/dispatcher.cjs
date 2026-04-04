@@ -214,6 +214,16 @@ class Dispatcher {
           });
         } catch {}
 
+        // Progress timer — send "still working" every 15s while task runs
+        let progressCount = 0;
+        const progressTimer = setInterval(async () => {
+          progressCount++;
+          const elapsed = progressCount * 15;
+          try {
+            await sink.send(event.data.chatId, `⏳ Still working... (${elapsed}s)`);
+          } catch {}
+        }, 15000);
+
         // Execute the task — try A2A router first for delegation tasks
         this.log(`[dispatcher] Executing task ${taskId}: ${taskDesc.slice(0, 80)}`);
         let result;
@@ -239,6 +249,7 @@ class Dispatcher {
           this.activeTasks.get(taskId).status = 'failed';
         }
         this.activeTasks.get(taskId).endTime = Date.now();
+        clearInterval(progressTimer);
 
         // Send the result (truncate for Telegram's 4096 char limit)
         const truncatedResult =
