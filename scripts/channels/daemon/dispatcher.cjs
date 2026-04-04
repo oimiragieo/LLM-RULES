@@ -582,7 +582,19 @@ class Dispatcher {
           }
         }
 
-        // Task results already sent via chunks above — skip the main send below
+        // Task results already sent via chunks above — skip the main send below.
+        // Record the result in chat memory so Claude knows the task completed.
+        if (this.memory && event.data.chatId) {
+          // Replace the [TASK] assistant message with the actual result
+          const chatHistory = this.memory.chats.get(event.data.chatId) || [];
+          const lastAssistant = chatHistory.findLastIndex(m => m.role === 'assistant');
+          if (lastAssistant >= 0 && chatHistory[lastAssistant].text.startsWith('[TASK]')) {
+            chatHistory[lastAssistant].text = cleanResult.slice(0, 2000);
+          } else {
+            this.memory.addMessage(event.data.chatId, 'assistant', cleanResult.slice(0, 2000));
+          }
+          this.memory._saveHistory();
+        }
         this.log(
           `[dispatcher] Delivered ${chunks.length} chunk(s) to ${route.sink || event.source}`
         );
@@ -609,6 +621,11 @@ class Dispatcher {
         await sink.send(event.data.chatId, response, {
           replyTo: event.data.messageId,
         });
+        // Record task/ralph/ultrawork results in chat memory
+        // (the renderer recorded the [TAG] message; now record the actual result)
+        if (this.memory && event.data.chatId) {
+          this.memory.addMessage(event.data.chatId, 'assistant', response.slice(0, 2000));
+        }
         this.log(`[dispatcher] Delivered to ${route.sink || event.source}`);
         this.history.push({
           timestamp: event.timestamp,

@@ -33,6 +33,8 @@ function createMockSink() {
 function createMockMemory() {
   return {
     chats: new Map(),
+    addMessage() {},
+    _saveHistory() {},
     shouldDream() {
       return false;
     },
