@@ -10,12 +10,13 @@
 const { TaskExecutor } = require('./executor.cjs');
 
 class Dispatcher {
-  constructor(router, renderer, sinks, log, memory, config) {
+  constructor(router, renderer, sinks, log, memory, config, skillStore) {
     this.router = router;
     this.renderer = renderer;
     this.sinks = sinks;
     this.log = log || console.log;
     this.memory = memory || null;
+    this.skillStore = skillStore || null;
     this.executor = new TaskExecutor(config || {}, log);
     this.queue = [];
     this.processing = false;
@@ -257,6 +258,13 @@ class Dispatcher {
             },
           });
           this.activeTasks.get(taskId).status = 'completed';
+          // Extract skill from successful ralph execution
+          if (this.skillStore) {
+            setImmediate(() => {
+              const skillName = this.skillStore.extractSkill(taskDesc, result);
+              if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+            });
+          }
         } catch (err) {
           result = `Ralph failed: ${err.message}`;
           this.activeTasks.get(taskId).status = 'failed';
@@ -318,6 +326,13 @@ class Dispatcher {
             result = this.executor.executeTask(taskDesc);
           }
           this.activeTasks.get(taskId).status = 'completed';
+          // Extract skill from successful task
+          if (this.skillStore && !result.startsWith('Error')) {
+            setImmediate(() => {
+              const skillName = this.skillStore.extractSkill(taskDesc, result);
+              if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+            });
+          }
         } catch (err) {
           result = `Task failed: ${err.message}`;
           this.activeTasks.get(taskId).status = 'failed';

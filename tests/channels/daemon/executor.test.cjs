@@ -96,4 +96,22 @@ describe('TaskExecutor', () => {
       assert.equal(typeof exec.isRouterAvailable, 'function');
     });
   });
+
+  describe('Rate limit handling', () => {
+    it('_isRateLimitError detects rate limits', () => {
+      const exec = new TaskExecutor({});
+      assert.equal(exec._isRateLimitError('Error: 429 rate limit exceeded'), true);
+      assert.equal(exec._isRateLimitError('too many requests'), true);
+      assert.equal(exec._isRateLimitError('Extra usage is required'), true);
+      assert.equal(exec._isRateLimitError('All tests pass'), false);
+      assert.equal(exec._isRateLimitError(null), false);
+    });
+
+    it('executeTaskWithRetry returns on success', () => {
+      const exec = new TaskExecutor({});
+      exec.executeTask = () => 'Success!';
+      const result = exec.executeTaskWithRetry('test', '', 1);
+      assert.equal(result, 'Success!');
+    });
+  });
 });

@@ -128,10 +128,11 @@ The daemon will notify the support team.
 You remember previous conversations with this customer. Reference past context naturally.`;
 
 class ClaudeRenderer {
-  constructor(config, memory) {
+  constructor(config, memory, skillStore) {
     this.model = config.model || 'sonnet';
     this.projectRoot = config.projectRoot || process.cwd();
     this.memory = memory || null;
+    this.skillStore = skillStore || null;
     this.mode = config.mode || 'developer';
     this.businessConfig = config.business || {};
 
@@ -221,6 +222,12 @@ class ClaudeRenderer {
       parts.push(
         `\n${user} sent a document (file_id: ${attachmentFileId}). You can use [TASK] to download it and convert to markdown using markitdown for analysis. Offer to read and summarize it for them.`
       );
+    }
+
+    // Auto-inject matching skills from previous sessions
+    if (this.skillStore) {
+      const skillCtx = this.skillStore.getSkillContext(text);
+      if (skillCtx) parts.push(skillCtx);
     }
 
     parts.push(`\nNew message from ${user}: ${text}`);

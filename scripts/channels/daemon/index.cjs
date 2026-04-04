@@ -44,6 +44,7 @@ const { SlackSink } = require('./sinks/slack.cjs');
 const { WebSource } = require('./sources/web.cjs');
 const { WebSink } = require('./sinks/web.cjs');
 const { DaemonMemory } = require('./memory.cjs');
+const { SkillStore } = require('./skills.cjs');
 const { TimerSource } = require('./sources/timer.cjs');
 const { CommandHandler } = require('./commands.cjs');
 
@@ -134,9 +135,13 @@ async function main() {
   const memory = new DaemonMemory(memoryDir, config.renderer);
   log(`Memory loaded: ${JSON.stringify(memory.getStats())}`);
 
-  const renderer = new ClaudeRenderer(config.renderer, memory);
+  // Skill store (OMC-style learned patterns)
+  const skillStore = new SkillStore(memoryDir);
+  log(`Skills loaded: ${skillStore.skills.length} skills`);
+
+  const renderer = new ClaudeRenderer(config.renderer, memory, skillStore);
   const router = new Router(config.routes);
-  const dispatcher = new Dispatcher(router, renderer, sinks, log, memory, config.renderer);
+  const dispatcher = new Dispatcher(router, renderer, sinks, log, memory, config.renderer, skillStore);
 
   // Start sources
   if (config.sources.telegram.enabled) {

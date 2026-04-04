@@ -119,6 +119,30 @@ class TaskExecutor {
   }
 
   /**
+   * Check if output indicates a rate limit error.
+   */
+  _isRateLimitError(output) {
+    return /rate.limit|429|too many requests|overloaded|Extra usage is required/i.test(output || '');
+  }
+
+  /**
+   * Execute task with automatic retry on rate limits.
+   */
+  executeTaskWithRetry(task, context = '', maxRetries = 3) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const result = this.executeTask(task, context);
+      if (!this._isRateLimitError(result)) return result;
+      if (attempt < maxRetries) {
+        const delaySec = 30 * Math.pow(2, attempt); // 30s, 60s, 120s
+        this.log(`[executor] Rate limited, waiting ${delaySec}s before retry ${attempt + 2}/${maxRetries + 1}...`);
+        const start = Date.now();
+        while (Date.now() - start < delaySec * 1000) {} // Sync wait
+      }
+    }
+    return 'Rate limit exceeded after retries. Try again later.';
+  }
+
+  /**
    * Send a task to the A2A server (router) for agent-based execution.
    */
   async sendToRouter(prompt, agentType = 'developer') {
