@@ -182,8 +182,10 @@ class ClaudeRenderer {
 
   _canTranscribe() {
     try {
-      execSync('transcribe-anything --version', { stdio: 'pipe', timeout: 5000 });
-      return true;
+      // Check if transcribe-anything is on PATH using 'where' (Windows) or 'which' (Unix)
+      const cmd = process.platform === 'win32' ? 'where transcribe-anything' : 'which transcribe-anything';
+      const result = execSync(cmd, { encoding: 'utf8', stdio: 'pipe', timeout: 5000 }).trim();
+      return result.length > 0;
     } catch { return false; }
   }
 
