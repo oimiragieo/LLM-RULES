@@ -127,7 +127,7 @@ Claude's responses can include execution tags that trigger different processing 
 
 | Tag           | Mode             | Description                                                |
 | ------------- | ---------------- | ---------------------------------------------------------- |
-| `[TASK]`      | One-shot         | Single headless execution with full tool access            |
+| `[TASK]`      | One-shot         | Headless execution with full tool + MCP access (Exa, etc.) |
 | `[RALPH]`     | Iterative loop   | Persistent verify/fix cycle, max 5 iterations              |
 | `[CLARIFY]`   | Single question  | One clarifying question before proceeding                  |
 | `[INTERVIEW]` | Multi-round      | Deep Socratic interview, collects answers before executing |
@@ -162,23 +162,37 @@ Per-user rate limiting at 10 messages/minute (configurable). Excess messages rec
 
 External systems can push events via `POST /webhook`. Supports GitHub webhooks, CI pipeline events, and custom payloads. Events are routed through the standard dispatcher pipeline.
 
+## Task Executor — MCP Tool Access
+
+Headless `claude -p` sessions spawned by the executor use `--append-system-prompt-file task-executor-prompt.txt` to override the router CLAUDE.md. This gives each headless session:
+
+- A task-executor identity (executes directly, doesn't route)
+- Awareness of available MCP tools (Exa web search/crawl, filesystem)
+- Access to all built-in tools (Bash, Read/Write/Edit, Grep/Glob)
+
+MCP servers are inherited from the project's `settings.json` automatically.
+
 ## Memory System
 
 ### Tier 1: Chat History
 
-Recent messages (max 30). Auto-compacts by summarizing older half.
+Recent messages (max 30). Auto-compacts by summarizing older half. Supports `user`, `assistant`, and `system` roles (system used for session gap markers on daemon restart).
 
 ### Tier 2: Session Summaries
 
-Built from compactions. Wiped after 5 compactions (session rotation).
+Built from compactions. Uses ACC-style full replacement when budget exceeds 3000 chars. Wiped after 5 compactions (session rotation).
 
 ### Tier 3: User Profiles
 
-Permanent facts (name, preferences, projects). Survives everything. Extracted during dream consolidation.
+Permanent facts (name, preferences, projects). Survives everything. Extracted during dream consolidation. Dream prompt includes explicit chatId list.
 
 ### Dream Consolidation
 
 4-phase KAIROS process: Orient → Gather → Consolidate → Prune. Runs automatically (every hour if 5+ messages) or manually via `/dream`.
+
+### Persistence
+
+All memory uses atomic write-to-temp-then-rename to prevent corruption. Daemon metadata (`lastDream`, `messagesSinceDream`, `compactionCounts`) persisted in `daemon-metadata.json` so dream state and session rotation survive restarts.
 
 ## Adding New Platforms
 

@@ -51,9 +51,17 @@ Claude -p response generator with conversation memory. System prompt follows Ope
 
 **Skill injection:** Before rendering, checks the skill extraction engine for matching learned patterns. If a match is found, injects the relevant skill context into the system prompt so Claude can apply previously learned techniques.
 
+### `claude-cli.cjs`
+
+Safe Claude CLI wrapper. All daemon modules use `claudeSync()` instead of raw `execSync` with string interpolation (SEC-011). Uses `spawnSync` with array arguments. Supports `--append-system-prompt` and `--append-system-prompt-file` for overriding CLAUDE.md in headless sessions. Falls back to temp file approach on Windows when prompt + system prompt exceed cmd.exe 8191 char limit.
+
+### `task-executor-prompt.txt`
+
+System prompt appended via `--append-system-prompt-file` to headless `claude -p` sessions spawned by the executor. Overrides the router CLAUDE.md by giving headless agents a task-executor identity. Lists available MCP tools (Exa web search/crawl, filesystem) so headless agents know they can do web research, file operations, and code tasks directly.
+
 ### `executor.cjs`
 
-Task execution engine. `executeTask()` spawns `claude -p --model sonnet --max-turns 10` with full tool access for coding tasks. `sendToRouter()` sends JSON-RPC tasks to the A2A server (port 3100). `isRouterAvailable()` checks A2A health endpoint. Tasks have 5-minute timeout.
+Task execution engine. `executeTask()` spawns `claude -p --append-system-prompt-file task-executor-prompt.txt --model sonnet --max-turns 10` with full tool access including MCP tools. The appended system prompt overrides the router CLAUDE.md, giving headless sessions a task-executor identity with explicit MCP tool awareness (Exa web search, filesystem, etc.). `sendToRouter()` sends JSON-RPC tasks to the A2A server (port 3100). `isRouterAvailable()` checks A2A health endpoint. Tasks have 5-minute timeout.
 
 **Ralph loop execution:** When the dispatcher detects a `[RALPH]` tag, the executor runs a persistent verify/fix loop — executes the task, verifies the result, and if verification fails, re-executes with the failure context. Max 5 iterations. Streams progress updates (15s heartbeat) back to the user during execution.
 
@@ -75,17 +83,17 @@ Telegram bot `/` command handler (OpenClaw pattern). Intercepts slash commands b
 
 KAIROS-style 3-tier memory system with dream consolidation.
 
-**Tier 1 (Chat History):** Raw recent messages per chat (max 30). Auto-compacts at 20 messages by summarizing older half via Haiku.
+**Tier 1 (Chat History):** Raw recent messages per chat (max 30). Auto-compacts at 20 messages by summarizing older half via Haiku. Supports `user`, `assistant`, and `system` message roles (system role used for session gap markers).
 
-**Tier 2 (Session Summaries):** Built from compactions. Capped at 3000 chars. Wiped on session rotation after 5 compactions.
+**Tier 2 (Session Summaries):** Built from compactions. Capped at 3000 chars. Uses ACC-style full replacement when budget is exceeded (replaces old summary entirely rather than slicing mid-sentence). Wiped on session rotation after 5 compactions.
 
-**Tier 3 (User Profiles):** Durable facts about each user. Extracted during dream consolidation. Max 50 facts per user. Survives everything.
+**Tier 3 (User Profiles):** Durable facts about each user. Extracted during dream consolidation. Max 50 facts per user. Survives everything. Dream prompt includes explicit chatId list to prevent misattribution.
 
 **Dream consolidation (4-phase KAIROS):** Orient (review existing) → Gather (extract identity, projects, preferences, expertise, corrections) → Consolidate (merge, resolve conflicts) → Prune (remove stale/duplicate). Uses Sonnet for quality. Triggers: manual `/dream`, auto after 5+ messages + 1hr, 10-minute timer check.
 
-**Session rotation:** After 5 compactions, Tier 1+2 are wiped (fresh start) but Tier 3 profile survives. User never notices — their identity carries over transparently.
+**Session rotation:** After 5 compactions, Tier 1+2 are wiped (fresh start) but Tier 3 profile survives. User never notices — their identity carries over transparently. Compaction counts persist across daemon restarts via `daemon-metadata.json`.
 
-All tiers persisted to JSON files in `.claude/context/runtime/channel-memory/`.
+**Persistence:** All tiers persisted to JSON files in `.claude/context/runtime/channel-memory/` using atomic write-to-temp-then-rename to prevent corruption. Daemon metadata (`lastDream`, `messagesSinceDream`, `compactionCounts`) persisted separately so dream state and session rotation survive restarts. Corrupt JSON files are logged on load instead of silently ignored.
 
 ## sources/
 
