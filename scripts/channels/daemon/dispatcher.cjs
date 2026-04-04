@@ -550,9 +550,11 @@ class Dispatcher {
         clearInterval(progressTimer);
 
         // Send the result (truncate for Telegram's 4096 char limit)
+        // Strip markdown headings (## / ###) since Telegram doesn't support them
+        const cleanResult = result.replace(/^#{1,6}\s+/gm, '').replace(/^---+$/gm, '');
         const truncatedResult =
-          result.length > 3500 ? result.slice(0, 3500) + '\n\n... (truncated)' : result;
-        response = `✅ Task complete:\n\n${truncatedResult}`;
+          cleanResult.length > 3800 ? cleanResult.slice(0, 3800) + '\n\n...' : cleanResult;
+        response = truncatedResult;
 
         // Detect file paths in result and send as attachments
         if (sink.sendFile) {
