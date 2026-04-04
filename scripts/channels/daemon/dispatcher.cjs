@@ -549,12 +549,21 @@ class Dispatcher {
         this.activeTasks.get(taskId).endTime = Date.now();
         clearInterval(progressTimer);
 
-        // Send the result (truncate for Telegram's 4096 char limit)
         // Strip markdown headings (## / ###) since Telegram doesn't support them
         const cleanResult = result.replace(/^#{1,6}\s+/gm, '').replace(/^---+$/gm, '');
-        const truncatedResult =
-          cleanResult.length > 3800 ? cleanResult.slice(0, 3800) + '\n\n...' : cleanResult;
-        response = truncatedResult;
+
+        // Chunk long results into multiple Telegram messages (4096 char limit)
+        const chunks = this._chunkText(cleanResult, 3800);
+        for (let ci = 0; ci < chunks.length; ci++) {
+          try {
+            await sink.send(event.data.chatId, chunks[ci], {
+              replyTo: ci === 0 ? event.data.messageId : undefined,
+            });
+          } catch {
+            /* ignored */
+          }
+        }
+        response = chunks[0] || cleanResult.slice(0, 500); // For history/logging
 
         // Detect file paths in result and send as attachments
         if (sink.sendFile) {
@@ -572,6 +581,28 @@ class Dispatcher {
             }
           }
         }
+
+        // Task results already sent via chunks above — skip the main send below
+        this.log(
+          `[dispatcher] Delivered ${chunks.length} chunk(s) to ${route.sink || event.source}`
+        );
+        this.history.push({
+          timestamp: event.timestamp,
+          user: event.data.user,
+          message: event.data.text,
+          response: response.slice(0, 500),
+          sink: route.sink || event.source,
+        });
+        if (this.history.length > this.maxHistory) this.history.shift();
+        if (this.memory?.appendDailyLog) {
+          this.memory.appendDailyLog(
+            event.data.chatId,
+            event.data.user,
+            event.data.text,
+            cleanResult
+          );
+        }
+        continue; // Skip the normal send path — already delivered
       }
 
       try {
@@ -615,6 +646,35 @@ class Dispatcher {
         this.log(`[dispatcher] Sink error: ${err.message}`);
       }
     }
+  }
+
+  /**
+   * Split long text into chunks that fit Telegram's message limit.
+   * Splits on paragraph boundaries (\n\n) to avoid cutting mid-sentence.
+   */
+  _chunkText(text, maxLen = 3800) {
+    if (text.length <= maxLen) return [text];
+
+    const chunks = [];
+    let remaining = text;
+
+    while (remaining.length > 0) {
+      if (remaining.length <= maxLen) {
+        chunks.push(remaining);
+        break;
+      }
+
+      // Find a good split point — prefer double newline, then single newline, then space
+      let splitAt = remaining.lastIndexOf('\n\n', maxLen);
+      if (splitAt < maxLen * 0.3) splitAt = remaining.lastIndexOf('\n', maxLen);
+      if (splitAt < maxLen * 0.3) splitAt = remaining.lastIndexOf(' ', maxLen);
+      if (splitAt < maxLen * 0.3) splitAt = maxLen; // Hard cut as last resort
+
+      chunks.push(remaining.slice(0, splitAt).trim());
+      remaining = remaining.slice(splitAt).trim();
+    }
+
+    return chunks.filter(c => c.length > 0);
   }
 
   getStats() {
