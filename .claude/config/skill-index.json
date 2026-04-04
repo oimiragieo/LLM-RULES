@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-04-04T15:44:07.159Z",
+  "generatedAt": "2026-04-04T15:53:18.248Z",
   "metadata": {
     "totalSkills": 342,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-04-04T15:44:07.160Z",
+    "lastValidated": "2026-04-04T15:53:18.250Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -4452,7 +4452,7 @@
       "displayName": "Assimilate",
       "category": "Other",
       "domain": "other",
-      "description": "Benchmark external agent frameworks and convert findings into a concrete TDD upgrade backlog for agent-studio evolution.",
+      "description": "Benchmark external agent frameworks, auto-detect source type, scan for prompt injection, and convert findings into a concrete TDD upgrade backlog for agent-studio evolution.",
       "requiredTools": [
         "Read",
         "Write",

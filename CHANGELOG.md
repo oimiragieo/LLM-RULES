@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Assimilate Skill v2.0.0 (Skill_Seekers Benchmarking)
+
+#### Added
+
+- **Source auto-detection** — auto-classifies input (GitHub URL, local path, document, package name) before analysis, inspired by Skill_Seekers' SourceDetector pattern
+- **Prompt injection scanning (Phase 1.5)** — mandatory security scan of cloned content before analysis; halts on high-risk findings; inspired by Skill_Seekers' workflow-integrated injection scanning
+- **Structured benchmark comparison report** — machine-readable `comparison-report.json` with 8-dimension maturity scoring (ahead/parity/behind/different_approach), replacing ad-hoc prose comparison
+- **Workflow template extraction** — when external projects use composable workflow definitions (YAML/JSON), extracts stage patterns, history chaining, and post-processing for gap analysis
+- **Two new iron laws** — mandatory injection scan before analysis; mandatory source auto-detection for ambiguous inputs
+
 ### Channel Daemon Fixes
 
 #### Fixed
