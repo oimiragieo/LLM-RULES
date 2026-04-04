@@ -249,4 +249,43 @@ describe('CommandHandler', () => {
       assert.ok(sink.sent[0].text.includes('Nothing pending'));
     });
   });
+
+  describe('/export', () => {
+    it('exports empty chat gracefully', async () => {
+      await handler.handle({ text: '/export', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('No conversation'));
+    });
+
+    it('exports chat with messages', async () => {
+      memory.chats.set('123', [
+        { role: 'user', user: 'omar', text: 'hello', timestamp: '2026-01-01T12:00:00Z' },
+        { role: 'assistant', user: '', text: 'hi there', timestamp: '2026-01-01T12:00:05Z' },
+      ]);
+      await handler.handle({ text: '/export', chatId: '123', messageId: 1 });
+      // Should send something (file or text fallback)
+      assert.ok(sink.sent.length >= 1);
+    });
+  });
+
+  describe('/pair', () => {
+    it('shows usage without args', async () => {
+      await handler.handle({ text: '/pair', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('Pairing'));
+    });
+
+    it('/pair request generates a code', async () => {
+      dispatcher._pendingPairings = new Map();
+      await handler.handle({ text: '/pair request', chatId: '123', messageId: 1, userId: 'u123' });
+      assert.ok(sink.sent[0].text.includes('code'));
+      assert.equal(dispatcher._pendingPairings.size, 1);
+    });
+
+    it('/pair approve resolves pending', async () => {
+      dispatcher._pendingPairings = new Map();
+      dispatcher._pendingPairings.set('abc123', { chatId: '999', userId: 'u999', timestamp: Date.now() });
+      await handler.handle({ text: '/pair approve abc123', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('approved'));
+      assert.equal(dispatcher._pendingPairings.size, 0);
+    });
+  });
 });

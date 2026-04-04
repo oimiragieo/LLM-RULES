@@ -329,6 +329,55 @@ async function main() {
       return;
     }
 
+    // Webhook endpoint — accept GitHub, CI/CD, or custom webhook events
+    if ((url.pathname === '/webhook' || url.pathname.startsWith('/webhook/')) && req.method === 'POST') {
+      let body = '';
+      req.on('data', c => body += c);
+      req.on('end', () => {
+        try {
+          const payload = JSON.parse(body);
+          const source = url.pathname.split('/').pop() || 'webhook';
+
+          // Detect GitHub webhook
+          const githubEvent = req.headers['x-github-event'];
+          let text;
+          if (githubEvent) {
+            const repo = payload.repository?.full_name || 'unknown';
+            if (githubEvent === 'push') {
+              const commits = payload.commits?.length || 0;
+              text = `🔔 GitHub push to ${repo}: ${commits} commit(s) by ${payload.pusher?.name || 'unknown'}`;
+            } else if (githubEvent === 'pull_request') {
+              text = `🔔 GitHub PR ${payload.action}: #${payload.pull_request?.number} "${payload.pull_request?.title}" on ${repo}`;
+            } else if (githubEvent === 'issues') {
+              text = `🔔 GitHub issue ${payload.action}: #${payload.issue?.number} "${payload.issue?.title}" on ${repo}`;
+            } else {
+              text = `🔔 GitHub ${githubEvent} on ${repo}`;
+            }
+          } else {
+            text = `🔔 Webhook (${source}): ${JSON.stringify(payload).slice(0, 300)}`;
+          }
+
+          // Dispatch to all configured home channels
+          const homeChat = process.env.TELEGRAM_OWNER_CHAT_ID || process.env.TELEGRAM_OWNER_ID;
+          if (homeChat) {
+            dispatcher.enqueue({
+              type: `webhook.${githubEvent || source}`,
+              source: 'telegram',
+              data: { chatId: homeChat, messageId: 0, user: 'webhook', userId: 'webhook', text },
+              timestamp: new Date().toISOString(),
+            });
+          }
+
+          res.statusCode = 200;
+          res.end(JSON.stringify({ received: true }));
+        } catch (err) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+      return;
+    }
+
     // Stop endpoint
     if (url.pathname === '/stop' || url.pathname === '/api/stop') {
       res.end(JSON.stringify({ stopping: true }));

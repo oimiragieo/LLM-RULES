@@ -25,7 +25,10 @@ class Dispatcher {
     this.taskCounter = 0;
     this.pendingClarifications = new Map(); // chatId → { originalText, question, timestamp }
     this.pendingApprovals = new Map(); // chatId → { resolve, reject, command, timestamp }
-    this.stats = { received: 0, processed: 0, errors: 0, tasksExecuted: 0, lastEvent: null };
+    this.rateLimits = new Map(); // chatId → [timestamp1, timestamp2, ...]
+    this.rateLimitMax = 10; // max messages per minute per user
+    this.rateLimitWindowMs = 60000;
+    this.stats = { received: 0, processed: 0, errors: 0, tasksExecuted: 0, rateLimited: 0, lastEvent: null };
   }
 
   /**
@@ -67,7 +70,31 @@ class Dispatcher {
     this.processing = false;
   }
 
+  _checkRateLimit(chatId) {
+    const now = Date.now();
+    if (!this.rateLimits.has(chatId)) this.rateLimits.set(chatId, []);
+    const timestamps = this.rateLimits.get(chatId);
+    // Clean old entries
+    while (timestamps.length > 0 && now - timestamps[0] > this.rateLimitWindowMs) timestamps.shift();
+    if (timestamps.length >= this.rateLimitMax) {
+      this.stats.rateLimited++;
+      return false; // Over limit
+    }
+    timestamps.push(now);
+    return true; // Under limit
+  }
+
   async _handleEvent(event) {
+    // Rate limiting — per-user throttle
+    if (event.data?.chatId && !this._checkRateLimit(event.data.chatId)) {
+      const sink = this.sinks[event.source];
+      if (sink) {
+        try { await sink.send(event.data.chatId, '⏳ Slow down! Rate limit reached. Try again in a minute.'); } catch {}
+      }
+      this.log(`[dispatcher] Rate limited ${event.data.chatId}`);
+      return;
+    }
+
     // "While you were away" recap (KAIROS-style)
     if (this.memory && event.data.chatId) {
       const history = this.memory.chats.get(event.data.chatId) || [];

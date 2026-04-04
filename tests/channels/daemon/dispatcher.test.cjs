@@ -254,6 +254,27 @@ describe('Dispatcher', () => {
     });
   });
 
+  describe('Rate Limiting', () => {
+    it('allows messages under limit', () => {
+      assert.equal(dispatcher._checkRateLimit('123'), true);
+      assert.equal(dispatcher._checkRateLimit('123'), true);
+    });
+
+    it('blocks messages over limit', () => {
+      dispatcher.rateLimitMax = 3;
+      for (let i = 0; i < 3; i++) dispatcher._checkRateLimit('456');
+      assert.equal(dispatcher._checkRateLimit('456'), false); // 4th blocked
+    });
+
+    it('different users have independent limits', () => {
+      dispatcher.rateLimitMax = 2;
+      dispatcher._checkRateLimit('a');
+      dispatcher._checkRateLimit('a');
+      assert.equal(dispatcher._checkRateLimit('a'), false); // a blocked
+      assert.equal(dispatcher._checkRateLimit('b'), true);  // b not blocked
+    });
+  });
+
   describe('Stats', () => {
     it('getStats() returns correct shape', () => {
       const stats = dispatcher.getStats();

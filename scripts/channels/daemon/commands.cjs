@@ -247,6 +247,66 @@ class CommandHandler {
         return this._reply(chatId, messageId, `📂 Saved sessions:\n\n${list}`);
       }
 
+      case '/pair': {
+        if (!args) {
+          return this._reply(chatId, messageId,
+            '🔑 Device Pairing\n\n' +
+            'New users request access by running: /pair request\n' +
+            'Owner approves with: /pair approve <code>');
+        }
+        if (args === 'request') {
+          const code = Math.random().toString(36).slice(2, 8);
+          if (!this.dispatcher._pendingPairings) this.dispatcher._pendingPairings = new Map();
+          this.dispatcher._pendingPairings.set(code, { chatId, userId: msgData.userId, timestamp: Date.now() });
+          return this._reply(chatId, messageId,
+            `🔑 Your pairing code: ${code}\n\nAsk the bot owner to run: /pair approve ${code}`);
+        }
+        if (args.startsWith('approve ')) {
+          const code = args.slice(8).trim();
+          const pending = this.dispatcher._pendingPairings?.get(code);
+          if (!pending) return this._reply(chatId, messageId, `❌ Unknown code: ${code}`);
+          this.dispatcher._pendingPairings.delete(code);
+          return this._reply(chatId, messageId, `✅ User ${pending.chatId} approved!`);
+        }
+        return this._reply(chatId, messageId, '🔑 Usage: /pair request | /pair approve <code>');
+      }
+
+      case '/export': {
+        const history = this.memory?.chats.get(chatId) || [];
+        if (history.length === 0) return this._reply(chatId, messageId, '📄 No conversation to export.');
+
+        const fs = require('fs');
+        const path = require('path');
+        const profile = this.memory.getProfile(chatId);
+        const summary = this.memory.summaries.get(chatId) || '';
+
+        let md = `# Chat Export\n\n**Date:** ${new Date().toISOString().split('T')[0]}\n**Messages:** ${history.length}\n\n`;
+        if (profile.facts.length > 0) md += `## Profile\n${profile.facts.map(f => `- ${f}`).join('\n')}\n\n`;
+        if (summary) md += `## Summary\n${summary}\n\n`;
+        md += `## Conversation\n\n`;
+        for (const msg of history) {
+          const ts = msg.timestamp ? msg.timestamp.slice(11, 19) : '';
+          md += msg.role === 'user'
+            ? `**${msg.user}** (${ts}): ${msg.text}\n\n`
+            : `**Assistant** (${ts}): ${msg.text}\n\n`;
+        }
+
+        const tmpDir = path.join(require('os').tmpdir(), 'daemon-export');
+        fs.mkdirSync(tmpDir, { recursive: true });
+        const filePath = path.join(tmpDir, `chat-export-${Date.now()}.md`);
+        fs.writeFileSync(filePath, md, 'utf8');
+
+        // Send as file if sink supports it
+        if (this.sink.sendFile) {
+          await this.sink.sendFile(chatId, filePath, { caption: '📄 Chat export' });
+          try { fs.unlinkSync(filePath); } catch {}
+          return true;
+        }
+        // Fallback: send as text (truncated)
+        try { fs.unlinkSync(filePath); } catch {}
+        return this._reply(chatId, messageId, md.slice(0, 4000));
+      }
+
       case '/approve': {
         const pending = this.dispatcher.pendingApprovals.get(chatId);
         if (!pending) {
