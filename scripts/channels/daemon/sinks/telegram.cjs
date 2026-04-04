@@ -29,6 +29,50 @@ class TelegramSink {
     }
   }
 
+  async sendFile(chatId, filePath, opts = {}) {
+    const fs = require('fs');
+    if (!fs.existsSync(filePath)) return null;
+    const stat = fs.statSync(filePath);
+    if (stat.size > 50 * 1024 * 1024) return null; // 50MB Telegram limit
+    const path = require('path');
+
+    // Use multipart form upload
+    const boundary = '----FormBoundary' + Date.now();
+    const filename = path.basename(filePath);
+    const fileData = fs.readFileSync(filePath);
+    const caption = opts.caption || '';
+
+    const parts = [];
+    parts.push(`--${boundary}\r\nContent-Disposition: form-data; name="chat_id"\r\n\r\n${chatId}`);
+    if (caption) parts.push(`--${boundary}\r\nContent-Disposition: form-data; name="caption"\r\n\r\n${caption}`);
+    if (opts.replyTo) parts.push(`--${boundary}\r\nContent-Disposition: form-data; name="reply_parameters"\r\n\r\n${JSON.stringify({ message_id: Number(opts.replyTo) })}`);
+    parts.push(`--${boundary}\r\nContent-Disposition: form-data; name="document"; filename="${filename}"\r\nContent-Type: application/octet-stream\r\n\r\n`);
+    const epilogue = `\r\n--${boundary}--\r\n`;
+
+    const header = Buffer.from(parts.join('\r\n') + '\r\n');
+    const body = Buffer.concat([header, fileData, Buffer.from(epilogue)]);
+
+    return new Promise((resolve) => {
+      const https = require('https');
+      const req = https.request({
+        hostname: 'api.telegram.org',
+        path: `/bot${this.token}/sendDocument`,
+        method: 'POST',
+        headers: { 'Content-Type': `multipart/form-data; boundary=${boundary}`, 'Content-Length': body.length },
+      }, res => {
+        let data = '';
+        res.on('data', c => data += c);
+        res.on('end', () => {
+          try { const r = JSON.parse(data); resolve(r.ok ? r.result?.message_id : null); }
+          catch { resolve(null); }
+        });
+      });
+      req.on('error', () => resolve(null));
+      req.write(body);
+      req.end();
+    });
+  }
+
   async send(chatId, text, opts = {}) {
     const { replyTo, format } = opts;
     const body = {

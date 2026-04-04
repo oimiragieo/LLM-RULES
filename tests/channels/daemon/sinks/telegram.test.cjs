@@ -122,4 +122,17 @@ describe('TelegramSink', () => {
       return { ok: true, result: { message_id: 999 } };
     };
   });
+
+  it('sendFile() returns null for missing file', async () => {
+    const { TelegramSink } = require('../../../../scripts/channels/daemon/sinks/telegram.cjs');
+    const sink = new TelegramSink('test-token');
+    const result = await sink.sendFile('123', '/nonexistent/file.pdf');
+    assert.equal(result, null);
+  });
+
+  it('sendFile() method exists', () => {
+    const { TelegramSink } = require('../../../../scripts/channels/daemon/sinks/telegram.cjs');
+    const sink = new TelegramSink('test-token');
+    assert.equal(typeof sink.sendFile, 'function');
+  });
 });

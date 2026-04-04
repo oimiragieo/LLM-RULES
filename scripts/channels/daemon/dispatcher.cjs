@@ -244,6 +244,19 @@ class Dispatcher {
         const truncatedResult =
           result.length > 3500 ? result.slice(0, 3500) + '\n\n... (truncated)' : result;
         response = `✅ Task complete:\n\n${truncatedResult}`;
+
+        // Detect file paths in result and send as attachments
+        if (sink.sendFile) {
+          const filePaths = result.match(/(?:\/[\w./-]+|[A-Z]:\\[\w.\\/-]+)\.(?:md|pdf|csv|txt|json|png|jpg|svg|html|xlsx|docx)/gi);
+          if (filePaths) {
+            for (const fp of [...new Set(filePaths)].slice(0, 3)) {
+              try {
+                const sent = await sink.sendFile(event.data.chatId, fp.trim());
+                if (sent) this.log(`[dispatcher] Sent file: ${fp}`);
+              } catch {}
+            }
+          }
+        }
       }
 
       try {
