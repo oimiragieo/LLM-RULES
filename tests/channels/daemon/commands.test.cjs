@@ -277,7 +277,7 @@ describe('CommandHandler', () => {
     it('sets personality with valid name', async () => {
       await handler.handle({ text: '/personality concise', chatId: '123', messageId: 1 });
       assert.ok(sink.sent[0].text.includes('concise'));
-      assert.equal(dispatcher._personality, 'concise');
+      assert.equal(dispatcher._personalities.get('123'), 'concise');
     });
 
     it('rejects unknown personality', async () => {

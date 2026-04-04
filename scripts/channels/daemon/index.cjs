@@ -213,6 +213,40 @@ async function main() {
     log(`Tick engine started (${proactiveConfig.schedules.length} schedules)`);
   }
 
+  // User schedule executor — checks dispatcher._userSchedules every 60s
+  setInterval(() => {
+    const userSchedules = dispatcher._userSchedules;
+    if (!userSchedules || userSchedules.size === 0) return;
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const dow = now.getDay();
+    for (const [chatId, schedules] of userSchedules) {
+      for (const sched of schedules) {
+        // Simple cron check (reuse TimerSource logic)
+        const parts = sched.cron.split(/\s+/);
+        if (parts.length < 5) continue;
+        const [cronMin, cronHour] = parts;
+        const minMatch = cronMin === '*' || parseInt(cronMin) === minute;
+        const hourMatch = cronHour === '*' || parseInt(cronHour) === hour;
+        if (minMatch && hourMatch) {
+          // Dedup key
+          const key = `${sched.cron}:${now.toISOString().split('T')[0]}`;
+          if (!dispatcher._firedSchedules) dispatcher._firedSchedules = new Set();
+          if (dispatcher._firedSchedules.has(key)) continue;
+          dispatcher._firedSchedules.add(key);
+          dispatcher.enqueue({
+            type: 'timer.user-schedule',
+            source: 'telegram',
+            data: { chatId, messageId: 0, user: 'scheduler', userId: 'scheduler', text: sched.prompt },
+            timestamp: now.toISOString(),
+          });
+          log(`[schedule] Fired user schedule for ${chatId}: ${sched.prompt.slice(0, 50)}`);
+        }
+      }
+    }
+  }, 60000);
+
   // ── HTTP Server (like clawhip's axum routes) ─────────────────────────────
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
@@ -362,15 +396,11 @@ async function main() {
             text = `🔔 Webhook (${source}): ${JSON.stringify(payload).slice(0, 300)}`;
           }
 
-          // Dispatch to all configured home channels
+          // Send directly to owner's chat as notification (no Claude processing needed)
           const homeChat = process.env.TELEGRAM_OWNER_CHAT_ID || process.env.TELEGRAM_OWNER_ID;
-          if (homeChat) {
-            dispatcher.enqueue({
-              type: `webhook.${githubEvent || source}`,
-              source: 'telegram',
-              data: { chatId: homeChat, messageId: 0, user: 'webhook', userId: 'webhook', text },
-              timestamp: new Date().toISOString(),
-            });
+          if (homeChat && sinks.telegram) {
+            sinks.telegram.send(homeChat, text).catch(() => {});
+            log(`[webhook] Notified ${homeChat}: ${text.slice(0, 80)}`);
           }
 
           res.statusCode = 200;

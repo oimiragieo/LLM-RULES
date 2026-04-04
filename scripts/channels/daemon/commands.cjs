@@ -337,14 +337,20 @@ class CommandHandler {
           friendly: 'Warm, encouraging, uses emoji freely 😊',
         };
         if (!args) {
-          const current = this.dispatcher._personality || 'default';
+          if (!this.dispatcher._personalities) this.dispatcher._personalities = new Map();
+          const current = this.dispatcher._personalities.get(chatId) || 'default';
           const list = Object.entries(personalities).map(([k, v]) => `${k === current ? '→' : '•'} ${k}: ${v}`).join('\n');
           return this._reply(chatId, messageId, `🎭 Personalities:\n\n${list}\n\nUsage: /personality <name>`);
         }
         if (!personalities[args]) {
           return this._reply(chatId, messageId, `🎭 Unknown personality: ${args}. Use /personality to see options.`);
         }
-        this.dispatcher._personality = args;
+        if (!this.dispatcher._personalities) this.dispatcher._personalities = new Map();
+        if (args === 'default') {
+          this.dispatcher._personalities.delete(chatId);
+        } else {
+          this.dispatcher._personalities.set(chatId, args);
+        }
         return this._reply(chatId, messageId, `🎭 Personality set to: ${args} — ${personalities[args]}`);
       }
 

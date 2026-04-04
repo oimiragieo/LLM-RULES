@@ -180,6 +180,57 @@ class ClaudeRenderer {
     return this.persona + (mod || '');
   }
 
+  _canTranscribe() {
+    try {
+      execSync('transcribe-anything --version', { stdio: 'pipe', timeout: 5000 });
+      return true;
+    } catch { return false; }
+  }
+
+  _transcribeVoice(fileId) {
+    try {
+      const token = process.env.TELEGRAM_BOT_TOKEN;
+      if (!token) return null;
+      const https = require('https');
+      const fs = require('fs');
+      const os = require('os');
+      const path = require('path');
+
+      // Get file path from Telegram
+      const fileInfo = JSON.parse(execSync(
+        `node -e "const https=require('https');https.get('https://api.telegram.org/bot${token}/getFile?file_id=${fileId}',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>console.log(d))})"`,
+        { encoding: 'utf8', timeout: 10000, shell: true }
+      ).trim());
+      if (!fileInfo.ok) return null;
+      const filePath = fileInfo.result.file_path;
+
+      // Download file
+      const tmpDir = path.join(os.tmpdir(), 'daemon-voice');
+      fs.mkdirSync(tmpDir, { recursive: true });
+      const localPath = path.join(tmpDir, `voice-${Date.now()}.ogg`);
+      execSync(
+        `node -e "const https=require('https');const fs=require('fs');const f=fs.createWriteStream('${localPath.replace(/\\/g, '/')}');https.get('https://api.telegram.org/file/bot${token}/${filePath}',r=>r.pipe(f).on('finish',()=>{f.close();console.log('done')}))"`,
+        { encoding: 'utf8', timeout: 30000, shell: true }
+      );
+
+      // Transcribe with Whisper
+      const outDir = path.join(tmpDir, 'out');
+      execSync(`transcribe-anything "${localPath}" --model tiny --output_dir "${outDir}"`, {
+        encoding: 'utf8', timeout: 60000, shell: true
+      });
+
+      // Read transcript
+      const txtFiles = fs.readdirSync(outDir).filter(f => f.endsWith('.txt'));
+      if (txtFiles.length === 0) return null;
+      const transcript = fs.readFileSync(path.join(outDir, txtFiles[0]), 'utf8').trim();
+
+      // Cleanup
+      try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+
+      return transcript || null;
+    } catch { return null; }
+  }
+
   _loadKnowledgeBase() {
     const kbPath = this.businessConfig.knowledgeBase;
     if (!kbPath) return '(No knowledge base configured)';
@@ -233,9 +284,20 @@ class ClaudeRenderer {
     // Handle attachments — tell Claude what was received so it can use [TASK] to process
     const { attachmentType, attachmentFileId } = event.data;
     if (attachmentType === 'voice' || attachmentType === 'audio') {
-      parts.push(
-        `\n${user} sent a voice/audio message (file_id: ${attachmentFileId}). You can use [TASK] to download and transcribe it using Whisper, or ask them to type their message if transcription isn't set up yet.`
-      );
+      // Try to download and transcribe the voice message
+      let transcription = null;
+      if (attachmentFileId && this._canTranscribe()) {
+        transcription = this._transcribeVoice(attachmentFileId);
+      }
+      if (transcription) {
+        parts.push(`\n${user} sent a voice message. Transcription: "${transcription}"`);
+        // Override the text with the transcription so Claude responds to it
+        event.data.text = transcription;
+      } else {
+        parts.push(
+          `\n${user} sent a voice/audio message. Voice transcription is not available. Ask them to type their message instead.`
+        );
+      }
     } else if (attachmentType === 'photo') {
       parts.push(
         `\n${user} sent a photo (file_id: ${attachmentFileId}). You can use [TASK] to download and analyze it, or ask them what they need help with regarding the image.`

@@ -194,8 +194,9 @@ class Dispatcher {
           if (!response) continue; // skip on error
         } else {
           this.log(`[dispatcher] Rendering response for ${event.type} from ${event.data.user}...`);
-          // Apply personality override if set
-          if (this._personality) this.renderer.personalityOverride = this._personality;
+          // Apply per-user personality override
+          const userPersonality = this._personalities?.get(event.data.chatId);
+          this.renderer.personalityOverride = userPersonality || null;
           response = this.renderer.render(event);
         }
         this.log(`[dispatcher] Response: ${response.slice(0, 80)}...`);
@@ -424,10 +425,10 @@ class Dispatcher {
                 ? JSON.stringify(a2aResult.result, null, 2)
                 : a2aResult.error || 'Router accepted task (check router session for results)';
             } else {
-              result = this.executor.executeTask(taskDesc);
+              result = this.executor.executeTaskWithRetry(taskDesc);
             }
           } else {
-            result = this.executor.executeTask(taskDesc);
+            result = this.executor.executeTaskWithRetry(taskDesc);
           }
           this.activeTasks.get(taskId).status = 'completed';
           // Extract skill from successful task
