@@ -56,6 +56,10 @@ class DaemonMemory {
     this.namedSessionsPath = path.join(storageDir, 'named-sessions.json');
     this.namedSessions = new Map();
 
+    // Per-user usage tracking
+    this.usagePath = path.join(storageDir, 'usage.json');
+    this.usage = new Map(); // chatId → { dates: { 'YYYY-MM-DD': { tokens, cost, messages, models: {} } } }
+
     this._load();
   }
 
@@ -314,6 +318,58 @@ class DaemonMemory {
     }
   }
 
+  // ── Usage Tracking ──────────────────────────────────────────────────────
+
+  trackUsage(chatId, model, estimatedTokens) {
+    const today = new Date().toISOString().split('T')[0];
+    const costRates = { haiku: 0.80, sonnet: 3.00, opus: 15.00 };
+    const rate = costRates[model] || 3.00;
+    const cost = (estimatedTokens / 1_000_000) * rate;
+
+    if (!this.usage.has(chatId)) this.usage.set(chatId, { dates: {} });
+    const user = this.usage.get(chatId);
+    if (!user.dates[today]) user.dates[today] = { tokens: 0, cost: 0, messages: 0, models: {} };
+    const day = user.dates[today];
+    day.tokens += estimatedTokens;
+    day.cost += cost;
+    day.messages += 1;
+    day.models[model] = (day.models[model] || 0) + 1;
+    this._saveUsage();
+  }
+
+  getUsage(chatId) {
+    const data = this.usage.get(chatId);
+    if (!data) return { today: null, week: null, month: null };
+
+    const today = new Date().toISOString().split('T')[0];
+    const todayStats = data.dates[today] || null;
+
+    // Aggregate week + month
+    const now = Date.now();
+    let weekTokens = 0, weekCost = 0, weekMsgs = 0;
+    let monthTokens = 0, monthCost = 0, monthMsgs = 0;
+    for (const [date, stats] of Object.entries(data.dates)) {
+      const age = now - new Date(date).getTime();
+      if (age < 7 * 86400000) { weekTokens += stats.tokens; weekCost += stats.cost; weekMsgs += stats.messages; }
+      if (age < 30 * 86400000) { monthTokens += stats.tokens; monthCost += stats.cost; monthMsgs += stats.messages; }
+    }
+
+    return {
+      today: todayStats,
+      week: { tokens: weekTokens, cost: weekCost, messages: weekMsgs },
+      month: { tokens: monthTokens, cost: monthCost, messages: monthMsgs },
+    };
+  }
+
+  _saveUsage() {
+    try {
+      fs.mkdirSync(this.storageDir, { recursive: true });
+      const obj = {};
+      for (const [k, v] of this.usage) obj[k] = v;
+      fs.writeFileSync(this.usagePath, JSON.stringify(obj), 'utf8');
+    } catch {}
+  }
+
   // ── Named Sessions ───────────────────────────────────────────────────────
 
   saveNamedSession(chatId, name) {
@@ -412,6 +468,11 @@ class DaemonMemory {
       if (fs.existsSync(this.namedSessionsPath))
         for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.namedSessionsPath, 'utf8'))))
           this.namedSessions.set(k, v);
+    } catch {}
+    try {
+      if (fs.existsSync(this.usagePath))
+        for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(this.usagePath, 'utf8'))))
+          this.usage.set(k, v);
     } catch {}
   }
 

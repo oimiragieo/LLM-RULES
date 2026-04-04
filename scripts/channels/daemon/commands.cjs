@@ -208,6 +208,17 @@ class CommandHandler {
       case '/model':
         return this._reply(chatId, messageId, '🤖 Current model: sonnet (Sonnet 4.6)');
 
+      case '/usage': {
+        if (!this.memory?.getUsage) return this._reply(chatId, messageId, '📊 Usage tracking not available.');
+        const usage = this.memory.getUsage(chatId);
+        const fmt = (s) => s ? `${s.messages} msgs, ~${Math.round(s.tokens / 1000)}K tokens, ~$${s.cost.toFixed(3)}` : 'none';
+        return this._reply(chatId, messageId,
+          `📊 Your usage:\n\n` +
+          `Today: ${fmt(usage.today)}\n` +
+          `This week: ${fmt(usage.week)}\n` +
+          `This month: ${fmt(usage.month)}`);
+      }
+
       case '/ping':
         return this._reply(chatId, messageId, '🏓 Pong!');
 

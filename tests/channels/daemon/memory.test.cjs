@@ -270,6 +270,42 @@ describe('DaemonMemory', () => {
     });
   });
 
+  describe('Usage Tracking', () => {
+    it('trackUsage increments token count', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      mem.trackUsage('chat1', 'sonnet', 1000);
+      const usage = mem.getUsage('chat1');
+      assert.ok(usage.today);
+      assert.equal(usage.today.tokens, 1000);
+      assert.equal(usage.today.messages, 1);
+      assert.ok(usage.today.cost > 0);
+    });
+
+    it('trackUsage accumulates across calls', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      mem.trackUsage('chat1', 'haiku', 500);
+      mem.trackUsage('chat1', 'sonnet', 2000);
+      const usage = mem.getUsage('chat1');
+      assert.equal(usage.today.tokens, 2500);
+      assert.equal(usage.today.messages, 2);
+      assert.equal(usage.today.models.haiku, 1);
+      assert.equal(usage.today.models.sonnet, 1);
+    });
+
+    it('getUsage returns null for unknown chat', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      const usage = mem.getUsage('nonexistent');
+      assert.equal(usage.today, null);
+    });
+
+    it('cost calculation uses correct rates', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      mem.trackUsage('chat1', 'haiku', 1_000_000); // 1M tokens
+      const usage = mem.getUsage('chat1');
+      assert.ok(Math.abs(usage.today.cost - 0.80) < 0.01); // haiku: $0.80/MTok
+    });
+  });
+
   describe('Stats', () => {
     it('getStats() returns correct shape', () => {
       const mem = new DaemonMemory(tmpDir, {});

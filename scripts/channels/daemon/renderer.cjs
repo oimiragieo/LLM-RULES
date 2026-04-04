@@ -151,6 +151,15 @@ class ClaudeRenderer {
   }
 
   /**
+   * Select the cheapest model that can handle this message.
+   * haiku for trivial, sonnet for regular, configured model for complex.
+   */
+  _selectModel(text) {
+    if (!text || text.length < 30) return 'haiku';
+    return this.model; // sonnet or opus based on config
+  }
+
+  /**
    * Build the prompt from event + memory context.
    * Shared between sync and async render paths.
    */
@@ -199,12 +208,13 @@ class ClaudeRenderer {
    */
   render(event) {
     const prompt = this._buildPrompt(event);
+    const model = this._selectModel(event.data?.text);
     try {
       const env = { ...process.env };
       delete env.ANTHROPIC_API_KEY;
 
       const result = execSync(
-        `claude -p "${prompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 3`,
+        `claude -p "${prompt}" --dangerously-skip-permissions --model ${model} --max-turns 3`,
         {
           cwd: this.projectRoot,
           encoding: 'utf8',
@@ -219,6 +229,11 @@ class ClaudeRenderer {
       const response = result || 'Sorry, I could not generate a response.';
       if (this.memory && event.data.chatId) {
         this.memory.addMessage(event.data.chatId, 'assistant', response);
+        // Track usage: estimate tokens from prompt + response length
+        if (this.memory.trackUsage) {
+          const estimatedTokens = Math.round((prompt.length + response.length) / 4);
+          this.memory.trackUsage(event.data.chatId, model, estimatedTokens);
+        }
       }
       return response;
     } catch (err) {
@@ -238,6 +253,7 @@ class ClaudeRenderer {
    */
   renderStream(event, onChunk) {
     const prompt = this._buildPrompt(event);
+    const model = this._selectModel(event.data?.text);
     const env = { ...process.env };
     delete env.ANTHROPIC_API_KEY;
 
@@ -248,7 +264,7 @@ class ClaudeRenderer {
         process.platform === 'win32'
           ? [
               '/c',
-              `claude -p "${prompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 3`,
+              `claude -p "${prompt}" --dangerously-skip-permissions --model ${model} --max-turns 3`,
             ]
           : [
               '-p',
@@ -336,7 +352,7 @@ class ClaudeRenderer {
       const env = { ...process.env };
       delete env.ANTHROPIC_API_KEY;
       return execSync(
-        `claude -p "${fullPrompt}" --dangerously-skip-permissions --model ${this.model} --max-turns 1`,
+        `claude -p "${fullPrompt}" --dangerously-skip-permissions --model haiku --max-turns 1`,
         {
           cwd: this.projectRoot,
           encoding: 'utf8',
