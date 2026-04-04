@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Task Executor — MCP Tool Awareness + System Prompt Override
+
+#### Added
+
+- **Task executor system prompt** (`task-executor-prompt.txt`) — appended via `--append-system-prompt-file` to override router CLAUDE.md instructions in headless sessions; gives headless agents a task-executor identity with full MCP tool awareness
+- **`claudeSync` append-system-prompt support** — `claude-cli.cjs` now accepts `appendSystemPrompt` and `appendSystemPromptFile` options, with automatic temp file fallback for Windows prompt length limits
+- **Web search in system prompt** — renderer system prompt now lists Exa web search/crawl as available tools for research tasks via `[TASK]` execution
+
 ### Channel Daemon Audit — 18 Bug Fixes
 
 #### Fixed
@@ -18,15 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **[H2] Persist compaction counts** — session rotation now survives daemon restarts via daemon-metadata.json
 - **[H3] System message labels** — compaction transcript now correctly labels system messages instead of misattributing as "Assistant"
 - **[H4] Dream chatId mismatch** — dream prompt now includes explicit list of valid chatIds
-- **[H5] _personalities Map init** — initialized in Dispatcher constructor instead of lazily
+- **[H5] \_personalities Map init** — initialized in Dispatcher constructor instead of lazily
 - **[H6] setImmediate error guards** — all 3 skill extraction callbacks wrapped in try-catch
 - **[H7] Discord reconnect leak** — reconnect timeout cancelled on stop()
 - **[H8] Error stack logging** — dispatcher now logs full stack traces for event processing errors
 - **[M1] Dream state persistence** — lastDream, messagesSinceDream persisted across restarts
-- **[M2] Compaction during render** — _buildPrompt no longer triggers claudeSync mid-render; truncates context instead
+- **[M2] Compaction during render** — \_buildPrompt no longer triggers claudeSync mid-render; truncates context instead
 - **[M3] Event mutation on voice** — voice transcription no longer mutates event.data.text
 - **[M4] Summary slicing** — ACC-style full replacement when summary exceeds budget instead of mid-sentence cut
-- **[M5] Corrupt JSON detection** — _load now logs errors for corrupt memory files instead of silent failure
+- **[M5] Corrupt JSON detection** — \_load now logs errors for corrupt memory files instead of silent failure
 - **[M6] HTTP body size limit** — 1MB cap on /event, /send, and other POST endpoints
 - **[M7] Rate limit off-by-one** — boundary condition fixed (> to >=)
 

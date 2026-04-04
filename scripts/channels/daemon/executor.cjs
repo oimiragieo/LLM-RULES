@@ -10,7 +10,11 @@
 
 const { execSync } = require('child_process');
 const http = require('http');
+const path = require('path');
 const { claudeSync } = require('./claude-cli.cjs');
+
+// Task executor system prompt — overrides router CLAUDE.md for headless sessions
+const TASK_EXECUTOR_PROMPT = path.join(__dirname, 'task-executor-prompt.txt');
 
 class TaskExecutor {
   constructor(config, log) {
@@ -22,6 +26,8 @@ class TaskExecutor {
 
   /**
    * Single-shot task execution via headless claude -p.
+   * Uses --append-system-prompt-file to override router CLAUDE.md
+   * and give the headless session access to MCP tools.
    */
   executeTask(task, context = '') {
     const prompt = context ? `Context: ${context}\n\nTask: ${task}` : task;
@@ -32,6 +38,7 @@ class TaskExecutor {
         maxTurns: 10,
         cwd: this.projectRoot,
         timeout: 300000,
+        appendSystemPromptFile: TASK_EXECUTOR_PROMPT,
       });
 
       return result || 'Task completed but produced no output.';

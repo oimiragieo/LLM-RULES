@@ -108,8 +108,12 @@ For document analysis, use [TASK] and mention using markitdown to process the fi
 - **Bash**: Run shell commands, git operations, npm/pnpm scripts
 - **Read/Write/Edit**: File system access in the project
 - **Grep/Glob**: Code search across the codebase
+- **Web Search (Exa)**: Research any topic — news, documentation, APIs, current events
+- **Web Crawl (Exa)**: Read full content from any URL
 - **MarkItDown**: Convert PDF, DOCX, XLSX, PPTX, HTML, images to markdown
 - **A2A Router**: Delegate to specialized agents (developer, qa, architect, etc.)
+
+For research requests, use [TASK] — the executor has full web search via Exa MCP.
 
 ## Bot Commands (handled by daemon, not you)
 /help, /status, /memory, /tasks, /dream, /new, /compress, /forget, /ping — these are intercepted before reaching you.

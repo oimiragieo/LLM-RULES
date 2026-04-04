@@ -2,8 +2,8 @@
  * claude-cli.cjs — Safe Claude CLI wrapper for the channel daemon
  *
  * Uses spawnSync with array arguments to avoid shell injection (SEC-011).
- * For prompts exceeding Windows cmd.exe 8191-char limit, writes to a temp
- * file and pipes via stdin.
+ * For prompts exceeding Windows cmd.exe 8191-char limit, pipes via stdin.
+ * Supports --append-system-prompt to override router CLAUDE.md for headless tasks.
  *
  * All daemon modules should use this instead of execSync with string interpolation.
  */
@@ -18,8 +18,31 @@ const os = require('os');
 const WIN_CMD_LIMIT = 7000;
 
 /**
+ * Build the args array for claude CLI.
+ */
+function _buildArgs(prompt, { model, maxTurns, appendSystemPrompt, appendSystemPromptFile }) {
+  const args = [
+    '-p',
+    prompt,
+    '--dangerously-skip-permissions',
+    '--model',
+    model,
+    '--max-turns',
+    maxTurns,
+  ];
+
+  if (appendSystemPromptFile) {
+    args.push('--append-system-prompt-file', appendSystemPromptFile);
+  } else if (appendSystemPrompt) {
+    args.push('--append-system-prompt', appendSystemPrompt);
+  }
+
+  return args;
+}
+
+/**
  * Run `claude -p <prompt>` safely with array arguments.
- * For long prompts on Windows, writes prompt to a temp file and pipes via stdin.
+ * For long prompts on Windows, pipes via stdin.
  *
  * @param {string} prompt - The prompt text (no escaping needed)
  * @param {Object} [opts]
@@ -28,6 +51,8 @@ const WIN_CMD_LIMIT = 7000;
  * @param {string} [opts.cwd] - Working directory
  * @param {number} [opts.timeout=120000] - Timeout in ms
  * @param {Object} [opts.env] - Additional env vars (ANTHROPIC_API_KEY is always removed)
+ * @param {string} [opts.appendSystemPrompt] - Text appended to the default system prompt
+ * @param {string} [opts.appendSystemPromptFile] - File path appended to the default system prompt
  * @returns {string} Trimmed stdout
  */
 function claudeSync(prompt, opts = {}) {
@@ -38,21 +63,18 @@ function claudeSync(prompt, opts = {}) {
   const maxTurns = String(opts.maxTurns || 3);
   const cwd = opts.cwd || process.cwd();
   const timeout = opts.timeout || 120000;
+  const appendSystemPrompt = opts.appendSystemPrompt || '';
+  const appendSystemPromptFile = opts.appendSystemPromptFile || '';
+
+  const argOpts = { model, maxTurns, appendSystemPrompt, appendSystemPromptFile };
 
   // On Windows with long prompts, use stdin piping to avoid cmd.exe 8191 char limit
-  if (process.platform === 'win32' && prompt.length > WIN_CMD_LIMIT) {
-    return _claudeSyncViaStdin(prompt, { model, maxTurns, cwd, timeout, env });
+  const totalLen = prompt.length + appendSystemPrompt.length;
+  if (process.platform === 'win32' && totalLen > WIN_CMD_LIMIT) {
+    return _claudeSyncViaFile(prompt, { ...argOpts, cwd, timeout, env });
   }
 
-  const args = [
-    '-p',
-    prompt,
-    '--dangerously-skip-permissions',
-    '--model',
-    model,
-    '--max-turns',
-    maxTurns,
-  ];
+  const args = _buildArgs(prompt, argOpts);
 
   const result = spawnSync('claude', args, {
     cwd,
@@ -69,27 +91,37 @@ function claudeSync(prompt, opts = {}) {
 }
 
 /**
- * Long-prompt fallback: write prompt to temp file, pass path via -p flag with @file syntax,
- * or pipe via stdin. Uses temp file approach for reliability on Windows.
+ * Long-prompt fallback: use --append-system-prompt-file for the system prompt
+ * and stdin piping for the user prompt when they exceed Windows limits.
  */
-function _claudeSyncViaStdin(prompt, { model, maxTurns, cwd, timeout, env }) {
+function _claudeSyncViaFile(
+  prompt,
+  { model, maxTurns, appendSystemPrompt, appendSystemPromptFile, cwd, timeout, env }
+) {
   const tmpDir = path.join(os.tmpdir(), 'daemon-claude');
   fs.mkdirSync(tmpDir, { recursive: true });
-  const tmpFile = path.join(tmpDir, `prompt-${Date.now()}-${process.pid}.txt`);
+  const tmpSysFile = path.join(tmpDir, `sys-${Date.now()}-${process.pid}.txt`);
 
   try {
-    fs.writeFileSync(tmpFile, prompt, 'utf8');
+    // If we have an inline system prompt, write it to a temp file
+    let sysFile = appendSystemPromptFile;
+    if (appendSystemPrompt && !appendSystemPromptFile) {
+      fs.writeFileSync(tmpSysFile, appendSystemPrompt, 'utf8');
+      sysFile = tmpSysFile;
+    }
 
-    // Use stdin piping: write prompt to stdin of claude process
     const args = [
       '-p',
-      '-',
+      prompt,
       '--dangerously-skip-permissions',
       '--model',
       model,
       '--max-turns',
       maxTurns,
     ];
+    if (sysFile) {
+      args.push('--append-system-prompt-file', sysFile);
+    }
 
     const result = spawnSync('claude', args, {
       cwd,
@@ -98,7 +130,6 @@ function _claudeSyncViaStdin(prompt, { model, maxTurns, cwd, timeout, env }) {
       env,
       windowsHide: true,
       shell: true,
-      input: prompt,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
@@ -106,7 +137,7 @@ function _claudeSyncViaStdin(prompt, { model, maxTurns, cwd, timeout, env }) {
     return (result.stdout || '').trim();
   } finally {
     try {
-      fs.unlinkSync(tmpFile);
+      fs.unlinkSync(tmpSysFile);
     } catch {
       /* ignored */
     }
