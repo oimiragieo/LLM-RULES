@@ -272,6 +272,7 @@ tests/fixtures/hybrid-search-cli/
 tests/fixtures/install-security-test/
 tests/fixtures/outside-target/
 tests/fixtures/code-indexing/hook-test/.claude/context/code-index/
+tests/fixtures/sample-code-large/
 
 # Old fragmented test directories (DEPRECATED - moved to tests/)
 .test-data/
