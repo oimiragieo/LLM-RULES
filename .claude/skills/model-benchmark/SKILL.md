@@ -228,10 +228,10 @@ In addition to the markdown report, generate a machine-readable JSON report at t
     }
   ],
   "dimensions": {
-    "accuracy": { "score": 0.85, "weight": 0.30, "weighted": 0.255 },
-    "latency": { "score": 0.72, "weight": 0.20, "weighted": 0.144 },
-    "memory": { "score": 0.90, "weight": 0.15, "weighted": 0.135 },
-    "cost": { "score": 0.60, "weight": 0.20, "weighted": 0.120 },
+    "accuracy": { "score": 0.85, "weight": 0.3, "weighted": 0.255 },
+    "latency": { "score": 0.72, "weight": 0.2, "weighted": 0.144 },
+    "memory": { "score": 0.9, "weight": 0.15, "weighted": 0.135 },
+    "cost": { "score": 0.6, "weight": 0.2, "weighted": 0.12 },
     "safety": { "score": 0.95, "weight": 0.15, "weighted": 0.1425 }
   },
   "composite": 0.7965,

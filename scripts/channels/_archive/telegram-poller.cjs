@@ -57,7 +57,9 @@ function loadAllowed() {
   try {
     const data = JSON.parse(fs.readFileSync(accessPath, 'utf8'));
     (data.allowFrom || []).forEach(id => allowed.add(String(id)));
-  } catch {}
+  } catch {
+    /* empty */
+  }
   return allowed;
 }
 
@@ -93,7 +95,7 @@ function telegramApi(token, method, body) {
 }
 
 // Get Claude response for a message
-function getClaudeResponse(text, chatId) {
+function getClaudeResponse(text, _chatId) {
   const authToken = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_OAUTH_TOKEN || '';
   const prompt = `A Telegram user sent this message: "${text.replace(/"/g, '\\"')}". Write a helpful, concise response (under 500 chars). Just the response text, nothing else.`;
   try {
@@ -111,6 +113,7 @@ function getClaudeResponse(text, chatId) {
 }
 
 // Main polling loop
+// eslint-disable-next-line complexity
 async function main() {
   loadEnv();
   const token = (process.env.TELEGRAM_BOT_TOKEN || '').trim();
@@ -132,7 +135,9 @@ async function main() {
   try {
     await telegramApi(token, 'getUpdates?timeout=0');
     log('Cleared competing connections');
-  } catch {}
+  } catch {
+    /* empty */
+  }
 
   while (true) {
     try {

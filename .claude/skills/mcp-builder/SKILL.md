@@ -444,21 +444,23 @@ After building an MCP server, auto-detect which AI coding agents are installed o
 
 **Supported agents and their config locations:**
 
-| Agent | Transport | Config Path (Windows) | Config Path (macOS/Linux) |
-|-------|-----------|----------------------|--------------------------|
-| Claude Code | stdio | `~/.claude.json` | `~/.claude.json` |
-| Cursor | HTTP | `%APPDATA%\Cursor\mcp_settings.json` | `~/Library/Application Support/Cursor/mcp_settings.json` |
-| Windsurf | HTTP | `%APPDATA%\Windsurf\mcp_config.json` | `~/Library/Application Support/Windsurf/mcp_config.json` |
-| VS Code + Cline | stdio | `%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json` | `~/.config/Code/User/globalStorage/...` |
-| IntelliJ IDEA | HTTP | `%APPDATA%\JetBrains\IntelliJIdea2024.3\mcp.xml` | `~/Library/Application Support/JetBrains/...` |
+| Agent           | Transport | Config Path (Windows)                                                                       | Config Path (macOS/Linux)                                |
+| --------------- | --------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Claude Code     | stdio     | `~/.claude.json`                                                                            | `~/.claude.json`                                         |
+| Cursor          | HTTP      | `%APPDATA%\Cursor\mcp_settings.json`                                                        | `~/Library/Application Support/Cursor/mcp_settings.json` |
+| Windsurf        | HTTP      | `%APPDATA%\Windsurf\mcp_config.json`                                                        | `~/Library/Application Support/Windsurf/mcp_config.json` |
+| VS Code + Cline | stdio     | `%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json` | `~/.config/Code/User/globalStorage/...`                  |
+| IntelliJ IDEA   | HTTP      | `%APPDATA%\JetBrains\IntelliJIdea2024.3\mcp.xml`                                            | `~/Library/Application Support/JetBrains/...`            |
 
 **Detection protocol:**
+
 1. Check if each config file exists at the platform-appropriate path
 2. For each detected agent, generate the MCP server config snippet in the agent's format
 3. Present all detected agents to the user with one-click install instructions
 4. For agents using HTTP transport, include the default port and health check URL
 
 **Config generation template** (Claude Code stdio example):
+
 ```json
 {
   "mcpServers": {

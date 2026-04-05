@@ -76,20 +76,22 @@ When synthesizing from 2+ sources, actively detect and flag contradictions. This
 
 **Conflict types to detect:**
 
-| Conflict Type | Example | Resolution Strategy |
-|---------------|---------|-------------------|
-| Version mismatch | Source A says "use v2 API", Source B says "v3 is required" | Flag with dates, prefer most recent |
-| Contradictory advice | Source A says "always use ORM", Source B says "raw SQL for performance" | Flag both with context, let decision-maker choose |
-| Deprecated patterns | Source A recommends pattern that Source B marks deprecated | Flag with deprecation notice, prefer Source B |
-| Incompatible implementations | Source A uses callbacks, Source B uses async/await | Flag with migration path if available |
+| Conflict Type                | Example                                                                 | Resolution Strategy                               |
+| ---------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------- |
+| Version mismatch             | Source A says "use v2 API", Source B says "v3 is required"              | Flag with dates, prefer most recent               |
+| Contradictory advice         | Source A says "always use ORM", Source B says "raw SQL for performance" | Flag both with context, let decision-maker choose |
+| Deprecated patterns          | Source A recommends pattern that Source B marks deprecated              | Flag with deprecation notice, prefer Source B     |
+| Incompatible implementations | Source A uses callbacks, Source B uses async/await                      | Flag with migration path if available             |
 
 **Detection protocol:**
+
 1. After collecting findings from all sources, build a **claim matrix** — extract factual claims from each source
 2. Compare claims pairwise for contradictions using semantic overlap (same topic, different recommendation)
 3. For each conflict, record: `{ claim_a, source_a, claim_b, source_b, conflictType, suggestedResolution }`
 4. Include a `conflicts` section in the synthesis report — **never silently pick one side**
 
 **Conflict output in report:**
+
 ```markdown
 ### Conflicts Detected (2)
 

@@ -427,9 +427,10 @@ main().catch(() => process.exit(1));
     delete env.ANTHROPIC_API_KEY;
 
     return new Promise((resolve, _reject) => {
+      // Use -p - to read prompt from stdin (avoids Windows shell quoting issues)
       const args = [
         '-p',
-        prompt,
+        '-',
         '--dangerously-skip-permissions',
         '--model',
         model,
@@ -444,6 +445,10 @@ main().catch(() => process.exit(1));
         shell: true,
         stdio: ['pipe', 'pipe', 'pipe'],
       });
+
+      // Write prompt to stdin
+      child.stdin.write(prompt);
+      child.stdin.end();
 
       let accumulated = '';
       let lastChunkTime = 0;

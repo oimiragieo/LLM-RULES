@@ -546,15 +546,16 @@ Quick project type detection
 
 When classifying files, directories, or components into categories, use weighted keyword scoring instead of simple string matching to prevent false positives:
 
-| Signal Source | Score Weight | Example |
-|---------------|-------------|---------|
-| File path/URL | 3 points | `/api/routes/` matches "API" category |
-| File/class name | 2 points | `AuthService.ts` matches "Authentication" |
-| File content/imports | 1 point | `import express` matches "Backend" |
+| Signal Source        | Score Weight | Example                                   |
+| -------------------- | ------------ | ----------------------------------------- |
+| File path/URL        | 3 points     | `/api/routes/` matches "API" category     |
+| File/class name      | 2 points     | `AuthService.ts` matches "Authentication" |
+| File content/imports | 1 point      | `import express` matches "Backend"        |
 
 **Threshold**: Require 2+ total points before assigning a category. Falls back to "other" if no category scores above threshold. This prevents weak single-signal matches from misclassifying components.
 
 **Category keywords** (extend per project type):
+
 - **API**: route, endpoint, controller, handler, middleware, api, rest, graphql
 - **Auth**: auth, login, session, jwt, oauth, token, credential, permission
 - **Database**: model, schema, migration, seed, repository, entity, query
@@ -573,6 +574,7 @@ For comprehensive project understanding, analyze three parallel streams:
 **Stream 3 — Community/Operations**: Git activity (commit frequency, contributor count), CI/CD configuration, issue templates, PR templates, release workflow, Docker/container setup.
 
 Combine all three streams into the output JSON under `analysis.streams`:
+
 ```json
 {
   "streams": {
@@ -588,17 +590,18 @@ Combine all three streams into the output JSON under `analysis.streams`:
 
 Detect common design patterns with confidence scoring:
 
-| Pattern | Detection Signal | Confidence Threshold |
-|---------|-----------------|---------------------|
-| Singleton | Private constructor + static instance | 0.80 |
-| Factory | `create*` methods returning interface types | 0.70 |
-| Observer | `subscribe`/`on`/`emit`/`addEventListener` | 0.70 |
-| Strategy | Interface + multiple implementations | 0.60 |
-| Decorator | Wrapper classes with same interface | 0.60 |
-| Repository | Data access layer abstraction | 0.70 |
-| Middleware | Chain-of-responsibility in request pipeline | 0.70 |
+| Pattern    | Detection Signal                            | Confidence Threshold |
+| ---------- | ------------------------------------------- | -------------------- |
+| Singleton  | Private constructor + static instance       | 0.80                 |
+| Factory    | `create*` methods returning interface types | 0.70                 |
+| Observer   | `subscribe`/`on`/`emit`/`addEventListener`  | 0.70                 |
+| Strategy   | Interface + multiple implementations        | 0.60                 |
+| Decorator  | Wrapper classes with same interface         | 0.60                 |
+| Repository | Data access layer abstraction               | 0.70                 |
+| Middleware | Chain-of-responsibility in request pipeline | 0.70                 |
 
 Output detected patterns in the analysis JSON with location, confidence, and evidence:
+
 ```json
 {
   "patterns": [

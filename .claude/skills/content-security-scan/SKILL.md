@@ -371,6 +371,7 @@ The 7-step gate can be extended with custom scan stages for domain-specific thre
 ```
 
 **Stage properties:**
+
 - `name`: unique identifier for the stage
 - `type`: `builtin` (use existing Steps 1-6) or `custom` (regex-based pattern matching)
 - `target`: `all` (full content), `prose` (outside code fences), `code` (inside code fences only)

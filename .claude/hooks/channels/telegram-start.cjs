@@ -47,7 +47,9 @@ function isDaemonRunning() {
       process.kill(pid, 0);
       return true;
     }
-  } catch {}
+  } catch {
+    /* ignored */
+  }
 
   // Check HTTP health endpoint
   return new Promise(resolve => {

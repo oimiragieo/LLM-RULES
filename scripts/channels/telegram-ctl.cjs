@@ -22,7 +22,7 @@ const PORT = process.env.CHANNEL_DAEMON_PORT || 3101;
 const cmd = process.argv[2] || 'status';
 
 function httpGet(urlPath) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     const req = http.get(`http://127.0.0.1:${PORT}${urlPath}`, res => {
       let data = '';
       res.on('data', c => (data += c));
@@ -54,7 +54,9 @@ async function main() {
           stdio: ['pipe', 'inherit', 'inherit'],
           timeout: 10000,
         });
-      } catch {}
+      } catch {
+        /* empty */
+      }
       // Wait for daemon to come up
       await new Promise(r => setTimeout(r, 3000));
       const check = await httpGet('/status');

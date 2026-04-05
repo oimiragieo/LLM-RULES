@@ -105,10 +105,14 @@ function runMain(sessionId) {
     // Channel not running despite sentinel — clear and retry
     try {
       fs.unlinkSync(CHANNEL_SENTINEL_PATH);
-    } catch (_) {}
+    } catch (_) {
+      /* ignored */
+    }
     try {
       fs.unlinkSync(LOCKFILE);
-    } catch (_) {}
+    } catch (_) {
+      /* ignored */
+    }
     process.stderr.write(
       '[channel-auto-start] Sentinel exists but channel not running — retrying\n'
     );
