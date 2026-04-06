@@ -20,6 +20,12 @@ class TaskExecutor {
   constructor(config, log) {
     this.model = config.model || 'sonnet';
     this.projectRoot = config.projectRoot || process.cwd();
+    // Track whether cwd was explicitly provided vs system-defaulted.
+    // Used by sendToRouter to decide whether to forward cwd in JSON-RPC
+    // payloads — omitting it lets the remote host use its own default,
+    // which avoids cross-platform path mismatches (WSL↔Windows, Docker,
+    // remote). See OpenClaw #58977 pattern: explicit-vs-default CWD.
+    this._cwdExplicit = config.projectRoot != null;
     this.a2aPort = config.a2aPort || 3100;
     this.log = log || console.log;
   }
@@ -225,6 +231,15 @@ class TaskExecutor {
   // eslint-disable-next-line require-await
   async sendToRouter(prompt, agentType = 'developer') {
     return new Promise(resolve => {
+      // Only forward cwd to the A2A router when it was explicitly provided.
+      // If cwd was system-defaulted (process.cwd()), omit it so the remote
+      // host uses its own default — prevents cross-platform path mismatches
+      // (WSL↔Windows, Docker, remote). See OpenClaw #58977.
+      const metadata = { agentType };
+      if (this._cwdExplicit) {
+        metadata.cwd = this.projectRoot;
+      }
+
       const body = JSON.stringify({
         jsonrpc: '2.0',
         id: Date.now().toString(),
@@ -234,7 +249,7 @@ class TaskExecutor {
             role: 'user',
             parts: [{ type: 'text', text: prompt }],
           },
-          metadata: { agentType },
+          metadata,
         },
       });
 

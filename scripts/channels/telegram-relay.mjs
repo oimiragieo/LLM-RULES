@@ -126,6 +126,44 @@ function enqueueMessage(msg) {
   if (messageQueue.length > MAX_QUEUE_SIZE) messageQueue.shift();
 }
 
+// 1c. Approval availability decoupled from delivery routing (OpenClaw #59776 pattern)
+//
+// Previously, TELEGRAM_DISABLE_POLLING=1 killed both message delivery AND approval relay,
+// because approval broadcasts went through sendTelegramMessage which requires polling to
+// receive yes/no verdict replies. This decoupling separates two concerns:
+//   - "Can we show approvals?" → canShowApprovals() — true if approvers are configured
+//   - "Is delivery active?" → isDeliveryActive() — true if polling loop is running
+//
+// When polling is off but approvers exist, approval requests are queued in pendingApprovals
+// so they can be retrieved via the check_messages tool (pull-based pattern).
+
+const pendingApprovals = [];
+const MAX_PENDING_APPROVALS = 50;
+let pollingActive = false;
+
+/**
+ * Returns true if there are configured approvers (allowed users) regardless of polling state.
+ * Approvers can respond to permission requests even if delivery routing is disabled,
+ * as long as there is a pull-based mechanism (check_messages) to surface the requests.
+ */
+function canShowApprovals() {
+  return allowAll || allowed.size > 0;
+}
+
+/**
+ * Returns true if the Telegram polling loop is actively running.
+ * When false, messages and approval verdicts cannot be received via push;
+ * they must be retrieved via check_messages (pull-based).
+ */
+function isDeliveryActive() {
+  return pollingActive;
+}
+
+function enqueuePendingApproval(approval) {
+  pendingApprovals.push(approval);
+  if (pendingApprovals.length > MAX_PENDING_APPROVALS) pendingApprovals.shift();
+}
+
 // 2. Initialize MCP Server
 const mcp = new Server(
   { name: 'telegram-relay', version: '1.0.0' },
@@ -215,9 +253,10 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'check_messages',
       description:
-        'Check for new Telegram messages. Returns all messages received since last check. ' +
-        'Call this periodically (every 10-30s) to monitor Telegram. Returns empty array if no new messages. ' +
-        'Each message has: chat_id, message_id, user, text, and optionally attachment_file_id.',
+        'Check for new Telegram messages and pending approval requests. Returns all messages received since last check. ' +
+        'Call this periodically (every 10-30s) to monitor Telegram. Returns "No new messages" if nothing pending. ' +
+        'Response contains: messages (with chat_id, message_id, user, text, optionally attachment_file_id) ' +
+        'and/or pending_approvals (permission requests queued when polling is disabled).',
       inputSchema: {
         type: 'object',
         properties: {
@@ -300,11 +339,26 @@ mcp.setRequestHandler(CallToolRequestSchema, async req => {
     const limit = req.params.arguments?.limit;
     const count = limit && limit > 0 ? Math.min(limit, messageQueue.length) : messageQueue.length;
     const messages = messageQueue.splice(0, count);
+
+    // Drain pending approvals alongside messages (OpenClaw #59776: pull-based approval retrieval)
+    const approvals = pendingApprovals.splice(0, pendingApprovals.length);
+
+    const hasMessages = messages.length > 0;
+    const hasApprovals = approvals.length > 0;
+
+    if (!hasMessages && !hasApprovals) {
+      return { content: [{ type: 'text', text: 'No new messages' }] };
+    }
+
+    const result = {};
+    if (hasMessages) result.messages = messages;
+    if (hasApprovals) result.pending_approvals = approvals;
+
     return {
       content: [
         {
           type: 'text',
-          text: messages.length === 0 ? 'No new messages' : JSON.stringify(messages, null, 2),
+          text: JSON.stringify(result, null, 2),
         },
       ],
     };
@@ -329,9 +383,28 @@ mcp.setNotificationHandler(PermissionRequestSchema, async ({ params }) => {
     (params.input_preview ? `\n\`\`\`\n${params.input_preview}\n\`\`\`\n\n` : `\n`) +
     `Reply "yes ${params.request_id}" or "no ${params.request_id}"`;
 
-  // Broadcast the prompt to all configured authorized users
-  for (const chatId of allowed) {
-    await sendTelegramMessage(chatId, prompt);
+  if (!canShowApprovals()) {
+    // No approvers configured — silently drop (same as before)
+    return;
+  }
+
+  if (isDeliveryActive()) {
+    // Polling is on — broadcast to all approvers via Telegram push (existing behavior)
+    for (const chatId of allowed) {
+      await sendTelegramMessage(chatId, prompt);
+    }
+  } else {
+    // Polling is off but approvers exist — queue for pull-based retrieval via check_messages
+    // (OpenClaw #59776: decouple approval availability from delivery routing)
+    enqueuePendingApproval({
+      type: 'permission_request',
+      request_id: params.request_id,
+      tool_name: params.tool_name,
+      description: params.description,
+      input_preview: params.input_preview || '',
+      prompt,
+      queued_at: new Date().toISOString(),
+    });
   }
 });
 
@@ -433,7 +506,15 @@ async function pollTelegram() {
 // Begin polling — unless TELEGRAM_DISABLE_POLLING is set (e.g., when a standalone
 // poller handles Telegram API directly and this MCP server only serves tools).
 if (process.env.TELEGRAM_DISABLE_POLLING !== '1') {
+  pollingActive = true;
   pollTelegram();
 } else {
-  console.error('[telegram-relay] Polling disabled (TELEGRAM_DISABLE_POLLING=1). Tools-only mode.');
+  // Polling disabled — approval requests will be queued for pull-based retrieval
+  // via check_messages if approvers are configured (OpenClaw #59776 decoupling).
+  const approverStatus = canShowApprovals()
+    ? `Approvals available via check_messages (${allowed.size} approver(s) configured).`
+    : 'No approvers configured.';
+  console.error(
+    `[telegram-relay] Polling disabled (TELEGRAM_DISABLE_POLLING=1). Tools-only mode. ${approverStatus}`
+  );
 }

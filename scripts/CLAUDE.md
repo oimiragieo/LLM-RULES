@@ -150,7 +150,7 @@ Telegram channel daemon and integration. See `scripts/channels/README.md` for fu
 | Script               | Purpose                                                                              |
 | -------------------- | ------------------------------------------------------------------------------------ |
 | `telegram-relay.mjs` | MCP server — tools-only mode in main session (`TELEGRAM_DISABLE_POLLING=1`)          |
-| `telegram-ctl.cjs`   | CLI: `start` / `stop` / `status` / `restart` the channel daemon                      |
+| `telegram-ctl.cjs`   | CLI: `start` / `stop` / `status` / `restart` / `doctor [--fix]` the channel daemon   |
 | `daemon/`            | Standalone channel daemon (11 files) — clawhip-style event router with KAIROS memory |
 | `_archive/`          | Archived: old VBScript/BAT system, manual launcher, intermediate poller              |
 

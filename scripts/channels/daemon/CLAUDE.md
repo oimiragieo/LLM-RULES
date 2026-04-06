@@ -20,6 +20,10 @@ Standalone channel daemon for Agent Studio. Inspired by [clawhip](https://github
 
 Main daemon entry point. Creates HTTP server (port 3101), wires sources/sinks/renderer/memory/commands, spawns Telegram source, starts auto-dream timer (10-minute check interval). HTTP routes: `/health`, `/status`, `/send`, `/history`, `/memory`, `/dream`, `/event`, `/stop`. CLI flags: `--status`, `--stop`. Writes PID file, handles SIGTERM/SIGINT graceful shutdown.
 
+### `../telegram-ctl.cjs` (parent directory)
+
+CLI control script. Commands: `start`, `stop`, `status`, `restart`, `doctor` (validate config), `doctor --fix` (validate + auto-repair). The `doctor` subcommand checks directories, TELEGRAM_BOT_TOKEN, access.json validity, env/access.json allowlist conflicts, and config.json structure. Each check returns `{status, changes[]}` tuples. `--fix` auto-creates missing files with defaults, merges orphaned env allowlists into access.json, and backs up corrupt files before replacing.
+
 ### `config.cjs`
 
 Configuration loader. Reads from `.env` (via `loadDotenv`) and `~/.claude/channels/config.json`. Builds allowed users set from `TELEGRAM_ALLOWED_USERS`, `TELEGRAM_OWNER_ID`, and `~/.claude/channels/telegram/access.json`. Exports source configs, renderer config, daemon port, and route definitions. Default port: 3101.
