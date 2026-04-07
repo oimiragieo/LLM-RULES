@@ -8,11 +8,25 @@ Standalone channel daemon for Agent Studio. Inspired by [clawhip](https://github
 [Sources] → [Dispatcher + Router] → [Renderer (Claude -p)] → [Sinks]
   (Telegram,     ↕         ↕              ↕          ↕
    Webhook,  [Commands] [Rate Limit] [Model Router] [Skills Engine]
-   Timer)    [Executor]              [Personality]   [3-Tier Memory]
-              (TASK/RALPH/           [Skill Inject]  [Dream Engine]
-               ULTRAWORK/
-               INTERVIEW)
+   Timer)    [TaskPool]              [Personality]   [3-Tier Memory]
+              ↕ (async)              [Skill Inject]  [Dream Engine]
+         [Executor Async]
+         (TASK/RALPH/ULTRAWORK
+          run as background
+          child processes)
 ```
+
+### Non-Blocking Task Execution (v1.1.0)
+
+Task execution is **fully asynchronous**. When Claude responds with `[TASK]`, `[RALPH]`, or `[ULTRAWORK]`, the dispatcher spawns the work into a **TaskPool** and immediately continues processing the message queue. The user can send new messages, check task status, and spawn additional tasks while others run in the background.
+
+**Key components:**
+
+- `task-pool.cjs` — Concurrent task routing table (EventEmitter). Tracks running/queued/completed tasks. Configurable concurrency limit (default 3). Supports cancel, timeout, and drain.
+- `claudeAsync()` in `claude-cli.cjs` — Non-blocking `spawn`-based wrapper alongside `claudeSync()`. Returns `{ child, promise, cancel }`.
+- `executeTaskAsync()` / `executeRalphLoopAsync()` in `executor.cjs` — Async task execution methods. Rate limit retry uses `setTimeout` (not busy-wait).
+- Pool event handlers in `dispatcher._wirePoolEvents()` — Deliver results, update memory, extract skills when background tasks complete.
+- `/cancel <id>` command — Kill a running task from Telegram.
 
 ## Files
 

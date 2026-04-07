@@ -11,7 +11,7 @@
 const { execSync } = require('child_process');
 const http = require('http');
 const path = require('path');
-const { claudeSync } = require('./claude-cli.cjs');
+const { claudeSync, claudeAsync } = require('./claude-cli.cjs');
 
 // Task executor system prompt — overrides router CLAUDE.md for headless sessions
 const TASK_EXECUTOR_PROMPT = path.join(__dirname, 'task-executor-prompt.txt');
@@ -134,6 +134,192 @@ class TaskExecutor {
         ? '⚠️ Max iterations reached'
         : `✅ Completed in ${iteration} iteration(s)`;
     return `${status}\n\n${lastResult}`;
+  }
+
+  // ========================================================================
+  // ASYNC METHODS — non-blocking versions for the task pool
+  // ========================================================================
+
+  /**
+   * Internal async Claude wrapper — mockable for tests.
+   * @private
+   */
+  _claudeAsync(prompt, opts = {}) {
+    return claudeAsync(prompt, opts);
+  }
+
+  /**
+   * Non-blocking single-shot task execution.
+   * Returns { promise, cancel } — does NOT block the event loop.
+   */
+  executeTaskAsync(task, context = '') {
+    const prompt = context ? `Context: ${context}\n\nTask: ${task}` : task;
+
+    const handle = this._claudeAsync(prompt, {
+      model: this.model,
+      maxTurns: 10,
+      timeout: 300000,
+      useWorkspace: true,
+      projectRoot: this.projectRoot,
+      appendSystemPromptFile: TASK_EXECUTOR_PROMPT,
+    });
+
+    return {
+      promise: handle.promise.then(
+        result => (result || 'Task completed but produced no output.').trim(),
+        err => {
+          throw err;
+        }
+      ),
+      cancel: handle.cancel,
+      child: handle.child,
+    };
+  }
+
+  /**
+   * Non-blocking Ralph loop — iterative verify/fix.
+   * Returns { promise, cancel }.
+   */
+  executeRalphLoopAsync(task, opts = {}) {
+    const maxIterations = opts.maxIterations || 5;
+    const onProgress = opts.onProgress || (() => {});
+
+    let cancelled = false;
+    let currentHandle = null;
+
+    const cancel = () => {
+      cancelled = true;
+      if (currentHandle && currentHandle.cancel) currentHandle.cancel();
+    };
+
+    const promise = (async () => {
+      let lastResult = '';
+
+      for (let iteration = 1; iteration <= maxIterations; iteration++) {
+        if (cancelled) throw new Error('cancelled');
+
+        onProgress(`\u{1f504} Ralph iteration ${iteration}/${maxIterations}...`);
+        this.log(`[executor] Ralph async iteration ${iteration}: ${task.slice(0, 60)}`);
+
+        const prompt =
+          iteration === 1
+            ? task
+            : `Previous iteration result:\n${lastResult.slice(0, 2000)}\n\nContinue working on: ${task}\n\nFix any remaining issues. If everything passes, say RALPH_COMPLETE.`;
+
+        currentHandle = this._claudeAsync(prompt, {
+          model: this.model,
+          maxTurns: 10,
+          timeout: 300000,
+          useWorkspace: true,
+          projectRoot: this.projectRoot,
+          appendSystemPromptFile: TASK_EXECUTOR_PROMPT,
+        });
+
+        lastResult = await currentHandle.promise;
+
+        if (lastResult.includes('RALPH_COMPLETE') || lastResult.includes('All tests pass')) {
+          this.log(`[executor] Ralph async completed at iteration ${iteration}`);
+          return `\u{2705} Completed in ${iteration} iteration(s)\n\n${lastResult}`;
+        }
+      }
+
+      return `\u{26a0}\u{fe0f} Max iterations reached\n\n${lastResult}`;
+    })();
+
+    return { promise, cancel };
+  }
+
+  /**
+   * Non-blocking task execution with async retry on rate limits.
+   * @param {string} task
+   * @param {string} context
+   * @param {number} maxRetries
+   * @param {number} baseDelayMs — base delay for exponential backoff (default 30000)
+   * @returns {Promise<string>}
+   */
+  async executeTaskWithRetryAsync(task, context = '', maxRetries = 3, baseDelayMs = 30000) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const handle = this.executeTaskAsync(task, context);
+      let result;
+      try {
+        result = await handle.promise;
+      } catch (err) {
+        result = err.message || String(err);
+      }
+      if (!this._isRateLimitError(result)) return result;
+      if (attempt < maxRetries) {
+        const delaySec = (baseDelayMs / 1000) * Math.pow(2, attempt);
+        this.log(
+          `[executor] Rate limited, async wait ${delaySec}s before retry ${attempt + 2}/${maxRetries + 1}...`
+        );
+        await new Promise(r => setTimeout(r, delaySec * 1000));
+      }
+    }
+    return 'Rate limit exceeded after retries. Try again later.';
+  }
+
+  /**
+   * Non-blocking parallel task execution (ultrawork).
+   */
+  async executeParallelAsync(task, opts = {}) {
+    const maxParallel = opts.maxParallel || 3;
+    const onProgress = opts.onProgress || (() => {});
+
+    // Step 1: Split task into subtasks
+    onProgress('\u{1f500} Splitting task into parallel subtasks...');
+    const splitHandle = this._claudeAsync(
+      `Split this task into ${maxParallel} independent subtasks that can run in parallel. Return ONLY a JSON array of task description strings. Task: ${task.slice(0, 500)}`,
+      {
+        model: this.model,
+        maxTurns: 3,
+        timeout: 60000,
+        useWorkspace: true,
+        projectRoot: this.projectRoot,
+      }
+    );
+    const splitResult = await splitHandle.promise;
+
+    let subtasks;
+    try {
+      const match = splitResult.match(/\[[\s\S]*\]/);
+      subtasks = match ? JSON.parse(match[0]) : null;
+    } catch {
+      /* ignored */
+    }
+
+    if (!subtasks || subtasks.length <= 1) {
+      onProgress('\u{1f4dd} Task not parallelizable, running sequentially');
+      const handle = this.executeTaskAsync(task);
+      return handle.promise;
+    }
+
+    // Step 2: Run subtasks concurrently
+    onProgress(`\u{26a1} Running ${subtasks.length} subtasks in parallel...`);
+    this.log(`[executor] Ultrawork async: ${subtasks.length} parallel subtasks`);
+
+    const results = await Promise.allSettled(
+      subtasks.slice(0, maxParallel).map(st => {
+        const handle = this.executeTaskAsync(st);
+        return handle.promise.then(
+          result => ({ subtask: st, result }),
+          err => ({ subtask: st, result: `FAILED: ${err.message}` })
+        );
+      })
+    );
+
+    // Step 3: Merge results
+    const merged = results
+      .map((r, i) => {
+        const data =
+          r.status === 'fulfilled' ? r.value : { subtask: subtasks[i], result: 'FAILED' };
+        return `### Subtask ${i + 1}: ${data.subtask?.slice(0, 80)}\n${data.result?.slice(0, 800)}`;
+      })
+      .join('\n\n');
+
+    const succeeded = results.filter(
+      r => r.status === 'fulfilled' && !r.value?.result?.startsWith('FAILED')
+    ).length;
+    return `\u{26a1} Ultrawork: ${succeeded}/${subtasks.length} subtasks completed\n\n${merged}`;
   }
 
   /**

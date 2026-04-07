@@ -1,3 +1,4 @@
+/* eslint max-lines: ["warn", 600] */
 /**
  * commands.cjs — Telegram bot commands (OpenClaw-style)
  *
@@ -34,9 +35,9 @@ class CommandHandler {
             "Just type naturally and I'll respond. I remember our conversations.\n\n" +
             'Commands:\n' +
             '/status — daemon & memory stats\n' +
+            '/tasks — running & recent tasks\n' +
+            '/cancel <id> — stop a running task\n' +
             '/memory — what I remember about you\n' +
-            '/dream — consolidate learnings\n' +
-            '/forget — clear your chat history\n' +
             '/help — show all commands'
         );
 
@@ -48,7 +49,8 @@ class CommandHandler {
             '📊 /status — daemon stats & uptime\n' +
             '🧠 /memory — what I remember about you\n' +
             '📜 /history — recent conversations\n' +
-            '📋 /tasks — executed task history\n' +
+            '📋 /tasks — running & recent tasks\n' +
+            '🚫 /cancel <id> — stop a running task\n' +
             '💭 /dream — consolidate learnings\n' +
             '🆕 /new — fresh conversation (keeps profile)\n' +
             '🗜 /compress — compact chat memory\n' +
@@ -158,16 +160,66 @@ class CommandHandler {
         if (tasks.length === 0) {
           return this._reply(chatId, messageId, '📋 No tasks executed yet.');
         }
+        const now = Date.now();
         const lines = tasks.slice(-10).map(([id, t]) => {
-          const dur = t.endTime ? `${Math.round((t.endTime - t.startTime) / 1000)}s` : 'running...';
-          const icon = t.status === 'completed' ? '✅' : t.status === 'failed' ? '❌' : '⏳';
+          let dur;
+          if (t.status === 'running') {
+            const elapsed = Math.round((now - t.startTime) / 1000);
+            dur = `${elapsed}s elapsed`;
+          } else if (t.endTime) {
+            dur = `${Math.round((t.endTime - t.startTime) / 1000)}s`;
+          } else {
+            dur = '...';
+          }
+          const icons = {
+            completed: '✅',
+            failed: '❌',
+            running: '🔄',
+            cancelled: '🚫',
+            timeout: '⏰',
+          };
+          const icon = icons[t.status] || '⏳';
           return `${icon} ${id}: ${t.description.slice(0, 60)} (${dur})`;
         });
+        const running = tasks.filter(([, t]) => t.status === 'running').length;
+        const header = running > 0 ? `📋 Tasks (${running} running):\n\n` : '📋 Recent tasks:\n\n';
+        const footer = running > 0 ? '\n\nUse /cancel <id> to stop a running task.' : '';
         return this._reply(
           chatId,
           messageId,
-          `📋 Recent tasks:\n\n${lines.join('\n')}\n\nTotal: ${this.dispatcher.stats.tasksExecuted}`
+          `${header}${lines.join('\n')}\n\nTotal: ${this.dispatcher.stats.tasksExecuted}${footer}`
         );
+      }
+
+      case '/cancel': {
+        if (!args) {
+          return this._reply(
+            chatId,
+            messageId,
+            '❓ Usage: /cancel <task-id>\nSee /tasks for task IDs.'
+          );
+        }
+        const taskId = args.trim();
+        const pool = this.dispatcher.taskPool;
+        if (!pool) {
+          return this._reply(chatId, messageId, '❌ Task pool not available.');
+        }
+        const task = pool.getTask(taskId);
+        if (!task) {
+          return this._reply(chatId, messageId, `❌ No task found with ID "${taskId}".`);
+        }
+        if (task.status !== 'running' && task.status !== 'queued') {
+          return this._reply(chatId, messageId, `Task ${taskId} already ${task.status}.`);
+        }
+        const cancelled = pool.cancel(taskId);
+        if (cancelled) {
+          return this._reply(
+            chatId,
+            messageId,
+            `🚫 Cancelled task ${taskId}: ${task.description.slice(0, 60)}`
+          );
+        }
+        return this._reply(chatId, messageId, `❌ Could not cancel task ${taskId}.`);
       }
 
       case '/new': {

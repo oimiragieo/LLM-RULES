@@ -9,6 +9,7 @@
 'use strict';
 
 const { TaskExecutor } = require('./executor.cjs');
+const { TaskPool } = require('./task-pool.cjs');
 
 class Dispatcher {
   constructor(router, renderer, sinks, log, memory, config, skillStore) {
@@ -19,6 +20,11 @@ class Dispatcher {
     this.memory = memory || null;
     this.skillStore = skillStore || null;
     this.executor = new TaskExecutor(config || {}, log);
+    this.taskPool = new TaskPool({
+      maxConcurrent: (config && config.maxConcurrentTasks) || 3,
+      log: this.log,
+    });
+    this._wirePoolEvents();
     this.queue = [];
     this.processing = false;
     this.history = [];
@@ -32,6 +38,7 @@ class Dispatcher {
     this.rateLimits = new Map(); // chatId → [timestamp1, timestamp2, ...]
     this.rateLimitMax = 10; // max messages per minute per user
     this.rateLimitWindowMs = 60000;
+    this._progressIntervalMs = (config && config.progressIntervalMs) || 15000;
     this.stats = {
       received: 0,
       processed: 0,
@@ -348,149 +355,123 @@ class Dispatcher {
         continue;
       }
 
-      // Check if Claude wants to execute a task
+      // ================================================================
+      // ASYNC TASK DISPATCH — spawn into pool, don't block the queue
+      // ================================================================
+
       // Check if Claude wants a Ralph loop (iterative verify/fix)
       if (response.startsWith('[RALPH]')) {
         const taskDesc = response.slice(7).trim();
         const taskId = `ralph-${++this.taskCounter}`;
-        this.activeTasks.set(taskId, {
-          status: 'running',
-          description: `[RALPH] ${taskDesc}`,
-          startTime: Date.now(),
-          chatId: event.data.chatId,
-          user: event.data.user,
-        });
         this.stats.tasksExecuted++;
 
         try {
           await sink.send(
             event.data.chatId,
             `🔄 Starting Ralph loop: ${taskDesc.slice(0, 100)}...`,
-            {
-              replyTo: event.data.messageId,
-            }
+            { replyTo: event.data.messageId }
           );
         } catch {
           /* ignored */
         }
 
-        const progressTimer = setInterval(async () => {
-          try {
-            await sink.send(event.data.chatId, '⏳ Ralph still working...');
-          } catch {
-            /* ignored */
-          }
-        }, 20000);
-
         this.log(`[dispatcher] Ralph loop ${taskId}: ${taskDesc.slice(0, 80)}`);
-        let result;
-        try {
-          result = this.executor.executeRalphLoop(taskDesc, {
-            maxIterations: 5,
-            onProgress: async msg => {
-              try {
-                await sink.send(event.data.chatId, msg);
-              } catch {
-                /* ignored */
-              }
-            },
-          });
-          this.activeTasks.get(taskId).status = 'completed';
-          // Extract skill from successful ralph execution
-          if (this.skillStore) {
-            setImmediate(() => {
-              try {
-                const skillName = this.skillStore.extractSkill(taskDesc, result);
-                if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
-              } catch (err) {
-                this.log(`[dispatcher] Skill extraction error: ${err.message}`);
-              }
-            });
-          }
-        } catch (err) {
-          result = `Ralph failed: ${err.message}`;
-          this.activeTasks.get(taskId).status = 'failed';
-        }
-        clearInterval(progressTimer);
-        this.activeTasks.get(taskId).endTime = Date.now();
 
-        const truncatedResult =
-          result.length > 3500 ? result.slice(0, 3500) + '\n\n... (truncated)' : result;
-        response = truncatedResult;
+        // Spawn into task pool — non-blocking
+        const sinkRef = sink;
+        const chatId = event.data.chatId;
+        this.taskPool.spawn(
+          taskId,
+          () => {
+            const handle = this.executor.executeRalphLoopAsync(taskDesc, {
+              maxIterations: 5,
+              onProgress: async msg => {
+                try {
+                  await sinkRef.send(chatId, msg);
+                } catch {
+                  /* ignored */
+                }
+              },
+            });
+            return { promise: handle.promise, cancel: handle.cancel };
+          },
+          {
+            description: `[RALPH] ${taskDesc}`,
+            chatId: event.data.chatId,
+            user: event.data.user,
+            timeout: 600000, // 10 min for ralph
+          }
+        );
+
+        // Record in history and continue immediately
+        this.history.push({
+          timestamp: event.timestamp,
+          user: event.data.user,
+          message: event.data.text,
+          response: `[RALPH] ${taskDesc.slice(0, 200)}`,
+          sink: route.sink || event.source,
+        });
+        if (this.history.length > this.maxHistory) this.history.shift();
+        continue; // Don't block — task runs in background
       }
 
       // Check if Claude wants ultrawork (parallel execution)
       if (response.startsWith('[ULTRAWORK]')) {
         const taskDesc = response.slice(11).trim();
         const taskId = `ultra-${++this.taskCounter}`;
-        this.activeTasks.set(taskId, {
-          status: 'running',
-          description: `[ULTRA] ${taskDesc}`,
-          startTime: Date.now(),
-          chatId: event.data.chatId,
-          user: event.data.user,
-        });
         this.stats.tasksExecuted++;
 
         try {
           await sink.send(
             event.data.chatId,
             `⚡ Starting ultrawork: ${taskDesc.slice(0, 100)}...`,
-            {
-              replyTo: event.data.messageId,
-            }
+            { replyTo: event.data.messageId }
           );
         } catch {
           /* ignored */
         }
 
         this.log(`[dispatcher] Ultrawork ${taskId}: ${taskDesc.slice(0, 80)}`);
-        let result;
-        try {
-          result = await this.executor.executeParallel(taskDesc, {
-            maxParallel: 3,
-            onProgress: async msg => {
-              try {
-                await sink.send(event.data.chatId, msg);
-              } catch {
-                /* ignored */
-              }
-            },
-          });
-          this.activeTasks.get(taskId).status = 'completed';
-          if (this.skillStore) {
-            setImmediate(() => {
-              try {
-                const skillName = this.skillStore.extractSkill(taskDesc, result);
-                if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
-              } catch (err) {
-                this.log(`[dispatcher] Skill extraction error: ${err.message}`);
-              }
-            });
+
+        this.taskPool.spawn(
+          taskId,
+          () =>
+            this.executor.executeParallelAsync(taskDesc, {
+              maxParallel: 3,
+              onProgress: async msg => {
+                try {
+                  await sink.send(event.data.chatId, msg);
+                } catch {
+                  /* ignored */
+                }
+              },
+            }),
+          {
+            description: `[ULTRA] ${taskDesc}`,
+            chatId: event.data.chatId,
+            user: event.data.user,
+            timeout: 600000,
           }
-        } catch (err) {
-          result = `Ultrawork failed: ${err.message}`;
-          this.activeTasks.get(taskId).status = 'failed';
-        }
-        this.activeTasks.get(taskId).endTime = Date.now();
-        const truncated = result.length > 3500 ? result.slice(0, 3500) + '\n\n...' : result;
-        response = truncated;
+        );
+
+        this.history.push({
+          timestamp: event.timestamp,
+          user: event.data.user,
+          message: event.data.text,
+          response: `[ULTRAWORK] ${taskDesc.slice(0, 200)}`,
+          sink: route.sink || event.source,
+        });
+        if (this.history.length > this.maxHistory) this.history.shift();
+        continue;
       }
 
       // Check if Claude wants to execute a single task
       if (response.startsWith('[TASK]')) {
         const taskDesc = response.slice(6).trim();
         const taskId = `task-${++this.taskCounter}`;
-        this.activeTasks.set(taskId, {
-          status: 'running',
-          description: taskDesc,
-          startTime: Date.now(),
-          chatId: event.data.chatId,
-          user: event.data.user,
-        });
         this.stats.tasksExecuted++;
 
-        // Notify user that task is starting
+        // Notify user that task is starting — immediate feedback
         try {
           await sink.send(event.data.chatId, `⚙️ Running task: ${taskDesc.slice(0, 100)}...`, {
             replyTo: event.data.messageId,
@@ -499,122 +480,53 @@ class Dispatcher {
           /* ignored */
         }
 
-        // Progress timer — send "still working" every 15s while task runs
+        this.log(`[dispatcher] Executing task ${taskId}: ${taskDesc.slice(0, 80)}`);
+
+        // Progress heartbeat timer — runs independently
         let progressCount = 0;
+        const intervalMs = this._progressIntervalMs;
+        const intervalSec = Math.round(intervalMs / 1000);
         const progressTimer = setInterval(async () => {
           progressCount++;
-          const elapsed = progressCount * 15;
+          const elapsed = progressCount * intervalSec;
           try {
             await sink.send(event.data.chatId, `⏳ Still working... (${elapsed}s)`);
           } catch {
             /* ignored */
           }
-        }, 15000);
+        }, intervalMs);
 
-        // Execute the task — try A2A router first for delegation tasks
-        this.log(`[dispatcher] Executing task ${taskId}: ${taskDesc.slice(0, 80)}`);
-        let result;
-        try {
-          const isRouterTask = /router|a2a|delegate|spawn.*agent|hand.?off/i.test(taskDesc);
-          if (isRouterTask && this.executor.sendToRouter) {
-            const routerAvail = await this.executor.isRouterAvailable();
-            if (routerAvail) {
-              this.log(`[dispatcher] Delegating to A2A router...`);
-              const a2aResult = await this.executor.sendToRouter(taskDesc);
-              result = a2aResult.result
-                ? JSON.stringify(a2aResult.result, null, 2)
-                : a2aResult.error || 'Router accepted task (check router session for results)';
-            } else {
-              result = this.executor.executeTaskWithRetry(taskDesc);
-            }
-          } else {
-            result = this.executor.executeTaskWithRetry(taskDesc);
+        // Spawn into task pool — non-blocking
+        const cancelRef = { cancel: null };
+        this.taskPool.spawn(
+          taskId,
+          () => {
+            const handle = this.executor.executeTaskAsync(taskDesc);
+            cancelRef.cancel = handle.cancel;
+            return handle.promise;
+          },
+          {
+            description: taskDesc,
+            chatId: event.data.chatId,
+            user: event.data.user,
+            timeout: 300000, // 5 min
+            cancel: () => cancelRef.cancel && cancelRef.cancel(),
+            _progressTimer: progressTimer,
+            _sink: sink,
+            _messageId: event.data.messageId,
           }
-          this.activeTasks.get(taskId).status = 'completed';
-          // Extract skill from successful task
-          if (this.skillStore && !result.startsWith('Error')) {
-            setImmediate(() => {
-              try {
-                const skillName = this.skillStore.extractSkill(taskDesc, result);
-                if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
-              } catch (err) {
-                this.log(`[dispatcher] Skill extraction error: ${err.message}`);
-              }
-            });
-          }
-        } catch (err) {
-          result = `Task failed: ${err.message}`;
-          this.activeTasks.get(taskId).status = 'failed';
-        }
-        this.activeTasks.get(taskId).endTime = Date.now();
-        clearInterval(progressTimer);
-
-        // Strip markdown headings (## / ###) since Telegram doesn't support them
-        const cleanResult = result.replace(/^#{1,6}\s+/gm, '').replace(/^---+$/gm, '');
-
-        // Chunk long results into multiple Telegram messages (4096 char limit)
-        const chunks = this._chunkText(cleanResult, 3800);
-        for (let ci = 0; ci < chunks.length; ci++) {
-          try {
-            await sink.send(event.data.chatId, chunks[ci], {
-              replyTo: ci === 0 ? event.data.messageId : undefined,
-            });
-          } catch {
-            /* ignored */
-          }
-        }
-        response = chunks[0] || cleanResult.slice(0, 500); // For history/logging
-
-        // Detect file paths in result and send as attachments
-        if (sink.sendFile) {
-          const filePaths = result.match(
-            /(?:\/[\w./-]+|[A-Z]:\\[\w.\\/-]+)\.(?:md|pdf|csv|txt|json|png|jpg|svg|html|xlsx|docx)/gi
-          );
-          if (filePaths) {
-            for (const fp of [...new Set(filePaths)].slice(0, 3)) {
-              try {
-                const sent = await sink.sendFile(event.data.chatId, fp.trim());
-                if (sent) this.log(`[dispatcher] Sent file: ${fp}`);
-              } catch {
-                /* ignored */
-              }
-            }
-          }
-        }
-
-        // Task results already sent via chunks above — skip the main send below.
-        // Record the result in chat memory so Claude knows the task completed.
-        if (this.memory && event.data.chatId) {
-          // Replace the [TASK] assistant message with the actual result
-          const chatHistory = this.memory.chats.get(event.data.chatId) || [];
-          const lastAssistant = chatHistory.findLastIndex(m => m.role === 'assistant');
-          if (lastAssistant >= 0 && chatHistory[lastAssistant].text.startsWith('[TASK]')) {
-            chatHistory[lastAssistant].text = cleanResult.slice(0, 2000);
-          } else {
-            this.memory.addMessage(event.data.chatId, 'assistant', cleanResult.slice(0, 2000));
-          }
-          this.memory._saveHistory();
-        }
-        this.log(
-          `[dispatcher] Delivered ${chunks.length} chunk(s) to ${route.sink || event.source}`
         );
+
+        // Record in history and continue immediately — result delivered by pool event handler
         this.history.push({
           timestamp: event.timestamp,
           user: event.data.user,
           message: event.data.text,
-          response: response.slice(0, 500),
+          response: `[TASK] ${taskDesc.slice(0, 200)}`,
           sink: route.sink || event.source,
         });
         if (this.history.length > this.maxHistory) this.history.shift();
-        if (this.memory?.appendDailyLog) {
-          this.memory.appendDailyLog(
-            event.data.chatId,
-            event.data.user,
-            event.data.text,
-            cleanResult
-          );
-        }
-        continue; // Skip the normal send path — already delivered
+        continue; // Don't block — task runs in background
       }
 
       try {
@@ -705,11 +617,164 @@ class Dispatcher {
     return chunks.filter(c => c.length > 0);
   }
 
+  /**
+   * Wire task pool events to handle result delivery, memory updates,
+   * and skill extraction when background tasks complete.
+   * @private
+   */
+  _wirePoolEvents() {
+    // Task started — update activeTasks map
+    this.taskPool.on('task-started', entry => {
+      this.activeTasks.set(entry.id, {
+        status: 'running',
+        description: entry.description,
+        startTime: entry.startTime,
+        chatId: entry.chatId,
+        user: entry.user,
+      });
+    });
+
+    // Task completed — deliver result to chat
+    this.taskPool.on('task-completed', entry => {
+      const activeEntry = this.activeTasks.get(entry.id);
+      if (activeEntry) {
+        activeEntry.status = 'completed';
+        activeEntry.endTime = entry.endTime;
+      }
+
+      // Clear progress timer if present
+      if (entry._progressTimer) clearInterval(entry._progressTimer);
+
+      const result = entry.result || 'Task completed.';
+      this._deliverTaskResult(entry, result);
+    });
+
+    // Task failed — deliver error to chat
+    this.taskPool.on('task-failed', entry => {
+      const activeEntry = this.activeTasks.get(entry.id);
+      if (activeEntry) {
+        activeEntry.status = 'failed';
+        activeEntry.endTime = entry.endTime;
+      }
+
+      if (entry._progressTimer) clearInterval(entry._progressTimer);
+
+      const errMsg = `❌ Task failed: ${entry.error || 'unknown error'}`;
+      this._deliverTaskResult(entry, errMsg);
+    });
+
+    // Task timeout
+    this.taskPool.on('task-timeout', entry => {
+      const activeEntry = this.activeTasks.get(entry.id);
+      if (activeEntry) {
+        activeEntry.status = 'timeout';
+        activeEntry.endTime = entry.endTime;
+      }
+
+      if (entry._progressTimer) clearInterval(entry._progressTimer);
+
+      const timeoutMsg = `⏰ Task timed out: ${entry.description.slice(0, 100)}`;
+      this._deliverTaskResult(entry, timeoutMsg);
+    });
+
+    // Task cancelled
+    this.taskPool.on('task-cancelled', entry => {
+      const activeEntry = this.activeTasks.get(entry.id);
+      if (activeEntry) {
+        activeEntry.status = 'cancelled';
+        activeEntry.endTime = entry.endTime;
+      }
+      if (entry._progressTimer) clearInterval(entry._progressTimer);
+    });
+  }
+
+  /**
+   * Deliver a task result to the chat that requested it.
+   * Handles chunking, memory updates, skill extraction, and file attachments.
+   * @private
+   */
+  async _deliverTaskResult(entry, result) {
+    const sink = this.sinks.telegram || Object.values(this.sinks)[0];
+    if (!sink) return;
+
+    // Strip markdown headings for Telegram
+    const cleanResult = result.replace(/^#{1,6}\s+/gm, '').replace(/^---+$/gm, '');
+
+    // Chunk long results
+    const chunks = this._chunkText(cleanResult, 3800);
+    for (let ci = 0; ci < chunks.length; ci++) {
+      try {
+        await sink.send(entry.chatId, chunks[ci], {
+          replyTo: ci === 0 ? entry._messageId : undefined,
+        });
+      } catch {
+        /* ignored */
+      }
+    }
+
+    this.log(`[dispatcher] Delivered ${chunks.length} chunk(s) for ${entry.id}`);
+
+    // Update memory with task result
+    if (this.memory && entry.chatId) {
+      const chatHistory = this.memory.chats.get(entry.chatId) || [];
+      const lastAssistant = chatHistory.findLastIndex
+        ? chatHistory.findLastIndex(m => m.role === 'assistant')
+        : -1;
+      if (
+        lastAssistant >= 0 &&
+        /^\[(?:TASK|RALPH|ULTRAWORK)]/.test(chatHistory[lastAssistant].text)
+      ) {
+        chatHistory[lastAssistant].text = cleanResult.slice(0, 2000);
+      } else {
+        this.memory.addMessage(entry.chatId, 'assistant', cleanResult.slice(0, 2000));
+      }
+      this.memory._saveHistory();
+    }
+
+    // Skill extraction (non-blocking)
+    if (this.skillStore && !result.startsWith('Error') && !result.startsWith('❌')) {
+      setImmediate(() => {
+        try {
+          const skillName = this.skillStore.extractSkill(entry.description, result);
+          if (skillName) this.log(`[dispatcher] Skill extracted: ${skillName}`);
+        } catch (err) {
+          this.log(`[dispatcher] Skill extraction error: ${err.message}`);
+        }
+      });
+    }
+
+    // File attachment detection
+    if (sink.sendFile) {
+      const filePaths = result.match(
+        /(?:\/[\w./-]+|[A-Z]:\\[\w.\\/-]+)\.(?:md|pdf|csv|txt|json|png|jpg|svg|html|xlsx|docx)/gi
+      );
+      if (filePaths) {
+        await this._sendExtractedFiles(sink, entry.chatId, filePaths);
+      }
+    }
+
+    // Daily activity log
+    if (this.memory?.appendDailyLog) {
+      this.memory.appendDailyLog(entry.chatId, entry.user, entry.description, cleanResult);
+    }
+  }
+
+  /** @private Send extracted file paths from task results */
+  async _sendExtractedFiles(sink, chatId, filePaths) {
+    for (const fp of [...new Set(filePaths)].slice(0, 3)) {
+      try {
+        const sent = await sink.sendFile(chatId, fp.trim());
+        if (sent) this.log(`[dispatcher] Sent file: ${fp}`);
+      } catch { /* ignored */ }
+    }
+  }
+
   getStats() {
     return {
       ...this.stats,
       queueLength: this.queue.length,
       processing: this.processing,
+      runningTasks: this.taskPool.getRunning().length,
     };
   }
 

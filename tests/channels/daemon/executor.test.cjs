@@ -141,4 +141,207 @@ describe('TaskExecutor', () => {
       assert.equal(result, 'Success!');
     });
   });
+
+  // Phase 3: Async executor methods
+  describe('executeTaskAsync', () => {
+    it('3.1 — returns a promise', () => {
+      const exec = new TaskExecutor({});
+      // Mock claudeAsync to return a handle
+      exec._claudeAsync = () => ({
+        child: null,
+        promise: Promise.resolve('result'),
+        cancel: () => {},
+      });
+      const handle = exec.executeTaskAsync('test');
+      assert.ok(handle.promise instanceof Promise);
+      assert.equal(typeof handle.cancel, 'function');
+    });
+
+    it('3.2 — resolves with output', async () => {
+      const exec = new TaskExecutor({});
+      exec._claudeAsync = () => ({
+        child: null,
+        promise: Promise.resolve('  task output  \n'),
+        cancel: () => {},
+      });
+      const handle = exec.executeTaskAsync('do something');
+      const result = await handle.promise;
+      assert.equal(result, 'task output');
+    });
+
+    it('3.3 — rejects on error', async () => {
+      const exec = new TaskExecutor({});
+      exec._claudeAsync = () => ({
+        child: null,
+        promise: Promise.reject(new Error('claude failed')),
+        cancel: () => {},
+      });
+      const handle = exec.executeTaskAsync('bad task');
+      await assert.rejects(handle.promise, err => {
+        assert.ok(err.message.includes('claude failed'));
+        return true;
+      });
+    });
+
+    it('3.4 — returns cancel function', () => {
+      const exec = new TaskExecutor({});
+      let cancelCalled = false;
+      exec._claudeAsync = () => ({
+        child: null,
+        promise: new Promise(() => {}), // never resolves
+        cancel: () => {
+          cancelCalled = true;
+        },
+      });
+      const handle = exec.executeTaskAsync('slow task');
+      handle.cancel();
+      assert.equal(cancelCalled, true);
+      // Prevent unhandled rejection
+      handle.promise.catch(() => {});
+    });
+
+    it('3.5 — passes timeout option', () => {
+      const exec = new TaskExecutor({});
+      let capturedOpts;
+      exec._claudeAsync = (_prompt, opts) => {
+        capturedOpts = opts;
+        return { child: null, promise: Promise.resolve('ok'), cancel: () => {} };
+      };
+      exec.executeTaskAsync('test');
+      assert.equal(capturedOpts.timeout, 300000);
+    });
+  });
+
+  describe('executeRalphLoopAsync', () => {
+    it('3.6 — returns a promise', () => {
+      const exec = new TaskExecutor({});
+      exec._claudeAsync = () => ({
+        child: null,
+        promise: Promise.resolve('RALPH_COMPLETE'),
+        cancel: () => {},
+      });
+      const handle = exec.executeRalphLoopAsync('test');
+      assert.ok(handle.promise instanceof Promise);
+    });
+
+    it('3.7 — iterates until RALPH_COMPLETE', async () => {
+      const exec = new TaskExecutor({});
+      let callCount = 0;
+      exec._claudeAsync = () => {
+        callCount++;
+        const output = callCount >= 3 ? 'Fixed! RALPH_COMPLETE' : 'Still working...';
+        return { child: null, promise: Promise.resolve(output), cancel: () => {} };
+      };
+      const handle = exec.executeRalphLoopAsync('fix bugs', { maxIterations: 5 });
+      const result = await handle.promise;
+      assert.equal(callCount, 3);
+      assert.ok(result.includes('Completed in 3'));
+    });
+
+    it('3.8 — respects maxIterations', async () => {
+      const exec = new TaskExecutor({});
+      let callCount = 0;
+      exec._claudeAsync = () => {
+        callCount++;
+        return { child: null, promise: Promise.resolve('not done'), cancel: () => {} };
+      };
+      const handle = exec.executeRalphLoopAsync('never finishes', { maxIterations: 3 });
+      const result = await handle.promise;
+      assert.equal(callCount, 3);
+      assert.ok(result.includes('Max iterations'));
+    });
+
+    it('3.9 — calls onProgress per iteration', async () => {
+      const exec = new TaskExecutor({});
+      const progress = [];
+      exec._claudeAsync = () => ({
+        child: null,
+        promise: Promise.resolve('RALPH_COMPLETE'),
+        cancel: () => {},
+      });
+      const handle = exec.executeRalphLoopAsync('test', {
+        maxIterations: 3,
+        onProgress: msg => progress.push(msg),
+      });
+      await handle.promise;
+      assert.ok(progress.length >= 1);
+      assert.ok(progress[0].includes('iteration 1'));
+    });
+
+    it('3.10 — feeds previous result as context', async () => {
+      const exec = new TaskExecutor({});
+      const prompts = [];
+      exec._claudeAsync = prompt => {
+        prompts.push(prompt);
+        const output = prompts.length >= 2 ? 'RALPH_COMPLETE' : 'Error: line 42';
+        return { child: null, promise: Promise.resolve(output), cancel: () => {} };
+      };
+      const handle = exec.executeRalphLoopAsync('fix code', { maxIterations: 3 });
+      await handle.promise;
+      assert.ok(prompts[1].includes('line 42'));
+    });
+  });
+
+  describe('executeTaskWithRetryAsync', () => {
+    it('3.11 — retries on rate limit', async () => {
+      const exec = new TaskExecutor({});
+      let callCount = 0;
+      exec._claudeAsync = () => {
+        callCount++;
+        const output = callCount < 3 ? 'Error: 429 rate limit' : 'Success!';
+        return { child: null, promise: Promise.resolve(output), cancel: () => {} };
+      };
+      const result = await exec.executeTaskWithRetryAsync('test', '', 3, 10);
+      assert.equal(callCount, 3);
+      assert.equal(result, 'Success!');
+    });
+
+    it('3.12 — uses async delay (not busy-wait)', async () => {
+      const exec = new TaskExecutor({});
+      let callCount = 0;
+      exec._claudeAsync = () => {
+        callCount++;
+        const output = callCount < 2 ? '429 rate limit' : 'ok';
+        return { child: null, promise: Promise.resolve(output), cancel: () => {} };
+      };
+      // Use short retry delays for testing
+      const start = Date.now();
+      const result = await exec.executeTaskWithRetryAsync('test', '', 2, 10);
+      const elapsed = Date.now() - start;
+      assert.equal(result, 'ok');
+      // Should have used async delay (setTimeout), not busy-wait
+      // If busy-wait, the event loop would be blocked
+      assert.ok(elapsed < 5000, 'should not busy-wait');
+    });
+  });
+
+  describe('executeParallelAsync', () => {
+    it('3.13 — runs subtasks concurrently', async () => {
+      const exec = new TaskExecutor({});
+      const startTimes = [];
+      exec._claudeAsync = prompt => {
+        startTimes.push(Date.now());
+        if (prompt.includes('Split this task')) {
+          return {
+            child: null,
+            promise: Promise.resolve('["task A", "task B", "task C"]'),
+            cancel: () => {},
+          };
+        }
+        return {
+          child: null,
+          promise: new Promise(r => setTimeout(() => r(`Done: ${prompt.slice(0, 20)}`), 20)),
+          cancel: () => {},
+        };
+      };
+      const result = await exec.executeParallelAsync('fix all files');
+      assert.ok(result.includes('Subtask 1'));
+      // All subtasks should have started close together (concurrent)
+      const subtaskStarts = startTimes.slice(1); // skip the split call
+      if (subtaskStarts.length >= 2) {
+        const spread = subtaskStarts[subtaskStarts.length - 1] - subtaskStarts[0];
+        assert.ok(spread < 50, `subtasks should start concurrently, spread was ${spread}ms`);
+      }
+    });
+  });
 });

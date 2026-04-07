@@ -318,6 +318,89 @@ describe('CommandHandler', () => {
     });
   });
 
+  // Phase 5: Enhanced /tasks + /cancel
+  describe('/tasks (enhanced)', () => {
+    it('5.1 — shows running tasks with elapsed time', async () => {
+      dispatcher.activeTasks.set('task-1', {
+        status: 'running',
+        description: 'Searching Reddit',
+        startTime: Date.now() - 30000,
+        endTime: null,
+        chatId: '123',
+        user: 'omar',
+      });
+      dispatcher.activeTasks.set('task-2', {
+        status: 'running',
+        description: 'Analyzing code',
+        startTime: Date.now() - 10000,
+        endTime: null,
+        chatId: '123',
+        user: 'omar',
+      });
+      await handler.handle({ text: '/tasks', chatId: '123', messageId: 1 });
+      const text = sink.sent[0].text;
+      assert.ok(text.includes('2 running'), 'Should show running count');
+      assert.ok(text.includes('elapsed'), 'Should show elapsed time');
+      assert.ok(text.includes('Searching Reddit'));
+      assert.ok(text.includes('/cancel'), 'Should mention /cancel');
+    });
+
+    it('5.2 — shows "no tasks" when empty', async () => {
+      await handler.handle({ text: '/tasks', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('No tasks'));
+    });
+
+    it('5.3 — shows recent completed tasks', async () => {
+      dispatcher.activeTasks.set('task-1', {
+        status: 'running',
+        description: 'Active task',
+        startTime: Date.now() - 5000,
+        endTime: null,
+        chatId: '123',
+        user: 'omar',
+      });
+      dispatcher.activeTasks.set('task-2', {
+        status: 'completed',
+        description: 'Done task',
+        startTime: Date.now() - 60000,
+        endTime: Date.now() - 30000,
+        chatId: '123',
+        user: 'omar',
+      });
+      await handler.handle({ text: '/tasks', chatId: '123', messageId: 1 });
+      const text = sink.sent[0].text;
+      assert.ok(text.includes('Active task'));
+      assert.ok(text.includes('Done task'));
+      assert.ok(text.includes('🔄'), 'Running should have 🔄 icon');
+      assert.ok(text.includes('✅'), 'Completed should have ✅ icon');
+    });
+  });
+
+  describe('/cancel', () => {
+    it('5.4 — cancels a running task', async () => {
+      let cancelCalled = false;
+      dispatcher.taskPool = {
+        getTask: id => (id === 'task-1' ? { status: 'running', description: 'My task' } : null),
+        cancel: id => {
+          cancelCalled = true;
+          return id === 'task-1';
+        },
+      };
+      await handler.handle({ text: '/cancel task-1', chatId: '123', messageId: 1 });
+      assert.equal(cancelCalled, true);
+      assert.ok(sink.sent[0].text.includes('Cancelled'));
+    });
+
+    it('5.5 — error for invalid task id', async () => {
+      dispatcher.taskPool = {
+        getTask: () => null,
+        cancel: () => false,
+      };
+      await handler.handle({ text: '/cancel task-999', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('No task found'));
+    });
+  });
+
   describe('/pair', () => {
     it('shows usage without args', async () => {
       await handler.handle({ text: '/pair', chatId: '123', messageId: 1 });
