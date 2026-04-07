@@ -211,8 +211,29 @@ function detectFileConflicts(waveTasks) {
   return conflicts;
 }
 
+/**
+ * Feature-flagged: analyze waves from TaskList-style tasks (blockedBy field).
+ * Uses wave-analyzer.cjs for tasks that come from Claude Code's task system.
+ *
+ * @param {Array<{id: string, blockedBy: string[]}>} tasks
+ * @returns {{ waves: string[][], orphans: string[] }}
+ */
+function analyzeTaskListWaves(tasks) {
+  if (process.env.WAVE_SCHEDULING !== 'true') {
+    return { waves: [tasks.map(t => t.id)], orphans: [] };
+  }
+  try {
+    const { analyzeWaves } = require('../utils/wave-analyzer.cjs');
+    return analyzeWaves(tasks);
+  } catch {
+    // fail-open: single wave with all tasks
+    return { waves: [tasks.map(t => t.id)], orphans: [] };
+  }
+}
+
 module.exports = {
   groupIntoWaves,
+  analyzeTaskListWaves,
   detectFileConflicts,
   buildDependencyGraph,
   topologicalSort,

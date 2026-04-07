@@ -1,3 +1,4 @@
+/* eslint max-lines: ["warn", 550] */
 'use strict';
 
 const crypto = require('crypto');
@@ -222,9 +223,35 @@ function classifyPromptComplexity(toolInput, basePrompt) {
     'performance',
   ];
   const keywordHits = complexityKeywords.filter(k => text.includes(k)).length;
-  if (basePrompt.length > 8000 || keywordHits >= 3) return 'high';
-  if (basePrompt.length > 2500 || keywordHits >= 1) return 'medium';
-  return 'low';
+  let level;
+  if (basePrompt.length > 8000 || keywordHits >= 3) level = 'high';
+  else if (basePrompt.length > 2500 || keywordHits >= 1) level = 'medium';
+  else level = 'low';
+
+  // Feature-flagged: quick-flow adaptive pipeline classification
+  if (process.env.QUICK_FLOW_ENABLED === 'true') {
+    try {
+      const qfMod = require('../../lib/orchestration/quick-flow.cjs');
+      const qf = qfMod.classifyComplexity({
+        fileCount: (text.match(/file/g) || []).length,
+        hasArchDecision: /architecture|design/.test(text),
+      });
+      const QF = { trivial: 0, low: 1, medium: 2, high: 3, epic: 4 };
+      if ((QF[qf.level] || 0) > ({ low: 1, medium: 2, high: 3 }[level] || 0))
+        level = qf.level === 'epic' ? 'high' : qf.level;
+      if (
+        /security|auth|pii/.test(text) &&
+        new qfMod.QuickFlow({
+          mode: qfMod.QuickFlow.getRecommendedMode(qf.level),
+        }).shouldSecurityReview({ hasSecurity: true })
+      )
+        process.stderr.write('[quick-flow] Security review recommended\n');
+    } catch {
+      /* fail-open */
+    }
+  }
+
+  return level;
 }
 
 function readRecentJsonl(filePath, maxRows = 300) {
@@ -385,6 +412,12 @@ function isSpawnPromptBudgetLogEnabled() {
   return v === 'on' || v === '1' || v === 'true';
 }
 
+// Feature-flagged integrations (extracted to stay within max-lines budget)
+const {
+  checkDeveloperReadiness,
+  resolveTaskOutputReferences,
+} = require('./spawn-prompt-assembler.integrations.cjs');
+
 function enforcePromptBudget(prompt) {
   if (!prompt || typeof prompt !== 'string') return prompt;
   if (!Number.isFinite(MAX_SPAWN_PROMPT_CHARS) || MAX_SPAWN_PROMPT_CHARS <= 0) {
@@ -493,6 +526,8 @@ module.exports = {
   getCachedAssembly,
   putCachedAssembly,
   classifyPromptComplexity,
+  resolveTaskOutputReferences,
+  checkDeveloperReadiness,
   shouldThrottleExpensiveEnrichment,
   getMemoryMode,
   isObservationalMode,

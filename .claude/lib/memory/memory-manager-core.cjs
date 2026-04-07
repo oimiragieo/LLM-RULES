@@ -20,6 +20,16 @@ const { sanitizeMemoryContent } = require('./memory-sanitizer.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 const { enhanceRecall } = require('./adaptive-recall.cjs');
 
+// Feature-flagged: composite memory scoring (semantic + recency + importance)
+let memoryRecallScorer;
+if (process.env.MEMORY_RECALL_SCORER === 'true') {
+  try {
+    memoryRecallScorer = require('../utils/memory-recall-scorer.cjs');
+  } catch {
+    /* fail-open */
+  }
+}
+
 const logger = createLogger('memory-manager');
 const asyncWriteQueue = new Map();
 
@@ -413,7 +423,28 @@ async function _callContextualMemory(method, args) {
 }
 
 async function searchMemory(query, options = {}) {
-  const results = await _callContextualMemory('search', [query, options]);
+  let results = await _callContextualMemory('search', [query, options]);
+  // Feature-flagged: apply composite scoring before recall enhancement
+  if (
+    memoryRecallScorer &&
+    process.env.MEMORY_RECALL_SCORER === 'true' &&
+    Array.isArray(results) &&
+    results.length > 0
+  ) {
+    try {
+      results = memoryRecallScorer.scoreAndSort({
+        results: results.map(r => ({
+          ...r,
+          similarity: r.similarity ?? r._distance ?? r.score ?? 0.5,
+          timestamp: r.timestamp ?? r.created ?? r.updated ?? new Date(),
+          importance: r.importance ?? 0.5,
+        })),
+        now: new Date(),
+      });
+    } catch {
+      // fail-open: use original results if scoring fails
+    }
+  }
   return enhanceRecall(query, results);
 }
 

@@ -74,7 +74,7 @@
       "type": "phased",
       "description": "Orchestrates the full project setup using Context-Driven Development methodology. Guides users through product definition, tech stack selection, workflow customization, and initial track generation.",
       "phases": 6,
-      "requiredAgents": ["planner", "developer", "architect", "code-reviewer", "router"],
+      "requiredAgents": ["planner", "developer", "architect", "code-reviewer"],
       "triggers": ["multi_agent"],
       "status": "active"
     },
@@ -102,7 +102,7 @@
       "type": "phased",
       "description": "Systematic workflow for optimizing context in long-running sessions. This workflow enables agents to work efficiently within token limits by intelligently compressing verbose content while preservi...",
       "phases": 4,
-      "requiredAgents": ["architect", "qa", "technical-writer", "code-reviewer", "router"],
+      "requiredAgents": ["architect", "qa", "technical-writer", "code-reviewer"],
       "triggers": [
         "high_complexity",
         "security_sensitive",
@@ -189,7 +189,7 @@
       "type": "sequential",
       "description": "Version: 1.0.0",
       "phases": 1,
-      "requiredAgents": ["technical-writer", "router"],
+      "requiredAgents": ["technical-writer"],
       "triggers": ["evolution", "incident", "reflection"],
       "status": "active"
     },
@@ -247,7 +247,7 @@
       "type": "sequential",
       "description": "Strict pre-flight environment checks, invariant bounding, and parallel scouting loop before code modification.",
       "phases": 3,
-      "requiredAgents": ["router", "master-orchestrator"],
+      "requiredAgents": ["master-orchestrator"],
       "triggers": ["multi_agent", "high_complexity"],
       "status": "active"
     },
@@ -315,7 +315,7 @@
       "type": "phased",
       "description": "Generate comprehensive C4 architecture documentation for an existing repository/codebase using a bottom-up analysis approach.",
       "phases": 4,
-      "requiredAgents": ["architect", "technical-writer", "code-reviewer", "router"],
+      "requiredAgents": ["architect", "technical-writer", "code-reviewer"],
       "triggers": ["high_complexity", "security_sensitive"],
       "status": "active"
     },
@@ -456,7 +456,7 @@
       "type": "state-machine",
       "description": "Executable workflow for creating new agents following the EVOLVE state machine",
       "phases": 28,
-      "requiredAgents": ["qa", "router", "evolution-orchestrator"],
+      "requiredAgents": ["qa", "evolution-orchestrator"],
       "triggers": ["security_sensitive", "multi_agent", "evolution", "reflection"],
       "status": "active"
     },

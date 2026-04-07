@@ -153,7 +153,51 @@ function recoverState(workspacePath) {
 }
 
 // ---------------------------------------------------------------------------
+// Feature-flagged: node-repair strategy selection for failed tasks
+// ---------------------------------------------------------------------------
+
+/**
+ * Select a repair strategy for a failed task using node-repair module.
+ * Returns { strategy: 'retry'|'decompose'|'escalate', reason: string }
+ *
+ * @param {{ taskId: string, failureType: string, attemptCount: number, maxAttempts?: number }} opts
+ * @returns {{ strategy: string, reason: string }}
+ */
+function selectTaskRepairStrategy(opts) {
+  if (process.env.NODE_REPAIR !== 'true') {
+    return { strategy: 'escalate', reason: 'Node repair disabled' };
+  }
+  try {
+    const { selectRepairStrategy } = require('../utils/node-repair.cjs');
+    return selectRepairStrategy(opts);
+  } catch {
+    return { strategy: 'escalate', reason: 'Node repair module unavailable' };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Feature-flagged: pipeline pause/resume controller
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a PauseResumeController for a pipeline.
+ * Returns null if feature is disabled.
+ *
+ * @param {string} pipelineId
+ * @returns {object|null}
+ */
+function createPipelineController(pipelineId) {
+  if (process.env.PIPELINE_PAUSE_RESUME !== 'true') return null;
+  try {
+    const { PauseResumeController } = require('./pause-resume.cjs');
+    return new PauseResumeController(pipelineId);
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
-module.exports = { saveState, recoverState };
+module.exports = { saveState, recoverState, selectTaskRepairStrategy, createPipelineController };

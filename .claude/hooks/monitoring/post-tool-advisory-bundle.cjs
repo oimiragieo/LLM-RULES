@@ -53,6 +53,9 @@ const recurringIssueDetector = require(
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'monitoring', 'recurring-issue-detector.cjs')
 );
 
+// ─── Invariant checker event accumulator (resets per-process) ────────────────
+const invariantEvents = [];
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -108,6 +111,74 @@ async function main() {
     recurringIssueDetector.processHookInput(safeInput);
   } catch (_err) {
     // Error in this sub-function must not prevent others from running
+  }
+
+  // ── Sub-function 5: nyquist-validator (feature-flagged) ───────────────────
+  // Validates plan coverage after Write/Edit to plan files.
+  if (process.env.NYQUIST_VALIDATION === 'true') {
+    try {
+      const toolName = safeInput.tool_name || safeInput.tool || '';
+      const toolInput = safeInput.tool_input || safeInput.input || {};
+      const filePath = toolInput.file_path || toolInput.path || '';
+      if ((toolName === 'Write' || toolName === 'Edit') && filePath.includes('/plans/')) {
+        const { validateCoverage } = require(
+          path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'nyquist-validator.cjs')
+        );
+        const result = validateCoverage(filePath);
+        if (result.coverageScore < 0.5 && result.totalTasks > 0) {
+          process.stderr.write(
+            `[nyquist-validator] ADVISORY: Plan coverage ${(result.coverageScore * 100).toFixed(0)}% ` +
+              `(${result.coveredTasks}/${result.totalTasks} tasks have verify steps). ` +
+              `Uncovered: ${result.uncoveredTasks.slice(0, 3).join(', ')}${result.uncoveredTasks.length > 3 ? '...' : ''}\n`
+          );
+        }
+      }
+    } catch (_err) {
+      // Error in this sub-function must not prevent others from running
+    }
+  }
+
+  // ── Sub-function 6: invariant-checker (feature-flagged) ──────────────────
+  // Validates tool events against routing invariants (banned tools, TaskUpdate).
+  if (process.env.INVARIANT_CHECK === 'true') {
+    try {
+      const { checkInvariants, BUILT_IN_INVARIANTS } = require(
+        path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'invariant-checker.cjs')
+      );
+      const toolName = safeInput.tool_name || safeInput.tool || '';
+      const agentType = safeInput.agent_type || process.env.AGENT_TYPE || '';
+      invariantEvents.push({ agent: agentType, tool: toolName, type: 'tool_use' });
+      const result = checkInvariants({ events: invariantEvents, invariants: BUILT_IN_INVARIANTS });
+      if (!result.passed) {
+        for (const v of result.violations) {
+          process.stderr.write(`[invariant-checker] ADVISORY: ${v.rule} — ${v.reason}\n`);
+        }
+      }
+    } catch (_err) {
+      // Error in this sub-function must not prevent others from running
+    }
+  }
+
+  // ── Sub-function 6: task-output-chain capture (feature-flagged) ──────────
+  // Captures task outputs from TaskUpdate(completed) metadata for downstream chaining.
+  if (process.env.TASK_OUTPUT_CHAIN === 'true') {
+    try {
+      const toolName = safeInput.tool_name || safeInput.tool || '';
+      const toolInput = safeInput.tool_input || safeInput.input || {};
+      if (toolName === 'TaskUpdate' && toolInput.status === 'completed' && toolInput.metadata) {
+        const taskOutputChain = require(
+          path.join(PROJECT_ROOT, '.claude', 'lib', 'orchestration', 'task-output-chain.cjs')
+        );
+        const taskId = toolInput.taskId || toolInput.task_id || '';
+        if (taskId) {
+          for (const [key, value] of Object.entries(toolInput.metadata)) {
+            taskOutputChain.setTaskOutput(taskId, key, value);
+          }
+        }
+      }
+    } catch (_err) {
+      // Error in this sub-function must not prevent others from running
+    }
   }
 
   // ─── Output ───────────────────────────────────────────────────────────────

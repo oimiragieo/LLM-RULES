@@ -29,6 +29,8 @@ const {
   stderrLog,
   emitSpawnRagTelemetry,
   enforcePromptBudget,
+  resolveTaskOutputReferences,
+  checkDeveloperReadiness,
   looksAssembled,
   getMemoryMode,
   classifyPromptComplexity,
@@ -468,6 +470,8 @@ async function main() {
 
     assembled = normalizeTaskIdReferences(assembled, explicitTaskId);
     assembled = ensureMandatorySpawnPreflight(assembled, explicitTaskId);
+    checkDeveloperReadiness(agentType, assembled);
+    assembled = resolveTaskOutputReferences(assembled);
     assembled = enforcePromptBudget(assembled);
 
     // === NEW DYNAMIC METADATA BLOCK APPENDED END ===
