@@ -37,7 +37,15 @@ const { enqueueMessage } = require('../db/queue-operations.cjs');
  * @param {number} [opts.estimatedTokens] - Estimated tokens for budget check (default: 1000)
  * @returns {{ dispatched: boolean, featureId?: string, reason?: string, retryAfterMs?: number }}
  */
-function dispatchFeature({ db, budget, featuresPath, missionPath, chatId, estimatedTokens, validateSkills }) {
+function dispatchFeature({
+  db,
+  budget,
+  featuresPath,
+  missionPath,
+  chatId,
+  estimatedTokens,
+  validateSkills,
+}) {
   // Normalize paths
   const normalizedFeaturesPath = path.normalize(featuresPath);
   const normalizedMissionPath = path.normalize(missionPath);

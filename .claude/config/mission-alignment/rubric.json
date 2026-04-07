@@ -1,8 +1,7 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "rubric.json",
+  "$id": "agent-studio/mission-alignment/v1/rubric.json",
   "version": "1.0.0",
-  "description": "Weighted scoring for mission alignment grading. Adapted from Factory Droid alignment-training-spec v1.",
+  "description": "Weighted scoring for mission alignment grading. Map rule outcomes to points; sum for score. Blockers fail the run regardless of points.",
   "scale": {
     "minScore": 0,
     "maxScore": 100,
@@ -55,18 +54,20 @@
       { "ruleId": "R-CONTRACT-MENTIONS-VAL", "pointsIfPass": 8 },
       { "ruleId": "R-SUCCESS-IMPLIES-EXIT-ZERO", "pointsIfPass": 8 },
       { "ruleId": "R-FEATURE-ID-MATCH-HANDOFF", "pointsIfPass": 12 }
-    ]
+    ],
+    "normalization": "After summing raw points from passed rules, scale linearly to 0-100 unless any blocker failed."
   },
   "gradingProcedure": [
-    "1. Validate JSON artifacts against schemas (blockers).",
-    "2. Evaluate each applicable rule; record pass/fail/na with evidence.",
-    "3. If any blocker failed, set passed=false and gradeBand=fail.",
+    "1. Validate JSON artifacts against JSON Schemas (blockers).",
+    "2. Evaluate each applicable rule; record pass/fail/na with evidence strings.",
+    "3. If any blocker failed, set passed=false and gradeBand=fail unless waiver documented.",
     "4. Sum points from passed rules using ruleOverrides and categoryCaps.",
-    "5. Normalize to 0-100; assign gradeBand from scale.",
-    "6. Emit grading-report conformant object."
+    "5. Normalize to 0-100; assign gradeBand from scale.gradeBands.",
+    "6. Emit mission-grading-report.schema.json conformant object."
   ],
   "trainingMode": {
+    "description": "Weight traceability + verification_evidence highest; require narrative explanation for any failed major rule.",
     "emphasizedCategories": ["traceability", "verification_evidence", "feature_spec"],
-    "requireReflection": "If score below passThreshold, agent must produce remediation plan."
+    "requireReflection": "If score below passThreshold, agent must produce remediation plan listing exact files and next commands."
   }
 }

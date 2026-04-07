@@ -146,6 +146,41 @@ function buildMissionContext(parsedMission, feature) {
     lines.push('');
   }
 
+  // Add skill feedback reporting template (Factory Droid alignment)
+  lines.push('### Skill Feedback (REQUIRED in handoff)');
+  lines.push('You MUST include a skillFeedback object in your handoff:');
+  lines.push('```json');
+  lines.push('{');
+  lines.push('  "skillFeedback": {');
+  lines.push('    "followedProcedure": true,');
+  lines.push('    "deviations": [');
+  lines.push('      {');
+  lines.push('        "step": "procedure step reference",');
+  lines.push('        "whatIDidInstead": "actual action taken",');
+  lines.push('        "why": "reason for deviation"');
+  lines.push('      }');
+  lines.push('    ],');
+  lines.push('    "suggestedChanges": ["skill improvement suggestions"]');
+  lines.push('  }');
+  lines.push('}');
+  lines.push('```');
+  lines.push(
+    'If you followed the skill procedure exactly, set followedProcedure=true and deviations=[].'
+  );
+  lines.push('If you deviated, set followedProcedure=false and document EVERY deviation.');
+  lines.push('');
+
+  // Add fulfills mapping if present
+  if (feature.fulfills && feature.fulfills.length > 0) {
+    lines.push('### Acceptance Assertions (fulfills)');
+    lines.push('This feature must satisfy these VAL-* assertions:');
+    for (const valId of feature.fulfills) {
+      lines.push(`- ${valId}`);
+    }
+    lines.push('Map your verification evidence to these IDs in your handoff.');
+    lines.push('');
+  }
+
   // Add OS-aware command guidance (Factory Droid alignment)
   lines.push('### Platform Guidance');
   if (process.platform === 'win32') {

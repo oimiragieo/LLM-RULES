@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mission-grading-report",
+  "title": "Output of an automated or semi-automated alignment grader",
+  "description": "Grading report scoring a mission or feature against alignment rules. Uses the rubric defined in .claude/config/mission-alignment/rubric.json.",
+  "type": "object",
+  "required": ["specVersion", "gradedAt", "summary", "results"],
+  "additionalProperties": true,
+  "properties": {
+    "specVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.\\d+$",
+      "description": "Alignment spec version (e.g., 1.0.0)"
+    },
+    "gradedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of grading"
+    },
+    "missionBaseSessionId": {
+      "type": "string",
+      "description": "Mission session UUID being graded"
+    },
+    "featureId": {
+      "type": "string",
+      "description": "Optional feature-level grading scope"
+    },
+    "summary": {
+      "type": "object",
+      "required": ["score", "maxScore", "passed"],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Computed alignment score"
+        },
+        "maxScore": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum achievable score"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "Whether score meets pass threshold"
+        },
+        "gradeBand": {
+          "type": "string",
+          "enum": ["excellent", "good", "marginal", "fail"],
+          "description": "Grade band classification"
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "outcome", "weight"],
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "Alignment rule ID (e.g., R-SCH-FEATURE-DOC)"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": ["pass", "fail", "na", "unknown"],
+            "description": "Rule evaluation outcome"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Rule weight in scoring"
+          },
+          "pointsAwarded": {
+            "type": "number",
+            "description": "Points earned for this rule"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Human-readable evidence or file reference"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Rule-specific evaluation details"
+          }
+        }
+      }
+    }
+  }
+}

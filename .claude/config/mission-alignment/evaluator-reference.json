@@ -1,0 +1,71 @@
+{
+  "$id": "agent-studio/mission-alignment/v1/evaluator-reference.json",
+  "version": "1.0.0",
+  "description": "Normative semantics for evaluation kinds referenced in rules.json. Implement these in your grader.",
+  "kinds": {
+    "json_schema": {
+      "inputs": ["artifactJson", "schemaPath"],
+      "algorithm": "Load schema; validate artifactJson; pass iff valid."
+    },
+    "all_of": {
+      "inputs": ["conditions[]"],
+      "algorithm": "Pass iff every child condition passes; short-circuit on first failure with aggregated reasons."
+    },
+    "array_nonempty": {
+      "inputs": ["artifactJson", "jsonPointer"],
+      "algorithm": "Resolve pointer; value must be array with length >= 1."
+    },
+    "string_nonempty": {
+      "inputs": ["artifactJson", "jsonPointer"],
+      "algorithm": "Resolve pointer; value must be string with trim length >= 1."
+    },
+    "set_subset": {
+      "inputs": ["leftArray", "rightObjectOrSet"],
+      "algorithm": "If asKeys: every element of leftArray exists as key in rightObject. Else: every element of left is in right set."
+    },
+    "regex_all_match": {
+      "inputs": ["stringArray", "regex"],
+      "algorithm": "Compile regex; every string must match fully (use ^...$ in regex field)."
+    },
+    "markdown_contains_all": {
+      "inputs": ["contractText", "needles[]"],
+      "algorithm": "For each VAL id in needles, contractText must contain that exact substring."
+    },
+    "verification_steps_covered": {
+      "inputs": ["verificationSteps[]", "commandsRun[]"],
+      "algorithm": "For each non-empty step S after trim: exists command C in commandsRun where C.command includes S as substring, OR normalized token equality. Empty verificationSteps: rule is na."
+    },
+    "json_pointer_all": {
+      "inputs": ["artifactJson", "pointer", "itemRule"],
+      "algorithm": "Resolve pointer to array; each item must satisfy itemRule (e.g. requiredKeys subset check)."
+    },
+    "object_keys_exist": {
+      "inputs": ["object", "requiredKeys[]"],
+      "algorithm": "Pass iff object has every required key."
+    },
+    "conditional_integrity": {
+      "inputs": ["when", "then"],
+      "algorithm": "If when matches artifact snapshot, evaluate then; else na."
+    },
+    "equals": {
+      "inputs": ["leftResolved", "rightResolved"],
+      "algorithm": "Deep equality for JSON primitives; strings compared strictly."
+    },
+    "precondition_parseable": {
+      "inputs": ["preconditions[]", "patterns[]"],
+      "algorithm": "Pass if each precondition matches at least one regex pattern OR is a known free-form gate string."
+    },
+    "consistency_warning": {
+      "inputs": ["feature", "validationState"],
+      "algorithm": "If when satisfied, emit warning object if warnIf holds; does not reduce score if severity is warning-only."
+    },
+    "manual_or_llm": {
+      "inputs": ["handoff", "AGENTS.md"],
+      "algorithm": "Human or model judgment; record outcome unknown unless rubric satisfied."
+    }
+  },
+  "jsonPointer": {
+    "syntax": "RFC 6901",
+    "notes": "Escape ~0 and ~1 per RFC; root is empty string."
+  }
+}

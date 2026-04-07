@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mission-state",
+  "title": "state.json (orchestrator snapshot)",
+  "description": "Runtime state of the mission orchestrator. Tracks current feature, worker sessions, progress counters, and milestone planning.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["missionId", "baseSessionId", "state", "workingDirectory"],
+  "properties": {
+    "missionId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique mission identifier"
+    },
+    "baseSessionId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "UUID identifying the mission session"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["pending", "running", "paused", "completed", "failed", "cancelled"],
+      "description": "Mission lifecycle state"
+    },
+    "workingDirectory": {
+      "type": "string",
+      "description": "Target code workspace path"
+    },
+    "currentFeatureId": {
+      "type": ["string", "null"],
+      "description": "Feature currently being executed"
+    },
+    "currentWorkerSessionId": {
+      "type": ["string", "null"],
+      "description": "Active worker session UUID"
+    },
+    "currentWorkerPid": {
+      "type": ["integer", "null"],
+      "description": "Active worker process ID"
+    },
+    "workerSessionIds": {
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" },
+      "description": "All worker sessions spawned in this mission"
+    },
+    "completedFeatures": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of completed feature executions"
+    },
+    "totalFeatures": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total features in mission backlog"
+    },
+    "milestonesWithValidationPlanned": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Milestones scheduled for validation"
+    },
+    "lastReviewedHandoffCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of handoffs reviewed by orchestrator"
+    },
+    "orchestratorActedSinceReturn": {
+      "type": "boolean",
+      "description": "Whether orchestrator has taken action since last return"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Mission creation timestamp"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last state update timestamp"
+    }
+  }
+}

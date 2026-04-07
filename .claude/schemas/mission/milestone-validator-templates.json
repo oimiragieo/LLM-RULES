@@ -15,11 +15,7 @@
         "No blocking issues found or documented for resolution",
         "Synthesis report produced with shared observations"
       ],
-      "verificationSteps": [
-        "pnpm lint:fix",
-        "pnpm format",
-        "pnpm test"
-      ],
+      "verificationSteps": ["pnpm lint:fix", "pnpm format", "pnpm test"],
       "fulfills": [],
       "milestone": "{{milestone}}",
       "status": "pending"
@@ -35,9 +31,7 @@
         "Validation-state.json updated with pass/fail for each assertion",
         "No unresolved blocking issues"
       ],
-      "verificationSteps": [
-        "pnpm test"
-      ],
+      "verificationSteps": ["pnpm test"],
       "fulfills": [],
       "milestone": "{{milestone}}",
       "status": "pending"

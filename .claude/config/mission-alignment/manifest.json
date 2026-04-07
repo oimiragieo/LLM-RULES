@@ -1,0 +1,28 @@
+{
+  "$id": "agent-studio/mission-alignment/v1/manifest.json",
+  "title": "Agent Studio mission alignment training spec bundle",
+  "version": "1.0.0",
+  "description": "Machine-readable schemas, deterministic alignment rules, and grading rubric for mission workflows. Adapted from Factory Droid alignment-training-spec v1.",
+  "artifacts": {
+    "schemas": [
+      "../../schemas/mission-features-document.schema.json",
+      "../../schemas/mission-feature.schema.json",
+      "../../schemas/mission-handoff-document.schema.json",
+      "../../schemas/mission-state.schema.json",
+      "../../schemas/mission-validation-state.schema.json",
+      "../../schemas/mission-grading-report.schema.json"
+    ],
+    "rules": "rules.json",
+    "rubric": "rubric.json",
+    "evaluatorReference": "evaluator-reference.json"
+  },
+  "compatibility": {
+    "factoryDroidSpec": "1.0.0",
+    "notes": [
+      "Skill definitions live under .claude/skills/<name>/SKILL.md.",
+      "Features reference skillName only; resolver validates against skill index.",
+      "Schemas use additionalProperties: true for forward compatibility.",
+      "State enum includes 'pending' (Agent Studio addition to Factory spec)."
+    ]
+  }
+}

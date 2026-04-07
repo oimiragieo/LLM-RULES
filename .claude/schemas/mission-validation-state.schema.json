@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mission-validation-state",
+  "title": "validation-state.json",
+  "description": "Acceptance assertion ledger tracking VAL-* status. Each assertion maps to a testable criterion in validation-contract.md.",
+  "type": "object",
+  "required": ["assertions"],
+  "additionalProperties": true,
+  "properties": {
+    "assertions": {
+      "type": "object",
+      "description": "Map of VAL-* assertion IDs to their status",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "additionalProperties": true,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["pending", "passed", "failed", "skipped"],
+            "description": "Assertion validation status"
+          },
+          "validatedAtMilestone": {
+            "type": "string",
+            "description": "Milestone where this assertion was validated"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Path to evidence file or inline evidence"
+          },
+          "validatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of validation"
+          }
+        }
+      }
+    }
+  }
+}

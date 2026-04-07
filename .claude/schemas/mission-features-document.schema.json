@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mission-features-document",
+  "title": "features.json root document",
+  "description": "Root container for the mission feature backlog. Features form a precondition DAG executed by the mission orchestrator.",
+  "type": "object",
+  "required": ["features"],
+  "additionalProperties": true,
+  "properties": {
+    "features": {
+      "type": "array",
+      "items": { "$ref": "mission-feature.schema.json" },
+      "minItems": 0,
+      "description": "Ordered feature backlog — array index determines priority"
+    }
+  }
+}

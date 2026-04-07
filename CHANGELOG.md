@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Factory Droid Mission Alignment — 3-Tier Upgrade
+### Factory Droid Mission Alignment — 9-Track Parity Upgrade
+
+#### Added
+
+- **6 mission JSON schemas** — `mission-feature.schema.json`, `mission-features-document.schema.json`, `mission-handoff-document.schema.json`, `mission-state.schema.json`, `mission-validation-state.schema.json`, `mission-grading-report.schema.json` under `.claude/schemas/`, aligned with Factory Droid alignment-training-spec v1
+- **Progress log writer** — `progress-log-writer.cjs` with 12 typed event emitters (mission_accepted, worker_started, worker_completed, milestone_validation_triggered, etc.) for Factory Droid-grade audit trails
+- **Alignment training spec** — `.claude/config/mission-alignment/` with `rules.json` (17 alignment rules), `rubric.json` (weighted scoring, pass=80, blocker=auto-fail), `evaluator-reference.json` (15 evaluation kinds), `manifest.json` (bundle index)
+- **Evidence collector** — `evidence-collector.cjs` runs verificationSteps and writes VAL-\*-keyed evidence files to `evidence/<milestone>/` with Factory naming convention
+- **Mission orchestrator** — `mission-orchestrator.cjs` main coordination loop: DAG-aware feature selection, handoff processing, milestone gate triggering, failure routing, progress logging
+- **Mission status generator** — `mission-status-generator.cjs` produces `mission-status.md` with side-by-side feature vs assertion progress and W-VAL-FEATURE-MISMATCH warnings
+- **5 mission CLI commands** — `pnpm mission:validate`, `pnpm mission:grade`, `pnpm mission:lint`, plus updated `pnpm mission:init` and `pnpm mission:status` paths
+- **Skill feedback template** in persona-injector — injects `skillFeedback` reporting contract (followedProcedure + deviations) and fulfills VAL-\* mapping into worker prompts
+- **77 new tests** across 6 test files covering all new mission modules
+
+### Factory Droid Mission Alignment — 3-Tier Upgrade (Prior)
 
 #### Added
 

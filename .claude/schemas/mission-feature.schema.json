@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mission-feature",
+  "title": "Mission feature (single item from features.json)",
+  "description": "Defines a single work unit in a Factory Droid-aligned mission. Features form a DAG via preconditions, map to VAL-* assertions via fulfills, and are executed by workers identified by skillName.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id",
+    "description",
+    "skillName",
+    "preconditions",
+    "expectedBehavior",
+    "verificationSteps",
+    "milestone",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9_-]*$",
+      "description": "Kebab-case feature identifier"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Detailed feature specification"
+    },
+    "skillName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Worker skill type (must resolve to .claude/skills/<name>/SKILL.md)"
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Dependency gates — feature IDs or gate expressions"
+    },
+    "expectedBehavior": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Observable behavioral specifications"
+    },
+    "verificationSteps": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Commands to verify feature correctness"
+    },
+    "fulfills": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^VAL-[A-Z0-9]+-[0-9]{3}$"
+      },
+      "description": "VAL-* assertion IDs this feature satisfies"
+    },
+    "milestone": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Milestone this feature belongs to"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "validating", "completed", "failed", "cancelled"],
+      "description": "Feature lifecycle state"
+    },
+    "workerSessionIds": {
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" },
+      "description": "All worker sessions assigned to this feature"
+    },
+    "currentWorkerSessionId": {
+      "type": ["string", "null"],
+      "description": "Active worker session UUID or null"
+    },
+    "completedWorkerSessionId": {
+      "type": ["string", "null"],
+      "description": "Worker session that completed this feature"
+    }
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mission-handoff-document",
+  "title": "Worker handoff JSON (handoffs/*.json)",
+  "description": "Structured completion report emitted by mission workers. Contains verification evidence, test results, discovered issues, and skill feedback for auditability.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "timestamp",
+    "workerSessionId",
+    "featureId",
+    "milestone",
+    "commitId",
+    "successState",
+    "returnToOrchestrator",
+    "handoff"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 completion timestamp"
+    },
+    "workerSessionId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique worker session identifier"
+    },
+    "featureId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Feature that was worked on"
+    },
+    "milestone": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Milestone the feature belongs to"
+    },
+    "commitId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{7,40}$",
+      "description": "Git commit SHA of the worker's changes"
+    },
+    "successState": {
+      "type": "string",
+      "enum": ["success", "failure", "partial"],
+      "description": "Overall completion outcome"
+    },
+    "returnToOrchestrator": {
+      "type": "boolean",
+      "description": "Whether control should return to the orchestrator"
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "salientSummary",
+        "whatWasImplemented",
+        "whatWasLeftUndone",
+        "verification",
+        "tests",
+        "discoveredIssues",
+        "skillFeedback"
+      ],
+      "properties": {
+        "salientSummary": {
+          "type": "string",
+          "description": "High-level human-readable completion summary"
+        },
+        "whatWasImplemented": {
+          "type": "string",
+          "description": "Detailed implementation narrative"
+        },
+        "whatWasLeftUndone": {
+          "type": "string",
+          "description": "Known gaps or deferred work"
+        },
+        "verification": {
+          "type": "object",
+          "required": ["commandsRun"],
+          "additionalProperties": true,
+          "properties": {
+            "commandsRun": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["command", "exitCode"],
+                "additionalProperties": true,
+                "properties": {
+                  "command": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Exact command string executed"
+                  },
+                  "exitCode": {
+                    "type": "integer",
+                    "description": "Process exit code (0 = success)"
+                  },
+                  "observation": {
+                    "type": "string",
+                    "description": "Human-readable outcome description"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tests": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "added": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "file": { "type": "string" },
+                  "cases": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string" },
+                        "verifies": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              },
+              "description": "New test files and cases"
+            },
+            "updated": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Modified test file paths"
+            },
+            "coverage": {
+              "type": "string",
+              "description": "Test coverage narrative"
+            }
+          }
+        },
+        "discoveredIssues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["severity", "description"],
+            "additionalProperties": true,
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": ["blocking", "non_blocking", "info"],
+                "description": "Issue impact level"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Issue details"
+              },
+              "suggestedFix": {
+                "type": "string",
+                "description": "Optional remediation suggestion"
+              }
+            }
+          }
+        },
+        "skillFeedback": {
+          "type": "object",
+          "required": ["followedProcedure", "deviations"],
+          "additionalProperties": true,
+          "properties": {
+            "followedProcedure": {
+              "type": "boolean",
+              "description": "Whether the worker followed the skill procedure"
+            },
+            "deviations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "step": { "type": "string", "description": "Procedure step reference" },
+                  "whatIDidInstead": { "type": "string", "description": "Actual action taken" },
+                  "why": { "type": "string", "description": "Reason for deviation" }
+                }
+              },
+              "description": "Skill procedure deviations with explanations"
+            },
+            "suggestedChanges": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Skill improvement suggestions"
+            }
+          }
+        }
+      }
+    }
+  }
+}

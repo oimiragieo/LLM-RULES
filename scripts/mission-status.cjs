@@ -147,7 +147,9 @@ function printHumanReport(features, milestones, mismatches, assertions, state) {
   if (mismatches.length > 0) {
     console.log(`\n  WARNINGS: ${mismatches.length} feature/assertion mismatches`);
     for (const m of mismatches) {
-      console.log(`    ${m.featureId} -> ${m.valId}: feature=${m.featureStatus}, assertion=${m.assertionStatus}`);
+      console.log(
+        `    ${m.featureId} -> ${m.valId}: feature=${m.featureStatus}, assertion=${m.assertionStatus}`
+      );
     }
   }
   console.log('');
@@ -180,7 +182,9 @@ function main() {
   const mismatches = collectMismatches(features, assertions);
 
   if (args.json) {
-    console.log(JSON.stringify(buildJsonReport(features, milestones, mismatches, assertions, state), null, 2));
+    console.log(
+      JSON.stringify(buildJsonReport(features, milestones, mismatches, assertions, state), null, 2)
+    );
   } else {
     printHumanReport(features, milestones, mismatches, assertions, state);
   }
