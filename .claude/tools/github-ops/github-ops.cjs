@@ -38,7 +38,7 @@ function parseArgs(argv) {
  * @returns {{ ok: boolean, data: unknown, stderr: string }}
  */
 function gh(args) {
-  const result = spawnSync('gh', args, { encoding: 'utf8' });
+  const result = spawnSync('gh', args, { encoding: 'utf8', windowsHide: true });
   if (result.error) {
     return { ok: false, data: null, stderr: result.error.message };
   }

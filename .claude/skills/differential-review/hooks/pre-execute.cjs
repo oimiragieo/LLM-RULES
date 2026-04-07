@@ -33,7 +33,7 @@ function validateInput(input) {
   const warnings = [];
 
   // Check that git is available
-  const gitCheck = spawnSync('git', ['--version'], { encoding: 'utf8' });
+  const gitCheck = spawnSync('git', ['--version'], { encoding: 'utf8', windowsHide: true });
   if (gitCheck.error || gitCheck.status !== 0) {
     errors.push('git is not available in PATH; differential-review requires git');
     return { errors, warnings };
@@ -43,6 +43,7 @@ function validateInput(input) {
   const repoPath = (input && input.repoPath) || process.cwd();
   const gitRevParse = spawnSync('git', ['-C', repoPath, 'rev-parse', '--git-dir'], {
     encoding: 'utf8',
+    windowsHide: true,
   });
   if (gitRevParse.status !== 0) {
     warnings.push(`No git repository found at ${repoPath}; ensure you are reviewing a git repo`);

@@ -28,7 +28,19 @@ test('atomicWriteSync waits when cross-process lock is held', async () => {
     windowsHide: true,
   });
 
-  await new Promise(resolve => setTimeout(resolve, 100));
+  // Poll until the child process actually acquires the lock (Windows process
+  // startup can be slow, so a fixed delay is unreliable).
+  const lockfile = require('proper-lockfile');
+  const pollStart = Date.now();
+  while (Date.now() - pollStart < 3000) {
+    try {
+      const release = lockfile.lockSync(target, { stale: 5000, retries: { retries: 0 } });
+      release(); // Lock was free — child hasn't grabbed it yet
+    } catch (_e) {
+      break; // Lock is held by child — proceed
+    }
+    await new Promise(resolve => setTimeout(resolve, 20));
+  }
 
   const started = Date.now();
   atomicWriteSync(target, '{"updated":true}\n', 'utf8');
