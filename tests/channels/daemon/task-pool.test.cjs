@@ -24,7 +24,7 @@ function failingTask(errMsg, ms = 10) {
  * Helper: create a cancellable task function (returns { promise, cancel }).
  * Prefixed with _ to indicate it's available but not used in every test run.
  */
- 
+
 function _cancellableTask(ms = 5000) {
   let cancelFn;
   const fn = () => {

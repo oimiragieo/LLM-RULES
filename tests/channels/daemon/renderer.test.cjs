@@ -6,19 +6,19 @@ const { ClaudeRenderer } = require('../../../scripts/channels/daemon/renderer.cj
 
 describe('ClaudeRenderer', () => {
   describe('_selectModel()', () => {
-    it('selects haiku for short greetings', () => {
+    it('uses configured model for short greetings (not haiku)', () => {
       const r = new ClaudeRenderer({ model: 'sonnet' });
-      assert.equal(r._selectModel('hello'), 'haiku');
-      assert.equal(r._selectModel('hi'), 'haiku');
-      assert.equal(r._selectModel('hey'), 'haiku');
-      assert.equal(r._selectModel('thanks'), 'haiku');
+      assert.equal(r._selectModel('hello'), 'sonnet');
+      assert.equal(r._selectModel('hi'), 'sonnet');
+      assert.equal(r._selectModel('hey'), 'sonnet');
+      assert.equal(r._selectModel('thanks'), 'sonnet');
     });
 
-    it('selects haiku for very short messages (<30 chars)', () => {
+    it('uses configured model for very short messages', () => {
       const r = new ClaudeRenderer({ model: 'sonnet' });
-      assert.equal(r._selectModel('yes'), 'haiku');
-      assert.equal(r._selectModel('ok sounds good'), 'haiku');
-      assert.equal(r._selectModel('👍'), 'haiku');
+      assert.equal(r._selectModel('yes'), 'sonnet');
+      assert.equal(r._selectModel('ok sounds good'), 'sonnet');
+      assert.equal(r._selectModel('👍'), 'sonnet');
     });
 
     it('selects sonnet for regular conversation', () => {
@@ -38,11 +38,11 @@ describe('ClaudeRenderer', () => {
       );
     });
 
-    it('selects haiku for empty/null text', () => {
+    it('uses configured model for empty/null text', () => {
       const r = new ClaudeRenderer({ model: 'sonnet' });
-      assert.equal(r._selectModel(''), 'haiku');
-      assert.equal(r._selectModel(null), 'haiku');
-      assert.equal(r._selectModel(undefined), 'haiku');
+      assert.equal(r._selectModel(''), 'sonnet');
+      assert.equal(r._selectModel(null), 'sonnet');
+      assert.equal(r._selectModel(undefined), 'sonnet');
     });
   });
 });

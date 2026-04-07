@@ -314,9 +314,15 @@ main().catch(() => process.exit(1));
    * Select the cheapest model that can handle this message.
    * haiku for trivial, sonnet for regular, configured model for complex.
    */
-  _selectModel(text) {
-    if (!text || text.length < 30) return 'haiku';
-    return this.model; // sonnet or opus based on config
+  /**
+   * Select model for chat rendering.
+   * Always uses the configured model (sonnet/opus) — haiku can't follow
+   * the execution tag system prompt reliably for conversational messages.
+   * Haiku is still used for tool-worker tasks (grep, search, compaction)
+   * in other parts of the daemon (memory compaction, suggestions, proactive).
+   */
+  _selectModel(_text) {
+    return this.model;
   }
 
   /**

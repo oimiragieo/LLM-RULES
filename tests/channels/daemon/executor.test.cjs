@@ -145,7 +145,7 @@ describe('TaskExecutor', () => {
   // Phase 3: Async executor methods
   describe('executeTaskAsync', () => {
     it('3.1 — returns a promise', () => {
-      const exec = new TaskExecutor({});
+      const exec = new TaskExecutor({ preResearch: false });
       // Mock claudeAsync to return a handle
       exec._claudeAsync = () => ({
         child: null,
@@ -158,7 +158,7 @@ describe('TaskExecutor', () => {
     });
 
     it('3.2 — resolves with output', async () => {
-      const exec = new TaskExecutor({});
+      const exec = new TaskExecutor({ preResearch: false });
       exec._claudeAsync = () => ({
         child: null,
         promise: Promise.resolve('  task output  \n'),
@@ -170,7 +170,7 @@ describe('TaskExecutor', () => {
     });
 
     it('3.3 — rejects on error', async () => {
-      const exec = new TaskExecutor({});
+      const exec = new TaskExecutor({ preResearch: false });
       exec._claudeAsync = () => ({
         child: null,
         promise: Promise.reject(new Error('claude failed')),
@@ -184,7 +184,7 @@ describe('TaskExecutor', () => {
     });
 
     it('3.4 — returns cancel function', () => {
-      const exec = new TaskExecutor({});
+      const exec = new TaskExecutor({ preResearch: false });
       let cancelCalled = false;
       exec._claudeAsync = () => ({
         child: null,
@@ -200,15 +200,97 @@ describe('TaskExecutor', () => {
       handle.promise.catch(() => {});
     });
 
-    it('3.5 — passes timeout option', () => {
-      const exec = new TaskExecutor({});
+    it('3.5 — passes timeout option', async () => {
+      const exec = new TaskExecutor({ preResearch: false });
       let capturedOpts;
       exec._claudeAsync = (_prompt, opts) => {
         capturedOpts = opts;
         return { child: null, promise: Promise.resolve('ok'), cancel: () => {} };
       };
-      exec.executeTaskAsync('test');
+      await exec.executeTaskAsync('test').promise;
       assert.equal(capturedOpts.timeout, 300000);
+    });
+  });
+
+  describe('Pre-research (haiku tool worker)', () => {
+    it('runs haiku pre-research before main task', async () => {
+      const exec = new TaskExecutor({ preResearch: true });
+      const calls = [];
+      exec._claudeAsync = (prompt, opts) => {
+        calls.push({ prompt, model: opts.model });
+        const output =
+          calls.length === 1 ? 'Found file: src/app.js with relevant code' : 'Task done';
+        return { child: null, promise: Promise.resolve(output), cancel: () => {} };
+      };
+      const handle = exec.executeTaskAsync('fix the bug in app.js');
+      await handle.promise;
+      assert.equal(calls.length, 2);
+      assert.equal(calls[0].model, 'haiku');
+      assert.equal(calls[1].model, 'sonnet');
+      assert.ok(calls[1].prompt.includes('Pre-research context'));
+      assert.ok(calls[1].prompt.includes('Found file'));
+    });
+
+    it('skips pre-research for web/search tasks', async () => {
+      const exec = new TaskExecutor({ preResearch: true });
+      const calls = [];
+      exec._claudeAsync = (prompt, opts) => {
+        calls.push({ prompt, model: opts.model });
+        return { child: null, promise: Promise.resolve('News results'), cancel: () => {} };
+      };
+      const handle = exec.executeTaskAsync('search the web for AI news');
+      await handle.promise;
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0].model, 'sonnet');
+    });
+
+    it('skips pre-research when disabled', async () => {
+      const exec = new TaskExecutor({ preResearch: false });
+      const calls = [];
+      exec._claudeAsync = (_prompt, opts) => {
+        calls.push({ model: opts.model });
+        return { child: null, promise: Promise.resolve('done'), cancel: () => {} };
+      };
+      const handle = exec.executeTaskAsync('fix the bug');
+      await handle.promise;
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0].model, 'sonnet');
+    });
+
+    it('skips pre-research when context already provided', async () => {
+      const exec = new TaskExecutor({ preResearch: true });
+      const calls = [];
+      exec._claudeAsync = (_prompt, opts) => {
+        calls.push({ model: opts.model });
+        return { child: null, promise: Promise.resolve('done'), cancel: () => {} };
+      };
+      const handle = exec.executeTaskAsync('fix bug', 'existing context');
+      await handle.promise;
+      assert.equal(calls.length, 1);
+    });
+
+    it('continues gracefully if pre-research fails', async () => {
+      const exec = new TaskExecutor({ preResearch: true });
+      let callCount = 0;
+      exec._claudeAsync = (_prompt, _opts) => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            child: null,
+            promise: Promise.reject(new Error('haiku timeout')),
+            cancel: () => {},
+          };
+        }
+        return {
+          child: null,
+          promise: Promise.resolve('task done without context'),
+          cancel: () => {},
+        };
+      };
+      const handle = exec.executeTaskAsync('fix the code');
+      const result = await handle.promise;
+      assert.equal(result, 'task done without context');
+      assert.equal(callCount, 2);
     });
   });
 
@@ -284,7 +366,7 @@ describe('TaskExecutor', () => {
 
   describe('executeTaskWithRetryAsync', () => {
     it('3.11 — retries on rate limit', async () => {
-      const exec = new TaskExecutor({});
+      const exec = new TaskExecutor({ preResearch: false });
       let callCount = 0;
       exec._claudeAsync = () => {
         callCount++;
@@ -297,7 +379,7 @@ describe('TaskExecutor', () => {
     });
 
     it('3.12 — uses async delay (not busy-wait)', async () => {
-      const exec = new TaskExecutor({});
+      const exec = new TaskExecutor({ preResearch: false });
       let callCount = 0;
       exec._claudeAsync = () => {
         callCount++;

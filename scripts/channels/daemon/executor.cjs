@@ -16,10 +16,23 @@ const { claudeSync, claudeAsync } = require('./claude-cli.cjs');
 // Task executor system prompt — overrides router CLAUDE.md for headless sessions
 const TASK_EXECUTOR_PROMPT = path.join(__dirname, 'task-executor-prompt.txt');
 
+// Pre-research prompt — tells haiku to gather context with read-only tools
+const PRE_RESEARCH_PROMPT = `You are a fast research assistant. Your ONLY job is to gather context for a task that another AI will execute.
+
+Rules:
+- Use Grep, Glob, Read, and safe Bash commands (git status, git log, ls) to find relevant files and context
+- Do NOT edit, write, or modify anything
+- Do NOT execute the actual task — just gather information
+- Be fast and concise — spend at most 2-3 tool calls
+- Output a brief context summary (under 1000 chars) of what you found: relevant file paths, key code snippets, current state
+
+If the task is purely web-based (search, news, research) or doesn't involve the codebase, just output: NO_CONTEXT_NEEDED`;
+
 class TaskExecutor {
   constructor(config, log) {
     this.model = config.model || 'sonnet';
     this.projectRoot = config.projectRoot || process.cwd();
+    this.preResearch = config.preResearch !== false; // default: true
     // Track whether cwd was explicitly provided vs system-defaulted.
     // Used by sendToRouter to decide whether to forward cwd in JSON-RPC
     // payloads — omitting it lets the remote host use its own default,
@@ -149,31 +162,86 @@ class TaskExecutor {
   }
 
   /**
+   * Haiku pre-research — cheap read-only context gathering before the main task.
+   * Spawns haiku with 3 turns to grep/read relevant files.
+   * Returns context string or empty if not needed.
+   * @private
+   */
+  async _preResearchAsync(taskDesc) {
+    // Skip for web/search tasks — no codebase context needed
+    if (/search|news|reddit|web|arxiv|trending|headlines|fetch|url/i.test(taskDesc)) {
+      this.log('[executor] Pre-research skipped (web/search task)');
+      return '';
+    }
+
+    this.log('[executor] Pre-research: haiku gathering context...');
+    const handle = this._claudeAsync(
+      `Task that will be executed next: ${taskDesc.slice(0, 500)}\n\nGather relevant context from the codebase for this task.`,
+      {
+        model: 'haiku',
+        maxTurns: 3,
+        timeout: 30000,
+        useWorkspace: true,
+        projectRoot: this.projectRoot,
+        appendSystemPrompt: PRE_RESEARCH_PROMPT,
+      }
+    );
+
+    try {
+      const result = await handle.promise;
+      if (!result || result.includes('NO_CONTEXT_NEEDED') || result.length < 20) {
+        this.log('[executor] Pre-research: no context needed');
+        return '';
+      }
+      this.log(`[executor] Pre-research: gathered ${result.length} chars of context`);
+      return result.slice(0, 2000);
+    } catch (err) {
+      // Non-fatal — just skip pre-research
+      this.log(`[executor] Pre-research failed (non-fatal): ${err.message}`);
+      return '';
+    }
+  }
+
+  /**
    * Non-blocking single-shot task execution.
    * Returns { promise, cancel } — does NOT block the event loop.
+   * If preResearch is enabled, runs a cheap haiku pass first to gather context.
    */
   executeTaskAsync(task, context = '') {
-    const prompt = context ? `Context: ${context}\n\nTask: ${task}` : task;
+    let cancelled = false;
+    let currentHandle = null;
 
-    const handle = this._claudeAsync(prompt, {
-      model: this.model,
-      maxTurns: 10,
-      timeout: 300000,
-      useWorkspace: true,
-      projectRoot: this.projectRoot,
-      appendSystemPromptFile: TASK_EXECUTOR_PROMPT,
-    });
-
-    return {
-      promise: handle.promise.then(
-        result => (result || 'Task completed but produced no output.').trim(),
-        err => {
-          throw err;
-        }
-      ),
-      cancel: handle.cancel,
-      child: handle.child,
+    const cancel = () => {
+      cancelled = true;
+      if (currentHandle && currentHandle.cancel) currentHandle.cancel();
     };
+
+    const promise = (async () => {
+      // Phase 1: Haiku pre-research (cheap read-only context gathering)
+      let fullContext = context;
+      if (this.preResearch && !context) {
+        const research = await this._preResearchAsync(task);
+        if (research) fullContext = research;
+      }
+      if (cancelled) throw new Error('cancelled');
+
+      // Phase 2: Main task execution with sonnet/opus
+      const prompt = fullContext ? `Pre-research context:\n${fullContext}\n\nTask: ${task}` : task;
+
+      currentHandle = this._claudeAsync(prompt, {
+        model: this.model,
+        maxTurns: 10,
+        timeout: 300000,
+        useWorkspace: true,
+        projectRoot: this.projectRoot,
+        appendSystemPromptFile: TASK_EXECUTOR_PROMPT,
+      });
+
+      const result = await currentHandle.promise;
+      return (result || 'Task completed but produced no output.').trim();
+    })();
+
+    return { promise, cancel, child: null };
   }
 
   /**
