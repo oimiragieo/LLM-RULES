@@ -15,7 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..'); // agent-studio root
 const OUTBOX_FILE = path.join(ROOT, '.claude', 'context', 'tmp', 'telegram-outbox.json');

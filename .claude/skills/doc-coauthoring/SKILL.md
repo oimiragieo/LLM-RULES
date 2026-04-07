@@ -1,5 +1,5 @@
-## <!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
-
+---
+# Agent: developer | Task: #5 | Session: 2026-03-05
 verified: true
 lastVerifiedAt: 2026-03-05T00:00:00.000Z
 name: doc-coauthoring

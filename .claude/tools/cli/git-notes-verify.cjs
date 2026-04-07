@@ -28,7 +28,7 @@ let gitNotesAudit;
 try {
   gitNotesAudit = require('../../hooks/audit/git-notes-audit.cjs');
 } catch (_e) {
-  gitNotesAudit = null; // Hook archived; note signature verification unavailable
+  gitNotesAudit = null; // Hook module never created (hooks/audit/ does not exist); verification unavailable
 }
 
 function runGitCommand(args) {

@@ -206,7 +206,7 @@ const newEntry = `| ${toolName} | ${args.description} | .claude/tools/${args.cat
 const {
   runIntegrationChecklist,
   queueCrossCreatorReview,
-} = require('.claude/lib/creator-commons.cjs');
+} = require('.claude/lib/creators/creator-commons.cjs');
 
 await runIntegrationChecklist('tool', toolPath);
 await queueCrossCreatorReview('tool', toolPath, {
@@ -224,7 +224,7 @@ After tool creation, run integration checklist:
 const {
   runIntegrationChecklist,
   queueCrossCreatorReview,
-} = require('.claude/lib/creator-commons.cjs');
+} = require('.claude/lib/creators/creator-commons.cjs');
 
 // 1. Run integration checklist
 const result = await runIntegrationChecklist('tool', '.claude/tools/<category>/<tool-name>.cjs');

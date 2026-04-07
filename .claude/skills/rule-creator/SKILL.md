@@ -145,7 +145,7 @@ if (!fileExists) {
 const {
   runIntegrationChecklist,
   queueCrossCreatorReview,
-} = require('.claude/lib/creator-commons.cjs');
+} = require('.claude/lib/creators/creator-commons.cjs');
 
 await runIntegrationChecklist('rule', rulePath);
 await queueCrossCreatorReview('rule', rulePath, {
@@ -162,7 +162,7 @@ After rule creation, run integration checklist:
 const {
   runIntegrationChecklist,
   queueCrossCreatorReview,
-} = require('.claude/lib/creator-commons.cjs');
+} = require('.claude/lib/creators/creator-commons.cjs');
 
 // 1. Run integration checklist
 const result = await runIntegrationChecklist('rule', '.claude/rules/<rule-name>.md');

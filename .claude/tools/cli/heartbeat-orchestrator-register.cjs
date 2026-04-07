@@ -124,10 +124,7 @@ async function main() {
 
   // Step 4: Write sentinel file
   console.log('\nStep 4: Writing heartbeat sentinel...');
-  const {
-    writeSentinel,
-    writeSessionPing,
-  } = require('./.claude/lib/heartbeat/heartbeat-sentinel.cjs');
+  const { writeSentinel, writeSessionPing } = require('../../lib/heartbeat/heartbeat-sentinel.cjs');
 
   try {
     const sentinelPath = writeSentinel(registeredIds);

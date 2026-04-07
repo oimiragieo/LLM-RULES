@@ -47,7 +47,7 @@ Telegram Voice Setup:
 
 ## When everything passes
 
-Tell the user: "Voice pipeline ready! Run `/enable-telegram-voice` to activate. Voice messages sent to the bot will be transcribed and responded to with audio."
+Tell the user: "Voice pipeline ready! Run `/enable-telegram` to activate. Voice messages sent to the bot will be transcribed and responded to with audio."
 
 ## Important
 

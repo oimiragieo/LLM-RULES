@@ -136,7 +136,7 @@ feat: Added feature  # Should use imperative tense
 ```bash
 #!/bin/bash
 commit_msg=$(git log -1 --pretty=%B)
-if ! node .claude/tools/validate-commit.mjs "$commit_msg"; then
+if ! node .claude/tools/cli/validate-commit.mjs "$commit_msg"; then
   echo "Commit message validation failed"
   exit 1
 fi
@@ -152,7 +152,7 @@ fi
 - name: Validate commit messages
   run: |
     git log origin/main..HEAD --pretty=%B | while read msg; do
-      node .claude/tools/validate-commit.mjs "$msg" || exit 1
+      node .claude/tools/cli/validate-commit.mjs "$msg" || exit 1
     done
 ```
 
@@ -197,10 +197,10 @@ Or for invalid messages:
 
 ```bash
 # Validate a commit message
-node .claude/tools/validate-commit.mjs "feat(auth): implement jwt login"
+node .claude/tools/cli/validate-commit.mjs "feat(auth): implement jwt login"
 
 # Validate from stdin (e.g. in a hook)
-echo "fix: incorrect variable name" | node .claude/tools/validate-commit.mjs
+echo "fix: incorrect variable name" | node .claude/tools/cli/validate-commit.mjs
 ```
 
 </usage_example>

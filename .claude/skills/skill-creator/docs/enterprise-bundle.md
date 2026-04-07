@@ -666,7 +666,7 @@ After skill creation, run integration checklist:
 const {
   runIntegrationChecklist,
   queueCrossCreatorReview,
-} = require('.claude/lib/creator-commons.cjs');
+} = require('.claude/lib/creators/creator-commons.cjs');
 
 // 1. Run integration checklist
 const result = await runIntegrationChecklist(
