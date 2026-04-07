@@ -482,28 +482,35 @@ class Dispatcher {
 
         this.log(`[dispatcher] Executing task ${taskId}: ${taskDesc.slice(0, 80)}`);
 
-        // Progress heartbeat timer — runs independently
-        let progressCount = 0;
+        // Spawn into task pool — non-blocking
+        // Progress heartbeat is started INSIDE the task function so it only
+        // fires during actual execution, not during haiku pre-research.
+        const cancelRef = { cancel: null };
+        const sinkRef = sink;
+        const chatId = event.data.chatId;
         const intervalMs = this._progressIntervalMs;
         const intervalSec = Math.round(intervalMs / 1000);
-        const progressTimer = setInterval(async () => {
-          progressCount++;
-          const elapsed = progressCount * intervalSec;
-          try {
-            await sink.send(event.data.chatId, `⏳ Still working... (${elapsed}s)`);
-          } catch {
-            /* ignored */
-          }
-        }, intervalMs);
 
-        // Spawn into task pool — non-blocking
-        const cancelRef = { cancel: null };
         this.taskPool.spawn(
           taskId,
           () => {
             const handle = this.executor.executeTaskAsync(taskDesc);
             cancelRef.cancel = handle.cancel;
-            return handle.promise;
+
+            // Start heartbeat now that the task is actually running
+            let progressCount = 0;
+            const progressTimer = setInterval(async () => {
+              progressCount++;
+              const elapsed = progressCount * intervalSec;
+              try {
+                await sinkRef.send(chatId, `⏳ Still working... (${elapsed}s)`);
+              } catch {
+                /* ignored */
+              }
+            }, intervalMs);
+
+            // Clean up timer when task finishes (success or failure)
+            return handle.promise.finally(() => clearInterval(progressTimer));
           },
           {
             description: taskDesc,
@@ -511,7 +518,6 @@ class Dispatcher {
             user: event.data.user,
             timeout: 300000, // 5 min
             cancel: () => cancelRef.cancel && cancelRef.cancel(),
-            _progressTimer: progressTimer,
             _sink: sink,
             _messageId: event.data.messageId,
           }
@@ -642,8 +648,7 @@ class Dispatcher {
         activeEntry.endTime = entry.endTime;
       }
 
-      // Clear progress timer if present
-      if (entry._progressTimer) clearInterval(entry._progressTimer);
+
 
       const result = entry.result || 'Task completed.';
       this._deliverTaskResult(entry, result);
@@ -657,8 +662,6 @@ class Dispatcher {
         activeEntry.endTime = entry.endTime;
       }
 
-      if (entry._progressTimer) clearInterval(entry._progressTimer);
-
       const errMsg = `❌ Task failed: ${entry.error || 'unknown error'}`;
       this._deliverTaskResult(entry, errMsg);
     });
@@ -671,8 +674,6 @@ class Dispatcher {
         activeEntry.endTime = entry.endTime;
       }
 
-      if (entry._progressTimer) clearInterval(entry._progressTimer);
-
       const timeoutMsg = `⏰ Task timed out: ${entry.description.slice(0, 100)}`;
       this._deliverTaskResult(entry, timeoutMsg);
     });
@@ -684,7 +685,6 @@ class Dispatcher {
         activeEntry.status = 'cancelled';
         activeEntry.endTime = entry.endTime;
       }
-      if (entry._progressTimer) clearInterval(entry._progressTimer);
     });
   }
 
