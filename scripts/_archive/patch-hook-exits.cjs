@@ -27,9 +27,9 @@ for (const file of files) {
 
   // 1. Normal console.log(formatResult(...)) \\n process.exit(2)
   const regex =
-    /(console\.log\s*\(\s*(?:formatResult|JSON\.stringify)\s*\([^;]+;\s*(?:return;\s*)?)(?:await\s+[a-zA-Z0-9_\(,\)\s]+;\s*)?process\.exit\(\s*2\s*\)/g;
+    /(console\.log\s*\(\s*(?:formatResult|JSON\.stringify)\s*\([^;]+;\s*(?:return;\s*)?)(?:await\s+[a-zA-Z0-9_(,)\s]+;\s*)?process\.exit\(\s*2\s*\)/g;
 
-  content = content.replace(regex, (match, p1) => {
+  content = content.replace(regex, (match, _p1) => {
     changed = true;
     return match.replace(/process\.exit\(\s*2\s*\)/, 'process.exit(0)');
   });

@@ -68,7 +68,7 @@
     }
   },
   "vectorStore": {
-    "persistDirectory": ".claude/context/data/code-index",
+    "persistDirectory": ".claude/context/code-index",
     "collectionName": "agent-studio-code",
     "distanceFunction": "cosine"
   },
