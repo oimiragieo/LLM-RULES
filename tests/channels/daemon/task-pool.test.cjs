@@ -10,7 +10,7 @@ const { TaskPool } = require('../../../scripts/channels/daemon/task-pool.cjs');
  * Helper: create a task function that resolves after `ms` with `result`.
  */
 function delayedTask(result, ms = 10) {
-  return () => new Promise((resolve) => setTimeout(() => resolve(result), ms));
+  return () => new Promise(resolve => setTimeout(() => resolve(result), ms));
 }
 
 /**
@@ -22,13 +22,14 @@ function failingTask(errMsg, ms = 10) {
 
 /**
  * Helper: create a cancellable task function (returns { promise, cancel }).
+ * Prefixed with _ to indicate it's available but not used in every test run.
  */
+ 
 function _cancellableTask(ms = 5000) {
   let cancelFn;
   const fn = () => {
-    let timer;
     const promise = new Promise((resolve, reject) => {
-      timer = setTimeout(() => resolve('done'), ms);
+      const timer = setTimeout(() => resolve('done'), ms);
       cancelFn = () => {
         clearTimeout(timer);
         reject(new Error('cancelled'));
@@ -165,13 +166,13 @@ describe('TaskPool', () => {
       });
 
       // Give it a tick to start
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise(r => setTimeout(r, 10));
       assert.equal(entry.status, 'running');
 
       const cancelled = pool.cancel('t-1');
       assert.equal(cancelled, true);
 
-      await new Promise((r) => setTimeout(r, 50));
+      await new Promise(r => setTimeout(r, 50));
       assert.equal(entry.status, 'cancelled');
     });
   });
@@ -202,7 +203,7 @@ describe('TaskPool', () => {
         timeout: 50,
       });
 
-      await new Promise((r) => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 200));
       assert.equal(entry.status, 'timeout');
     });
   });
@@ -214,7 +215,7 @@ describe('TaskPool', () => {
       pool.spawn('t-2', delayedTask('b', 200), { description: 'b', chatId: '1', user: 'u' });
 
       // Wait for t-1 to complete
-      await new Promise((r) => setTimeout(r, 50));
+      await new Promise(r => setTimeout(r, 50));
 
       const running = pool.getRunning();
       assert.equal(running.length, 1);
@@ -253,7 +254,7 @@ describe('TaskPool', () => {
   describe('2.14 — emits task-started event', () => {
     it('event fires with entry', async () => {
       const events = [];
-      pool.on('task-started', (entry) => events.push(entry));
+      pool.on('task-started', entry => events.push(entry));
 
       pool.spawn('t-1', delayedTask('a', 10), { description: 'a', chatId: '1', user: 'u' });
       assert.equal(events.length, 1);
@@ -265,7 +266,7 @@ describe('TaskPool', () => {
   describe('2.15 — emits task-completed event with result', () => {
     it('event fires on completion', async () => {
       const events = [];
-      pool.on('task-completed', (entry) => events.push(entry));
+      pool.on('task-completed', entry => events.push(entry));
 
       pool.spawn('t-1', delayedTask('done!', 10), { description: 'a', chatId: '1', user: 'u' });
       await pool.drain();
@@ -278,7 +279,7 @@ describe('TaskPool', () => {
   describe('2.16 — emits task-failed event with error', () => {
     it('event fires on failure', async () => {
       const events = [];
-      pool.on('task-failed', (entry) => events.push(entry));
+      pool.on('task-failed', entry => events.push(entry));
 
       pool.spawn('t-1', failingTask('boom'), { description: 'a', chatId: '1', user: 'u' });
       await pool.drain();
@@ -292,7 +293,7 @@ describe('TaskPool', () => {
     it('fires queued event', async () => {
       pool = new TaskPool({ maxConcurrent: 1 });
       const events = [];
-      pool.on('task-queued', (entry) => events.push(entry));
+      pool.on('task-queued', entry => events.push(entry));
 
       pool.spawn('t-1', delayedTask('a', 50), { description: 'a', chatId: '1', user: 'u' });
       pool.spawn('t-2', delayedTask('b', 50), { description: 'b', chatId: '1', user: 'u' });
@@ -312,7 +313,7 @@ describe('TaskPool', () => {
       await pool.drain();
 
       const all = pool.getAll();
-      assert.ok(all.every((t) => t.status === 'completed'));
+      assert.ok(all.every(t => t.status === 'completed'));
     });
   });
 
@@ -329,10 +330,10 @@ describe('TaskPool', () => {
       pool = new TaskPool({ maxConcurrent: 2 });
       let maxSeen = 0;
 
-      const trackingTask = (ms) => () => {
+      const trackingTask = ms => () => {
         const running = pool.getRunning().length;
         if (running > maxSeen) maxSeen = running;
-        return new Promise((r) => setTimeout(() => r('ok'), ms));
+        return new Promise(r => setTimeout(() => r('ok'), ms));
       };
 
       for (let i = 0; i < 5; i++) {
@@ -349,7 +350,7 @@ describe('TaskPool', () => {
       const progressMsgs = [];
       const fn = () => {
         // Simulate calling onProgress
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           setTimeout(() => resolve('done'), 10);
         });
       };
@@ -358,7 +359,7 @@ describe('TaskPool', () => {
         description: 'test',
         chatId: '1',
         user: 'u',
-        onProgress: (msg) => progressMsgs.push(msg),
+        onProgress: msg => progressMsgs.push(msg),
       });
 
       await pool.drain();

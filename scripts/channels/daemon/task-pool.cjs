@@ -93,7 +93,7 @@ class TaskPool extends EventEmitter {
 
     if (entry.status === 'queued') {
       // Remove from queue
-      const idx = this.queue.findIndex((t) => t.id === id);
+      const idx = this.queue.findIndex(t => t.id === id);
       if (idx >= 0) this.queue.splice(idx, 1);
       entry.status = 'cancelled';
       entry.endTime = Date.now();
@@ -138,7 +138,7 @@ class TaskPool extends EventEmitter {
    * @returns {TaskEntry[]}
    */
   getRunning() {
-    return [...this.tasks.values()].filter((t) => t.status === 'running');
+    return [...this.tasks.values()].filter(t => t.status === 'running');
   }
 
   /**
@@ -163,7 +163,7 @@ class TaskPool extends EventEmitter {
         await Promise.allSettled(promises);
       } else {
         // Queue has items but no promises yet — wait a tick for dequeue
-        await new Promise((r) => setTimeout(r, 5));
+        await new Promise(r => setTimeout(r, 5));
       }
     }
   }

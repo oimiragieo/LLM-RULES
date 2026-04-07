@@ -765,7 +765,9 @@ class Dispatcher {
       try {
         const sent = await sink.sendFile(chatId, fp.trim());
         if (sent) this.log(`[dispatcher] Sent file: ${fp}`);
-      } catch { /* ignored */ }
+      } catch {
+        /* ignored */
+      }
     }
   }
 

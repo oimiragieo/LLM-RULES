@@ -1,12 +1,11 @@
 'use strict';
 
-const { describe, it, beforeEach, afterEach, mock } = require('node:test');
+const { describe, it, beforeEach, mock } = require('node:test');
 const assert = require('node:assert/strict');
 const { EventEmitter } = require('node:events');
 
-// We'll mock child_process.spawn before requiring the module
+// Spawn mock populated in beforeEach
 let spawnMock;
-// Module refs populated in beforeEach when needed
 
 /**
  * Create a fake ChildProcess that implements the subset we need:
@@ -24,7 +23,7 @@ function createFakeChild(opts = {}) {
   child.stdout = new EventEmitter();
   child.stderr = new EventEmitter();
 
-  child.kill = mock.fn((signal) => {
+  child.kill = mock.fn(signal => {
     child.killed = true;
     // Simulate process exit after kill
     if (opts.exitOnKill !== false) {
@@ -35,7 +34,7 @@ function createFakeChild(opts = {}) {
   });
 
   // Helper to simulate successful exit with stdout
-  child.simulateSuccess = (output) => {
+  child.simulateSuccess = output => {
     setImmediate(() => {
       child.stdout.emit('data', output);
       child.emit('close', 0, null);
@@ -104,7 +103,7 @@ describe('claudeAsync', () => {
       if (!mod._claudeAsyncImpl) return; // skip if not exported
       const handle = mod._claudeAsyncImpl('bad prompt', {}, spawnMock);
       fakeChild.simulateFailure('Error: something broke', 1);
-      await assert.rejects(handle.promise, (err) => {
+      await assert.rejects(handle.promise, err => {
         assert.ok(err.message.includes('something broke'));
         return true;
       });
@@ -117,7 +116,7 @@ describe('claudeAsync', () => {
       if (!mod._claudeAsyncImpl) return;
       const handle = mod._claudeAsyncImpl('slow task', {}, spawnMock);
       handle.cancel();
-      await assert.rejects(handle.promise, (err) => {
+      await assert.rejects(handle.promise, err => {
         assert.ok(err.message.includes('cancelled') || err.message.includes('cancel'));
         return true;
       });
@@ -132,7 +131,7 @@ describe('claudeAsync', () => {
       const child = createFakeChild({ exitOnKill: true });
       const spawn = mock.fn(() => child);
       const handle = mod._claudeAsyncImpl('slow', { timeout: 100 }, spawn);
-      await assert.rejects(handle.promise, (err) => {
+      await assert.rejects(handle.promise, err => {
         assert.ok(
           err.message.includes('timeout') || err.message.includes('Timeout'),
           `Expected timeout error, got: ${err.message}`
