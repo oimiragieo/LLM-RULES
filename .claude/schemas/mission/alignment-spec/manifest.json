@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "manifest.json",
+  "title": "Agent Studio alignment training spec bundle",
+  "version": "1.0.0",
+  "description": "Machine-readable schemas, deterministic alignment rules, and grading rubric for evaluating mission workflow quality. Adapted from Factory Droid alignment-training-spec v1.",
+  "artifacts": {
+    "schemas": [
+      "../features-document.schema.json",
+      "../feature.schema.json",
+      "../mission-handoff.schema.json",
+      "../mission-state.schema.json",
+      "../validation-state.schema.json",
+      "grading-report.schema.json"
+    ],
+    "rules": "rules.json",
+    "rubric": "rubric.json",
+    "evaluatorReference": "evaluator-reference.json"
+  },
+  "compatibility": {
+    "notes": [
+      "Skill definitions are under .claude/skills/<name>/SKILL.md; features reference skillName only.",
+      "Schemas use additionalProperties: true where safe for extensibility.",
+      "Schemas use relative $id values resolved from the schemas directory."
+    ]
+  }
+}

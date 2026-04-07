@@ -1,0 +1,179 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mission-handoff.schema.json",
+  "title": "Worker handoff JSON (handoffs/*.json)",
+  "description": "Schema for worker handoff documents. Each handoff records what a worker accomplished, verification evidence, discovered issues, and skill feedback. Aligned with Factory Droid handoff-document.schema.json.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "timestamp",
+    "workerSessionId",
+    "featureId",
+    "milestone",
+    "commitId",
+    "successState",
+    "returnToOrchestrator",
+    "handoff"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of handoff creation"
+    },
+    "workerSessionId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "UUID of the worker session that produced this handoff"
+    },
+    "featureId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Feature ID this handoff corresponds to (must match feature.id)"
+    },
+    "milestone": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Milestone this feature belongs to (must match feature.milestone)"
+    },
+    "commitId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{7,40}$",
+      "description": "Git commit hash (short or full) of the changes made"
+    },
+    "successState": {
+      "type": "string",
+      "enum": ["success", "failure", "partial"],
+      "description": "Overall outcome of the worker's attempt"
+    },
+    "returnToOrchestrator": {
+      "type": "boolean",
+      "description": "Whether control should return to the orchestrator (true for validators)"
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "salientSummary",
+        "whatWasImplemented",
+        "whatWasLeftUndone",
+        "verification",
+        "tests",
+        "discoveredIssues",
+        "skillFeedback"
+      ],
+      "properties": {
+        "salientSummary": {
+          "type": "string",
+          "description": "1-2 paragraph executive summary of work done"
+        },
+        "whatWasImplemented": {
+          "type": "string",
+          "description": "Detailed description of all work completed"
+        },
+        "whatWasLeftUndone": {
+          "type": "string",
+          "description": "Description of remaining work (empty string if fully complete)"
+        },
+        "verification": {
+          "type": "object",
+          "required": ["commandsRun"],
+          "additionalProperties": true,
+          "properties": {
+            "commandsRun": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["command", "exitCode"],
+                "additionalProperties": true,
+                "properties": {
+                  "command": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The verification command that was executed"
+                  },
+                  "exitCode": {
+                    "type": "integer",
+                    "description": "Exit code of the command (0 = success)"
+                  },
+                  "observation": {
+                    "type": "string",
+                    "description": "Human-readable observation about the command result"
+                  }
+                }
+              },
+              "description": "Array of verification commands that were run with their exit codes"
+            }
+          }
+        },
+        "tests": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "added": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Test files or cases that were added"
+            },
+            "updated": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Test files that were modified"
+            },
+            "coverage": {
+              "type": "string",
+              "description": "Description of test coverage achieved"
+            }
+          }
+        },
+        "discoveredIssues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["severity", "description"],
+            "additionalProperties": true,
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": ["blocking", "non_blocking", "info"],
+                "description": "Issue severity level"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Description of the discovered issue"
+              },
+              "suggestedFix": {
+                "type": "string",
+                "description": "Suggested remediation for the issue"
+              }
+            }
+          },
+          "description": "Issues found during implementation"
+        },
+        "skillFeedback": {
+          "type": "object",
+          "required": ["followedProcedure", "deviations"],
+          "additionalProperties": true,
+          "properties": {
+            "followedProcedure": {
+              "type": "boolean",
+              "description": "Whether the worker followed the skill procedure"
+            },
+            "deviations": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "List of deviations from the expected procedure with reasons"
+            },
+            "suggestedChanges": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Suggestions for improving the skill procedure"
+            }
+          },
+          "description": "Feedback on skill procedure adherence"
+        }
+      }
+    }
+  }
+}

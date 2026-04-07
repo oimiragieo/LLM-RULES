@@ -146,6 +146,22 @@ function buildMissionContext(parsedMission, feature) {
     lines.push('');
   }
 
+  // Add OS-aware command guidance (Factory Droid alignment)
+  lines.push('### Platform Guidance');
+  if (process.platform === 'win32') {
+    lines.push('- Platform: Windows. Use `\\` paths or normalize to `/`.');
+    lines.push('- Use `cargo.exe` not `cargo` if PATH issues arise.');
+    lines.push('- PowerShell is default shell; bash commands may need adaptation.');
+    lines.push('- Use `node.exe` for Node.js scripts.');
+    lines.push('- File paths are case-insensitive but case-preserving.');
+  } else if (process.platform === 'darwin') {
+    lines.push('- Platform: macOS. Use `/` paths.');
+    lines.push('- Homebrew binaries may be in /opt/homebrew/bin/.');
+  } else {
+    lines.push(`- Platform: ${process.platform}. Use \`/\` paths.`);
+  }
+  lines.push('');
+
   return lines.join('\n');
 }
 

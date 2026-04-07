@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "milestone-validator-templates.json",
+  "title": "Milestone validator feature templates",
+  "description": "Reusable feature templates for scrutiny-validator and user-testing-validator features. Add these to features.json after all implementation features for a milestone are complete. Aligned with Factory Droid milestone validation cadence.",
+  "templates": {
+    "scrutiny-validator": {
+      "id": "scrutiny-validator-{{milestone}}",
+      "description": "Scrutiny code review and test validation for milestone {{milestone}}. Reviews all completed features, checks code quality, verifies test coverage, and produces a synthesis report.",
+      "skillName": "code-reviewer",
+      "preconditions": ["All implementation features for milestone {{milestone}} are complete"],
+      "expectedBehavior": [
+        "All feature handoffs for {{milestone}} reviewed for code quality",
+        "Test coverage verified for all features",
+        "No blocking issues found or documented for resolution",
+        "Synthesis report produced with shared observations"
+      ],
+      "verificationSteps": [
+        "pnpm lint:fix",
+        "pnpm format",
+        "pnpm test"
+      ],
+      "fulfills": [],
+      "milestone": "{{milestone}}",
+      "status": "pending"
+    },
+    "user-testing-validator": {
+      "id": "user-testing-validator-{{milestone}}",
+      "description": "End-to-end user testing validation for milestone {{milestone}}. Verifies functional behavior from a user perspective, running acceptance tests against validation contract assertions.",
+      "skillName": "qa",
+      "preconditions": ["scrutiny-validator-{{milestone}} completed"],
+      "expectedBehavior": [
+        "All VAL-* assertions for {{milestone}} features verified",
+        "Evidence artifacts created under evidence/{{milestone}}/",
+        "Validation-state.json updated with pass/fail for each assertion",
+        "No unresolved blocking issues"
+      ],
+      "verificationSteps": [
+        "pnpm test"
+      ],
+      "fulfills": [],
+      "milestone": "{{milestone}}",
+      "status": "pending"
+    }
+  },
+  "usage": "Replace {{milestone}} with the actual milestone name (e.g., 'memory-enhancements'). Copy the expanded template objects into the features[] array in features.json."
+}

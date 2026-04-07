@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "grading-report.schema.json",
+  "title": "Output of an automated alignment grader",
+  "description": "Schema for grading report output. Adapted from Factory Droid alignment-training-spec v1.",
+  "type": "object",
+  "required": ["specVersion", "gradedAt", "summary", "results"],
+  "additionalProperties": true,
+  "properties": {
+    "specVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.\\d+$",
+      "description": "Version of the alignment spec used for grading"
+    },
+    "gradedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when grading was performed"
+    },
+    "missionId": {
+      "type": "string",
+      "description": "Mission UUID that was graded"
+    },
+    "featureId": {
+      "type": "string",
+      "description": "Feature ID that was evaluated"
+    },
+    "summary": {
+      "type": "object",
+      "required": ["score", "maxScore", "passed"],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Normalized score (0-100)"
+        },
+        "maxScore": {
+          "type": "number",
+          "description": "Maximum possible score (typically 100)"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "True if score >= passThreshold and no blocker failures"
+        },
+        "gradeBand": {
+          "type": "string",
+          "enum": ["excellent", "good", "marginal", "fail"],
+          "description": "Grade band based on score"
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "outcome", "weight"],
+        "additionalProperties": true,
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "Rule ID from rules.json"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": ["pass", "fail", "na", "unknown"],
+            "description": "Rule evaluation outcome"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Points possible for this rule"
+          },
+          "pointsAwarded": {
+            "type": "number",
+            "description": "Actual points awarded"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Explanation or evidence for the outcome"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional rule-specific details"
+          }
+        }
+      }
+    }
+  }
+}

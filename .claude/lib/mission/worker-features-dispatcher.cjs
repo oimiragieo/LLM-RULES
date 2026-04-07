@@ -19,6 +19,7 @@
  * - personaContext: { missionObjectives, featureDescription, expectedBehavior, verificationSteps }
  */
 
+const fs = require('node:fs');
 const path = require('node:path');
 const { loadFeatures } = require('./features-state-machine.cjs');
 const { parseMission } = require('./mission-parser.cjs');
@@ -66,6 +67,33 @@ function dispatchFeature({ db, budget, featuresPath, missionPath, chatId, estima
 
   // Select the first eligible feature (lowest array index = highest priority)
   const feature = eligibleFeatures[0];
+
+  // Validate skillName resolves to a real skill (Factory Droid alignment)
+  if (feature.skillName) {
+    const skillPaths = [
+      path.join(process.cwd(), '.claude', 'skills'),
+      path.join(process.cwd(), '.claude', 'agents', 'domain'),
+      path.join(process.cwd(), '.claude', 'agents', 'core'),
+    ];
+    const skillExists = skillPaths.some(sp => {
+      const skillFile = path.join(sp, feature.skillName, 'SKILL.md');
+      const agentFile = path.join(sp, feature.skillName + '.md');
+      try {
+        return fs.existsSync(skillFile) || fs.existsSync(agentFile);
+      } catch {
+        return false;
+      }
+    });
+    if (!skillExists) {
+      return {
+        dispatched: false,
+        reason: 'skill_not_found',
+        featureId: feature.id,
+        skillName: feature.skillName,
+        error: `Skill "${feature.skillName}" not found in .claude/skills/ or .claude/agents/. Create the skill first or fix the skillName in features.json.`,
+      };
+    }
+  }
 
   // Check budget before dispatching
   const slot = budget.acquireWorkerSlot(estimatedTokens || 1000);

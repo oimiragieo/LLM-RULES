@@ -223,9 +223,12 @@ function _topologicalSort(features) {
 class FeaturesStateMachine {
   /**
    * @param {string} featuresPath - Path to features.json file
+   * @param {Object} [options] - Optional configuration
+   * @param {string} [options.progressLogPath] - Path to progress_log.jsonl for event emission
    */
-  constructor(featuresPath) {
+  constructor(featuresPath, options = {}) {
     this.featuresPath = path.normalize(featuresPath);
+    this.progressLogPath = options.progressLogPath || null;
     this.features = [];
     this.featureMap = new Map();
     this.loaded = false;
@@ -422,6 +425,14 @@ class FeaturesStateMachine {
 
     // Persist with atomic write
     this._persist();
+
+    // Emit progress log event if progressLogPath is set
+    this._emitProgressEvent('feature_transition', {
+      featureId,
+      from: currentStatus,
+      to: newStatus,
+      milestone: updatedFeature.milestone,
+    });
   }
 
   /**
@@ -430,6 +441,25 @@ class FeaturesStateMachine {
   _persist() {
     const data = { features: this.features };
     atomicWriteJSON(this.featuresPath, data);
+  }
+
+  /**
+   * Emit a progress log event to progress_log.jsonl
+   * @param {string} type - Event type
+   * @param {Object} data - Event data
+   */
+  _emitProgressEvent(type, data) {
+    if (!this.progressLogPath) return;
+    try {
+      const event = {
+        timestamp: new Date().toISOString(),
+        type,
+        ...data,
+      };
+      fs.appendFileSync(this.progressLogPath, JSON.stringify(event) + '\n', 'utf8');
+    } catch {
+      // Progress logging is best-effort — never block state transitions
+    }
   }
 
   /**

@@ -281,6 +281,27 @@ class MilestoneGate {
         this.blocking.push(...assertionBlockers);
       }
 
+      // Collect W-VAL-FEATURE-MISMATCH warnings (Factory Droid alignment)
+      // Feature completed but fulfills VAL assertions still pending
+      const warnings = [];
+      for (const feature of milestoneFeatures) {
+        if (feature.status === 'completed' && !this._isInfrastructureFeature(feature)) {
+          for (const valId of feature.fulfills || []) {
+            const assertion = gatekeeper.getAssertion(valId);
+            if (assertion && assertion.status !== 'passed') {
+              warnings.push({
+                type: 'W-VAL-FEATURE-MISMATCH',
+                featureId: feature.id,
+                assertionId: valId,
+                featureStatus: 'completed',
+                assertionStatus: assertion.status,
+                message: `Feature "${feature.id}" is completed but ${valId} is still ${assertion.status}. Mission may be between feature completion and milestone validation.`,
+              });
+            }
+          }
+        }
+      }
+
       // Determine verdicts
       const passed = this.blocking.length === 0;
       const scrutinyVerdict = this._determineScrutinyVerdict();
@@ -289,6 +310,7 @@ class MilestoneGate {
       return {
         passed,
         blocking: this.blocking,
+        warnings,
         features: milestoneFeatures.map(f => ({
           id: f.id,
           status: f.status,

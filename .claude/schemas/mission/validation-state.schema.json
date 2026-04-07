@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "validation-state.schema.json",
+  "title": "validation-state.json",
+  "description": "Ledger of validation assertions (VAL-*) and their pass/fail/pending status. Each key is a VAL-* ID mapping to its current state.",
+  "type": "object",
+  "required": ["assertions"],
+  "additionalProperties": true,
+  "properties": {
+    "assertions": {
+      "type": "object",
+      "description": "Map of VAL-* assertion IDs to their status objects",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "additionalProperties": true,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["pending", "passed", "failed", "blocked", "skipped"],
+            "description": "Current assertion validation state"
+          },
+          "validatedAtMilestone": {
+            "type": "string",
+            "description": "Milestone at which this assertion was validated"
+          },
+          "validatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of last validation attempt"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Path to evidence file proving this assertion"
+          }
+        }
+      }
+    }
+  }
+}

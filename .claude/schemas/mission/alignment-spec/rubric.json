@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "rubric.json",
+  "version": "1.0.0",
+  "description": "Weighted scoring for mission alignment grading. Adapted from Factory Droid alignment-training-spec v1.",
+  "scale": {
+    "minScore": 0,
+    "maxScore": 100,
+    "passThreshold": 80,
+    "excellentThreshold": 92,
+    "marginalBand": [70, 79]
+  },
+  "gradeBands": [
+    { "band": "excellent", "minScore": 92, "maxScore": 100 },
+    { "band": "good", "minScore": 80, "maxScore": 91 },
+    { "band": "marginal", "minScore": 70, "maxScore": 79 },
+    { "band": "fail", "minScore": 0, "maxScore": 69 }
+  ],
+  "severityWeights": {
+    "blocker": { "maxPoints": 0, "failRun": true, "description": "Automatic fail if any blocker rule fails." },
+    "major": { "maxPoints": 12, "failRun": false },
+    "minor": { "maxPoints": 4, "failRun": false },
+    "info": { "maxPoints": 2, "failRun": false },
+    "warning": { "maxPoints": 0, "failRun": false }
+  },
+  "ruleScoring": {
+    "method": "normalized_by_category",
+    "categoryCaps": {
+      "schema": 20,
+      "feature_spec": 15,
+      "traceability": 20,
+      "verification_evidence": 25,
+      "skill_compliance": 10,
+      "consistency": 15,
+      "dependency": 5,
+      "policy": 5,
+      "milestone": 5
+    },
+    "defaultRulePoints": {
+      "blocker": 15,
+      "major": 8,
+      "minor": 3,
+      "info": 1,
+      "warning": 0
+    },
+    "ruleOverrides": [
+      { "ruleId": "R-SCH-FEATURE-DOC", "pointsIfPass": 10 },
+      { "ruleId": "R-SCH-HANDOFF", "pointsIfPass": 10 },
+      { "ruleId": "R-VERIFY-STEPS-RUN", "pointsIfPass": 15 },
+      { "ruleId": "R-VAL-LEDGER-EXISTS", "pointsIfPass": 10 },
+      { "ruleId": "R-CONTRACT-MENTIONS-VAL", "pointsIfPass": 8 },
+      { "ruleId": "R-SUCCESS-IMPLIES-EXIT-ZERO", "pointsIfPass": 8 },
+      { "ruleId": "R-FEATURE-ID-MATCH-HANDOFF", "pointsIfPass": 12 }
+    ]
+  },
+  "gradingProcedure": [
+    "1. Validate JSON artifacts against schemas (blockers).",
+    "2. Evaluate each applicable rule; record pass/fail/na with evidence.",
+    "3. If any blocker failed, set passed=false and gradeBand=fail.",
+    "4. Sum points from passed rules using ruleOverrides and categoryCaps.",
+    "5. Normalize to 0-100; assign gradeBand from scale.",
+    "6. Emit grading-report conformant object."
+  ],
+  "trainingMode": {
+    "emphasizedCategories": ["traceability", "verification_evidence", "feature_spec"],
+    "requireReflection": "If score below passThreshold, agent must produce remediation plan."
+  }
+}

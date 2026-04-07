@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "evaluator-reference.json",
+  "version": "1.0.0",
+  "description": "Normative semantics for evaluation kinds referenced in rules.json. Adapted from Factory Droid alignment-training-spec v1.",
+  "kinds": {
+    "json_schema": {
+      "inputs": ["artifactJson", "schemaPath"],
+      "algorithm": "Load schema; validate artifactJson; pass iff valid."
+    },
+    "all_of": {
+      "inputs": ["conditions[]"],
+      "algorithm": "Pass iff every child condition passes; short-circuit on first failure."
+    },
+    "array_nonempty": {
+      "inputs": ["artifactJson", "jsonPointer"],
+      "algorithm": "Resolve pointer; value must be array with length >= 1."
+    },
+    "string_nonempty": {
+      "inputs": ["artifactJson", "jsonPointer"],
+      "algorithm": "Resolve pointer; value must be string with trim length >= 1."
+    },
+    "set_subset": {
+      "inputs": ["leftArray", "rightObjectOrSet"],
+      "algorithm": "If asKeys: every element of leftArray exists as key in rightObject. Else: every element of left is in right set."
+    },
+    "regex_all_match": {
+      "inputs": ["stringArray", "regex"],
+      "algorithm": "Compile regex; every string must match fully (use ^...$ in regex field)."
+    },
+    "markdown_contains_all": {
+      "inputs": ["contractText", "needles[]"],
+      "algorithm": "For each VAL id in needles, contractText must contain that exact substring."
+    },
+    "verification_steps_covered": {
+      "inputs": ["verificationSteps[]", "commandsRun[]"],
+      "algorithm": "For each non-empty step S: exists command C in commandsRun where C.command includes S as substring. Empty verificationSteps: rule is na."
+    },
+    "json_pointer_all": {
+      "inputs": ["artifactJson", "pointer", "itemRule"],
+      "algorithm": "Resolve pointer to array; each item must satisfy itemRule (e.g. requiredKeys check)."
+    },
+    "object_keys_exist": {
+      "inputs": ["object", "requiredKeys[]"],
+      "algorithm": "Pass iff object has every required key."
+    },
+    "conditional_integrity": {
+      "inputs": ["when", "then"],
+      "algorithm": "If when matches artifact, evaluate then; else na."
+    },
+    "equals": {
+      "inputs": ["leftResolved", "rightResolved"],
+      "algorithm": "Deep equality for JSON primitives."
+    },
+    "consistency_warning": {
+      "inputs": ["feature", "validationState"],
+      "algorithm": "If when satisfied, emit warning if warnIf holds; does not reduce score."
+    },
+    "file_exists": {
+      "inputs": ["path_template"],
+      "algorithm": "Resolve template with feature fields; check file exists on disk. Agent Studio extension."
+    }
+  },
+  "jsonPointer": {
+    "syntax": "RFC 6901",
+    "notes": "Escape ~0 and ~1 per RFC; root is empty string."
+  }
+}

@@ -1,0 +1,215 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "rules.json",
+  "version": "1.0.0",
+  "description": "Deterministic alignment rules for Agent Studio missions. Implement evaluators per evaluation.kind; combine with rubric.json for scoring. Adapted from Factory Droid alignment-training-spec v1.",
+  "artifacts": {
+    "feature": "Single object from features.json.features[]",
+    "featuresDocument": "Root features.json",
+    "handoff": "handoffs/*.json root object",
+    "missionState": "state.json",
+    "validationState": "validation-state.json",
+    "validationContract": "validation-contract.md (text)",
+    "agentsMd": "AGENTS.md (text)"
+  },
+  "evaluationKinds": {
+    "json_schema": "Validate artifact JSON against a schema",
+    "array_nonempty": "JSON Pointer must exist and be a non-empty array",
+    "string_nonempty": "JSON Pointer must exist and be non-whitespace string",
+    "set_subset": "Every element of set A is a key in object B (or member of set B)",
+    "regex_all_match": "Every string in array matches regex",
+    "cross_reference": "IDs in field A appear in contract or validation ledger",
+    "markdown_heading_exists": "validation-contract.md contains heading or VAL line for ID",
+    "consistency_warning": "Surface mismatch without failing (e.g. completed feature vs pending VAL)"
+  },
+  "rules": [
+    {
+      "id": "R-SCH-FEATURE-DOC",
+      "title": "features.json parses as features document schema",
+      "category": "schema",
+      "severity": "blocker",
+      "evaluation": {
+        "kind": "json_schema",
+        "artifact": "featuresDocument",
+        "schemaPath": "../features-document.schema.json"
+      }
+    },
+    {
+      "id": "R-SCH-HANDOFF",
+      "title": "Handoff file parses as handoff document schema",
+      "category": "schema",
+      "severity": "blocker",
+      "evaluation": {
+        "kind": "json_schema",
+        "artifact": "handoff",
+        "schemaPath": "../mission-handoff.schema.json"
+      }
+    },
+    {
+      "id": "R-FEAT-SPEC-COMPLETE",
+      "title": "Feature has executable spec fields",
+      "category": "feature_spec",
+      "severity": "blocker",
+      "evaluation": {
+        "kind": "all_of",
+        "conditions": [
+          { "kind": "string_nonempty", "artifact": "feature", "pointer": "/id" },
+          { "kind": "string_nonempty", "artifact": "feature", "pointer": "/description" },
+          { "kind": "array_nonempty", "artifact": "feature", "pointer": "/expectedBehavior" },
+          { "kind": "array_nonempty", "artifact": "feature", "pointer": "/preconditions" }
+        ]
+      }
+    },
+    {
+      "id": "R-VAL-ID-FORMAT",
+      "title": "fulfills entries match VAL-* assertion ID pattern",
+      "category": "traceability",
+      "severity": "major",
+      "appliesWhen": { "feature": "/fulfills", "exists": true },
+      "evaluation": {
+        "kind": "regex_all_match",
+        "artifact": "feature",
+        "pointer": "/fulfills",
+        "regex": "^VAL-[A-Z0-9]+-[0-9]{3}$"
+      }
+    },
+    {
+      "id": "R-VAL-LEDGER-EXISTS",
+      "title": "Each fulfills ID exists as a key in validation-state.json assertions",
+      "category": "traceability",
+      "severity": "major",
+      "appliesWhen": { "feature": "/fulfills", "exists": true },
+      "evaluation": {
+        "kind": "set_subset",
+        "left": { "artifact": "feature", "pointer": "/fulfills" },
+        "right": { "artifact": "validationState", "pointer": "/assertions", "asKeys": true }
+      }
+    },
+    {
+      "id": "R-CONTRACT-MENTIONS-VAL",
+      "title": "Each fulfills ID appears in validation-contract.md",
+      "category": "traceability",
+      "severity": "major",
+      "appliesWhen": { "feature": "/fulfills", "exists": true },
+      "evaluation": {
+        "kind": "markdown_contains_all",
+        "artifact": "validationContract",
+        "needlesFrom": { "artifact": "feature", "pointer": "/fulfills" }
+      }
+    },
+    {
+      "id": "R-VERIFY-STEPS-RUN",
+      "title": "Every non-empty verificationSteps command appears in handoff.verification.commandsRun",
+      "category": "verification_evidence",
+      "severity": "major",
+      "appliesWhen": { "feature": "/verificationSteps", "arrayMinLength": 1 },
+      "evaluation": {
+        "kind": "verification_steps_covered",
+        "featurePointer": "/verificationSteps",
+        "handoffPointer": "/handoff/verification/commandsRun",
+        "match": "substring_or_normalization"
+      }
+    },
+    {
+      "id": "R-HANDOFF-EXIT-CODES",
+      "title": "Reported verification commands include exitCode for each command",
+      "category": "verification_evidence",
+      "severity": "minor",
+      "evaluation": {
+        "kind": "json_pointer_all",
+        "artifact": "handoff",
+        "pointer": "/handoff/verification/commandsRun",
+        "itemRule": { "requiredKeys": ["command", "exitCode"] }
+      }
+    },
+    {
+      "id": "R-SUCCESS-IMPLIES-EXIT-ZERO",
+      "title": "If successState is success, all commandsRun exitCode should be 0",
+      "category": "verification_evidence",
+      "severity": "major",
+      "evaluation": {
+        "kind": "conditional_integrity",
+        "when": { "pointer": "/successState", "equals": "success" },
+        "then": {
+          "kind": "all_commands_exit_zero",
+          "pointer": "/handoff/verification/commandsRun"
+        }
+      }
+    },
+    {
+      "id": "R-SKILL-FEEDBACK-PRESENT",
+      "title": "skillFeedback documents procedure adherence",
+      "category": "skill_compliance",
+      "severity": "minor",
+      "evaluation": {
+        "kind": "object_keys_exist",
+        "artifact": "handoff",
+        "pointer": "/handoff/skillFeedback",
+        "requiredKeys": ["followedProcedure", "deviations"]
+      }
+    },
+    {
+      "id": "R-DEVIATIONS-EXPLAIN-SKIP",
+      "title": "If followedProcedure is false, deviations must be non-empty",
+      "category": "skill_compliance",
+      "severity": "major",
+      "evaluation": {
+        "kind": "conditional_integrity",
+        "when": { "pointer": "/handoff/skillFeedback/followedProcedure", "equals": false },
+        "then": { "kind": "array_nonempty", "pointer": "/handoff/skillFeedback/deviations" }
+      }
+    },
+    {
+      "id": "R-FEATURE-ID-MATCH-HANDOFF",
+      "title": "Handoff featureId matches the feature under evaluation",
+      "category": "consistency",
+      "severity": "blocker",
+      "evaluation": {
+        "kind": "equals",
+        "left": { "artifact": "handoff", "pointer": "/featureId" },
+        "right": { "artifact": "feature", "pointer": "/id" }
+      }
+    },
+    {
+      "id": "R-MILESTONE-MATCH",
+      "title": "Handoff milestone matches feature milestone",
+      "category": "consistency",
+      "severity": "major",
+      "evaluation": {
+        "kind": "equals",
+        "left": { "artifact": "handoff", "pointer": "/milestone" },
+        "right": { "artifact": "feature", "pointer": "/milestone" }
+      }
+    },
+    {
+      "id": "W-VAL-FEATURE-MISMATCH",
+      "title": "Warning: feature status completed but fulfills VAL still pending in ledger",
+      "category": "consistency",
+      "severity": "warning",
+      "evaluation": {
+        "kind": "consistency_warning",
+        "when": {
+          "all": [
+            { "feature": "/status", "equals": "completed" },
+            { "feature": "/fulfills", "exists": true }
+          ]
+        },
+        "warnIf": {
+          "anyFulfills": { "inValidationState": "/assertions", "statusNot": "passed" }
+        },
+        "message": "Mission may be between feature completion and milestone validation; do not treat as user-facing done without closing VALs."
+      }
+    },
+    {
+      "id": "R-SKILL-NAME-RESOLVES",
+      "title": "Feature skillName resolves to .claude/skills/<name>/SKILL.md",
+      "category": "feature_spec",
+      "severity": "major",
+      "evaluation": {
+        "kind": "file_exists",
+        "path_template": ".claude/skills/{{feature.skillName}}/SKILL.md",
+        "notes": "Agent Studio extension: validates skill existence at dispatch time."
+      }
+    }
+  ]
+}

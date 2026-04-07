@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "features-document.schema.json",
+  "title": "features.json root document",
+  "description": "Root schema for the mission features backlog. Contains an array of feature specifications forming a precondition DAG.",
+  "type": "object",
+  "required": ["features"],
+  "additionalProperties": true,
+  "properties": {
+    "features": {
+      "type": "array",
+      "items": { "$ref": "feature.schema.json" },
+      "minItems": 0,
+      "description": "Ordered array of feature specifications. Lower index = higher priority for dispatch."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the features document format"
+    },
+    "missionId": {
+      "type": "string",
+      "description": "Mission UUID this features document belongs to"
+    }
+  }
+}

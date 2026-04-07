@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "feature.schema.json",
+  "title": "Mission feature (single item from features.json)",
+  "description": "Schema for an individual feature specification within a mission backlog. Aligned with Factory Droid alignment-training-spec v1.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id",
+    "description",
+    "skillName",
+    "preconditions",
+    "expectedBehavior",
+    "verificationSteps",
+    "milestone",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9_-]*$",
+      "description": "Unique kebab-case identifier for this feature"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Detailed specification of what the feature must do"
+    },
+    "skillName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Worker skill type to dispatch (e.g., rust-worker, developer, qa)"
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Dependency declarations forming a DAG — other feature IDs or environment predicates"
+    },
+    "expectedBehavior": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Behavioral acceptance criteria that must be true when feature is complete"
+    },
+    "verificationSteps": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Commands to run to verify the feature works (e.g., test commands)"
+    },
+    "fulfills": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^VAL-[A-Z0-9]+-\\d{3}$"
+      },
+      "description": "VAL-* assertion IDs this feature proves when completed"
+    },
+    "milestone": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Milestone this feature belongs to"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "validating", "completed", "failed", "cancelled"],
+      "description": "Current lifecycle state of this feature"
+    },
+    "workerSessionIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "All worker session UUIDs that have touched this feature"
+    },
+    "currentWorkerSessionId": {
+      "oneOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Currently active worker session UUID, or null if idle"
+    },
+    "completedWorkerSessionId": {
+      "oneOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Worker session UUID that completed this feature, or null"
+    },
+    "retryCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of times this feature has been retried after failure"
+    }
+  }
+}

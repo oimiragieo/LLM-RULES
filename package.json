@@ -116,6 +116,8 @@
     "lint:staged": "eslint --ext .js,.cjs,.mjs",
     "manifest:generate": "node .claude/tools/cli/generate-tool-manifest.cjs",
     "manifest:validate": "node .claude/tools/cli/generate-tool-manifest.cjs --validate",
+    "mission:init": "node scripts/mission-init.cjs",
+    "mission:status": "node scripts/mission-status.cjs",
     "memory:init": "node .claude/tools/cli/init-memory-db.cjs",
     "docs:heal": "node scripts/heal-docs.cjs",
     "plugins:list": "node .claude/lib/plugins/cli.cjs list",

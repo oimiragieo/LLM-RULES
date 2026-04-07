@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Factory Droid Mission Alignment — 3-Tier Upgrade
+
+#### Added
+
+- **Mission bundle schemas** — 5 JSON Schema files under `.claude/schemas/mission/` aligned with Factory Droid alignment-training-spec v1: `feature.schema.json`, `features-document.schema.json`, `mission-state.schema.json`, `validation-state.schema.json`, `mission-handoff.schema.json`
+- **Mission workspace provisioner v2** — `workspace-provisioner.cjs` now scaffolds full Factory-aligned bundle: mission.md, AGENTS.md, features.json, state.json, validation-contract.md, validation-state.json, progress_log.jsonl, working_directory.txt, evidence/, verdicts/
+- **`pnpm mission:init` CLI** — scaffolds new mission bundle with `--working-directory` and `--json` options
+- **`pnpm mission:status` CLI** — generates human-readable dashboard with feature/milestone progress, VAL assertion matrix, and feature/assertion mismatch warnings
+- **W-VAL-FEATURE-MISMATCH warnings** in `milestone-gate.cjs` — surfaces Factory-style warnings when features are completed but their fulfills VAL assertions remain pending
+- **Alignment training spec** vendored under `.claude/schemas/mission/alignment-spec/` — rules.json (16 deterministic rules), rubric.json (weighted scoring with 80% pass threshold), evaluator-reference.json (evaluation kind semantics), grading-report.schema.json
+- **Progress log emission** in `features-state-machine.cjs` — emits JSONL events on state transitions to progress_log.jsonl via optional `progressLogPath` parameter
+- **skillName resolution check** in `worker-features-dispatcher.cjs` — validates feature.skillName resolves to `.claude/skills/<name>/SKILL.md` or agent file before dispatch; fails fast with clear error
+- **OS-aware persona injection** in `persona-injector.cjs` — injects platform-specific command guidance (Windows paths, cargo.exe, shell differences) into worker prompts
+- **Milestone validator templates** — reusable JSON templates for scrutiny-validator and user-testing-validator features
+
 ### Task Executor — MCP Tool Awareness + System Prompt Override
 
 #### Added

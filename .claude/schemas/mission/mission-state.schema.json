@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mission-state.schema.json",
+  "title": "state.json (orchestrator snapshot)",
+  "description": "Schema for mission orchestrator state. Tracks current mission progress, active worker, and milestone status.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["missionId", "baseSessionId", "state", "workingDirectory"],
+  "properties": {
+    "missionId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable mission identifier (UUID)"
+    },
+    "baseSessionId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Root orchestrator session UUID"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["pending", "running", "paused", "completed", "failed", "cancelled"],
+      "description": "Current mission lifecycle state"
+    },
+    "workingDirectory": {
+      "type": "string",
+      "description": "Absolute path to the target code workspace"
+    },
+    "currentFeatureId": {
+      "oneOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Feature currently being worked on, or null if idle"
+    },
+    "currentWorkerSessionId": {
+      "oneOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Active worker session UUID, or null if no worker active"
+    },
+    "currentWorkerPid": {
+      "oneOf": [{ "type": "integer" }, { "type": "null" }],
+      "description": "PID of the current worker process, or null"
+    },
+    "workerSessionIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Complete history of all spawned worker session UUIDs"
+    },
+    "completedFeatures": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Count of features with status completed"
+    },
+    "totalFeatures": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of features in the mission"
+    },
+    "milestonesWithValidationPlanned": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Milestones that have validation orchestration scheduled"
+    },
+    "lastReviewedHandoffCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of handoff documents the orchestrator has processed"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of mission creation"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last state update"
+    }
+  }
+}
