@@ -1,3 +1,21 @@
+## ADR-2026-04-07: Dead Code Remediation — Individual Updater Skills Over Generic Updater (2026-04-07)
+
+**Status:** Approved
+**Date:** 2026-04-07
+**Source:** Architect agent, dead code audit remediation planning
+
+**Decision:** Create 4 individual updater skills (hook-updater, schema-updater, template-updater, tool-updater) following established {type}-updater pattern, rather than a single generic artifact-updater.
+
+**Rationale:** Consistency with existing skill-updater/agent-updater/workflow-updater naming; domain specialization (hooks need settings.json registration, schemas need Draft-07 validation, etc.); routing clarity (no disambiguation needed); low incremental cost via skill-creator scaffolding.
+
+**Alternative rejected:** Generic `artifact-updater` — would be a God Object, breaks established symmetry, requires routing disambiguation.
+
+**ADR-2026-04-07b:** Feature flag pattern for orphaned module integration — reuse env var pattern from commit 85f8f8ef8 (default OFF, try-catch wrapper, graceful degradation). 9 clusters of 70+ modules gated behind individual env vars.
+
+**Plan artifact:** `.claude/context/plans/dead-code-remediation-plan-2026-04-07.md`
+
+---
+
 ## ADR-2026-03-22: Monolith-to-Microservices v4.0 Architecture Update (2026-03-22)
 
 **Status:** Proposed
@@ -157,50 +175,6 @@
 
 ---
 
-## ADR-2026-03-13-068: QA Must Verify Rule-Index Count After Rule Creation (2026-03-13)
-
-**Status:** ACCEPTED
-**Date:** 2026-03-13
-**Trigger:** Session task #14 created 7 rule files (lancedb, supabase, playwright, astro, solidjs, cleanup-always, documentation-always) but `pnpm index-rules` was never run by subagents. Gap-log entry confirmed: "rule-index count discrepancy 114→126". The QA agent passed without detecting this gap.
-
-**Decision:** QA agent MUST proactively check rule-index count whenever any session involved rule creation. Specifically:
-
-1. Run `pnpm index-rules 2>/dev/null | tail -1` and capture count
-2. Count `.claude/rules/*.md` files in the directory
-3. Assert that indexed count matches file count (or that the count increased by the number of rules created)
-4. FAIL QA if discrepancy exists
-
-**Verification command QA must run:**
-
-```bash
-node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); process.stdout.write('Indexed rules: ' + Object.keys(d.rules||d).length + '\n')"
-```
-
-**Root Cause:** rule-creator Step 4 (run `pnpm index-rules`) is mandatory per the skill's workflow, but subagents skipped it. QA did not check index health as part of its final validation sweep.
-
-**Consequences:** QA must add a "framework index integrity" check to its proactive-audit checklist. This check verifies: rule-index count, skill-index count (if skills created), and agent-registry count (if agents created) all match the actual file counts.
-
----
-
-## ADR-2026-03-13-067: Root-Level Slop Files Are QA Responsibility (2026-03-13)
-
-**Status:** ACCEPTED
-**Date:** 2026-03-13
-**Trigger:** 19 untracked files accumulated in the project root during the MEGA EPIC session (dump-test.cjs, test-out.txt, errors.json, eslint.json, rename_agent.cjs, revert_rename.cjs, update_frequencies.cjs, update_skill_loops.cjs, update_skill_rigidity.cjs, etc.). The router failed to detect these. User had to manually confront the router about cleanup.
-
-**Decision:** QA agent MUST run `git status -s | grep "^??" | grep -v ".claude/"` as part of its final pipeline check. Any `??` files in the project root (excluding `.claude/` paths) should be flagged as a QA finding. QA must:
-
-1. List all untracked root-level files
-2. Categorize them: temp scripts, test outputs, migration scripts, debug files
-3. ASK USER before deleting (per file-deletion-safety iron law)
-4. Report them as a "workspace hygiene" finding if QA cannot confirm their purpose
-
-**Root Cause:** Developers created temp scripts and test artifacts in project root without cleaning up. QA passed without checking workspace hygiene.
-
-**Consequences:** Adds a "workspace hygiene" check to QA's proactive-audit. QA must NEVER delete untracked files silently — it must list them and report, then ask user. This is distinct from the file-deletion-safety rule which prevents deletion; this ADR mandates QA to _detect_ and _surface_ the problem.
-
----
-
 ## ADR-2026-03-13-066: Router Self-Accountability — Failure Must Be Logged, Not Deflected (2026-03-13)
 
 **Status:** ACCEPTED
@@ -218,22 +192,6 @@ node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | n
 
 **Consequences:** Router's gap-log entries must include `routerDecision` field explaining what the router chose and why. Reflection-agent must score routing quality as a dimension.
 
----
+> ⚠️ Content archived to archive/decisions-2026-04-06.md on 2026-04-06
 
-## ADR-2026-03-12-065: Multi-Model Review Must Run in Fresh Session (2026-03-12)
-
-**Status:** ACCEPTED (pattern)
-**Date:** 2026-03-12
-**Trigger:** Task 5 Phase 3 multi-model review (Gemini/Codex) blocked by 24 context-length-exceeded errors after long Phases 1 and 2.
-**Decision:** Multi-model review phases that follow heavy analysis+implementation sequences MUST run as the first phase of a fresh session. The EPIC pipeline plan template must include an explicit "Fresh Session Gate" checkpoint before multi-model review steps. "Start review in fresh session" must appear in the handoff note of the preceding implementation task.
-**Consequences:** Adds an explicit session boundary in EPIC pipelines. Slightly extends wall-clock time but prevents review phase from being silently dropped due to context overflow.
-
----
-
-## ADR-2026-03-12-064: Security Audit Confirms shell:false Compliance Baseline (2026-03-12)
-
-**Status:** ACCEPTED (observation)
-**Date:** 2026-03-12
-**Trigger:** Security audit of all active `.claude/hooks/` files (65 files scanned).
-**Decision:** All 65 production hook files are shell:false compliant. The one `shell:true` instance in `tools/cron-runner/queue-drain.cjs` is documented-intentional (non-hook tool, trusted internal command). This establishes a verified compliance baseline as of 2026-03-11. Track any new hook additions against this baseline via CI.
-**Consequences:** shell:false baseline confirmed. Future hook authors must not use `shell:true` in production hook code. The cron-runner exception must be unit-tested to assert `writebackCmd` is assembled from hardcoded parts only.
+> ⚠️ Content archived to archive/decisions-2026-04-07.md on 2026-04-07

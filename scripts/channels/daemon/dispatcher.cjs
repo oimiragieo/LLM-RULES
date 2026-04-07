@@ -648,8 +648,6 @@ class Dispatcher {
         activeEntry.endTime = entry.endTime;
       }
 
-
-
       const result = entry.result || 'Task completed.';
       this._deliverTaskResult(entry, result);
     });

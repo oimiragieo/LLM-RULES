@@ -80,7 +80,7 @@ wrapCLITool('diagnostics', () => {
     if (typeof mod.run === 'function') {
       const result = mod.run(args);
       if (result && typeof result.then === 'function') {
-        result.catch((err) => {
+        result.catch(err => {
           console.error(`Error: ${err.message}`);
           process.exit(1);
         });

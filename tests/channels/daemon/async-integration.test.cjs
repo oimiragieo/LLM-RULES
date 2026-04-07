@@ -22,8 +22,12 @@ function createMockMemory() {
     chats: new Map(),
     addMessage() {},
     _saveHistory() {},
-    shouldDream() { return false; },
-    dream() { return null; },
+    shouldDream() {
+      return false;
+    },
+    dream() {
+      return null;
+    },
   };
 }
 
@@ -49,17 +53,18 @@ describe('Async Integration Smoke Tests', () => {
         // First call returns a task, subsequent return chat
         return callCount === 1 ? '[TASK] Find the answer' : 'Chat response';
       },
-      renderProactive() { return 'proactive'; },
+      renderProactive() {
+        return 'proactive';
+      },
     };
 
-    const dispatcher = new Dispatcher(
-      router, renderer, { telegram: sink }, () => {}, memory,
-      { progressIntervalMs: 999999 }
-    );
+    const dispatcher = new Dispatcher(router, renderer, { telegram: sink }, () => {}, memory, {
+      progressIntervalMs: 999999,
+    });
 
     // Mock async executor
-    dispatcher.executor.executeTaskAsync = (task) => ({
-      promise: new Promise((resolve) =>
+    dispatcher.executor.executeTaskAsync = task => ({
+      promise: new Promise(resolve =>
         setTimeout(() => resolve(`Answer found: ${task.slice(0, 20)}`), 50)
       ),
       cancel: () => {},
@@ -71,15 +76,15 @@ describe('Async Integration Smoke Tests', () => {
 
     // Wait for task to complete
     await dispatcher.taskPool.drain();
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise(r => setTimeout(r, 50));
 
     // Verify lifecycle:
     // 1. "Running task" notification
-    const notification = sink.sent.find((m) => m.text.includes('Running task'));
+    const notification = sink.sent.find(m => m.text.includes('Running task'));
     assert.ok(notification, 'Should send task notification');
 
     // 2. Task result delivered
-    const result = sink.sent.find((m) => m.text.includes('Answer found'));
+    const result = sink.sent.find(m => m.text.includes('Answer found'));
     assert.ok(result, 'Should deliver task result');
 
     // 3. Result came after notification
@@ -98,18 +103,22 @@ describe('Async Integration Smoke Tests', () => {
         if (renderCount <= 2) return `[TASK] Task ${renderCount}`;
         return `Chat reply to: ${event.data.text}`;
       },
-      renderProactive() { return 'proactive'; },
+      renderProactive() {
+        return 'proactive';
+      },
     };
 
     const dispatcher = new Dispatcher(
-      router, renderer, { telegram: sink }, () => {}, createMockMemory(),
+      router,
+      renderer,
+      { telegram: sink },
+      () => {},
+      createMockMemory(),
       { progressIntervalMs: 999999 }
     );
 
-    dispatcher.executor.executeTaskAsync = (task) => ({
-      promise: new Promise((resolve) =>
-        setTimeout(() => resolve(`Done: ${task.slice(0, 20)}`), 100)
-      ),
+    dispatcher.executor.executeTaskAsync = task => ({
+      promise: new Promise(resolve => setTimeout(() => resolve(`Done: ${task.slice(0, 20)}`), 100)),
       cancel: () => {},
       child: null,
     });
@@ -119,23 +128,23 @@ describe('Async Integration Smoke Tests', () => {
     dispatcher.enqueue(makeEvent('task two'));
 
     // Wait a tick for task dispatch
-    await new Promise((r) => setTimeout(r, 30));
+    await new Promise(r => setTimeout(r, 30));
 
     dispatcher.enqueue(makeEvent('hello'));
     dispatcher.enqueue(makeEvent('how are you'));
     dispatcher.enqueue(makeEvent('whats up'));
 
     // Chat messages should be answered within 500ms (not waiting for tasks)
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise(r => setTimeout(r, 300));
 
-    const chatReplies = sink.sent.filter((m) => m.text.startsWith('Chat reply'));
+    const chatReplies = sink.sent.filter(m => m.text.startsWith('Chat reply'));
     assert.ok(chatReplies.length >= 3, `Expected 3 chat replies, got ${chatReplies.length}`);
 
     // Tasks should also complete
     await dispatcher.taskPool.drain();
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise(r => setTimeout(r, 50));
 
-    const taskResults = sink.sent.filter((m) => m.text.startsWith('Done:'));
+    const taskResults = sink.sent.filter(m => m.text.startsWith('Done:'));
     assert.ok(taskResults.length >= 2, `Expected 2 task results, got ${taskResults.length}`);
   });
 
@@ -144,12 +153,20 @@ describe('Async Integration Smoke Tests', () => {
     const sink = createMockSink();
 
     const renderer = {
-      render() { return '[TASK] Slow task'; },
-      renderProactive() { return 'proactive'; },
+      render() {
+        return '[TASK] Slow task';
+      },
+      renderProactive() {
+        return 'proactive';
+      },
     };
 
     const dispatcher = new Dispatcher(
-      router, renderer, { telegram: sink }, () => {}, createMockMemory(),
+      router,
+      renderer,
+      { telegram: sink },
+      () => {},
+      createMockMemory(),
       { progressIntervalMs: 999999 }
     );
 
@@ -169,10 +186,10 @@ describe('Async Integration Smoke Tests', () => {
 
     dispatcher.enqueue(makeEvent('slow thing'));
 
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise(r => setTimeout(r, 300));
 
     const timeoutMsg = sink.sent.find(
-      (m) => m.text.includes('timed out') || m.text.includes('Timeout')
+      m => m.text.includes('timed out') || m.text.includes('Timeout')
     );
     assert.ok(timeoutMsg, 'Should deliver timeout error to chat');
   });
@@ -182,17 +199,25 @@ describe('Async Integration Smoke Tests', () => {
     const sink = createMockSink();
 
     const renderer = {
-      render() { return '[TASK] Work'; },
-      renderProactive() { return 'proactive'; },
+      render() {
+        return '[TASK] Work';
+      },
+      renderProactive() {
+        return 'proactive';
+      },
     };
 
     const dispatcher = new Dispatcher(
-      router, renderer, { telegram: sink }, () => {}, createMockMemory(),
+      router,
+      renderer,
+      { telegram: sink },
+      () => {},
+      createMockMemory(),
       { progressIntervalMs: 999999 }
     );
 
     dispatcher.executor.executeTaskAsync = () => ({
-      promise: new Promise((resolve) => setTimeout(() => resolve('done'), 50)),
+      promise: new Promise(resolve => setTimeout(() => resolve('done'), 50)),
       cancel: () => {},
       child: null,
     });
@@ -200,7 +225,7 @@ describe('Async Integration Smoke Tests', () => {
     dispatcher.enqueue(makeEvent('work 1'));
     dispatcher.enqueue(makeEvent('work 2'));
 
-    await new Promise((r) => setTimeout(r, 20));
+    await new Promise(r => setTimeout(r, 20));
 
     // Simulate shutdown — drain the pool
     const drainStart = Date.now();
@@ -209,7 +234,7 @@ describe('Async Integration Smoke Tests', () => {
 
     // All tasks should have completed
     const allTasks = dispatcher.taskPool.getAll();
-    const completed = allTasks.filter((t) => t.status === 'completed');
+    const completed = allTasks.filter(t => t.status === 'completed');
     assert.ok(completed.length >= 2, `Expected 2 completed tasks, got ${completed.length}`);
     assert.ok(drainTime < 5000, `Drain should complete quickly, took ${drainTime}ms`);
   });
