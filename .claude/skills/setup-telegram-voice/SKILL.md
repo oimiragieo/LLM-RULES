@@ -25,7 +25,7 @@ Check if voice message handling is properly configured. Use ONLY the Read tool.
    - `WHISPER_MODEL` — optional, defaults to `medium`
    - `TELEGRAM_BOT_TOKEN` — required (same as base telegram setup)
 
-2. **Read `.claude/skills/enable-telegram-voice/SKILL.md`** to confirm the skill exists.
+2. **Read `.claude/skills/enable-telegram/SKILL.md`** to confirm the skill exists.
 
 ## Report format
 

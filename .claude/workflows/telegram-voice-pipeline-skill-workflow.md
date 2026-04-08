@@ -1,10 +1,10 @@
-# Telegram Voice Pipeline Skill Workflow
+# Check Telegram Voice Skill Workflow
 
 ## Skill Location
 
-`.claude/skills/telegram-voice-pipeline/SKILL.md`
+`.claude/skills/check-telegram-voice/SKILL.md`
 
 ## Invocation
 
-- /telegram-voice-pipeline
-- node .claude/skills/telegram-voice-pipeline/scripts/main.cjs --help
+- /check-telegram-voice
+- node .claude/skills/check-telegram-voice/scripts/main.cjs --help
