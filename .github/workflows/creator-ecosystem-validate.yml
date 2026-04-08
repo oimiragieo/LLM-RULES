@@ -66,8 +66,8 @@ jobs:
 
       - name: Verify ecosystem reports are produced
         run: |
-          ls -1 .claude/context/reports/skill-ecosystem-audit-*.json
-          ls -1 .claude/context/reports/skill-ecosystem-audit-*.md
+          ls -1 .claude/context/reports/backend/skill-ecosystem-audit-*.json
+          ls -1 .claude/context/reports/backend/skill-ecosystem-audit-*.md
 
       - name: Run status check governance validation
         run: pnpm validate:status-check-governance
