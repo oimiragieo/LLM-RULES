@@ -5,7 +5,6 @@
  */
 
 const fs = require('fs');
-const path = require('path');
 const yaml = require('yaml');
 
 class WorkflowValidator {

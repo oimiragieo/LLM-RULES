@@ -527,6 +527,65 @@ When context is BROWNFIELD or HYBRID, the plan MUST include:
 - **Integration Verification**: How to verify changes work with existing code
 - **Rollback Strategy**: Per-phase rollback commands if changes need to be reverted
 
+### Mission Bundle (Factory Droid Alignment — MEDIUM+ complexity)
+
+For MEDIUM, HIGH, and EPIC complexity tasks, emit a **features.json** alongside the markdown plan. This enables structured orchestration via the mission engine (`.claude/lib/mission/`), evidence collection, validation ledger tracking, and automated grading.
+
+**When to emit:** Any plan with 3+ phases or 5+ tasks.
+
+**File location:** Save to the plan directory as `features.json` (sibling to the markdown plan).
+
+**Feature object schema** (each task becomes a feature):
+
+```json
+{
+  "id": "fix-broken-requires",
+  "description": "Fix 3 broken require() paths in mission library modules",
+  "skillName": "developer",
+  "preconditions": ["phase-0-research completed"],
+  "expectedBehavior": [
+    "All require() paths resolve without error",
+    "No runtime crashes on module import"
+  ],
+  "verificationSteps": [
+    "node --test tests/lib/mission/evidence-collector.test.cjs",
+    "node --test tests/lib/mission/mission-grader.test.cjs"
+  ],
+  "fulfills": ["VAL-FIX-001", "VAL-FIX-002"],
+  "milestone": "phase-1-critical",
+  "status": "pending"
+}
+```
+
+**Required fields per feature:**
+
+- `id` — kebab-case identifier matching `^[a-z0-9][a-z0-9_-]*$`
+- `description` — what the task accomplishes
+- `skillName` — agent type to execute (e.g. `developer`, `qa`, `technical-writer`)
+- `preconditions` — array of dependency strings (e.g. `"feature-id completed"`)
+- `expectedBehavior` — array of behavior assertions (what success looks like)
+- `verificationSteps` — array of shell commands that prove the work is done
+- `fulfills` — array of VAL-\* assertion IDs (format: `VAL-AREA-NNN`)
+- `milestone` — phase grouping (e.g. `phase-1-critical`, `phase-2-wiring`)
+- `status` — always `"pending"` when emitted by planner
+
+**Validation contract:** Also emit a `validation-contract.md` with one entry per VAL-\* ID:
+
+```markdown
+# Validation Contract
+
+## Area: Critical Fixes
+
+### VAL-FIX-001: Broken require paths resolved
+
+All require() calls in .claude/lib/mission/ resolve without throwing.
+Evidence: node --test tests/lib/mission/evidence-collector.test.cjs
+```
+
+**Milestone validators:** For each milestone, the orchestrator auto-injects scrutiny-validator and user-testing-validator features. You do not need to add these manually.
+
+**Schema reference:** `.claude/schemas/mission/feature.schema.json`, `.claude/schemas/mission/features-document.schema.json`
+
 ### must_haves Block (MANDATORY)
 
 Every plan MUST include a `must_haves` block at the end with goal-backward verification:

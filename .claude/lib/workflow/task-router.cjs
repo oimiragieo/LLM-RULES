@@ -374,7 +374,7 @@ class TaskRouter {
    * @param {string} primarySystem - System that failed
    * @returns {Promise<Object>} Fallback routing decision
    */
-  async routeWithFallback(task, primarySystem) {
+  async routeWithFallback(_task, primarySystem) {
     const fallbackSystem = primarySystem === 'agent-studio' ? 'conductor-main' : 'agent-studio';
     this.fallbackCount++;
 

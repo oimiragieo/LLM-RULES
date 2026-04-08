@@ -50,7 +50,8 @@ CHANNEL_AUTO_START=true
 - **Dream consolidation** — KAIROS-style 4-phase memory synthesis (Orient → Gather → Consolidate → Prune)
 - **Context rot protection** — auto-detects and rotates sessions transparently
 - **Task execution** — ask the bot to run code, check git, run tests via headless Claude
-- **24 bot commands** — `/help`, `/status`, `/memory`, `/dream`, `/tasks`, `/usage`, `/insights`, `/personality`, `/schedule`, `/export`, `/pair`, and more
+- **25 bot commands** — `/help`, `/status`, `/memory`, `/dream`, `/tasks`, `/code`, `/usage`, `/insights`, `/personality`, `/schedule`, `/export`, `/pair`, and more
+- **`/code` mission-aware coding** — routes coding tasks through skill classification (16 agent types), builds feature specs, injects TDD workflow, grades results 0-100 against alignment rules
 - **Skill extraction** — learns from completed tasks, auto-injects matching patterns into future prompts
 - **Ralph loops** — iterative verify/fix execution (`[RALPH]` tag), max 5 iterations
 - **Ultrawork parallel** — splits tasks into concurrent subtasks (`[ULTRAWORK]` tag)
@@ -406,6 +407,17 @@ pnpm test:code-indexing
 ```bash
 pnpm lint
 pnpm format:check
+```
+
+5. Mission CLI (Factory Droid-aligned orchestration):
+
+```bash
+pnpm mission:init                      # scaffold new mission bundle
+pnpm mission:validate <mission-path>   # validate features.json + schemas
+pnpm mission:lint <mission-path>       # lint features for circular deps
+pnpm mission:grade <mission-path>      # grade against 17 alignment rules (0-100)
+pnpm mission:audit <mission-path>      # query audit trail
+pnpm mission:status <mission-path>     # feature vs assertion progress
 ```
 
 Notes:

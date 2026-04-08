@@ -61,8 +61,8 @@ function provisionWorkspace(options = {}) {
   // Generate or use provided mission ID
   const id = missionId || crypto.randomUUID();
 
-  // Construct workspace path
-  const workspacePath = path.join(rootPath, 'missions', id);
+  // Construct workspace path (rootPath already points to the missions directory)
+  const workspacePath = path.join(rootPath, id);
 
   // Check if workspace already exists
   if (fs.existsSync(workspacePath)) {

@@ -59,6 +59,9 @@ const VALID_EVENT_TYPES = new Set([
   'user_testing_validator_completed',
   'mission_paused',
   'mission_completed',
+  'evidence_collected',
+  'mission_graded',
+  'validation_contract_generated',
 ]);
 
 /**
@@ -224,6 +227,30 @@ function createProgressLogWriter(logFilePath) {
       return appendEvent(logFilePath, 'mission_completed', {
         completedFeatures,
         totalFeatures,
+      });
+    },
+
+    logEvidenceCollected({ featureId, evidenceFiles, assertionsUpdated }) {
+      return appendEvent(logFilePath, 'evidence_collected', {
+        featureId,
+        evidenceFiles,
+        assertionsUpdated,
+      });
+    },
+
+    logMissionGraded({ featureId, score, gradeBand, passed }) {
+      return appendEvent(logFilePath, 'mission_graded', {
+        featureId,
+        score,
+        gradeBand,
+        passed,
+      });
+    },
+
+    logValidationContractGenerated({ contractPath, assertionCount }) {
+      return appendEvent(logFilePath, 'validation_contract_generated', {
+        contractPath,
+        assertionCount,
       });
     },
 

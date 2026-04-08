@@ -13,7 +13,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { execSync } = require('node:child_process');
+const { spawnSync } = require('node:child_process');
 
 /**
  * Slugify a VAL-* ID for use in filenames.
@@ -32,23 +32,25 @@ function slugifyValId(valId) {
  * @returns {{ exitCode: number, stdout: string, stderr: string }}
  */
 function runVerificationStep(command, workingDirectory, timeoutMs = 30000) {
-  try {
-    const stdout = execSync(command, {
-      cwd: workingDirectory,
-      timeout: timeoutMs,
-      encoding: 'utf8',
-      shell: false,
-      windowsHide: true,
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-    return { exitCode: 0, stdout: stdout || '', stderr: '' };
-  } catch (err) {
-    return {
-      exitCode: err.status || 1,
-      stdout: err.stdout || '',
-      stderr: err.stderr || '',
-    };
-  }
+  // Split command into binary + args for shell:false safety (SE: shell injection prevention)
+  const parts = command.trim().split(/\s+/);
+  const bin = parts[0];
+  const args = parts.slice(1);
+
+  const result = spawnSync(bin, args, {
+    cwd: workingDirectory,
+    timeout: timeoutMs,
+    encoding: 'utf8',
+    shell: false,
+    windowsHide: true,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+
+  return {
+    exitCode: result.status ?? 1,
+    stdout: result.stdout || '',
+    stderr: result.stderr || '',
+  };
 }
 
 /**
@@ -190,9 +192,70 @@ function collectMissionEvidence(options) {
   return { featureResults, totalEvidence };
 }
 
+/**
+ * Collect evidence and bind it to assertions in validation-state.json.
+ * After evidence files are written, updates each VAL-* assertion with the evidence path.
+ *
+ * @param {object} options
+ * @param {object} options.feature - Feature object from features.json
+ * @param {string} options.evidenceDir - Base evidence directory
+ * @param {string} options.workingDirectory - Target repo path
+ * @param {string} options.validationStatePath - Path to validation-state.json
+ * @param {number} [options.timeoutMs=30000] - Per-step timeout
+ * @returns {{ results: Array, evidenceFiles: string[], assertionsUpdated: string[] }}
+ */
+function collectAndBindEvidence(options) {
+  const { feature, evidenceDir, workingDirectory, validationStatePath, timeoutMs } = options;
+  const { results, evidenceFiles } = collectFeatureEvidence({
+    feature,
+    evidenceDir,
+    workingDirectory,
+    timeoutMs,
+  });
+
+  const assertionsUpdated = [];
+
+  // If we have a validation-state path, bind evidence to assertions
+  if (validationStatePath && fs.existsSync(validationStatePath)) {
+    const { ValidationStateGatekeeper } = require('./validation-state-gatekeeper.cjs');
+    const gatekeeper = new ValidationStateGatekeeper(validationStatePath);
+
+    const milestone = feature.milestone || 'default';
+
+    for (const valId of feature.fulfills || []) {
+      const slug = slugifyValId(valId);
+      const featureSlug = (feature.id || 'unknown').replace(/[^a-z0-9-]/g, '-');
+      const filename = `${slug}-${featureSlug}.txt`;
+      const evidencePath = path.join(milestone, filename);
+
+      try {
+        const assertion = gatekeeper.getAssertion(valId);
+        if (assertion && assertion.status !== 'passed') {
+          // Check if all verification steps passed
+          const allPassed = results.every(r => r.exitCode === 0);
+
+          if (allPassed) {
+            gatekeeper.transition(valId, 'passed', {
+              evidencePath,
+              validatedAtMilestone: milestone,
+              validatedAt: new Date().toISOString(),
+            });
+            assertionsUpdated.push(valId);
+          }
+        }
+      } catch {
+        // Assertion may not exist in state — skip silently
+      }
+    }
+  }
+
+  return { results, evidenceFiles, assertionsUpdated };
+}
+
 module.exports = {
   collectFeatureEvidence,
   collectMissionEvidence,
+  collectAndBindEvidence,
   checkEvidenceExists,
   runVerificationStep,
   slugifyValId,

@@ -299,49 +299,64 @@ function ensureTaskId(toolInput, hookInput) {
   };
 }
 
-let _registryCache = null;
-let _manifestCache = null;
-let _constitutionCache = null;
+let _registryCache = { data: null, mtimeMs: 0 };
+let _manifestCache = { data: null, mtimeMs: 0 };
+let _constitutionCache = { data: null, mtimeMs: 0 };
+
+function _getMtimeMs(filePath) {
+  try {
+    return fs.statSync(filePath).mtimeMs;
+  } catch {
+    return 0;
+  }
+}
 
 function loadAgentRegistry() {
-  if (_registryCache) return _registryCache;
+  const currentMtimeReg = _getMtimeMs(AGENT_REGISTRY_PATH);
+  if (_registryCache.data !== null && currentMtimeReg === _registryCache.mtimeMs)
+    return _registryCache.data;
   try {
     if (fs.existsSync(AGENT_REGISTRY_PATH)) {
       const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
       const parsed = safeParseJSON(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'), null);
       if (parsed) {
-        _registryCache = parsed;
-        return _registryCache;
+        _registryCache = { data: parsed, mtimeMs: currentMtimeReg };
+        return _registryCache.data;
       }
     }
   } catch (e) {
     debugLog('spawn-prompt-assembler', 'Failed to load agent-registry', e);
   }
-  _registryCache = { agents: {} };
-  return _registryCache;
+  _registryCache = { data: { agents: {} }, mtimeMs: 0 };
+  return _registryCache.data;
 }
 
 function loadToolManifest() {
-  if (_manifestCache) return _manifestCache;
+  const currentMtimeMf = _getMtimeMs(TOOL_MANIFEST_PATH);
+  if (_manifestCache.data !== null && currentMtimeMf === _manifestCache.mtimeMs)
+    return _manifestCache.data;
   try {
     if (fs.existsSync(TOOL_MANIFEST_PATH)) {
       const { safeParseJSON: safeParseJSON2 } = require('../../lib/utils/safe-json.cjs');
       const parsed2 = safeParseJSON2(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf8'), null);
       if (parsed2) {
-        _manifestCache = parsed2;
-        return _manifestCache;
+        _manifestCache = { data: parsed2, mtimeMs: currentMtimeMf };
+        return _manifestCache.data;
       }
     }
   } catch (e) {
     debugLog('spawn-prompt-assembler', 'Failed to load tool-manifest', e);
   }
   _manifestCache = {
-    constraints: {
-      maxToolsPerAgent: MAX_TOOLS_AGENT,
-      maxToolsPerOrchestrator: MAX_TOOLS_ORCHESTRATOR,
+    data: {
+      constraints: {
+        maxToolsPerAgent: MAX_TOOLS_AGENT,
+        maxToolsPerOrchestrator: MAX_TOOLS_ORCHESTRATOR,
+      },
     },
+    mtimeMs: 0,
   };
-  return _manifestCache;
+  return _manifestCache.data;
 }
 
 function inferAgentFromPrompt(prompt) {
@@ -539,8 +554,6 @@ function enrichAllowedTools(agentType, currentTools, prompt) {
 }
 
 function loadConstitutionContext(projectRoot) {
-  if (_constitutionCache) return _constitutionCache;
-
   const constitutionPath = path.join(
     projectRoot,
     '.claude',
@@ -549,6 +562,12 @@ function loadConstitutionContext(projectRoot) {
     'constitution.md'
   );
   const behaviourPath = path.join(projectRoot, '.claude', 'context', 'memory', 'behaviour.md');
+
+  const mtime1 = _getMtimeMs(constitutionPath);
+  const mtime2 = _getMtimeMs(behaviourPath);
+  const combinedMtime = mtime1 + mtime2;
+  if (_constitutionCache.data !== null && combinedMtime === _constitutionCache.mtimeMs)
+    return _constitutionCache.data;
 
   let constitution = '';
   let behaviour = '';
@@ -569,8 +588,8 @@ function loadConstitutionContext(projectRoot) {
     debugLog('spawn-prompt-assembler', 'Failed to load behaviour.md (ignored)', e);
   }
 
-  _constitutionCache = { constitution, behaviour };
-  return _constitutionCache;
+  _constitutionCache = { data: { constitution, behaviour }, mtimeMs: combinedMtime };
+  return _constitutionCache.data;
 }
 
 function appendConstitutionSection(assembled, context) {
@@ -849,6 +868,12 @@ function appendProjectContextSection(prompt, contextContent) {
   return `${prompt}\n\n## Project Context\n\n${contextContent.trim()}`;
 }
 
+function _resetCaches() {
+  _registryCache = { data: null, mtimeMs: 0 };
+  _manifestCache = { data: null, mtimeMs: 0 };
+  _constitutionCache = { data: null, mtimeMs: 0 };
+}
+
 module.exports = {
   sanitizeTaskPrompt,
   generateRequiredPrefixFragment,
@@ -863,6 +888,8 @@ module.exports = {
   ensureTaskId,
   enrichAllowedTools,
   inferAgentFromPrompt,
+  loadAgentRegistry,
+  loadToolManifest,
   loadConstitutionContext,
   appendConstitutionSection,
   appendConfigModelSection,
@@ -876,4 +903,5 @@ module.exports = {
   appendSoulSection,
   loadProjectContext,
   appendProjectContextSection,
+  _resetCaches,
 };

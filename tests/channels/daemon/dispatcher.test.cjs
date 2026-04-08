@@ -109,16 +109,17 @@ describe('Dispatcher', () => {
 
       await new Promise(r => setTimeout(r, 200));
 
-      // Should have sent "Running task..." notification + result
+      // Should have sent task notification + result
       assert.ok(sinks.telegram.sent.length >= 1);
-      // First message should be the task notification
-      const taskNotification = sinks.telegram.sent.find(m => m.text.includes('Running task'));
-      assert.ok(
-        taskNotification ||
-          sinks.telegram.sent.find(
-            m => m.text.includes('Task complete') || m.text.includes('Error')
-          )
+      // First message should be the task notification (plain or mission-aware)
+      const taskNotification = sinks.telegram.sent.find(
+        m =>
+          m.text.includes('Running task') ||
+          m.text.includes('Mission task') ||
+          m.text.includes('Task complete') ||
+          m.text.includes('Error')
       );
+      assert.ok(taskNotification, 'Should have task notification or result');
       assert.equal(dispatcher.stats.tasksExecuted, 1);
     });
 
@@ -445,7 +446,11 @@ describe('Dispatcher', () => {
       await new Promise(r => setTimeout(r, 50));
 
       const notification = s.telegram.sent.find(
-        m => m.text.includes('Running task') || m.text.includes('\u{2699}\u{fe0f}')
+        m =>
+          m.text.includes('Running task') ||
+          m.text.includes('Mission task') ||
+          m.text.includes('\u{2699}\u{fe0f}') ||
+          m.text.includes('\u{1f527}')
       );
       assert.ok(notification, 'Should send task started notification');
       await d.taskPool.drain();

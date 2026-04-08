@@ -270,7 +270,7 @@ class ValidationStateGatekeeper {
    * @returns {Object} - { success: true, previousStatus, newStatus, updatedAt }
    * @throws {Error} With code for invalid transitions or unknown assertions
    */
-  transition(assertionId, newStatus) {
+  transition(assertionId, newStatus, metadata) {
     // Validate status value
     if (!VALID_STATES.includes(newStatus)) {
       const error = new Error(`Invalid status value: ${newStatus}`);
@@ -310,13 +310,20 @@ class ValidationStateGatekeeper {
       throw error;
     }
 
-    // Update assertion
+    // Update assertion with optional metadata (evidence path, milestone)
     const now = new Date().toISOString();
-    this._state.assertions[assertionId] = {
+    const update = {
       ...assertion,
       status: newStatus,
       updatedAt: now,
     };
+    if (metadata) {
+      if (metadata.evidencePath) update.evidencePath = metadata.evidencePath;
+      if (metadata.validatedAtMilestone)
+        update.validatedAtMilestone = metadata.validatedAtMilestone;
+      if (metadata.validatedAt) update.validatedAt = metadata.validatedAt;
+    }
+    this._state.assertions[assertionId] = update;
 
     // Persist
     this._persist();

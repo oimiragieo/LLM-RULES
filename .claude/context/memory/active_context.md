@@ -1,34 +1,34 @@
-# Active Context — Session Handoff 2026-03-25 (Late)
+# Session Handoff — Performance Phase 3: Mtime Cache Invalidation
 
-**NEXT ACTION (IMMEDIATE):** Two tasks — fix tab-vs-window issue, then create windows-terminal skill.
+**NEXT ACTION (IMMEDIATE):** Implement Phase 3 from the performance plan — mtime-based cache invalidation for spawn-prompt-assembler.task-tools.cjs. The plan is at `C:\Users\oimir\.claude\plans\cuddly-shimmying-stardust.md`.
 
-## Task 1: Fix channel-auto-start to open as TAB not WINDOW
+## What Was Done This Session
 
-Hook currently uses `start "" cmd /k "..."` → opens new WINDOW. User wants a TAB.
+1. **Factory Droid parity** — Planner emits features.json, spawn template requires handoff metadata, orchestrator wired to grading/evidence/contract generation
+2. **Telegram /code command** — Mission-aware coding pipeline with skill-router, handoff-capture, mission-executor (48 tests)
+3. **Bug fixes** — AJV format warnings, workspace nested path, evidence-collector shell safety, complexity-classifier restored, drift-detector unreachable code, 8 unused var fixes
+4. **Code index fix** — Exclusion patterns added for worktrees/tmp (index went from 15K junk files to 4K real files, 10x faster rebuild)
+5. **Performance phases 1,2,4,5 complete** — Lazy AJV (saves 15-30ms), metadata size caps (2K/4K), token budget enforcement (90% + diminishing returns), index config validation test
+6. **Session-handoff bug fix** — Added --model sonnet flag to spawn-new-session.cjs to prevent 1M context extra-usage error
 
-**Fix:** Replace `start` with `wt -w 0 new-tab -- cmd /k "..."` in the generated bat file. The `-w 0` flag targets the most recent WT window.
+## Phase 3 Remaining (THE TASK)
 
-**File:** `.claude/hooks/channels/channel-auto-start.cjs` line ~146
+**File to modify:** `.claude/hooks/routing/spawn-prompt-assembler.task-tools.cjs`
 
-## Task 2: Create "windows-terminal" skill
+**What to do:**
 
-Document terminal management patterns learned this session:
+- Replace `let _registryCache = null` (line 302) with `{ data: null, mtimeMs: 0 }`
+- Same for `_manifestCache` (line 303) and `_constitutionCache` (line 304)
+- Add `_getMtimeMs(path)` helper: `fs.statSync(path).mtimeMs` in try/catch
+- In `loadAgentRegistry()` (line 306): compare current mtime to cached mtime, skip read if unchanged
+- In `loadToolManifest()` (line 324): same pattern
+- In `loadConstitutionContext()` (line 542): track two mtimes (constitution.md + behaviour.md)
+- Export `_resetCaches()` for test cleanup
 
-- `wt new-tab` vs `start` (tab vs window)
-- `-w 0` targeting current WT window
-- VBScript AppActivate by PID via WMI
-- Process tree escape from hooks (start in bat + execFileSync)
-- PID tracking via terminal-tracker.cjs
-- Hook process tree killing on Windows
+**Test to write:** `tests/hooks/spawn-prompt-assembler-mtime-cache.test.cjs`
 
-## Task 3: Research + improve agent-studio
+**After Phase 3:** Run `pnpm lint:fix && pnpm format && pnpm test`. Then commit ALL session changes and push.
 
-User wants Exa research on multi-agent CLI framework best practices, Telegram bot patterns, channel architecture.
+## All Uncommitted Changes
 
-## Accomplished this session:
-
-- Fixed channel-auto-start: direct claude spawn, no channel-manager indirection
-- Fixed VBScript: WMI PID targeting instead of window title
-- Confirmed Telegram end-to-end working
-- Remaining: opens as window not tab
-- 3 commits pushed (55a3a132, 203f4515, b59bf798)
+30+ modified files, 20+ new files. Run `git status` for full list. ALL tests pass (25 new + existing). Lint and format clean.

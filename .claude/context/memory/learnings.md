@@ -48,3 +48,4 @@
 - Created new agent: bool-action (2026-04-04)
 - Created new agent: repo-onboarder (2026-04-04)
 - Created new agent: release-guardian (2026-04-04)
+- [2026-04-08] Agents frequently complete tasks without summary metadata in TaskUpdate(completed). Router should emphasize in spawn prompts that the summary field is required. Pattern observed in 5 consecutive task-completion reflections (tasks 20-25), all flagged by post-completion hook as "completed without summary metadata".

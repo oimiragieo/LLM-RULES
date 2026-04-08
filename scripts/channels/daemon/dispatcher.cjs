@@ -10,6 +10,7 @@
 
 const { TaskExecutor } = require('./executor.cjs');
 const { TaskPool } = require('./task-pool.cjs');
+const { createMissionExecutor } = require('./mission-executor.cjs');
 
 class Dispatcher {
   constructor(router, renderer, sinks, log, memory, config, skillStore) {
@@ -20,6 +21,9 @@ class Dispatcher {
     this.memory = memory || null;
     this.skillStore = skillStore || null;
     this.executor = new TaskExecutor(config || {}, log);
+    this.missionExecutor = createMissionExecutor(this.executor, {
+      projectRoot: (config && config.projectRoot) || process.cwd(),
+    });
     this.taskPool = new TaskPool({
       maxConcurrent: (config && config.maxConcurrentTasks) || 3,
       log: this.log,
@@ -471,30 +475,41 @@ class Dispatcher {
         const taskId = `task-${++this.taskCounter}`;
         this.stats.tasksExecuted++;
 
+        // Classify: is this a coding task or a general task?
+        const classification = this.missionExecutor.classify(taskDesc);
+        const isMission = classification.isCoding;
+        const modeLabel = isMission
+          ? `🔧 Mission task (${classification.agentType})`
+          : '⚙️ Running task';
+
         // Notify user that task is starting — immediate feedback
         try {
-          await sink.send(event.data.chatId, `⚙️ Running task: ${taskDesc.slice(0, 100)}...`, {
+          await sink.send(event.data.chatId, `${modeLabel}: ${taskDesc.slice(0, 100)}...`, {
             replyTo: event.data.messageId,
           });
         } catch {
           /* ignored */
         }
 
-        this.log(`[dispatcher] Executing task ${taskId}: ${taskDesc.slice(0, 80)}`);
+        this.log(
+          `[dispatcher] Executing ${isMission ? 'mission' : 'plain'} task ${taskId}: ${taskDesc.slice(0, 80)}`
+        );
 
         // Spawn into task pool — non-blocking
-        // Progress heartbeat is started INSIDE the task function so it only
-        // fires during actual execution, not during haiku pre-research.
         const cancelRef = { cancel: null };
         const sinkRef = sink;
         const chatId = event.data.chatId;
         const intervalMs = this._progressIntervalMs;
         const intervalSec = Math.round(intervalMs / 1000);
+        const missionExec = this.missionExecutor;
 
         this.taskPool.spawn(
           taskId,
           () => {
-            const handle = this.executor.executeTaskAsync(taskDesc);
+            // Route to mission executor for coding, standard executor otherwise
+            const handle = isMission
+              ? missionExec.executeAsync(taskDesc)
+              : this.executor.executeTaskAsync(taskDesc);
             cancelRef.cancel = handle.cancel;
 
             // Start heartbeat now that the task is actually running
@@ -509,8 +524,15 @@ class Dispatcher {
               }
             }, intervalMs);
 
-            // Clean up timer when task finishes (success or failure)
-            return handle.promise.finally(() => clearInterval(progressTimer));
+            // For mission tasks, format the result before delivery
+            const resultPromise = handle.promise.then(result => {
+              if (isMission && result && typeof result === 'object' && result.grade) {
+                return missionExec.formatResult(result);
+              }
+              return result;
+            });
+
+            return resultPromise.finally(() => clearInterval(progressTimer));
           },
           {
             description: taskDesc,

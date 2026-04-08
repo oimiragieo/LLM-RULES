@@ -46,7 +46,7 @@ function report(ruleId, severity, outcome, evidence) {
 
 // Load artifacts
 const featuresDoc = readJSON('features.json');
-const _state = readJSON('state.json');
+readJSON('state.json'); // validate state.json is parseable
 const validationState = readJSON('validation-state.json');
 const validationContract = readText('validation-contract.md');
 

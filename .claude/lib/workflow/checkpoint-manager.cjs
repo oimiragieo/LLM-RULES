@@ -30,11 +30,7 @@
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
-const { promisify } = require('util');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
-
-const _gzip = promisify(zlib.gzip);
-const _gunzip = promisify(zlib.gunzip);
 
 // =============================================================================
 // Constants

@@ -133,10 +133,15 @@ function spawnTerminalWindow(cmd, opts = {}) {
 
   if (platform === 'win32') {
     if (process.env.WT_SESSION) {
-      const wtArgs = ['/c', 'start', '', 'wt', '-w', 'new', 'new-tab'];
+      // Use wt.exe with full path resolution — cmd.exe /c start wt doesn't
+      // work reliably from Git Bash because PATH inheritance breaks.
+      const wtExe = process.env.LOCALAPPDATA
+        ? path.join(process.env.LOCALAPPDATA, 'Microsoft', 'WindowsApps', 'wt.exe')
+        : 'wt.exe';
+      const wtArgs = ['-w', '0', 'new-tab'];
       if (opts.cwd) wtArgs.push('-d', opts.cwd);
-      wtArgs.push('--title', 'Claude New Session', 'cmd', '/k', cmd);
-      return spawnDetached('cmd.exe', wtArgs, opts.cwd);
+      wtArgs.push('--title', 'Claude Handoff', '--', 'cmd', '/k', cmd);
+      return spawnDetached(wtExe, wtArgs, opts.cwd);
     }
     const psCmd = opts.cwd
       ? `Start-Process cmd.exe -WorkingDirectory ${JSON.stringify(opts.cwd)} -ArgumentList '/k ${cmd.replace(/'/g, "''")}'`
@@ -208,6 +213,13 @@ function main() {
   // We unset CLAUDECODE so the child process doesn't see a nested-session error.
   // Strip -d flag: -d redirects output to debug file → blank window.
   const interactiveFlags = claudeFlags.replace(/\s*-d\b/g, '').trim();
+  // Ensure model flag is present — without it, the spawned session may inherit
+  // the parent's 1M context model which requires extra-usage to be enabled.
+  // Default to sonnet for handoff sessions (cheaper, sufficient for continuation).
+  const modelFlag =
+    interactiveFlags.includes('--model') || interactiveFlags.includes('-m ')
+      ? ''
+      : ' --model sonnet';
   let cleanCommand;
   // CLAUDE_FRESH_SPAWN=1 tells handover-detector that this window was spawned by a
   // handoff. The detector uses it to safely clear the inherited session-id.json
@@ -256,9 +268,9 @@ function main() {
   // Escape double quotes for shell embedding
   const escapedPrompt = seedPrompt.replace(/"/g, '\\"');
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags} "${escapedPrompt}"`;
+    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags}${modelFlag} "${escapedPrompt}"`;
   } else {
-    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags} "${escapedPrompt}"`;
+    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${interactiveFlags}${modelFlag} "${escapedPrompt}"`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);

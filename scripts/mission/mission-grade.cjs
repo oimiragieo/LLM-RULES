@@ -4,147 +4,134 @@
 /**
  * Mission Grade CLI
  *
- * Scores a mission against the alignment rubric and emits a grading report.
- * Usage: node scripts/mission/mission-grade.cjs <mission-path> [--output <path>]
+ * Scores a mission against the full alignment rubric (17 rules, 12 evaluation kinds)
+ * and emits a grading-report.schema.json conformant report.
+ *
+ * Usage:
+ *   node scripts/mission/mission-grade.cjs <mission-path> [--output <path>] [--feature <id>]
  */
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { MissionGrader } = require('../../.claude/lib/mission/mission-grader.cjs');
+
+/**
+ * Find the latest handoff for a given feature.
+ * @param {string} missionDir - Mission directory path
+ * @param {string} targetFeatureId - Feature ID to match
+ * @returns {object|null}
+ */
+function findLatestHandoff(missionDir, targetFeatureId) {
+  const handoffsDir = path.join(missionDir, 'handoffs');
+  if (!fs.existsSync(handoffsDir)) return null;
+
+  let latest = null;
+  const files = fs.readdirSync(handoffsDir).filter(f => f.endsWith('.json'));
+
+  for (const file of files) {
+    try {
+      const h = JSON.parse(fs.readFileSync(path.join(handoffsDir, file), 'utf8'));
+      if (h.featureId !== targetFeatureId) continue;
+      if (!latest || h.timestamp > latest.timestamp) latest = h;
+    } catch {
+      // Skip malformed files
+    }
+  }
+
+  return latest;
+}
 
 const args = process.argv.slice(2);
 const missionPath = args.find(a => !a.startsWith('--'));
 const outputIdx = args.indexOf('--output');
 const outputPath = outputIdx !== -1 && outputIdx + 1 < args.length ? args[outputIdx + 1] : null;
+const featureIdx = args.indexOf('--feature');
+const featureId = featureIdx !== -1 && featureIdx + 1 < args.length ? args[featureIdx + 1] : null;
 
 if (!missionPath) {
-  console.error('Usage: mission-grade <mission-path> [--output <path>]');
+  console.error('Usage: mission-grade <mission-path> [--output <path>] [--feature <id>]');
   process.exit(1);
 }
 
 const resolved = path.resolve(missionPath);
-const rubricPath = path.join(
-  __dirname,
-  '..',
-  '..',
-  '.claude',
-  'config',
-  'mission-alignment',
-  'rubric.json'
-);
 
-function readJSON(file) {
-  const filePath = path.join(resolved, file);
-  if (!fs.existsSync(filePath)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  } catch {
-    return null;
-  }
+if (!fs.existsSync(resolved)) {
+  console.error(`Mission directory not found: ${resolved}`);
+  process.exit(1);
 }
 
-const rubric = JSON.parse(fs.readFileSync(rubricPath, 'utf8'));
-const featuresDoc = readJSON('features.json');
-const state = readJSON('state.json');
-const validationState = readJSON('validation-state.json');
+const grader = new MissionGrader();
 
-// Simplified grading — count rules passed by category
-const ruleResults = [];
-let blockerFailed = false;
+let report;
 
-function evaluate(ruleId, category, severity, passed, evidence) {
-  const override = rubric.ruleScoring.ruleOverrides.find(o => o.ruleId === ruleId);
-  const defaultPoints = rubric.ruleScoring.defaultRulePoints[severity] || 0;
-  const points = passed ? (override ? override.pointsIfPass : defaultPoints) : 0;
+if (featureId) {
+  // Grade a specific feature
+  const featuresDoc = JSON.parse(fs.readFileSync(path.join(resolved, 'features.json'), 'utf8'));
+  const feature = (featuresDoc.features || []).find(f => f.id === featureId);
 
-  if (severity === 'blocker' && !passed) blockerFailed = true;
+  if (!feature) {
+    console.error(`Feature not found: ${featureId}`);
+    process.exit(1);
+  }
 
-  ruleResults.push({
-    ruleId,
-    outcome: passed ? 'pass' : 'fail',
-    weight: override ? override.pointsIfPass : defaultPoints,
-    pointsAwarded: points,
-    evidence: evidence || '',
+  // Find latest handoff for this feature
+  const handoff = findLatestHandoff(resolved, featureId);
+
+  if (!handoff) {
+    console.error(`No handoff found for feature: ${featureId}`);
+    process.exit(1);
+  }
+
+  const validationState = fs.existsSync(path.join(resolved, 'validation-state.json'))
+    ? JSON.parse(fs.readFileSync(path.join(resolved, 'validation-state.json'), 'utf8'))
+    : { assertions: {} };
+
+  const validationContract = fs.existsSync(path.join(resolved, 'validation-contract.md'))
+    ? fs.readFileSync(path.join(resolved, 'validation-contract.md'), 'utf8')
+    : '';
+
+  report = grader.gradeFeature(feature, handoff, {
+    featuresDocument: featuresDoc,
+    validationState,
+    validationContract,
   });
+} else {
+  // Grade entire mission
+  report = grader.gradeMission(resolved);
 }
 
-// Schema checks
-evaluate(
-  'R-SCH-FEATURE-DOC',
-  'schema',
-  'blocker',
-  featuresDoc && Array.isArray(featuresDoc.features),
-  featuresDoc ? `${(featuresDoc.features || []).length} features` : 'missing'
-);
-
-// Feature spec checks
-const features = (featuresDoc && featuresDoc.features) || [];
-const allSpecComplete = features.every(
-  f => f.id && f.description && Array.isArray(f.expectedBehavior) && f.expectedBehavior.length > 0
-);
-evaluate(
-  'R-FEAT-SPEC-COMPLETE',
-  'feature_spec',
-  'blocker',
-  allSpecComplete,
-  allSpecComplete ? 'all features have spec' : 'some features missing spec fields'
-);
-
-// Validation ledger
-const assertions = (validationState && validationState.assertions) || {};
-const allFulfillsExist = features.every(f => (f.fulfills || []).every(v => assertions[v]));
-evaluate(
-  'R-VAL-LEDGER-EXISTS',
-  'traceability',
-  'major',
-  allFulfillsExist,
-  allFulfillsExist ? 'all fulfills in ledger' : 'some fulfills missing'
-);
-
-// Feature ID consistency
-evaluate('R-FEATURE-ID-MATCH-HANDOFF', 'consistency', 'blocker', true, 'checked at handoff time');
-
-// Compute score
-const totalPoints = ruleResults.reduce((sum, r) => sum + r.pointsAwarded, 0);
-const maxPossible = ruleResults.reduce((sum, r) => sum + r.weight, 0);
-const normalizedScore = maxPossible > 0 ? Math.round((totalPoints / maxPossible) * 100) : 0;
-const finalScore = blockerFailed ? 0 : normalizedScore;
-const passed = finalScore >= rubric.scale.passThreshold;
-
-let gradeBand = 'fail';
-for (const band of rubric.gradeBands) {
-  if (finalScore >= band.minScore && finalScore <= band.maxScore) {
-    gradeBand = band.band;
-    break;
-  }
-}
-
-const report = {
-  specVersion: '1.0.0',
-  gradedAt: new Date().toISOString(),
-  missionBaseSessionId: state ? state.baseSessionId : undefined,
-  summary: {
-    score: finalScore,
-    maxScore: 100,
-    passed,
-    gradeBand,
-  },
-  results: ruleResults,
-};
-
+// Write output if requested
 if (outputPath) {
   fs.writeFileSync(path.resolve(outputPath), JSON.stringify(report, null, 2) + '\n', 'utf8');
   console.log(`Grading report written to: ${outputPath}`);
 }
 
+// Display results
 console.log(`\n=== Grading Report ===`);
-console.log(`Score: ${finalScore}/100`);
-console.log(`Grade: ${gradeBand.toUpperCase()}`);
-console.log(`Passed: ${passed}`);
-console.log(`Blocker failed: ${blockerFailed}`);
-console.log(`\nRules:`);
-for (const r of ruleResults) {
-  const icon = r.outcome === 'pass' ? '✓' : '✗';
-  console.log(
-    `  ${icon} ${r.ruleId}: ${r.outcome} (+${r.pointsAwarded}/${r.weight}) ${r.evidence}`
-  );
+console.log(`Score: ${report.summary.score}/100`);
+console.log(`Grade: ${report.summary.gradeBand.toUpperCase()}`);
+console.log(`Passed: ${report.summary.passed}`);
+
+if (report.summary.featuresGraded != null) {
+  console.log(`Features graded: ${report.summary.featuresGraded}/${report.summary.featuresTotal}`);
+}
+
+// Show per-rule results for single feature grading
+if (report.results) {
+  console.log(`\nRules:`);
+  for (const r of report.results) {
+    const icon = r.outcome === 'pass' ? '+' : r.outcome === 'na' ? '~' : '-';
+    console.log(
+      `  [${icon}] ${r.ruleId}: ${r.outcome} (+${r.pointsAwarded}/${r.weight}) ${r.evidence}`
+    );
+  }
+}
+
+// Show per-feature results for mission grading
+if (report.featureReports) {
+  console.log(`\nFeature Scores:`);
+  for (const fr of report.featureReports) {
+    const icon = fr.summary.passed ? '+' : '-';
+    console.log(`  [${icon}] ${fr.featureId}: ${fr.summary.score}/100 (${fr.summary.gradeBand})`);
+  }
 }

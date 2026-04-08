@@ -177,8 +177,8 @@ describe('Reading and counting events', () => {
 });
 
 describe('VALID_EVENT_TYPES', () => {
-  it('has exactly 12 event types', () => {
-    assert.equal(VALID_EVENT_TYPES.size, 12);
+  it('has exactly 15 event types', () => {
+    assert.equal(VALID_EVENT_TYPES.size, 15);
   });
 
   it('includes all expected types', () => {
@@ -195,6 +195,9 @@ describe('VALID_EVENT_TYPES', () => {
       'user_testing_validator_completed',
       'mission_paused',
       'mission_completed',
+      'evidence_collected',
+      'mission_graded',
+      'validation_contract_generated',
     ];
     for (const type of expected) {
       assert.ok(VALID_EVENT_TYPES.has(type), `should include ${type}`);

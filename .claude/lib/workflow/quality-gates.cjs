@@ -90,7 +90,7 @@ function evaluateGate1(workflowState, projectRoot, result) {
  * Gate 2: Implement -> Review
  * Checks: tests exist, tests pass (agent-reported), all tasks complete
  */
-function evaluateGate2(workflowState, projectRoot, result) {
+function evaluateGate2(workflowState, _projectRoot, result) {
   const phaseData = workflowState.phases?.PHASE_2_IMPLEMENT;
   if (!phaseData) {
     result.blocking.push('PHASE_2_IMPLEMENT phase data not found');
@@ -135,7 +135,7 @@ function evaluateGate2(workflowState, projectRoot, result) {
  * Gate 3: Review -> Deploy
  * Checks: zero critical findings, code-reviewer approved, coverage check (MED+)
  */
-function evaluateGate3(workflowState, projectRoot, result) {
+function evaluateGate3(workflowState, _projectRoot, result) {
   const phaseData = workflowState.phases?.PHASE_3_REVIEW;
   if (!phaseData) {
     result.blocking.push('PHASE_3_REVIEW phase data not found');
@@ -184,7 +184,7 @@ function evaluateGate3(workflowState, projectRoot, result) {
  * Gate 4: Deploy -> Document
  * Checks: CI passes, commit exists, no merge conflicts
  */
-function evaluateGate4(workflowState, projectRoot, result) {
+function evaluateGate4(workflowState, _projectRoot, result) {
   const phaseData = workflowState.phases?.PHASE_4_DEPLOY;
   if (!phaseData) {
     result.blocking.push('PHASE_4_DEPLOY phase data not found');
@@ -227,7 +227,7 @@ function evaluateGate4(workflowState, projectRoot, result) {
  * Gate 5: Document -> Reflect
  * Checks: docs updated (non-blocking for most checks)
  */
-function evaluateGate5(workflowState, projectRoot, result) {
+function evaluateGate5(workflowState, _projectRoot, result) {
   const phaseData = workflowState.phases?.PHASE_5_DOCUMENT;
   if (!phaseData) {
     result.warnings.push('PHASE_5_DOCUMENT phase data not found');
@@ -255,7 +255,7 @@ function evaluateGate5(workflowState, projectRoot, result) {
  * Gate 6: Reflect -> Complete
  * Checks: learnings recorded (non-blocking)
  */
-function evaluateGate6(workflowState, projectRoot, result) {
+function evaluateGate6(workflowState, _projectRoot, result) {
   const phaseData = workflowState.phases?.PHASE_6_REFLECT;
   if (!phaseData) {
     result.warnings.push('PHASE_6_REFLECT phase data not found');

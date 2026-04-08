@@ -269,7 +269,6 @@ function main() {
     } catch (_err) {
       // Fail-open if stdin unavailable
       process.exit(0);
-      return;
     }
 
     // Parse input
@@ -278,12 +277,10 @@ function main() {
       input = safeParseJSON(data, null);
       if (!input || typeof input !== 'object' || Array.isArray(input)) {
         process.exit(0);
-        return;
       }
     } catch (_err) {
       // Malformed JSON - fail-open without passthrough output
       process.exit(0);
-      return;
     }
 
     // Extract user prompt
@@ -291,7 +288,6 @@ function main() {
     if (!userPrompt || typeof userPrompt !== 'string') {
       // No prompt to analyze - noop
       process.exit(0);
-      return;
     }
 
     // Get session ID

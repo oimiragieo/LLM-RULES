@@ -1,4 +1,4 @@
-/* eslint max-lines: ["warn", 600] */
+/* eslint max-lines: ["warn", 650] */
 /**
  * commands.cjs — Telegram bot commands (OpenClaw-style)
  *
@@ -64,7 +64,8 @@ class CommandHandler {
             '🎭 /personality — switch response style\n' +
             '📄 /export — download chat as markdown\n' +
             '🔑 /pair — device pairing for new users\n' +
-            '✅ /approve · ❌ /deny — approve pending commands\n\n' +
+            '✅ /approve · ❌ /deny — approve pending commands\n' +
+            '🔧 /code <task> — mission-aware coding (agent routing + grading)\n\n' +
             '💡 I can also DO things — ask me to run code, check git, run tests, etc.'
         );
 
@@ -550,6 +551,55 @@ class CommandHandler {
         pending.resolve('deny');
         this.dispatcher.pendingApprovals.delete(chatId);
         return this._reply(chatId, messageId, '❌ Denied. Task cancelled.');
+      }
+
+      case '/code': {
+        // Force mission-aware coding execution — bypass Claude classification
+        if (!args) {
+          return this._reply(
+            chatId,
+            messageId,
+            '💡 Usage: /code <task description>\n\nExample: /code fix the login form validation\n\nThis routes your task through the mission-aware coding pipeline with agent selection, verification, and grading.'
+          );
+        }
+
+        const { classify: classifyTask } = require('./skill-router.cjs');
+        const codeClassification = classifyTask(args);
+        const agentLabel = codeClassification.isCoding ? codeClassification.agentType : 'developer';
+
+        // Directly spawn into the dispatcher's task pool via mission executor
+        if (this.dispatcher && this.dispatcher.missionExecutor) {
+          const taskId = `code-${++this.dispatcher.taskCounter}`;
+          const missionExec = this.dispatcher.missionExecutor;
+          const cancelRef = { cancel: null };
+
+          this.dispatcher.taskPool.spawn(
+            taskId,
+            () => {
+              const handle = missionExec.executeAsync(args);
+              cancelRef.cancel = handle.cancel;
+              return handle.promise.then(result => {
+                if (result && result.grade) return missionExec.formatResult(result);
+                return result;
+              });
+            },
+            {
+              description: args,
+              chatId,
+              user: msgData.user || 'unknown',
+              timeout: 300000,
+              cancel: () => cancelRef.cancel && cancelRef.cancel(),
+              _sink: this.sink,
+              _messageId: messageId,
+            }
+          );
+        }
+
+        return this._reply(
+          chatId,
+          messageId,
+          `🔧 Coding task queued → ${agentLabel}\nDescription: ${args.slice(0, 100)}`
+        );
       }
 
       default:

@@ -186,6 +186,59 @@ When calling `TaskUpdate({ status: 'completed' })`, metadata MUST include:
 
 These fields trigger the memory extraction pipeline. Without them, your work is invisible to the learning system.
 
+### Mission Handoff Fields (Factory Droid Alignment)
+
+When working on a mission feature (task spawned with `featureId` in prompt), ALSO include these fields in metadata to enable automated grading and evidence collection:
+
+- `commandsRun`: array of `{ command, exitCode, observation }` — every verification step executed
+- `discoveredIssues`: array of `{ severity, description, suggestedFix }` — issues found during work
+  - severity: `"blocking"` (stops progress), `"non_blocking"` (can continue), `"info"` (informational)
+- `skillFeedback`: object with:
+  - `followedProcedure`: boolean — did you follow the expected workflow?
+  - `deviations`: array of `{ step, whatIDidInstead, why }` — any departures from standard process
+  - `suggestedChanges`: string[] — improvements to the skill/procedure
+- `testsAdded`: string[] — test files created or modified
+- `testsCoverage`: string — brief coverage description
+
+**Example mission-aware completion:**
+
+```javascript
+TaskUpdate({
+  taskId: '<ID>',
+  status: 'completed',
+  metadata: {
+    summary: 'Fixed broken require paths in evidence-collector and mission-grader',
+    filesModified: ['.claude/lib/mission/evidence-collector.cjs'],
+    commandsRun: [
+      {
+        command: 'node --test tests/lib/mission/evidence-collector.test.cjs',
+        exitCode: 0,
+        observation: 'All 8 tests passed',
+      },
+      { command: 'pnpm lint:fix', exitCode: 0, observation: 'No lint errors' },
+    ],
+    discoveredIssues: [
+      {
+        severity: 'non_blocking',
+        description: 'Windows path separator in evidence filenames',
+        suggestedFix: 'Normalize with .replace(/\\\\/g, "/")',
+      },
+    ],
+    skillFeedback: {
+      followedProcedure: true,
+      deviations: [],
+      suggestedChanges: [],
+    },
+    testsAdded: ['tests/lib/mission/evidence-collector.test.cjs'],
+    testsCoverage:
+      'Covers evidence file naming, verification step execution, and assertion binding',
+    memoriesRecorded: ['gotcha:platform'],
+  },
+});
+```
+
+Schema reference: `.claude/schemas/mission/mission-handoff.schema.json`
+
 > [!WARNING] PLAN FILE: If spawned with a plan file path, update `[ ]` → `[~]` on start and `[~]` → `[x]` on complete. Use `Edit` on the specific line. Do this BEFORE `TaskUpdate(completed)`. Skip silently if the plan file does not exist.
 
 ## Named Memory API (for topic-specific persistence)

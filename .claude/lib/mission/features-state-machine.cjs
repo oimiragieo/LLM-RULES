@@ -21,7 +21,6 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const Ajv = require('ajv');
 
 // Schema for a single feature
 const FEATURE_SCHEMA = {
@@ -41,12 +40,12 @@ const FEATURE_SCHEMA = {
       enum: ['pending', 'in_progress', 'validating', 'completed', 'failed', 'cancelled'],
     },
     retryCount: { type: 'integer', minimum: 0 },
-    startedAt: { type: 'string', format: 'date-time', nullable: true },
-    completedAt: { type: 'string', format: 'date-time', nullable: true },
-    failedAt: { type: 'string', format: 'date-time', nullable: true },
+    startedAt: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'null' }] },
+    completedAt: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'null' }] },
+    failedAt: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'null' }] },
     workerSessionIds: { type: 'array', items: { type: 'string' } },
-    currentWorkerSessionId: { type: 'string', nullable: true },
-    completedWorkerSessionId: { type: 'string', nullable: true },
+    currentWorkerSessionId: { oneOf: [{ type: 'string' }, { type: 'null' }] },
+    completedWorkerSessionId: { oneOf: [{ type: 'string' }, { type: 'null' }] },
   },
   additionalProperties: true,
 };
@@ -74,9 +73,20 @@ const VALID_TRANSITIONS = {
   cancelled: [], // Terminal
 };
 
-// Initialize AJV validator
-const ajv = new Ajv({ allErrors: true, strict: false });
-const validateFeatureFile = ajv.compile(FEATURES_FILE_SCHEMA);
+// Lazy AJV initialization — only load when validation is actually needed.
+// Saves ~15-30ms on module load for consumers that only need VALID_TRANSITIONS
+// or detectCircularDependencies (e.g., routing, dispatch).
+let _validateFeatureFile = null;
+function getValidator() {
+  if (!_validateFeatureFile) {
+    const Ajv = require('ajv');
+    const addFormats = require('ajv-formats');
+    const ajv = new Ajv({ allErrors: true, strict: false });
+    addFormats(ajv);
+    _validateFeatureFile = ajv.compile(FEATURES_FILE_SCHEMA);
+  }
+  return _validateFeatureFile;
+}
 
 /**
  * Atomic write: write to .tmp file then rename
@@ -277,13 +287,14 @@ class FeaturesStateMachine {
       throw error;
     }
 
-    // Validate schema
-    if (!validateFeatureFile(data)) {
+    // Validate schema (lazy-loads AJV on first call)
+    const validateFn = getValidator();
+    if (!validateFn(data)) {
       const error = new Error('features.json schema validation failed');
       error.code = 'SCHEMA_VALIDATION_ERROR';
       error.details = {
         path: this.featuresPath,
-        errors: validateFeatureFile.errors,
+        errors: validateFn.errors,
       };
       throw error;
     }
@@ -471,7 +482,7 @@ class FeaturesStateMachine {
       throw new Error('Features not loaded. Call load() first.');
     }
 
-    return this.features.filter(feature => {
+    const eligible = this.features.filter(feature => {
       if (feature.status !== 'pending') {
         return false;
       }
@@ -479,6 +490,15 @@ class FeaturesStateMachine {
       const precondResult = this.checkPreconditions(feature.id);
       return precondResult.met;
     });
+
+    // Sort by topological order so foundational features dispatch first
+    const topoOrder = _topologicalSort(this.features);
+    const orderIndex = new Map(topoOrder.map((id, i) => [id, i]));
+    eligible.sort(
+      (a, b) => (orderIndex.get(a.id) ?? Infinity) - (orderIndex.get(b.id) ?? Infinity)
+    );
+
+    return eligible;
   }
 
   /**

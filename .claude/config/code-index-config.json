@@ -7,8 +7,10 @@
     "excludePatterns": [
       "**/node_modules/**",
       "**/.git/**",
+      "**/.claude/worktrees/**",
       "**/.claude/context/code-index/**",
       "**/.claude/context/data/**",
+      "**/.claude/context/tmp/**",
       "**/.claude.archive/**",
       "**/local_cache/**",
       "**/dist/**",

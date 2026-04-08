@@ -240,7 +240,7 @@ async function main() {
     const now = new Date();
     const hour = now.getHours();
     const minute = now.getMinutes();
-    const _dow = now.getDay();
+    // day-of-week available via now.getDay() if needed for schedule matching
     for (const [chatId, schedules] of userSchedules) {
       for (const sched of schedules) {
         // Simple cron check (reuse TimerSource logic)

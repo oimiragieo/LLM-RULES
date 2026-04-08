@@ -67,6 +67,9 @@ const INDEXABLE_EXTENSIONS = new Set([
 const EXCLUDE_PATTERNS = [
   /node_modules/,
   /\.git/,
+  /\.claude\/worktrees/,
+  /\.claude\/context\/code-index/, // Don't index the index itself
+  /\.claude\/context\/tmp/,
   /dist/,
   /build/,
   /\.next/,
@@ -74,7 +77,6 @@ const EXCLUDE_PATTERNS = [
   /\.min\./,
   /\.bundle\./,
   /\.map$/,
-  /\.claude\/context\/code-index/, // Don't index the index itself
 ];
 
 // Simple lock file for cross-process coordination

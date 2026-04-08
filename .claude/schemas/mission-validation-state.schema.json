@@ -17,7 +17,7 @@
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["pending", "passed", "failed", "skipped"],
+            "enum": ["pending", "passed", "failed", "blocked", "skipped"],
             "description": "Assertion validation status"
           },
           "validatedAtMilestone": {

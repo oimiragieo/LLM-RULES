@@ -188,9 +188,77 @@ function logTokenEvent(eventType, data) {
   fs.appendFileSync(TOKEN_LOG_PATH, JSON.stringify(event) + '\n', 'utf8');
 }
 
+// --- Enforcement layer (opt-in via TOKEN_BUDGET_ENFORCE=on) ---
+// Ported from Claude Code's tokenBudget.ts diminishing returns pattern.
+
+const HARD_CAP_PERCENT = 90;
+const DIMINISHING_RETURNS_THRESHOLD = 500;
+const DIMINISHING_RETURNS_MAX_CONTINUATIONS = 3;
+
+// In-memory per-agent continuation tracking (not persisted — session-scoped)
+const _continuationCounters = new Map();
+
+/**
+ * Record a continuation (additional turn) for an agent.
+ * Tracks consecutive low-delta continuations for diminishing returns detection.
+ *
+ * @param {string} agentId - Agent identifier
+ * @param {number} tokenDelta - Token delta from previous turn
+ */
+function recordContinuation(agentId, tokenDelta) {
+  if (!_continuationCounters.has(agentId)) {
+    _continuationCounters.set(agentId, { lowDeltaCount: 0 });
+  }
+  const counter = _continuationCounters.get(agentId);
+  if (tokenDelta < DIMINISHING_RETURNS_THRESHOLD) {
+    counter.lowDeltaCount++;
+  } else {
+    counter.lowDeltaCount = 0;
+  }
+}
+
+/**
+ * Check if an agent should be stopped based on budget and diminishing returns.
+ * Only enforces when TOKEN_BUDGET_ENFORCE env var is set to 'on', 'true', or '1'.
+ *
+ * @param {string} agentId - Agent identifier
+ * @returns {{ stop: boolean, reason: string }}
+ */
+function shouldEnforceStop(agentId) {
+  const envVal = (process.env.TOKEN_BUDGET_ENFORCE || '').toLowerCase();
+  if (envVal !== 'on' && envVal !== 'true' && envVal !== '1') {
+    return { stop: false, reason: 'enforcement_disabled' };
+  }
+
+  // Check hard budget cap
+  const status = checkBudgetStatus(agentId);
+  if (status.percentUsed >= HARD_CAP_PERCENT) {
+    return {
+      stop: true,
+      reason: `budget_exceeded: ${status.percentUsed.toFixed(1)}% used (cap: ${HARD_CAP_PERCENT}%)`,
+    };
+  }
+
+  // Check diminishing returns
+  const counter = _continuationCounters.get(agentId);
+  if (counter && counter.lowDeltaCount >= DIMINISHING_RETURNS_MAX_CONTINUATIONS) {
+    return {
+      stop: true,
+      reason: `diminishing_returns: ${counter.lowDeltaCount} consecutive low-delta continuations (threshold: <${DIMINISHING_RETURNS_THRESHOLD} tokens)`,
+    };
+  }
+
+  return { stop: false, reason: 'within_budget' };
+}
+
 module.exports = {
   estimateTokens,
   trackAgentUsage,
   checkBudgetStatus,
   logTokenEvent,
+  recordContinuation,
+  shouldEnforceStop,
+  HARD_CAP_PERCENT,
+  DIMINISHING_RETURNS_THRESHOLD,
+  DIMINISHING_RETURNS_MAX_CONTINUATIONS,
 };

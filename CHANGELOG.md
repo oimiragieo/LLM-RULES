@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Factory Droid Mission Execution & Telegram Coding Pipeline
+
+#### Added
+
+- **Planner features.json emission** — Planner agent now emits structured `features.json` alongside markdown plans for MEDIUM+ complexity tasks, with precondition DAGs, verificationSteps, and VAL-\* fulfills mapping
+- **Mission handoff completion contract** — Universal spawn template requires agents to emit `commandsRun`, `discoveredIssues`, `skillFeedback`, and `testsAdded` in TaskUpdate metadata for mission-aware grading
+- **Orchestrator evidence/grading/contract methods** — `collectEvidence()`, `grade()`, and `generateValidationContract()` wired into mission-orchestrator for post-completion scoring and VAL-\* contract auto-generation
+- **3 new progress log events** — `evidence_collected`, `mission_graded`, `validation_contract_generated` with typed logger methods
+- **Telegram `/code` command** — Mission-aware coding execution via `scripts/channels/daemon/mission-executor.cjs`: classifies tasks by agent type (16 patterns), builds feature specs, injects coding-task system prompt, captures structured handoff output, grades results 0-100
+- **Skill router** — `scripts/channels/daemon/skill-router.cjs` maps user requests to agent types via keyword matching with per-agent verification step defaults
+- **Handoff capture** — `scripts/channels/daemon/handoff-capture.cjs` parses headless Claude output for fenced `handoff` blocks, falls back to unstructured extraction, writes handoff JSON, grades against 6 alignment rules
+- **Coding task system prompt** — `scripts/channels/daemon/coding-task-prompt.txt` for mission-aware headless sessions requiring TDD workflow, verification execution, and structured handoff output
+- **48 new tests** across 3 test files for skill-router, handoff-capture, and mission-executor
+
+#### Fixed
+
+- **Session handoff Windows Terminal spawn** — Fixed `spawn-new-session.cjs` to use full `wt.exe` path via `LOCALAPPDATA/Microsoft/WindowsApps/wt.exe` instead of `cmd.exe /c start wt` which fails from Git Bash due to PATH inheritance. Added `--model sonnet` default to prevent 1M context extra-usage errors. Uses `-w 0 new-tab` to open in current window as tab (not new window)
+- **AJV format warnings** — Added `ajv-formats` to `features-state-machine.cjs`; replaced non-standard `nullable: true` with JSON Schema `oneOf` pattern for `startedAt`/`completedAt`/`failedAt` fields
+- **Mission workspace nested path** — `workspace-provisioner.cjs` was creating `.claude/missions/missions/<uuid>` due to double `missions/` in path; now correctly creates `.claude/missions/<uuid>`
+- **Evidence collector shell safety** — Replaced `execSync(command, {shell:false})` (crashes on multi-word commands) with `spawnSync(bin, args, {shell:false})` using proper command splitting
+- **Restored complexity-classifier** — `.claude/lib/workflow/complexity-classifier.cjs` was incorrectly deleted as orphaned; restored from git history to fix `integration-example.test.cjs`
+- **Unreachable code in drift-detector** — Removed 4 `return` statements after `process.exit(0)` calls
+- **Unused imports/variables** — Removed `path` from `workflow-validator.cjs`, `_gzip`/`_gunzip` from `checkpoint-manager.cjs`, prefixed unused `projectRoot` params in `quality-gates.cjs` gates 2-6, `_task` in `task-router.cjs`, `_state` in `mission-validate.cjs`, `_dow` in daemon `index.cjs`
+- **Mission grading nesting** — Refactored `mission-grade.cjs` to extract `findLatestHandoff()` helper, eliminating max-depth lint warnings
+- **Wired \_topologicalSort** — Connected dead `_topologicalSort()` function in `features-state-machine.cjs` to `getEligibleFeatures()` so features dispatch in dependency order
+- **Wired skill-feedback-aggregator** — Connected orphaned `checkSkillHealth()` into orchestrator's `processHandoff()` for recurring deviation tracking
+- **Refreshed code search index** — Rebuilt BM25 index (14,954 files, 59,536 chunks) from 4-day stale state
+
 ### Factory Droid Mission Alignment — 9-Track Parity Upgrade
 
 #### Added
