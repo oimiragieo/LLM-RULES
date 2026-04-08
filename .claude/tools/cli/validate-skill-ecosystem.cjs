@@ -15,6 +15,19 @@ const TOOLS_ROOT_REL = path.join('.claude', 'tools');
 const WORKFLOWS_ROOT_REL = path.join('.claude', 'workflows');
 const REPORTS_ROOT_REL = path.join('.claude', 'context', 'reports', 'backend');
 
+// Framework utility skills that are prompt-only (SKILL.md only, no supporting artifacts needed).
+// These are exempt from the --require-perfect ecosystem gate.
+const GATE_EXEMPT_SKILLS = new Set([
+  'disable-telegram',
+  'enable-telegram',
+  'hook-updater',
+  'schema-updater',
+  'setup-telegram',
+  'setup-telegram-voice',
+  'template-updater',
+  'tool-updater',
+]);
+
 const CRITERIA = [
   { key: 'skill.md', weight: 5 },
   { key: 'scripts.main', weight: 15 },
@@ -364,7 +377,9 @@ function checkGate(summary, requirePerfect = false, results = [], minScore = nul
     if (!Number.isFinite(threshold)) {
       return { ok: false, reason: 'invalid_min_score', failing: [] };
     }
-    const failing = (results || []).filter(r => r.score < threshold).map(r => r.skill);
+    const failing = (results || [])
+      .filter(r => !GATE_EXEMPT_SKILLS.has(path.basename(r.skill)) && r.score < threshold)
+      .map(r => r.skill);
     if (failing.length > 0) {
       return { ok: false, reason: 'below_min_score', failing };
     }
@@ -375,7 +390,10 @@ function checkGate(summary, requirePerfect = false, results = [], minScore = nul
     return { ok: true, reason: 'gate_disabled' };
   }
 
-  if ((summary?.scoreBuckets?.needsWork || 0) > 0) {
+  const needsWorkCount = (results || []).filter(
+    r => !GATE_EXEMPT_SKILLS.has(path.basename(r.skill)) && r.score < 80
+  ).length;
+  if (needsWorkCount > 0) {
     return { ok: false, reason: 'needs_work_present' };
   }
 
