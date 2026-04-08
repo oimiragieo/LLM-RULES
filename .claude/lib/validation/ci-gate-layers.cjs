@@ -319,7 +319,7 @@ async function validateSemantic(projectRoot, options = {}) {
   if (fs.existsSync(skillsDir)) {
     const skillDirs = fs
       .readdirSync(skillsDir, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
+      .filter(dirent => dirent.isDirectory() && dirent.name !== '_archive')
       .map(dirent => dirent.name);
 
     for (const skillName of skillDirs) {

@@ -199,7 +199,9 @@ function createMissionExecutor(baseExecutor, options = {}) {
 
       // Grade header
       const gradeIcon = grade.passed ? (grade.grade === 'excellent' ? '🏆' : '✅') : '⚠️';
-      parts.push(`${gradeIcon} Task Complete (Score: ${grade.score}/100 ${grade.grade.toUpperCase()})\n`);
+      parts.push(
+        `${gradeIcon} Task Complete (Score: ${grade.score}/100 ${grade.grade.toUpperCase()})\n`
+      );
 
       // Summary
       if (handoff.summary) {

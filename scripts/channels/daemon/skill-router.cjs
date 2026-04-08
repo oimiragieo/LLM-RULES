@@ -13,10 +13,19 @@ const CODING_PATTERNS = [
   { pattern: /\b(review|code review|pr review|pull request)\b/i, agentType: 'code-reviewer' },
   { pattern: /\b(refactor|simplify|clean\s?up|deduplicate)\b/i, agentType: 'code-simplifier' },
   { pattern: /\b(doc|readme|changelog|jsdoc|comment)\b/i, agentType: 'technical-writer' },
-  { pattern: /\b(deploy|docker|ci|cd|pipeline|github actions|k8s|kubernetes)\b/i, agentType: 'devops' },
-  { pattern: /\b(schema|migration|sql|database|table|index|query)\b/i, agentType: 'database-architect' },
+  {
+    pattern: /\b(deploy|docker|ci|cd|pipeline|github actions|k8s|kubernetes)\b/i,
+    agentType: 'devops',
+  },
+  {
+    pattern: /\b(schema|migration|sql|database|table|index|query)\b/i,
+    agentType: 'database-architect',
+  },
   { pattern: /\b(security|auth|jwt|oauth|xss|csrf|injection)\b/i, agentType: 'security-architect' },
-  { pattern: /\b(react|vue|svelte|angular|css|tailwind|component|ui|frontend)\b/i, agentType: 'frontend-pro' },
+  {
+    pattern: /\b(react|vue|svelte|angular|css|tailwind|component|ui|frontend)\b/i,
+    agentType: 'frontend-pro',
+  },
   { pattern: /\b(python|django|flask|fastapi)\b/i, agentType: 'python-pro' },
   { pattern: /\b(rust|cargo|crate)\b/i, agentType: 'rust-pro' },
   { pattern: /\b(go|golang|goroutine)\b/i, agentType: 'golang-pro' },

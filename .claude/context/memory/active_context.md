@@ -14,13 +14,13 @@
 
 ## Performance Phases Status
 
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 1 | Lazy AJV in features-state-machine (saves 15-30ms) | ✅ Done |
-| 2 | Metadata size cap in task-update-contract (2K/4K limits) | ✅ Done |
-| 3 | Mtime cache in spawn-prompt-assembler (0 reads on warm cache) | ✅ Done |
-| 4 | Token budget enforcement (90% hard cap + diminishing returns) | ✅ Done |
-| 5 | Code-index exclusion validation test | ✅ Done |
+| Phase | Description                                                   | Status  |
+| ----- | ------------------------------------------------------------- | ------- |
+| 1     | Lazy AJV in features-state-machine (saves 15-30ms)            | ✅ Done |
+| 2     | Metadata size cap in task-update-contract (2K/4K limits)      | ✅ Done |
+| 3     | Mtime cache in spawn-prompt-assembler (0 reads on warm cache) | ✅ Done |
+| 4     | Token budget enforcement (90% hard cap + diminishing returns) | ✅ Done |
+| 5     | Code-index exclusion validation test                          | ✅ Done |
 
 ## Known Pre-existing Issues
 

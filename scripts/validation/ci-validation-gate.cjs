@@ -44,7 +44,7 @@ async function main() {
         const fullPath = path.join(dir, entry.name);
         if (entry.isDirectory()) {
           walk(fullPath);
-        } else if (entry.name.endsWith('.md')) {
+        } else if (entry.name.endsWith('.md') && entry.name !== 'CLAUDE.md') {
           agents.push(fullPath);
         }
       }

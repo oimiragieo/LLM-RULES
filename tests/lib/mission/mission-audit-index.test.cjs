@@ -8,10 +8,19 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { createAuditIndex, AUDIT_EVENT_TYPES } = require('../../../.claude/lib/mission/mission-audit-index.cjs');
+const {
+  createAuditIndex,
+  AUDIT_EVENT_TYPES,
+} = require('../../../.claude/lib/mission/mission-audit-index.cjs');
 
 function createTempDir() {
-  const dir = path.join(__dirname, '..', '..', 'fixtures', `temp-audit-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const dir = path.join(
+    __dirname,
+    '..',
+    '..',
+    'fixtures',
+    `temp-audit-${Date.now()}-${Math.random().toString(36).slice(2)}`
+  );
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 }
@@ -71,7 +80,11 @@ describe('Mission Audit Index', () => {
 
   it('tracks milestone and grading events', () => {
     audit.emitMilestoneTriggered('alpha');
-    audit.emitValidatorsInjected('alpha', 'scrutiny-validator-alpha', 'user-testing-validator-alpha');
+    audit.emitValidatorsInjected(
+      'alpha',
+      'scrutiny-validator-alpha',
+      'user-testing-validator-alpha'
+    );
     audit.emitGradingCompleted('feat-a', 92, 'excellent', true);
 
     const all = audit.query();

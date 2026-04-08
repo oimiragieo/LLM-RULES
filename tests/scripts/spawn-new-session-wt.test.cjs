@@ -18,7 +18,9 @@ describe('spawn-new-session.cjs Windows Terminal regression guards', () => {
   it('uses LOCALAPPDATA wt.exe path, NOT bare wt via cmd.exe /c start', () => {
     // The working pattern: resolve wt.exe via LOCALAPPDATA/Microsoft/WindowsApps/
     assert.ok(
-      content.includes('Microsoft') && content.includes('WindowsApps') && content.includes('wt.exe'),
+      content.includes('Microsoft') &&
+        content.includes('WindowsApps') &&
+        content.includes('wt.exe'),
       'Must use full LOCALAPPDATA/Microsoft/WindowsApps/wt.exe path — bare wt breaks from Git Bash'
     );
     // Must NOT use the old broken pattern

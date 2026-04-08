@@ -25,7 +25,13 @@ const {
 // ---------------------------------------------------------------------------
 
 const MINIMAL_RUBRIC = {
-  scale: { minScore: 0, maxScore: 100, passThreshold: 80, excellentThreshold: 92, marginalBand: [70, 79] },
+  scale: {
+    minScore: 0,
+    maxScore: 100,
+    passThreshold: 80,
+    excellentThreshold: 92,
+    marginalBand: [70, 79],
+  },
   gradeBands: [
     { band: 'excellent', minScore: 92, maxScore: 100 },
     { band: 'good', minScore: 80, maxScore: 91 },
@@ -42,14 +48,18 @@ const MINIMAL_RUBRIC = {
   ruleScoring: {
     method: 'normalized_by_category',
     categoryCaps: {
-      schema: 20, feature_spec: 15, traceability: 20,
-      verification_evidence: 25, skill_compliance: 10,
-      consistency: 15, dependency: 5, policy: 5, milestone: 5,
+      schema: 20,
+      feature_spec: 15,
+      traceability: 20,
+      verification_evidence: 25,
+      skill_compliance: 10,
+      consistency: 15,
+      dependency: 5,
+      policy: 5,
+      milestone: 5,
     },
     defaultRulePoints: { blocker: 15, major: 8, minor: 3, info: 1, warning: 0 },
-    ruleOverrides: [
-      { ruleId: 'R-CUSTOM', pointsIfPass: 12 },
-    ],
+    ruleOverrides: [{ ruleId: 'R-CUSTOM', pointsIfPass: 12 }],
   },
 };
 
@@ -82,9 +92,7 @@ function makeHandoff(overrides = {}) {
       whatWasImplemented: 'Full implementation',
       whatWasLeftUndone: 'Nothing',
       verification: {
-        commandsRun: [
-          { command: 'npm test', exitCode: 0, observation: 'All pass' },
-        ],
+        commandsRun: [{ command: 'npm test', exitCode: 0, observation: 'All pass' }],
       },
       tests: { added: ['test.js'], coverage: '95%' },
       discoveredIssues: [],
@@ -132,7 +140,7 @@ describe('array_nonempty', () => {
       { kind: 'array_nonempty', artifact: 'feature', pointer: '/items' },
       { items: [1, 2] },
       { feature: { items: [1, 2] } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -142,7 +150,7 @@ describe('array_nonempty', () => {
       { kind: 'array_nonempty', artifact: 'feature', pointer: '/items' },
       { items: [] },
       { feature: { items: [] } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
   });
@@ -152,7 +160,7 @@ describe('array_nonempty', () => {
       { kind: 'array_nonempty', artifact: 'feature', pointer: '/items' },
       { items: 'nope' },
       { feature: { items: 'nope' } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
   });
@@ -164,7 +172,7 @@ describe('string_nonempty', () => {
       { kind: 'string_nonempty', artifact: 'feature', pointer: '/name' },
       { name: 'hello' },
       { feature: { name: 'hello' } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -174,7 +182,7 @@ describe('string_nonempty', () => {
       { kind: 'string_nonempty', artifact: 'feature', pointer: '/name' },
       { name: '   ' },
       { feature: { name: '   ' } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
   });
@@ -193,7 +201,7 @@ describe('set_subset', () => {
         feature: { ids: ['VAL-A-001', 'VAL-A-002'] },
         validationState: { assertions: { 'VAL-A-001': {}, 'VAL-A-002': {}, 'VAL-A-003': {} } },
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -210,7 +218,7 @@ describe('set_subset', () => {
         feature: { ids: ['VAL-A-001', 'VAL-MISSING-999'] },
         validationState: { assertions: { 'VAL-A-001': {} } },
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
     assert.ok(r.evidence.includes('VAL-MISSING-999'));
@@ -228,7 +236,7 @@ describe('regex_all_match', () => {
       },
       {},
       { feature: { fulfills: ['VAL-TEST-001', 'VAL-TEST-002'] } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -243,7 +251,7 @@ describe('regex_all_match', () => {
       },
       {},
       { feature: { fulfills: ['VAL-TEST-001', 'bad-format'] } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
   });
@@ -262,7 +270,7 @@ describe('markdown_contains_all', () => {
         feature: { fulfills: ['VAL-TEST-001'] },
         validationContract: '### VAL-TEST-001: Some assertion\nDetails here.',
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -279,7 +287,7 @@ describe('markdown_contains_all', () => {
         feature: { fulfills: ['VAL-MISSING-999'] },
         validationContract: 'No matching IDs here.',
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
   });
@@ -306,7 +314,7 @@ describe('verification_steps_covered', () => {
           },
         },
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -323,14 +331,12 @@ describe('verification_steps_covered', () => {
         handoff: {
           handoff: {
             verification: {
-              commandsRun: [
-                { command: 'npm test', exitCode: 0 },
-              ],
+              commandsRun: [{ command: 'npm test', exitCode: 0 }],
             },
           },
         },
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
     assert.ok(r.evidence.includes('npm run lint'));
@@ -345,7 +351,7 @@ describe('verification_steps_covered', () => {
       },
       { verificationSteps: [] },
       { handoff: {} },
-      '.',
+      '.'
     );
     assert.equal(r.outcome, 'na');
   });
@@ -362,7 +368,7 @@ describe('object_keys_exist', () => {
       },
       {},
       { handoff: { sf: { followedProcedure: true, deviations: [] } } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -377,7 +383,7 @@ describe('object_keys_exist', () => {
       },
       {},
       { handoff: { sf: { followedProcedure: true } } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
   });
@@ -393,7 +399,7 @@ describe('equals', () => {
       },
       {},
       { handoff: { featureId: 'abc' }, feature: { id: 'abc' } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -407,7 +413,7 @@ describe('equals', () => {
       },
       {},
       { handoff: { featureId: 'abc' }, feature: { id: 'xyz' } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
   });
@@ -421,7 +427,7 @@ describe('equals', () => {
       },
       {},
       { handoff: { returnToOrchestrator: true } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -437,7 +443,7 @@ describe('conditional_integrity', () => {
       },
       {},
       { handoff: { successState: 'failure', handoff: { verification: { commandsRun: [] } } } },
-      '.',
+      '.'
     );
     assert.equal(r.outcome, 'na');
   });
@@ -456,7 +462,7 @@ describe('conditional_integrity', () => {
           handoff: { verification: { commandsRun: [{ command: 'test', exitCode: 0 }] } },
         },
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -478,7 +484,7 @@ describe('conditional_integrity', () => {
           },
         },
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -503,7 +509,7 @@ describe('consistency_warning', () => {
         feature: { status: 'completed', fulfills: ['VAL-A-001'] },
         validationState: { assertions: { 'VAL-A-001': { status: 'pending' } } },
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
     assert.equal(r.warning, true);
@@ -527,7 +533,7 @@ describe('consistency_warning', () => {
         feature: { status: 'completed', fulfills: ['VAL-A-001'] },
         validationState: { assertions: { 'VAL-A-001': { status: 'passed' } } },
       },
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
     assert.equal(r.warning, undefined);
@@ -547,16 +553,13 @@ describe('isRuleApplicable', () => {
     assert.equal(
       isRuleApplicable(
         { appliesWhen: { feature: '/fulfills', exists: true } },
-        { feature: { fulfills: ['VAL-A-001'] } },
+        { feature: { fulfills: ['VAL-A-001'] } }
       ),
-      true,
+      true
     );
     assert.equal(
-      isRuleApplicable(
-        { appliesWhen: { feature: '/fulfills', exists: true } },
-        { feature: {} },
-      ),
-      false,
+      isRuleApplicable({ appliesWhen: { feature: '/fulfills', exists: true } }, { feature: {} }),
+      false
     );
   });
 
@@ -564,16 +567,16 @@ describe('isRuleApplicable', () => {
     assert.equal(
       isRuleApplicable(
         { appliesWhen: { feature: '/verificationSteps', arrayMinLength: 1 } },
-        { feature: { verificationSteps: ['test'] } },
+        { feature: { verificationSteps: ['test'] } }
       ),
-      true,
+      true
     );
     assert.equal(
       isRuleApplicable(
         { appliesWhen: { feature: '/verificationSteps', arrayMinLength: 1 } },
-        { feature: { verificationSteps: [] } },
+        { feature: { verificationSteps: [] } }
       ),
-      false,
+      false
     );
   });
 
@@ -581,16 +584,16 @@ describe('isRuleApplicable', () => {
     assert.equal(
       isRuleApplicable(
         { appliesWhen: { feature: '/id', regex: '(scrutiny-validator-)' } },
-        { feature: { id: 'scrutiny-validator-memory' } },
+        { feature: { id: 'scrutiny-validator-memory' } }
       ),
-      true,
+      true
     );
     assert.equal(
       isRuleApplicable(
         { appliesWhen: { feature: '/id', regex: '(scrutiny-validator-)' } },
-        { feature: { id: 'fts5-search' } },
+        { feature: { id: 'fts5-search' } }
       ),
-      false,
+      false
     );
   });
 });
@@ -748,7 +751,7 @@ describe('precondition_parseable', () => {
       },
       { preconditions: ['setup-project completed', 'codebase compiles'] },
       {},
-      '.',
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -762,7 +765,7 @@ describe('precondition_parseable', () => {
       },
       { preconditions: ['Some custom gate condition'] },
       {},
-      '.',
+      '.'
     );
     // Info severity — free-form is allowed
     assert.equal(r.pass, true);
@@ -784,8 +787,15 @@ describe('json_pointer_all', () => {
         itemRule: { requiredKeys: ['command', 'exitCode'] },
       },
       {},
-      { handoff: { cmds: [{ command: 'test', exitCode: 0 }, { command: 'lint', exitCode: 0 }] } },
-      '.',
+      {
+        handoff: {
+          cmds: [
+            { command: 'test', exitCode: 0 },
+            { command: 'lint', exitCode: 0 },
+          ],
+        },
+      },
+      '.'
     );
     assert.equal(r.pass, true);
   });
@@ -800,7 +810,7 @@ describe('json_pointer_all', () => {
       },
       {},
       { handoff: { cmds: [{ command: 'test' }] } },
-      '.',
+      '.'
     );
     assert.equal(r.pass, false);
   });
@@ -815,7 +825,7 @@ describe('json_pointer_all', () => {
       },
       {},
       { handoff: { cmds: [] } },
-      '.',
+      '.'
     );
     assert.equal(r.outcome, 'na');
   });
@@ -831,7 +841,7 @@ describe('manual_or_llm', () => {
       { kind: 'manual_or_llm', rubric: 'Check AGENTS.md compliance' },
       {},
       {},
-      '.',
+      '.'
     );
     assert.equal(r.outcome, 'unknown');
   });

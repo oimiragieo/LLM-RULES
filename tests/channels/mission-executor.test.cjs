@@ -4,12 +4,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 
-const {
-  buildFeatureSpec,
-  buildMissionPrompt,
-  CODING_TASK_PROMPT,
-  DEFAULT_HANDOFFS_DIR,
-} = require(
+const { buildFeatureSpec, buildMissionPrompt, CODING_TASK_PROMPT, DEFAULT_HANDOFFS_DIR } = require(
   path.join(__dirname, '..', '..', 'scripts', 'channels', 'daemon', 'mission-executor.cjs')
 );
 const fs = require('node:fs');
@@ -79,14 +74,26 @@ describe('buildMissionPrompt()', () => {
   });
 
   it('includes pre-research context when provided', () => {
-    const spec = { id: 'test', skillName: 'dev', description: 'x', expectedBehavior: [], verificationSteps: [] };
+    const spec = {
+      id: 'test',
+      skillName: 'dev',
+      description: 'x',
+      expectedBehavior: [],
+      verificationSteps: [],
+    };
     const prompt = buildMissionPrompt('task', spec, 'Found relevant file: src/app.js');
     assert.ok(prompt.includes('Pre-Research Context'));
     assert.ok(prompt.includes('src/app.js'));
   });
 
   it('omits pre-research section when not provided', () => {
-    const spec = { id: 'test', skillName: 'dev', description: 'x', expectedBehavior: [], verificationSteps: [] };
+    const spec = {
+      id: 'test',
+      skillName: 'dev',
+      description: 'x',
+      expectedBehavior: [],
+      verificationSteps: [],
+    };
     const prompt = buildMissionPrompt('task', spec);
     assert.ok(!prompt.includes('Pre-Research Context'));
   });

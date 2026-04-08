@@ -100,7 +100,8 @@ function extractUnstructured(text) {
     commandsRun.push({
       command: 'tests',
       exitCode: testFailMatch && parseInt(testFailMatch[1], 10) > 0 ? 1 : 0,
-      observation: `${testPassMatch ? testPassMatch[0] : ''} ${testFailMatch ? testFailMatch[0] : ''}`.trim(),
+      observation:
+        `${testPassMatch ? testPassMatch[0] : ''} ${testFailMatch ? testFailMatch[0] : ''}`.trim(),
     });
   }
 
@@ -252,7 +253,9 @@ function gradeHandoff(handoff, featureSpec) {
     } else {
       const partial = Math.round((covered.length / expectedSteps.length) * 15);
       score += partial;
-      details.push(`+${partial} ${covered.length}/${expectedSteps.length} verification steps covered`);
+      details.push(
+        `+${partial} ${covered.length}/${expectedSteps.length} verification steps covered`
+      );
     }
   } else if (expectedSteps.length === 0) {
     score += 15;

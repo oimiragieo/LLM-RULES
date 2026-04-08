@@ -1,3 +1,7 @@
+---
+description: Documentation index for all user-facing slash commands
+---
+
 # Commands
 
 User-facing slash commands that can be invoked from the Claude Code CLI. Each `.md` or `.json` file defines a command that expands into a full prompt when the user types `/<command-name>`.

@@ -40,9 +40,7 @@ function resolvePointer(obj, pointer) {
 // ---------------------------------------------------------------------------
 
 function evalJsonSchema(artifact, schemaPath, baseDir) {
-  const resolvedPath = path.isAbsolute(schemaPath)
-    ? schemaPath
-    : path.join(baseDir, schemaPath);
+  const resolvedPath = path.isAbsolute(schemaPath) ? schemaPath : path.join(baseDir, schemaPath);
 
   if (!fs.existsSync(resolvedPath)) {
     return { pass: false, evidence: `Schema file not found: ${resolvedPath}` };
@@ -341,41 +339,32 @@ function evaluateKind(evaluation, artifact, artifactMap, baseDir) {
       return evalJsonSchema(
         artifactMap[evaluation.artifact] || artifact,
         evaluation.schemaPath,
-        baseDir,
+        baseDir
       );
 
     case 'all_of':
       return evalAllOf(evaluation.conditions, artifactMap, baseDir);
 
     case 'array_nonempty':
-      return evalArrayNonempty(
-        artifactMap[evaluation.artifact] || artifact,
-        evaluation.pointer,
-      );
+      return evalArrayNonempty(artifactMap[evaluation.artifact] || artifact, evaluation.pointer);
 
     case 'string_nonempty':
-      return evalStringNonempty(
-        artifactMap[evaluation.artifact] || artifact,
-        evaluation.pointer,
-      );
+      return evalStringNonempty(artifactMap[evaluation.artifact] || artifact, evaluation.pointer);
 
     case 'set_subset': {
       const left = resolvePointer(
         artifactMap[evaluation.left.artifact] || artifact,
-        evaluation.left.pointer,
+        evaluation.left.pointer
       );
       const right = resolvePointer(
         artifactMap[evaluation.right.artifact] || artifact,
-        evaluation.right.pointer,
+        evaluation.right.pointer
       );
       return evalSetSubset(left, right, evaluation.right.asKeys);
     }
 
     case 'regex_all_match': {
-      const arr = resolvePointer(
-        artifactMap[evaluation.artifact] || artifact,
-        evaluation.pointer,
-      );
+      const arr = resolvePointer(artifactMap[evaluation.artifact] || artifact, evaluation.pointer);
       return evalRegexAllMatch(arr, evaluation.regex);
     }
 
@@ -383,17 +372,14 @@ function evaluateKind(evaluation, artifact, artifactMap, baseDir) {
       const text = artifactMap[evaluation.artifact] || artifactMap.validationContract;
       const needles = resolvePointer(
         artifactMap[evaluation.needlesFrom.artifact] || artifact,
-        evaluation.needlesFrom.pointer,
+        evaluation.needlesFrom.pointer
       );
       return evalMarkdownContainsAll(text, needles || []);
     }
 
     case 'verification_steps_covered': {
       const steps = resolvePointer(artifact, evaluation.featurePointer);
-      const cmds = resolvePointer(
-        artifactMap.handoff || artifact,
-        evaluation.handoffPointer,
-      );
+      const cmds = resolvePointer(artifactMap.handoff || artifact, evaluation.handoffPointer);
       return evalVerificationStepsCovered(steps, cmds);
     }
 
@@ -401,36 +387,34 @@ function evaluateKind(evaluation, artifact, artifactMap, baseDir) {
       return evalJsonPointerAll(
         artifactMap[evaluation.artifact] || artifact,
         evaluation.pointer,
-        evaluation.itemRule,
+        evaluation.itemRule
       );
 
     case 'object_keys_exist':
       return evalObjectKeysExist(
         artifactMap[evaluation.artifact] || artifact,
         evaluation.pointer,
-        evaluation.requiredKeys,
+        evaluation.requiredKeys
       );
 
     case 'conditional_integrity':
-      return evalConditionalIntegrity(
-        artifactMap.handoff || artifact,
-        evaluation,
-        artifactMap,
-      );
+      return evalConditionalIntegrity(artifactMap.handoff || artifact, evaluation, artifactMap);
 
     case 'equals': {
-      const left = evaluation.left.literal !== undefined
-        ? evaluation.left.literal
-        : resolvePointer(
-          artifactMap[evaluation.left.artifact] || artifact,
-          evaluation.left.pointer,
-        );
-      const right = evaluation.right.literal !== undefined
-        ? evaluation.right.literal
-        : resolvePointer(
-          artifactMap[evaluation.right.artifact] || artifact,
-          evaluation.right.pointer,
-        );
+      const left =
+        evaluation.left.literal !== undefined
+          ? evaluation.left.literal
+          : resolvePointer(
+              artifactMap[evaluation.left.artifact] || artifact,
+              evaluation.left.pointer
+            );
+      const right =
+        evaluation.right.literal !== undefined
+          ? evaluation.right.literal
+          : resolvePointer(
+              artifactMap[evaluation.right.artifact] || artifact,
+              evaluation.right.pointer
+            );
       return evalEquals(left, right);
     }
 
@@ -443,7 +427,7 @@ function evaluateKind(evaluation, artifact, artifactMap, baseDir) {
       return evalConsistencyWarning(
         artifactMap.feature || artifact,
         artifactMap.validationState,
-        evaluation,
+        evaluation
       );
 
     case 'manual_or_llm':
@@ -462,9 +446,7 @@ function isRuleApplicable(rule, artifactMap) {
   if (!rule.appliesWhen) return true;
 
   const aw = rule.appliesWhen;
-  const featureOrArtifact = aw.feature
-    ? (artifactMap.feature || artifactMap.featuresDocument)
-    : null;
+  const featureOrArtifact = aw.feature ? artifactMap.feature || artifactMap.featuresDocument : null;
 
   if (aw.feature && aw.exists) {
     const val = resolvePointer(featureOrArtifact, aw.feature);
@@ -670,9 +652,7 @@ class MissionGrader {
       ? fs.readFileSync(contractPath, 'utf8')
       : '';
 
-    const agentsMd = fs.existsSync(agentsPath)
-      ? fs.readFileSync(agentsPath, 'utf8')
-      : '';
+    const agentsMd = fs.existsSync(agentsPath) ? fs.readFileSync(agentsPath, 'utf8') : '';
 
     const missionState = fs.existsSync(statePath)
       ? JSON.parse(fs.readFileSync(statePath, 'utf8'))
@@ -718,9 +698,8 @@ class MissionGrader {
 
     // Aggregate scores
     const scores = featureReports.map(r => r.summary.score);
-    const avgScore = scores.length > 0
-      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-      : 0;
+    const avgScore =
+      scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
     const allPassed = featureReports.every(r => r.summary.passed);
     const hasBlocker = featureReports.some(r => r.summary.gradeBand === 'fail');
 

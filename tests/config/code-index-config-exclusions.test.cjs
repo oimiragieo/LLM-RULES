@@ -5,14 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const CONFIG_PATH = path.join(
-  __dirname,
-  '..',
-  '..',
-  '.claude',
-  'config',
-  'code-index-config.json'
-);
+const CONFIG_PATH = path.join(__dirname, '..', '..', '.claude', 'config', 'code-index-config.json');
 
 let config;
 

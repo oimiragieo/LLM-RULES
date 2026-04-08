@@ -441,7 +441,9 @@ async function main() {
           // Send directly to owner's chat as notification (no Claude processing needed)
           const homeChat = process.env.TELEGRAM_OWNER_CHAT_ID || process.env.TELEGRAM_OWNER_ID;
           if (homeChat && sinks.telegram) {
-            sinks.telegram.send(homeChat, text).catch(() => {});
+            sinks.telegram
+              .send(homeChat, text)
+              .catch(e => process.stderr.write(`[WARN] webhook notify: ${e.message}\n`));
             log(`[webhook] Notified ${homeChat}: ${text.slice(0, 80)}`);
           }
 

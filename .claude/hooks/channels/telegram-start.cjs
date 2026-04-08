@@ -135,5 +135,9 @@ async function main() {
 // Read stdin (hook protocol) then run
 const chunks = [];
 process.stdin.on('data', c => chunks.push(c));
-process.stdin.on('error', () => main().catch(() => {}));
-process.stdin.on('end', () => main().catch(() => {}));
+process.stdin.on('error', () =>
+  main().catch(e => process.stderr.write(`[WARN] telegram-start: ${e.message}\n`))
+);
+process.stdin.on('end', () =>
+  main().catch(e => process.stderr.write(`[WARN] telegram-start: ${e.message}\n`))
+);

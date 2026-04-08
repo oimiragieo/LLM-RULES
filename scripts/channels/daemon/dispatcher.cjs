@@ -228,7 +228,9 @@ class Dispatcher {
     // Send typing indicator before rendering (cosmetic, fire-and-forget)
     const typingSink = this.sinks[event.source];
     if (typingSink?.sendTyping) {
-      typingSink.sendTyping(event.data.chatId).catch(() => {});
+      typingSink
+        .sendTyping(event.data.chatId)
+        .catch(e => process.stderr.write(`[WARN] sendTyping: ${e.message}\n`));
     }
 
     // Route: find matching routes
@@ -826,7 +828,7 @@ class Dispatcher {
             chatId,
             `⚠️ **Dangerous command requires approval:**\n\`\`\`\n${commandPreview.slice(0, 200)}\n\`\`\`\nReply /approve to execute or /deny to cancel.`
           )
-          .catch(() => {});
+          .catch(e => process.stderr.write(`[WARN] approval prompt: ${e.message}\n`));
       }
 
       // 5-minute timeout → auto-deny
@@ -835,7 +837,9 @@ class Dispatcher {
           this.pendingApprovals.delete(chatId);
           resolve('deny');
           if (sink) {
-            sink.send(chatId, '⏰ Approval timed out. Command cancelled.').catch(() => {});
+            sink
+              .send(chatId, '⏰ Approval timed out. Command cancelled.')
+              .catch(e => process.stderr.write(`[WARN] approval timeout: ${e.message}\n`));
           }
         }
       }, 300000);

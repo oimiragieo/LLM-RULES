@@ -109,7 +109,8 @@ function aggregateFeedback(missionDir) {
     // Count deviation patterns (by step or description)
     const deviationCounts = new Map();
     for (const dev of allDeviations) {
-      const key = typeof dev === 'string' ? dev : (dev.step || dev.whatIDidInstead || JSON.stringify(dev));
+      const key =
+        typeof dev === 'string' ? dev : dev.step || dev.whatIDidInstead || JSON.stringify(dev);
       deviationCounts.set(key, (deviationCounts.get(key) || 0) + 1);
     }
 
@@ -119,7 +120,7 @@ function aggregateFeedback(missionDir) {
       if (count >= 3) {
         recurring.push({ pattern, count });
         recommendations.push(
-          `Skill "${skillName}" has ${count} recurring deviation(s): "${pattern}". Consider updating the skill procedure.`,
+          `Skill "${skillName}" has ${count} recurring deviation(s): "${pattern}". Consider updating the skill procedure.`
         );
       }
     }
@@ -127,9 +128,8 @@ function aggregateFeedback(missionDir) {
     skillFeedback.push({
       skillName,
       totalHandoffs,
-      procedureFollowedRate: totalHandoffs > 0
-        ? Math.round((procedureFollowed / totalHandoffs) * 100)
-        : 0,
+      procedureFollowedRate:
+        totalHandoffs > 0 ? Math.round((procedureFollowed / totalHandoffs) * 100) : 0,
       uniqueDeviations: deviationCounts.size,
       recurringDeviations: recurring,
       suggestedChanges: [...new Set(allSuggestions)],

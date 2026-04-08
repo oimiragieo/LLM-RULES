@@ -179,8 +179,6 @@ skills:
   - tauri-svelte-typescript-general
   - tauri-svelte-ui-components
   - tdd
-  - telegram-polling
-  - telegram-voice-pipeline
   - template-creator
   - template-renderer
   - thinking-tools

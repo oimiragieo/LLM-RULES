@@ -14,12 +14,21 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { injectMilestoneValidators, saveFeaturesDoc } = require('../../../.claude/lib/mission/mission-orchestrator.cjs');
+const {
+  injectMilestoneValidators,
+  saveFeaturesDoc,
+} = require('../../../.claude/lib/mission/mission-orchestrator.cjs');
 
 function createTempDir() {
   const timestamp = Date.now();
   const random = Math.random().toString(36).slice(2);
-  const dir = path.join(__dirname, '..', '..', 'fixtures', `temp-validators-${timestamp}-${random}`);
+  const dir = path.join(
+    __dirname,
+    '..',
+    '..',
+    'fixtures',
+    `temp-validators-${timestamp}-${random}`
+  );
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 }
@@ -129,9 +138,7 @@ describe('injectMilestoneValidators', () => {
     const isolatedDir = path.join(tempDir, 'isolated');
     fs.mkdirSync(isolatedDir, { recursive: true });
 
-    const features = [
-      { id: 'f1', milestone: 'gamma', fulfills: [], status: 'completed' },
-    ];
+    const features = [{ id: 'f1', milestone: 'gamma', fulfills: [], status: 'completed' }];
     saveFeaturesDoc(isolatedDir, features);
 
     // This will try to find the template relative to the module — it should find it

@@ -162,13 +162,15 @@ function createAuditIndex(missionDir, missionId) {
     if (!fs.existsSync(indexPath)) return [];
 
     const lines = fs.readFileSync(indexPath, 'utf8').trim().split('\n').filter(Boolean);
-    let entries = lines.map(line => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
+    let entries = lines
+      .map(line => {
+        try {
+          return JSON.parse(line);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
 
     if (filter.featureId) {
       entries = entries.filter(e => e.featureId === filter.featureId);
@@ -186,9 +188,7 @@ function createAuditIndex(missionDir, missionId) {
    * @returns {object[]} Ordered events for this feature
    */
   function getAuditTrail(featureId) {
-    return query({ featureId }).sort((a, b) =>
-      a.timestamp.localeCompare(b.timestamp),
-    );
+    return query({ featureId }).sort((a, b) => a.timestamp.localeCompare(b.timestamp));
   }
 
   /**

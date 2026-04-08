@@ -4,11 +4,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 
-const {
-  normalizeTaskUpdatePayload,
-  MAX_METADATA_FIELD_CHARS,
-  MAX_METADATA_TOTAL_CHARS,
-} = require(
+const { normalizeTaskUpdatePayload, MAX_METADATA_FIELD_CHARS, MAX_METADATA_TOTAL_CHARS } = require(
   path.join(__dirname, '..', '..', '..', '.claude', 'lib', 'routing', 'task-update-contract.cjs')
 );
 

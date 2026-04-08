@@ -8,10 +8,19 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { aggregateFeedback, checkSkillHealth } = require('../../../.claude/lib/mission/skill-feedback-aggregator.cjs');
+const {
+  aggregateFeedback,
+  checkSkillHealth,
+} = require('../../../.claude/lib/mission/skill-feedback-aggregator.cjs');
 
 function createTempDir() {
-  const dir = path.join(__dirname, '..', '..', 'fixtures', `temp-feedback-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const dir = path.join(
+    __dirname,
+    '..',
+    '..',
+    'fixtures',
+    `temp-feedback-${Date.now()}-${Math.random().toString(36).slice(2)}`
+  );
   fs.mkdirSync(dir, { recursive: true });
   fs.mkdirSync(path.join(dir, 'handoffs'), { recursive: true });
   return dir;
@@ -85,7 +94,11 @@ describe('Skill Feedback Aggregator', () => {
       { id: 'f3', skillName: 'dev' },
     ]);
 
-    for (const [fid, ts] of [['f1', '01'], ['f2', '02'], ['f3', '03']]) {
+    for (const [fid, ts] of [
+      ['f1', '01'],
+      ['f2', '02'],
+      ['f3', '03'],
+    ]) {
       writeHandoff(tempDir, {
         timestamp: `2026-04-07T${ts}:00:00Z`,
         featureId: fid,
@@ -111,7 +124,11 @@ describe('Skill Feedback Aggregator', () => {
       { id: 'f3', skillName: 'broken-skill' },
     ]);
 
-    for (const [fid, ts] of [['f1', '01'], ['f2', '02'], ['f3', '03']]) {
+    for (const [fid, ts] of [
+      ['f1', '01'],
+      ['f2', '02'],
+      ['f3', '03'],
+    ]) {
       writeHandoff(tempDir, {
         timestamp: `2026-04-07T${ts}:00:00Z`,
         featureId: fid,
