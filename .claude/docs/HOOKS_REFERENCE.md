@@ -104,6 +104,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `workflow-watchdog-hook.cjs`: Watchdog for workflows.
 - `analysis-paralysis-guard.cjs`: Prevents infinite looping on reads.
 - `post-tool-advisory-bundle.cjs`: Consolidated advisory bundle that runs 4 PostToolUse sub-checks per tool call (metrics/error tracking, context window monitoring, stale worktree hook detection, recurring issue detection). Fail-open (async).
+- `slo-alert-gate.cjs`: SLO enforcement gate. Reads hook latency and recorder failure rate metrics from the SLO metrics file and blocks if p95 hook latency exceeds `HOOK_P95_MAX_MS` (default 5ms) or recorder failure rate exceeds `RECORDER_FAILURE_RATE_MAX` (default 1%). Fail-open when metrics file is absent.
 
 ### SessionEnd
 
