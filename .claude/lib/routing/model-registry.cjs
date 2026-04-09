@@ -17,6 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 /** Default config path relative to this file */
 const DEFAULT_CONFIG_PATH = path.join(__dirname, '../../config/model-registry.json');
@@ -111,7 +112,7 @@ class ModelRegistry {
       }
 
       const content = fs.readFileSync(this._configPath, 'utf8');
-      const data = JSON.parse(content);
+      const data = safeParseJSON(content, {}).data;
 
       if (!data || !Array.isArray(data.models) || data.models.length === 0) {
         this._models = this._copyDefaults();

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "mission-feature",
   "title": "Mission feature (single item from features.json)",
-  "description": "Defines a single work unit in a Factory Droid-aligned mission. Features form a DAG via preconditions, map to VAL-* assertions via fulfills, and are executed by workers identified by skillName.",
+  "description": "Schema for an individual feature specification within a mission backlog. Aligned with Factory Droid alignment-training-spec v1.",
   "type": "object",
   "additionalProperties": true,
   "required": [
@@ -20,40 +20,40 @@
       "type": "string",
       "minLength": 1,
       "pattern": "^[a-z0-9][a-z0-9_-]*$",
-      "description": "Kebab-case feature identifier"
+      "description": "Unique kebab-case identifier for this feature"
     },
     "description": {
       "type": "string",
       "minLength": 1,
-      "description": "Detailed feature specification"
+      "description": "Detailed specification of what the feature must do"
     },
     "skillName": {
       "type": "string",
       "minLength": 1,
-      "description": "Worker skill type (must resolve to .claude/skills/<name>/SKILL.md)"
+      "description": "Worker skill type to dispatch (e.g., rust-worker, developer, qa)"
     },
     "preconditions": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Dependency gates — feature IDs or gate expressions"
+      "description": "Dependency declarations forming a DAG — other feature IDs or environment predicates"
     },
     "expectedBehavior": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 },
-      "description": "Observable behavioral specifications"
+      "description": "Behavioral acceptance criteria that must be true when feature is complete"
     },
     "verificationSteps": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Commands to verify feature correctness"
+      "description": "Commands to run to verify the feature works (e.g., test commands)"
     },
     "fulfills": {
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^VAL-[A-Z0-9]+-[0-9]{3}$"
+        "pattern": "^VAL-[A-Z0-9]+-\\d{3}$"
       },
-      "description": "VAL-* assertion IDs this feature satisfies"
+      "description": "VAL-* assertion IDs this feature proves when completed"
     },
     "milestone": {
       "type": "string",
@@ -63,20 +63,25 @@
     "status": {
       "type": "string",
       "enum": ["pending", "in_progress", "validating", "completed", "failed", "cancelled"],
-      "description": "Feature lifecycle state"
+      "description": "Current lifecycle state of this feature"
     },
     "workerSessionIds": {
       "type": "array",
-      "items": { "type": "string", "format": "uuid" },
-      "description": "All worker sessions assigned to this feature"
+      "items": { "type": "string" },
+      "description": "All worker session UUIDs that have touched this feature"
     },
     "currentWorkerSessionId": {
-      "type": ["string", "null"],
-      "description": "Active worker session UUID or null"
+      "oneOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Currently active worker session UUID, or null if idle"
     },
     "completedWorkerSessionId": {
-      "type": ["string", "null"],
-      "description": "Worker session that completed this feature"
+      "oneOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Worker session UUID that completed this feature, or null"
+    },
+    "retryCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of times this feature has been retried after failure"
     }
   }
 }

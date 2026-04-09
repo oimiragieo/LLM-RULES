@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Audit: Codebase Integrity & Security Fixes
+
+#### Fixed
+
+- **Security: 20 unsafe JSON.parse calls** replaced with `safeParseJSON()` in mission-grader.cjs (7), mission-orchestrator.cjs (6), validation-state-gatekeeper.cjs (2), denial-feedback-reader.cjs (1), model-registry.cjs (1), cli-client.cjs (3) — per SEC-007 rules
+- **Duplicate mission schemas consolidated** — synced root-level `mission-feature.schema.json` and `mission-features-document.schema.json` with newer `mission/` subdir versions (added `retryCount`, `version`, `missionId` fields, fixed `oneOf` patterns)
+- **Removed empty `.claude/agents/core/developer/` directory** — stale artifact from migration
+- **Cleared 9 stale reflection queue entries** and zombie task `task-lifecycle-42` from runtime state
+
 ### Performance: Context Token Budget Optimization
 
 #### Added

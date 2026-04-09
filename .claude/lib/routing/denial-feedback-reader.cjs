@@ -23,6 +23,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
@@ -223,7 +224,7 @@ function readDenialLog(logFile) {
     if (!content || !content.trim()) {
       return [];
     }
-    const parsed = JSON.parse(content);
+    const parsed = safeParseJSON(content, []).data;
     if (!Array.isArray(parsed)) {
       return [];
     }

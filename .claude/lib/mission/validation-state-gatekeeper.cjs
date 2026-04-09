@@ -29,6 +29,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 const { parseValidationContract, getRuleIds } = require('./validation-contract-parser.cjs');
 
 // Valid assertion states
@@ -141,7 +142,7 @@ function loadState(statePath) {
   // Try to parse JSON
   let state;
   try {
-    state = JSON.parse(content);
+    state = safeParseJSON(content, null).data;
   } catch (_parseErr) {
     // Invalid JSON - backup and reinitialize
     createCorruptionBackup(statePath);

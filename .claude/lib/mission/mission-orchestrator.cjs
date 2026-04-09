@@ -24,6 +24,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 const { createProgressLogWriter } = require('./progress-log-writer.cjs');
 
 /**
@@ -36,10 +37,10 @@ function loadMissionState(missionDir) {
   const featuresPath = path.join(missionDir, 'features.json');
   const validationPath = path.join(missionDir, 'validation-state.json');
 
-  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-  const featuresDoc = JSON.parse(fs.readFileSync(featuresPath, 'utf8'));
+  const state = safeParseJSON(fs.readFileSync(statePath, 'utf8'), {}).data;
+  const featuresDoc = safeParseJSON(fs.readFileSync(featuresPath, 'utf8'), {}).data;
   const validationState = fs.existsSync(validationPath)
-    ? JSON.parse(fs.readFileSync(validationPath, 'utf8'))
+    ? safeParseJSON(fs.readFileSync(validationPath, 'utf8'), { assertions: {} }).data
     : { assertions: {} };
 
   return { state, features: featuresDoc.features || [], validationState };
@@ -155,7 +156,7 @@ function injectMilestoneValidators(missionDir, features, milestone) {
 
   let templates;
   try {
-    templates = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
+    templates = safeParseJSON(fs.readFileSync(templatePath, 'utf8'), {}).data;
   } catch {
     return { injected: false, scrutinyId: null, userTestingId: null };
   }
@@ -545,7 +546,10 @@ function createMissionOrchestrator(missionDir) {
           const files = fs.readdirSync(handoffsDir).filter(f => f.endsWith('.json'));
           for (const file of files) {
             try {
-              const h = JSON.parse(fs.readFileSync(path.join(handoffsDir, file), 'utf8'));
+              const h = safeParseJSON(
+                fs.readFileSync(path.join(handoffsDir, file), 'utf8'),
+                {}
+              ).data;
               if (h.featureId === featureId) {
                 if (!handoff || h.timestamp > handoff.timestamp) {
                   handoff = h;
@@ -622,7 +626,9 @@ function createMissionOrchestrator(missionDir) {
       let validationState = { assertions: {} };
       if (fs.existsSync(validationStatePath)) {
         try {
-          validationState = JSON.parse(fs.readFileSync(validationStatePath, 'utf8'));
+          validationState = safeParseJSON(fs.readFileSync(validationStatePath, 'utf8'), {
+            assertions: {},
+          }).data;
         } catch {
           validationState = { assertions: {} };
         }
