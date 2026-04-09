@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Performance: Context Token Budget Optimization
+
+#### Added
+
+- **Effort level guidance** in `@MODEL_SELECTION.md` — maps agent categories to recommended effort levels (low/medium/high/max) based on Claude Code source analysis
+- **11 performance env vars** in `.env.example` — `CLAUDE_CODE_EFFORT_LEVEL`, `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`, `DISABLE_AUTO_COMPACT`, `CLAUDE_CODE_REMOTE`, `CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING`, `CLAUDE_CODE_SUBAGENT_MODEL`, `CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY` with documentation
+
+#### Changed
+
+- **Slimmed CLAUDE.md context by 24%** (48,911 → 37,007 chars) — was 8,911 chars over the 40K `MAX_MEMORY_CHARACTER_COUNT` limit, now 2,993 under
+- **Workspace CLAUDE.md** — removed duplicated Architecture section (already in project CLAUDE.md + rules)
+- **Project CLAUDE.md** — replaced verbose Directory Documentation Index with one-line summary, tightened formatting
+- **rules/CLAUDE.md** — collapsed 3,271-char rules index to one-line description (rules are auto-loaded)
+- **9 rules files** — removed `## Related References` footer sections (duplicated context, agents can Read on demand)
+
+#### Fixed
+
+- **Pre-existing test failure** in `deviation-rules.test.cjs` — case-sensitive `Auto-fix` vs `Auto-Fix` mismatch fixed with case-insensitive check
+- **Test assertion** in `deviation-merge.test.cjs` — updated to check inline references only (removed references were in deleted Related References sections)
+
 ### Factory Droid Mission Execution & Telegram Coding Pipeline
 
 #### Added

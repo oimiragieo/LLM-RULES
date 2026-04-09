@@ -14,8 +14,3 @@ Pass structured metadata on task completion for handoff: `status`, `progress`, `
 ## Conductor Pattern
 
 One orchestrator (master-orchestrator) creates tasks with `addBlockedBy` dependencies. Specialists execute in sequence. Each task unblocks automatically when its dependencies complete. Benefits: clear dependencies, no duplicate work, traceable execution.
-
-## Related References
-
-- `@TASK_TRACKING_GUIDE.md` - Complete TaskUpdate protocol
-- `task-management-protocol` skill - Session handoff patterns

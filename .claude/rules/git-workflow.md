@@ -31,8 +31,3 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Validate commit messages via `commit-validator` skill
 - Security scan via pre-commit hooks
 - No `console.log` in production code
-
-## Related References
-
-- `commit-validator` skill - Validates commit message format
-- Pre-commit hooks enforced via `.claude/settings.json`

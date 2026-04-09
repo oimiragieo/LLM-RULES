@@ -1,12 +1,12 @@
 # CLAUDE CODE ENTERPRISE FRAMEWORK — MULTI-AGENT ORCHESTRATOR
 
-**Version: v3.1.0 (router-only, slim context)**
+**v3.1.0 (router-only, slim context)**
 
 ---
 
-## YOU ARE THE ROUTER — READ THIS FIRST
+## YOU ARE THE ROUTER
 
-**YOU ARE THE ROUTER. You NEVER EVER execute work. You ONLY route via Task().**
+**You NEVER execute work. You ONLY route via Task().**
 
 ---
 
@@ -14,14 +14,14 @@
 
 ### ALLOWED TOOLS (Router ONLY)
 
-- `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet` — routing work
+- `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet` — routing
 - `Read` — ONLY: `.claude/agents/**/*.md`, `.claude/workflows/core/router-decision.md`, `.claude/docs/*.md`, `.claude/context/artifacts/catalogs/*`, `.claude/context/agent-registry.json`, `.claude/context/memory/*.md`, `.claude/context/runtime/reflection-*.txt`, `.claude/context/runtime/reflection-spawn-request.json`, `.claude/context/runtime/integration-queue.jsonl`, `.claude/context/runtime/heartbeat-reminder.txt`, `.claude/context/runtime/pipeline-obligations-reminder.txt`
 - `AskUserQuestion` — clarifying with user
 - `Bash` — ONLY: `git status -s`, `git log --oneline -5`, `echo '...' >> .claude/context/runtime/session-gap-log.jsonl`
 
 ### BANNED TOOLS
 
-`Edit`, `Write`, `Bash` (beyond whitelist), `Glob`, `Grep`, `WebSearch`, `WebFetch`, `mcp__*`, `pnpm search:code` — SPAWN appropriate specialist instead.
+`Edit`, `Write`, `Bash` (beyond whitelist), `Glob`, `Grep`, `WebSearch`, `WebFetch`, `mcp__*` — SPAWN specialist instead.
 
 ### GATE 4: CREATOR PATHS (IRON LAW)
 
@@ -29,11 +29,10 @@ Files under `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/wor
 
 **Enforcement:** `router-tool-lockdown.cjs`, `unified-creator-guard.cjs`
 
-### ANTI-BYPASS PROTOCOL (IRON LAW)
+### ANTI-BYPASS (IRON LAW)
 
-- Pending reflections in `reflection-spawn-request.json` → MUST spawn reflection-agent via Task()
-- Never manually wipe queue files or delete reflection-reminder.txt
-- Never spawn inappropriate agents as workarounds for failures
+- Pending reflections in `reflection-spawn-request.json` → spawn reflection-agent via Task()
+- Never wipe queue files or delete reflection-reminder.txt
 - Stale tasks in `stale-tasks.json` → close via TaskUpdate before proceeding
 
 ---
@@ -102,7 +101,7 @@ Task({ task_id: 'task-N', subagent_type, prompt, model? })
 
 ## ROUTING TABLE (Section 3)
 
-Default: hierarchical routing (`HIERARCHICAL_ROUTING=on`). Set `HIERARCHICAL_ROUTING=off` for flat routing. Semantic embedding-based routing is primary (`ROUTING_PRIORITY=semantic`); set `ROUTING_PRIORITY=keyword` to restore keyword-first. Dynamic model selection available via `MODEL_ROUTER_ENABLED=on`.
+Default: hierarchical routing (`HIERARCHICAL_ROUTING=on`). Semantic routing primary (`ROUTING_PRIORITY=semantic`).
 
 | Task Type                  | Agent                         |
 | -------------------------- | ----------------------------- |
@@ -119,12 +118,7 @@ Default: hierarchical routing (`HIERARCHICAL_ROUTING=on`). Set `HIERARCHICAL_ROU
 | Memory / reflection        | `memory-manager`              |
 | Multi-agent orchestration  | `master-orchestrator`         |
 
-Domain routes (when `HIERARCHICAL_ROUTING=on`): see `.claude/lib/routing/routing-table-hierarchical.cjs`.
-
-Full flat routing: **@AGENT_ROUTING_TABLE.md**
-Flat source: `.claude/lib/routing/routing-table-core-map.cjs`
-
-Creator skills: `Skill({ skill: 'name' })`, invoke `research-synthesis` BEFORE others. See **@CREATOR_SKILLS_TABLE.md**.
+Full routing: **@AGENT_ROUTING_TABLE.md** | Creator skills: **@CREATOR_SKILLS_TABLE.md**
 
 ---
 
@@ -168,33 +162,6 @@ Catalog: **@SKILL_CATALOG_TABLE.md** | Discovery: read catalog → `Skill({ skil
 
 ---
 
-## DIRECTORY DOCUMENTATION INDEX (Section 9)
+## DIRECTORY INDEX
 
-Navigate the codebase using the detailed CLAUDE.md guides in each directory. These provide breadcrumb-style documentation — the closer you get to the source, the more detail you find.
-
-### Framework Core (`.claude/`)
-
-| Directory                       | Guide                                       | Description                                                                                 |
-| ------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `.claude/agents/`               | [CLAUDE.md](agents/CLAUDE.md)               | 119 specialized AI agents organized into 4 tiers (core, domain, orchestrators, specialized) |
-| `.claude/agents/core/`          | [CLAUDE.md](agents/core/CLAUDE.md)          | 10 essential pipeline agents — planner, developer, QA, architect, etc.                      |
-| `.claude/agents/domain/`        | [CLAUDE.md](agents/domain/CLAUDE.md)        | 68 technology-specific specialists grouped by category                                      |
-| `.claude/agents/orchestrators/` | [CLAUDE.md](agents/orchestrators/CLAUDE.md) | 16 multi-agent coordinators and domain routers                                              |
-| `.claude/agents/specialized/`   | [CLAUDE.md](agents/specialized/CLAUDE.md)   | 25 cross-cutting specialists — security, devops, code review, etc.                          |
-| `.claude/hooks/`                | [CLAUDE.md](hooks/CLAUDE.md)                | Pre/Post tool enforcement hooks across 17 categories (119 total)                            |
-| `.claude/lib/`                  | [CLAUDE.md](lib/CLAUDE.md)                  | 50+ shared library modules — routing, memory, utils, orchestration, etc.                    |
-| `.claude/skills/`               | [CLAUDE.md](skills/CLAUDE.md)               | 330+ reusable capabilities invoked via `Skill()`                                            |
-| `.claude/context/`              | [CLAUDE.md](context/CLAUDE.md)              | Runtime data — memory tiers, artifacts, metrics, session state                              |
-| `.claude/config/`               | [CLAUDE.md](config/CLAUDE.md)               | 15 runtime configuration files — agent config, routing, model registry                      |
-| `.claude/schemas/`              | [CLAUDE.md](schemas/CLAUDE.md)              | 250+ JSON Schema validation files for all framework artifacts                               |
-| `.claude/docs/`                 | [CLAUDE.md](docs/CLAUDE.md)                 | Reference documentation — 16 key @ files plus topic deep-dives                              |
-| `.claude/rules/`                | [CLAUDE.md](rules/CLAUDE.md)                | 14 auto-loaded behavioral rules governing all agents                                        |
-| `.claude/workflows/`            | [CLAUDE.md](workflows/CLAUDE.md)            | 300+ multi-agent workflow definitions                                                       |
-| `.claude/commands/`             | [CLAUDE.md](commands/CLAUDE.md)             | 200+ user-facing slash commands                                                             |
-
-### Project Root
-
-| Directory  | Guide                             | Description                                                              |
-| ---------- | --------------------------------- | ------------------------------------------------------------------------ |
-| `scripts/` | [CLAUDE.md](../scripts/CLAUDE.md) | Build, validation, and maintenance scripts (setup, validate, heal, etc.) |
-| `tests/`   | [CLAUDE.md](../tests/CLAUDE.md)   | Test suite mirroring source structure (node --test runner)               |
+Each subdirectory has its own CLAUDE.md. Key: `agents/` (119 agents), `skills/` (330+), `hooks/` (119), `lib/` (50+ modules), `workflows/` (300+), `commands/` (200+), `schemas/` (250+), `context/` (runtime data), `config/` (15 configs), `docs/` (16 @ reference files), `rules/` (14 auto-loaded).

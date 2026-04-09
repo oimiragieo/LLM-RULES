@@ -25,8 +25,3 @@ If slop was found, log to `.claude/context/runtime/session-gap-log.jsonl` with `
 ## Correct File Locations
 
 Debug/temp → `.claude/context/tmp/` | Reports → `.claude/context/reports/` | Plans → `.claude/context/plans/` | Research → `.claude/context/artifacts/research-reports/` | Lint output → stdout only (never persisted)
-
-## Related References
-
-- `.claude/rules/safety-rules.md` — Do not delete untracked files without confirmation
-- `.claude/rules/workspace-conventions.md` — Canonical file placement rules

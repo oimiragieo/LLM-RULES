@@ -41,15 +41,9 @@ test('merged file contains Anti-Patterns section', () => {
   );
 });
 
-test('merged file contains all Related References from both source files', () => {
+test('merged file contains key inline references from rule body', () => {
   const content = fs.readFileSync(MERGED_FILE, 'utf8');
-  const requiredRefs = [
-    'session-gap-log.jsonl',
-    'cleanup-always.md',
-    'plan-file-update.md',
-    'decisions.md',
-    'reflection-agent.md',
-  ];
+  const requiredRefs = ['session-gap-log.jsonl', 'decisions.md'];
   for (const ref of requiredRefs) {
     assert.ok(content.includes(ref), `Merged file must reference: ${ref}`);
   }

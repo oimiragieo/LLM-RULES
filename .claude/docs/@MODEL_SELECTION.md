@@ -293,6 +293,28 @@ When a Task spawn provides an explicit model that differs from configured model,
 
 ---
 
+## EFFORT LEVEL GUIDANCE
+
+Claude Code supports effort levels (`low`, `medium`, `high`, `max`) that control reasoning depth per turn. Set via `CLAUDE_CODE_EFFORT_LEVEL` env var or `/effort` command.
+
+| Agent Category                        | Recommended Effort | Rationale                                                         |
+| ------------------------------------- | ------------------ | ----------------------------------------------------------------- |
+| Router (routing-only turns)           | `low`              | Only calls TaskList/TaskCreate/TaskUpdate — no reasoning needed   |
+| Standard agents (developer, qa, etc.) | `medium` (default) | Balanced speed vs quality for implementation work                 |
+| Architect, security-architect         | `high`             | Complex reasoning for design decisions and threat modeling        |
+| Planner (complex multi-step)          | `high`             | Needs thorough analysis for plan generation                       |
+| Code-reviewer                         | `medium`           | Standard review quality; use `high` for security-critical reviews |
+| General-assistant, researcher         | `medium`           | Standard reasoning sufficient for Q&A and research                |
+
+**Key facts:**
+
+- Opus 4.6 defaults to `medium` for Pro/Max/Team subscribers
+- `ultrathink` keyword in prompts bumps medium to high automatically
+- `max` effort is Opus 4.6 only — other models downgrade to `high`
+- Effort changes between turns bust the prompt cache — avoid mid-conversation changes
+
+---
+
 ## RELATED REFERENCES
 
 - **@AGENT_ROUTING_TABLE.md** - Agent types and their typical complexity

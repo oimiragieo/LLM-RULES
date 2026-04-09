@@ -70,8 +70,3 @@ Before spawning, Router checks 4 gates:
 2. **Security**: Auth/credentials/PII? → Include **security-architect**
 3. **Tool**: Need blacklisted tools? → Spawn appropriate agent
 4. **Creator**: Creating skills/agents/hooks? → Invoke creator skill first
-
-## Related References
-
-- `@AGENT_ROUTING_TABLE.md` - Complete agent routing matrix
-- `routing-guard.cjs` - Enforcement hook for specialist routing

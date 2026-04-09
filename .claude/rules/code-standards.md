@@ -66,8 +66,3 @@ Use `lsp-navigator` skill for compiler-verified symbol lookups (goToDefinition, 
 - Run `pnpm lint:fix` before committing any code changes
 - Run `pnpm format` before committing any code changes
 - Both must pass with zero errors/changes — no exceptions
-
-## Related References
-
-- `.claude/agents/specialized/code-reviewer.md` - Code review agent
-- `.claude/skills/lsp-navigator/SKILL.md` - LSP navigation skill

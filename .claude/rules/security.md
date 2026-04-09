@@ -86,9 +86,3 @@ Malicious data in memory/context influences future agent behavior. Mitigations: 
 - See CLAUDE.md Section 1.1 for complete tool restrictions
 
 **Validation**: `routing-guard.cjs` enforces tool restrictions at runtime.
-
-## Related References
-
-- `@ENFORCEMENT_HOOKS.md` - security-trigger.cjs enforcement
-- `@AGENT_ROUTING_TABLE.md` - security-architect agent routing
-- `.claude/workflows/security-architect-skill-workflow.md` - Structured security review

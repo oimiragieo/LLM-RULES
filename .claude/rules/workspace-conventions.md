@@ -31,7 +31,3 @@ All agent-generated files must include as first line: `<!-- Agent: {type} | Task
 - NEVER create Windows reserved filenames (`nul`, `con`, `prn`, `aux`, `com1`-`com9`, `lpt1`-`lpt9`)
 - NEVER write temp files outside `.claude/context/tmp/`
 - NEVER place files in `.claude/context/artifacts/` root (use subdirectories)
-
-## Related References
-
-- `.claude/docs/FILE_PLACEMENT_RULES.md` - Complete placement specification

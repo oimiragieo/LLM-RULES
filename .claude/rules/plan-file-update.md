@@ -32,8 +32,3 @@ On multi-step workflow completion, write a companion `.snapshot.json` with `step
 - Never skip the start marker (`[ ]` → `[~]`) even if the task is fast
 - Never mark `[x]` before the task is complete
 - Never rewrite the entire plan file for one line
-
-## Related References
-
-- `.claude/skills/task-management-protocol/SKILL.md` — Full task protocol
-- `.claude/agents/core/reflection-agent.md` — Plan file staleness scoring

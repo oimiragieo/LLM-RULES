@@ -1,8 +1,8 @@
 {
   "version": "1.1.0",
   "prebuilt": false,
-  "total_rules": 13,
-  "master_rules": 13,
+  "total_rules": 14,
+  "master_rules": 14,
   "library_rules": 0,
   "schema_version": "1.0.0",
   "versioning": {
@@ -24,6 +24,17 @@
       "type": "master",
       "size": 3375,
       "line_count": 78
+    },
+    {
+      "path": ".claude/rules/CLAUDE.md",
+      "name": "CLAUDE",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": ["go"],
+      "type": "master",
+      "size": 3239,
+      "line_count": 28
     },
     {
       "path": ".claude/rules/cleanup-always.md",
@@ -161,15 +172,16 @@
   "technology_map": {
     "python": [".claude/rules/agents.md"],
     "typescript": [".claude/rules/agents.md", ".claude/rules/code-standards.md"],
-    "api": [".claude/rules/code-standards.md", ".claude/rules/memory-protocol.md"],
-    "nodejs": [".claude/rules/code-standards.md"],
     "go": [
+      ".claude/rules/CLAUDE.md",
       ".claude/rules/documentation-always.md",
       ".claude/rules/hooks.md",
       ".claude/rules/memory-protocol.md",
       ".claude/rules/safety-rules.md",
       ".claude/rules/security.md"
     ],
+    "api": [".claude/rules/code-standards.md", ".claude/rules/memory-protocol.md"],
+    "nodejs": [".claude/rules/code-standards.md"],
     "rust": [".claude/rules/safety-rules.md", ".claude/rules/security.md"],
     "java": [".claude/rules/security.md"],
     "javascript": [".claude/rules/security.md"],

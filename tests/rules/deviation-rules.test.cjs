@@ -14,7 +14,7 @@ describe('deviation-rules.md', () => {
 
   it('contains Auto-fix rule for minor bugs', () => {
     const content = fs.readFileSync(RULE_PATH, 'utf8');
-    assert.ok(content.includes('Auto-fix'), 'Should contain Auto-fix rule');
+    assert.ok(content.toLowerCase().includes('auto-fix'), 'Should contain Auto-fix rule');
   });
 
   it('contains blocking dependencies rule', () => {
