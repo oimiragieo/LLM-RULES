@@ -136,6 +136,12 @@ const ALLOWED_COMMANDS = {
     description: 'Node.js runtime',
   },
 
+  // Token usage reporting (safe read-only)
+  ccusage: {
+    allowed: true,
+    description: 'Claude Code token/cost usage reporter (read-only)',
+  },
+
   // Testing (safe)
   test: {
     allowed: true,

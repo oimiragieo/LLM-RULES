@@ -219,6 +219,7 @@ const SAFE_COMMANDS_ALLOWLIST = [
 
   // Framework self-testing (Claude CLI for headless tests)
   'claude',
+  'ccusage', // Claude Code token/cost usage reporter (read-only)
 
   // Build and test tools
   'make',
