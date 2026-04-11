@@ -22,6 +22,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -55,11 +56,7 @@ const SESSION_ID_PATH = path.join(RUNTIME_DIR, 'session-id.json');
 
 /** Safely parse JSON, returning fallback on any error. */
 function safeParse(raw, fallback) {
-  try {
-    return JSON.parse(raw);
-  } catch (_e) {
-    return fallback;
-  }
+  return safeParseJSON(raw, null, null, fallback);
 }
 
 /** Read current session ID from runtime, returns null if unavailable. */

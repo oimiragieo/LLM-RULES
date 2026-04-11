@@ -33,6 +33,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const { PROJECT_ROOT } = require(
   path.join(__dirname, '..', '..', 'lib', 'utils', 'project-root.cjs')
@@ -80,7 +81,7 @@ function readLog(logFile) {
     if (!fs.existsSync(filePath)) return [];
     const content = fs.readFileSync(filePath, 'utf8');
     if (!content || !content.trim()) return [];
-    const parsed = JSON.parse(content);
+    const parsed = safeParseJSON(content, null, null, null);
     // Must be an array — any other value is treated as corruption.
     if (!Array.isArray(parsed)) return [];
     return parsed;

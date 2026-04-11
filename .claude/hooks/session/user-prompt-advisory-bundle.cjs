@@ -35,6 +35,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
@@ -66,7 +67,7 @@ function hasStartupAlreadyFired(sessionId) {
   try {
     if (!fs.existsSync(STARTUP_SENTINEL_PATH)) return false;
     const raw = fs.readFileSync(STARTUP_SENTINEL_PATH, 'utf8');
-    const data = JSON.parse(raw);
+    const data = safeParseJSON(raw, null, null, {});
     if (!data) return false;
     // Unknown session ID: use timestamp-based deduplication (1-hour window)
     if (!sessionId || sessionId === 'default') {

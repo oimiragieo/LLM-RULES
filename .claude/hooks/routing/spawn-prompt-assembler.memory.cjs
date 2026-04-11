@@ -11,6 +11,7 @@ const {
   capTierBSection,
   buildEvidenceId,
 } = require('./spawn-prompt-assembler.core.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 /**
  * Prompt injection blocklist patterns (case-insensitive line-level filter).
@@ -57,7 +58,7 @@ function getMemoryQueryCache(queryKey) {
   try {
     if (!fs.existsSync(MEMORY_QUERY_CACHE_PATH)) return null;
     const raw = fs.readFileSync(MEMORY_QUERY_CACHE_PATH, 'utf8');
-    const cache = JSON.parse(raw);
+    const cache = safeParseJSON(raw, null, null, {});
     if (!cache || typeof cache !== 'object') return null;
     const entry = cache[queryKey];
     if (!entry || Date.now() - entry.ts > MEMORY_QUERY_CACHE_TTL_MS) return null;
@@ -72,7 +73,7 @@ function setMemoryQueryCache(queryKey, results) {
     let cache = {};
     if (fs.existsSync(MEMORY_QUERY_CACHE_PATH)) {
       try {
-        cache = JSON.parse(fs.readFileSync(MEMORY_QUERY_CACHE_PATH, 'utf8')) || {};
+        cache = safeParseJSON(fs.readFileSync(MEMORY_QUERY_CACHE_PATH, 'utf8'), null, null, {});
       } catch (_e) {
         cache = {};
       }
