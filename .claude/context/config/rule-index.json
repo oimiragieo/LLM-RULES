@@ -22,8 +22,8 @@
       "priority": "",
       "technologies": ["python", "typescript"],
       "type": "master",
-      "size": 3375,
-      "line_count": 78
+      "size": 3227,
+      "line_count": 73
     },
     {
       "path": ".claude/rules/CLAUDE.md",
@@ -33,8 +33,8 @@
       "priority": "",
       "technologies": ["go"],
       "type": "master",
-      "size": 3239,
-      "line_count": 28
+      "size": 175,
+      "line_count": 4
     },
     {
       "path": ".claude/rules/cleanup-always.md",
@@ -44,8 +44,8 @@
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 1764,
-      "line_count": 33
+      "size": 1577,
+      "line_count": 28
     },
     {
       "path": ".claude/rules/code-standards.md",
@@ -55,8 +55,8 @@
       "priority": "",
       "technologies": ["api", "nodejs", "typescript"],
       "type": "master",
-      "size": 2871,
-      "line_count": 74
+      "size": 2714,
+      "line_count": 69
     },
     {
       "path": ".claude/rules/deviation-rules.md",
@@ -66,8 +66,8 @@
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 2222,
-      "line_count": 47
+      "size": 1862,
+      "line_count": 39
     },
     {
       "path": ".claude/rules/documentation-always.md",
@@ -88,8 +88,8 @@
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 1092,
-      "line_count": 39
+      "size": 951,
+      "line_count": 34
     },
     {
       "path": ".claude/rules/hooks.md",
@@ -121,8 +121,8 @@
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 1442,
-      "line_count": 40
+      "size": 1270,
+      "line_count": 35
     },
     {
       "path": ".claude/rules/safety-rules.md",
@@ -141,10 +141,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "java", "javascript", "rust"],
+      "technologies": ["java", "javascript", "rust"],
       "type": "master",
-      "size": 3827,
-      "line_count": 95
+      "size": 3850,
+      "line_count": 92
     },
     {
       "path": ".claude/rules/task-tracking.md",
@@ -154,8 +154,8 @@
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 1099,
-      "line_count": 22
+      "size": 954,
+      "line_count": 17
     },
     {
       "path": ".claude/rules/workspace-conventions.md",
@@ -165,8 +165,8 @@
       "priority": "",
       "technologies": ["sql"],
       "type": "master",
-      "size": 1987,
-      "line_count": 38
+      "size": 1887,
+      "line_count": 34
     }
   ],
   "technology_map": {
@@ -177,8 +177,7 @@
       ".claude/rules/documentation-always.md",
       ".claude/rules/hooks.md",
       ".claude/rules/memory-protocol.md",
-      ".claude/rules/safety-rules.md",
-      ".claude/rules/security.md"
+      ".claude/rules/safety-rules.md"
     ],
     "api": [".claude/rules/code-standards.md", ".claude/rules/memory-protocol.md"],
     "nodejs": [".claude/rules/code-standards.md"],
