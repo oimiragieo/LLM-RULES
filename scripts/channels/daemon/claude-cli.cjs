@@ -6,6 +6,27 @@
  * shell:true silently truncates arguments containing spaces.
  *
  * All daemon modules should use this instead of raw execSync/spawnSync.
+ *
+ * ## Security Rationale — shell: true (M-01)
+ *
+ * Both claudeSync() and _claudeAsyncImpl() use shell: true when spawning
+ * 'claude'. This is required on Windows because the Claude Code CLI is
+ * installed as a .cmd wrapper (claude.cmd) in the PATH. Node.js cannot
+ * resolve .cmd files without shell: true on Windows — the spawn call would
+ * fail with ENOENT.
+ *
+ * Shell injection risk is mitigated because:
+ *   1. The command is the literal string 'claude' — no user-controlled data.
+ *   2. All arguments are an internal-only array built from vetted config values.
+ *   3. The prompt (the only user-controlled content) is passed via stdin, not
+ *      as a shell argument. stdin bypasses shell parsing entirely.
+ *   4. ANTHROPIC_API_KEY is deleted from env before spawning.
+ *
+ * Converting to shell: false would require a platform-specific .cmd resolver
+ * and the execFile/spawn API does not support .cmd wrappers on Windows without
+ * calling cmd.exe /c explicitly, which reintroduces shell parsing.
+ *
+ * Audit reference: M-01 (security hardening review 2026-04-10)
  */
 'use strict';
 
@@ -82,6 +103,8 @@ function claudeSync(prompt, opts = {}) {
       timeout,
       env,
       windowsHide: true,
+      // shell: true required for Windows .cmd wrapper resolution (claude.cmd);
+      // all args are internal-only; prompt is piped via stdin, not args.
       shell: true,
       input: prompt,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -176,6 +199,8 @@ function _claudeAsyncImpl(prompt, opts, spawnFn) {
     cwd,
     env,
     windowsHide: true,
+    // shell: true required for Windows .cmd wrapper resolution (claude.cmd);
+    // all args are internal-only; prompt is piped via stdin, not args.
     shell: true,
     stdio: ['pipe', 'pipe', 'pipe'],
   });

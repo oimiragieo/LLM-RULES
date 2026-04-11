@@ -448,6 +448,9 @@ main().catch(() => process.exit(1));
         cwd: this.projectRoot,
         env,
         windowsHide: true,
+        // shell: true required for Windows .cmd wrapper resolution (claude.cmd);
+        // all args are internal-only; prompt is piped via stdin, not args.
+        // Audit reference: M-01 (security hardening review 2026-04-10)
         shell: true,
         stdio: ['pipe', 'pipe', 'pipe'],
       });

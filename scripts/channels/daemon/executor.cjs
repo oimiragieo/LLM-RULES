@@ -119,6 +119,13 @@ class TaskExecutor {
             timeout: 60000,
             env,
             windowsHide: true,
+            // shell: true required here: verifyCommand is an arbitrary shell
+            // command string (e.g. "pnpm test", "node --test tests/...") that
+            // cannot be expressed as a fixed array. The value is set by daemon
+            // config/dispatcher — never sourced from user-controlled Telegram
+            // input — so shell injection from external callers is not possible.
+            // ANTHROPIC_API_KEY is removed from env before execution.
+            // Audit reference: M-01 (security hardening review 2026-04-10)
             shell: true,
             stdio: ['pipe', 'pipe', 'pipe'],
           }).trim();
