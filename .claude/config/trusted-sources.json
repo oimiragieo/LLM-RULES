@@ -19,7 +19,8 @@
     "api.github.com",
     "arxiv.org",
     "huggingface.co",
-    "learn.microsoft.com"
+    "learn.microsoft.com",
+    "sidekick.binary.ninja"
   ],
   "fetch_policy": {
     "trusted": "scan_and_incorporate",
