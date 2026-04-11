@@ -14,16 +14,14 @@ category: frontend
 tags: [ui, design, css, react, typography, animation, components, aesthetics]
 aliases: [ui-design, design-system, frontend-aesthetics]
 best_practices:
-
-- Choose a bold aesthetic direction and execute it with precision
-- Avoid generic AI slop — centered layouts, Inter/Arial/Roboto, purple gradients, uniform rounded corners
-- Select fonts that are characterful and context-appropriate, not default safe choices
-- Commit to a cohesive color palette with dominant and sharp accent colors
-- Prioritize high-impact motion (page load, key transitions) over scattered micro-interactions
-- Match code complexity to vision — elaborate for maximalist, restrained for minimalist
-  error_handling: strict
-  streaming: supported
-
+  - Choose a bold aesthetic direction and execute it with precision
+  - Avoid generic AI slop — centered layouts, Inter/Arial/Roboto, purple gradients, uniform rounded corners
+  - Select fonts that are characterful and context-appropriate, not default safe choices
+  - Commit to a cohesive color palette with dominant and sharp accent colors
+  - Prioritize high-impact motion (page load, key transitions) over scattered micro-interactions
+  - Match code complexity to vision — elaborate for maximalist, restrained for minimalist
+error_handling: strict
+streaming: supported
 ---
 
 # Frontend Design

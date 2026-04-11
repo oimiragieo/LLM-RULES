@@ -2,7 +2,7 @@
 name: session-handoff
 description: Initiate a session handoff to transfer context and pending actions to a new terminal session. Executing this skill safely drains tasks and launches a new cross-platform window natively.
 version: 1.0.0
-model: sonnet
+model: claude-sonnet-4-6
 invoked_by: both
 user_invocable: true
 tools: [Bash]

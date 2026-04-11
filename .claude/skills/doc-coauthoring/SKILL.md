@@ -14,16 +14,14 @@ category: writing
 tags: [documentation, writing, collaboration, prd, spec, proposal, rfc, design-doc]
 aliases: [collaborative-writing, doc-writing, document-creation]
 best_practices:
-
-- Ask clarifying questions before writing a single word
-- Brainstorm 5-20 options per section then curate the best
-- Use str_replace for targeted edits — never reprint entire documents
-- Test with reader sub-agents before declaring complete
-- Scaffold the full document early with placeholders
-- Preserve authorial voice and preferences across sections
-  error_handling: strict
-  streaming: supported
-
+  - Ask clarifying questions before writing a single word
+  - Brainstorm 5-20 options per section then curate the best
+  - Use str_replace for targeted edits — never reprint entire documents
+  - Test with reader sub-agents before declaring complete
+  - Scaffold the full document early with placeholders
+  - Preserve authorial voice and preferences across sections
+error_handling: strict
+streaming: supported
 ---
 
 # Doc Co-Authoring Workflow

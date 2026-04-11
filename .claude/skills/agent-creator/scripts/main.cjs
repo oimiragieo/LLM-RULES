@@ -63,6 +63,7 @@ function renderFromFileTemplate(template, params) {
     .replace(/\{\{category\}\}/g, params.category)
     .replace(/\{\{temperature\}\}/g, String(params.temperature))
     .replace(/\{\{tools_csv\}\}/g, params.tools.join(', '))
+    .replace(/\{\{skills_csv\}\}/g, params.skills.join(', '))
     .replace(/\{\{skills_yaml\}\}/g, params.skills.map(skill => `  - ${skill}`).join('\n'))
     .replace(/\{\{lastVerifiedAt\}\}/g, params.lastVerifiedAt);
 }

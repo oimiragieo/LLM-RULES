@@ -14,16 +14,14 @@ category: development
 tags: [mcp, model-context-protocol, typescript, python, api-integration, tools]
 aliases: [mcp-server-builder, mcp-development]
 best_practices:
-
-- Study MCP protocol docs before implementing any server
-- TypeScript is strongly preferred for its high-quality SDK support
-- Use streamable HTTP for remote servers, stdio for local servers
-- Validate all inputs with Zod (TypeScript) or Pydantic (Python)
-- Annotate tools with readOnlyHint, destructiveHint, idempotentHint, openWorldHint
-- Create 10 independent evaluation questions per server
-  error_handling: strict
-  streaming: supported
-
+  - Study MCP protocol docs before implementing any server
+  - TypeScript is strongly preferred for its high-quality SDK support
+  - Use streamable HTTP for remote servers, stdio for local servers
+  - Validate all inputs with Zod (TypeScript) or Pydantic (Python)
+  - Annotate tools with readOnlyHint, destructiveHint, idempotentHint, openWorldHint
+  - Create 10 independent evaluation questions per server
+error_handling: strict
+streaming: supported
 ---
 
 # MCP Server Development Guide

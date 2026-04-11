@@ -14,16 +14,14 @@ category: frontend
 tags: [react, typescript, tailwind, shadcn, artifacts, html, bundle, vite, parcel]
 aliases: [artifact-builder, react-artifact, web-artifact]
 best_practices:
-
-- Initialize with init-artifact.sh before any code
-- Use shadcn/ui components from the pre-installed catalog
-- Bundle with bundle-artifact.sh to get single-file HTML output
-- Avoid Inter font, purple gradients, centered layouts (AI slop)
-- Present artifact first, test only if issues arise
-- Keep all state in React — no external APIs unless explicitly requested
-  error_handling: strict
-  streaming: supported
-
+  - Initialize with init-artifact.sh before any code
+  - Use shadcn/ui components from the pre-installed catalog
+  - Bundle with bundle-artifact.sh to get single-file HTML output
+  - Avoid Inter font, purple gradients, centered layouts (AI slop)
+  - Present artifact first, test only if issues arise
+  - Keep all state in React — no external APIs unless explicitly requested
+error_handling: strict
+streaming: supported
 ---
 
 # Web Artifacts Builder
