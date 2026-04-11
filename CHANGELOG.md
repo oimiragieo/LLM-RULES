@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Audit H-04: Harden marketplace git clone against command and option injection
+
+#### Security
+
+- **`.claude/lib/plugins/marketplace.cjs`** — Replaced `execSync` + string-concatenated git clone (broken `q()` quoter) with `execFileSync` + `{ shell: false }` array args in both `cloneMarketplace` and `updateMarketplace`. Added URL allowlist (`validateGitSource`) restricting sources to HTTPS URLs on github/gitlab/bitbucket/codeberg or existing local absolute paths; added `--` terminator to block `--upload-pack=...` / `--config=...` option injection; added `validateMarketplaceName` to reject path traversal and `-`-prefixed names. CWE-78 (OS Command Injection). Fixes audit report H-04.
+- **`tests/plugins/marketplace.test.cjs`** — Added 16 security tests under `security (SEC-H-04 / CWE-78)` covering non-https rejection, option-injection URL rejection (`--upload-pack`, `--config`), shell metacharacter rejection (`$(...)`, backticks, `;`), untrusted host rejection, path-traversal marketplace names, empty/oversized URL rejection, and valid https/local-path pass-through. All 34 marketplace tests pass.
+
 ### Telegram Daemon: New Command
 
 #### Added
@@ -20,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Fixed
 
 - **`pnpm format:check` was red** due to generator/prettier formatting mismatch on `.claude/config/skill-index.json` and `.claude/context/agent-registry.json`. Every `pnpm format` reformatted them → next `pnpm skills:index` / `pnpm agents:registry` regenerated them → CI dirty again. Added both to `.prettierignore` so the generator is the sole source of formatting truth, breaking the perpetual thrash cycle.
+
+### Audit C-02: Remove stale channel-auto-start.cjs test references
+
+#### Fixed
+
+- **4 failing tests** in `tests/hooks/hook-sentinel-startup.test.cjs` that referenced `.claude/hooks/channels/channel-auto-start.cjs` — a hook intentionally archived to `.claude/hooks/channels/_archive/` during the daemon architecture migration. Removed the 4 `channel-auto-start:` sentinel tests (export check, roundtrip, first-run write, second-run skip) since the hook no longer lives at the path under test and is not registered in `settings.json`. The remaining 13 tests all pass. (audit report C-02)
 
 ### Audit C-01: safeParseJSON .data regression fix
 

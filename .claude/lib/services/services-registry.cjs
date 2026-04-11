@@ -153,7 +153,7 @@ class ServicesRegistry {
     // Parse YAML
     let parsed;
     try {
-      parsed = yaml.load(content);
+      parsed = yaml.load(content, { schema: yaml.CORE_SCHEMA });
     } catch (err) {
       this.valid = false;
       this.errors = [`YAML parse error: ${err.message}`];

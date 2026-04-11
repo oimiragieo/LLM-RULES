@@ -31,7 +31,7 @@ function parseFrontmatter(content) {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   if (!match) return null;
   try {
-    return yaml.load(match[1]) || null;
+    return yaml.load(match[1], { schema: yaml.CORE_SCHEMA }) || null;
   } catch {
     return null;
   }
@@ -42,7 +42,7 @@ function normalizeSkills(frontmatter) {
   if (Array.isArray(frontmatter.skills)) return frontmatter.skills.filter(Boolean);
   if (typeof frontmatter.skills === 'string') {
     try {
-      const parsed = yaml.load(frontmatter.skills);
+      const parsed = yaml.load(frontmatter.skills, { schema: yaml.CORE_SCHEMA });
       return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
     } catch {
       return [];

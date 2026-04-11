@@ -209,7 +209,7 @@ function _parseFrontmatter(content) {
 
   const yamlStr = afterOpener.slice(0, closeMatch.index);
   try {
-    const parsed = yaml.load(yamlStr);
+    const parsed = yaml.load(yamlStr, { schema: yaml.CORE_SCHEMA });
     return parsed != null && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
   } catch {
     return null;

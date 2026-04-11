@@ -75,7 +75,9 @@ class FeatureFlags {
   _readConfigFeatures() {
     try {
       if (!fs.existsSync(this.configPath)) return {};
-      const parsed = yaml.load(fs.readFileSync(this.configPath, 'utf8'));
+      const parsed = yaml.load(fs.readFileSync(this.configPath, 'utf8'), {
+        schema: yaml.CORE_SCHEMA,
+      });
       if (!parsed || typeof parsed !== 'object') return {};
       const features = parsed.features;
       return features && typeof features === 'object' ? features : {};

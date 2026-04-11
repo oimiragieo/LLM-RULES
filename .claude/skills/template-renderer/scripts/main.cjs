@@ -46,7 +46,6 @@ function findProjectRoot() {
 const PROJECT_ROOT = findProjectRoot();
 const CLAUDE_DIR = path.join(PROJECT_ROOT, '.claude');
 const TEMPLATES_DIR = path.join(CLAUDE_DIR, 'templates');
-const SCHEMAS_DIR = path.join(CLAUDE_DIR, 'schemas');
 
 // Token whitelists (SEC-SPEC-003)
 const TOKEN_WHITELISTS = {
@@ -229,7 +228,7 @@ function validateSpecification(content) {
   try {
     // Try to parse YAML (basic validation)
     const yaml = require('js-yaml');
-    const frontmatter = yaml.load(yamlMatch[1]);
+    const frontmatter = yaml.load(yamlMatch[1], { schema: yaml.CORE_SCHEMA });
 
     // Check required fields
     const required = ['title', 'version', 'author', 'status', 'date', 'acceptance_criteria'];
