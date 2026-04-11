@@ -139,7 +139,6 @@ const POST_TOOL_BUNDLE_HOOKS = {
  * (not consolidated into bundles). Each must have async:true in advisory events.
  */
 const ADVISORY_HOOKS_INDIVIDUAL = {
-  'channel-auto-start': 'channel-auto-start.cjs',
   'a2a-server-autostart': 'a2a-server-autostart.cjs',
   'audit-skill-recency': 'audit-skill-recency.cjs',
   'handover-detector': 'handover-detector.cjs',

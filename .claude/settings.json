@@ -73,61 +73,6 @@
             "timeout_ms": 5000
           }
         ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/stale-task-detector.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/session-budget-watchdog.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/drift-detector.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/ccusage-statusline.cjs",
-            "async": true,
-            "timeout_ms": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/startup-failopen-audit.cjs",
-            "async": true,
-            "timeout_ms": 5000
-          }
-        ]
       }
     ],
     "PreToolUse": [

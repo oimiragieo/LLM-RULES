@@ -12,6 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Verified `merkle-tree.cjs:87` already escapes regex specials (`[.+?^${}()|[\]\\]`) before glob token conversion (`**` → `.*`, `*` → `[^/]*`). Adds regression test guard (`tests/lib/code-indexing/merkle-tree-glob-escape.test.cjs`) with adversarial cases (literal dot, alternation, double-star) to prevent future regressions. (audit H-08 false positive)
 - Verified 6 `path.relative()` sites flagged by SE-01 are already defended via downstream `.replace(/\\/g, '/')` normalization or slash-agnostic `startsWith('..')` checks. No code changes needed. Sites: `routing-guard-core.policy.cjs:463` (normalizes at :465), `companion-check.cjs:274` (via normalizePath), `hybrid-lazy-indexer-methods-a.cjs:204,375` (normalization/slash-agnostic checks), `pre-tool-unified.guardrails.cjs:366` (normalizes at :368), `pre-tool-unified.read-safety.cjs:336` (uses startsWith('..')). (audit H-06 false positive)
 
+### Audit H-01: hook-async-classification test drift
+
+#### Fixed
+
+- **`tests/hooks/hook-async-classification.test.cjs`** — Removed 7 obsolete test cases that referenced the archived `channel-auto-start.cjs` hook (removed in C-02) and asserted an outdated dual-bundle advisory pattern that no longer matches `settings.json`. Updated advisory bundle expectation to `user-prompt-advisory-bundle.cjs` (canonical form). All 48 remaining tests pass. (audit H-01)
+- **`.claude/settings.json`** — No structural change; verified advisory hook registration matches test expectations after C-02 archive.
+
+### Audit H-02: post-completion-trace-handoff runner hang
+
+#### Fixed
+
+- **`.claude/tools/cli/run-hook.cjs`** — Resolved `buildHookEnv` require path issue that caused the `node --test` runner to hang indefinitely on `tests/hooks/post-completion-trace-handoff.test.cjs`. The test runner now terminates cleanly (1 test, 1 pass).
+- **`.claude/hooks/run-hook.cjs`** — Added thin re-export forwarder for test compatibility, exposing `detectProjectRoot`, `resolveHookScriptPath`, and `buildHookEnv` from the canonical implementation path. (audit H-02)
+
 ### Fixed
 
 - **`package.json` `metrics:memory-cache:ci` script** — Removed `--require-data true` flag so the CI gate does not fail when no memory-cache stability samples exist in the 24-hour window (no data = no SLO violation). This resolves the H-03 audit item where a cold/idle environment caused `metrics:ci` to exit non-zero due to an absence-of-data parse failure, not an actual SLO breach. The underlying parse-failure-rate counter (tracked in `metrics:memory:slo:ci`) is unaffected; only the hard-require guard on the cache-stability sub-check is relaxed.
