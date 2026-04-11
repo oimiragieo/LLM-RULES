@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`.claude/hooks/routing/user-prompt-unified.core.cjs` line 1850** — Added comment clarifying that the 3-day stale-plan window uses UTC epoch arithmetic (`Date.now() - 3 * 24 * 60 * 60 * 1000`) which is DST-safe for file-age (`mtimeMs`) comparison; ~1h skew at DST transitions is negligible (<2% relative error) for a 72-hour window. No logic change (M-04).
+
 ### Audit H-04: Harden marketplace git clone against command and option injection
 
 #### Security

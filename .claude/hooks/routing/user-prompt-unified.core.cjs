@@ -1847,6 +1847,8 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
     const plansDir = path.join(PROJECT_ROOT, '.claude', 'context', 'plans');
     const stalePlansReminderPath = path.join(runtimeDir, 'stale-plans-reminder.txt');
+    // UTC epoch math: DST-safe for file-age comparison. 1h skew at DST transitions
+    // is acceptable for 3-day windows (relative error < 2%).
     const threeDaysAgoMs = Date.now() - 3 * 24 * 60 * 60 * 1000;
 
     if (!fs.existsSync(plansDir)) {
