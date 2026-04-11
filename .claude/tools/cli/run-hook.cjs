@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const { findProjectRoot } = require('../lib/utils/project-root.cjs');
-const eventBus = require('../lib/events/event-bus.cjs');
+const { findProjectRoot } = require('../../lib/utils/project-root.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
 
 function detectProjectRoot(cwd = process.cwd()) {
   const fromCwd = findProjectRoot(cwd);
