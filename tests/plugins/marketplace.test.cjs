@@ -149,6 +149,208 @@ describe('marketplace', () => {
       const manifestPath = path.join(marketplacesDir, 'with-plugins', 'my-plugin', 'plugin.json');
       assert.ok(fs.existsSync(manifestPath), 'plugin.json must exist in cloned repo');
     });
+
+    // ---------------------------------------------------------------------
+    // SEC-H-04: CWE-78 command injection hardening (execFileSync + allowlist)
+    // ---------------------------------------------------------------------
+    describe('security (SEC-H-04 / CWE-78)', () => {
+      const marketplacesDir = () => path.join(tmpDir, `sec-${Math.random().toString(36).slice(2)}`);
+
+      it('rejects non-https URLs (ssh://)', () => {
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: 'evil',
+              gitUrl: 'ssh://git@github.com/user/repo.git',
+              marketplacesDir: marketplacesDir(),
+            }),
+          /Refusing to clone git source/
+        );
+      });
+
+      it('rejects http:// URLs (plaintext)', () => {
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: 'evil',
+              gitUrl: 'http://github.com/user/repo.git',
+              marketplacesDir: marketplacesDir(),
+            }),
+          /Refusing to clone git source/
+        );
+      });
+
+      it('rejects git-option injection via --upload-pack', () => {
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: 'evil',
+              gitUrl: '--upload-pack=touch /tmp/pwn',
+              marketplacesDir: marketplacesDir(),
+            }),
+          /option injection/
+        );
+      });
+
+      it('rejects git-option injection via --config', () => {
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: 'evil',
+              gitUrl: '--config=core.sshCommand=evil',
+              marketplacesDir: marketplacesDir(),
+            }),
+          /option injection/
+        );
+      });
+
+      it('rejects shell metacharacter injection via $(...)', () => {
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: 'evil',
+              gitUrl: 'https://github.com/user/repo$(whoami).git',
+              marketplacesDir: marketplacesDir(),
+            }),
+          /Refusing to clone git source/
+        );
+      });
+
+      it('rejects shell metacharacter injection via backticks', () => {
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: 'evil',
+              gitUrl: 'https://github.com/user/`whoami`.git',
+              marketplacesDir: marketplacesDir(),
+            }),
+          /Refusing to clone git source/
+        );
+      });
+
+      it('rejects shell metacharacter injection via semicolon', () => {
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: 'evil',
+              gitUrl: 'https://github.com/user/repo.git;rm -rf /',
+              marketplacesDir: marketplacesDir(),
+            }),
+          /Refusing to clone git source/
+        );
+      });
+
+      it('rejects host outside allowlist (untrusted.example.com)', () => {
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: 'evil',
+              gitUrl: 'https://untrusted.example.com/user/repo.git',
+              marketplacesDir: marketplacesDir(),
+            }),
+          /Refusing to clone git source/
+        );
+      });
+
+      it('accepts a valid github.com HTTPS URL (validator pass)', () => {
+        // Validator must NOT throw; actual clone may fail because the URL is
+        // not fetchable in tests — we only care that validation succeeds.
+        // We assert the error (if any) is NOT a validation error.
+        try {
+          cloneMarketplace({
+            name: 'valid-github',
+            gitUrl: 'https://github.com/nonexistent-org/nonexistent-repo.git',
+            marketplacesDir: marketplacesDir(),
+          });
+        } catch (err) {
+          assert.ok(
+            !/Refusing to clone git source|option injection|Invalid git source/.test(err.message),
+            `Validation should not have rejected the URL, but got: ${err.message}`
+          );
+        }
+      });
+
+      it('accepts a valid gitlab.com HTTPS URL (validator pass)', () => {
+        try {
+          cloneMarketplace({
+            name: 'valid-gitlab',
+            gitUrl: 'https://gitlab.com/nonexistent/repo.git',
+            marketplacesDir: marketplacesDir(),
+          });
+        } catch (err) {
+          assert.ok(
+            !/Refusing to clone git source|option injection|Invalid git source/.test(err.message),
+            `Validation should not have rejected the URL, but got: ${err.message}`
+          );
+        }
+      });
+
+      it('accepts an existing local absolute path (used by test fixtures)', () => {
+        const sourceRepo = path.join(tmpDir, 'sec-local-source');
+        createGitRepo(sourceRepo);
+        const mkDir = marketplacesDir();
+        // Must not throw
+        cloneMarketplace({ name: 'local-valid', gitUrl: sourceRepo, marketplacesDir: mkDir });
+        assert.ok(fs.existsSync(path.join(mkDir, 'local-valid')));
+      });
+
+      it('rejects marketplace name with path traversal (..)', () => {
+        const sourceRepo = path.join(tmpDir, 'sec-traversal-source');
+        createGitRepo(sourceRepo);
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: '../escape',
+              gitUrl: sourceRepo,
+              marketplacesDir: marketplacesDir(),
+            }),
+          /Invalid marketplace name/
+        );
+      });
+
+      it('rejects marketplace name with slash', () => {
+        const sourceRepo = path.join(tmpDir, 'sec-slash-source');
+        createGitRepo(sourceRepo);
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: 'bad/name',
+              gitUrl: sourceRepo,
+              marketplacesDir: marketplacesDir(),
+            }),
+          /Invalid marketplace name/
+        );
+      });
+
+      it('rejects marketplace name starting with -', () => {
+        const sourceRepo = path.join(tmpDir, 'sec-dash-source');
+        createGitRepo(sourceRepo);
+        assert.throws(
+          () =>
+            cloneMarketplace({
+              name: '-evil',
+              gitUrl: sourceRepo,
+              marketplacesDir: marketplacesDir(),
+            }),
+          /Invalid marketplace name/
+        );
+      });
+
+      it('rejects empty gitUrl', () => {
+        assert.throws(
+          () => cloneMarketplace({ name: 'x', gitUrl: '', marketplacesDir: marketplacesDir() }),
+          /Invalid git source/
+        );
+      });
+
+      it('rejects oversized gitUrl (>2048 chars)', () => {
+        const huge = 'https://github.com/' + 'a'.repeat(2050);
+        assert.throws(
+          () => cloneMarketplace({ name: 'x', gitUrl: huge, marketplacesDir: marketplacesDir() }),
+          /exceeds 2048 characters/
+        );
+      });
+    });
   });
 
   // -------------------------------------------------------------------------

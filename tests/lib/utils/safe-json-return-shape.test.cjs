@@ -20,7 +20,11 @@ test('safeParseJSON: returns parsed object directly (not wrapped in {data})', ()
 
 test('safeParseJSON: .data on return is undefined — regression guard for C-01', () => {
   const result = safeParseJSON('{"a":1}', {});
-  assert.strictEqual(result.data, undefined, '.data must be undefined — do not use safeParseJSON(...).data');
+  assert.strictEqual(
+    result.data,
+    undefined,
+    '.data must be undefined — do not use safeParseJSON(...).data'
+  );
 });
 
 test('safeParseJSON: returns defaults on parse failure', () => {
