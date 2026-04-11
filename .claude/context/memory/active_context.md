@@ -15,6 +15,7 @@
 ## Session Accomplishments (this session — full picture)
 
 ### Commits pushed to origin/ghidramcp-eval
+
 ```
 1071d170 chore: gitignore VRL run artifacts and local config noise
 343a35c1 docs: prune REVOLUTION_PLAN.md to VRL-only with Phase 2 gate
@@ -27,6 +28,7 @@
 ```
 
 ### What was proven this session
+
 - Oracle integration works end-to-end: hexyl (3/3 seeds) → 0 stdout vs 615–768 bytes from real binary
 - compile_adapter + oracle_adapter wired and tested
 - IterativeRefiner has 18 tests: 10 happy-path + 8 fault-injection (oracle timeout, malformed LLM, cascade failure, no-progress guard)
@@ -34,13 +36,16 @@
 - REVOLUTION_PLAN.md pruned: Phase 2 gate added, aspirational scope labeled
 
 ## Working Directory
+
 - **Primary:** `C:\dev\projects\reveng-main`
 - **Branch:** `ghidramcp-eval` (pushed to origin)
 - **ALWAYS:** `python scripts/run_vrl.py` (no PYTHONPATH needed now)
 - **NEVER:** `--timeout` with pytest
 
 ## Current Test Baseline
+
 **1093/1106 green** (3 pre-existing failures in JS bundle + release report tests — unrelated to VRL).
+
 ```bash
 cd C:/dev/projects/reveng-main && python -m pytest tests/unit/ -q --tb=no
 ```
@@ -66,11 +71,13 @@ cd C:/dev/projects/reveng-main && REVENG_AI_PROVIDER=ollama python scripts/run_v
 **If grade doesn't improve:** Debug why (compile failure? oracle not detecting improvement? prompt too vague?). Fix one thing at a time.
 
 ## Phase 2 Gate (still locked)
+
 - [ ] 1 real LLM round-trip: divergence → fix → recompile → grade improves
 - [ ] 3 binaries at `behavior_matched`
 - [ ] ≥5 non-trivial seeds per binary
 
 ## Key Files
+
 - `scripts/run_vrl.py` — CLI runner (standalone, no PYTHONPATH needed)
 - `src/reveng/verification/refinement/refiner.py` — IterativeRefiner
 - `src/reveng/verification/refinement/compile_adapter.py` — make_compile_fn()
@@ -80,6 +87,7 @@ cd C:/dev/projects/reveng-main && REVENG_AI_PROVIDER=ollama python scripts/run_v
 - `_archive/2026-04-10-cleanup/analysis-dirs/analysis_hexyl/reconstructed.c` — initial source
 
 ## Known Gotchas
+
 1. ANTHROPIC_API_KEY not in subprocess env — must export explicitly
 2. NEVER `--timeout` with pytest
 3. `git commit -F <file>` not `-m` (parentheses break hooks)
@@ -89,4 +97,5 @@ cd C:/dev/projects/reveng-main && REVENG_AI_PROVIDER=ollama python scripts/run_v
 7. ccusage blocked by SEC-AUDIT-017 hook — already added to allowlist in registry.cjs
 
 ## Session Cost
+
 $352.41 today (~634K tokens: haiku-4-5, opus-4-6, sonnet-4-6)
