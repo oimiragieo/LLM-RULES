@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`package.json` `metrics:memory-cache:ci` script** — Removed `--require-data true` flag so the CI gate does not fail when no memory-cache stability samples exist in the 24-hour window (no data = no SLO violation). This resolves the H-03 audit item where a cold/idle environment caused `metrics:ci` to exit non-zero due to an absence-of-data parse failure, not an actual SLO breach. The underlying parse-failure-rate counter (tracked in `metrics:memory:slo:ci`) is unaffected; only the hard-require guard on the cache-stability sub-check is relaxed.
+- **`.claude/hooks/a2a/a2a-server-autostart.cjs`** — Replaced two `JSON.parse()` calls with `safeParseJSON()` (safe-json utility) to harden against prototype-pollution and malformed input on startup sentinel and stdin read paths (SE-02 / security chore).
+- **`.claude/hooks/safety/context-monitor.cjs`** — Replaced internal `safeParse` wrapper's `JSON.parse()` call with `safeParseJSON()` from the shared safe-json utility for consistent prototype-pollution protection (SE-02 / security chore).
+
 - **`.claude/hooks/safety/validators/registry.cjs` and `.claude/lib/safety/command-allowlist.cjs`** — Added `ccusage` to the bash-command allowlist so the read-only token usage reporter can run at wave/phase boundaries without being blocked by the pre-tool Bash guard (safety chore).
 
 - **`.claude/hooks/routing/user-prompt-unified.core.cjs` line 1850** — Added comment clarifying that the 3-day stale-plan window uses UTC epoch arithmetic (`Date.now() - 3 * 24 * 60 * 60 * 1000`) which is DST-safe for file-age (`mtimeMs`) comparison; ~1h skew at DST transitions is negligible (<2% relative error) for a 72-hour window. No logic change (M-04).

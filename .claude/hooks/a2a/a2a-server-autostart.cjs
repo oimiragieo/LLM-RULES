@@ -40,7 +40,7 @@ const A2A_SENTINEL_PATH = path.join(RUNTIME, 'a2a-server-autostart.sentinel');
 function hasStartupAlreadyFired(sessionId) {
   try {
     if (!fs.existsSync(A2A_SENTINEL_PATH)) return false;
-    const data = JSON.parse(fs.readFileSync(A2A_SENTINEL_PATH, 'utf8'));
+    const data = safeParseJSON(fs.readFileSync(A2A_SENTINEL_PATH, 'utf8'), null, null, {});
     if (!data) return false;
     // Unknown session ID: use timestamp-based deduplication (1-hour window)
     if (!sessionId) {
@@ -223,17 +223,13 @@ $splat = @{
 $proc = Start-Process @splat
 Write-Output $proc.Id
 `;
-      const _result = execFileSync(
-        'powershell',
-        ['-NoProfile', '-NonInteractive', '-Command', psScript],
-        {
-          shell: false,
-          timeout: 5000,
-          stdio: ['ignore', 'pipe', 'ignore'],
-          windowsHide: true,
-          cwd: ROOT,
-        }
-      );
+      execFileSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', psScript], {
+        shell: false,
+        timeout: 5000,
+        stdio: ['ignore', 'pipe', 'ignore'],
+        windowsHide: true,
+        cwd: ROOT,
+      });
       // The PID returned is the powershell process, not the spawned cmd.
       // We need a different approach: find the cmd with title "A2AServer" after spawn.
     } catch (_e) {
@@ -351,7 +347,7 @@ function main() {
     try {
       const raw = Buffer.concat(chunks).toString('utf8').trim();
       if (raw) {
-        const input = JSON.parse(raw);
+        const input = safeParseJSON(raw, null, null, {});
         sessionId = input && typeof input.session_id === 'string' ? input.session_id : null;
       }
     } catch (_err) {

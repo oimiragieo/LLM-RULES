@@ -21,6 +21,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -59,7 +60,7 @@ const SESSION_ID_PATH = path.join(RUNTIME_DIR, 'session-id.json');
 /** Safely parse JSON, returning null on any error. */
 function safeParse(raw) {
   try {
-    return JSON.parse(raw);
+    return safeParseJSON(raw, null, null, null) || null;
   } catch (_e) {
     return null;
   }
@@ -173,7 +174,6 @@ function main() {
       if (!usage) {
         process.stdout.write(JSON.stringify({ allow: true }));
         process.exit(0);
-        return;
       }
 
       const { tokensUsed, budget, usagePct } = usage;
