@@ -9,9 +9,11 @@
  *
  *   1. startup-failopen-audit.cjs  — guarded via user-prompt-advisory-bundle
  *   2. worktree-prune-on-start.cjs — guarded via user-prompt-advisory-bundle
- *   3. channel-auto-start.cjs      — self-guarded (individual hook)
- *   4. a2a-server-autostart.cjs    — self-guarded (individual hook)
- *   5. audit-skill-recency.cjs     — self-guarded (pre-existing sentinel)
+ *   3. a2a-server-autostart.cjs    — self-guarded (individual hook)
+ *   4. audit-skill-recency.cjs     — self-guarded (pre-existing sentinel)
+ *
+ * NOTE: channel-auto-start.cjs was archived (moved to _archive/) as part of the
+ * daemon architecture migration. Its sentinel tests have been removed (C-02).
  *
  * Tests verify:
  *   - hasStartupAlreadyFired() returns false when no sentinel exists
@@ -265,115 +267,6 @@ test('bundle: new session (different session_id) fires startup hooks again', () 
     );
   } finally {
     safeUnlink(STARTUP_SENTINEL_PATH);
-  }
-});
-
-// ─── channel-auto-start.cjs sentinel tests ───────────────────────────────────
-
-test('channel-auto-start: exports hasStartupAlreadyFired, writeStartupSentinel, CHANNEL_SENTINEL_PATH', () => {
-  const hook = require(
-    path.join(PROJECT_ROOT, '.claude', 'hooks', 'channels', 'channel-auto-start.cjs')
-  );
-  assert.ok(
-    typeof hook.hasStartupAlreadyFired === 'function',
-    'Must export hasStartupAlreadyFired'
-  );
-  assert.ok(typeof hook.writeStartupSentinel === 'function', 'Must export writeStartupSentinel');
-  assert.ok(typeof hook.CHANNEL_SENTINEL_PATH === 'string', 'Must export CHANNEL_SENTINEL_PATH');
-});
-
-test('channel-auto-start: sentinel write/read roundtrip', () => {
-  const { hasStartupAlreadyFired, writeStartupSentinel, CHANNEL_SENTINEL_PATH } = require(
-    path.join(PROJECT_ROOT, '.claude', 'hooks', 'channels', 'channel-auto-start.cjs')
-  );
-
-  const sessionId = 'channel-test-' + Date.now();
-
-  safeUnlink(CHANNEL_SENTINEL_PATH);
-
-  try {
-    assert.strictEqual(hasStartupAlreadyFired(sessionId), false, 'Should be false before write');
-    writeStartupSentinel(sessionId);
-    assert.strictEqual(
-      hasStartupAlreadyFired(sessionId),
-      true,
-      'Should be true after write (same session)'
-    );
-    assert.strictEqual(
-      hasStartupAlreadyFired('other-session-' + Date.now()),
-      false,
-      'Should be false for different session ID'
-    );
-  } finally {
-    safeUnlink(CHANNEL_SENTINEL_PATH);
-  }
-});
-
-test('channel-auto-start: first run writes sentinel', () => {
-  const { CHANNEL_SENTINEL_PATH } = require(
-    path.join(PROJECT_ROOT, '.claude', 'hooks', 'channels', 'channel-auto-start.cjs')
-  );
-
-  const sessionId = 'channel-run-test-' + Date.now();
-  const hookPath = path.join(
-    PROJECT_ROOT,
-    '.claude',
-    'hooks',
-    'channels',
-    'channel-auto-start.cjs'
-  );
-
-  safeUnlink(CHANNEL_SENTINEL_PATH);
-
-  try {
-    // Run with CHANNEL_AUTO_START=false (so it exits early but still writes sentinel)
-    const result = runHook(
-      hookPath,
-      { prompt: 'test', session_id: sessionId },
-      { CHANNEL_AUTO_START: 'false', TELEGRAM_BOT_TOKEN: '' }
-    );
-    assert.strictEqual(result.status, 0, `Hook should exit 0. stderr: ${result.stderr}`);
-
-    // Sentinel should be written after first run
-    assert.ok(
-      fs.existsSync(CHANNEL_SENTINEL_PATH),
-      'Sentinel file should be written after first run'
-    );
-    const sentinel = JSON.parse(fs.readFileSync(CHANNEL_SENTINEL_PATH, 'utf8'));
-    assert.strictEqual(sentinel.sessionId, sessionId, 'Sentinel should contain correct session ID');
-  } finally {
-    safeUnlink(CHANNEL_SENTINEL_PATH);
-  }
-});
-
-test('channel-auto-start: second run (same session) sentinel check returns true (skip)', () => {
-  const { hasStartupAlreadyFired, writeStartupSentinel, CHANNEL_SENTINEL_PATH } = require(
-    path.join(PROJECT_ROOT, '.claude', 'hooks', 'channels', 'channel-auto-start.cjs')
-  );
-
-  const sessionId = 'channel-skip-test-' + Date.now();
-
-  safeUnlink(CHANNEL_SENTINEL_PATH);
-
-  try {
-    // Write sentinel for this session
-    writeStartupSentinel(sessionId);
-
-    // Verify sentinel check returns true (would skip on second run)
-    assert.strictEqual(
-      hasStartupAlreadyFired(sessionId),
-      true,
-      'hasStartupAlreadyFired should return true for the session that wrote the sentinel'
-    );
-
-    // New session should return false (would fire again)
-    assert.strictEqual(
-      hasStartupAlreadyFired('new-session-' + Date.now()),
-      false,
-      'hasStartupAlreadyFired should return false for new session ID'
-    );
-  } finally {
-    safeUnlink(CHANNEL_SENTINEL_PATH);
   }
 });
 
