@@ -33,7 +33,10 @@ describe('MerkleTree._globToRegExp — SE-05 regex metachar escape', () => {
     // The `(` and `|` and `)` are escaped; the `*` remains a glob wildcard converting to [^/]*.
     // Result: this matches strings starting with literal `a(b|c)` followed by any path chars then `d`.
     const re = globToRegExp('a(b|c)*d');
-    assert.ok(!re.test('abcd'), 'alternation must be escaped; should not match abcd via regex alternation');
+    assert.ok(
+      !re.test('abcd'),
+      'alternation must be escaped; should not match abcd via regex alternation'
+    );
     assert.ok(!re.test('acbd'), 'alternation must be escaped; should not match acbd');
   });
 
@@ -44,7 +47,10 @@ describe('MerkleTree._globToRegExp — SE-05 regex metachar escape', () => {
     const re = globToRegExp('foo(.*)+bar');
     // The literal string `foo(.*)+bar` — cannot be a filename in practice, but
     // proves the fix: the resulting regex must NOT match `fooXXXbar`.
-    assert.ok(!re.test('fooXXXbar'), 'regex metacharacters must be escaped; should not match fooXXXbar');
+    assert.ok(
+      !re.test('fooXXXbar'),
+      'regex metacharacters must be escaped; should not match fooXXXbar'
+    );
     // It should only match the literal string itself (if such a file existed).
     assert.ok(re.test('foo(.*)+bar'), 'should match the literal string foo(.*)+bar');
   });

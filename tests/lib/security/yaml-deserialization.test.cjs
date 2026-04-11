@@ -51,7 +51,7 @@ test('CORE_SCHEMA: rejects !!js/function tag (CWE-502)', () => {
   const malicious = "exploit: !!js/function 'function(){return process.env}'";
   assert.throws(
     () => safeLoad(malicious),
-    (err) => {
+    err => {
       // js-yaml throws YAMLException for unknown tags in CORE_SCHEMA
       assert.ok(err instanceof Error, 'Should throw an Error');
       return true;
@@ -64,7 +64,7 @@ test('CORE_SCHEMA: rejects !!js/regexp tag', () => {
   const malicious = "pattern: !!js/regexp '/foo/gi'";
   assert.throws(
     () => safeLoad(malicious),
-    (err) => {
+    err => {
       assert.ok(err instanceof Error, 'Should throw an Error');
       return true;
     },
@@ -76,7 +76,7 @@ test('CORE_SCHEMA: rejects !!js/undefined tag', () => {
   const malicious = 'value: !!js/undefined ~';
   assert.throws(
     () => safeLoad(malicious),
-    (err) => {
+    err => {
       assert.ok(err instanceof Error, 'Should throw an Error');
       return true;
     },
@@ -91,7 +91,7 @@ test('CORE_SCHEMA: nested object with dangerous-looking key names parses safely'
   const input = 'outer:\n  inner: !!js/function "function(){}"';
   assert.throws(
     () => safeLoad(input),
-    (err) => {
+    err => {
       assert.ok(err instanceof Error, 'Should throw for nested !!js/function');
       return true;
     },
