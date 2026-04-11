@@ -34,11 +34,14 @@ execSync('git commit -m "' + message + '"'); // command injection risk
 const data = JSON.parse(userInput);
 
 // SECURE
-const { success, data, error } = safeParseJSON(userInput, {});
-if (!success) return {};
+// safeParseJSON returns the parsed object directly (or the provided defaults on failure).
+const data = safeParseJSON(userInput, 'schemaName', undefined, {
+  /* defaults */
+});
+// `data` is the validated object on success, or defaults on parse failure.
 ```
 
-`safeParseJSON` (`.claude/lib/utils/safe-json.cjs`) provides: try-catch wrapping, prototype pollution protection (`__proto__`/`constructor`/`prototype` stripped), structured `{ success, data, error }` return. **Enforcement:** ESLint rule blocks direct `JSON.parse()` in hook files.
+`safeParseJSON` (`.claude/lib/utils/safe-json.cjs`) provides: try-catch wrapping, prototype pollution protection (`__proto__`/`constructor`/`prototype` stripped), direct return of the parsed object (or defaults on failure). Signature: `safeParseJSON(content, schemaName, inlineSchema, inlineDefaults)`. **Enforcement:** ESLint rule blocks direct `JSON.parse()` in hook files.
 
 ### Concurrent File Operations (MEDIUM)
 
