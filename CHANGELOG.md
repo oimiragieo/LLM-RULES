@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Verified `merkle-tree.cjs:87` already escapes regex specials (`[.+?^${}()|[\]\\]`) before glob token conversion (`**` → `.*`, `*` → `[^/]*`). Adds regression test guard (`tests/lib/code-indexing/merkle-tree-glob-escape.test.cjs`) with adversarial cases (literal dot, alternation, double-star) to prevent future regressions. (audit H-08 false positive)
+
 ### Fixed
+
+- **`.claude/hooks/safety/validators/registry.cjs` and `.claude/lib/safety/command-allowlist.cjs`** — Added `ccusage` to the bash-command allowlist so the read-only token usage reporter can run at wave/phase boundaries without being blocked by the pre-tool Bash guard (safety chore).
 
 - **`.claude/hooks/routing/user-prompt-unified.core.cjs` line 1850** — Added comment clarifying that the 3-day stale-plan window uses UTC epoch arithmetic (`Date.now() - 3 * 24 * 60 * 60 * 1000`) which is DST-safe for file-age (`mtimeMs`) comparison; ~1h skew at DST transitions is negligible (<2% relative error) for a 72-hour window. No logic change (M-04).
 
