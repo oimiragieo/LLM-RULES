@@ -17,3 +17,10 @@ package-lock.json
 .claude/evaluation/promptfoo_configs/classification_config.yaml
 .claude/evaluation/promptfoo_configs/rag_config.yaml
 .claude/tools/artifact-registry.mjs
+
+# Generated registries — generator (pnpm agents:registry / pnpm skills:index) is the
+# sole source of formatting truth. Running prettier on these creates a thrash cycle:
+# generator output ≠ prettier output, so every format pass re-dirties files that the
+# next regen will overwrite anyway.
+.claude/config/skill-index.json
+.claude/context/agent-registry.json

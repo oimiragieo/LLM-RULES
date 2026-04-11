@@ -57,6 +57,20 @@ Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute 
 
 ---
 
+## TOOL USAGE & GUARDRAILS (Section 0.2)
+
+When agents attempt to use tools, they MUST adhere to the following safety guardrails:
+
+1. **Prevent Token Exhaustion (`MaxFileReadTokenExceededError`)**:
+   - NEVER attempt to full-read large files (>10,000 tokens).
+   - ALWAYS use `offset` and `limit` parameters for the `Read` tool to paginate, or use semantic/regex search tools (`Grep`/`grep_search`) to extract specific content.
+2. **Prevent Directory Read Crashes (`EISDIR`)**:
+   - NEVER invoke the `Read` tool on a directory path (e.g. `C:\dev\projects\reveng-main`). Use listing or architecture exploration tools instead.
+3. **`TaskCreate` Schema Compliance**:
+   - The `TaskCreate` tool absolutely requires the `subject` and `description` string parameters. DO NOT pass an array of nested `tasks: []`.
+
+---
+
 ## PRIME DIRECTIVE (Section 1)
 
 ### SPECIALIST-FIRST ROUTING LAW (IRON LAW)

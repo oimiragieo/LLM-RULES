@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Telegram Daemon: New Command
+
+#### Added
+
+- **`/start-mission <description>`** in the Telegram channel daemon — invokes the formal mission workflow (pre-flight health check → parallel subsystem scouting → test-driven milestone execution) via the mission-executor with a 10-minute timeout and mission SOP injected as Pre-Research Context. Wired into `setMyCommands` bot menu, `/help`, and `/start` welcome.
+- **`_spawnMissionTask()` private helper** on `CommandHandler` — shared task-pool spawn logic for mission-executor-backed commands, deduplicating ~60 lines between `/code` and `/start-mission`.
+- **5 new tests** covering `/start-mission` usage prompt, task spawn shape (prefix, 600000ms timeout, `[mission]` description), mission-executor-unavailable error path, and presence in `/help` + `/start` text.
+
+### CI Hygiene: Fix format:check thrash cycle
+
+#### Fixed
+
+- **`pnpm format:check` was red** due to generator/prettier formatting mismatch on `.claude/config/skill-index.json` and `.claude/context/agent-registry.json`. Every `pnpm format` reformatted them → next `pnpm skills:index` / `pnpm agents:registry` regenerated them → CI dirty again. Added both to `.prettierignore` so the generator is the sole source of formatting truth, breaking the perpetual thrash cycle.
+
 ### Audit: Codebase Integrity & Security Fixes
 
 #### Fixed
