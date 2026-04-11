@@ -57,6 +57,7 @@ function generateAgentFingerprint(agentId) {
 
   const nameBytes = Buffer.from(`agent-studio:${agentId}`, 'utf8');
 
+  // M-03: non-security use (cache key / content addressing / UUID namespace); MD5/SHA-1 acceptable
   // SHA-1 hash of (namespace || name)
   const hash = crypto.createHash('sha1').update(DNS_NAMESPACE).update(nameBytes).digest();
 

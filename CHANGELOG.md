@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Verified `merkle-tree.cjs:87` already escapes regex specials (`[.+?^${}()|[\]\\]`) before glob token conversion (`**` → `.*`, `*` → `[^/]*`). Adds regression test guard (`tests/lib/code-indexing/merkle-tree-glob-escape.test.cjs`) with adversarial cases (literal dot, alternation, double-star) to prevent future regressions. (audit H-08 false positive)
 - Verified 6 `path.relative()` sites flagged by SE-01 are already defended via downstream `.replace(/\\/g, '/')` normalization or slash-agnostic `startsWith('..')` checks. No code changes needed. Sites: `routing-guard-core.policy.cjs:463` (normalizes at :465), `companion-check.cjs:274` (via normalizePath), `hybrid-lazy-indexer-methods-a.cjs:204,375` (normalization/slash-agnostic checks), `pre-tool-unified.guardrails.cjs:366` (normalizes at :368), `pre-tool-unified.read-safety.cjs:336` (uses startsWith('..')). (audit H-06 false positive)
 
+### Documentation
+
+- **M-03: MD5/SHA-1 non-security annotation** — Added inline `// M-03: non-security use` comments to 15 sites across 13 files (hooks, lib, skills, tests). All uses are cache keys, content addressing, UUID v5 namespaces, evidence IDs, or fingerprints — none are security-sensitive. Annotations silence SAST false-positives without changing any logic.
+
 ### Audit H-01: hook-async-classification test drift
 
 #### Fixed

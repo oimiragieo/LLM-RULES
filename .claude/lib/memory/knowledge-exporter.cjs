@@ -15,6 +15,7 @@ const { EntityQuery } = require('./entity-query.cjs');
  * @returns {string} 12-character hex hash.
  */
 function getProjectHash(projectDir) {
+  // M-03: non-security use (cache key / content addressing / UUID namespace); MD5/SHA-1 acceptable
   return crypto.createHash('md5').update(projectDir).digest('hex').slice(0, 12);
 }
 

@@ -82,6 +82,7 @@ function buildRequest(options = {}) {
   );
   const now = new Date().toISOString();
   const idInput = `${trigger}|${suggestedArtifactType || 'unknown'}|${summary}|${evidence}`;
+  // M-03: non-security use (cache key / content addressing / UUID namespace); MD5/SHA-1 acceptable
   const id = `evo_${crypto.createHash('sha1').update(idInput).digest('hex').slice(0, 12)}`;
 
   return {

@@ -97,6 +97,7 @@ function extractFindingSummary(line) {
 
 function makeFingerprint(summary, _severity = 'unknown') {
   const base = normalizeSummary(summary).toLowerCase();
+  // M-03: non-security use (cache key / content addressing / UUID namespace); MD5/SHA-1 acceptable
   return crypto.createHash('sha1').update(base).digest('hex');
 }
 

@@ -58,6 +58,7 @@ const KEYWORDS_ISSUE = ['issue', 'discovered'];
  */
 function buildEntryId(entry) {
   const base = `${entry.text || ''}\n${entry.timestamp || ''}\n${entry.area || ''}`;
+  // M-03: non-security use (cache key / content addressing / UUID namespace); MD5/SHA-1 acceptable
   return crypto.createHash('sha1').update(base).digest('hex');
 }
 

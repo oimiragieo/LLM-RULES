@@ -17,6 +17,7 @@ function normalize(value) {
 
 function expectedEvidenceId(prefix, content) {
   const normalized = normalize(content);
+  // M-03: non-security use (cache key / content addressing / UUID namespace); MD5/SHA-1 acceptable
   const digest = crypto.createHash('sha1').update(normalized).digest('hex').slice(0, 8);
   return `${prefix}:${digest}`;
 }

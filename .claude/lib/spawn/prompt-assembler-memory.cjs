@@ -70,6 +70,7 @@ function clipMemoryText(value) {
 function buildEvidenceId(prefix, content) {
   const normalized = normalizeMemoryText(content);
   if (!normalized) return `${prefix}:unknown`;
+  // M-03: non-security use (cache key / content addressing / UUID namespace); MD5/SHA-1 acceptable
   const digest = crypto.createHash('sha1').update(normalized).digest('hex').slice(0, 8);
   return `${prefix}:${digest}`;
 }

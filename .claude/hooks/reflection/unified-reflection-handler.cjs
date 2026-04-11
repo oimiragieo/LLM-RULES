@@ -301,6 +301,7 @@ function ingestStaleArtifactRecommendations(options = {}) {
     const name = String(artifact?.name || 'unknown').trim() || 'unknown';
     const status = String(artifact?.status || 'stale').trim() || 'stale';
     const fingerprint = `${type}:${name}:${timestamp}:${status}`;
+    // M-03: non-security use (fingerprint ID); MD5/SHA-1 is acceptable
     const id = `evo_${crypto.createHash('sha1').update(fingerprint).digest('hex').slice(0, 12)}`;
     if (existingIds.has(id)) continue;
 

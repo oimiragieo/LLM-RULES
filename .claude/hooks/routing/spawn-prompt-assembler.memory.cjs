@@ -377,6 +377,7 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, std
   let results = [];
 
   // Check memory query batch cache (avoids re-querying on burst spawns)
+  // M-03: non-security use (cache key / content addressing / UUID namespace); MD5/SHA-1 acceptable
   const queryCacheKey = crypto.createHash('md5').update(query).digest('hex').slice(0, 16);
   const cachedResults = getMemoryQueryCache(queryCacheKey);
   if (cachedResults) {

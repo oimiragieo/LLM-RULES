@@ -92,6 +92,7 @@ function createPerfRecorder(enabled) {
  * Returns a single hash string for backward compatibility.
  */
 function getPromptFingerprint(input) {
+  // M-03: non-security use (cache key / prompt fingerprint); MD5/SHA-1 is acceptable
   const hash = crypto.createHash('sha1');
   hash.update(
     JSON.stringify({
@@ -116,6 +117,7 @@ function getPromptFingerprint(input) {
  * TTL: 5 minutes (vs 2 minutes for full fingerprint).
  */
 function getEnvelopeFingerprint(input) {
+  // M-03: non-security use (cache key / envelope fingerprint); MD5/SHA-1 is acceptable
   const hash = crypto.createHash('sha1');
   hash.update(
     JSON.stringify({

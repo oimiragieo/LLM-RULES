@@ -98,6 +98,7 @@ describe('getProjectHash', () => {
 
   it('matches expected MD5 slice', () => {
     const dir = '/my/test/project';
+    // M-03: non-security use (cache key / content addressing / UUID namespace); MD5/SHA-1 acceptable
     const expected = crypto.createHash('md5').update(dir).digest('hex').slice(0, 12);
     assert.equal(getProjectHash(dir), expected);
   });
