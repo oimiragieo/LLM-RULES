@@ -147,7 +147,7 @@ class GitHubCLI {
       'url,number',
     ].join(' ');
     const output = this._exec(cmd);
-    return safeParseJSON(output, {}).data;
+    return safeParseJSON(output, {});
   }
 
   /**
@@ -183,7 +183,7 @@ class GitHubCLI {
     let cmd = 'gh pr list --json number,title,state,author';
     if (state != null) cmd += ` --state ${q(state)}`;
     const output = this._exec(cmd);
-    return safeParseJSON(output, {}).data;
+    return safeParseJSON(output, {});
   }
 
   /**
@@ -195,7 +195,7 @@ class GitHubCLI {
   getPR(number) {
     const cmd = `gh pr view ${number} --json number,title,state,author,body,url,headRefName,baseRefName`;
     const output = this._exec(cmd);
-    return safeParseJSON(output, {}).data;
+    return safeParseJSON(output, {});
   }
 
   /**

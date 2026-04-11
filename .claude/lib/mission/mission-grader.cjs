@@ -49,7 +49,7 @@ function evalJsonSchema(artifact, schemaPath, baseDir) {
 
   let schema;
   try {
-    schema = safeParseJSON(fs.readFileSync(resolvedPath, 'utf8'), {}).data;
+    schema = safeParseJSON(fs.readFileSync(resolvedPath, 'utf8'), {});
   } catch (e) {
     return { pass: false, evidence: `Failed to parse schema: ${e.message}` };
   }
@@ -476,8 +476,8 @@ function loadConfig(baseDir) {
   const rulesPath = path.join(configDir, 'rules.json');
   const rubricPath = path.join(configDir, 'rubric.json');
 
-  const rules = safeParseJSON(fs.readFileSync(rulesPath, 'utf8'), {}).data;
-  const rubric = safeParseJSON(fs.readFileSync(rubricPath, 'utf8'), {}).data;
+  const rules = safeParseJSON(fs.readFileSync(rulesPath, 'utf8'), {});
+  const rubric = safeParseJSON(fs.readFileSync(rubricPath, 'utf8'), {});
 
   return { rules: rules.rules, rubric };
 }
@@ -642,11 +642,11 @@ class MissionGrader {
     const statePath = path.join(missionDir, 'state.json');
     const handoffsDir = path.join(missionDir, 'handoffs');
 
-    const featuresDoc = safeParseJSON(fs.readFileSync(featuresPath, 'utf8'), {}).data;
+    const featuresDoc = safeParseJSON(fs.readFileSync(featuresPath, 'utf8'), {});
     const features = featuresDoc.features || [];
 
     const validationState = fs.existsSync(validationStatePath)
-      ? safeParseJSON(fs.readFileSync(validationStatePath, 'utf8'), { assertions: {} }).data
+      ? safeParseJSON(fs.readFileSync(validationStatePath, 'utf8'), { assertions: {} })
       : { assertions: {} };
 
     const validationContract = fs.existsSync(contractPath)
@@ -656,7 +656,7 @@ class MissionGrader {
     const agentsMd = fs.existsSync(agentsPath) ? fs.readFileSync(agentsPath, 'utf8') : '';
 
     const missionState = fs.existsSync(statePath)
-      ? safeParseJSON(fs.readFileSync(statePath, 'utf8'), {}).data
+      ? safeParseJSON(fs.readFileSync(statePath, 'utf8'), {})
       : {};
 
     // Load handoff files
@@ -665,7 +665,7 @@ class MissionGrader {
       const files = fs.readdirSync(handoffsDir).filter(f => f.endsWith('.json'));
       for (const file of files) {
         try {
-          const h = safeParseJSON(fs.readFileSync(path.join(handoffsDir, file), 'utf8'), {}).data;
+          const h = safeParseJSON(fs.readFileSync(path.join(handoffsDir, file), 'utf8'), {});
           if (h.featureId) {
             // Use latest handoff per feature
             if (!handoffMap[h.featureId] || h.timestamp > handoffMap[h.featureId].timestamp) {

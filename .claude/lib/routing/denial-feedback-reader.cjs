@@ -224,7 +224,7 @@ function readDenialLog(logFile) {
     if (!content || !content.trim()) {
       return [];
     }
-    const parsed = safeParseJSON(content, []).data;
+    const parsed = safeParseJSON(content, []);
     if (!Array.isArray(parsed)) {
       return [];
     }

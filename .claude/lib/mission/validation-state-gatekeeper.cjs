@@ -142,7 +142,7 @@ function loadState(statePath) {
   // Try to parse JSON
   let state;
   try {
-    state = safeParseJSON(content, null).data;
+    state = safeParseJSON(content, null);
   } catch (_parseErr) {
     // Invalid JSON - backup and reinitialize
     createCorruptionBackup(statePath);

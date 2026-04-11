@@ -37,10 +37,10 @@ function loadMissionState(missionDir) {
   const featuresPath = path.join(missionDir, 'features.json');
   const validationPath = path.join(missionDir, 'validation-state.json');
 
-  const state = safeParseJSON(fs.readFileSync(statePath, 'utf8'), {}).data;
-  const featuresDoc = safeParseJSON(fs.readFileSync(featuresPath, 'utf8'), {}).data;
+  const state = safeParseJSON(fs.readFileSync(statePath, 'utf8'), {});
+  const featuresDoc = safeParseJSON(fs.readFileSync(featuresPath, 'utf8'), {});
   const validationState = fs.existsSync(validationPath)
-    ? safeParseJSON(fs.readFileSync(validationPath, 'utf8'), { assertions: {} }).data
+    ? safeParseJSON(fs.readFileSync(validationPath, 'utf8'), { assertions: {} })
     : { assertions: {} };
 
   return { state, features: featuresDoc.features || [], validationState };
@@ -156,7 +156,7 @@ function injectMilestoneValidators(missionDir, features, milestone) {
 
   let templates;
   try {
-    templates = safeParseJSON(fs.readFileSync(templatePath, 'utf8'), {}).data;
+    templates = safeParseJSON(fs.readFileSync(templatePath, 'utf8'), {});
   } catch {
     return { injected: false, scrutinyId: null, userTestingId: null };
   }

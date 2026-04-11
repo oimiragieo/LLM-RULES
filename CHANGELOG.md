@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`pnpm format:check` was red** due to generator/prettier formatting mismatch on `.claude/config/skill-index.json` and `.claude/context/agent-registry.json`. Every `pnpm format` reformatted them → next `pnpm skills:index` / `pnpm agents:registry` regenerated them → CI dirty again. Added both to `.prettierignore` so the generator is the sole source of formatting truth, breaking the perpetual thrash cycle.
 
+### Audit C-01: safeParseJSON .data regression fix
+
+#### Fixed
+
+- **`safeParseJSON(...).data` regression** (introduced in commit 05c158079): removed broken `.data` access on 17 call sites across mission lib, routing, and GitHub CLI client. The function returns the parsed object directly; `.data` was always `undefined`. Adds regression test `tests/lib/utils/safe-json-return-shape.test.cjs`. (audit report C-01)
+
 ### Audit: Codebase Integrity & Security Fixes
 
 #### Fixed

@@ -112,7 +112,7 @@ class ModelRegistry {
       }
 
       const content = fs.readFileSync(this._configPath, 'utf8');
-      const data = safeParseJSON(content, {}).data;
+      const data = safeParseJSON(content, {});
 
       if (!data || !Array.isArray(data.models) || data.models.length === 0) {
         this._models = this._copyDefaults();
