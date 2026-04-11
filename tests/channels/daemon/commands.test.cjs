@@ -426,4 +426,71 @@ describe('CommandHandler', () => {
       assert.equal(dispatcher._pendingPairings.size, 0);
     });
   });
+
+  describe('/start-mission', () => {
+    beforeEach(() => {
+      // Wire a mock mission executor into the dispatcher
+      dispatcher.taskCounter = 0;
+      dispatcher.taskPool = {
+        spawned: [],
+        spawn(taskId, _fn, opts) {
+          this.spawned.push({ taskId, opts });
+        },
+      };
+      dispatcher.missionExecutor = {
+        executeAsync(_desc, context) {
+          return {
+            promise: Promise.resolve({ grade: { passed: true, score: 100, grade: 'excellent' } }),
+            cancel: () => {},
+            _capturedContext: context, // expose for assertion
+          };
+        },
+        formatResult(_r) {
+          return 'formatted';
+        },
+      };
+    });
+
+    it('shows usage without args', async () => {
+      await handler.handle({ text: '/start-mission', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('Usage'));
+      assert.ok(sink.sent[0].text.includes('start-mission'));
+      assert.equal(dispatcher.taskPool.spawned.length, 0);
+    });
+
+    it('spawns a mission-prefixed task on valid input', async () => {
+      await handler.handle({
+        text: '/start-mission refactor auth middleware',
+        chatId: '123',
+        messageId: 1,
+      });
+      assert.equal(dispatcher.taskPool.spawned.length, 1);
+      const spawned = dispatcher.taskPool.spawned[0];
+      assert.match(spawned.taskId, /^mission-\d+$/);
+      assert.equal(spawned.opts.timeout, 600000); // 10min, not the 5min /code default
+      assert.match(spawned.opts.description, /^\[mission\] /);
+      assert.ok(sink.sent[0].text.includes('Mission started'));
+      assert.ok(sink.sent[0].text.includes('refactor auth middleware'));
+    });
+
+    it('reports error when mission executor unavailable', async () => {
+      dispatcher.missionExecutor = null;
+      await handler.handle({
+        text: '/start-mission do the thing',
+        chatId: '123',
+        messageId: 1,
+      });
+      assert.ok(sink.sent[0].text.includes('not available'));
+    });
+
+    it('/help lists /start-mission', async () => {
+      await handler.handle({ text: '/help', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('/start-mission'));
+    });
+
+    it('/start welcome mentions /start-mission', async () => {
+      await handler.handle({ text: '/start', chatId: '123', messageId: 1 });
+      assert.ok(sink.sent[0].text.includes('/start-mission'));
+    });
+  });
 });

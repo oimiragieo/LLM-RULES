@@ -77,6 +77,7 @@ class TelegramSource {
           { command: 'export', description: 'Download chat as markdown' },
           { command: 'model', description: 'Current AI model' },
           { command: 'ping', description: 'Check if alive' },
+          { command: 'start-mission', description: 'Formal mission: pre-flight → scout → TDD' },
         ],
       });
     } catch {

@@ -1,4 +1,4 @@
-/* eslint max-lines: ["warn", 650] */
+/* eslint max-lines: ["warn", 720] */
 /**
  * commands.cjs — Telegram bot commands (OpenClaw-style)
  *
@@ -38,6 +38,7 @@ class CommandHandler {
             '/tasks — running & recent tasks\n' +
             '/cancel <id> — stop a running task\n' +
             '/memory — what I remember about you\n' +
+            '/start-mission <desc> — formal mission (pre-flight → scout → TDD)\n' +
             '/help — show all commands'
         );
 
@@ -65,7 +66,8 @@ class CommandHandler {
             '📄 /export — download chat as markdown\n' +
             '🔑 /pair — device pairing for new users\n' +
             '✅ /approve · ❌ /deny — approve pending commands\n' +
-            '🔧 /code <task> — mission-aware coding (agent routing + grading)\n\n' +
+            '🔧 /code <task> — mission-aware coding (agent routing + grading)\n' +
+            '🚀 /start-mission <desc> — formal mission workflow (pre-flight → scout → TDD)\n\n' +
             '💡 I can also DO things — ask me to run code, check git, run tests, etc.'
         );
 
@@ -554,7 +556,6 @@ class CommandHandler {
       }
 
       case '/code': {
-        // Force mission-aware coding execution — bypass Claude classification
         if (!args) {
           return this._reply(
             chatId,
@@ -562,43 +563,50 @@ class CommandHandler {
             '💡 Usage: /code <task description>\n\nExample: /code fix the login form validation\n\nThis routes your task through the mission-aware coding pipeline with agent selection, verification, and grading.'
           );
         }
-
         const { classify: classifyTask } = require('./skill-router.cjs');
         const codeClassification = classifyTask(args);
         const agentLabel = codeClassification.isCoding ? codeClassification.agentType : 'developer';
-
-        // Directly spawn into the dispatcher's task pool via mission executor
-        if (this.dispatcher && this.dispatcher.missionExecutor) {
-          const taskId = `code-${++this.dispatcher.taskCounter}`;
-          const missionExec = this.dispatcher.missionExecutor;
-          const cancelRef = { cancel: null };
-
-          this.dispatcher.taskPool.spawn(
-            taskId,
-            () => {
-              const handle = missionExec.executeAsync(args);
-              cancelRef.cancel = handle.cancel;
-              return handle.promise.then(result => {
-                if (result && result.grade) return missionExec.formatResult(result);
-                return result;
-              });
-            },
-            {
-              description: args,
-              chatId,
-              user: msgData.user || 'unknown',
-              timeout: 300000,
-              cancel: () => cancelRef.cancel && cancelRef.cancel(),
-              _sink: this.sink,
-              _messageId: messageId,
-            }
-          );
-        }
-
+        this._spawnMissionTask(msgData, args, { taskIdPrefix: 'code', timeoutMs: 300000 });
         return this._reply(
           chatId,
           messageId,
           `🔧 Coding task queued → ${agentLabel}\nDescription: ${args.slice(0, 100)}`
+        );
+      }
+
+      case '/start-mission': {
+        if (!args) {
+          return this._reply(
+            chatId,
+            messageId,
+            '🚀 Usage: /start-mission <mission description>\n\n' +
+              'Example: /start-mission refactor the auth middleware for OAuth 2.1 compliance\n\n' +
+              'Runs the formal start-mission workflow: pre-flight health check → parallel ' +
+              'subsystem scouting → test-driven milestone execution.'
+          );
+        }
+        // Mission workflow preamble — injected as Pre-Research Context so the headless
+        // Claude session follows the formal SOP (mirrors .claude/workflows/start-mission.md).
+        const missionContext =
+          '**MISSION MODE — follow the start-mission workflow (.claude/workflows/start-mission.md):**\n' +
+          '1. Context metadata — read CONTINUATION_PLAN.md / INVARIANTS.md / ANTI_GOALS.md if present.\n' +
+          '2. Pre-flight — run `pnpm test` and `pnpm lint`. If broken, STOP and report.\n' +
+          '3. Parallel scouting — dispatch read-only subagents to investigate coupled subsystems.\n' +
+          '4. Milestone execution — test-driven. Run tests after every batch of edits.\n' +
+          '5. On completion — emit a structured handoff with summary, files changed, verification evidence.';
+        const taskId = this._spawnMissionTask(msgData, args, {
+          taskIdPrefix: 'mission',
+          timeoutMs: 600000, // 10min — missions are longer than plain /code tasks
+          missionContext,
+          descriptionPrefix: '[mission] ',
+        });
+        if (!taskId) return true; // spawn failed, error reply already sent
+        return this._reply(
+          chatId,
+          messageId,
+          `🚀 Mission started (${taskId})\n` +
+            `📋 ${args.slice(0, 120)}${args.length > 120 ? '…' : ''}\n\n` +
+            'Workflow: pre-flight → scout → TDD. Use /tasks to monitor, /cancel to abort.'
         );
       }
 
@@ -616,6 +624,43 @@ class CommandHandler {
       this.log(`[cmd] Error: ${err.message}`);
     }
     return true;
+  }
+
+  /**
+   * Shared task-pool spawn for mission-executor-backed commands (/code, /start-mission).
+   * @returns {string|null} Task ID on success, null if mission executor unavailable (error reply sent).
+   */
+  _spawnMissionTask(msgData, args, opts) {
+    const { chatId, messageId, user } = msgData;
+    if (!this.dispatcher || !this.dispatcher.missionExecutor) {
+      this._reply(chatId, messageId, '❌ Mission executor not available.');
+      return null;
+    }
+    const taskId = `${opts.taskIdPrefix}-${++this.dispatcher.taskCounter}`;
+    const missionExec = this.dispatcher.missionExecutor;
+    const cancelRef = { cancel: null };
+
+    this.dispatcher.taskPool.spawn(
+      taskId,
+      () => {
+        const handle = missionExec.executeAsync(args, opts.missionContext);
+        cancelRef.cancel = handle.cancel;
+        return handle.promise.then(result => {
+          if (result && result.grade) return missionExec.formatResult(result);
+          return result;
+        });
+      },
+      {
+        description: `${opts.descriptionPrefix || ''}${args}`,
+        chatId,
+        user: user || 'unknown',
+        timeout: opts.timeoutMs,
+        cancel: () => cancelRef.cancel && cancelRef.cancel(),
+        _sink: this.sink,
+        _messageId: messageId,
+      }
+    );
+    return taskId;
   }
 }
 
