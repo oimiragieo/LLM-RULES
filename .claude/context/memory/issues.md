@@ -51,3 +51,95 @@ Source: reflection of session tasks (2026-04-02 to 2026-04-04)
 **Update 2026-04-11**: 5 new reflection entries (tasks 6, 7, 8, 10, 1) from ghidramcp-eval differential oracle session. Gap log now 873 total (+9 from last batch of 864). task-lifecycle-42 confirmed separately closed (Task #3 "completed" in this session) — gap log noise should decrease in subsequent sessions. 3 of 5 tasks had good metadata.summary (tasks 6, 7, 8, 10); task 1 had fallback string (score withheld). Ghidramcp-eval pattern: fault-injection tests, PYTHONPATH fix via sys.path.insert, oracle exception resilience. Strong delivery evidence from this session. Missing metadata root cause still unresolved for post-completion-chain.cjs.
 
 **Update 2026-04-11 (evening batch)**: 5 more entries (tasks 11, 12, 24, 25, 26) batch-processed. Gap log now 912 total. Tasks 24/25/26 are NO metadata (score withheld — dataQuality: insufficient). Tasks 11/12 have partial metadata (summaries only): task 11 = "gitignore pass needed for 321 untracked files"; task 12 = "REVOLUTION_PLAN.md pruned, Phase 2 gate added, commit 343a35c1". Patterns remain identical to prior batches: (1) missing_metadata dominates gap log, (2) post-completion-chain.cjs fallback string still firing for most tasks. Queue cleared. Root causes remain unaddressed: enforce pre-completion-validation.cjs BLOCK on absent metadata.summary.
+
+**Update 2026-04-12 (enterprise audit batch — tasks 38/40/41/42/43)**: 5 entries processed from 2026-04-11 enterprise audit remediation session. Gap log now 923 total. Tasks 38/40/41 arrived with fallback strings ("Task N completed without summary metadata") — dataQuality: insufficient for formal scoring, but session context (git log + user-provided task descriptions) confirms substantive delivery. Task 42 = PARTIAL data (format chore summary only). Task 43 = FULL data (SkillClaw research). Process adherence issue: 3/5 tasks still failing metadata contract. Good news: the gap-log noise from task-lifecycle-42 zombie should have diminished after it was auto-closed on 2026-04-11. The recurring missing_metadata pattern across 20+ sessions now constitutes a P0 systemic failure — pre-completion-validation.cjs MUST be upgraded from warn to BLOCK for absent metadata.summary. No further updates planned here; escalate to enforcement hook update.
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T05:11:44.707Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T05:11:44.728Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T05:11:44.750Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T05:17:56.335Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T05:17:56.357Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T05:17:56.375Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T05:21:52.499Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T05:21:52.518Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T05:21:52.538Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T05:24:23.388Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T05:24:23.406Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T05:24:23.421Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T05:27:38.491Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T05:27:38.512Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T05:27:38.530Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T05:42:16.021Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T05:42:16.045Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T05:42:16.067Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T05:46:20.576Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T05:46:20.592Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T05:46:20.608Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T06:16:41.502Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T06:16:41.518Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T06:16:41.535Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T06:21:49.473Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T06:21:49.489Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T06:21:49.503Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T06:24:06.274Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T06:24:06.291Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T06:24:06.306Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T06:26:25.413Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T06:26:25.430Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T06:26:25.448Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T06:28:47.450Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T06:28:47.467Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T06:28:47.482Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T06:31:02.024Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T06:31:02.040Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T06:31:02.054Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T06:44:20.608Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T06:44:20.626Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T06:44:20.644Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-12T06:50:27.710Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-12T06:50:27.749Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-12T06:50:27.787Z

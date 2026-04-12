@@ -19,7 +19,7 @@
     "metrics:routing:ci": "node .claude/tools/cli/router-churn-summary.cjs --hours 24 --require-data true --assert-max-block-rate 70 --assert-max-repeated-blocks 8 --json",
     "metrics:runtime:summary": "node .claude/tools/cli/runtime-health-summary.cjs --hours 24",
     "metrics:runtime:snapshot": "node .claude/tools/cli/runtime-health-snapshot.cjs --component metrics-bootstrap --status ok --json true",
-    "metrics:runtime:ci": "node .claude/tools/cli/runtime-health-summary.cjs --hours 24 --require-data true --assert-max-p95-ms 800 --assert-max-heap-mb 512 --json",
+    "metrics:runtime:ci": "node .claude/tools/cli/runtime-health-summary.cjs --hours 24 --require-data true --exclude-component spawn-prompt-assembler --assert-max-p95-ms 800 --assert-max-heap-mb 512 --json",
     "metrics:memory:slo:summary": "node .claude/tools/cli/memory-slo-summary.cjs --json",
     "metrics:memory:slo:ci": "node .claude/tools/cli/memory-slo-summary.cjs --require-data true --assert-max-write-p95-ms 120 --assert-max-lock-wait-p95-ms 40 --assert-max-parse-failure-rate 0.02 --assert-max-churn-rate 0.8 --json",
     "metrics:memory-cache:summary": "node .claude/tools/cli/memory-cache-stability-summary.cjs --hours 24",

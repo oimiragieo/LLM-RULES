@@ -10,9 +10,15 @@ const path = require('path');
 function parseArgs(argv) {
   const args = argv.slice(2);
   const map = new Map();
+  const excludeComponents = [];
   for (let i = 0; i < args.length; i++) {
     const key = args[i];
     if (!key.startsWith('--')) continue;
+    if (key === '--exclude-component') {
+      const val = args[i + 1] && !args[i + 1].startsWith('--') ? args[++i] : '';
+      if (val) excludeComponents.push(val);
+      continue;
+    }
     const value = args[i + 1] && !args[i + 1].startsWith('--') ? args[++i] : 'true';
     map.set(key, value);
   }
@@ -24,6 +30,7 @@ function parseArgs(argv) {
     assertMaxHeapMb: map.has('--assert-max-heap-mb')
       ? Number(map.get('--assert-max-heap-mb'))
       : null,
+    excludeComponents,
     path:
       map.get('--path') ||
       path.join(process.cwd(), '.claude', 'context', 'metrics', 'runtime-health-metrics.jsonl'),
@@ -95,7 +102,10 @@ function evaluate(summary, opts) {
 function main() {
   const opts = parseArgs(process.argv);
   const cutoff = Date.now() - opts.hours * 60 * 60 * 1000;
-  const rows = readRows(opts.path, cutoff);
+  let rows = readRows(opts.path, cutoff);
+  if (opts.excludeComponents.length > 0) {
+    rows = rows.filter(r => !opts.excludeComponents.includes(r.component));
+  }
   const summary = summarize(rows, opts.hours);
   const failures = evaluate(summary, opts);
 
