@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Wave 7 Item 2: outcome-reflection trajectory signal emission** — `reflect()` in `.claude/skills/outcome-reflection/scripts/main.cjs` now calls `appendCalibrationEntry` after every run (persisting a structured calibration record to `learnings.md`), then calls `detectRepeatFailures` to scan history, and when >= 3 repeat failures are found for an agent type calls `emitTrajectorySignal` which appends a `trajectory-signal` entry to `integration-queue.jsonl`. All three functions are exported from `module.exports`. Result object now includes `trajectorySignal` field.
+- **P0.1: Trajectory logging hook** — PostToolUse async fail-open hook at `.claude/hooks/monitoring/trajectory-logger.cjs` that logs every tool call as structured JSONL to `.claude/context/logs/trajectory-YYYY-MM-DD.jsonl`. Registered in `settings.json` under PostToolUse matching TaskUpdate. Includes 17 tests covering sanitize, buildRecord, ensureDir, getLogPath, appendRecord, and schema compliance.
+
 ### Security
 
 - Verified `merkle-tree.cjs:87` already escapes regex specials (`[.+?^${}()|[\]\\]`) before glob token conversion (`**` → `.*`, `*` → `[^/]*`). Adds regression test guard (`tests/lib/code-indexing/merkle-tree-glob-escape.test.cjs`) with adversarial cases (literal dot, alternation, double-star) to prevent future regressions. (audit H-08 false positive)
