@@ -20,6 +20,12 @@
 const path = require('path');
 const fs = require('fs');
 
+const LEARNINGS_FILE = path.resolve(__dirname, '../../../../context/memory/learnings.md');
+const INTEGRATION_QUEUE = path.resolve(
+  __dirname,
+  '../../../../context/runtime/integration-queue.jsonl'
+);
+
 // ---------------------------------------------------------------------------
 // Argument parsing
 // ---------------------------------------------------------------------------
@@ -141,6 +147,97 @@ function generateNotes(estimation, decisionScore, actuals = {}) {
 }
 
 // ---------------------------------------------------------------------------
+// Detect repeat failures by scanning learnings.md for calibration entries
+// Returns { detected, failureClass, count, taskIds } if count >= 3
+// ---------------------------------------------------------------------------
+function detectRepeatFailures(agentType, flags) {
+  if (!agentType || !flags || flags.length === 0) {
+    return { detected: false, failureClass: null, count: 0, taskIds: [] };
+  }
+
+  let content = '';
+  try {
+    if (fs.existsSync(LEARNINGS_FILE)) {
+      content = fs.readFileSync(LEARNINGS_FILE, 'utf8');
+    }
+  } catch {
+    return { detected: false, failureClass: null, count: 0, taskIds: [] };
+  }
+
+  // Parse calibration entries matching: [calibration] agentType=X ... flags=Y taskId=Z
+  const calibrationRegex =
+    /- \[calibration\] agentType=(\S+)\s+taskType=\S+\s+flags=(\S+)\s+taskId=(\S+)/g;
+  const entries = [];
+  let match;
+
+  while ((match = calibrationRegex.exec(content)) !== null) {
+    entries.push({ agentType: match[1], flags: match[2].split(','), taskId: match[3] });
+  }
+
+  // Check each flag for repeat failures matching the agent type
+  for (const flag of flags) {
+    const matching = entries.filter(e => e.agentType === agentType && e.flags.includes(flag));
+    if (matching.length >= 3) {
+      return {
+        detected: true,
+        failureClass: flag,
+        count: matching.length,
+        taskIds: matching.map(e => e.taskId),
+      };
+    }
+  }
+
+  return { detected: false, failureClass: null, count: 0, taskIds: [] };
+}
+
+// ---------------------------------------------------------------------------
+// Append calibration entry to learnings.md
+// ---------------------------------------------------------------------------
+function appendCalibrationEntry(taskId, agentType, taskType, flags, overall) {
+  const date = new Date().toISOString().slice(0, 10);
+  const flagStr = flags.length > 0 ? flags.join(',') : 'none';
+  const overallStr = overall !== null ? overall.toFixed(2) : 'N/A';
+  const entry = `- [calibration] agentType=${agentType || 'unknown'} taskType=${taskType || 'unknown'} flags=${flagStr} taskId=${taskId} overall=${overallStr} (${date})\n`;
+
+  try {
+    const dir = path.dirname(LEARNINGS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.appendFileSync(LEARNINGS_FILE, entry, 'utf8');
+  } catch {
+    // Non-fatal: calibration entry write failure should not crash reflection
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Emit trajectory signal to integration-queue.jsonl
+// ---------------------------------------------------------------------------
+function emitTrajectorySignal(agentType, taskType, failureInfo) {
+  const signal = {
+    type: 'trajectory-signal',
+    timestamp: new Date().toISOString(),
+    source: 'outcome-reflection',
+    agentType: agentType || 'unknown',
+    taskType: taskType || 'unknown',
+    failureClass: failureInfo.failureClass,
+    occurrenceCount: failureInfo.count,
+    taskIds: failureInfo.taskIds,
+    summary: `${agentType || 'unknown'} agent has ${failureInfo.count} repeat ${failureInfo.failureClass} failures`,
+    suggestedAction: 'skill-update',
+    targetSkill: null,
+  };
+
+  try {
+    const dir = path.dirname(INTEGRATION_QUEUE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.appendFileSync(INTEGRATION_QUEUE, JSON.stringify(signal) + '\n', 'utf8');
+  } catch {
+    // Non-fatal: queue write failure should not crash reflection
+  }
+
+  return signal;
+}
+
+// ---------------------------------------------------------------------------
 // Main reflect mode
 // ---------------------------------------------------------------------------
 function reflect(args) {
@@ -180,6 +277,26 @@ function reflect(args) {
   const flags = computeFlags({ ...scores, overall }, actuals);
   const notes = generateNotes(estimation, decisionScore, actuals);
 
+  // Persist calibration entry to learnings.md for trend detection
+  appendCalibrationEntry(
+    args.taskId || 'unknown',
+    args.agentType || null,
+    args.taskType || null,
+    flags,
+    overall
+  );
+
+  // Detect repeat failures and emit trajectory signal when threshold reached
+  const failureInfo = detectRepeatFailures(args.agentType || null, flags);
+  let trajectorySignal = null;
+  if (failureInfo.detected) {
+    trajectorySignal = emitTrajectorySignal(
+      args.agentType || null,
+      args.taskType || null,
+      failureInfo
+    );
+  }
+
   const result = {
     taskId: args.taskId || 'unknown',
     mode: 'reflect',
@@ -188,6 +305,7 @@ function reflect(args) {
     flags,
     notes,
     reflectionQueued: flags.includes('high-miss'),
+    trajectorySignal,
   };
 
   console.log(JSON.stringify(result, null, 2));
@@ -242,4 +360,7 @@ module.exports = {
   computeOverallScore,
   computeFlags,
   generateNotes,
+  detectRepeatFailures,
+  appendCalibrationEntry,
+  emitTrajectorySignal,
 };
