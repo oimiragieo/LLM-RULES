@@ -6,7 +6,9 @@
  */
 'use strict';
 
+const fs = require('fs');
 const https = require('https');
+const { loadAccessConfig, ACCESS_PATH } = require('../config.cjs');
 
 function telegramApi(token, method, body) {
   return new Promise((resolve, reject) => {
@@ -47,9 +49,49 @@ class TelegramSource {
     this.token = config.token;
     this.allowed = config.allowedUsers;
     this.allowAll = config.allowAll;
+    this.dmPolicy = config.dmPolicy || 'pairing';
+    this.groups = config.groups || [];
+    this.pending = config.pending || [];
     this.dispatch = dispatch;
     this.lastUpdateId = 0;
     this.running = false;
+    // Hot-reload: mtime tracking for access.json
+    this._accessMtime = 0;
+    this._accessStatic = (process.env.TELEGRAM_ACCESS_MODE || '').toLowerCase() === 'static';
+    this._initAccessMtime();
+  }
+
+  /** Record initial mtime of access.json */
+  _initAccessMtime() {
+    try {
+      this._accessMtime = fs.statSync(ACCESS_PATH).mtimeMs;
+    } catch {
+      this._accessMtime = 0;
+    }
+  }
+
+  /**
+   * Hot-reload access.json if mtime changed since last check.
+   * Called once per poll cycle. Skipped if TELEGRAM_ACCESS_MODE=static.
+   */
+  _reloadAccess() {
+    if (this._accessStatic) return;
+    try {
+      const mtime = fs.statSync(ACCESS_PATH).mtimeMs;
+      if (mtime === this._accessMtime) return;
+      this._accessMtime = mtime;
+      const ac = loadAccessConfig();
+      // Merge new allowFrom into allowed set (keep env users, add new file entries)
+      ac.allowFrom.forEach(id => this.allowed.add(id));
+      this.dmPolicy = ac.dmPolicy;
+      this.groups = ac.groups;
+      this.pending = ac.pending;
+      process.stderr.write(
+        `[INFO] access.json reloaded (policy=${ac.dmPolicy}, users=${ac.allowFrom.length})\n`
+      );
+    } catch {
+      // File deleted or unreadable — keep current state
+    }
   }
 
   // eslint-disable-next-line complexity
@@ -93,6 +135,9 @@ class TelegramSource {
 
     while (this.running) {
       try {
+        // Hot-reload access.json each poll cycle (mtime-based, no-op if unchanged)
+        this._reloadAccess();
+
         const data = await telegramApi(
           this.token,
           `getUpdates?offset=${this.lastUpdateId}&timeout=30`
@@ -108,8 +153,27 @@ class TelegramSource {
 
           const senderId = String(update.message.from?.id || '');
           const senderUsername = update.message.from?.username || '';
-          if (!this.allowAll && !this.allowed.has(senderId) && !this.allowed.has(senderUsername))
-            continue;
+
+          // Policy-aware access control
+          if (!this.allowAll) {
+            // 'disabled' policy: drop all DMs
+            // eslint-disable-next-line max-depth
+            if (this.dmPolicy === 'disabled') continue;
+            // 'allowlist' and 'pairing': check if user is in allowed set
+            // eslint-disable-next-line max-depth
+            if (!this.allowed.has(senderId) && !this.allowed.has(senderUsername)) {
+              // In pairing mode, let unrecognized users through so /pair can work
+              // eslint-disable-next-line max-depth
+              if (this.dmPolicy === 'pairing') {
+                const text = (update.message.text || '').trim();
+                // Only allow /start and /pair commands from unknown users
+                // eslint-disable-next-line max-depth
+                if (!text.startsWith('/start') && !text.startsWith('/pair')) continue;
+              } else {
+                continue;
+              }
+            }
+          }
 
           let text = update.message.text || '';
           let attachmentFileId = null;

@@ -15,6 +15,28 @@ const DEFAULT_POLL_INTERVAL = 30000; // 30s
 const DEFAULT_MODEL = 'sonnet';
 
 const CONFIG_PATH = path.join(os.homedir(), '.claude', 'channels', 'config.json');
+const ACCESS_PATH = path.join(os.homedir(), '.claude', 'channels', 'telegram', 'access.json');
+
+/** Valid DM access policies */
+const DM_POLICIES = ['pairing', 'allowlist', 'disabled'];
+
+/**
+ * Load and parse access.json, returning structured access config.
+ * @returns {{ dmPolicy: string, allowFrom: string[], groups: object[], pending: object[] }}
+ */
+function loadAccessConfig() {
+  try {
+    const data = JSON.parse(fs.readFileSync(ACCESS_PATH, 'utf8'));
+    const dmPolicy = DM_POLICIES.includes(data.dmPolicy) ? data.dmPolicy : 'pairing';
+    const allowFrom = (data.allowFrom || []).map(String);
+    const groups = Array.isArray(data.groups) ? data.groups : [];
+    const pending = Array.isArray(data.pending) ? data.pending : [];
+    return { dmPolicy, allowFrom, groups, pending };
+  } catch {
+    // No access.json or corrupt — default to pairing mode with empty lists
+    return { dmPolicy: 'pairing', allowFrom: [], groups: [], pending: [] };
+  }
+}
 
 function loadDotenv(root) {
   const envPath = path.join(root, '.env');
@@ -47,20 +69,16 @@ function loadConfig(root) {
     }
   }
 
-  // Build allowed users set
+  // Load structured access config (3-policy ACL)
+  const accessConfig = loadAccessConfig();
+
+  // Build allowed users set from env + access.json allowFrom
   const allowed = new Set();
   const envUsers = (process.env.TELEGRAM_ALLOWED_USERS || '').trim();
   if (envUsers) envUsers.split(',').forEach(id => allowed.add(id.trim()));
   const ownerId = (process.env.TELEGRAM_OWNER_ID || '').trim();
   if (ownerId) allowed.add(ownerId);
-  // From access.json
-  const accessPath = path.join(os.homedir(), '.claude', 'channels', 'telegram', 'access.json');
-  try {
-    const data = JSON.parse(fs.readFileSync(accessPath, 'utf8'));
-    (data.allowFrom || []).forEach(id => allowed.add(String(id)));
-  } catch {
-    /* ignored */
-  }
+  accessConfig.allowFrom.forEach(id => allowed.add(id));
 
   // Mode: 'developer' (default) or 'business'
   const mode = process.env.CHANNEL_MODE || fileConfig.mode || 'developer';
@@ -92,6 +110,9 @@ function loadConfig(root) {
         token: (process.env.TELEGRAM_BOT_TOKEN || '').trim(),
         allowedUsers: allowed,
         allowAll: (process.env.TELEGRAM_ALLOW_ALL || '').toLowerCase() === 'true',
+        dmPolicy: accessConfig.dmPolicy,
+        groups: accessConfig.groups,
+        pending: accessConfig.pending,
         pollInterval:
           parseInt(process.env.TELEGRAM_POLL_INTERVAL || '', 10) || DEFAULT_POLL_INTERVAL,
       },
@@ -126,4 +147,11 @@ function loadConfig(root) {
   };
 }
 
-module.exports = { loadConfig, CONFIG_PATH, DEFAULT_PORT };
+module.exports = {
+  loadConfig,
+  loadAccessConfig,
+  CONFIG_PATH,
+  ACCESS_PATH,
+  DEFAULT_PORT,
+  DM_POLICIES,
+};

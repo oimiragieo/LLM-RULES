@@ -7,6 +7,10 @@
  */
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+const { ACCESS_PATH } = require('./config.cjs');
+
 class CommandHandler {
   constructor(sink, memory, dispatcher, log) {
     this.sink = sink;
@@ -398,7 +402,34 @@ class CommandHandler {
           const pending = this.dispatcher._pendingPairings?.get(code);
           if (!pending) return this._reply(chatId, messageId, `❌ Unknown code: ${code}`);
           this.dispatcher._pendingPairings.delete(code);
-          return this._reply(chatId, messageId, `✅ User ${pending.chatId} approved!`);
+
+          // Persist approved user to access.json
+          const approvedId = String(pending.userId || pending.chatId);
+          try {
+            let accessData = { dmPolicy: 'pairing', allowFrom: [], groups: [], pending: [] };
+            try {
+              accessData = JSON.parse(fs.readFileSync(ACCESS_PATH, 'utf8'));
+              // eslint-disable-next-line no-empty
+            } catch {}
+            if (!Array.isArray(accessData.allowFrom)) accessData.allowFrom = [];
+            if (!accessData.allowFrom.includes(approvedId)) {
+              accessData.allowFrom.push(approvedId);
+              // Atomic write: write to .tmp then rename
+              const tmpPath = ACCESS_PATH + '.tmp';
+              fs.mkdirSync(path.dirname(ACCESS_PATH), { recursive: true });
+              fs.writeFileSync(tmpPath, JSON.stringify(accessData, null, 2) + '\n');
+              fs.renameSync(tmpPath, ACCESS_PATH);
+            }
+          } catch (e) {
+            process.stderr.write(`[WARN] Failed to persist pairing: ${e.message}\n`);
+          }
+
+          // Also add to the live allowed set so hot-reload picks it up immediately
+          if (this.dispatcher.sources?.telegram) {
+            this.dispatcher.sources.telegram.allowed?.add(approvedId);
+          }
+
+          return this._reply(chatId, messageId, `✅ User ${pending.chatId} approved and saved!`);
         }
         return this._reply(chatId, messageId, '🔑 Usage: /pair request | /pair approve <code>');
       }
@@ -493,8 +524,6 @@ class CommandHandler {
         if (history.length === 0)
           return this._reply(chatId, messageId, '📄 No conversation to export.');
 
-        const fs = require('fs');
-        const path = require('path');
         const profile = this.memory.getProfile(chatId);
         const summary = this.memory.summaries.get(chatId) || '';
 
