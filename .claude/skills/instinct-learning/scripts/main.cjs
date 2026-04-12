@@ -72,6 +72,7 @@ function recordInstinct({ text, confidence, tags, source }) {
     project: promoted ? null : process.env.PROJECT_NAME || 'agent-studio',
     text: text.trim(),
     confidence: conf,
+    frequency: 1,
     source_context: (source || '').trim(),
     tags: tags
       ? tags
@@ -86,7 +87,16 @@ function recordInstinct({ text, confidence, tags, source }) {
   records.push(record);
   saveInstincts(records);
 
-  console.log(JSON.stringify({ ok: true, id, scope: record.scope, promoted }));
+  console.log(
+    JSON.stringify({
+      ok: true,
+      id,
+      scope: record.scope,
+      promoted,
+      frequency: 1,
+      evolutionTriggered: false,
+    })
+  );
 }
 
 function updateInstinct({ id, confidence }) {
@@ -115,6 +125,8 @@ function updateInstinct({ id, confidence }) {
   const justPromoted = !wasGlobal && nowPromoted;
 
   rec.confidence = conf;
+  rec.frequency = (rec.frequency || 1) + 1;
+
   if (justPromoted) {
     rec.scope = 'global';
     rec.project = null;
@@ -123,8 +135,37 @@ function updateInstinct({ id, confidence }) {
   }
 
   saveInstincts(records);
+
+  // Emit evolution request when frequency reaches threshold
+  const evolutionTriggered = rec.frequency >= 3;
+  if (evolutionTriggered) {
+    const evolutionRequest = {
+      timestamp: new Date().toISOString(),
+      source: 'recommend-evolution',
+      trigger: 'repeated_error',
+      evidence: `Instinct "${rec.text}" observed ${rec.frequency} times (tags: ${rec.tags.join(', ')})`,
+      suggestedArtifactType: 'skill',
+      summary: `Recurring pattern detected: "${rec.text}" — frequency ${rec.frequency} suggests skill evolution needed`,
+      status: 'proposed',
+    };
+    const queuePath = path.resolve(
+      __dirname,
+      '../../../../context/runtime/evolution-requests.jsonl'
+    );
+    const queueDir = path.dirname(queuePath);
+    if (!fs.existsSync(queueDir)) fs.mkdirSync(queueDir, { recursive: true });
+    fs.appendFileSync(queuePath, JSON.stringify(evolutionRequest) + '\n', 'utf8');
+  }
+
   console.log(
-    JSON.stringify({ ok: true, id, confidence: conf, promoted: justPromoted || wasGlobal })
+    JSON.stringify({
+      ok: true,
+      id,
+      confidence: conf,
+      promoted: justPromoted || wasGlobal,
+      frequency: rec.frequency,
+      evolutionTriggered,
+    })
   );
 }
 

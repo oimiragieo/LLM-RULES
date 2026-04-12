@@ -73,6 +73,20 @@
           "maxItems": 3
         }
       }
+    },
+    "trajectorySignal": {
+      "type": ["object", "null"],
+      "description": "Emitted when 3+ repeat failures of same class detected for an agent-type + task-type pair",
+      "properties": {
+        "failureClass": { "type": "string" },
+        "occurrenceCount": { "type": "integer", "minimum": 3 },
+        "taskIds": { "type": "array", "items": { "type": "string" } },
+        "suggestedAction": {
+          "type": "string",
+          "enum": ["skill-update", "skill-create", "investigate"]
+        },
+        "targetSkill": { "type": ["string", "null"] }
+      }
     }
   },
   "additionalProperties": false

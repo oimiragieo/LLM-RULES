@@ -12,7 +12,9 @@
         "id": { "type": "string" },
         "scope": { "type": "string", "enum": ["project", "global"] },
         "promoted": { "type": "boolean" },
-        "confidence": { "type": "number" }
+        "confidence": { "type": "number" },
+        "frequency": { "type": "integer", "minimum": 1 },
+        "evolutionTriggered": { "type": "boolean" }
       }
     },
     {
@@ -31,7 +33,8 @@
           "source_context": { "type": "string" },
           "tags": { "type": "array", "items": { "type": "string" } },
           "promoted_at": { "type": ["string", "null"] },
-          "promoted_confidence": { "type": ["number", "null"] }
+          "promoted_confidence": { "type": ["number", "null"] },
+          "frequency": { "type": "integer", "minimum": 1 }
         }
       }
     }

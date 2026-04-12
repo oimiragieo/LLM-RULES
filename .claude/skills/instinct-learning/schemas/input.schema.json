@@ -52,6 +52,11 @@
       "minimum": 1,
       "maximum": 100,
       "description": "Maximum number of results to return"
+    },
+    "frequency": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Observation frequency counter. Auto-increments on update. Evolution triggered at frequency >= 3."
     }
   },
   "additionalProperties": false,
