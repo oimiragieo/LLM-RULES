@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Wave 7 Item 1: instinct-learning frequency counter** — Add frequency counter to instinct-learning skill; auto-triggers evolution request when same instinct reinforced >= 3 times. New `frequency` field in instinct records (backward compatible: existing records without it treated as frequency=1). On update, when frequency reaches threshold, appends structured evolution request to `runtime/evolution-requests.jsonl`. Updated input/output schemas to include frequency and evolutionTriggered fields.
 - **Wave 7 Item 2: outcome-reflection trajectory signal emission** — `reflect()` in `.claude/skills/outcome-reflection/scripts/main.cjs` now calls `appendCalibrationEntry` after every run (persisting a structured calibration record to `learnings.md`), then calls `detectRepeatFailures` to scan history, and when >= 3 repeat failures are found for an agent type calls `emitTrajectorySignal` which appends a `trajectory-signal` entry to `integration-queue.jsonl`. All three functions are exported from `module.exports`. Result object now includes `trajectorySignal` field.
 - **P0.1: Trajectory logging hook** — PostToolUse async fail-open hook at `.claude/hooks/monitoring/trajectory-logger.cjs` that logs every tool call as structured JSONL to `.claude/context/logs/trajectory-YYYY-MM-DD.jsonl`. Registered in `settings.json` under PostToolUse matching TaskUpdate. Includes 17 tests covering sanitize, buildRecord, ensureDir, getLogPath, appendRecord, and schema compliance.
 
