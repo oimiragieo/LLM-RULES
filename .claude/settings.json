@@ -372,6 +372,12 @@
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/post-pipeline-self-review.cjs",
             "timeout_ms": 10000,
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/trajectory-logger.cjs",
+            "timeout_ms": 5000,
+            "async": true
           }
         ]
       },
