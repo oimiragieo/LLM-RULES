@@ -107,10 +107,111 @@ function checkMandatorySkills(agentPath) {
   return { present, missing, allPresent: missing.length === 0 };
 }
 
-function _findModuleExportInsertionPoint(content) {
-  const exportMatch = content.match(/\r?\n\r?\nmodule\.exports\s*=\s*\{/);
-  if (!exportMatch) return -1;
-  return exportMatch.index;
+/**
+ * Run framework tests and return the pass count.
+ * Uses `pnpm test:framework` with a 120s timeout.
+ * Returns { passed: number, output: string } or null on failure.
+ */
+function computeScoreGate(projectRoot) {
+  const { spawnSync } = require('node:child_process');
+  const result = spawnSync(
+    'npx',
+    [
+      '--yes',
+      'cross-env',
+      'NODE_OPTIONS=--experimental-vm-modules',
+      'pnpm',
+      'test:framework',
+      '--',
+      '--test-timeout=10000',
+    ],
+    {
+      cwd: projectRoot || PROJECT_ROOT,
+      shell: false,
+      timeout: 120_000,
+      windowsHide: true,
+      encoding: 'utf8',
+      env: { ...process.env, FORCE_COLOR: '0' },
+    }
+  );
+
+  const combined = [result.stdout || '', result.stderr || ''].join('\n');
+  // Parse TAP-style "# pass N" or Node test runner "# pass N"
+  const passMatch = combined.match(/# pass\s+(\d+)/i);
+  const passed = passMatch ? parseInt(passMatch[1], 10) : -1;
+
+  return { passed, output: combined.slice(0, 2000) };
+}
+
+/**
+ * Evaluate score gate: compare pre and post test pass counts.
+ * Returns { allowed: boolean, warning: string|null, pre: number, post: number }
+ *
+ * Policy:
+ * - post < pre - 2  => BLOCK (hard regression)
+ * - post < pre      => WARN (soft regression)
+ * - post >= pre     => ALLOW
+ */
+function evaluateScoreGate(pre, post) {
+  if (pre < 0 || post < 0) {
+    return {
+      allowed: true,
+      warning: 'Score gate skipped: could not parse test pass counts',
+      pre,
+      post,
+    };
+  }
+  if (post < pre - 2) {
+    return {
+      allowed: false,
+      warning: `BLOCKED: Test pass count dropped by ${pre - post} (from ${pre} to ${post}). Threshold: max -2.`,
+      pre,
+      post,
+    };
+  }
+  if (post < pre) {
+    return {
+      allowed: true,
+      warning: `WARNING: Test pass count decreased by ${pre - post} (from ${pre} to ${post}). Review recommended.`,
+      pre,
+      post,
+    };
+  }
+  return { allowed: true, warning: null, pre, post };
+}
+
+/**
+ * Append a row to the evolution audit trail TSV.
+ * Creates the file with a header row if it does not exist.
+ *
+ * @param {Object} entry
+ * @param {string} entry.artifactType   - 'agent' | 'skill' | 'workflow' | 'hook' etc.
+ * @param {string} entry.artifactName   - kebab-case name
+ * @param {string} entry.action         - 'created' | 'updated' | 'deprecated'
+ * @param {string} entry.changeSummary  - brief description of changes
+ * @param {string} [entry.timestamp]    - ISO-8601 timestamp (default: now)
+ */
+function appendEvolutionLog(entry) {
+  const tsvPath = path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'agent-evolution-log.tsv');
+  const header = 'timestamp\tartifact_type\tartifact_name\taction\tchange_summary\n';
+  if (!fs.existsSync(tsvPath)) {
+    // Ensure directory exists
+    const dir = path.dirname(tsvPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(tsvPath, header, 'utf8');
+  }
+  const row = [
+    entry.timestamp || new Date().toISOString(),
+    entry.artifactType || '',
+    entry.artifactName || '',
+    entry.action || 'updated',
+    String(entry.changeSummary || '')
+      .replace(/\t/g, ' ')
+      .replace(/\n/g, ' '),
+  ].join('\t');
+  fs.appendFileSync(tsvPath, row + '\n', 'utf8');
 }
 
 function buildPatchPlan(target, agentName) {
@@ -254,16 +355,54 @@ function main(input = null) {
   const risk = classifyRisk(options.changes || '');
   const mandatorySkillsCheck = checkMandatorySkills(resolved.agentPath);
   const patchPlan = buildPatchPlan(resolved.agentPath, resolved.agentName);
+
+  // Append evolution audit trail entry
+  try {
+    appendEvolutionLog({
+      artifactType: 'agent',
+      artifactName: resolved.agentName,
+      action: 'updated',
+      changeSummary: options.changes || `agent-updater run (trigger: ${trigger})`,
+    });
+  } catch (err) {
+    console.error(`Warning: Could not append evolution log: ${err.message}`);
+  }
+
+  // Score gate: capture pre-change baseline when in execute mode
+  const effectiveMode =
+    String(options.mode || 'plan')
+      .trim()
+      .toLowerCase() || 'plan';
+  let scoreGateResult = {
+    available: true,
+    description: 'Run computeScoreGate() before and after applying changes to detect regressions',
+    thresholds: { block: -2, warn: -1 },
+  };
+  if (effectiveMode === 'execute') {
+    try {
+      const preResult = computeScoreGate(PROJECT_ROOT);
+      scoreGateResult = {
+        ...scoreGateResult,
+        preBaseline: preResult,
+        prePassCount: preResult.passed,
+        capturedAt: new Date().toISOString(),
+        instructions:
+          'After applying changes, call computeScoreGate() again and pass both counts to evaluateScoreGate(pre, post)',
+      };
+    } catch (err) {
+      scoreGateResult.preBaseline = null;
+      scoreGateResult.error = `Pre-baseline capture failed: ${err.message}`;
+    }
+  }
+
   return {
     ok: true,
     trigger,
     target: resolved,
     risk,
     mandatorySkillsCheck,
-    mode:
-      String(options.mode || 'plan')
-        .trim()
-        .toLowerCase() || 'plan',
+    scoreGate: scoreGateResult,
+    mode: effectiveMode,
     requiredInvocations: [
       "Skill({ skill: 'framework-context' })",
       "Skill({ skill: 'research-synthesis' })",
@@ -297,4 +436,13 @@ if (require.main === module) {
   process.exit(result.ok ? 0 : 1);
 }
 
-module.exports = { parseArgs, resolveAgentPath, classifyRisk, checkMandatorySkills, main };
+module.exports = {
+  parseArgs,
+  resolveAgentPath,
+  classifyRisk,
+  checkMandatorySkills,
+  computeScoreGate,
+  evaluateScoreGate,
+  appendEvolutionLog,
+  main,
+};

@@ -51,6 +51,10 @@ These agent definition sections are protected and must survive updates:
 - `Anti-Patterns` section
 - Any section tagged `[PERMANENT]`
 
+### FIXED/EDITABLE Section Markers
+
+Any section wrapped in `<!-- FIXED: ... -->` / `<!-- /FIXED -->` markers MUST be preserved during autonomous updates. These markers indicate interface boundaries that cannot be modified without explicit human approval.
+
 ### Preserving Identity Integrations (CRITICAL)
 
 If the target agent contains a `soul:` frontmatter property or a "SOUL.md Integration" / "Memory Evolution Protocol" section:
@@ -128,9 +132,31 @@ invoke `Skill({ skill: 'security-architect' })` for manual review.
    4. Wire created artifacts into the agent's frontmatter (`skills:`) or Capabilities/body before applying the main patch
    5. Record created companion artifacts in `evolution-state.json` and `decisions.md`
 
-5. Validate integration and regenerate agent registry if assignments changed: run `node .claude/tools/cli/generate-agent-registry.cjs` (canonical output: `.claude/context/agent-registry.json`).
-6. **Global Ecosystem Sync (MANDATORY):** Run `npm run gen:all-registries` as your final action to ensure the `agent-registry`, `skill-index`, and `tool-manifest` are completely up-to-date and consistent with each other.
-7. Record learnings and unresolved risks in memory.
+#### Step 4.5: Score Gate (Regression Prevention)
+
+Before applying changes from the diff plan, capture a baseline test pass count. After applying changes, compare the new count. This prevents updates that silently break tests.
+
+```bash
+# Capture baseline BEFORE applying changes
+pnpm test:framework -- --test-timeout=10000 2>&1 | grep "# pass"
+
+# Apply changes...
+
+# Capture post-change count
+pnpm test:framework -- --test-timeout=10000 2>&1 | grep "# pass"
+```
+
+**Policy:**
+
+- If post-change pass count < pre-change - 2: **BLOCK** the update (hard regression threshold). Revert changes and investigate.
+- If post-change pass count < pre-change: **WARN** but allow. Log to `decisions.md` with rationale.
+- If post-change pass count >= pre-change: **ALLOW** (no regression detected).
+
+The `computeScoreGate()` function in `scripts/main.cjs` automates this comparison. Call `evaluateScoreGate(pre, post)` to get a structured result with `{ allowed, warning, pre, post }`.
+
+1. Validate integration and regenerate agent registry if assignments changed: run `node .claude/tools/cli/generate-agent-registry.cjs` (canonical output: `.claude/context/agent-registry.json`).
+2. **Global Ecosystem Sync (MANDATORY):** Run `npm run gen:all-registries` as your final action to ensure the `agent-registry`, `skill-index`, and `tool-manifest` are completely up-to-date and consistent with each other.
+3. Record learnings and unresolved risks in memory.
 
 ## Orchestrator Update Contract (MANDATORY)
 
@@ -203,6 +229,8 @@ Do not introduce prompt rules that contradict active hook behavior.
 - [ ] Integration validation run
 - [ ] Agent registry regenerated when skill assignments/frontmatter changed (`node .claude/tools/cli/generate-agent-registry.cjs` → `.claude/context/agent-registry.json`)
 - [ ] Global Ecosystem Sync run (`npm run gen:all-registries`) to ensure `agent-registry`, `skill-index`, and `tool-manifest` consistency
+- [ ] Score gate passed: test pass count did not regress by >2 (`computeScoreGate()` before/after comparison via `evaluateScoreGate(pre, post)`)
+- [ ] Evolution audit trail: row appended to `.claude/context/data/agent-evolution-log.tsv` via `appendEvolutionLog()`
 - [ ] `evolution-state.json` updated if EVOLVE-triggered (add entry with artifactType, name, path, status, completedAt)
 - [ ] `pnpm lint:fix && pnpm format` clean on touched files
 - [ ] Memory learnings/decisions/issues updated
