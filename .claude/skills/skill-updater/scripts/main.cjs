@@ -5,6 +5,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const yaml = require('js-yaml');
+const {
+  validateFixedPreserved,
+  applyUpdatePreservingFixed,
+} = require('../../../lib/updaters/fixed-section-handler.cjs');
 
 const PROJECT_ROOT = findProjectRoot();
 
@@ -344,6 +348,32 @@ if (require.main === module) {
   process.exit(result.ok ? 0 : 1);
 }
 
+/**
+ * Validate that proposed content for a skill file does not violate FIXED section markers.
+ * @param {string} skillPath - relative path to the skill file
+ * @param {string} proposedContent - new content to apply
+ * @returns {{ valid: boolean, violations: Array<{sectionName: string, reason: string}> }}
+ */
+function validateFixedSections(skillPath, proposedContent) {
+  const absolutePath = path.join(PROJECT_ROOT, skillPath);
+  if (!fs.existsSync(absolutePath)) return { valid: true, violations: [] };
+  const originalContent = fs.readFileSync(absolutePath, 'utf8');
+  return validateFixedPreserved(originalContent, proposedContent);
+}
+
+/**
+ * Apply proposedContent to a skill file while preserving FIXED sections from the original.
+ * @param {string} skillPath
+ * @param {string} proposedContent
+ * @returns {string} merged safe content
+ */
+function applyPreservingFixedSections(skillPath, proposedContent) {
+  const absolutePath = path.join(PROJECT_ROOT, skillPath);
+  if (!fs.existsSync(absolutePath)) return proposedContent;
+  const originalContent = fs.readFileSync(absolutePath, 'utf8');
+  return applyUpdatePreservingFixed(originalContent, proposedContent);
+}
+
 module.exports = {
   parseArgs,
   normalizeSkillRef,
@@ -356,5 +386,7 @@ module.exports = {
   applyPostUpdateIntegration,
   buildTddBacklog,
   buildResult,
+  validateFixedSections,
+  applyPreservingFixedSections,
   main,
 };

@@ -3,6 +3,10 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const {
+  validateFixedPreserved,
+  applyUpdatePreservingFixed,
+} = require('../../../lib/updaters/fixed-section-handler.cjs');
 
 function findProjectRoot() {
   let dir = __dirname;
@@ -214,6 +218,41 @@ function appendEvolutionLog(entry) {
   fs.appendFileSync(tsvPath, row + '\n', 'utf8');
 }
 
+/**
+ * Validate that the proposed content for an agent file does not violate
+ * any FIXED section markers. Reads the current on-disk content as the
+ * original reference.
+ *
+ * @param {string} agentPath   - relative path to the agent file (e.g. .claude/agents/core/developer.md)
+ * @param {string} proposedContent - the new content to apply
+ * @returns {{ valid: boolean, violations: Array<{sectionName: string, reason: string}> }}
+ */
+function validateFixedSections(agentPath, proposedContent) {
+  const absolutePath = path.join(PROJECT_ROOT, agentPath);
+  if (!fs.existsSync(absolutePath)) {
+    return { valid: true, violations: [] };
+  }
+  const originalContent = fs.readFileSync(absolutePath, 'utf8');
+  return validateFixedPreserved(originalContent, proposedContent);
+}
+
+/**
+ * Apply proposedContent to an agent file while preserving any FIXED sections
+ * from the current on-disk content.
+ *
+ * @param {string} agentPath
+ * @param {string} proposedContent
+ * @returns {string} merged safe content
+ */
+function applyPreservingFixedSections(agentPath, proposedContent) {
+  const absolutePath = path.join(PROJECT_ROOT, agentPath);
+  if (!fs.existsSync(absolutePath)) {
+    return proposedContent;
+  }
+  const originalContent = fs.readFileSync(absolutePath, 'utf8');
+  return applyUpdatePreservingFixed(originalContent, proposedContent);
+}
+
 function buildPatchPlan(target, agentName) {
   // POST-UPDATE INTEGRATION (Phase 4.3 Hardening)
   try {
@@ -403,6 +442,14 @@ function main(input = null) {
     mandatorySkillsCheck,
     scoreGate: scoreGateResult,
     mode: effectiveMode,
+    fixedSectionEnforcement: {
+      description:
+        'Before writing agent content, call validateFixedSections(agentPath, proposedContent). If violations are found, use applyPreservingFixedSections(agentPath, proposedContent) to restore FIXED blocks automatically.',
+      validateFunction: 'validateFixedSections(agentPath, proposedContent)',
+      applyFunction: 'applyPreservingFixedSections(agentPath, proposedContent)',
+      patchPlanNote:
+        'FIXED sections in the agent file are locked. Only EDITABLE sections and unmarked regions may be changed.',
+    },
     requiredInvocations: [
       "Skill({ skill: 'framework-context' })",
       "Skill({ skill: 'research-synthesis' })",
@@ -444,5 +491,7 @@ module.exports = {
   computeScoreGate,
   evaluateScoreGate,
   appendEvolutionLog,
+  validateFixedSections,
+  applyPreservingFixedSections,
   main,
 };
