@@ -59,6 +59,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `session-start-watchpaths.cjs`      | x      |             |          |            |              |            |
 | `subagent-start-iron-law.cjs`       | x      | x           | x        | x          | x            | x          |
 | `user-prompt-advisory-bundle.cjs`   | x      |             |          |            |              |            |
+| `trajectory-logger.cjs`             | x      | x           | x        | x          | x            | x          |
 
 **Agent Archetype Definitions:**
 
@@ -136,6 +137,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 ### PostToolUse (all tools)
 
 1. `post-tool-advisory-bundle.cjs` — consolidated: metrics, context window, hook error detection, recurring issue detection (async)
+2. `trajectory-logger.cjs` — logs each tool call as ATIF-compatible JSONL to `.claude/context/logs/trajectory-YYYY-MM-DD.jsonl` (async, fail-open)
 
 ### PostToolUse (TaskUpdate)
 

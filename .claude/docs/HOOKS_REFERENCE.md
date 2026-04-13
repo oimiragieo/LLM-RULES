@@ -105,6 +105,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `analysis-paralysis-guard.cjs`: Prevents infinite looping on reads.
 - `post-tool-advisory-bundle.cjs`: Consolidated advisory bundle that runs 4 PostToolUse sub-checks per tool call (metrics/error tracking, context window monitoring, stale worktree hook detection, recurring issue detection). Fail-open (async).
 - `slo-alert-gate.cjs`: SLO enforcement gate. Reads hook latency and recorder failure rate metrics from the SLO metrics file and blocks if p95 hook latency exceeds `HOOK_P95_MAX_MS` (default 5ms) or recorder failure rate exceeds `RECORDER_FAILURE_RATE_MAX` (default 1%). Fail-open when metrics file is absent.
+- `trajectory-logger.cjs`: Logs each tool call as a structured ATIF-compatible JSONL record to `.claude/context/logs/trajectory-YYYY-MM-DD.jsonl`. Fires on every PostToolUse event and captures tool name, sanitized input/output summaries, session ID, agent type, and task ID. Fail-open (always exits 0).
 
 ### SessionEnd
 
