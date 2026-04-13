@@ -1,3 +1,4 @@
+<!-- FIXED: frontmatter — interface contract, do not modify during autonomous updates -->
 ---
 name: {{SKILL_NAME}}
 description: {{BRIEF_DESCRIPTION}}. Use when {{USE_CASE}}.
@@ -8,14 +9,19 @@ user_invocable: {{true_or_false}}
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 assigned_agents: []  # MUST be populated by Step 7 of skill-creator
 best_practices:
-  - {{BEST_PRACTICE_1}}
-  - {{BEST_PRACTICE_2}}
-  - {{BEST_PRACTICE_3}}
+
+- {{BEST_PRACTICE_1}}
+- {{BEST_PRACTICE_2}}
+- {{BEST_PRACTICE_3}}
 error_handling: strict
 streaming: supported
+
 ---
+<!-- /FIXED -->
 
 # {{SKILL_DISPLAY_NAME}}
+
+<!-- FIXED: post-creation checklist — integration contract, do not modify during autonomous updates -->
 
 ## POST-CREATION CHECKLIST (BLOCKING - DO NOT SKIP)
 
@@ -78,7 +84,11 @@ grep -r "{{SKILL_NAME}}" .claude/agents/ || echo "ERROR: No agents assigned - BL
 
 **WHY**: Skills not in the skill catalog are invisible to Router. Unassigned skills are never invoked.
 
+<!-- /FIXED -->
+
 ---
+
+<!-- EDITABLE: overview — skill behavior, safe for autonomous modification -->
 
 ## Overview
 
@@ -99,6 +109,10 @@ grep -r "{{SKILL_NAME}}" .claude/agents/ || echo "ERROR: No agents assigned - BL
 - {{EXCEPTION_1}}
 - {{EXCEPTION_2}}
 
+<!-- /EDITABLE -->
+
+<!-- FIXED: iron law — governance contract, do not modify during autonomous updates -->
+
 ## The Iron Law
 
 ```
@@ -111,6 +125,10 @@ grep -r "{{SKILL_NAME}}" .claude/agents/ || echo "ERROR: No agents assigned - BL
 
 - {{RULE_1}}
 - {{RULE_2}}
+
+<!-- /FIXED -->
+
+<!-- EDITABLE: workflow — execution details, safe for autonomous modification -->
 
 ## Workflow
 
@@ -149,6 +167,10 @@ grep -r "{{SKILL_NAME}}" .claude/agents/ || echo "ERROR: No agents assigned - BL
 1. {{STEP_1}}
 2. {{STEP_2}}
 3. {{STEP_3}}
+
+<!-- /EDITABLE -->
+
+<!-- EDITABLE: verification and examples — operational detail, safe for autonomous modification -->
 
 ## Verification Checklist
 
@@ -220,6 +242,10 @@ This skill works well with:
 
 **Solution:** {{SOLUTION}}
 
+<!-- /EDITABLE -->
+
+<!-- FIXED: assigned agents — routing contract, do not modify during autonomous updates -->
+
 ## Assigned Agents
 
 This skill has been assigned to the following agents:
@@ -237,6 +263,10 @@ This skill has been assigned to the following agents:
 # Add "{{SKILL_NAME}}" to the skills: array
 ```
 
+<!-- /FIXED -->
+
+<!-- FIXED: memory protocol — framework contract, do not modify during autonomous updates -->
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
@@ -249,3 +279,5 @@ Read `.claude/context/memory/learnings.md`
 - Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+<!-- /FIXED -->
