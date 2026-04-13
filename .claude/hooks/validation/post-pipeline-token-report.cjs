@@ -120,30 +120,32 @@ function emitReport(projectRoot) {
   return lines.join('');
 }
 
-// Main hook entry point (stdin-based)
-let input = '';
-process.stdin.on('data', chunk => {
-  input += chunk;
-});
-process.stdin.on('end', () => {
-  try {
-    const { success: parseSuccess, data } = safeParseJSON(input, {});
-    if (!parseSuccess) {
-      process.exit(0);
-    }
+// Main hook entry point (stdin-based) — only when run directly, not when require()'d
+if (require.main === module) {
+  let input = '';
+  process.stdin.on('data', chunk => {
+    input += chunk;
+  });
+  process.stdin.on('end', () => {
+    try {
+      const { success: parseSuccess, data } = safeParseJSON(input, {});
+      if (!parseSuccess) {
+        process.exit(0);
+      }
 
-    const { shouldReport } = shouldTriggerReport(data);
-    if (!shouldReport) {
-      process.exit(0);
-    }
+      const { shouldReport } = shouldTriggerReport(data);
+      if (!shouldReport) {
+        process.exit(0);
+      }
 
-    // Pipeline appears complete — read ccusage-status.txt
-    process.stderr.write(emitReport(PROJECT_ROOT));
-  } catch (_e) {
-    // Advisory hook — fail open
-  }
-  process.exit(0);
-});
+      // Pipeline appears complete — read ccusage-status.txt
+      process.stderr.write(emitReport(PROJECT_ROOT));
+    } catch (_e) {
+      // Advisory hook — fail open
+    }
+    process.exit(0);
+  });
+}
 
 // Export for testing
 module.exports = {

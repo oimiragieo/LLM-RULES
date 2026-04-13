@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **test:framework open handle hang** — Wrapped stdin listener in `post-pipeline-token-report.cjs` with `require.main === module` guard. The hook's `process.stdin.on('data')` was registered unconditionally on `require()`, keeping the Node.js event loop alive when the module was imported by test files. `pnpm test:framework` now exits cleanly.
+
 ### Added
 
 - **Wave 6 P0.3: FIXED/EDITABLE section markers in templates** — Added `<!-- FIXED -->` and `<!-- EDITABLE -->` section markers to `agent-template.md` and `skill-template.md`. Marks which sections agent-updater and skill-updater must preserve (FIXED) vs sections they may freely modify (EDITABLE), preventing accidental overwrites of structural boilerplate during automated update cycles.
