@@ -208,6 +208,7 @@ class TelegramSource {
           const chatId = String(update.message.chat?.id || '');
           const msgData = {
             chatId,
+            chatType: update.message.chat?.type || 'private',
             messageId: update.message.message_id,
             user: senderUsername || senderId,
             userId: senderId,

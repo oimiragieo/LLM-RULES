@@ -42,6 +42,7 @@ class Dispatcher {
     this.rateLimits = new Map(); // chatId → [timestamp1, timestamp2, ...]
     this.rateLimitMax = 10; // max messages per minute per user
     this.rateLimitWindowMs = 60000;
+    this._botUsername = (process.env.TELEGRAM_BOT_USERNAME || '').toLowerCase();
     this._progressIntervalMs = (config && config.progressIntervalMs) || 15000;
     this.stats = {
       received: 0,
@@ -124,6 +125,17 @@ class Dispatcher {
       }
       this.log(`[dispatcher] Rate limited ${event.data.chatId}`);
       return;
+    }
+
+    // B2: Group chat mention detection — only process group messages if bot is @mentioned
+    const chatType = event.data?.chatType || 'private';
+    if (chatType === 'group' || chatType === 'supergroup') {
+      const text = (event.data.text || '').toLowerCase();
+      const botName = this._botUsername;
+      if (botName && !text.includes(`@${botName}`)) {
+        // Not mentioned in group — skip silently
+        return;
+      }
     }
 
     // Session gap detection — clear stale Tier 1 history on long idle gaps.
@@ -225,396 +237,411 @@ class Dispatcher {
       }
     }
 
-    // Send typing indicator before rendering (cosmetic, fire-and-forget)
+    // B3: Repeating typing indicator — Telegram's expires after ~5s, so refresh every 4s
     const typingSink = this.sinks[event.source];
+    let typingInterval = null;
     if (typingSink?.sendTyping) {
-      typingSink
-        .sendTyping(event.data.chatId)
-        .catch(e => process.stderr.write(`[WARN] sendTyping: ${e.message}\n`));
+      const sendTypingAction = () =>
+        typingSink
+          .sendTyping(event.data.chatId)
+          .catch(e => process.stderr.write(`[WARN] sendTyping: ${e.message}\n`));
+      sendTypingAction(); // Send immediately
+      typingInterval = setInterval(sendTypingAction, 4000);
     }
 
-    // Route: find matching routes
-    const routes = this.router.resolve(event);
+    try {
+      // Route: find matching routes
+      const routes = this.router.resolve(event);
 
-    for (const route of routes) {
-      // Render: get response from Claude (or other handler)
-      let response;
-      if (route.handler === 'claude') {
-        if (event.type.startsWith('timer.')) {
-          // Proactive/scheduled event — use proactive renderer
-          this.log(`[dispatcher] Proactive render for ${event.type}...`);
-          try {
-            response = this.renderer.renderProactive(event);
-          } catch (err) {
-            this.log(`[dispatcher] Proactive render error: ${err.message}`);
+      for (const route of routes) {
+        // Render: get response from Claude (or other handler)
+        let response;
+        if (route.handler === 'claude') {
+          if (event.type.startsWith('timer.')) {
+            // Proactive/scheduled event — use proactive renderer
+            this.log(`[dispatcher] Proactive render for ${event.type}...`);
+            try {
+              response = this.renderer.renderProactive(event);
+            } catch (err) {
+              this.log(`[dispatcher] Proactive render error: ${err.message}`);
+              continue;
+            }
+            if (!response) continue; // skip on error
+          } else {
+            this.log(
+              `[dispatcher] Rendering response for ${event.type} from ${event.data.user}...`
+            );
+            // Apply per-user personality override
+            const userPersonality = this._personalities?.get(event.data.chatId);
+            this.renderer.personalityOverride = userPersonality || null;
+            response = this.renderer.render(event);
+          }
+          this.log(`[dispatcher] Response: ${response.slice(0, 80)}...`);
+        } else if (route.handler === 'echo') {
+          response = `Echo: ${event.data.text}`;
+        } else if (route.handler === 'ignore') {
+          continue;
+        } else {
+          response = `Unknown handler: ${route.handler}`;
+        }
+
+        // Sink: deliver the response
+        const sink = this.sinks[route.sink || event.source];
+        if (!sink) {
+          this.log(`[dispatcher] No sink for "${route.sink || event.source}"`);
+          continue;
+        }
+
+        // Check if Claude wants to clarify before executing
+        // Check if Claude wants a multi-round interview
+        if (response.startsWith('[INTERVIEW]')) {
+          const lines = response
+            .slice(11)
+            .trim()
+            .split('\n')
+            .filter(l => l.trim());
+          const questions = lines.map(l => l.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
+          if (questions.length > 0) {
+            this.pendingInterviews.set(event.data.chatId, {
+              originalText: event.data.text,
+              questions,
+              answers: [],
+              currentRound: 0,
+              timestamp: Date.now(),
+            });
+            this.log(
+              `[dispatcher] Interview started for ${event.data.chatId}: ${questions.length} questions`
+            );
+            const remaining = questions.length - 1;
+            try {
+              await sink.send(
+                event.data.chatId,
+                `🎓 Before I proceed, let me ask a few questions:\n\n❓ ${questions[0]}\n\n(${remaining} more questions after this, or say "just do it" to skip)`,
+                { replyTo: event.data.messageId }
+              );
+            } catch {
+              /* ignored */
+            }
             continue;
           }
-          if (!response) continue; // skip on error
-        } else {
-          this.log(`[dispatcher] Rendering response for ${event.type} from ${event.data.user}...`);
-          // Apply per-user personality override
-          const userPersonality = this._personalities?.get(event.data.chatId);
-          this.renderer.personalityOverride = userPersonality || null;
-          response = this.renderer.render(event);
         }
-        this.log(`[dispatcher] Response: ${response.slice(0, 80)}...`);
-      } else if (route.handler === 'echo') {
-        response = `Echo: ${event.data.text}`;
-      } else if (route.handler === 'ignore') {
-        continue;
-      } else {
-        response = `Unknown handler: ${route.handler}`;
-      }
 
-      // Sink: deliver the response
-      const sink = this.sinks[route.sink || event.source];
-      if (!sink) {
-        this.log(`[dispatcher] No sink for "${route.sink || event.source}"`);
-        continue;
-      }
-
-      // Check if Claude wants to clarify before executing
-      // Check if Claude wants a multi-round interview
-      if (response.startsWith('[INTERVIEW]')) {
-        const lines = response
-          .slice(11)
-          .trim()
-          .split('\n')
-          .filter(l => l.trim());
-        const questions = lines.map(l => l.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
-        if (questions.length > 0) {
-          this.pendingInterviews.set(event.data.chatId, {
+        if (response.startsWith('[CLARIFY]')) {
+          const question = response.slice(9).trim();
+          this.pendingClarifications.set(event.data.chatId, {
             originalText: event.data.text,
-            questions,
-            answers: [],
-            currentRound: 0,
+            question,
             timestamp: Date.now(),
           });
           this.log(
-            `[dispatcher] Interview started for ${event.data.chatId}: ${questions.length} questions`
+            `[dispatcher] Clarification requested for ${event.data.chatId}: ${question.slice(0, 60)}`
           );
-          const remaining = questions.length - 1;
+          try {
+            await sink.send(event.data.chatId, `❓ ${question}`, {
+              replyTo: event.data.messageId,
+            });
+          } catch {
+            /* ignored */
+          }
+          // Record in history but skip further processing
+          this.history.push({
+            timestamp: event.timestamp,
+            user: event.data.user,
+            message: event.data.text,
+            response: `[CLARIFY] ${question}`,
+            sink: route.sink || event.source,
+          });
+          if (this.history.length > this.maxHistory) this.history.shift();
+          continue; // Don't execute — wait for user's answer
+        }
+
+        // Check if Claude wants to hand off to a human (business mode)
+        if (response.startsWith('[HANDOFF]')) {
+          const summary = response.slice(9).trim();
+          this.log(`[dispatcher] Handoff requested: ${summary.slice(0, 80)}`);
           try {
             await sink.send(
               event.data.chatId,
-              `🎓 Before I proceed, let me ask a few questions:\n\n❓ ${questions[0]}\n\n(${remaining} more questions after this, or say "just do it" to skip)`,
+              `🤝 I'm connecting you with our support team. A human will follow up shortly.\n\nI've shared this summary with them: "${summary.slice(0, 200)}"`,
               { replyTo: event.data.messageId }
             );
           } catch {
             /* ignored */
           }
+          // Log handoff for audit
+          this.history.push({
+            timestamp: event.timestamp,
+            user: event.data.user,
+            message: event.data.text,
+            response: `[HANDOFF] ${summary}`,
+            sink: route.sink || event.source,
+          });
+          if (this.history.length > this.maxHistory) this.history.shift();
           continue;
         }
-      }
 
-      if (response.startsWith('[CLARIFY]')) {
-        const question = response.slice(9).trim();
-        this.pendingClarifications.set(event.data.chatId, {
-          originalText: event.data.text,
-          question,
-          timestamp: Date.now(),
-        });
-        this.log(
-          `[dispatcher] Clarification requested for ${event.data.chatId}: ${question.slice(0, 60)}`
-        );
-        try {
-          await sink.send(event.data.chatId, `❓ ${question}`, {
-            replyTo: event.data.messageId,
+        // ================================================================
+        // ASYNC TASK DISPATCH — spawn into pool, don't block the queue
+        // ================================================================
+
+        // Check if Claude wants a Ralph loop (iterative verify/fix)
+        if (response.startsWith('[RALPH]')) {
+          const taskDesc = response.slice(7).trim();
+          const taskId = `ralph-${++this.taskCounter}`;
+          this.stats.tasksExecuted++;
+
+          try {
+            await sink.send(
+              event.data.chatId,
+              `🔄 Starting Ralph loop: ${taskDesc.slice(0, 100)}...`,
+              { replyTo: event.data.messageId }
+            );
+          } catch {
+            /* ignored */
+          }
+
+          this.log(`[dispatcher] Ralph loop ${taskId}: ${taskDesc.slice(0, 80)}`);
+
+          // Spawn into task pool — non-blocking
+          const sinkRef = sink;
+          const chatId = event.data.chatId;
+          this.taskPool.spawn(
+            taskId,
+            () => {
+              const handle = this.executor.executeRalphLoopAsync(taskDesc, {
+                maxIterations: 5,
+                onProgress: async msg => {
+                  try {
+                    await sinkRef.send(chatId, msg);
+                  } catch {
+                    /* ignored */
+                  }
+                },
+              });
+              return { promise: handle.promise, cancel: handle.cancel };
+            },
+            {
+              description: `[RALPH] ${taskDesc}`,
+              chatId: event.data.chatId,
+              user: event.data.user,
+              timeout: 600000, // 10 min for ralph
+            }
+          );
+
+          // Record in history and continue immediately
+          this.history.push({
+            timestamp: event.timestamp,
+            user: event.data.user,
+            message: event.data.text,
+            response: `[RALPH] ${taskDesc.slice(0, 200)}`,
+            sink: route.sink || event.source,
           });
-        } catch {
-          /* ignored */
+          if (this.history.length > this.maxHistory) this.history.shift();
+          continue; // Don't block — task runs in background
         }
-        // Record in history but skip further processing
-        this.history.push({
-          timestamp: event.timestamp,
-          user: event.data.user,
-          message: event.data.text,
-          response: `[CLARIFY] ${question}`,
-          sink: route.sink || event.source,
-        });
-        if (this.history.length > this.maxHistory) this.history.shift();
-        continue; // Don't execute — wait for user's answer
-      }
 
-      // Check if Claude wants to hand off to a human (business mode)
-      if (response.startsWith('[HANDOFF]')) {
-        const summary = response.slice(9).trim();
-        this.log(`[dispatcher] Handoff requested: ${summary.slice(0, 80)}`);
-        try {
-          await sink.send(
-            event.data.chatId,
-            `🤝 I'm connecting you with our support team. A human will follow up shortly.\n\nI've shared this summary with them: "${summary.slice(0, 200)}"`,
-            { replyTo: event.data.messageId }
+        // Check if Claude wants ultrawork (parallel execution)
+        if (response.startsWith('[ULTRAWORK]')) {
+          const taskDesc = response.slice(11).trim();
+          const taskId = `ultra-${++this.taskCounter}`;
+          this.stats.tasksExecuted++;
+
+          try {
+            await sink.send(
+              event.data.chatId,
+              `⚡ Starting ultrawork: ${taskDesc.slice(0, 100)}...`,
+              { replyTo: event.data.messageId }
+            );
+          } catch {
+            /* ignored */
+          }
+
+          this.log(`[dispatcher] Ultrawork ${taskId}: ${taskDesc.slice(0, 80)}`);
+
+          this.taskPool.spawn(
+            taskId,
+            () =>
+              this.executor.executeParallelAsync(taskDesc, {
+                maxParallel: 3,
+                onProgress: async msg => {
+                  try {
+                    await sink.send(event.data.chatId, msg);
+                  } catch {
+                    /* ignored */
+                  }
+                },
+              }),
+            {
+              description: `[ULTRA] ${taskDesc}`,
+              chatId: event.data.chatId,
+              user: event.data.user,
+              timeout: 600000,
+            }
           );
-        } catch {
-          /* ignored */
-        }
-        // Log handoff for audit
-        this.history.push({
-          timestamp: event.timestamp,
-          user: event.data.user,
-          message: event.data.text,
-          response: `[HANDOFF] ${summary}`,
-          sink: route.sink || event.source,
-        });
-        if (this.history.length > this.maxHistory) this.history.shift();
-        continue;
-      }
 
-      // ================================================================
-      // ASYNC TASK DISPATCH — spawn into pool, don't block the queue
-      // ================================================================
-
-      // Check if Claude wants a Ralph loop (iterative verify/fix)
-      if (response.startsWith('[RALPH]')) {
-        const taskDesc = response.slice(7).trim();
-        const taskId = `ralph-${++this.taskCounter}`;
-        this.stats.tasksExecuted++;
-
-        try {
-          await sink.send(
-            event.data.chatId,
-            `🔄 Starting Ralph loop: ${taskDesc.slice(0, 100)}...`,
-            { replyTo: event.data.messageId }
-          );
-        } catch {
-          /* ignored */
+          this.history.push({
+            timestamp: event.timestamp,
+            user: event.data.user,
+            message: event.data.text,
+            response: `[ULTRAWORK] ${taskDesc.slice(0, 200)}`,
+            sink: route.sink || event.source,
+          });
+          if (this.history.length > this.maxHistory) this.history.shift();
+          continue;
         }
 
-        this.log(`[dispatcher] Ralph loop ${taskId}: ${taskDesc.slice(0, 80)}`);
+        // Check if Claude wants to execute a single task
+        if (response.startsWith('[TASK]')) {
+          const taskDesc = response.slice(6).trim();
+          const taskId = `task-${++this.taskCounter}`;
+          this.stats.tasksExecuted++;
 
-        // Spawn into task pool — non-blocking
-        const sinkRef = sink;
-        const chatId = event.data.chatId;
-        this.taskPool.spawn(
-          taskId,
-          () => {
-            const handle = this.executor.executeRalphLoopAsync(taskDesc, {
-              maxIterations: 5,
-              onProgress: async msg => {
-                try {
-                  await sinkRef.send(chatId, msg);
-                } catch {
-                  /* ignored */
-                }
-              },
+          // Classify: is this a coding task or a general task?
+          const classification = this.missionExecutor.classify(taskDesc);
+          const isMission = classification.isCoding;
+          const modeLabel = isMission
+            ? `🔧 Mission task (${classification.agentType})`
+            : '⚙️ Running task';
+
+          // Notify user that task is starting — immediate feedback
+          try {
+            await sink.send(event.data.chatId, `${modeLabel}: ${taskDesc.slice(0, 100)}...`, {
+              replyTo: event.data.messageId,
             });
-            return { promise: handle.promise, cancel: handle.cancel };
-          },
-          {
-            description: `[RALPH] ${taskDesc}`,
-            chatId: event.data.chatId,
-            user: event.data.user,
-            timeout: 600000, // 10 min for ralph
+          } catch {
+            /* ignored */
           }
-        );
 
-        // Record in history and continue immediately
-        this.history.push({
-          timestamp: event.timestamp,
-          user: event.data.user,
-          message: event.data.text,
-          response: `[RALPH] ${taskDesc.slice(0, 200)}`,
-          sink: route.sink || event.source,
-        });
-        if (this.history.length > this.maxHistory) this.history.shift();
-        continue; // Don't block — task runs in background
-      }
-
-      // Check if Claude wants ultrawork (parallel execution)
-      if (response.startsWith('[ULTRAWORK]')) {
-        const taskDesc = response.slice(11).trim();
-        const taskId = `ultra-${++this.taskCounter}`;
-        this.stats.tasksExecuted++;
-
-        try {
-          await sink.send(
-            event.data.chatId,
-            `⚡ Starting ultrawork: ${taskDesc.slice(0, 100)}...`,
-            { replyTo: event.data.messageId }
+          this.log(
+            `[dispatcher] Executing ${isMission ? 'mission' : 'plain'} task ${taskId}: ${taskDesc.slice(0, 80)}`
           );
-        } catch {
-          /* ignored */
-        }
 
-        this.log(`[dispatcher] Ultrawork ${taskId}: ${taskDesc.slice(0, 80)}`);
+          // Spawn into task pool — non-blocking
+          const cancelRef = { cancel: null };
+          const sinkRef = sink;
+          const chatId = event.data.chatId;
+          const intervalMs = this._progressIntervalMs;
+          const intervalSec = Math.round(intervalMs / 1000);
+          const missionExec = this.missionExecutor;
 
-        this.taskPool.spawn(
-          taskId,
-          () =>
-            this.executor.executeParallelAsync(taskDesc, {
-              maxParallel: 3,
-              onProgress: async msg => {
+          this.taskPool.spawn(
+            taskId,
+            () => {
+              // Route to mission executor for coding, standard executor otherwise
+              const handle = isMission
+                ? missionExec.executeAsync(taskDesc)
+                : this.executor.executeTaskAsync(taskDesc);
+              cancelRef.cancel = handle.cancel;
+
+              // Start heartbeat now that the task is actually running
+              let progressCount = 0;
+              const progressTimer = setInterval(async () => {
+                progressCount++;
+                const elapsed = progressCount * intervalSec;
                 try {
-                  await sink.send(event.data.chatId, msg);
+                  await sinkRef.send(chatId, `⏳ Still working... (${elapsed}s)`);
                 } catch {
                   /* ignored */
                 }
-              },
-            }),
-          {
-            description: `[ULTRA] ${taskDesc}`,
-            chatId: event.data.chatId,
+              }, intervalMs);
+
+              // For mission tasks, format the result before delivery
+              const resultPromise = handle.promise.then(result => {
+                if (isMission && result && typeof result === 'object' && result.grade) {
+                  return missionExec.formatResult(result);
+                }
+                return result;
+              });
+
+              return resultPromise.finally(() => clearInterval(progressTimer));
+            },
+            {
+              description: taskDesc,
+              chatId: event.data.chatId,
+              user: event.data.user,
+              timeout: 300000, // 5 min
+              cancel: () => cancelRef.cancel && cancelRef.cancel(),
+              _sink: sink,
+              _messageId: event.data.messageId,
+            }
+          );
+
+          // Record in history and continue immediately — result delivered by pool event handler
+          this.history.push({
+            timestamp: event.timestamp,
             user: event.data.user,
-            timeout: 600000,
-          }
-        );
-
-        this.history.push({
-          timestamp: event.timestamp,
-          user: event.data.user,
-          message: event.data.text,
-          response: `[ULTRAWORK] ${taskDesc.slice(0, 200)}`,
-          sink: route.sink || event.source,
-        });
-        if (this.history.length > this.maxHistory) this.history.shift();
-        continue;
-      }
-
-      // Check if Claude wants to execute a single task
-      if (response.startsWith('[TASK]')) {
-        const taskDesc = response.slice(6).trim();
-        const taskId = `task-${++this.taskCounter}`;
-        this.stats.tasksExecuted++;
-
-        // Classify: is this a coding task or a general task?
-        const classification = this.missionExecutor.classify(taskDesc);
-        const isMission = classification.isCoding;
-        const modeLabel = isMission
-          ? `🔧 Mission task (${classification.agentType})`
-          : '⚙️ Running task';
-
-        // Notify user that task is starting — immediate feedback
-        try {
-          await sink.send(event.data.chatId, `${modeLabel}: ${taskDesc.slice(0, 100)}...`, {
-            replyTo: event.data.messageId,
+            message: event.data.text,
+            response: `[TASK] ${taskDesc.slice(0, 200)}`,
+            sink: route.sink || event.source,
           });
-        } catch {
-          /* ignored */
+          if (this.history.length > this.maxHistory) this.history.shift();
+          continue; // Don't block — task runs in background
         }
 
-        this.log(
-          `[dispatcher] Executing ${isMission ? 'mission' : 'plain'} task ${taskId}: ${taskDesc.slice(0, 80)}`
-        );
-
-        // Spawn into task pool — non-blocking
-        const cancelRef = { cancel: null };
-        const sinkRef = sink;
-        const chatId = event.data.chatId;
-        const intervalMs = this._progressIntervalMs;
-        const intervalSec = Math.round(intervalMs / 1000);
-        const missionExec = this.missionExecutor;
-
-        this.taskPool.spawn(
-          taskId,
-          () => {
-            // Route to mission executor for coding, standard executor otherwise
-            const handle = isMission
-              ? missionExec.executeAsync(taskDesc)
-              : this.executor.executeTaskAsync(taskDesc);
-            cancelRef.cancel = handle.cancel;
-
-            // Start heartbeat now that the task is actually running
-            let progressCount = 0;
-            const progressTimer = setInterval(async () => {
-              progressCount++;
-              const elapsed = progressCount * intervalSec;
+        try {
+          await sink.send(event.data.chatId, response, {
+            replyTo: event.data.messageId,
+          });
+          // Record task/ralph/ultrawork results in chat memory.
+          // The renderer already recorded the [TAG] response — only add if response
+          // was overridden by a task result (starts with common task output patterns).
+          if (this.memory && event.data.chatId && !response.startsWith('[')) {
+            // Check if this is a task result that replaced the original [TAG] response
+            const chatHistory = this.memory.chats.get(event.data.chatId) || [];
+            const lastMsg = chatHistory[chatHistory.length - 1];
+            if (
+              lastMsg &&
+              lastMsg.role === 'assistant' &&
+              /^\[(?:TASK|RALPH|ULTRAWORK)]/.test(lastMsg.text)
+            ) {
+              lastMsg.text = response.slice(0, 2000);
+              this.memory._saveHistory();
+            }
+          }
+          this.log(`[dispatcher] Delivered to ${route.sink || event.source}`);
+          this.history.push({
+            timestamp: event.timestamp,
+            user: event.data.user,
+            message: event.data.text,
+            response: response.slice(0, 500),
+            sink: route.sink || event.source,
+          });
+          if (this.history.length > this.maxHistory) this.history.shift();
+          // Daily activity log (append-only, feeds dream consolidation)
+          if (this.memory?.appendDailyLog) {
+            this.memory.appendDailyLog(
+              event.data.chatId,
+              event.data.user,
+              event.data.text,
+              response
+            );
+          }
+          // Prompt suggestions (async, non-blocking — failure doesn't affect response)
+          if (
+            this.renderer.generateSuggestions &&
+            !response.startsWith('[') &&
+            event.data.text.length > 10
+          ) {
+            setImmediate(async () => {
               try {
-                await sinkRef.send(chatId, `⏳ Still working... (${elapsed}s)`);
+                const suggestions = this.renderer.generateSuggestions(event.data.text, response);
+                if (suggestions.length > 0) {
+                  await sink.send(
+                    event.data.chatId,
+                    '💡 ' + suggestions.map(s => `• ${s}`).join('\n')
+                  );
+                }
               } catch {
                 /* ignored */
               }
-            }, intervalMs);
-
-            // For mission tasks, format the result before delivery
-            const resultPromise = handle.promise.then(result => {
-              if (isMission && result && typeof result === 'object' && result.grade) {
-                return missionExec.formatResult(result);
-              }
-              return result;
             });
-
-            return resultPromise.finally(() => clearInterval(progressTimer));
-          },
-          {
-            description: taskDesc,
-            chatId: event.data.chatId,
-            user: event.data.user,
-            timeout: 300000, // 5 min
-            cancel: () => cancelRef.cancel && cancelRef.cancel(),
-            _sink: sink,
-            _messageId: event.data.messageId,
           }
-        );
-
-        // Record in history and continue immediately — result delivered by pool event handler
-        this.history.push({
-          timestamp: event.timestamp,
-          user: event.data.user,
-          message: event.data.text,
-          response: `[TASK] ${taskDesc.slice(0, 200)}`,
-          sink: route.sink || event.source,
-        });
-        if (this.history.length > this.maxHistory) this.history.shift();
-        continue; // Don't block — task runs in background
+        } catch (err) {
+          this.log(`[dispatcher] Sink error: ${err.message}`);
+        }
       }
-
-      try {
-        await sink.send(event.data.chatId, response, {
-          replyTo: event.data.messageId,
-        });
-        // Record task/ralph/ultrawork results in chat memory.
-        // The renderer already recorded the [TAG] response — only add if response
-        // was overridden by a task result (starts with common task output patterns).
-        if (this.memory && event.data.chatId && !response.startsWith('[')) {
-          // Check if this is a task result that replaced the original [TAG] response
-          const chatHistory = this.memory.chats.get(event.data.chatId) || [];
-          const lastMsg = chatHistory[chatHistory.length - 1];
-          if (
-            lastMsg &&
-            lastMsg.role === 'assistant' &&
-            /^\[(?:TASK|RALPH|ULTRAWORK)]/.test(lastMsg.text)
-          ) {
-            lastMsg.text = response.slice(0, 2000);
-            this.memory._saveHistory();
-          }
-        }
-        this.log(`[dispatcher] Delivered to ${route.sink || event.source}`);
-        this.history.push({
-          timestamp: event.timestamp,
-          user: event.data.user,
-          message: event.data.text,
-          response: response.slice(0, 500),
-          sink: route.sink || event.source,
-        });
-        if (this.history.length > this.maxHistory) this.history.shift();
-        // Daily activity log (append-only, feeds dream consolidation)
-        if (this.memory?.appendDailyLog) {
-          this.memory.appendDailyLog(event.data.chatId, event.data.user, event.data.text, response);
-        }
-        // Prompt suggestions (async, non-blocking — failure doesn't affect response)
-        if (
-          this.renderer.generateSuggestions &&
-          !response.startsWith('[') &&
-          event.data.text.length > 10
-        ) {
-          setImmediate(async () => {
-            try {
-              const suggestions = this.renderer.generateSuggestions(event.data.text, response);
-              if (suggestions.length > 0) {
-                await sink.send(
-                  event.data.chatId,
-                  '💡 ' + suggestions.map(s => `• ${s}`).join('\n')
-                );
-              }
-            } catch {
-              /* ignored */
-            }
-          });
-        }
-      } catch (err) {
-        this.log(`[dispatcher] Sink error: ${err.message}`);
-      }
+    } finally {
+      if (typingInterval) clearInterval(typingInterval);
     }
   }
 
