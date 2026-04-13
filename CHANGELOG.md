@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Wave 6 P0.3: FIXED/EDITABLE section markers in templates** — Added `<!-- FIXED -->` and `<!-- EDITABLE -->` section markers to `agent-template.md` and `skill-template.md`. Marks which sections agent-updater and skill-updater must preserve (FIXED) vs sections they may freely modify (EDITABLE), preventing accidental overwrites of structural boilerplate during automated update cycles.
 - **Wave 7 Item 1: instinct-learning frequency counter** — Add frequency counter to instinct-learning skill; auto-triggers evolution request when same instinct reinforced >= 3 times. New `frequency` field in instinct records (backward compatible: existing records without it treated as frequency=1). On update, when frequency reaches threshold, appends structured evolution request to `runtime/evolution-requests.jsonl`. Updated input/output schemas to include frequency and evolutionTriggered fields.
 - **Wave 7 Item 2: outcome-reflection trajectory signal emission** — `reflect()` in `.claude/skills/outcome-reflection/scripts/main.cjs` now calls `appendCalibrationEntry` after every run (persisting a structured calibration record to `learnings.md`), then calls `detectRepeatFailures` to scan history, and when >= 3 repeat failures are found for an agent type calls `emitTrajectorySignal` which appends a `trajectory-signal` entry to `integration-queue.jsonl`. All three functions are exported from `module.exports`. Result object now includes `trajectorySignal` field.
 - **P0.1: Trajectory logging hook** — PostToolUse async fail-open hook at `.claude/hooks/monitoring/trajectory-logger.cjs` that logs every tool call as structured JSONL to `.claude/context/logs/trajectory-YYYY-MM-DD.jsonl`. Registered in `settings.json` under PostToolUse matching TaskUpdate. Includes 17 tests covering sanitize, buildRecord, ensureDir, getLogPath, appendRecord, and schema compliance.
@@ -44,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Restore trajectory-logger.cjs entries in `HOOKS_REFERENCE.md` and `@HOOK_AGENT_MAP.md` to pass the `validate:hooks:docs` gate (entries were missing after the hook was registered in `settings.json` without corresponding reference doc updates)
 - Exclude `spawn-prompt-assembler` component from the p95 runtime CI gate; its prompt-assembly workload (p95 ~2707ms) is not a runtime hot-path, bringing the effective p95 to 95ms and clearing the 800ms threshold violation
 
 - **`package.json` `metrics:memory-cache:ci` script** — Removed `--require-data true` flag so the CI gate does not fail when no memory-cache stability samples exist in the 24-hour window (no data = no SLO violation). This resolves the H-03 audit item where a cold/idle environment caused `metrics:ci` to exit non-zero due to an absence-of-data parse failure, not an actual SLO breach. The underlying parse-failure-rate counter (tracked in `metrics:memory:slo:ci`) is unaffected; only the hard-require guard on the cache-stability sub-check is relaxed.
