@@ -86,7 +86,7 @@ test('checkRouterEnforcement uses hierarchical routing when enabled and flat rou
     assert.notStrictEqual(result.candidates[0].agent.name, 'domain-router-web-frontend');
   });
 
-  await t.test('defaults to flat routing when HIERARCHICAL_ROUTING is unset', async () => {
+  await t.test('defaults to hierarchical routing when HIERARCHICAL_ROUTING is unset', async () => {
     delete process.env.HIERARCHICAL_ROUTING;
 
     const { checkRouterEnforcement } = loadHook();
@@ -94,7 +94,8 @@ test('checkRouterEnforcement uses hierarchical routing when enabled and flat rou
       prompt: 'Build a React component with responsive Tailwind styles.',
     });
 
-    assert.notStrictEqual(result.routingType, 'hierarchical');
-    assert.notStrictEqual(result.candidates[0].agent.name, 'domain-router-web-frontend');
+    // Default is now hierarchical (HIERARCHICAL_ROUTING=on in CLAUDE.md)
+    assert.strictEqual(result.routingType, 'hierarchical');
+    assert.strictEqual(result.candidates[0].agent.name, 'domain-router-web-frontend');
   });
 });

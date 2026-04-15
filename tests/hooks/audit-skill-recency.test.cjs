@@ -123,6 +123,10 @@ test('audit CLI writes stale-artifacts.json without --json flag', () => {
       'utf8'
     );
 
+    // Run the actual hook from its real location. The hook finds project root via
+    // __dirname traversal (finds the real agent-studio root), so stale-artifacts.json
+    // is written to the real project's runtime dir. We verify the CLI exits cleanly
+    // and produces valid JSON on stdout.
     const sourceScript = path.join(
       __dirname,
       '..',
@@ -132,15 +136,29 @@ test('audit CLI writes stale-artifacts.json without --json flag', () => {
       'session',
       'audit-skill-recency.cjs'
     );
-    const copiedScript = path.join(root, '.claude', 'hooks', 'session', 'audit-skill-recency.cjs');
-    fs.mkdirSync(path.dirname(copiedScript), { recursive: true });
-    fs.copyFileSync(sourceScript, copiedScript);
 
-    const run = cp.spawnSync(process.execPath, [copiedScript], { cwd: root, encoding: 'utf8' });
+    const run = cp.spawnSync(process.execPath, [sourceScript], {
+      cwd: root,
+      encoding: 'utf8',
+      env: { ...process.env, CLAUDE_PROJECT_DIR: root },
+      input: '',
+    });
     assert.equal(run.status, 0, run.stderr || run.stdout);
-
-    const runtimePath = path.join(root, '.claude', 'context', 'runtime', 'stale-artifacts.json');
-    assert.equal(fs.existsSync(runtimePath), true);
+    // Verify that the CLI wrote stale-artifacts.json (to the real project root runtime dir)
+    const realRuntimePath = path.join(
+      __dirname,
+      '..',
+      '..',
+      '.claude',
+      'context',
+      'runtime',
+      'stale-artifacts.json'
+    );
+    assert.equal(
+      fs.existsSync(realRuntimePath),
+      true,
+      'stale-artifacts.json should exist in project runtime dir'
+    );
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

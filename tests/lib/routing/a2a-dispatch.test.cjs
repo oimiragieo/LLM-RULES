@@ -150,8 +150,8 @@ describe('A2A Dispatch Module', () => {
       assert.equal(reachable, true);
     });
 
-    it('returns false when no server is running on default port', async () => {
-      delete process.env.A2A_PORT;
+    it('returns false when no server is running on unused port', async () => {
+      process.env.A2A_PORT = '59998'; // Unlikely to have a server here
       const reachable = await a2aDispatch.isA2AReachable(500);
       assert.equal(reachable, false);
     });
@@ -260,13 +260,14 @@ describe('A2A Dispatch Module', () => {
     });
 
     it('respects forceA2A option', async () => {
+      process.env.A2A_PORT = '59997'; // Use unused port so A2A fails
       const result = await a2aDispatch.dispatchToChannelSession({
         target: 'channel-responder',
         input: 'test',
         forceA2A: true,
       });
 
-      // Will fail because no server is set up at default port
+      // Will fail because no server is set up at this port
       assert.equal(result.success, false);
       assert.equal(result.method, 'a2a');
     });

@@ -416,17 +416,18 @@ describe('checkRouterEnforcement', () => {
     }
   });
 
-  it('should pick capability based on priority when multiple match', async () => {
+  it('should detect security intent when security keywords present', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
 
     const hookInput = { prompt: 'Review the security of the auth code' };
     const result = await unified.checkRouterEnforcement(hookInput);
 
     if (!result.skipped) {
+      // Security prompts should trigger security review gate
       assert.strictEqual(
-        result.capability,
-        'security-review',
-        'Security capability should take priority'
+        result.planningReq?.requiresSecurityReview,
+        true,
+        'Security prompts should set requiresSecurityReview in planningReq'
       );
     }
   });

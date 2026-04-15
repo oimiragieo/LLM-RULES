@@ -50,11 +50,11 @@ describe('hierarchical routing table', () => {
 });
 
 describe('hierarchical routing feature flag mode', () => {
-  it('defaults HIERARCHICAL_ROUTING to off when unset', () => {
+  it('defaults HIERARCHICAL_ROUTING to on when unset', () => {
     const previous = process.env.HIERARCHICAL_ROUTING;
     delete process.env.HIERARCHICAL_ROUTING;
 
-    assert.strictEqual(getHierarchicalRoutingMode(), 'off');
+    assert.strictEqual(getHierarchicalRoutingMode(), 'on');
 
     if (previous === undefined) {
       delete process.env.HIERARCHICAL_ROUTING;

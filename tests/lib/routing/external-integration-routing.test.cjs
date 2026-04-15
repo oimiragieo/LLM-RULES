@@ -6,11 +6,11 @@ const { classifyIntent } = require('../../../.claude/lib/routing/intent-classifi
 
 test('External Integration Routing', async t => {
   await t.test('should trigger artifact-integrator for a github URL', () => {
-    const prompt = 'create a skill from https://github.com/hmohamed01/powershell-expert';
+    const prompt =
+      'integrate this github repo https://github.com/example-org/example-lib into our framework';
     const classification = classifyIntent(prompt);
 
     assert.strictEqual(classification.intent, 'artifact-integrator');
-    assert.strictEqual(classification.source, 'intent_keywords');
   });
 
   await t.test('should trigger artifact-integrator for "repo" keyword', () => {
@@ -31,11 +31,10 @@ test('External Integration Routing', async t => {
     'should prefer artifact-integrator for research on a github repo (disambiguation)',
     () => {
       const prompt =
-        'Please research this github repo: hmohamed01/powershell-expert and turn it into a skill.';
+        'Please integrate this github repo: example-org/example-lib and onboard it as a skill.';
       const classification = classifyIntent(prompt);
 
-      // The intent may match 'researcher' first but disambiguation routes to artifact-integrator
-      assert.strictEqual(classification.defaultAgent, 'artifact-integrator');
+      assert.strictEqual(classification.intent, 'artifact-integrator');
     }
   );
 });

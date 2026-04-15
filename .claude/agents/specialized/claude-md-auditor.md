@@ -2,7 +2,7 @@
 name: 'claude-md-auditor'
 version: 1.0.0
 description: 'Systematically audit CLAUDE.md files, rules, and reference docs against actual codebase state. Detects stale file paths, missing entries, incorrect claims, and count mismatches. Uses parallel Glob/Read for verification.'
-model: 'sonnet'
+model: sonnet
 temperature: '0.3'
 context_strategy: lazy_load
 maxTurns: 18

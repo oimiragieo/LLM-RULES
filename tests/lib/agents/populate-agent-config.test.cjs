@@ -85,10 +85,14 @@ test('each agent model should match config.yaml or frontmatter precedence', () =
     const resolved = resolveAgentModel(agentId, PROJECT_ROOT);
 
     // This test verifies model precedence is correctly applied
+    // Compare using shorthand since agent-config.json stores shorthand names
+    const { getShorthand } = require('../../../.claude/lib/utils/agent-config-reader.cjs');
+    const configShorthand = getShorthand(agentData.model) || agentData.model;
+    const resolvedShorthand = resolved.shorthand || getShorthand(resolved.model) || resolved.model;
     assert.strictEqual(
-      agentData.model,
-      resolved.model,
-      `Agent "${agentId}" has model "${agentData.model}" but should be "${resolved.model}" (source: ${resolved.source})`
+      configShorthand,
+      resolvedShorthand,
+      `Agent "${agentId}" has model "${agentData.model}" (shorthand: ${configShorthand}) but should be "${resolved.model}" (shorthand: ${resolvedShorthand}, source: ${resolved.source})`
     );
   }
 });
