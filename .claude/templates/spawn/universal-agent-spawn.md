@@ -270,3 +270,16 @@ const names = await manager.listMemories(); // ['auth-design-decisions', ...]
 - Orchestrator template: `.claude/templates/spawn/orchestrator-spawn.md`
 - Router policy: `.claude/CLAUDE.md`
 - Named memory API: `.claude/lib/memory/memory-manager.cjs`
+
+
+### Environment: CLAUDE_AGENT_ID (MANDATORY)
+
+Every spawn prompt MUST instruct the sub-agent that it runs with `CLAUDE_AGENT_ID=<subagent_type>` set in the environment. This variable is the primary signal used by PreToolUse hooks (e.g. `routing-guard-core.impl.cjs`) to detect sub-agent context and bypass router-only restrictions. Without it, hooks cannot distinguish sub-agents from the router and will deny Edit/Write calls.
+
+Set this in every `Task()` invocation:
+
+```json
+{ "env": { "CLAUDE_AGENT_ID": "<subagent_type>" } }
+```
+
+Example: `CLAUDE_AGENT_ID=developer`, `CLAUDE_AGENT_ID=qa`, `CLAUDE_AGENT_ID=technical-writer`.
