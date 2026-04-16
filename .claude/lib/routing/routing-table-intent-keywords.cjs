@@ -106,4 +106,16 @@ module.exports = {
     'detecting',
     'patterns',
   ],
+  'hooks-explainer': [
+    'hooks-explainer',
+    'hooks',
+    'explainer',
+    'hook',
+    'enforcement',
+    'bypass',
+    'mechanisms',
+    'routing-guard',
+    'creator-guard',
+    'write-pretool-bundle',
+  ],
 };

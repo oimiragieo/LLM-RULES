@@ -190,6 +190,7 @@ const INTENT_TO_AGENT = {
   'stale-references': 'claude-md-auditor',
   'verify-docs': 'claude-md-auditor',
   'release-guardian': 'qa',
+  'hooks-explainer': 'developer',
 };
 
 module.exports = { INTENT_TO_AGENT };
