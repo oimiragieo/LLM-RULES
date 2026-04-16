@@ -837,7 +837,15 @@ async function main() {
 }
 
 if (require.main === module) {
-  main();
+  // SE-03: advisory hook must fail-open. Attach .catch() so an unexpected
+  // rejection from main() does not become an unhandled-rejection that Node.js
+  // terminates with exit code 1 (which Claude Code treats as a hard error,
+  // silently blocking the tool with no stderr output).
+  main().catch(err => {
+    process.stderr.write(`[pre-completion-validation] Fatal: ${err&&err.message||String(err)}
+`);
+    process.exit(0);
+  });
 }
 
 module.exports = {
