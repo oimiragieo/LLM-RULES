@@ -4,8 +4,8 @@
   ".claude\\hooks\\safety\\spawn-prompt-validator.cjs": 1181,
   ".claude\\hooks\\routing\\spawn-prompt-assembler.task-tools.cjs": 908,
   ".claude\\hooks\\routing\\pre-task-unified-core.cjs": 870,
+  ".claude\\hooks\\validation\\pre-completion-validation.cjs": 867,
   ".claude\\hooks\\routing\\pre-tool-unified.read-safety.cjs": 861,
-  ".claude\\hooks\\validation\\pre-completion-validation.cjs": 859,
   ".claude\\hooks\\routing\\unified-creator-guard.cjs": 856,
   ".claude\\lib\\routing\\router-state.cjs": 833,
   ".claude\\lib\\readiness\\readiness-remediation.cjs": 785,
@@ -56,6 +56,6 @@
   ".claude\\lib\\routing\\sub-router-selection.cjs": 520,
   ".claude\\hooks\\routing\\routing-guard-core.policy.cjs": 513,
   ".claude\\hooks\\safety\\bypass-audit-hook.cjs": 513,
-  ".claude\\hooks\\routing\\routing-guard-core.checks-router.cjs": 503,
+  ".claude\\hooks\\routing\\routing-guard-core.checks-router.cjs": 504,
   ".claude\\hooks\\routing\\spawn-prompt-assembler.memory.cjs": 503
 }
