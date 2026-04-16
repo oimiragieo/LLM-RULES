@@ -4,7 +4,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { computeScoreGate, evaluateScoreGate } = require('../../.claude/skills/agent-updater/scripts/main.cjs');
+const {
+  computeScoreGate,
+  evaluateScoreGate,
+} = require('../../.claude/skills/agent-updater/scripts/main.cjs');
 
 // ---------------------------------------------------------------------------
 // evaluateScoreGate — unit tests with mock inputs (no pnpm test:framework run)

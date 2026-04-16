@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Investigated
+
+- **hook permission_mode and agent_id in sub-agent PreToolUse context** — Confirmed via official Claude Code docs (HOOKS.md): agent_id is ONLY present in SubagentStart/SubagentStop hook events, NOT in PreToolUse stdin payload. permission_mode IS in common hook input fields (values: default, plan, acceptEdits, dontAsk, bypassPermissions). router-tool-lockdown isRouterSession() cannot use hookInput.agent_id for PreToolUse sub-agent detection — falls through to CLAUDE_AGENT_ID env, task_id, allowed_tools, CWD. The [bypass] tag in block messages appears ONLY when permission_mode===bypassPermissions (--dangerously-skip-permissions).
+
+
 ### Fixed
 
+- **safeParseJSON empty-object bypass in trajectory-logger** — `safeParseJSON()` returns `Object.create(null)` (truthy) on parse failure instead of `null`, bypassing the `!hookInput` early-exit guard. Added length-check normalizer after each `safeParseJSON` call in `trajectory-logger.cjs` to restore null-on-failure behavior.
 - **`bypassPermissions` bypass in router-tool-lockdown** — Added `bypassPermissions` session flag check to `router-tool-lockdown.cjs`; when the session runs with elevated permissions (e.g. `--dangerously-skip-permissions`), sub-agent Write/Edit calls are no longer blocked by the router lockdown guard. Unblocks worktree-isolated developer agents that legitimately need file write access.
 - **SEC-02 prototype pollution in trajectory-logger** — Replaced raw `JSON.parse()` with `safeParseJSON()` from `.claude/lib/utils/safe-json.cjs` in `trajectory-logger.cjs`. Eliminates prototype pollution risk on untrusted tool-call payloads written to the trajectory log.
 - **Env variable leak in search-tools integration test** — Fixed 3 order-dependent suite failures in `tests/integration/search-tools-integration.test.cjs` caused by process env mutation leaking across test suites. Each suite now restores original env vars in an `afterEach` block.

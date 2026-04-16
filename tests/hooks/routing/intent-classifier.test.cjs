@@ -12,10 +12,7 @@ const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 
-const MODULE_PATH = path.resolve(
-  __dirname,
-  "../../../.claude/lib/routing/intent-classifier.cjs"
-);
+const MODULE_PATH = path.resolve(__dirname, '../../../.claude/lib/routing/intent-classifier.cjs');
 
 let classifyIntent, classifyDomain, isHierarchicalRoutingEnabled;
 
@@ -60,9 +57,15 @@ test('classifyIntent() handles documentation prompts', () => {
 });
 
 test('classifyIntent() with includeAlternatives option returns alternatives array', () => {
-  const result = classifyIntent('refactor and test the routing module', { includeAlternatives: true, maxAlternatives: 3 });
+  const result = classifyIntent('refactor and test the routing module', {
+    includeAlternatives: true,
+    maxAlternatives: 3,
+  });
   assert.ok(typeof result === 'object');
-  assert.ok(Array.isArray(result.alternatives), 'alternatives should be an array when includeAlternatives=true');
+  assert.ok(
+    Array.isArray(result.alternatives),
+    'alternatives should be an array when includeAlternatives=true'
+  );
 });
 
 test('classifyIntent() without includeAlternatives does not require alternatives array', () => {

@@ -14,18 +14,19 @@ const path = require('path');
 
 const TEMP_STATE_FILE = path.join(
   os.tmpdir(),
-  "test-router-state-" + process.pid + "-" + Date.now() + ".json"
+  'test-router-state-' + process.pid + '-' + Date.now() + '.json'
 );
 
-const STATE_MODULE_PATH = path.resolve(
-  __dirname,
-  "../../.claude/lib/routing/router-state.cjs"
-);
+const STATE_MODULE_PATH = path.resolve(__dirname, '../../.claude/lib/routing/router-state.cjs');
 
 function loadModule() {
   delete require.cache[require.resolve(STATE_MODULE_PATH)];
   for (const key of Object.keys(require.cache)) {
-    if (key.includes("state-cache") || key.includes("atomic-write") || key.includes("state-contracts")) {
+    if (
+      key.includes('state-cache') ||
+      key.includes('atomic-write') ||
+      key.includes('state-contracts')
+    ) {
       delete require.cache[key];
     }
   }
@@ -34,17 +35,33 @@ function loadModule() {
 
 before(() => {
   process.env.ROUTER_STATE_FILE = TEMP_STATE_FILE;
-  process.env.ROUTER_WRITE_GUARD = "off";
+  process.env.ROUTER_WRITE_GUARD = 'off';
 });
 
 beforeEach(() => {
-  try { fs.unlinkSync(TEMP_STATE_FILE); } catch (_) { /* may not exist */ }
-  try { fs.unlinkSync(TEMP_STATE_FILE + ".lock"); } catch (_) { /* ignore */ }
+  try {
+    fs.unlinkSync(TEMP_STATE_FILE);
+  } catch (_) {
+    /* may not exist */
+  }
+  try {
+    fs.unlinkSync(TEMP_STATE_FILE + '.lock');
+  } catch (_) {
+    /* ignore */
+  }
 });
 
 after(() => {
-  try { fs.unlinkSync(TEMP_STATE_FILE); } catch (_) { /* may not exist */ }
-  try { fs.unlinkSync(TEMP_STATE_FILE + ".lock"); } catch (_) { /* ignore */ }
+  try {
+    fs.unlinkSync(TEMP_STATE_FILE);
+  } catch (_) {
+    /* may not exist */
+  }
+  try {
+    fs.unlinkSync(TEMP_STATE_FILE + '.lock');
+  } catch (_) {
+    /* ignore */
+  }
   delete process.env.ROUTER_STATE_FILE;
   delete process.env.ROUTER_WRITE_GUARD;
 });
@@ -144,7 +161,8 @@ test('getState() returns object with version field', () => {
 });
 
 test('exitAgentMode() preserves planner/security spawn tracking', () => {
-  const { enterAgentMode, exitAgentMode, markPlannerSpawned, markSecuritySpawned, getState } = loadModule();
+  const { enterAgentMode, exitAgentMode, markPlannerSpawned, markSecuritySpawned, getState } =
+    loadModule();
   enterAgentMode('test task');
   markPlannerSpawned();
   markSecuritySpawned();

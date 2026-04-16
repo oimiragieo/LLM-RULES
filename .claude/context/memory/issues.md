@@ -229,3 +229,22 @@ Source: reflection of session tasks (2026-04-02 to 2026-04-04)
 - [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-15T01:36:26.467Z
 
 **Update 2026-04-15 (tasks 3-7 batch)**: 5 entries processed from 2026-04-15 session. Gap log now 946+ total. SYSTEMIC ISSUE PERSISTS: task-lifecycle-42 continues generating stale-detection hits even though TaskList() confirms the task does not exist. This phantom detection pattern (durations 21-1957 min across entries) is caused by stale-task-detector.cjs having no TTL-based cleanup for missing task IDs — it keeps checking a ghost ID indefinitely. Tasks 6 and 7 again arrived without metadata.summary (fallback strings). Tasks 3 (48->3 test failures), 4 (28 Wave 5 Telegram tests), and 5 (5-phase audit: 2 HIGH security, CLAUDE.md drift, 17 orphaned root files, 10 untested files, 5 test smells) had substantive delivery evidence from session context. ROOT CAUSE TICKET (NEW): stale-task-detector.cjs must add TTL-based auto-expiry for task IDs absent from TaskList() after N consecutive detections to prevent gap-log flooding. Existing root causes (pre-completion-validation.cjs BLOCK enforcement, post-completion-chain.cjs metadata propagation) remain unaddressed.
+
+
+## Hook permission_mode and agent_id in PreToolUse — Sub-agent Detection Broken (2026-04-16)
+
+**Finding**: Claude Code does NOT inject agent_id into PreToolUse hook stdin payload. agent_id is ONLY available in SubagentStart/SubagentStop hook events. This means isRouterSession() in router-tool-lockdown.cjs cannot use hookInput.agent_id to detect sub-agent context for PreToolUse hooks.
+
+**permission_mode values** (per official HOOKS.md): default, plan, acceptEdits, dontAsk, bypassPermissions. It IS in the common hook input fields on every event.
+
+**Current detection fallback order** (isRouterSession in router-tool-lockdown):
+1. hookInput.agent_id — always empty for PreToolUse (docs confirm not injected)
+2. CLAUDE_AGENT_ID env var — only set when explicitly configured
+3. hookInput.task_id — only if task context passed in hookInput
+4. allowed_tools array without Task — negative signal only
+5. CWD worktree check — weak signal
+6. Default: assume ROUTER (returns true) — causes false-positive blocks
+
+**Impact**: Sub-agents running without CLAUDE_AGENT_ID env or worktree CWD are treated as the router and have Write/Edit blocked. The [bypass] tag appears ONLY when permission_mode===bypassPermissions.
+
+**Fix needed**: The Write blocks for sub-agent sessions need either (a) CLAUDE_AGENT_ID to be set in sub-agent spawn env, or (b) router-state.cjs task context to be updated when task is active, or (c) checkRouterWrite to accept hookInput and check permission_mode.
