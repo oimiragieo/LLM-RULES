@@ -9,11 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`bypassPermissions` bypass in router-tool-lockdown** — Added `bypassPermissions` session flag check to `router-tool-lockdown.cjs`; when the session runs with elevated permissions (e.g. `--dangerously-skip-permissions`), sub-agent Write/Edit calls are no longer blocked by the router lockdown guard. Unblocks worktree-isolated developer agents that legitimately need file write access.
+- **SEC-02 prototype pollution in trajectory-logger** — Replaced raw `JSON.parse()` with `safeParseJSON()` from `.claude/lib/utils/safe-json.cjs` in `trajectory-logger.cjs`. Eliminates prototype pollution risk on untrusted tool-call payloads written to the trajectory log.
+- **Env variable leak in search-tools integration test** — Fixed 3 order-dependent suite failures in `tests/integration/search-tools-integration.test.cjs` caused by process env mutation leaking across test suites. Each suite now restores original env vars in an `afterEach` block.
+- **Phantom in-progress entries in task-status.json** — Cleaned stale `hb-*`, `test-sync-task-*`, and `task-lifecycle-*` entries left in `.claude/context/runtime/task-status.json` from aborted heartbeat and test runs. File now reflects only legitimate active tasks.
 - **test:framework open handle hang** — Wrapped stdin listener in `post-pipeline-token-report.cjs` with `require.main === module` guard. The hook's `process.stdin.on('data')` was registered unconditionally on `require()`, keeping the Node.js event loop alive when the module was imported by test files. `pnpm test:framework` now exits cleanly.
 - **test:framework failures 48→3** — Archived 4 orphaned test files for deleted hooks (state-reset x2, process-evolution-queue, worktree-prune-on-start). Updated hierarchical routing default expectation (now `on`). Fixed agent frontmatter quoting (`claude-md-auditor`). Fixed A2A port assumptions, external-integration-routing prompts, security intent assertion path, and telemetry event check. 3 remaining failures are order-dependent suite pollution.
 
 ### Added
 
+- **12-test suite for router-state.cjs** — New test file `tests/lib/router/router-state.test.cjs` covering mode transitions (default, hierarchical, semantic), write guard enforcement, and planner/security-architect tracking across 12 assertions.
+- **13-test suite for intent-classifier.cjs** — New test file `tests/lib/router/intent-classifier.test.cjs` covering intent classification (security, planning, development, documentation, testing), domain routing, and hierarchical routing flag propagation across 13 assertions.
+- **Unit tests for safe-json.cjs and safe-path.cjs** — New test files covering prototype pollution filtering, parse failure defaults, and path traversal rejection.
 - **FIXED/EDITABLE marker enforcement** — New shared utility `.claude/lib/updaters/fixed-section-handler.cjs` with `extractSections`, `validateFixedPreserved`, and `applyUpdatePreservingFixed` functions. Wired into both `agent-updater` and `skill-updater` scripts via `validateFixedSections()` and `applyPreservingFixedSections()` exports. Includes 21 tests in `tests/lib/updaters/fixed-section-handler.test.cjs`.
 - **Telegram Wave 5 integration tests** — 28 unit tests covering B2 (@mention detection), B3 (typing indicator start/cancel), B4 (auto-chunk >4096 chars), B5 (file path detection), and A1 (ACL 3-policy enum) in `tests/hooks/telegram-wave5-features.test.cjs`.
 - **Agent-updater score gate E2E tests** — 8 tests for `evaluateScoreGate` (ALLOW/WARN/BLOCK thresholds, negative count skip) plus module export verification in `tests/skills/agent-updater-score-gate.test.cjs`.
@@ -29,6 +36,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Wave 5 B3: Typing indicator** — Dispatcher sends a `sendChatAction("typing")` signal immediately when processing begins, then repeats every 4 seconds until the response is ready. Users see the bot is working during long-running tasks.
 - **Wave 5 B4: Text auto-chunking** — Responses longer than 4096 characters are automatically split into sequential Telegram messages. Prevents the Telegram API 400 error on oversized payloads without requiring callers to pre-split content.
 - **Wave 5 B5: File upload** — Task results containing valid file paths (detected via regex) are uploaded as Telegram documents via `sendFile()` in addition to (or instead of) sending the path as text. Enables automated delivery of generated reports and artifacts directly to the chat.
+
+### Changed
+
+- **CLAUDE.md DIRECTORY INDEX hook and skill counts** — Updated hook count 119→123 and skill count 330+→346 in the CLAUDE.md DIRECTORY INDEX to match current registry state after Wave 5/6/7 additions.
+- **Root-level log slop files removed** — Deleted 3 tracked root-level slop files (`feature-review2026.md`, `test-results.txt`, `validate-output.txt`) that were committed AI session artifacts not belonging in the project root.
 
 ### Security
 
