@@ -113,11 +113,7 @@ describe('extractSections', () => {
   });
 
   it('handles FIXED marker with extra whitespace in name', () => {
-    const content = [
-      '<!-- FIXED:   spaced-name   -->',
-      'content',
-      '<!-- /FIXED -->',
-    ].join('\n');
+    const content = ['<!-- FIXED:   spaced-name   -->', 'content', '<!-- /FIXED -->'].join('\n');
 
     const result = extractSections(content);
     assert.equal(result.fixed.length, 1);
@@ -170,11 +166,9 @@ describe('validateFixedPreserved', () => {
       'original fixed content',
       '<!-- /FIXED -->',
     ].join('\n');
-    const updated = [
-      '<!-- FIXED: important -->',
-      'CHANGED fixed content',
-      '<!-- /FIXED -->',
-    ].join('\n');
+    const updated = ['<!-- FIXED: important -->', 'CHANGED fixed content', '<!-- /FIXED -->'].join(
+      '\n'
+    );
 
     const result = validateFixedPreserved(original, updated);
     assert.equal(result.valid, false);

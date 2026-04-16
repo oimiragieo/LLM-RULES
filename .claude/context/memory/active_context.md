@@ -17,43 +17,47 @@
 ## Session Accomplishments (2026-04-13)
 
 ### Validation Confirmed
+
 - `pnpm validate:full` — PASS (after fixing trajectory-logger hook docs gap)
 - `pnpm metrics:ci` — PASS (after excluding spawn-prompt-assembler from p95 gate)
 - `pnpm test:framework` — pre-existing open handle hang (not introduced by this session)
 
 ### 15 Commits Pushed to origin/main (84bf44108)
 
-| Commit | Description |
-|--------|-------------|
-| a2feb6c62 | fix(metrics): exclude spawn-prompt-assembler from p95 runtime gate |
-| b4e828a3e | feat: add ATIF-style trajectory logging hook (Wave 6 P0.1) |
-| 8eeb7fb77 | fix(telegram): wire pairing persistence + remove orphaned imports |
-| 46c94a4e8 | feat(outcome-reflection): wire trajectory signal emission (Wave 7 Item 2) |
-| 921dfefed | feat(instinct-learning): frequency counter with evolution trigger >=3 (Wave 7 Item 1) |
-| 99df1648f | feat(agent-updater): wire score gate + evolution audit trail (Wave 6 P0.2+P0.4) |
-| 36cc0cfa7 | feat(telegram): group mention + typing indicator + auto-chunking + file upload (Wave 5 B2-B5) |
-| 22c6c6d1d | docs(hooks): add trajectory-logger to HOOKS_REFERENCE and HOOK_AGENT_MAP |
-| 56c03d07a | feat(templates): add FIXED/EDITABLE section markers (Wave 6 P0.3) |
-| + 6x docs(changelog) commits | CHANGELOG entries for all features |
+| Commit                       | Description                                                                                   |
+| ---------------------------- | --------------------------------------------------------------------------------------------- |
+| a2feb6c62                    | fix(metrics): exclude spawn-prompt-assembler from p95 runtime gate                            |
+| b4e828a3e                    | feat: add ATIF-style trajectory logging hook (Wave 6 P0.1)                                    |
+| 8eeb7fb77                    | fix(telegram): wire pairing persistence + remove orphaned imports                             |
+| 46c94a4e8                    | feat(outcome-reflection): wire trajectory signal emission (Wave 7 Item 2)                     |
+| 921dfefed                    | feat(instinct-learning): frequency counter with evolution trigger >=3 (Wave 7 Item 1)         |
+| 99df1648f                    | feat(agent-updater): wire score gate + evolution audit trail (Wave 6 P0.2+P0.4)               |
+| 36cc0cfa7                    | feat(telegram): group mention + typing indicator + auto-chunking + file upload (Wave 5 B2-B5) |
+| 22c6c6d1d                    | docs(hooks): add trajectory-logger to HOOKS_REFERENCE and HOOK_AGENT_MAP                      |
+| 56c03d07a                    | feat(templates): add FIXED/EDITABLE section markers (Wave 6 P0.3)                             |
+| + 6x docs(changelog) commits | CHANGELOG entries for all features                                                            |
 
 ### Features Implemented
 
 **Wave 5 — Telegram P0 (7/7 items):**
+
 - A1: 3-policy ACL enum (pairing/allowlist/disabled) in config.cjs
 - A2: Hot-reload access.json via fs.watch (no daemon restart)
 - B1: /pair approve persists user ID to access.json
 - B2: Group chat @mention detection (skip if bot not mentioned)
 - B3: Repeating typing indicator (4s interval, auto-cancel on response)
-- B4: Auto-chunk responses >4096 chars using _chunkText()
+- B4: Auto-chunk responses >4096 chars using \_chunkText()
 - B5: Auto-detect file paths in task results, upload via sendFile()
 
 **Wave 6 — autoagent P0 (4/4 items):**
+
 - P0.1: ATIF-style trajectory logging hook (PostToolUse -> trajectory-YYYY-MM-DD.jsonl)
 - P0.2: Score gate in agent-updater (compares test pass counts before/after)
 - P0.3: FIXED/EDITABLE section markers in agent-template.md + skill-template.md
 - P0.4: Evolution audit trail TSV (agent-evolution-log.tsv)
 
 **Wave 7 — SkillClaw P0 (2/2 items):**
+
 - instinct-learning: frequency counter (auto-triggers evolution-request at >=3)
 - outcome-reflection: trajectory signal emission on 3+ repeat failures
 
@@ -62,22 +66,26 @@
 ## Follow-Up Work (next session)
 
 ### P0 — test:framework hang (BLOCKING for CI reliability)
+
 - Binary-search `tests/hooks/` group — run each file individually
 - Find file that takes >5s or never prints `# tests:` summary
 - Fix open handle (likely child_process.spawn without .unref())
 - This also unblocks the agent-updater score gate reliability
 
 ### P1 — Integration test Telegram features
+
 - Start daemon with test access.json
 - Send @mention in group, verify B2 routing
 - Send long message, verify B4 chunking
 - Verify typing indicator clears on response
 
 ### P1 — Enforce FIXED markers in agent-updater code
+
 - P0.3 added markers to templates but agent-updater has no enforcement code
 - Need to add parsing logic to skip FIXED sections during diffs
 
 ### Deferred Audit Phases (from 2026-04-11 deep dive)
+
 - Phase 2.1 OWASP + ASI deep-dive (partial)
 - Phase 2.2 Penetration test (partial)
 - Phase 3.1-3.3 Code review, ecosystem, CLAUDE.md drift

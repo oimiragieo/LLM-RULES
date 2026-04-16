@@ -1,5 +1,5 @@
-<!-- FIXED: frontmatter — identity and interface contract, do not modify during autonomous updates -->
----
+## <!-- FIXED: frontmatter — identity and interface contract, do not modify during autonomous updates -->
+
 name: {{AGENT_NAME}}
 description: {{BRIEF_DESCRIPTION}}. Use for {{PRIMARY_USE_CASES}}.
 tools:
@@ -28,6 +28,7 @@ permissionMode: default
 # - debugging
 
 ---
+
 <!-- /FIXED -->
 
 # {{AGENT_DISPLAY_NAME}} Agent

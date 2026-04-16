@@ -1,5 +1,5 @@
-<!-- FIXED: frontmatter — interface contract, do not modify during autonomous updates -->
----
+## <!-- FIXED: frontmatter — interface contract, do not modify during autonomous updates -->
+
 name: {{SKILL_NAME}}
 description: {{BRIEF_DESCRIPTION}}. Use when {{USE_CASE}}.
 version: 1.0
@@ -7,16 +7,17 @@ model: sonnet
 invoked_by: both
 user_invocable: {{true_or_false}}
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-assigned_agents: []  # MUST be populated by Step 7 of skill-creator
+assigned_agents: [] # MUST be populated by Step 7 of skill-creator
 best_practices:
 
 - {{BEST_PRACTICE_1}}
 - {{BEST_PRACTICE_2}}
 - {{BEST_PRACTICE_3}}
-error_handling: strict
-streaming: supported
+  error_handling: strict
+  streaming: supported
 
 ---
+
 <!-- /FIXED -->
 
 # {{SKILL_DISPLAY_NAME}}

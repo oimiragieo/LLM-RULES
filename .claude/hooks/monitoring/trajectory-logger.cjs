@@ -15,6 +15,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 function findProjectRoot() {
   let dir = __dirname;
@@ -104,7 +105,7 @@ function main() {
     // Claude Code passes JSON via stdin for PostToolUse hooks
     if (process.argv[2]) {
       try {
-        hookInput = JSON.parse(process.argv[2]);
+        hookInput = safeParseJSON(process.argv[2], 'trajectory-logger', undefined, null);
       } catch (_e) {
         // Not valid JSON arg, ignore
       }
@@ -115,7 +116,7 @@ function main() {
       try {
         const stdinData = fs.readFileSync(0, 'utf8');
         if (stdinData && stdinData.trim()) {
-          hookInput = JSON.parse(stdinData.trim());
+          hookInput = safeParseJSON(stdinData.trim(), 'trajectory-logger', undefined, null);
         }
       } catch (_e) {
         // No stdin or invalid, ignore

@@ -40,10 +40,7 @@ beforeEach(() => {
 // A1: ACL enum — 3-policy config parsing (pairing / allowlist / disabled)
 // ===========================================================================
 describe('A1: ACL enum — DM_POLICIES constant and loadAccessConfig', () => {
-  const {
-    DM_POLICIES,
-    loadAccessConfig,
-  } = require('../../scripts/channels/daemon/config.cjs');
+  const { DM_POLICIES, loadAccessConfig } = require('../../scripts/channels/daemon/config.cjs');
 
   it('DM_POLICIES contains exactly the three valid policies', () => {
     assert.deepStrictEqual(DM_POLICIES.sort(), ['allowlist', 'disabled', 'pairing']);
@@ -53,7 +50,10 @@ describe('A1: ACL enum — DM_POLICIES constant and loadAccessConfig', () => {
     // The file path points to a user home directory that won't exist in CI —
     // loadAccessConfig catches the error and returns defaults.
     const config = loadAccessConfig();
-    assert.ok(DM_POLICIES.includes(config.dmPolicy), `dmPolicy "${config.dmPolicy}" is not a valid policy`);
+    assert.ok(
+      DM_POLICIES.includes(config.dmPolicy),
+      `dmPolicy "${config.dmPolicy}" is not a valid policy`
+    );
     assert.ok(Array.isArray(config.allowFrom), 'allowFrom should be an array');
     assert.ok(Array.isArray(config.groups), 'groups should be an array');
     assert.ok(Array.isArray(config.pending), 'pending should be an array');
@@ -336,10 +336,7 @@ describe('B4: Auto-chunking — Dispatcher._chunkText', () => {
     const chunks = d._chunkText(text, maxLen);
 
     for (const chunk of chunks) {
-      assert.ok(
-        chunk.length <= maxLen,
-        `chunk of length ${chunk.length} exceeds maxLen ${maxLen}`
-      );
+      assert.ok(chunk.length <= maxLen, `chunk of length ${chunk.length} exceeds maxLen ${maxLen}`);
     }
   });
 
@@ -431,7 +428,19 @@ describe('B5: File path detection regex', () => {
   });
 
   it('detects all supported extensions', () => {
-    const extensions = ['md', 'pdf', 'csv', 'txt', 'json', 'png', 'jpg', 'svg', 'html', 'xlsx', 'docx'];
+    const extensions = [
+      'md',
+      'pdf',
+      'csv',
+      'txt',
+      'json',
+      'png',
+      'jpg',
+      'svg',
+      'html',
+      'xlsx',
+      'docx',
+    ];
     for (const ext of extensions) {
       const text = `/some/path/file.${ext}`;
       const paths = findPaths(text);

@@ -178,4 +178,4 @@ Catalog: **@SKILL_CATALOG_TABLE.md** | Discovery: read catalog → `Skill({ skil
 
 ## DIRECTORY INDEX
 
-Each subdirectory has its own CLAUDE.md. Key: `agents/` (119 agents), `skills/` (330+), `hooks/` (119), `lib/` (50+ modules), `workflows/` (300+), `commands/` (200+), `schemas/` (250+), `context/` (runtime data), `config/` (15 configs), `docs/` (16 @ reference files), `rules/` (14 auto-loaded).
+Each subdirectory has its own CLAUDE.md. Key: `agents/` (119 agents), `skills/` (346), `hooks/` (123), `lib/` (50+ modules), `workflows/` (300+), `commands/` (200+), `schemas/` (250+), `context/` (runtime data), `config/` (15 configs), `docs/` (16 @ reference files), `rules/` (14 auto-loaded).

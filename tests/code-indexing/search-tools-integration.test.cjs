@@ -15,6 +15,13 @@ const fs = require('fs').promises;
 const path = require('path');
 
 // Keep tests lightweight and deterministic: force-disable semantic model workers.
+// Save originals so the after() hook can restore them and avoid env var leaks.
+const _savedEnv = {
+  CODE_INDEX_EMBEDDER: process.env.CODE_INDEX_EMBEDDER,
+  CODE_INDEX_EMBEDDINGS: process.env.CODE_INDEX_EMBEDDINGS,
+  MEMORY_SEMANTIC_SEARCH: process.env.MEMORY_SEMANTIC_SEARCH,
+  LANCEDB_EMBEDDING_MODE: process.env.LANCEDB_EMBEDDING_MODE,
+};
 process.env.CODE_INDEX_EMBEDDER = 'mock';
 process.env.CODE_INDEX_EMBEDDINGS = 'off';
 process.env.MEMORY_SEMANTIC_SEARCH = 'off';
@@ -50,6 +57,11 @@ describe('Search tools and indexing E2E', () => {
     const { MemoryVectorStore } = require('../../.claude/lib/memory/lancedb-client-impl.cjs');
     MemoryVectorStore.clearSharedStores();
     await fs.rm(FIXTURES_DIR, { recursive: true, force: true }).catch(() => {});
+    // Restore env vars to prevent leaking into other test files
+    for (const [key, val] of Object.entries(_savedEnv)) {
+      if (val === undefined) delete process.env[key];
+      else process.env[key] = val;
+    }
   });
 
   describe('full workflow', () => {

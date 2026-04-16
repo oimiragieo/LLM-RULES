@@ -63,7 +63,10 @@ describe('emitTrajectorySignal', () => {
 // ---------------------------------------------------------------------------
 describe('computeEstimationScore', () => {
   it('returns an object with score field', () => {
-    const result = computeEstimationScore({ estimatedComplexity: 'high', actualComplexity: 'high' });
+    const result = computeEstimationScore({
+      estimatedComplexity: 'high',
+      actualComplexity: 'high',
+    });
     assert.equal(typeof result, 'object');
     assert.ok('score' in result);
     assert.ok('samplesUsed' in result);
@@ -91,7 +94,9 @@ describe('computeFlags', () => {
 
   it('flags overestimated when estimation score is low', () => {
     const flags = computeFlags({ estimationScore: 20, decisionScore: 80 });
-    assert.ok(flags.includes('overestimated') || flags.includes('underestimated') || flags.length >= 0);
+    assert.ok(
+      flags.includes('overestimated') || flags.includes('underestimated') || flags.length >= 0
+    );
   });
 });
 
@@ -102,14 +107,20 @@ describe('instinct-learning module', () => {
   it('main.cjs file exists', () => {
     const fs = require('fs');
     const path = require('path');
-    const mainPath = path.resolve(__dirname, '../../.claude/skills/instinct-learning/scripts/main.cjs');
+    const mainPath = path.resolve(
+      __dirname,
+      '../../.claude/skills/instinct-learning/scripts/main.cjs'
+    );
     assert.ok(fs.existsSync(mainPath), 'instinct-learning main.cjs should exist');
   });
 
   it('main.cjs contains frequency counter logic', () => {
     const fs = require('fs');
     const path = require('path');
-    const mainPath = path.resolve(__dirname, '../../.claude/skills/instinct-learning/scripts/main.cjs');
+    const mainPath = path.resolve(
+      __dirname,
+      '../../.claude/skills/instinct-learning/scripts/main.cjs'
+    );
     const content = fs.readFileSync(mainPath, 'utf8');
     assert.ok(content.includes('frequency'), 'Should contain frequency counter logic');
   });
