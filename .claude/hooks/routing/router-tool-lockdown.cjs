@@ -279,6 +279,32 @@ function checkRouterToolLockdown(toolName, toolInput, hookInput, cwd = process.c
     }
   }
 
+  // bypassPermissions mode bypass — allow Write/Edit/Glob/Grep/NotebookEdit to prevent
+  // sub-agent deadlocks when running with elevated permissions. Mirrors the bypass in
+  // routing-guard-core.checks-router.cjs.
+  const permissionMode = String(
+    hookInput?.permission_mode || hookInput?.permissionMode || ''
+  ).toLowerCase();
+  const isBypassPermissions = permissionMode === 'bypasspermissions';
+  if (
+    isBypassPermissions &&
+    (effectiveToolName === 'Write' ||
+      effectiveToolName === 'Edit' ||
+      effectiveToolName === 'NotebookEdit' ||
+      effectiveToolName === 'Glob' ||
+      effectiveToolName === 'Grep')
+  ) {
+    return {
+      pass: true,
+      result: 'warn',
+      message:
+        '[ROUTER-LOCKDOWN BYPASS] Allowing ' +
+        toolName +
+        ' in bypassPermissions mode to avoid sub-agent deadlocks. ' +
+        'Prefer Task() delegation for deeper analysis.',
+    };
+  }
+
   // Build the block/warn message
   const agent = suggestAgent(effectiveToolName);
   const mcpNote = mcpMapping ? ` (MCP equivalent of ${effectiveToolName})` : '';
