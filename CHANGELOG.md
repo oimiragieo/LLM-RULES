@@ -11,8 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **hook permission_mode and agent_id in sub-agent PreToolUse context** — Confirmed via official Claude Code docs (HOOKS.md): agent_id is ONLY present in SubagentStart/SubagentStop hook events, NOT in PreToolUse stdin payload. permission_mode IS in common hook input fields (values: default, plan, acceptEdits, dontAsk, bypassPermissions). router-tool-lockdown isRouterSession() cannot use hookInput.agent_id for PreToolUse sub-agent detection — falls through to CLAUDE_AGENT_ID env, task_id, allowed_tools, CWD. The [bypass] tag in block messages appears ONLY when permission_mode===bypassPermissions (--dangerously-skip-permissions).
 
-
 ### Fixed
+
+- **CLAUDE_AGENT_ID sub-agent bypass in routing-guard-core** — `hasExplicitAgentContext()` now uses `process.env.CLAUDE_AGENT_ID` as primary detection signal for sub-agents in PreToolUse hooks. `checkRouterWrite()` accepts `hookInput` and short-circuits via this check, preventing legitimate developer sub-agents from being blocked by the router write guard.
 
 - **safeParseJSON empty-object bypass in trajectory-logger** — `safeParseJSON()` returns `Object.create(null)` (truthy) on parse failure instead of `null`, bypassing the `!hookInput` early-exit guard. Added length-check normalizer after each `safeParseJSON` call in `trajectory-logger.cjs` to restore null-on-failure behavior.
 - **`bypassPermissions` bypass in router-tool-lockdown** — Added `bypassPermissions` session flag check to `router-tool-lockdown.cjs`; when the session runs with elevated permissions (e.g. `--dangerously-skip-permissions`), sub-agent Write/Edit calls are no longer blocked by the router lockdown guard. Unblocks worktree-isolated developer agents that legitimately need file write access.
@@ -23,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **test:framework failures 48→3** — Archived 4 orphaned test files for deleted hooks (state-reset x2, process-evolution-queue, worktree-prune-on-start). Updated hierarchical routing default expectation (now `on`). Fixed agent frontmatter quoting (`claude-md-auditor`). Fixed A2A port assumptions, external-integration-routing prompts, security intent assertion path, and telemetry event check. 3 remaining failures are order-dependent suite pollution.
 
 ### Added
+
+- **5-test suite for hasExplicitAgentContext and checkRouterWrite bypass** — New test file `tests/hooks/routing/has-explicit-agent-context.test.cjs` covering CLAUDE_AGENT_ID primary signal (3 cases) and checkRouterWrite Edit/Write bypass (2 cases).
 
 - **12-test suite for router-state.cjs** — New test file `tests/lib/router/router-state.test.cjs` covering mode transitions (default, hierarchical, semantic), write guard enforcement, and planner/security-architect tracking across 12 assertions.
 - **13-test suite for intent-classifier.cjs** — New test file `tests/lib/router/intent-classifier.test.cjs` covering intent classification (security, planning, development, documentation, testing), domain routing, and hierarchical routing flag propagation across 13 assertions.

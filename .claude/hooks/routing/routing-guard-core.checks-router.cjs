@@ -387,7 +387,8 @@ function checkRouterReadGovernance(toolName, toolInput = {}) {
   return { pass: true, result: 'warn', message };
 }
 
-function checkRouterWrite(toolName, toolInput) {
+function checkRouterWrite(toolName, toolInput, hookInput = {}) {
+  if (hasExplicitAgentContext(hookInput)) return { pass: true };
   if (!WRITE_TOOLS.includes(toolName)) {
     return { pass: true };
   }

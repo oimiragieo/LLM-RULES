@@ -253,7 +253,7 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
       captureWarn('high-risk-specialist-architect-guard', highRiskArchitectCheck);
     }
 
-    const writeCheck = checkRouterWrite(toolName, toolInput);
+    const writeCheck = checkRouterWrite(toolName, toolInput, hookInput);
     if (!writeCheck.pass) {
       return {
         pass: false,
