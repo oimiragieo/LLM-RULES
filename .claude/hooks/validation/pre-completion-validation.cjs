@@ -842,7 +842,7 @@ if (require.main === module) {
   // terminates with exit code 1 (which Claude Code treats as a hard error,
   // silently blocking the tool with no stderr output).
   main().catch(err => {
-    process.stderr.write(`[pre-completion-validation] Fatal: ${err&&err.message||String(err)}
+    process.stderr.write(`[pre-completion-validation] Fatal: ${(err && err.message) || String(err)}
 `);
     process.exit(0);
   });

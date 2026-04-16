@@ -21,9 +21,8 @@ describe('hasExplicitAgentContext — CLAUDE_AGENT_ID primary signal', () => {
     originalEnv = { ...process.env };
     delete process.env.CLAUDE_AGENT_ID;
 
-    const modPath = require.resolve(
-      '../../../.claude/hooks/routing/routing-guard-core.helpers.cjs'
-    );
+    const modPath =
+      require.resolve('../../../.claude/hooks/routing/routing-guard-core.helpers.cjs');
     delete require.cache[modPath];
     hasExplicitAgentContext =
       require('../../../.claude/hooks/routing/routing-guard-core.helpers.cjs').hasExplicitAgentContext;
@@ -60,22 +59,19 @@ describe('checkRouterWrite — CLAUDE_AGENT_ID bypass', () => {
     delete process.env.ROUTER_WRITE_GUARD;
 
     // Bust the module cache so env changes are picked up
-    const helpersPath = require.resolve(
-      '../../../.claude/hooks/routing/routing-guard-core.helpers.cjs'
-    );
-    const sharedPath = require.resolve(
-      '../../../.claude/hooks/routing/routing-guard-core.shared.cjs'
-    );
-    const checksPath = require.resolve(
-      '../../../.claude/hooks/routing/routing-guard-core.checks-router.cjs'
-    );
+    const helpersPath =
+      require.resolve('../../../.claude/hooks/routing/routing-guard-core.helpers.cjs');
+    const sharedPath =
+      require.resolve('../../../.claude/hooks/routing/routing-guard-core.shared.cjs');
+    const checksPath =
+      require.resolve('../../../.claude/hooks/routing/routing-guard-core.checks-router.cjs');
     delete require.cache[helpersPath];
     delete require.cache[sharedPath];
     delete require.cache[checksPath];
 
-    ({ checkRouterWrite } = require(
-      '../../../.claude/hooks/routing/routing-guard-core.checks-router.cjs'
-    ));
+    ({
+      checkRouterWrite,
+    } = require('../../../.claude/hooks/routing/routing-guard-core.checks-router.cjs'));
   });
 
   afterEach(() => {

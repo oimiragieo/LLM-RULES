@@ -23,14 +23,14 @@ Then run validate:full + commit + push.
 
 ## Phase Status
 
-| Phase | Status | Notes |
-|---|---|---|
-| Phase 1 (CLAUDE_AGENT_ID bypass) | COMPLETE | 3 commits pushed |
-| Phase 2a (write-pretool-bundle) | PENDING | red test written; impl deferred |
-| Phase 2b (pre-completion SE-03) | PENDING | blocks TaskUpdate closures |
-| Phase 3 (worktrees + dependabot) | PENDING | specs ready |
-| Phase 4 (hooks-explainer skill) | PENDING | spec in plan |
-| Phase 5 (validate+commit+push) | PENDING | depends on 2-4 |
+| Phase                            | Status   | Notes                           |
+| -------------------------------- | -------- | ------------------------------- |
+| Phase 1 (CLAUDE_AGENT_ID bypass) | COMPLETE | 3 commits pushed                |
+| Phase 2a (write-pretool-bundle)  | PENDING  | red test written; impl deferred |
+| Phase 2b (pre-completion SE-03)  | PENDING  | blocks TaskUpdate closures      |
+| Phase 3 (worktrees + dependabot) | PENDING  | specs ready                     |
+| Phase 4 (hooks-explainer skill)  | PENDING  | spec in plan                    |
+| Phase 5 (validate+commit+push)   | PENDING  | depends on 2-4                  |
 
 ## Relevant File Paths
 
@@ -46,6 +46,6 @@ CLAUDE_AGENT_ID env var is NOT set by Claude Code automatically at spawn time. U
 ## Dependabot Fix (ready to apply)
 
 In package.json pnpm.overrides, add:
-  "hono": ">=4.12.14"
-  "@hono/node-server": ">=1.19.13"
+"hono": ">=4.12.14"
+"@hono/node-server": ">=1.19.13"
 Zero runtime exposure (transitive via @modelcontextprotocol/sdk stdio transport only).
