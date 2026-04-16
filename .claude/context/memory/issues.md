@@ -262,3 +262,15 @@ Source: reflection of session tasks (2026-04-02 to 2026-04-04)
 - [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-16T21:19:10.475Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-16T21:19:10.492Z
+
+## Systemic: task-lifecycle-42 Phantom Stale Detection Persists (Update 2026-04-16)
+
+**Pattern**: Gap log now at 995 total entries. This session's last 20 entries include 6 more missing_metadata entries for task-lifecycle-42 (durations: 1621, 1627, 2198, 2348, 2522, 55 minutes). The 55-minute entry suggests the phantom reference persists across router session resets or was re-created. Despite 2026-04-11 closure and 2026-04-15 learnings noting this issue, the TTL-based auto-expiry fix in stale-task-detector.cjs has NOT been applied.
+
+**Status**: UNRESOLVED. Recommended fix: add TTL-based auto-expiry to stale-task-detector.cjs — auto-expire task IDs not in TaskList() after N=3 consecutive detections (TTL=30 min).
+
+**Impact**: Continues to pollute gap-log signal. Every session generates multiple false-positive stale-task entries, drowning out genuine anomalies.
+
+**SE-03 note (one-off)**: pre-completion-validation.cjs blocked TaskUpdate with no stderr once this session. Recent commits a586ea825+bdb731d02 added SE-03 fail-open. Single occurrence — classify as one-off; monitor for recurrence.
+
+Source: reflection task 1, session 2026-04-16

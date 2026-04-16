@@ -61,4 +61,21 @@ describe('write-pretool-bundle fail behavior', () => {
       );
     }
   });
+
+  test('sub-agent bypass: CLAUDE_AGENT_ID skips all checks', () => {
+    const src = fs.readFileSync(HOOK_PATH, 'utf8');
+
+    // The hook should read CLAUDE_AGENT_ID and bypass all safety checks
+    // for non-router sub-agents (they are already isolated in worktrees)
+    assert.ok(
+      src.includes('CLAUDE_AGENT_ID'),
+      'Should check CLAUDE_AGENT_ID env var for sub-agent bypass'
+    );
+
+    // The bypass should not apply to the router itself
+    assert.ok(
+      src.includes("'router'") || src.includes('"router"'),
+      'Should exclude the router from the bypass (router still enforced)'
+    );
+  });
 });

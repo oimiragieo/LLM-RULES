@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **CLAUDE_AGENT_ID sub-agent bypass in routing-guard-core** — `hasExplicitAgentContext()` now uses `process.env.CLAUDE_AGENT_ID` as primary detection signal for sub-agents in PreToolUse hooks. `checkRouterWrite()` accepts `hookInput` and short-circuits via this check, preventing legitimate developer sub-agents from being blocked by the router write guard.
 
+- **sub-agent bypass in write-pretool-bundle.cjs** — add sub-agent bypass to write-pretool-bundle.cjs so CLAUDE_AGENT_ID-identified agents can write to creator paths without router-mode blocking.
+
 - **safeParseJSON empty-object bypass in trajectory-logger** — `safeParseJSON()` returns `Object.create(null)` (truthy) on parse failure instead of `null`, bypassing the `!hookInput` early-exit guard. Added length-check normalizer after each `safeParseJSON` call in `trajectory-logger.cjs` to restore null-on-failure behavior.
 - **`bypassPermissions` bypass in router-tool-lockdown** — Added `bypassPermissions` session flag check to `router-tool-lockdown.cjs`; when the session runs with elevated permissions (e.g. `--dangerously-skip-permissions`), sub-agent Write/Edit calls are no longer blocked by the router lockdown guard. Unblocks worktree-isolated developer agents that legitimately need file write access.
 - **SEC-02 prototype pollution in trajectory-logger** — Replaced raw `JSON.parse()` with `safeParseJSON()` from `.claude/lib/utils/safe-json.cjs` in `trajectory-logger.cjs`. Eliminates prototype pollution risk on untrusted tool-call payloads written to the trajectory log.
