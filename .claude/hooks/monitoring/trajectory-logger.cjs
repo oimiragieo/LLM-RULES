@@ -106,6 +106,7 @@ function main() {
     if (process.argv[2]) {
       try {
         hookInput = safeParseJSON(process.argv[2], 'trajectory-logger', undefined, null);
+        if (!hookInput || Object.keys(hookInput).length === 0) hookInput = null;
       } catch (_e) {
         // Not valid JSON arg, ignore
       }
@@ -117,6 +118,7 @@ function main() {
         const stdinData = fs.readFileSync(0, 'utf8');
         if (stdinData && stdinData.trim()) {
           hookInput = safeParseJSON(stdinData.trim(), 'trajectory-logger', undefined, null);
+          if (!hookInput || Object.keys(hookInput).length === 0) hookInput = null;
         }
       } catch (_e) {
         // No stdin or invalid, ignore
