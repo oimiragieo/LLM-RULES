@@ -248,3 +248,17 @@ Source: reflection of session tasks (2026-04-02 to 2026-04-04)
 **Impact**: Sub-agents running without CLAUDE_AGENT_ID env or worktree CWD are treated as the router and have Write/Edit blocked. The [bypass] tag appears ONLY when permission_mode===bypassPermissions.
 
 **Fix needed**: The Write blocks for sub-agent sessions need either (a) CLAUDE_AGENT_ID to be set in sub-agent spawn env, or (b) router-state.cjs task context to be updated when task is active, or (c) checkRouterWrite to accept hookInput and check permission_mode.
+
+**RESOLVED 2026-04-16 (Phase 1 — commits 145d812c8 + 71c73db7a)**: Option (a) implemented. CLAUDE_AGENT_ID env var is now propagated into sub-agent spawn prompts, and checkRouterWrite() bypasses the router-write block when CLAUDE_AGENT_ID is set to a non-router value. This unblocks Write/Edit for developer, qa, and other specialist agents that were being incorrectly blocked. Phase 2 (write-pretool-bundle refactor to merge write-safety checks, pre-completion-validation.cjs SE-03 fix for non-zero exit code on unexpected errors) remains open — spec in `.claude/context/plans/2026-04-16-hook-deadlock-recovery-plan.md`.
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-16T21:16:57.065Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-16T21:16:57.079Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-16T21:16:57.093Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-04-16T21:19:10.458Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-04-16T21:19:10.475Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-04-16T21:19:10.492Z
