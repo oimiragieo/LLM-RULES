@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **hooks-explainer skill** — New skill documenting the hook enforcement system, bypass mechanisms, and common failure patterns to help agents avoid getting stuck on protected path writes.
 - **5-test suite for hasExplicitAgentContext and checkRouterWrite bypass** — New test file `tests/hooks/routing/has-explicit-agent-context.test.cjs` covering CLAUDE_AGENT_ID primary signal (3 cases) and checkRouterWrite Edit/Write bypass (2 cases).
 
 - **12-test suite for router-state.cjs** — New test file `tests/lib/router/router-state.test.cjs` covering mode transitions (default, hierarchical, semantic), write guard enforcement, and planner/security-architect tracking across 12 assertions.

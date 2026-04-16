@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-04-13T17:01:52.446Z",
+  "generatedAt": "2026-04-16T23:47:27.944Z",
   "metadata": {
-    "totalSkills": 346,
+    "totalSkills": 347,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-04-13T17:01:52.447Z",
+    "lastValidated": "2026-04-16T23:47:27.946Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -8313,6 +8313,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "hooks-explainer": {
+      "name": "hooks-explainer",
+      "displayName": "Hooks Explainer",
+      "category": "Other",
+      "domain": "other",
+      "description": "Documents the hook enforcement system, bypass mechanisms, and common failure patterns to help agents avoid getting stuck on protected path writes",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "hooks-explainer"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "huggingface": {
       "name": "huggingface",
       "displayName": "Huggingface",
@@ -9828,6 +9850,7 @@
         "google-workspace",
         "heartbeat",
         "hook-updater",
+        "hooks-explainer",
         "huggingface",
         "imagen-generation",
         "implementation-readiness",
@@ -10280,6 +10303,7 @@
         "google-workspace",
         "heartbeat",
         "hook-updater",
+        "hooks-explainer",
         "huggingface",
         "imagen-generation",
         "implementation-readiness",
@@ -10714,6 +10738,7 @@
         "google-workspace",
         "heartbeat",
         "hook-updater",
+        "hooks-explainer",
         "huggingface",
         "imagen-generation",
         "implementation-readiness",
@@ -11004,6 +11029,7 @@
         "frontend-design",
         "google-workspace",
         "hook-updater",
+        "hooks-explainer",
         "huggingface",
         "imagen-generation",
         "init",
@@ -11447,6 +11473,7 @@
         "goal-backward-verification",
         "heartbeat",
         "hook-updater",
+        "hooks-explainer",
         "instinct-learning",
         "judge-verification",
         "knowledge-graph",
@@ -12166,6 +12193,7 @@
         "goal-backward-verification",
         "google-workspace",
         "hook-updater",
+        "hooks-explainer",
         "huggingface",
         "imagen-generation",
         "implementation-readiness",
@@ -14057,6 +14085,7 @@
         "goal-backward-verification",
         "google-workspace",
         "hook-updater",
+        "hooks-explainer",
         "huggingface",
         "imagen-generation",
         "implementation-readiness",
