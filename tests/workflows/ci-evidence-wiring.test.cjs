@@ -35,3 +35,32 @@ test('package scripts expose ci summary and artifact index helpers for workflow 
   assert.equal(typeof scripts['ci:artifact:index'], 'string');
   assert.match(scripts['ci:artifact:index'], /ci-artifact-index\.cjs/);
 });
+
+test('authoritative workflows upload uniquely named failure evidence artifacts and summaries', () => {
+  const workflows = ['full-validation.yml', 'global-quality-gates.yml', 'observability-ci.yml'];
+
+  for (const workflowName of workflows) {
+    const workflow = readWorkflow(workflowName);
+    assert.match(
+      workflow,
+      /failure-evidence\.cjs/,
+      `${workflowName} missing failure evidence helper`
+    );
+    assert.match(workflow, /if:\s*failure\(\)/, `${workflowName} missing failure-only step`);
+    assert.match(
+      workflow,
+      /actions\/upload-artifact@v4/,
+      `${workflowName} missing artifact upload`
+    );
+    assert.match(
+      workflow,
+      /failure-evidence-\$\{\{\s*github\.workflow\s*\}\}-\$\{\{\s*github\.job\s*\}\}-\$\{\{\s*github\.run_id\s*\}\}-\$\{\{\s*github\.run_attempt\s*\}\}/,
+      `${workflowName} missing unique failure artifact naming`
+    );
+    assert.match(
+      workflow,
+      /ci:summary:write --kind failure-evidence/,
+      `${workflowName} missing failure-evidence summary step`
+    );
+  }
+});

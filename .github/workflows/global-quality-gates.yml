@@ -38,6 +38,83 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
+      - name: Capture failure evidence
+        if: failure()
+        shell: bash
+        env:
+          FAILURE_ARTIFACT_NAME: failure-evidence-${{ github.workflow }}-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          FAILURE_STAGE: lint-and-format
+        run: |
+          mkdir -p .claude/context/ci
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const { writeFailureEvidence } = require('./.claude/lib/ci/failure-evidence.cjs');
+
+          const root = process.cwd();
+          const evidencePath = writeFailureEvidence(root, {
+            env: process.env,
+            failure: {
+              workflow: process.env.GITHUB_WORKFLOW,
+              job: process.env.GITHUB_JOB,
+              stage: process.env.FAILURE_STAGE,
+            },
+          });
+          const summaryPath = path.join(root, '.claude', 'context', 'ci', 'failure-evidence-summary.json');
+          fs.writeFileSync(
+            summaryPath,
+            JSON.stringify(
+              {
+                artifacts: [
+                  {
+                    name: process.env.FAILURE_ARTIFACT_NAME,
+                    kind: 'failure_evidence',
+                    createdAt: new Date().toISOString(),
+                    path: path.relative(root, evidencePath),
+                  },
+                ],
+              },
+              null,
+              2
+            )
+          );
+          NODE
+
+      - name: Upload failure evidence artifact
+        if: failure()
+        id: upload-failure-evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-evidence-${{ github.workflow }}-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            .claude/context/ci/failure-evidence/
+            .claude/context/ci/failure-evidence-summary.json
+
+      - name: Write failure evidence summary
+        if: failure()
+        shell: bash
+        env:
+          FAILURE_ARTIFACT_NAME: failure-evidence-${{ github.workflow }}-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          FAILURE_ARTIFACT_URL: ${{ steps.upload-failure-evidence.outputs.artifact-url }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const summaryPath = path.join(process.cwd(), '.claude', 'context', 'ci', 'failure-evidence-summary.json');
+          const payload = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+          if (Array.isArray(payload.artifacts) && payload.artifacts[0]) {
+            payload.artifacts[0].name = process.env.FAILURE_ARTIFACT_NAME;
+            if (process.env.FAILURE_ARTIFACT_URL) {
+              payload.artifacts[0].url = process.env.FAILURE_ARTIFACT_URL;
+            }
+          }
+          fs.writeFileSync(summaryPath, JSON.stringify(payload, null, 2));
+          NODE
+          pnpm ci:summary:write --kind failure-evidence --input .claude/context/ci/failure-evidence-summary.json
+
   validate-and-test:
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -76,3 +153,80 @@ jobs:
 
       - name: Run full tests
         run: pnpm test
+
+      - name: Capture failure evidence
+        if: failure()
+        shell: bash
+        env:
+          FAILURE_ARTIFACT_NAME: failure-evidence-${{ github.workflow }}-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          FAILURE_STAGE: validate-and-test
+        run: |
+          mkdir -p .claude/context/ci
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const { writeFailureEvidence } = require('./.claude/lib/ci/failure-evidence.cjs');
+
+          const root = process.cwd();
+          const evidencePath = writeFailureEvidence(root, {
+            env: process.env,
+            failure: {
+              workflow: process.env.GITHUB_WORKFLOW,
+              job: process.env.GITHUB_JOB,
+              stage: process.env.FAILURE_STAGE,
+            },
+          });
+          const summaryPath = path.join(root, '.claude', 'context', 'ci', 'failure-evidence-summary.json');
+          fs.writeFileSync(
+            summaryPath,
+            JSON.stringify(
+              {
+                artifacts: [
+                  {
+                    name: process.env.FAILURE_ARTIFACT_NAME,
+                    kind: 'failure_evidence',
+                    createdAt: new Date().toISOString(),
+                    path: path.relative(root, evidencePath),
+                  },
+                ],
+              },
+              null,
+              2
+            )
+          );
+          NODE
+
+      - name: Upload failure evidence artifact
+        if: failure()
+        id: upload-failure-evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-evidence-${{ github.workflow }}-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            .claude/context/ci/failure-evidence/
+            .claude/context/ci/failure-evidence-summary.json
+
+      - name: Write failure evidence summary
+        if: failure()
+        shell: bash
+        env:
+          FAILURE_ARTIFACT_NAME: failure-evidence-${{ github.workflow }}-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          FAILURE_ARTIFACT_URL: ${{ steps.upload-failure-evidence.outputs.artifact-url }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const summaryPath = path.join(process.cwd(), '.claude', 'context', 'ci', 'failure-evidence-summary.json');
+          const payload = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+          if (Array.isArray(payload.artifacts) && payload.artifacts[0]) {
+            payload.artifacts[0].name = process.env.FAILURE_ARTIFACT_NAME;
+            if (process.env.FAILURE_ARTIFACT_URL) {
+              payload.artifacts[0].url = process.env.FAILURE_ARTIFACT_URL;
+            }
+          }
+          fs.writeFileSync(summaryPath, JSON.stringify(payload, null, 2));
+          NODE
+          pnpm ci:summary:write --kind failure-evidence --input .claude/context/ci/failure-evidence-summary.json
