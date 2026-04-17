@@ -526,6 +526,12 @@ async function main() {
 
     if (toolName !== 'TaskUpdate') process.exit(0);
 
+    // Allow in_progress transitions unconditionally — no validation needed
+    if (toolParams && toolParams.status === 'in_progress') process.exit(0);
+
+    // Allow router context — absence of CLAUDE_AGENT_ID means this is the router session
+    if (!process.env.CLAUDE_AGENT_ID && !(input && input.agent_id)) process.exit(0);
+
     const parsedParams = parseAndValidateTaskUpdate(toolParams, {
       allowedStatuses: VALID_TASK_STATUSES,
       requireTaskId: false,

@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **TaskUpdate PreToolUse block from router context** — `pre-completion-validation.cjs` now allows the router to set `in_progress`/`completed` on its own tasks. The hook short-circuits when `CLAUDE_AGENT_ID` is absent (router context) and the operation is `in_progress` or `completed`, unblocking standard task lifecycle management. Test coverage added in `tests/hooks/validation/pre-completion-validation.test.cjs`.
+
 - **CLAUDE_AGENT_ID sub-agent bypass in routing-guard-core** — `hasExplicitAgentContext()` now uses `process.env.CLAUDE_AGENT_ID` as primary detection signal for sub-agents in PreToolUse hooks. `checkRouterWrite()` accepts `hookInput` and short-circuits via this check, preventing legitimate developer sub-agents from being blocked by the router write guard.
 
 - **sub-agent bypass in write-pretool-bundle.cjs** — add sub-agent bypass to write-pretool-bundle.cjs so CLAUDE_AGENT_ID-identified agents can write to creator paths without router-mode blocking.
@@ -27,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Reconcile agent count in docs** — Verified agent count from registry (119 entries). All documentation already reflected the correct count of 119; no numeric changes required. Registry `totalAgents` field and all doc references are consistent.
+- **README agent-file counts refreshed** — Top-level README copy now reflects the current 124 tracked `.claude/agents/**/*.md` files used by `validate:sync`, including isolated worktree variants.
 
 ### Added
 
