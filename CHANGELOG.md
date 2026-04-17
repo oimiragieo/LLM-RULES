@@ -52,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Deterministic CI and release governance tooling** — Added repo-native flake ledger and CLI summary (`.claude/lib/ci/flake-ledger.cjs`, `.claude/tools/cli/flake-report.cjs`), failure evidence artifact capture with secret redaction (`.claude/lib/ci/failure-evidence.cjs`), impacted validation planning (`.claude/lib/ci/impacted-validation-planner.cjs`, `.claude/tools/cli/validate-affected.cjs`), and semver-aware release gating (`.claude/lib/ci/release-gate.cjs`, `.claude/tools/cli/release-gate.cjs`). Exposed the helpers through `pnpm flake:report`, `pnpm validate:affected`, and `pnpm release:gate`.
+- **Remote CI evidence and release enforcement** — `CI` now persists advisory impacted-validation and release-gate artifacts, `Full Validation` now runs a PR-only `Release Governance` gate that diffs governed agent/skill/schema artifacts from the PR base SHA to the PR head SHA while preserving deletions and renames, uploads durable release-governance evidence, and `CI Flake Ops` now aggregates recent advisory plus failure-evidence artifacts into a scheduled maintainer report with issue escalation when recurring failures become actionable.
 
 - **README agent-file counts refreshed** — Top-level README copy now reflects the current 124 tracked `.claude/agents/**/*.md` files used by `validate:sync`, including isolated worktree variants.
 
@@ -580,7 +581,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `task-manager` agent (haiku): post-pipeline task hygiene — closes stale tasks, audits 9 framework health invariants, creates fix tasks for CRITICAL/HIGH violations, produces structured health reports
 - Router drain gate Step 2.5: conditional task-manager spawn for HIGH/EPIC pipelines when stale task signals detected
 - `cron-decision` skill: decision framework for when/whether to use Claude's native cron scheduler vs alternatives (one-off tasks, manual triggers, external schedulers)
-- `scheduled-tasks` skill v1.1.0: added decision framework, official URL (https://code.claude.com/docs/en/scheduled-tasks), session-scope context note
+- `scheduled-tasks` skill v1.1.0: added decision framework, official URL (<https://code.claude.com/docs/en/scheduled-tasks>), session-scope context note
 - `@MODEL_SELECTION.md`: context window sizes table (Opus 4.6 = 1M tokens, Sonnet 4.6 = 200K tokens) and large-context routing guidance (>150K tokens → use opus)
 
 ### Fixed
@@ -2386,7 +2387,7 @@ See `.claude/docs/EXECUTION_MODE_MIGRATION.md` for detailed migration steps.
 - **Concurrent Operations**: 0% failure rate (down from 30%)
 - **Throughput**: 4.4-4.8 calls/sec under rapid stress
 
-###Files Created (17 total)
+### Files Created (17 total)
 
 - 4 test framework files (.claude/tests/)
 - 3 documentation files (.claude/docs/)

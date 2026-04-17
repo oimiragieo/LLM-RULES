@@ -64,3 +64,44 @@ test('authoritative workflows upload uniquely named failure evidence artifacts a
     );
   }
 });
+
+test('full validation wires an authoritative PR-only release governance gate', () => {
+  const workflow = readWorkflow('full-validation.yml');
+  const releaseGovernanceBlockMatch = workflow.match(
+    /release-governance:[\s\S]*?(?=\n\s{2}[a-z0-9-]+:|\n$)/
+  );
+
+  assert.match(workflow, /release-governance:/);
+  assert.match(workflow, /name:\s*Release Governance/);
+  assert.match(workflow, /if:\s*github\.event_name == 'pull_request'/);
+  assert.match(workflow, /fetch-depth:\s*0/);
+  assert.match(workflow, /Collect changed files/);
+  assert.match(workflow, /pull_request\.head\.sha/);
+  assert.match(workflow, /--name-status/);
+  assert.match(workflow, /--find-renames/);
+  assert.match(workflow, /--diff-filter=ACMRD/);
+  assert.match(workflow, /changed-files\.tsv/);
+  assert.match(workflow, /git show/);
+  assert.match(workflow, /pnpm release:gate --json/);
+  assert.match(workflow, /--old/);
+  assert.match(workflow, /--new/);
+  assert.match(workflow, /--commit-message-file/);
+  assert.match(workflow, /release-intent\.txt/);
+  assert.match(workflow, /ci:summary:write --kind release-gate/);
+  assert.match(workflow, /actions\/upload-artifact@v4/);
+  assert.match(
+    workflow,
+    /release-governance-\$\{\{\s*github\.run_id\s*\}\}-\$\{\{\s*github\.run_attempt\s*\}\}/
+  );
+  assert.ok(releaseGovernanceBlockMatch, 'release-governance block should exist');
+  assert.doesNotMatch(
+    releaseGovernanceBlockMatch[0],
+    /--diff-filter=ACMR\b/,
+    'authoritative release-governance job must preserve deletions'
+  );
+  assert.doesNotMatch(
+    releaseGovernanceBlockMatch[0],
+    /continue-on-error:\s*true/,
+    'authoritative release-governance job must not be advisory'
+  );
+});

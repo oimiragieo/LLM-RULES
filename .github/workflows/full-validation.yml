@@ -423,6 +423,399 @@ jobs:
           NODE
           pnpm ci:summary:write --kind failure-evidence --input .claude/context/ci/failure-evidence-summary.json
 
+  release-governance:
+    name: Release Governance
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Collect changed files
+        shell: bash
+        run: |
+          mkdir -p .claude/context/ci
+          output_path=".claude/context/ci/changed-files.txt"
+          metadata_path=".claude/context/ci/changed-files.tsv"
+          base_ref="${{ github.event.pull_request.base.sha }}"
+          head_ref="${{ github.event.pull_request.head.sha }}"
+          git diff --name-status --find-renames --diff-filter=ACMRD "$base_ref" "$head_ref" > "$metadata_path"
+          : > "$output_path"
+          while IFS=$'\t' read -r status path_a path_b; do
+            [[ -z "$status" ]] && continue
+            representative_path="$path_a"
+            case "$status" in
+              R*)
+                representative_path="$path_b"
+                ;;
+            esac
+            [[ -n "$representative_path" ]] && printf '%s\n' "$representative_path" >> "$output_path"
+          done < "$metadata_path"
+
+      - name: Capture release intent
+        shell: bash
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const dir = path.join(process.cwd(), '.claude', 'context', 'ci');
+          fs.mkdirSync(dir, { recursive: true });
+          const content = `${process.env.PR_TITLE || ''}\n\n${process.env.PR_BODY || ''}`.trim();
+          fs.writeFileSync(path.join(dir, 'release-intent.txt'), `${content}\n`, 'utf8');
+          NODE
+
+      - name: Run authoritative release gate
+        shell: bash
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mkdir -p .claude/context/ci/release-gate
+
+          classify_artifact() {
+            local candidate="$1"
+            case "$candidate" in
+              .claude/skills/*/SKILL.md)
+                printf 'skill\n'
+                return
+                ;;
+              .claude/agents/*.md|.claude/agents/*/*.md|.claude/agents/*/*/*.md)
+                if [[ "$(basename "$candidate")" != "CLAUDE.md" ]]; then
+                  printf 'agent\n'
+                  return
+                fi
+                ;;
+              .claude/schemas/*.json|.claude/schemas/*/*.json|.claude/schemas/*/*/*.json|.claude/schemas/*/*/*/*.json)
+                printf 'schema\n'
+                return
+                ;;
+            esac
+            printf '\n'
+          }
+
+          run_release_gate() {
+            local artifact_type="$1"
+            local source_old="$2"
+            local source_new="$3"
+
+            governed_count=$((governed_count + 1))
+
+            local old_path=".claude/context/ci/release-gate/${governed_count}-old"
+            local new_path=".claude/context/ci/release-gate/${governed_count}-new"
+            local result_path=".claude/context/ci/release-gate/${governed_count}.json"
+
+            if [[ -n "$source_old" ]] && git cat-file -e "$BASE_REF:$source_old" 2>/dev/null; then
+              git show "$BASE_REF:$source_old" > "$old_path"
+            else
+              : > "$old_path"
+            fi
+
+            if [[ -n "$source_new" ]] && git cat-file -e "$HEAD_REF:$source_new" 2>/dev/null; then
+              git show "$HEAD_REF:$source_new" > "$new_path"
+            else
+              : > "$new_path"
+            fi
+
+            args=(
+              --old "$old_path"
+              --new "$new_path"
+              --type "$artifact_type"
+              --commit-message-file .claude/context/ci/release-intent.txt
+            )
+            if [[ -n "$migration_guide" ]]; then
+              args+=(--migration-guide "$migration_guide")
+            fi
+
+            set +e
+            pnpm release:gate --json "${args[@]}" > "$result_path"
+            current_status=$?
+            set -e
+            if [[ "$current_status" -ne 0 ]]; then
+              gate_status=$current_status
+            fi
+          }
+
+          migration_guide=""
+          while IFS=$'\t' read -r status path_a path_b; do
+            [[ -z "$status" ]] && continue
+            candidate="$path_a"
+            case "$status" in
+              R*)
+                candidate="$path_b"
+                ;;
+            esac
+            if [[ -z "$migration_guide" && -n "$candidate" && "$candidate" =~ (^|/)[^/]*[Mm][Ii][Gg][Rr][Aa][Tt][Ii][Oo][Nn][^/]*\.md$ && -f "$candidate" ]]; then
+              migration_guide="$candidate"
+            fi
+          done < .claude/context/ci/changed-files.tsv
+          if [[ -z "$migration_guide" && -f .claude/docs/MIGRATION.md ]]; then
+            migration_guide=".claude/docs/MIGRATION.md"
+          fi
+
+          governed_count=0
+          gate_status=0
+
+          while IFS=$'\t' read -r status path_a path_b; do
+            [[ -z "$status" ]] && continue
+
+            old_type="$(classify_artifact "$path_a")"
+            new_type="$(classify_artifact "$path_b")"
+
+            if [[ "$status" != R* ]]; then
+              new_type="$old_type"
+            fi
+
+            if [[ -n "$old_type" && -n "$new_type" && "$old_type" != "$new_type" ]]; then
+              run_release_gate "$old_type" "$path_a" ""
+              run_release_gate "$new_type" "" "$path_b"
+              continue
+            fi
+
+            artifact_type="$new_type"
+            source_old=""
+            source_new=""
+
+            if [[ -n "$new_type" ]]; then
+              artifact_type="$new_type"
+              if [[ "$status" == R* ]]; then
+                source_new="$path_b"
+                if [[ -n "$old_type" ]]; then
+                  source_old="$path_a"
+                fi
+              else
+                source_new="$path_a"
+                source_old="$path_a"
+              fi
+            elif [[ -n "$old_type" ]]; then
+              artifact_type="$old_type"
+              source_old="$path_a"
+            else
+              continue
+            fi
+
+            run_release_gate "$artifact_type" "$source_old" "$source_new"
+          done < .claude/context/ci/changed-files.tsv
+
+          if [[ "$governed_count" -eq 0 ]]; then
+            args=(--commit-message-file .claude/context/ci/release-intent.txt)
+            while IFS= read -r file; do
+              [[ -n "$file" ]] && args+=(--changed-file "$file")
+            done < .claude/context/ci/changed-files.txt
+            if [[ -n "$migration_guide" ]]; then
+              args+=(--migration-guide "$migration_guide")
+            fi
+
+            set +e
+            pnpm release:gate --json "${args[@]}" > .claude/context/ci/release-gate.json
+            gate_status=$?
+            set -e
+            exit "$gate_status"
+          fi
+
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          function isDocFile(filePath) {
+            const normalized = String(filePath || '').replace(/\\/g, '/');
+            return (
+              normalized.endsWith('.md') ||
+              normalized.startsWith('.claude/docs/') ||
+              normalized === 'README.md' ||
+              normalized === 'CHANGELOG.md'
+            );
+          }
+
+          const root = process.cwd();
+          const changedFilesPath = path.join(root, '.claude', 'context', 'ci', 'changed-files.txt');
+          const changedFilesMetadataPath = path.join(
+            root,
+            '.claude',
+            'context',
+            'ci',
+            'changed-files.tsv'
+          );
+          const releaseGateDir = path.join(root, '.claude', 'context', 'ci', 'release-gate');
+          const changedFiles = fs
+            .readFileSync(changedFilesPath, 'utf8')
+            .split(/\r?\n/)
+            .filter(Boolean);
+          const changedFileRecords = fs.existsSync(changedFilesMetadataPath)
+            ? fs
+                .readFileSync(changedFilesMetadataPath, 'utf8')
+                .split(/\r?\n/)
+                .filter(Boolean)
+                .map(line => {
+                  const [status, pathA = '', pathB = ''] = line.split('\t');
+                  return {
+                    status,
+                    pathA,
+                    pathB,
+                  };
+                })
+            : [];
+          const rank = { patch: 0, minor: 1, major: 2 };
+          let requiredBump = 'patch';
+          const failures = new Set();
+
+          const resultFiles = fs
+            .readdirSync(releaseGateDir)
+            .filter(name => /^\d+\.json$/u.test(name))
+            .sort((a, b) => Number.parseInt(a, 10) - Number.parseInt(b, 10));
+
+          for (const resultFile of resultFiles) {
+            const rawPayload = JSON.parse(
+              fs.readFileSync(path.join(releaseGateDir, resultFile), 'utf8')
+            );
+            const result = rawPayload.result || rawPayload;
+            if ((rank[result.requiredBump] || 0) > (rank[requiredBump] || 0)) {
+              requiredBump = result.requiredBump;
+            }
+            for (const failure of Array.isArray(result.failures) ? result.failures : []) {
+              failures.add(String(failure));
+            }
+          }
+
+          fs.writeFileSync(
+            path.join(root, '.claude', 'context', 'ci', 'release-gate.json'),
+            JSON.stringify(
+              {
+                result: {
+                  docsOnly:
+                    changedFileRecords.length > 0
+                      ? changedFileRecords.every(record =>
+                          [record.pathA, record.pathB].filter(Boolean).every(isDocFile)
+                        )
+                      : changedFiles.length > 0 && changedFiles.every(isDocFile),
+                  requiredBump,
+                  failures: [...failures],
+                  ok: failures.size === 0,
+                },
+              },
+              null,
+              2
+            )
+          );
+          NODE
+
+          exit "$gate_status"
+
+      - name: Write release gate summary
+        if: always()
+        run: pnpm ci:summary:write --kind release-gate --input .claude/context/ci/release-gate.json
+
+      - name: Upload release governance artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-governance-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            .claude/context/ci/changed-files.txt
+            .claude/context/ci/changed-files.tsv
+            .claude/context/ci/release-intent.txt
+            .claude/context/ci/release-gate/
+            .claude/context/ci/release-gate.json
+
+      - name: Capture failure evidence
+        if: failure()
+        shell: bash
+        env:
+          FAILURE_ARTIFACT_NAME: failure-evidence-${{ github.workflow }}-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          FAILURE_STAGE: release-governance
+        run: |
+          mkdir -p .claude/context/ci
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const { writeFailureEvidence } = require('./.claude/lib/ci/failure-evidence.cjs');
+
+          const root = process.cwd();
+          const evidencePath = writeFailureEvidence(root, {
+            env: process.env,
+            failure: {
+              workflow: process.env.GITHUB_WORKFLOW,
+              job: process.env.GITHUB_JOB,
+              stage: process.env.FAILURE_STAGE,
+            },
+          });
+          const summaryPath = path.join(root, '.claude', 'context', 'ci', 'failure-evidence-summary.json');
+          fs.writeFileSync(
+            summaryPath,
+            JSON.stringify(
+              {
+                artifacts: [
+                  {
+                    name: process.env.FAILURE_ARTIFACT_NAME,
+                    kind: 'failure_evidence',
+                    createdAt: new Date().toISOString(),
+                    path: path.relative(root, evidencePath),
+                  },
+                ],
+              },
+              null,
+              2
+            )
+          );
+          NODE
+
+      - name: Upload failure evidence artifact
+        if: failure()
+        id: upload-failure-evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-evidence-${{ github.workflow }}-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            .claude/context/ci/failure-evidence/
+            .claude/context/ci/failure-evidence-summary.json
+
+      - name: Write failure evidence summary
+        if: failure()
+        shell: bash
+        env:
+          FAILURE_ARTIFACT_NAME: failure-evidence-${{ github.workflow }}-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          FAILURE_ARTIFACT_URL: ${{ steps.upload-failure-evidence.outputs.artifact-url }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const summaryPath = path.join(process.cwd(), '.claude', 'context', 'ci', 'failure-evidence-summary.json');
+          const payload = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+          if (Array.isArray(payload.artifacts) && payload.artifacts[0]) {
+            payload.artifacts[0].name = process.env.FAILURE_ARTIFACT_NAME;
+            if (process.env.FAILURE_ARTIFACT_URL) {
+              payload.artifacts[0].url = process.env.FAILURE_ARTIFACT_URL;
+            }
+          }
+          fs.writeFileSync(summaryPath, JSON.stringify(payload, null, 2));
+          NODE
+          pnpm ci:summary:write --kind failure-evidence --input .claude/context/ci/failure-evidence-summary.json
+
   tests:
     name: Unit & Integration Tests
     runs-on: ubuntu-latest
