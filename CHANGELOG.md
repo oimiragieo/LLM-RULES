@@ -7,13 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Subagent safe-path Write bypass in `write-pretool-bundle.cjs` (reports/plans/artifacts/tmp/logs/memory/metrics paths).
+- `Agent` added to PostToolUse matcher in `settings.json`.
+- Committed in-flight modules: pre-completion-validation splits, flight-recorder-schema-gate, hooks/benchmarks, tests/monitoring/flight-recorder.test.cjs.
+- Committed memory-consolidation pipeline (consolidate-agent, retention-enforcer, consolidation/CLAUDE.md).
+- Committed memory-manager-core-impl.cjs facade.
+- Committed phase-advance-reader.cjs domain resolver.
+- Committed skills/telegram-polling/.
+
+### Removed
+- skill-updater-skill-workflow.md (no consumers).
+
+### Deferred
+- Feature-drop delete pass: identity-memory-section.cjs, memory-tools.cjs, mcp-allowlist-checker.cjs, skill-auto-router.cjs (each needs paired test-block removal).
+- Routing-guard wiring for resolveDomainSpecialist (blueprint P1-06).
+- telegram-polling agent-frontmatter wiring (blueprint P2-02; FILE-PLACEMENT-GUARD blocks automated edit).
+
 ### Investigated
 
 - **hook permission_mode and agent_id in sub-agent PreToolUse context** — Confirmed via official Claude Code docs (HOOKS.md): agent_id is ONLY present in SubagentStart/SubagentStop hook events, NOT in PreToolUse stdin payload. permission_mode IS in common hook input fields (values: default, plan, acceptEdits, dontAsk, bypassPermissions). router-tool-lockdown isRouterSession() cannot use hookInput.agent_id for PreToolUse sub-agent detection — falls through to CLAUDE_AGENT_ID env, task_id, allowed_tools, CWD. The [bypass] tag in block messages appears ONLY when permission_mode===bypassPermissions (--dangerously-skip-permissions).
 
 ### Fixed
 
+- **Flight recorder hot-path regression and benchmark flake** — Removed a duplicate `Date.now()` declaration in `.claude/lib/monitoring/flight-recorder.cjs`, added buffered-write-aware rotation probe skipping plus missing-file debounce coverage in `tests/monitoring/flight-recorder.test.cjs`, and stabilized the telemetry hot-path benchmark so repeated `tests/benchmarks/telemetry-hotpath-latency.test.cjs` runs stay under the suite threshold.
+
+- **Legacy `debug-agent` routing alias drift** — Remapped the stale `debug-agent` intent alias to `advanced-debugging` in `.claude/lib/routing/routing-table-intent-agents.cjs` and narrowed the legacy keyword set in `.claude/lib/routing/routing-table-intent-keywords-data.cjs`, clearing the routing equivalence and intent-keyword overlap failures.
+
+- **Phase 1A cost-tracking E2E timing flake** — Warmed up the timing sample, moved the measurement to `performance.now()`, removed an unused helper, and made the suite threshold explicitly configurable in `tests/integration/e2e/phase1a-e2e.test.cjs` so full-run overhead assertions no longer fail on normal timer jitter.
+
+- **Minimal profiler async timing flake** — Increased the async instrumentation delay margin in `tests/performance-profiling-minimal.test.cjs` so the profiler check validates real work without depending on an unstable 10 ms timer boundary under full-suite load.
+
 - **TaskUpdate PreToolUse block from router context** — `pre-completion-validation.cjs` now allows the router to set `in_progress`/`completed` on its own tasks. The hook short-circuits when `CLAUDE_AGENT_ID` is absent (router context) and the operation is `in_progress` or `completed`, unblocking standard task lifecycle management. Test coverage added in `tests/hooks/validation/pre-completion-validation.test.cjs`.
+
+- **Pre-completion validation regression recovery** — narrowed the router bypass so invalid-status and artifact-block paths still enforce outside true router completions, extracted summary/task-output/drain-gate logic into focused helper modules, restored legacy regression coverage, and refreshed the stale safe-json adoption test to target the current self-healing module layout.
+
+- **Hook runner and safety audit regressions** — restored direct CLI execution for `.claude/hooks/run-hook.cjs` by forwarding into the real `tools/cli` entrypoint, fixed the archived `channel-auto-start.cjs` safe-json import path so hook import audits stay green, and normalized `context-monitor.cjs` back to its documented null-on-invalid-JSON parsing contract.
+
+- **Channel daemon timeout cleanup regressions** — batched `hook-file-validator.cjs` git tracking into a single `git ls-files -z` lookup so `pre-spawn-hook-check.cjs` no longer times out under audit load, taught `TaskPool` to settle timed-out and cancelled tasks for `drain()`/test-runner cleanup, and wired dispatcher task heartbeat intervals into the same cancel path so timeout scenarios no longer leave the async integration suite hanging after completion.
 
 - **CLAUDE_AGENT_ID sub-agent bypass in routing-guard-core** — `hasExplicitAgentContext()` now uses `process.env.CLAUDE_AGENT_ID` as primary detection signal for sub-agents in PreToolUse hooks. `checkRouterWrite()` accepts `hookInput` and short-circuits via this check, preventing legitimate developer sub-agents from being blocked by the router write guard.
 
