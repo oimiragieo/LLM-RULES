@@ -312,7 +312,7 @@
         ]
       },
       {
-        "matcher": "Task|TaskList|TaskOutput|TaskUpdate",
+        "matcher": "Task|TaskList|TaskOutput|TaskUpdate|Agent",
         "hooks": [
           {
             "type": "command",
@@ -453,6 +453,7 @@
             "timeout_ms": 10000
           }
         ]
+
       },
       {
         "matcher": "",

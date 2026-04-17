@@ -58,9 +58,38 @@ async function main() {
     hookInput = await parseHookInputAsync();
     if (!hookInput) process.exit(0);
 
-    // Sub-agent bypass: non-router sub-agents skip all write safety checks
+    // Sub-agent bypass: non-router sub-agents skip all write safety checks.
+    // Matches the precedent in router-tool-lockdown.cjs:171-177 and
+    // routing-guard-core.helpers.cjs:29-33 — task_id in hookInput is a
+    // definitive signal that a subagent is executing this tool call.
     const _agentId = process.env.CLAUDE_AGENT_ID;
-    if (_agentId && _agentId !== 'router') {
+    const hookTaskId = hookInput && (hookInput.task_id || hookInput.taskId);
+    if ((_agentId && _agentId !== 'router') || hookTaskId) {
+      process.exit(0);
+    }
+
+    // Path whitelist: report/plan/artifact/tmp/log paths are always allowed.
+    // These are append-only outputs with no security surface; all agents write to them.
+    // Needed because subagent hookInput carries only  (no task_id, no CLAUDE_AGENT_ID),
+    // so the bypass above never triggers for legitimate subagent output writes.
+    const SAFE_WRITE_PREFIXES = [
+      '.claude/context/reports/',
+      '.claude/context/artifacts/',
+      '.claude/context/plans/',
+      '.claude/context/tmp/',
+      '.claude/context/logs/',
+      '.claude/context/memory/',
+      '.claude/context/metrics/',
+    ];
+    const writePath =
+      (getToolInput(hookInput) &&
+        (getToolInput(hookInput).file_path || getToolInput(hookInput).path)) ||
+      '';
+    const normalizedWritePath = writePath.split('\\').join('/');
+    const relWritePath = normalizedWritePath.includes('.claude/context/')
+      ? normalizedWritePath.slice(normalizedWritePath.indexOf('.claude/context/'))
+      : normalizedWritePath;
+    if (SAFE_WRITE_PREFIXES.some(prefix => relWritePath.startsWith(prefix))) {
       process.exit(0);
     }
 
