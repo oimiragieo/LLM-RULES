@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **test:framework open handle hang** — Wrapped stdin listener in `post-pipeline-token-report.cjs` with `require.main === module` guard. The hook's `process.stdin.on('data')` was registered unconditionally on `require()`, keeping the Node.js event loop alive when the module was imported by test files. `pnpm test:framework` now exits cleanly.
 - **test:framework failures 48→3** — Archived 4 orphaned test files for deleted hooks (state-reset x2, process-evolution-queue, worktree-prune-on-start). Updated hierarchical routing default expectation (now `on`). Fixed agent frontmatter quoting (`claude-md-auditor`). Fixed A2A port assumptions, external-integration-routing prompts, security intent assertion path, and telemetry event check. 3 remaining failures are order-dependent suite pollution.
 
+### Changed
+
+- **Reconcile agent count in docs** — Verified agent count from registry (119 entries). All documentation already reflected the correct count of 119; no numeric changes required. Registry `totalAgents` field and all doc references are consistent.
+
 ### Added
 
 - **hooks-explainer skill** — New skill documenting the hook enforcement system, bypass mechanisms, and common failure patterns to help agents avoid getting stuck on protected path writes.
