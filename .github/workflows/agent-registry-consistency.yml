@@ -39,11 +39,51 @@ jobs:
         run: npm run gen:agent-registry
 
       - name: Verify registry is up to date
+        shell: bash
         run: |
-          if git diff --quiet -- .claude/context/agent-registry.json; then
+          normalize_registry() {
+            local source_path="$1"
+            local output_path="$2"
+
+            node - "$source_path" "$output_path" <<'NODE'
+            const fs = require('fs');
+
+            const inputPath = process.argv[2];
+            const outputPath = process.argv[3];
+            const registry = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
+
+            delete registry.generatedAt;
+            if (registry.metadata && typeof registry.metadata === 'object') {
+              delete registry.metadata.lastHealthCheck;
+              delete registry.metadata.lastFullScan;
+            }
+
+            for (const card of Object.values(registry.agents || {})) {
+              if (!card || typeof card !== 'object') continue;
+              if (card.health && typeof card.health === 'object') {
+                delete card.health.lastUpdate;
+              }
+              if (card.metadata && typeof card.metadata === 'object') {
+                delete card.metadata.createdAt;
+                delete card.metadata.updatedAt;
+              }
+            }
+
+            fs.writeFileSync(outputPath, JSON.stringify(registry, null, 2) + '\n');
+            NODE
+          }
+
+          baseline_raw="$(mktemp)"
+          baseline_normalized="$(mktemp)"
+          current_normalized="$(mktemp)"
+
+          git show HEAD:.claude/context/agent-registry.json > "$baseline_raw"
+          normalize_registry "$baseline_raw" "$baseline_normalized"
+          normalize_registry ".claude/context/agent-registry.json" "$current_normalized"
+
+          if diff -u "$baseline_normalized" "$current_normalized"; then
             echo "Agent registry is up to date."
           else
             echo "Agent registry is stale. Run: npm run gen:agent-registry"
-            git --no-pager diff -- .claude/context/agent-registry.json
             exit 1
           fi
