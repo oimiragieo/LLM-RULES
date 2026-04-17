@@ -715,6 +715,7 @@ const INTENT_KEYWORDS = {
     'reference audit',
   ],
   'release-guardian': ['release-guardian', 'release', 'guardian', 'safety', 'specialist'],
+  'debug-agent': ['debug-agent', 'debug agent'],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

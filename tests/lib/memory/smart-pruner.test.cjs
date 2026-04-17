@@ -34,6 +34,12 @@ function cleanupTempDir(tmpDir) {
   }
 }
 
+function isoDateDaysAgo(daysAgo) {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  return date.toISOString().slice(0, 10);
+}
+
 // ========================================================================
 // Step 6: jaccardSimilarity() and deduplicateFile() tests (TDD RED phase)
 // ========================================================================
@@ -198,12 +204,14 @@ Frontend rendering performance degrades with large virtual DOM trees.
 
 test('pruneResolvedEntries() - removes old resolved entries', () => {
   const pruner = require(path.join(PROJECT_ROOT, '.claude/lib/memory/smart-pruner.cjs'));
+  const oldResolvedDate = isoDateDaysAgo(45);
+  const recentResolvedDate = isoDateDaysAgo(7);
 
   const content = `# Issues
 
 ## Old Resolved Bug
 
-**Date:** 2025-12-01
+**Date:** ${oldResolvedDate}
 **Status: RESOLVED**
 
 This was resolved over 30 days ago.
@@ -212,7 +220,7 @@ This was resolved over 30 days ago.
 
 ## Recent Resolved Bug
 
-**Date:** 2026-03-01
+**Date:** ${recentResolvedDate}
 **Status: RESOLVED**
 
 This was resolved recently (within 30 days).
@@ -247,12 +255,13 @@ This is still open.
 
 test('pruneResolvedEntries() - preserves [PERMANENT] resolved entries', () => {
   const pruner = require(path.join(PROJECT_ROOT, '.claude/lib/memory/smart-pruner.cjs'));
+  const oldResolvedDate = isoDateDaysAgo(45);
 
   const content = `# Issues
 
 ## Old Resolved Critical Bug [PERMANENT]
 
-**Date:** 2025-12-01
+**Date:** ${oldResolvedDate}
 **Status: RESOLVED**
 
 This was resolved over 30 days ago but is permanently important.
@@ -261,7 +270,7 @@ This was resolved over 30 days ago but is permanently important.
 
 ## Old Resolved Normal Bug
 
-**Date:** 2025-12-01
+**Date:** ${oldResolvedDate}
 **Status: RESOLVED**
 
 This was resolved over 30 days ago.

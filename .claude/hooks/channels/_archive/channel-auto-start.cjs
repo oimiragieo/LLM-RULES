@@ -18,7 +18,7 @@
 const path = require('path');
 const fs = require('fs');
 const { execFileSync } = require('child_process');
-const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const RUNTIME = path.join(ROOT, '.claude', 'context', 'runtime');
@@ -327,7 +327,10 @@ if (require.main === module) {
 
 // ─── Exports for testing ──────────────────────────────────────────────────────
 module.exports = {
+  main,
+  runMain,
   hasStartupAlreadyFired,
   writeStartupSentinel,
+  LOCKFILE,
   CHANNEL_SENTINEL_PATH,
 };

@@ -13,6 +13,9 @@
 
 const { EventEmitter } = require('node:events');
 
+const TASK_TIMEOUT_SIGNAL = Symbol('task-timeout');
+const TASK_CANCELLED_SIGNAL = Symbol('task-cancelled');
+
 class TaskPool extends EventEmitter {
   /**
    * @param {Object} [opts]
@@ -63,6 +66,8 @@ class TaskPool extends EventEmitter {
       onProgress: meta.onProgress || null,
       _cancel: meta.cancel || null,
       _timeoutTimer: null,
+      _terminalSignalPromise: null,
+      _terminalSignalResolve: null,
       // Forward arbitrary metadata (e.g., _progressTimer, _sink, _messageId)
       _progressTimer: meta._progressTimer || null,
       _sink: meta._sink || null,
@@ -114,6 +119,7 @@ class TaskPool extends EventEmitter {
       if (entry._timeoutTimer) clearTimeout(entry._timeoutTimer);
       entry.status = 'cancelled';
       entry.endTime = Date.now();
+      this._signalTerminal(entry, TASK_CANCELLED_SIGNAL);
       this.emit('task-cancelled', entry);
       this._runningCount--;
       this._dequeue();
@@ -179,6 +185,10 @@ class TaskPool extends EventEmitter {
     this.emit('task-started', entry);
     this.log(`[pool] Task ${entry.id} started (${this._runningCount}/${this.maxConcurrent} slots)`);
 
+    entry._terminalSignalPromise = new Promise(resolve => {
+      entry._terminalSignalResolve = resolve;
+    });
+
     // Set up timeout if configured
     if (entry.timeout > 0) {
       entry._timeoutTimer = setTimeout(() => {
@@ -193,6 +203,7 @@ class TaskPool extends EventEmitter {
             /* ignored */
           }
         }
+        this._signalTerminal(entry, TASK_TIMEOUT_SIGNAL);
         this._runningCount--;
         this.emit('task-timeout', entry);
         this._dequeue();
@@ -213,22 +224,32 @@ class TaskPool extends EventEmitter {
     try {
       const taskResult = entry.fn();
 
-      let result;
+      let executionPromise;
       if (taskResult && typeof taskResult.then === 'function') {
-        result = await taskResult;
+        executionPromise = taskResult;
       } else if (taskResult && taskResult.promise) {
         if (taskResult.cancel && !entry._cancel) {
           entry._cancel = taskResult.cancel;
         }
-        result = await taskResult.promise;
+        executionPromise = taskResult.promise;
       } else {
-        result = taskResult;
+        executionPromise = Promise.resolve(taskResult);
+      }
+
+      const result = entry._terminalSignalPromise
+        ? await Promise.race([executionPromise, entry._terminalSignalPromise])
+        : await executionPromise;
+
+      if (result === TASK_TIMEOUT_SIGNAL || result === TASK_CANCELLED_SIGNAL) {
+        return;
       }
 
       this._finishTask(entry, result, null);
     } catch (err) {
       this._finishTask(entry, null, err);
     } finally {
+      entry._terminalSignalPromise = null;
+      entry._terminalSignalResolve = null;
       this._taskPromises.delete(entry.id);
     }
   }
@@ -291,6 +312,13 @@ class TaskPool extends EventEmitter {
       for (let i = 0; i < toEvict; i++) {
         this.tasks.delete(finished[i][0]);
       }
+    }
+  }
+
+  _signalTerminal(entry, signal) {
+    if (typeof entry._terminalSignalResolve === 'function') {
+      entry._terminalSignalResolve(signal);
+      entry._terminalSignalResolve = null;
     }
   }
 }

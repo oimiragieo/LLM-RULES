@@ -1,6 +1,25 @@
+---
+name: CLAUDE
+tools:
+  - Read
+  - MemoryRecord
+skills:
+  - memory-search
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - token-saver-context-compression
+---
+
 # Domain Agents
 
 68 technology-specific specialists — one per language, framework, or professional domain. Each masters a specific technology stack and is preferred over the generic `developer` agent whenever a match exists.
+
+Search-First Protocol: use `pnpm search:code` or `ripgrep` before touching the domain index so new specialist entries follow the existing structure. When extending this catalog, reference the lookup step with `Skill({ name: 'ripgrep' })` or an equivalent search skill in the coordinating prompt.
+
+## Token Saver Invocation Rule
+
+Invoke `token-saver-context-compression` before continuing once domain-routing work has accumulated large search results, multiple agent summaries, or enough copied snippets that the next task would mostly repeat already-known context.
 
 ## By Category
 

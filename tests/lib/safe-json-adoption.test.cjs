@@ -37,31 +37,23 @@ function _writeGoodJson(dir, filename, data) {
 }
 
 // ---------------------------------------------------------------------------
-// 1. rollback-manager.cjs — _loadManifest()
+// 1. loop-state-manager.cjs — getState()
 // ---------------------------------------------------------------------------
-test('rollback-manager: _loadManifest does not crash on corrupt manifest.json', () => {
+test('loop-state-manager: getState does not crash on corrupt loop-state.json', () => {
   const tmpDir = makeTmpDir();
-  const checkpointDir = path.join(tmpDir, 'checkpoints');
-  const checkpointId = 'cp-test';
-  const cpDir = path.join(checkpointDir, checkpointId);
-  fs.mkdirSync(cpDir, { recursive: true });
-  writeBadJson(cpDir, 'manifest.json');
+  const stateFile = writeBadJson(tmpDir, 'loop-state.json');
 
-  const { RollbackManager } = require(
-    path.join(PROJECT_ROOT, '.claude', 'lib', 'self-healing', 'rollback-manager.cjs')
+  const { getState } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'self-healing', 'loop-state-manager.cjs')
   );
-  const rm = new RollbackManager({ checkpointDir });
 
-  // Should not throw
   let result;
   assert.doesNotThrow(() => {
-    result = rm._loadManifest(checkpointId);
+    result = getState(stateFile);
   });
 
-  // Should return an empty manifest or null (not crash)
-  if (result !== null) {
-    assert.ok(typeof result === 'object', 'result should be an object');
-  }
+  assert.ok(typeof result === 'object', 'result should be an object');
+  assert.ok(Array.isArray(result.actionHistory), 'result should include default actionHistory');
 });
 
 // ---------------------------------------------------------------------------
@@ -140,7 +132,6 @@ test('pre-completion-validation: readActiveCreatorSkills handles corrupt state f
   const _stateFile = path.join(tmpDir, 'active-creators.json');
   writeBadJson(tmpDir, 'active-creators.json');
 
-  // We test this by reading the source and verifying safeParseJSON is used
   const modulePath = path.join(
     PROJECT_ROOT,
     '.claude',
@@ -148,10 +139,17 @@ test('pre-completion-validation: readActiveCreatorSkills handles corrupt state f
     'validation',
     'pre-completion-validation.cjs'
   );
-  const src = fs.readFileSync(modulePath, 'utf8');
+  const helperPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'hooks',
+    'validation',
+    'pre-completion-validation.task-output.cjs'
+  );
+  const src = `${fs.readFileSync(modulePath, 'utf8')}\n${fs.readFileSync(helperPath, 'utf8')}`;
   assert.ok(
     src.includes('safeParseJSON'),
-    'pre-completion-validation.cjs should use safeParseJSON'
+    'pre-completion-validation modules should use safeParseJSON'
   );
 });
 

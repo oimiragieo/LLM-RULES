@@ -98,9 +98,11 @@ function loadState(statePath) {
     return { state: { assertions: {} }, recovered: true, created: false };
   }
 
-  // Try to parse JSON
+  // Validate raw JSON syntax first so malformed files trigger corruption
+  // backup/recovery instead of silently falling through safe-json fallback.
   let state;
   try {
+    JSON.parse(content);
     state = safeParseJSON(content, null);
   } catch (_parseErr) {
     // Invalid JSON - backup and reinitialize

@@ -22,6 +22,8 @@ const { execFileSync } = require('node:child_process');
 
 const { PluginRegistry } = require('./registry.cjs');
 
+const GIT_EXEC_TIMEOUT_MS = 15000;
+
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
@@ -116,6 +118,21 @@ function validateMarketplaceName(name) {
   }
 }
 
+function buildGitExecOptions(extra = {}) {
+  return {
+    stdio: 'pipe',
+    windowsHide: true,
+    shell: false,
+    timeout: GIT_EXEC_TIMEOUT_MS,
+    env: {
+      ...process.env,
+      GIT_TERMINAL_PROMPT: '0',
+      GCM_INTERACTIVE: 'Never',
+    },
+    ...extra,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -148,11 +165,7 @@ function cloneMarketplace({ name, gitUrl, marketplacesDir }) {
   // (blocks --upload-pack=..., --config=..., etc. even if validation is bypassed).
   // shell:false ensures no shell metacharacter interpretation, making this
   // immune to command injection via $(...), `...`, ;, &, |, <, >, \n.
-  execFileSync('git', ['clone', '--depth=1', '--', gitUrl, targetDir], {
-    stdio: 'pipe',
-    windowsHide: true,
-    shell: false,
-  });
+  execFileSync('git', ['clone', '--depth=1', '--', gitUrl, targetDir], buildGitExecOptions());
 
   // Register the marketplace in known_marketplaces.json
   const registry = new PluginRegistry(marketplacesDir);
@@ -183,12 +196,7 @@ function updateMarketplace({ name, marketplacesDir }) {
   // SEC-H-04 (CWE-78): Use execFileSync with array args and shell:false.
   // No user input is interpolated into the command, but we still enforce
   // shell:false for consistency and defense-in-depth.
-  execFileSync('git', ['pull'], {
-    cwd: marketplaceDir,
-    stdio: 'pipe',
-    windowsHide: true,
-    shell: false,
-  });
+  execFileSync('git', ['pull'], buildGitExecOptions({ cwd: marketplaceDir }));
 
   // Refresh lastUpdated in the registry
   const registry = new PluginRegistry(marketplacesDir);
@@ -292,4 +300,7 @@ module.exports = {
   cloneMarketplace,
   updateMarketplace,
   discoverPlugins,
+  validateGitSource,
+  validateMarketplaceName,
+  buildGitExecOptions,
 };

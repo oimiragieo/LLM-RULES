@@ -68,3 +68,113 @@
 - [2026-04-16] [WORKFLOW] task-lifecycle-42 phantom stale detection: still firing across 995 gap-log entries as of 2026-04-16 session. Gap entries with durations 1621-2522 min plus a 55-min entry confirm the ghost reference persists through router resets. TTL-based auto-expiry fix for stale-task-detector.cjs (N=3 consecutive detections, TTL=30 min) remains unimplemented — this is the single highest-noise source in gap-log across all sessions.
 - [2026-04-16] [WORKFLOW] SE-03 violation in pre-completion-validation.cjs observed once (blocked TaskUpdate with no stderr). SE-03 fail-open fix was added in commits a586ea825+bdb731d02 (fail-open .catch on main()). Single occurrence post-fix likely indicates a race condition or one-off; not systemic. Monitor if it recurs.
 - [2026-04-16] [DELIVERY] refl-routing-guard-detection-2026-04-16 reflection processed cleanly: Phase 1 fix (CLAUDE_AGENT_ID propagation, commits 145d812c8+71c73db7a) confirmed correct, spawn queue cleared. Good pattern: named reflection IDs tied to specific fix commits enable efficient resolution verification.
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
+
+- Updated workflow: evolution-workflow (2026-04-17)
+
+- Updated workflow: missing-workflow-xyz (2026-04-17)
+
+- Created new agent: qa-guardian (2026-04-17)
+
+- Created new agent: contract-check (2026-04-17)
+
+- Created new agent: bool-action (2026-04-17)
+
+- Created new agent: repo-onboarder (2026-04-17)
+
+- Created new agent: release-guardian (2026-04-17)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
+
+- Updated workflow: evolution-workflow (2026-04-17)
+
+- Updated workflow: missing-workflow-xyz (2026-04-17)
+
+- Created new agent: qa-guardian (2026-04-17)
+
+- Created new agent: contract-check (2026-04-17)
+
+- Created new agent: bool-action (2026-04-17)
+
+- Created new agent: repo-onboarder (2026-04-17)
+
+- Created new agent: release-guardian (2026-04-17)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
+
+- Updated workflow: evolution-workflow (2026-04-17)
+
+- Updated workflow: missing-workflow-xyz (2026-04-17)
+
+- Created new agent: qa-guardian (2026-04-17)
+
+- Created new agent: contract-check (2026-04-17)
+
+- Created new agent: bool-action (2026-04-17)
+
+- Created new agent: repo-onboarder (2026-04-17)
+
+- Created new agent: release-guardian (2026-04-17)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
+
+- Updated workflow: evolution-workflow (2026-04-17)
+
+- Updated workflow: missing-workflow-xyz (2026-04-17)
+
+- Created new agent: qa-guardian (2026-04-17)
+
+- Created new agent: contract-check (2026-04-17)
+
+- Created new agent: bool-action (2026-04-17)
+
+- Created new agent: repo-onboarder (2026-04-17)
+
+- Created new agent: release-guardian (2026-04-17)
+
+- Created new agent: qa-guardian (2026-04-17)
+
+- Created new agent: contract-check (2026-04-17)
+
+- Created new agent: bool-action (2026-04-17)
+
+- Created new agent: repo-onboarder (2026-04-17)
+
+- Created new agent: release-guardian (2026-04-17)
+
+- Created new agent: qa-guardian (2026-04-17)
+
+- Created new agent: contract-check (2026-04-17)
+
+- Created new agent: bool-action (2026-04-17)
+
+- Created new agent: repo-onboarder (2026-04-17)
+
+- Created new agent: release-guardian (2026-04-17)
+
+- Created new agent: qa-guardian (2026-04-17)
+
+- Created new agent: contract-check (2026-04-17)
+
+- Created new agent: bool-action (2026-04-17)
+
+- Created new agent: repo-onboarder (2026-04-17)
+
+- Created new agent: release-guardian (2026-04-17)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
+
+- Updated workflow: evolution-workflow (2026-04-17)
+
+- Updated workflow: missing-workflow-xyz (2026-04-17)

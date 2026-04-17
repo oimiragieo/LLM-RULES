@@ -5,6 +5,7 @@ const path = require('node:path');
 
 const PROJECT_ROOT = process.cwd();
 const TOKEN_LOG_PATH = path.join(PROJECT_ROOT, '.claude/context/token-usage.jsonl');
+const BUDGET_STATE_PATH = path.join(PROJECT_ROOT, '.claude/context/runtime/budget-tracker.json');
 
 // Import the module we're testing
 const {
@@ -20,12 +21,18 @@ describe('token-budget-tracker.cjs', () => {
     if (fs.existsSync(TOKEN_LOG_PATH)) {
       fs.unlinkSync(TOKEN_LOG_PATH);
     }
+    if (fs.existsSync(BUDGET_STATE_PATH)) {
+      fs.unlinkSync(BUDGET_STATE_PATH);
+    }
   });
 
   after(() => {
     // Clean up test log file after tests
     if (fs.existsSync(TOKEN_LOG_PATH)) {
       fs.unlinkSync(TOKEN_LOG_PATH);
+    }
+    if (fs.existsSync(BUDGET_STATE_PATH)) {
+      fs.unlinkSync(BUDGET_STATE_PATH);
     }
   });
 

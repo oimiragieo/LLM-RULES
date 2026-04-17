@@ -33,6 +33,13 @@ let transformersPipeline = null;
 let embeddingMode = null;
 let deviceInfo = { device: 'cpu', gpuName: null, gpuMemoryMB: 0 };
 
+function getFastembedExecutionProviders(fastembed, preferGpu) {
+  const providerEnum = fastembed && fastembed.ExecutionProvider ? fastembed.ExecutionProvider : {};
+  const cpuProvider = providerEnum.CPU || 'cpu';
+  const cudaProvider = providerEnum.CUDA || 'cuda';
+  return preferGpu ? [cudaProvider] : [cpuProvider];
+}
+
 /**
  * Detect GPU using the project's GPUDetector
  */
@@ -59,12 +66,21 @@ async function detectGPU() {
   }
 }
 
-async function initFastembed() {
-  await detectGPU();
+async function initFastembed(preferGpu = true) {
+  if (preferGpu) {
+    await detectGPU();
+  } else {
+    deviceInfo = { device: 'cpu', gpuName: null, gpuMemoryMB: 0 };
+    process.stderr.write('[embed-worker] GPU disabled, using CPU\n');
+  }
 
   const fastembed = require('fastembed');
   const initOptions = {
     model: fastembed.EmbeddingModel.BGESmallENV15,
+    executionProviders: getFastembedExecutionProviders(
+      fastembed,
+      preferGpu && deviceInfo.device === 'gpu'
+    ),
   };
 
   if (deviceInfo.device === 'gpu') {
@@ -82,8 +98,11 @@ async function initFastembed() {
     // If GPU init fails, retry CPU-only
     if (deviceInfo.device === 'gpu') {
       process.stderr.write(`[embed-worker] GPU init failed (${e.message}), retrying with CPU...\n`);
-      deviceInfo.device = 'cpu';
-      fastembedModel = await fastembed.FlagEmbedding.init(initOptions);
+      deviceInfo = { device: 'cpu', gpuName: null, gpuMemoryMB: 0 };
+      fastembedModel = await fastembed.FlagEmbedding.init({
+        ...initOptions,
+        executionProviders: getFastembedExecutionProviders(fastembed, false),
+      });
       process.stderr.write('[embed-worker] FastEmbed initialized (CPU fallback)\n');
     } else {
       throw e;
@@ -155,7 +174,7 @@ async function handleMessage(msg) {
   if (msg.action === 'init') {
     embeddingMode = msg.mode || 'fastembed';
     if (embeddingMode === 'fastembed') {
-      await initFastembed();
+      await initFastembed(msg.preferGpu !== false);
     } else if (embeddingMode === 'transformers') {
       await initTransformers(msg.model);
     }

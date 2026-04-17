@@ -41,10 +41,10 @@ Files under `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/wor
 
 ### Pre-flight Sequence (EVERY prompt)
 
-1. `reflection-reminder.txt`+`reflection-spawn-request.json` → spawn reflection-agent if pending
+1. `reflection-reminder.txt` + `reflection-spawn-request.json` → spawn reflection-agent if pending
 2. `stale-tasks.json` → close stale tasks via TaskUpdate
-3. `heartbeat-reminder.txt`→heartbeat-orchestrator; `integration-queue.jsonl`→artifact-integrator
-4. Creation preflight → spawn planner for feasibility-gate
+3. `heartbeat-reminder.txt` → heartbeat-orchestrator; `integration-queue.jsonl` → artifact-integrator
+4. Creation preflight → planner feasibility gate
 5. Framework changes → spawn QA with proactive-audit
 
 Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute requests.
@@ -59,15 +59,9 @@ Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute 
 
 ## TOOL USAGE & GUARDRAILS (Section 0.2)
 
-When agents attempt to use tools, they MUST adhere to the following safety guardrails:
-
-1. **Prevent Token Exhaustion (`MaxFileReadTokenExceededError`)**:
-   - NEVER attempt to full-read large files (>10,000 tokens).
-   - ALWAYS use `offset` and `limit` parameters for the `Read` tool to paginate, or use semantic/regex search tools (`Grep`/`grep_search`) to extract specific content.
-2. **Prevent Directory Read Crashes (`EISDIR`)**:
-   - NEVER invoke the `Read` tool on a directory path (e.g. `C:\dev\projects\reveng-main`). Use listing or architecture exploration tools instead.
-3. **`TaskCreate` Schema Compliance**:
-   - The `TaskCreate` tool absolutely requires the `subject` and `description` string parameters. DO NOT pass an array of nested `tasks: []`.
+- Avoid `MaxFileReadTokenExceededError`: never full-read large files; paginate `Read` or search first.
+- Avoid `EISDIR`: never `Read` a directory path; list/explore it instead.
+- `TaskCreate` requires string `subject` and `description`; never send nested `tasks: []`.
 
 ---
 
@@ -75,7 +69,7 @@ When agents attempt to use tools, they MUST adhere to the following safety guard
 
 ### SPECIALIST-FIRST ROUTING LAW (IRON LAW)
 
-**Developer is LAST RESORT.** 119 agents exist — always use the best-fit specialist. See `.claude/rules/agents.md` for common misrouting examples.
+**Developer is LAST RESORT.** Always route to the best-fit specialist first. See `.claude/rules/agents.md`.
 
 Use `Task(...)` not persona-switching. Include `task_id` in every spawn. Agents invoke skills via `Skill()`.
 
@@ -178,4 +172,4 @@ Catalog: **@SKILL_CATALOG_TABLE.md** | Discovery: read catalog → `Skill({ skil
 
 ## DIRECTORY INDEX
 
-Each subdirectory has its own CLAUDE.md. Key: `agents/` (119 agents), `skills/` (346), `hooks/` (123), `lib/` (50+ modules), `workflows/` (300+), `commands/` (200+), `schemas/` (250+), `context/` (runtime data), `config/` (15 configs), `docs/` (16 @ reference files), `rules/` (14 auto-loaded).
+Each major subdirectory has its own CLAUDE.md. Key roots: `agents/`, `skills/`, `hooks/`, `lib/`, `workflows/`, `commands/`, `schemas/`, `context/`, `config/`, `docs/`, `rules/`.

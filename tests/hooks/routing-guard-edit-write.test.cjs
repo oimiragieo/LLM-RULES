@@ -208,7 +208,7 @@ describe('Fix 1: routing-guard blocks Edit/Write/NotebookEdit in router mode', (
   // Settings.json registration verification
   // =========================================================================
 
-  it('should have write-pretool-bundle.cjs as the ONLY hook for Edit|Write|NotebookEdit in settings.json', () => {
+  it('should have write-pretool-bundle.cjs as the ONLY hook covering Edit|Write|NotebookEdit in settings.json', () => {
     const settingsPath = path.join(PROJECT_ROOT, '.claude', 'settings.json');
     assert.ok(fs.existsSync(settingsPath), 'settings.json should exist');
 
@@ -216,9 +216,11 @@ describe('Fix 1: routing-guard blocks Edit/Write/NotebookEdit in router mode', (
     const preToolUse = settings.hooks.PreToolUse;
     assert.ok(Array.isArray(preToolUse), 'PreToolUse should be an array');
 
-    // Find the Edit|Write|NotebookEdit matcher
-    const editWriteMatcher = preToolUse.find(m => m.matcher === 'Edit|Write|NotebookEdit');
-    assert.ok(editWriteMatcher, 'Edit|Write|NotebookEdit matcher should exist');
+    const editWriteMatcher = preToolUse.find(m => {
+      const matcher = String(m.matcher || '');
+      return ['Edit', 'Write', 'NotebookEdit'].every(tool => matcher.includes(tool));
+    });
+    assert.ok(editWriteMatcher, 'A matcher covering Edit|Write|NotebookEdit should exist');
     assert.ok(Array.isArray(editWriteMatcher.hooks), 'Matcher should have hooks array');
     assert.strictEqual(
       editWriteMatcher.hooks.length,

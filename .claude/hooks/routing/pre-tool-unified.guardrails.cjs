@@ -377,11 +377,27 @@ function getMutationPath(toolName, toolInput) {
   return normalizeToolPath(filePath);
 }
 
+function normalizeStructuredMemoryPath(rawPath) {
+  const normalized = normalizeToolPath(rawPath);
+  if (normalized) return normalized;
+  if (!rawPath || typeof rawPath !== 'string') return null;
+
+  const canonical = canonicalizePathForPlatform(rawPath, PROJECT_ROOT).replace(/\\/g, '/');
+  const marker = '/.claude/context/memory/';
+  const markerIndex = canonical.toLowerCase().indexOf(marker);
+  if (markerIndex === -1) return null;
+
+  return canonical.slice(markerIndex + 1);
+}
+
 function checkStructuredMemoryDirectWrite(toolName, toolInput) {
   const mode = (process.env.MEMORY_DIRECT_WRITE_ENFORCEMENT || 'block').toLowerCase();
   if (mode === 'off') return { checked: false, reason: 'disabled' };
 
-  const mutationPath = getMutationPath(toolName, toolInput);
+  const filePath =
+    toolInput?.file_path || toolInput?.filePath || toolInput?.path || toolInput?.notebook_path;
+  const mutationPath =
+    getMutationPath(toolName, toolInput) || normalizeStructuredMemoryPath(filePath);
   if (!mutationPath) return { checked: false, reason: 'no_mutation_path' };
 
   const normalizedPath = mutationPath.toLowerCase();
