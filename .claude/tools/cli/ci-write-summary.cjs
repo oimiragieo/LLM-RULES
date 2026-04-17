@@ -4,6 +4,7 @@
 const fs = require('fs');
 
 const { buildSummary, normalizeSummaryKind } = require('../../lib/ci/github-actions-summary.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 function parseArgs(argv) {
@@ -28,7 +29,7 @@ function parseArgs(argv) {
       continue;
     }
     if (current === '--payload' && args[i + 1]) {
-      payload = JSON.parse(args[++i]);
+      payload = safeParseJSON(args[++i], null);
     }
   }
 
@@ -41,7 +42,7 @@ function parseArgs(argv) {
 }
 
 function readJSONFile(inputPath) {
-  return JSON.parse(fs.readFileSync(inputPath, 'utf8'));
+  return safeParseJSON(fs.readFileSync(inputPath, 'utf8'), null);
 }
 
 function resolvePayload(kind, rawPayload) {

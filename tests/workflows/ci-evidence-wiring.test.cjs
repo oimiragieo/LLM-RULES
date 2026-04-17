@@ -18,13 +18,15 @@ test('ci workflow wires advisory changed-files, impacted-validation, release-gat
 
   assert.match(workflow, /name:\s*Collect changed files/);
   assert.match(workflow, /id:\s*changed-files/);
-  assert.match(workflow, /pnpm validate:affected --json/);
+  assert.match(workflow, /node\s+\.claude\/tools\/cli\/validate-affected\.cjs\s+--json/);
   assert.match(workflow, /ci:summary:write --kind impacted-validation/);
   assert.match(workflow, /if:\s*github\.event_name == 'pull_request'/);
-  assert.match(workflow, /pnpm release:gate --json/);
+  assert.match(workflow, /node\s+\.claude\/tools\/cli\/release-gate\.cjs\s+--json/);
   assert.match(workflow, /ci:summary:write --kind release-gate/);
   assert.match(workflow, /actions\/upload-artifact@v4/);
   assert.match(workflow, /ci-advisory-/);
+  assert.doesNotMatch(workflow, /pnpm validate:affected --json/);
+  assert.doesNotMatch(workflow, /pnpm release:gate --json/);
 });
 
 test('package scripts expose ci summary and artifact index helpers for workflow use', () => {
@@ -82,7 +84,7 @@ test('full validation wires an authoritative PR-only release governance gate', (
   assert.match(workflow, /--diff-filter=ACMRD/);
   assert.match(workflow, /changed-files\.tsv/);
   assert.match(workflow, /git show/);
-  assert.match(workflow, /pnpm release:gate --json/);
+  assert.match(workflow, /node\s+\.claude\/tools\/cli\/release-gate\.cjs\s+--json/);
   assert.match(workflow, /--old/);
   assert.match(workflow, /--new/);
   assert.match(workflow, /--commit-message-file/);
@@ -103,5 +105,10 @@ test('full validation wires an authoritative PR-only release governance gate', (
     releaseGovernanceBlockMatch[0],
     /continue-on-error:\s*true/,
     'authoritative release-governance job must not be advisory'
+  );
+  assert.doesNotMatch(
+    releaseGovernanceBlockMatch[0],
+    /pnpm release:gate --json/,
+    'authoritative release-governance job must emit clean JSON without pnpm banners'
   );
 });

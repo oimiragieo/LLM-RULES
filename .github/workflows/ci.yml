@@ -71,7 +71,7 @@ jobs:
           while IFS= read -r file; do
             [[ -n "$file" ]] && args+=(--file "$file")
           done < .claude/context/ci/changed-files.txt
-          pnpm validate:affected --json "${args[@]}" > .claude/context/ci/impacted-validation.json
+          node .claude/tools/cli/validate-affected.cjs --json "${args[@]}" > .claude/context/ci/impacted-validation.json
 
       - name: Write advisory impacted validation summary
         if: always()
@@ -87,11 +87,17 @@ jobs:
           while IFS= read -r file; do
             [[ -n "$file" ]] && args+=(--changed-file "$file")
           done < .claude/context/ci/changed-files.txt
-          pnpm release:gate --json "${args[@]}" > .claude/context/ci/release-gate.json
+          node .claude/tools/cli/release-gate.cjs --json "${args[@]}" > .claude/context/ci/release-gate.json
 
       - name: Write advisory release gate summary
         if: github.event_name == 'pull_request' && always()
-        run: pnpm ci:summary:write --kind release-gate --input .claude/context/ci/release-gate.json
+        shell: bash
+        run: |
+          if [[ -f .claude/context/ci/release-gate.json ]]; then
+            pnpm ci:summary:write --kind release-gate --input .claude/context/ci/release-gate.json
+          else
+            echo "Advisory release gate output missing; skipping summary."
+          fi
 
       - name: Upload advisory CI artifacts
         if: always()

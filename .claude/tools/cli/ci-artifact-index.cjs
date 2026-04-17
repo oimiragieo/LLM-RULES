@@ -4,6 +4,7 @@
 const fs = require('fs');
 
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 function parseArgs(argv) {
   const args = argv.slice(2);
@@ -121,7 +122,7 @@ function buildArtifactIndex(records = []) {
 
 function readInputRecords(inputPath) {
   if (inputPath) {
-    const parsed = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
+    const parsed = safeParseJSON(fs.readFileSync(inputPath, 'utf8'), null);
     if (Array.isArray(parsed)) return parsed;
     if (Array.isArray(parsed.artifacts)) return parsed.artifacts;
     return [parsed];
@@ -130,7 +131,7 @@ function readInputRecords(inputPath) {
   if (!process.stdin.isTTY) {
     const raw = fs.readFileSync(0, 'utf8').trim();
     if (raw !== '') {
-      const parsed = JSON.parse(raw);
+      const parsed = safeParseJSON(raw, null);
       if (Array.isArray(parsed)) return parsed;
       if (Array.isArray(parsed.artifacts)) return parsed.artifacts;
       return [parsed];

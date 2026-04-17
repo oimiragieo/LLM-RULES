@@ -548,7 +548,7 @@ jobs:
             fi
 
             set +e
-            pnpm release:gate --json "${args[@]}" > "$result_path"
+            node .claude/tools/cli/release-gate.cjs --json "${args[@]}" > "$result_path"
             current_status=$?
             set -e
             if [[ "$current_status" -ne 0 ]]; then
@@ -627,7 +627,7 @@ jobs:
             fi
 
             set +e
-            pnpm release:gate --json "${args[@]}" > .claude/context/ci/release-gate.json
+            node .claude/tools/cli/release-gate.cjs --json "${args[@]}" > .claude/context/ci/release-gate.json
             gate_status=$?
             set -e
             exit "$gate_status"
