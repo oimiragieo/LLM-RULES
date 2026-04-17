@@ -193,6 +193,8 @@
     "validate:agent-template-contract": "node .claude/tools/cli/validate-agent-template-contract.cjs",
     "validate:tool-manifest-drift": "node scripts/validation/validate-tool-manifest-drift.cjs",
     "validate:artifact-regression": "node .claude/tools/cli/validate-artifact-regression-gate.cjs",
+    "ci:summary:write": "node .claude/tools/cli/ci-write-summary.cjs",
+    "ci:artifact:index": "node .claude/tools/cli/ci-artifact-index.cjs",
     "quality:daemon:run-once": "node .claude/tools/cli/artifact-quality-daemon.cjs --mode once --json",
     "quality:daemon:start": "node .claude/tools/cli/artifact-quality-daemon.cjs --mode daemon",
     "quality:daemon:status": "node .claude/tools/cli/artifact-quality-daemon.cjs --mode status --json",

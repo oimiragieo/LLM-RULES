@@ -51,6 +51,25 @@ function resolvePayload(kind, rawPayload) {
   }
 
   switch (normalizedKind) {
+    case 'impacted-validation': {
+      const plan = rawPayload.plan || rawPayload;
+      const matchedRules = Array.isArray(plan.matchedRules) ? plan.matchedRules : [];
+      const rationale =
+        matchedRules.length > 0
+          ? `Matched rules: ${matchedRules.join(', ')}`
+          : plan.conservativeFallback
+            ? 'No targeted rules matched; using conservative fallback.'
+            : undefined;
+
+      return {
+        advisory: plan.advisory !== false,
+        changedFiles: Array.isArray(plan.changedFiles) ? plan.changedFiles : [],
+        rationale,
+        recommendedCommands: Array.isArray(plan.recommendedCommands)
+          ? plan.recommendedCommands
+          : [],
+      };
+    }
     case 'release-gate':
       return rawPayload.result || rawPayload;
     case 'flake-ops':

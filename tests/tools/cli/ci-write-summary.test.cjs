@@ -94,3 +94,48 @@ test('ci-write-summary appends markdown when GITHUB_STEP_SUMMARY is set', () => 
     cleanupTempDir(tempDir);
   }
 });
+
+test('ci-write-summary unwraps validate-affected plan payloads for impacted validation summaries', () => {
+  const tempDir = makeTempDir('ci-write-summary-plan');
+
+  try {
+    const summaryPath = path.join(tempDir, 'summary.md');
+    const payloadPath = path.join(tempDir, 'payload.json');
+
+    fs.writeFileSync(
+      payloadPath,
+      JSON.stringify({
+        plan: {
+          changedFiles: ['.github/workflows/ci.yml', 'package.json'],
+          matchedRules: ['routing'],
+          conservativeFallback: false,
+          recommendedCommands: ['pnpm lint', 'pnpm validate:routing'],
+        },
+      }),
+      'utf8'
+    );
+
+    const result = spawnSync(
+      'node',
+      [CLI, '--kind', 'impacted-validation', '--input', payloadPath],
+      {
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          GITHUB_STEP_SUMMARY: summaryPath,
+        },
+      }
+    );
+
+    assert.equal(result.status, 0, result.stderr);
+
+    const summary = fs.readFileSync(summaryPath, 'utf8');
+
+    assert.match(summary, /## Impacted Validation/);
+    assert.match(summary, /- Changed files: `2`/);
+    assert.match(summary, /- Recommended commands:/);
+    assert.match(summary, /`pnpm validate:routing`/);
+  } finally {
+    cleanupTempDir(tempDir);
+  }
+});
