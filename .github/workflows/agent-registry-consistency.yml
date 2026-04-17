@@ -46,31 +46,31 @@ jobs:
             local output_path="$2"
 
             node - "$source_path" "$output_path" <<'NODE'
-            const fs = require('fs');
+          const fs = require('fs');
 
-            const inputPath = process.argv[2];
-            const outputPath = process.argv[3];
-            const registry = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
+          const inputPath = process.argv[2];
+          const outputPath = process.argv[3];
+          const registry = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
 
-            delete registry.generatedAt;
-            if (registry.metadata && typeof registry.metadata === 'object') {
-              delete registry.metadata.lastHealthCheck;
-              delete registry.metadata.lastFullScan;
+          delete registry.generatedAt;
+          if (registry.metadata && typeof registry.metadata === 'object') {
+            delete registry.metadata.lastHealthCheck;
+            delete registry.metadata.lastFullScan;
+          }
+
+          for (const card of Object.values(registry.agents || {})) {
+            if (!card || typeof card !== 'object') continue;
+            if (card.health && typeof card.health === 'object') {
+              delete card.health.lastUpdate;
             }
-
-            for (const card of Object.values(registry.agents || {})) {
-              if (!card || typeof card !== 'object') continue;
-              if (card.health && typeof card.health === 'object') {
-                delete card.health.lastUpdate;
-              }
-              if (card.metadata && typeof card.metadata === 'object') {
-                delete card.metadata.createdAt;
-                delete card.metadata.updatedAt;
-              }
+            if (card.metadata && typeof card.metadata === 'object') {
+              delete card.metadata.createdAt;
+              delete card.metadata.updatedAt;
             }
+          }
 
-            fs.writeFileSync(outputPath, JSON.stringify(registry, null, 2) + '\n');
-            NODE
+          fs.writeFileSync(outputPath, JSON.stringify(registry, null, 2) + '\n');
+          NODE
           }
 
           baseline_raw="$(mktemp)"
