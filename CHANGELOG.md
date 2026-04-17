@@ -51,6 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Deterministic CI and release governance tooling** — Added repo-native flake ledger and CLI summary (`.claude/lib/ci/flake-ledger.cjs`, `.claude/tools/cli/flake-report.cjs`), failure evidence artifact capture with secret redaction (`.claude/lib/ci/failure-evidence.cjs`), impacted validation planning (`.claude/lib/ci/impacted-validation-planner.cjs`, `.claude/tools/cli/validate-affected.cjs`), and semver-aware release gating (`.claude/lib/ci/release-gate.cjs`, `.claude/tools/cli/release-gate.cjs`). Exposed the helpers through `pnpm flake:report`, `pnpm validate:affected`, and `pnpm release:gate`.
+
 - **README agent-file counts refreshed** — Top-level README copy now reflects the current 124 tracked `.claude/agents/**/*.md` files used by `validate:sync`, including isolated worktree variants.
 
 ### Added

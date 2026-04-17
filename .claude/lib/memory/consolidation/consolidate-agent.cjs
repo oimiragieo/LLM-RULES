@@ -5,8 +5,7 @@ const crypto = require('node:crypto');
 const TABLE_SQL = {
   episodic_memory: {
     pragma: 'PRAGMA table_info(episodic_memory)',
-    addConsolidatedAt:
-      'ALTER TABLE episodic_memory ADD COLUMN consolidated_at INTEGER',
+    addConsolidatedAt: 'ALTER TABLE episodic_memory ADD COLUMN consolidated_at INTEGER',
   },
   file_memory: {
     pragma: 'PRAGMA table_info(file_memory)',

@@ -11,6 +11,7 @@ If you want a local-first, reproducible agent stack with strict validation and h
 `Getting Started` · `.claude/docs/GETTING_STARTED.md`  
 `Architecture` · `.claude/docs/ARCHITECTURE.md`  
 `Developer Workflow` · `.claude/docs/DEVELOPER_WORKFLOW.md`  
+`Release Governance` · `.claude/docs/RELEASE_GOVERNANCE.md`  
 `Hooks Reference` · `.claude/docs/HOOKS_REFERENCE.md`  
 `Memory System` · `.claude/docs/MEMORY_SYSTEM.md`  
 `Code Indexing` · `.claude/docs/CODE_INDEXING_DESIGN.md`  
@@ -86,6 +87,14 @@ Full docs: `.claude/docs/TELEGRAM_ARCHITECTURE.md`
 - **Creator ecosystem contracts repaired**: Restored the `telegram-polling` skill bundle, fixed `agent-template.md` placeholder/frontmatter drift, and tightened the strict skill-ecosystem gate so detailed results fail correctly without breaking summary-only callers
 - **Docs and rules resynced**: Re-compressed `.claude/CLAUDE.md` under the contract limit, documented the 80K/120K/150K memory thresholds in `memory-protocol.md`, and removed the stale duplicate `skill-updater` workflow doc
 - **Full suite re-verified**: `pnpm test` completed cleanly at 3,062 top-level tests with 12,528 passing assertions and 0 failures
+
+### Phase 11 — Deterministic CI and Release Governance
+
+- **Flake ledger added**: New `.claude/lib/ci/flake-ledger.cjs` tracks categorized recurring failures with malformed-ledger quarantine and a maintainer-facing `pnpm flake:report` summary command
+- **Failure evidence artifacts added**: New `.claude/lib/ci/failure-evidence.cjs` captures branch/ref, CI job metadata, changed files, and redacted failure context without leaking secrets into persisted artifacts
+- **Impacted validation planner added**: New `pnpm validate:affected` helper maps changed paths to repo-specific validation commands, targeted test areas, and benchmark slices while degrading conservatively on unknown changes
+- **Semver-aware release gate added**: New `pnpm release:gate` reuses artifact semver diffing, keeps docs-only changes on the non-breaking path, and enforces migration-guide plus breaking-change signaling for semver-major releases
+- **Release runbook documented**: `.claude/docs/RELEASE_GOVERNANCE.md` now documents branch naming, local verification, required remote checks, and minor-vs-major release handling
 
 ### Prompt Cache Optimization (Zylos-inspired)
 

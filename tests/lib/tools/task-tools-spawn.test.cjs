@@ -20,7 +20,6 @@ test('Task uses real process spawn by default', async () => {
   const previous = process.env.TASK_TOOL_REAL_SPAWN;
   const previousSink = process.env.EVENT_BUS_SINK;
   const eventsPath = path.join(process.cwd(), '.claude/context/runtime/event-bus.jsonl');
-  const initialEvents = fs.existsSync(eventsPath) ? fs.readFileSync(eventsPath, 'utf8') : '';
   delete process.env.TASK_TOOL_REAL_SPAWN;
   delete process.env.EVENT_BUS_SINK;
 
@@ -47,17 +46,17 @@ test('Task uses real process spawn by default', async () => {
     );
     assert.equal(result.spawn.output?.frameworkLoaded, true);
 
-    // Event-bus telemetry is best-effort; verify spawn completed successfully
-    // (event-bus.jsonl may not exist if EVENT_BUS_SINK is not configured)
+    // Event-bus telemetry is best-effort. The sink is a shared, capped JSONL file,
+    // so verify the spawned task's telemetry is present in the final file rather
+    // than diffing by byte offset against the pre-test contents.
     if (fs.existsSync(eventsPath)) {
       const updatedEvents = fs.readFileSync(eventsPath, 'utf8');
-      const appended = updatedEvents.slice(initialEvents.length);
-      if (appended.length > 0) {
-        assert.ok(
-          appended.includes('task-subagent-telemetry') || appended.includes('TOOL_COMPLETED'),
-          'If event-bus has new entries, they should include telemetry'
-        );
-      }
+      assert.ok(
+        updatedEvents.includes('task-spawn-test-1') &&
+          (updatedEvents.includes('task-subagent-telemetry') ||
+            updatedEvents.includes('TOOL_COMPLETED')),
+        'If event-bus exists, it should retain telemetry for the spawned task'
+      );
     }
   } finally {
     MemoryVectorStore.clearSharedStores();
