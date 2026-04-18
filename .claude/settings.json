@@ -453,39 +453,6 @@
             "timeout_ms": 10000
           }
         ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/hook-error-detector.cjs",
-            "async": true,
-            "timeout_ms": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/recurring-issue-detector.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/context-window-monitor.cjs",
-            "async": true,
-            "timeout_ms": 10000
-          }
-        ]
       }
     ],
     "PostToolUseFailure": [

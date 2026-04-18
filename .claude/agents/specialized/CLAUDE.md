@@ -1,6 +1,25 @@
+---
+name: CLAUDE
+tools:
+  - Read
+  - MemoryRecord
+skills:
+  - memory-search
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - token-saver-context-compression
+---
+
 # Specialized Agents
 
 25 cross-cutting concern specialists that handle specific technical disciplines. These are preferred over the generic `developer` agent for their respective domains.
+
+Search-First Protocol: use `pnpm search:code` or `ripgrep` to inspect neighboring specialist prompts before reorganizing this index. If the catalog changes, note the discovery step with `Skill({ name: 'ripgrep' })` or another approved search skill in the execution prompt.
+
+## Token Saver Invocation Rule
+
+Invoke `token-saver-context-compression` before continuing once specialized review or investigation work has stacked enough search output, artifact excerpts, or agent summaries that the next step would mostly re-state existing context.
 
 ## Agents
 

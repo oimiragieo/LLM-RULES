@@ -518,6 +518,7 @@ class Dispatcher {
 
           // Spawn into task pool — non-blocking
           const cancelRef = { cancel: null };
+          const progressTimerRef = { current: null };
           const sinkRef = sink;
           const chatId = event.data.chatId;
           const intervalMs = this._progressIntervalMs;
@@ -535,7 +536,7 @@ class Dispatcher {
 
               // Start heartbeat now that the task is actually running
               let progressCount = 0;
-              const progressTimer = setInterval(async () => {
+              progressTimerRef.current = setInterval(async () => {
                 progressCount++;
                 const elapsed = progressCount * intervalSec;
                 try {
@@ -553,14 +554,25 @@ class Dispatcher {
                 return result;
               });
 
-              return resultPromise.finally(() => clearInterval(progressTimer));
+              return resultPromise.finally(() => {
+                if (progressTimerRef.current) {
+                  clearInterval(progressTimerRef.current);
+                  progressTimerRef.current = null;
+                }
+              });
             },
             {
               description: taskDesc,
               chatId: event.data.chatId,
               user: event.data.user,
               timeout: 300000, // 5 min
-              cancel: () => cancelRef.cancel && cancelRef.cancel(),
+              cancel: () => {
+                if (progressTimerRef.current) {
+                  clearInterval(progressTimerRef.current);
+                  progressTimerRef.current = null;
+                }
+                if (cancelRef.cancel) cancelRef.cancel();
+              },
               _sink: sink,
               _messageId: event.data.messageId,
             }

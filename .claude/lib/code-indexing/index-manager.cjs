@@ -63,6 +63,7 @@ class IndexManager {
     if (!this.vectorStore) {
       this.vectorStore = new VectorStore({
         projectRoot: this.options.projectRoot,
+        sharedStore: false,
         bm25: this.options.bm25 || {
           k1: 1.5,
           b: 0.75,

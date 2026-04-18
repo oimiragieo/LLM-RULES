@@ -206,6 +206,61 @@ describe('TaskPool', () => {
       await new Promise(r => setTimeout(r, 200));
       assert.equal(entry.status, 'timeout');
     });
+
+    it('drain resolves after a timeout even when the task promise never settles', async () => {
+      const entry = pool.spawn(
+        't-timeout-hang',
+        () => ({
+          promise: new Promise(() => {}),
+          cancel: () => {},
+        }),
+        {
+          description: 'hung task',
+          chatId: '1',
+          user: 'u',
+          timeout: 50,
+        }
+      );
+
+      await Promise.race([
+        pool.drain(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('drain hung after timeout')), 500)
+        ),
+      ]);
+
+      assert.equal(entry.status, 'timeout');
+      assert.equal(pool._taskPromises.size, 0);
+    });
+
+    it('invokes the cancel cleanup callback when a task times out', async () => {
+      let cancelCalls = 0;
+      const entry = pool.spawn(
+        't-timeout-cancel',
+        () => ({
+          promise: new Promise(() => {}),
+          cancel: () => {
+            cancelCalls++;
+          },
+        }),
+        {
+          description: 'hung task with cleanup',
+          chatId: '1',
+          user: 'u',
+          timeout: 50,
+        }
+      );
+
+      await Promise.race([
+        pool.drain(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('drain hung after timeout cleanup test')), 500)
+        ),
+      ]);
+
+      assert.equal(entry.status, 'timeout');
+      assert.equal(cancelCalls, 1);
+    });
   });
 
   describe('2.10 — getRunning returns only running tasks', () => {

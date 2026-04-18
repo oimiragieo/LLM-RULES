@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "hooks-explainer output",
+  "type": "object",
+  "required": ["topic", "summary", "components", "failureModes", "nextSteps"],
+  "additionalProperties": false,
+  "properties": {
+    "topic": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "absolutePath"],
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "absolutePath": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "failureModes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

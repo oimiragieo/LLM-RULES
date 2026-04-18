@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-04-16T23:47:27.944Z",
+  "generatedAt": "2026-04-18T00:13:31.042Z",
   "metadata": {
-    "totalSkills": 347,
+    "totalSkills": 348,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-04-16T23:47:27.946Z",
+    "lastValidated": "2026-04-18T00:13:31.045Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -9189,6 +9189,27 @@
       "priority": 1,
       "aliasOf": null
     },
+    "telegram-polling": {
+      "name": "telegram-polling",
+      "displayName": "Telegram Polling",
+      "category": "Other",
+      "domain": "other",
+      "description": "Use when building, debugging, or documenting Telegram bot polling flows that need safe agent routing, state tracking, and final-only replies without webhooks.",
+      "requiredTools": [
+        "Read",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "telegram-polling"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "template-updater": {
       "name": "template-updater",
       "displayName": "Template Updater",
@@ -9886,6 +9907,7 @@
         "style-analyzer",
         "task-delegation",
         "team-orchestration",
+        "telegram-polling",
         "template-updater",
         "token-saver-adaptive-ratio",
         "token-saver-context-compression",
@@ -10339,6 +10361,7 @@
         "style-analyzer",
         "task-delegation",
         "team-orchestration",
+        "telegram-polling",
         "template-updater",
         "token-saver-adaptive-ratio",
         "token-saver-context-compression",
@@ -10774,6 +10797,7 @@
         "style-analyzer",
         "task-delegation",
         "team-orchestration",
+        "telegram-polling",
         "template-updater",
         "token-saver-adaptive-ratio",
         "token-saver-context-compression",
@@ -11494,6 +11518,7 @@
         "session-log-analyzer",
         "slack-expert",
         "team-orchestration",
+        "telegram-polling",
         "template-updater",
         "tool-updater",
         "transcription",
@@ -12216,6 +12241,7 @@
         "setup-telegram-voice",
         "slack-expert",
         "task-delegation",
+        "telegram-polling",
         "template-updater",
         "token-saver-adaptive-ratio",
         "token-saver-memory-dedup",
@@ -14108,6 +14134,7 @@
         "setup-telegram-voice",
         "slack-expert",
         "task-delegation",
+        "telegram-polling",
         "template-updater",
         "token-saver-adaptive-ratio",
         "token-saver-memory-dedup",

@@ -1,5 +1,7 @@
 'use strict';
 
+/* eslint-disable max-lines -- dispatcher daemon coverage lives in one file to share the integration fixtures */
+
 const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 const { Dispatcher } = require('../../../scripts/channels/daemon/dispatcher.cjs');
@@ -99,6 +101,21 @@ describe('Dispatcher', () => {
     it('[TASK] tag triggers executor flow', async () => {
       renderer = createMockRenderer('[TASK] Run the tests');
       dispatcher = new Dispatcher(router, renderer, sinks, () => {}, memory, {});
+      dispatcher.executor.executeTaskAsync = () => ({
+        promise: Promise.resolve('Result: task complete'),
+        cancel: () => {},
+        child: null,
+      });
+      dispatcher.missionExecutor.executeAsync = () => ({
+        promise: Promise.resolve({
+          grade: { passed: true, grade: 'good', score: 100 },
+          handoff: { summary: 'Result: task complete' },
+          structured: true,
+        }),
+        cancel: () => {},
+      });
+      dispatcher.missionExecutor.formatResult = result =>
+        result.handoff?.summary || 'Result: task complete';
 
       dispatcher.enqueue({
         type: 'telegram.message',
@@ -121,6 +138,7 @@ describe('Dispatcher', () => {
       );
       assert.ok(taskNotification, 'Should have task notification or result');
       assert.equal(dispatcher.stats.tasksExecuted, 1);
+      await dispatcher.taskPool.drain();
     });
 
     it('echo handler returns echoed text', async () => {
@@ -401,6 +419,24 @@ describe('Dispatcher', () => {
           `\u{26a1} Ultrawork: 2/2 subtasks completed\n\n${task.slice(0, 50)}`
         );
       };
+
+      // Keep async task tests hermetic even when the skill router classifies
+      // a [TASK] prompt as coding and routes it through the mission executor.
+      d.missionExecutor.executeAsync = task => ({
+        promise: new Promise(resolve =>
+          setTimeout(
+            () =>
+              resolve({
+                grade: { passed: true, grade: 'good', score: 100 },
+                handoff: { summary: `Result: ${task.slice(0, 30)}` },
+                structured: true,
+              }),
+            taskDelay
+          )
+        ),
+        cancel: () => {},
+      });
+      d.missionExecutor.formatResult = result => result.handoff?.summary || 'Mission complete';
 
       return { dispatcher: d, sinks: s, memory: m };
     }

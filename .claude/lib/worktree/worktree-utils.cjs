@@ -115,6 +115,40 @@ function isUnderWorktreesDir(cwd) {
 }
 
 /**
+ * Detect whether `cwd` is a Claude-managed agent worktree under `projectRoot/.claude/worktrees`.
+ *
+ * This is intentionally narrower than `isUnderWorktreesDir()`: linked git worktrees created
+ * outside the repo-managed `.claude/worktrees/` directory must not be treated as disposable
+ * agent sandboxes for destructive cleanup steps.
+ *
+ * @param {string} [cwd] - Working directory to inspect (defaults to process.cwd())
+ * @param {string} [projectRoot] - Repository/project root (defaults to process.cwd())
+ * @returns {boolean}
+ */
+function isManagedClaudeWorktree(cwd, projectRoot) {
+  const pathModule = require('path');
+  const fsModule = require('fs');
+
+  const checkDir = pathModule.resolve(cwd || process.cwd());
+  const rootDir = pathModule.resolve(projectRoot || process.cwd());
+  const managedRoot = pathModule.resolve(rootDir, '.claude', 'worktrees');
+
+  const normalizedCheckDir = checkDir.replace(/\\/g, '/').toLowerCase();
+  const normalizedManagedRoot = managedRoot.replace(/\\/g, '/').replace(/\/?$/, '/').toLowerCase();
+
+  if (!normalizedCheckDir.startsWith(normalizedManagedRoot)) {
+    return false;
+  }
+
+  try {
+    const stat = fsModule.statSync(pathModule.join(checkDir, '.git'));
+    return stat.isFile();
+  } catch (_err) {
+    return false;
+  }
+}
+
+/**
  * Pre-creation guard: determine whether a new isolated worktree should be created.
  *
  * Returns { ok: true } when safe to create, or { ok: false, reason: string } when
@@ -211,4 +245,10 @@ async function shouldUseWorktree(opts = {}) {
   return { ok: true };
 }
 
-module.exports = { detectDefaultBranch, gitRun, isUnderWorktreesDir, shouldUseWorktree };
+module.exports = {
+  detectDefaultBranch,
+  gitRun,
+  isUnderWorktreesDir,
+  isManagedClaudeWorktree,
+  shouldUseWorktree,
+};

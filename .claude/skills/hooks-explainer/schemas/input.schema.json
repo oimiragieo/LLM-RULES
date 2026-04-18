@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "hooks-explainer input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "topic": {
+      "type": "string",
+      "enum": ["overview", "protected_paths", "bypasses", "taskupdate"]
+    },
+    "format": {
+      "type": "string",
+      "enum": ["markdown", "json"]
+    },
+    "projectRoot": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -3,11 +3,18 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const {
-  isCreatorCompletion,
-  quickIntegrationCheck,
-  extractArtifactId,
-} = require('./post-creation-integration.cjs');
+const path = require('node:path');
+const HOOK_PATH = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  '.claude',
+  'hooks',
+  'workflow',
+  'post-creation-integration.cjs'
+);
+const { isCreatorCompletion, quickIntegrationCheck, extractArtifactId } = require(HOOK_PATH);
 
 // Edge Case 1: Hook gracefully degrades when graph file is missing
 test('quickIntegrationCheck returns graph-unavailable when graph missing', () => {
@@ -91,7 +98,7 @@ test('extractArtifactId prefers explicit artifactId', () => {
 
 // Edge Case 6: Hook handles non-TaskUpdate tools
 test('processCreatorCompletion passes through non-TaskUpdate tools', async () => {
-  const { processCreatorCompletion } = require('./post-creation-integration.cjs');
+  const { processCreatorCompletion } = require(HOOK_PATH);
 
   const hookData = {
     toolUse: {

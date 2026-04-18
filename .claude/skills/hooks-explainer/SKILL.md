@@ -10,7 +10,7 @@ tools: [Read, Write, Bash]
 verified: true
 lastVerifiedAt: 2026-04-16T23:40:27.289Z
 agents: [developer]
-category: "Specialized Patterns"
+category: 'Specialized Patterns'
 tags: [hooks, explainer, documents, hook, enforcement, system, bypass, mechanisms]
 best_practices:
   - Follow existing project patterns
@@ -90,6 +90,7 @@ cat .claude/context/memory/decisions.md
 \`\`\`
 
 **After completing:**
+
 - New pattern -> \`.claude/context/memory/learnings.md\`
 - Issue found -> \`.claude/context/memory/issues.md\`
 - Decision made -> \`.claude/context/memory/decisions.md\`

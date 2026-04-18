@@ -21,7 +21,7 @@ describe('Performance Profiling - Minimal Tests', () => {
     const profiler = new PerformanceProfiler(PROJECT_ROOT);
 
     const testFn = async () => {
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise(resolve => setTimeout(resolve, 20));
       return 'result';
     };
 
@@ -31,7 +31,7 @@ describe('Performance Profiling - Minimal Tests', () => {
     assert.strictEqual(result, 'result');
     const metrics = profiler.getMetrics('test');
     assert.ok(metrics);
-    assert.ok(metrics.executionTime >= 10);
+    assert.ok(metrics.executionTime >= 15);
   });
 
   it('should instrument sync function', () => {

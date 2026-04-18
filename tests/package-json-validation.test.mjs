@@ -45,6 +45,32 @@ test('test script should run actual tests and fail if 0 tests found', () => {
   );
 });
 
+test('framework test scripts should only reference real tests paths', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const frameworkScript = pkg.scripts['test:framework'] || '';
+  const hooksScript = pkg.scripts['test:framework:hooks'] || '';
+
+  assert.ok(
+    !frameworkScript.includes('.claude/hooks/**/*.test.cjs') &&
+      !frameworkScript.includes('.claude/lib/**/*.test.cjs'),
+    'test:framework should not reference archived .claude test globs'
+  );
+  assert.ok(
+    !hooksScript.includes('.claude/hooks/**/*.test.cjs'),
+    'test:framework:hooks should not reference archived .claude hook globs'
+  );
+  assert.ok(
+    frameworkScript.includes('tests/hooks/*.test.cjs') &&
+      frameworkScript.includes('tests/lib/**/*.test.cjs') &&
+      frameworkScript.includes('tests/cli/*.test.cjs'),
+    'test:framework should target the actual tests/hooks, tests/lib, and tests/cli globs'
+  );
+  assert.ok(
+    hooksScript.includes('tests/hooks/*.test.cjs'),
+    'test:framework:hooks should target the actual tests/hooks glob'
+  );
+});
+
 test('count-all-tests.mjs should report failed test files, not hide them', () => {
   const scriptPath = join(PROJECT_ROOT, 'scripts', 'testing', 'count-all-tests.mjs');
   const script = readFileSync(scriptPath, 'utf-8');
@@ -124,5 +150,15 @@ test('validate:full should include status check governance validation', () => {
   assert.ok(
     fullScript.includes('pnpm validate:status-check-governance'),
     'validate:full should run status check governance validation'
+  );
+});
+
+test('better-sqlite3 should be listed in onlyBuiltDependencies for CI native builds', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const builtDeps = pkg?.pnpm?.onlyBuiltDependencies || [];
+
+  assert.ok(
+    Array.isArray(builtDeps) && builtDeps.includes('better-sqlite3'),
+    'pnpm.onlyBuiltDependencies should include better-sqlite3 so CI builds its native binding'
   );
 });

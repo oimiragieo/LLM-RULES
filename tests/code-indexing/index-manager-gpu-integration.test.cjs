@@ -14,6 +14,7 @@ const assert = require('node:assert');
 const fs = require('fs').promises;
 const path = require('path');
 const { IndexManager } = require('../../.claude/lib/code-indexing/index-manager.cjs');
+const { MemoryVectorStore } = require('../../.claude/lib/memory/lancedb-client.cjs');
 
 const LANCEDB_DIR = path.join(__dirname, '..', 'fixtures', 'code-indexing', 'lancedb-gpu-test');
 const TABLE_NAME = `code_index_gpu_test_${process.pid}`;
@@ -158,6 +159,29 @@ class AuthService {
     if (manager.vectorStore.bm25Index) {
       assert.ok(hybridResults.length > 0, 'Hybrid search should find results when BM25 is wired');
     }
+    await manager.close();
+  });
+
+  test('RED: clearing shared stores elsewhere must not deinitialize an active index manager store', async () => {
+    const manager = new IndexManager({
+      projectRoot: TEST_PROJECT,
+      verbose: false,
+    });
+
+    await manager.indexDirectory(TEST_PROJECT);
+    assert.ok(
+      manager.vectorStore.store.isInitialized,
+      'Store should be initialized after indexing'
+    );
+
+    MemoryVectorStore.clearSharedStores();
+    await new Promise(resolve => setImmediate(resolve));
+
+    assert.ok(
+      manager.vectorStore.store.isInitialized,
+      'Active index manager store should remain initialized after shared store reset'
+    );
+
     await manager.close();
   });
 });

@@ -57,6 +57,13 @@ async function getLanceDb() {
   return lancedbModule;
 }
 
+function getFastembedExecutionProviders(fastembed, preferGpu) {
+  const providerEnum = fastembed && fastembed.ExecutionProvider ? fastembed.ExecutionProvider : {};
+  const cpuProvider = providerEnum.CPU || 'cpu';
+  const cudaProvider = providerEnum.CUDA || 'cuda';
+  return preferGpu ? [cudaProvider] : [cpuProvider];
+}
+
 /**
  * MemoryVectorStore - LanceDB implementation
  */
@@ -263,21 +270,33 @@ class MemoryVectorStore {
         const useSubprocess = process.env.EMBED_SUBPROCESS !== 'off';
         if (useSubprocess) {
           this._fastembedModel = null;
-          this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
-          this._mockMode = false;
           logger.info('FastEmbed will use subprocess isolation (ONNX memory leak workaround)');
+          try {
+            await this._spawnEmbedWorkers();
+            this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
+            this._mockMode = false;
+          } catch (e) {
+            await this._killEmbedWorker();
+            this._embeddingStatus = {
+              status: 'unavailable',
+              mode: 'fastembed',
+              reason: e.message || 'Install optional dependency: pnpm add fastembed',
+            };
+            this._mockMode = true;
+            logger.warn('FastEmbed subprocess initialization failed', { error: e.message });
+          }
         } else {
           try {
             const fastembed = require('fastembed');
+            const useGpuProvider = this.device === 'gpu' && this.gpuDetected;
 
             // Initialize with GPU support if available
             const initOptions = {
               model: fastembed.EmbeddingModel.BGESmallENV15,
-              // FastEmbed handles execution providers automatically
-              // GPU will be used if CUDA is available, otherwise falls back to CPU
+              executionProviders: getFastembedExecutionProviders(fastembed, useGpuProvider),
             };
 
-            if (this.device === 'gpu' && this.gpuDetected) {
+            if (useGpuProvider) {
               logger.info('FastEmbed initializing with GPU (CUDA) support');
             } else {
               logger.info('FastEmbed initializing with CPU');
@@ -299,6 +318,7 @@ class MemoryVectorStore {
                 const fastembed = require('fastembed');
                 this._fastembedModel = await fastembed.FlagEmbedding.init({
                   model: fastembed.EmbeddingModel.BGESmallENV15,
+                  executionProviders: getFastembedExecutionProviders(fastembed, false),
                 });
                 this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
                 this._mockMode = false;
@@ -526,7 +546,13 @@ class MemoryVectorStore {
       maxCalls: 50,
     }));
 
-    await Promise.all(this._embedWorkers.map(w => this._initSingleWorker(w)));
+    try {
+      await Promise.all(this._embedWorkers.map(w => this._initSingleWorker(w)));
+    } catch (error) {
+      await this._killEmbedWorker();
+      this._embedWorkers = null;
+      throw error;
+    }
   }
 
   async _initSingleWorker(worker) {
@@ -557,6 +583,7 @@ class MemoryVectorStore {
     worker.proc.stdout.setEncoding('utf-8');
 
     await new Promise((resolve, reject) => {
+      const workerStdout = worker.proc.stdout;
       const timeout = setTimeout(() => reject(new Error('Embed worker start timeout')), 60000);
       const onData = chunk => {
         worker.stdoutBuf += chunk;
@@ -569,7 +596,7 @@ class MemoryVectorStore {
             const msg = safeParseJSON(line, null, null, null);
             if (msg.ready) {
               clearTimeout(timeout);
-              worker.proc.stdout.removeListener('data', onData);
+              workerStdout.removeListener('data', onData);
               resolve();
               return;
             }
@@ -586,6 +613,7 @@ class MemoryVectorStore {
     });
 
     const initResult = await new Promise((resolve, reject) => {
+      const workerStdout = worker.proc.stdout;
       const onData = chunk => {
         worker.stdoutBuf += chunk;
         let idx;
@@ -595,25 +623,26 @@ class MemoryVectorStore {
           if (!line) continue;
           try {
             const msg = safeParseJSON(line, null, null, null);
-            worker.proc.stdout.removeListener('data', onData);
+            workerStdout.removeListener('data', onData);
             if (msg.ok) {
               resolve(msg);
             } else {
               reject(new Error(msg.error || 'Init failed'));
             }
           } catch (e) {
-            worker.proc.stdout.removeListener('data', onData);
+            workerStdout.removeListener('data', onData);
             reject(e);
           }
           return;
         }
       };
-      worker.proc.stdout.on('data', onData);
+      workerStdout.on('data', onData);
       worker.proc.stdin.write(
         JSON.stringify({
           action: 'init',
           mode: this.config.embeddingMode,
           model: this.config.embeddingModel,
+          preferGpu: this.config.gpu?.enabled !== false,
         }) + '\n'
       );
     });

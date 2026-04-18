@@ -34,6 +34,7 @@ const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
 const Ajv = require('ajv');
+const addFormats = require('ajv-formats');
 
 const { commandExists } = require('../utils/command-exists.cjs');
 
@@ -694,6 +695,7 @@ class ReadinessScorer {
 
     // Validate report against schema
     const ajv = new Ajv({ strict: false });
+    addFormats(ajv);
     const validate = ajv.compile(READINESS_REPORT_SCHEMA);
     const valid = validate(report);
 
@@ -722,6 +724,7 @@ function scoreReadiness(repoPath, options = {}) {
 
 // Initialize AJV validator for external use
 const ajv = new Ajv({ strict: false });
+addFormats(ajv);
 const validateReport = ajv.compile(READINESS_REPORT_SCHEMA);
 
 module.exports = {

@@ -2,8 +2,15 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 
-const { parseArgs, evaluate } = require('../../../.claude/tools/cli/open-findings-summary.cjs');
+const {
+  parseArgs,
+  evaluate,
+  buildSummary,
+} = require('../../../.claude/tools/cli/open-findings-summary.cjs');
 
 test('parseArgs reads json and threshold flags', () => {
   const opts = parseArgs([
@@ -103,4 +110,41 @@ test('evaluate passes when findings are within thresholds', () => {
   });
 
   assert.deepEqual(failures, []);
+});
+
+test('buildSummary auto-resolves missing transient findings before counting thresholds', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'open-findings-summary-'));
+  try {
+    const findingsPath = path.join(root, '.claude', 'context', 'memory', 'open-findings.json');
+    fs.mkdirSync(path.dirname(findingsPath), { recursive: true });
+    fs.writeFileSync(
+      findingsPath,
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          findings: [
+            {
+              fingerprint: 'transient-1',
+              summary: 'Transient critical finding from temp report',
+              severity: 'critical',
+              status: 'open',
+              sourceReportPath: '.claude/context/reports/tmp-post-task-unified-findings.md',
+              createdAt: new Date().toISOString(),
+              lastSeenAt: new Date().toISOString(),
+            },
+          ],
+        },
+        null,
+        2
+      ),
+      'utf8'
+    );
+
+    const summary = buildSummary(root);
+
+    assert.equal(summary.open, 0);
+    assert.equal(summary.resolved, 1);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });

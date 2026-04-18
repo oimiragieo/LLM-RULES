@@ -22,7 +22,10 @@
         "UserPromptSubmit",
         "SessionEnd",
         "PreCompact",
-        "Stop"
+        "Stop",
+        "SubagentStart",
+        "PermissionDenied",
+        "SessionStart"
       ],
       "description": "Hook trigger type"
     },

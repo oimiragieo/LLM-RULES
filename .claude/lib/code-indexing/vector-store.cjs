@@ -26,6 +26,7 @@ class VectorStore {
       process.env.LANCEDB_URI ||
       path.join(projectRoot, '.claude', 'context', 'data', 'lancedb');
     const collectionName = options.collectionName || process.env.LANCEDB_TABLE_CODE || 'code_index';
+    const useSharedStore = options.sharedStore !== false;
 
     this.embeddingMode =
       options.embeddingMode ||
@@ -37,7 +38,7 @@ class VectorStore {
     if (this.embeddingMode !== 'off') {
       // Lazy-load lancedb-client only when needed (avoid CUDA auto-discovery in BM25-only mode)
       const { MemoryVectorStore } = require('../memory/lancedb-client.cjs');
-      this.store = MemoryVectorStore.getSharedStore({
+      const storeConfig = {
         persistDirectory,
         collectionName,
         embeddingMode: this.embeddingMode,
@@ -45,7 +46,10 @@ class VectorStore {
           this.embeddingMode === 'fastembed'
             ? undefined
             : process.env.LANCEDB_EMBEDDING_MODEL || 'Xenova/all-MiniLM-L6-v2',
-      });
+      };
+      this.store = useSharedStore
+        ? MemoryVectorStore.getSharedStore(storeConfig)
+        : new MemoryVectorStore(storeConfig);
     } else {
       this.store = null;
     }

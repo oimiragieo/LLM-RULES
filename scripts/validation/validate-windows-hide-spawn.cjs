@@ -46,7 +46,7 @@ function hasWindowsHide(lines, startIdx) {
       return true;
     }
     if (
-      /\b(build[A-Za-z0-9_]*SpawnOptions|buildHiddenSpawnSyncOptions|buildVersionProbeSpawnOptions)\s*\(/.test(
+      /\b(build[A-Za-z0-9_]*(?:Spawn|Exec)Options|buildHiddenSpawnSyncOptions|buildVersionProbeSpawnOptions)\s*\(/.test(
         lines[i]
       )
     ) {
@@ -114,4 +114,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { main };
+module.exports = { hasWindowsHide, main };

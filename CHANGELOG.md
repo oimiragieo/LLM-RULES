@@ -13,6 +13,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Flight recorder hot-path regression and benchmark flake** — Removed a duplicate `Date.now()` declaration in `.claude/lib/monitoring/flight-recorder.cjs`, added buffered-write-aware rotation probe skipping plus missing-file debounce coverage in `tests/monitoring/flight-recorder.test.cjs`, and stabilized the telemetry hot-path benchmark so repeated `tests/benchmarks/telemetry-hotpath-latency.test.cjs` runs stay under the suite threshold.
+
+- **Legacy `debug-agent` routing alias drift** — Remapped the stale `debug-agent` intent alias to `advanced-debugging` in `.claude/lib/routing/routing-table-intent-agents.cjs` and narrowed the legacy keyword set in `.claude/lib/routing/routing-table-intent-keywords-data.cjs`, clearing the routing equivalence and intent-keyword overlap failures.
+
+- **Phase 1A cost-tracking E2E timing flake** — Warmed up the timing sample, moved the measurement to `performance.now()`, removed an unused helper, and made the suite threshold explicitly configurable in `tests/integration/e2e/phase1a-e2e.test.cjs` so full-run overhead assertions no longer fail on normal timer jitter.
+
+- **Minimal profiler async timing flake** — Increased the async instrumentation delay margin in `tests/performance-profiling-minimal.test.cjs` so the profiler check validates real work without depending on an unstable 10 ms timer boundary under full-suite load.
+
+- **Session startup/worktree pruning compatibility** — Added `.claude/hooks/session/worktree-prune-on-start.cjs` as a fail-open compatibility wrapper so the expected session hook contract still writes the session sentinel, delegates to the startup pruning path, and never blocks startup on malformed stdin or git probe issues.
+
+- **Malformed JSON recovery for validation state and model registry** — `state-io.cjs` now validates raw JSON syntax before `safeParseJSON()` so corrupted validation-state files are backed up to `.corrupt.*` as intended, and `model-registry.cjs` now emits its invalid-JSON warning/fallback path on true syntax errors instead of silently accepting the null-object fallback.
+
+- **Creator ecosystem parity and template drift** — Restored the `.claude/skills/telegram-polling/` bundle, fixed malformed `tools` and `skills` placeholders in `.claude/skills/agent-creator/templates/agent-template.md`, and updated `validate-skill-ecosystem.cjs` so strict mode fails detailed `<100` result sets while preserving backward-compatible summary-only behavior.
+
+- **Memory/runtime contract documentation sync** — Re-compressed `.claude/CLAUDE.md` under the contract guard, documented the 80K warning / 120K mandatory compression / 150K red-line thresholds in `.claude/rules/memory-protocol.md`, and removed the stale duplicate `.claude/workflows/skill-updater-skill-workflow.md` source of truth.
+
+- **TaskUpdate PreToolUse block from router context** — `pre-completion-validation.cjs` now allows the router to set `in_progress`/`completed` on its own tasks. The hook short-circuits when `CLAUDE_AGENT_ID` is absent (router context) and the operation is `in_progress` or `completed`, unblocking standard task lifecycle management. Test coverage added in `tests/hooks/validation/pre-completion-validation.test.cjs`.
+
+- **Pre-completion validation regression recovery** — narrowed the router bypass so invalid-status and artifact-block paths still enforce outside true router completions, extracted summary/task-output/drain-gate logic into focused helper modules, restored legacy regression coverage, and refreshed the stale safe-json adoption test to target the current self-healing module layout.
+
+- **Hook runner and safety audit regressions** — restored direct CLI execution for `.claude/hooks/run-hook.cjs` by forwarding into the real `tools/cli` entrypoint, fixed the archived `channel-auto-start.cjs` safe-json import path so hook import audits stay green, and normalized `context-monitor.cjs` back to its documented null-on-invalid-JSON parsing contract.
+
+- **Channel daemon timeout cleanup regressions** — batched `hook-file-validator.cjs` git tracking into a single `git ls-files -z` lookup so `pre-spawn-hook-check.cjs` no longer times out under audit load, taught `TaskPool` to settle timed-out and cancelled tasks for `drain()`/test-runner cleanup, and wired dispatcher task heartbeat intervals into the same cancel path so timeout scenarios no longer leave the async integration suite hanging after completion.
+
 - **CLAUDE_AGENT_ID sub-agent bypass in routing-guard-core** — `hasExplicitAgentContext()` now uses `process.env.CLAUDE_AGENT_ID` as primary detection signal for sub-agents in PreToolUse hooks. `checkRouterWrite()` accepts `hookInput` and short-circuits via this check, preventing legitimate developer sub-agents from being blocked by the router write guard.
 
 - **sub-agent bypass in write-pretool-bundle.cjs** — add sub-agent bypass to write-pretool-bundle.cjs so CLAUDE_AGENT_ID-identified agents can write to creator paths without router-mode blocking.
@@ -24,6 +48,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phantom in-progress entries in task-status.json** — Cleaned stale `hb-*`, `test-sync-task-*`, and `task-lifecycle-*` entries left in `.claude/context/runtime/task-status.json` from aborted heartbeat and test runs. File now reflects only legitimate active tasks.
 - **test:framework open handle hang** — Wrapped stdin listener in `post-pipeline-token-report.cjs` with `require.main === module` guard. The hook's `process.stdin.on('data')` was registered unconditionally on `require()`, keeping the Node.js event loop alive when the module was imported by test files. `pnpm test:framework` now exits cleanly.
 - **test:framework failures 48→3** — Archived 4 orphaned test files for deleted hooks (state-reset x2, process-evolution-queue, worktree-prune-on-start). Updated hierarchical routing default expectation (now `on`). Fixed agent frontmatter quoting (`claude-md-auditor`). Fixed A2A port assumptions, external-integration-routing prompts, security intent assertion path, and telemetry event check. 3 remaining failures are order-dependent suite pollution.
+
+### Changed
+
+- **Deterministic CI and release governance tooling** — Added repo-native flake ledger and CLI summary (`.claude/lib/ci/flake-ledger.cjs`, `.claude/tools/cli/flake-report.cjs`), failure evidence artifact capture with secret redaction (`.claude/lib/ci/failure-evidence.cjs`), impacted validation planning (`.claude/lib/ci/impacted-validation-planner.cjs`, `.claude/tools/cli/validate-affected.cjs`), and semver-aware release gating (`.claude/lib/ci/release-gate.cjs`, `.claude/tools/cli/release-gate.cjs`). Exposed the helpers through `pnpm flake:report`, `pnpm validate:affected`, and `pnpm release:gate`.
+
+- **README agent-file counts refreshed** — Top-level README copy now reflects the current 124 tracked `.claude/agents/**/*.md` files used by `validate:sync`, including isolated worktree variants.
 
 ### Added
 

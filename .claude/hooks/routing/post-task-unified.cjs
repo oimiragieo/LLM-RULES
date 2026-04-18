@@ -200,8 +200,8 @@ const {
 function performWorktreeCleanupIfCompleted(status) {
   if (String(status).toLowerCase() !== 'completed') return;
   try {
-    const { isUnderWorktreesDir, gitRun } = require('../../lib/worktree/worktree-utils.cjs');
-    if (isUnderWorktreesDir(process.cwd())) {
+    const { isManagedClaudeWorktree, gitRun } = require('../../lib/worktree/worktree-utils.cjs');
+    if (isManagedClaudeWorktree(process.cwd(), PROJECT_ROOT)) {
       if (process.env.DEBUG_HOOKS === 'true') {
         console.error(
           `[post-task-unified] Worktree context detected. Purging untracked files before deletion...`

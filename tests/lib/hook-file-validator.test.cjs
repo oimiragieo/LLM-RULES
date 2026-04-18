@@ -8,6 +8,7 @@ const os = require('os');
 
 const {
   extractHookPaths,
+  listTrackedFiles,
   validateHookFiles,
 } = require('../../.claude/lib/utils/hook-file-validator.cjs');
 
@@ -47,6 +48,14 @@ describe('extractHookPaths', () => {
 });
 
 describe('validateHookFiles', () => {
+  test('listTrackedFiles returns tracked hook paths for the real project', () => {
+    const tracked = listTrackedFiles(PROJECT_ROOT);
+
+    assert.ok(tracked instanceof Set, 'tracked files should be returned as a Set');
+    assert.ok(tracked.has('.claude/hooks/validation/pre-spawn-hook-check.cjs'));
+    assert.ok(tracked.has('.claude/hooks/validation/check-console-log.cjs'));
+  });
+
   test('reports valid:true on real project (all hooks tracked)', () => {
     const result = validateHookFiles(PROJECT_ROOT);
 

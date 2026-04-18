@@ -17,6 +17,37 @@ const { execFileSync } = require('child_process');
 const { safeParseJSON } = require('./safe-json.cjs');
 
 /**
+ * Returns the set of git-tracked files for the repository root, or null when
+ * git metadata is unavailable.
+ *
+ * Uses a single `git ls-files -z` call so hook validation stays fast even when
+ * dozens of hooks are registered.
+ *
+ * @param {string} projectRoot - Absolute path to project root
+ * @returns {Set<string>|null}
+ */
+function listTrackedFiles(projectRoot) {
+  try {
+    const output = execFileSync('git', ['ls-files', '-z'], {
+      cwd: projectRoot,
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'buffer',
+      windowsHide: true,
+    });
+    return new Set(
+      output
+        .toString('utf8')
+        .split('\0')
+        .map(item => item.trim())
+        .filter(Boolean)
+        .map(item => item.replace(/\\/g, '/'))
+    );
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Extracts hook file paths from a settings.json file.
  *
  * Scans all hook command strings for patterns like:
@@ -89,6 +120,7 @@ function extractHookPaths(settingsPath) {
 function validateHookFiles(projectRoot) {
   const settingsPath = path.join(projectRoot, '.claude', 'settings.json');
   const hookPaths = extractHookPaths(settingsPath);
+  const trackedFiles = listTrackedFiles(projectRoot);
 
   const missing = [];
   const untracked = [];
@@ -101,14 +133,7 @@ function validateHookFiles(projectRoot) {
       continue;
     }
 
-    // Check if git-tracked
-    try {
-      execFileSync('git', ['ls-files', '--error-unmatch', hp], {
-        cwd: projectRoot,
-        stdio: 'pipe',
-        windowsHide: true,
-      });
-    } catch {
+    if (trackedFiles && !trackedFiles.has(hp.replace(/\\/g, '/'))) {
       untracked.push(hp);
     }
   }
@@ -123,4 +148,4 @@ function validateHookFiles(projectRoot) {
   };
 }
 
-module.exports = { extractHookPaths, validateHookFiles };
+module.exports = { extractHookPaths, listTrackedFiles, validateHookFiles };
