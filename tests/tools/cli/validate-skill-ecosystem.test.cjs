@@ -187,6 +187,20 @@ describe('validate-skill-ecosystem', () => {
     assert.strictEqual(gate.reason, 'needs_work_present');
   });
 
+  test('checkGate --require-perfect only blocks non-exempt skills in needs-work range', () => {
+    const results = [
+      { skill: 'hooks-explainer', score: 20 },
+      { skill: 'modern-python', score: 92 },
+      { skill: 'setup-telegram', score: 5 },
+    ];
+
+    const gate = checkGate({ scoreBuckets: { needsWork: 2 } }, true, results, null);
+
+    assert.strictEqual(gate.ok, false);
+    assert.strictEqual(gate.reason, 'needs_work_present');
+    assert.deepStrictEqual(gate.failing, ['hooks-explainer']);
+  });
+
   test('parseArgs supports --min-score flag', () => {
     const { parseArgs } = require('../../../.claude/tools/cli/validate-skill-ecosystem.cjs');
     const args = parseArgs(['--min-score', '70']);
@@ -233,6 +247,43 @@ describe('validate-skill-ecosystem', () => {
     const report = runAudit({ projectRoot: root, minScore: 70 });
     // All skills score 100, so gate should pass
     const gate = checkGate(report.summary, false, report.results, 70);
+    assert.strictEqual(gate.ok, true);
+
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  test('runAudit returns results so require-perfect can ignore exempt low-score skills', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-audit-'));
+    const skillsRoot = path.join(root, '.claude', 'skills');
+
+    const exemptSkill = path.join(skillsRoot, 'setup-telegram');
+    fs.mkdirSync(exemptSkill, { recursive: true });
+    fs.writeFileSync(path.join(exemptSkill, 'SKILL.md'), '# setup-telegram');
+
+    const goodSkill = path.join(skillsRoot, 'good-skill');
+    fs.mkdirSync(goodSkill, { recursive: true });
+    fs.writeFileSync(path.join(goodSkill, 'SKILL.md'), '# good-skill');
+    fs.mkdirSync(path.join(goodSkill, 'scripts'), { recursive: true });
+    fs.writeFileSync(path.join(goodSkill, 'scripts', 'main.cjs'), 'module.exports = {};');
+    fs.mkdirSync(path.join(goodSkill, 'hooks'), { recursive: true });
+    fs.writeFileSync(path.join(goodSkill, 'hooks', 'pre-execute.cjs'), 'module.exports = {};');
+    fs.writeFileSync(path.join(goodSkill, 'hooks', 'post-execute.cjs'), 'module.exports = {};');
+    fs.mkdirSync(path.join(goodSkill, 'schemas'), { recursive: true });
+    fs.writeFileSync(path.join(goodSkill, 'schemas', 'input.schema.json'), '{}');
+    fs.writeFileSync(path.join(goodSkill, 'schemas', 'output.schema.json'), '{}');
+    fs.mkdirSync(path.join(goodSkill, 'rules'), { recursive: true });
+    fs.writeFileSync(path.join(goodSkill, 'rules', 'good-skill.md'), '# rule');
+    fs.mkdirSync(path.join(goodSkill, 'commands'), { recursive: true });
+    fs.writeFileSync(path.join(goodSkill, 'commands', 'good-skill.md'), '# cmd');
+    fs.mkdirSync(path.join(goodSkill, 'templates'), { recursive: true });
+    fs.writeFileSync(path.join(goodSkill, 'templates', 'implementation-template.md'), '# template');
+    fs.mkdirSync(path.join(goodSkill, 'references'), { recursive: true });
+    fs.writeFileSync(path.join(goodSkill, 'references', 'research-requirements.md'), '# refs');
+
+    const report = runAudit({ projectRoot: root });
+    const gate = checkGate(report.summary, true, report.results, null);
+
+    assert.strictEqual(Array.isArray(report.results), true);
     assert.strictEqual(gate.ok, true);
 
     fs.rmSync(root, { recursive: true, force: true });

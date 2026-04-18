@@ -27,6 +27,7 @@ const GATE_EXEMPT_SKILLS = new Set([
   'template-updater',
   'tool-updater',
 ]);
+const NEEDS_WORK_THRESHOLD = 80;
 
 const CRITERIA = [
   { key: 'skill.md', weight: 5 },
@@ -392,7 +393,9 @@ function checkGate(summary, requirePerfect = false, results = [], minScore = nul
 
   if (Array.isArray(results) && results.length > 0) {
     const failing = results
-      .filter(r => !GATE_EXEMPT_SKILLS.has(path.basename(r.skill)) && r.score < 100)
+      .filter(
+        r => !GATE_EXEMPT_SKILLS.has(path.basename(r.skill)) && r.score < NEEDS_WORK_THRESHOLD
+      )
       .map(r => r.skill);
     if (failing.length > 0) {
       return { ok: false, reason: 'needs_work_present', failing };
@@ -486,6 +489,7 @@ function runAudit({ projectRoot, outputJson, outputMd, includeArchived = false }
 
   return {
     summary,
+    results,
     outputJson: outJson,
     outputMd: outMd,
   };

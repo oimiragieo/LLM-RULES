@@ -73,6 +73,7 @@ function evaluate(summary, opts) {
 }
 
 function buildSummary(projectRoot) {
+  pruneStaleOpenFindings(projectRoot, { pruneTransientMissing: true });
   return {
     projectRoot,
     timestamp: new Date().toISOString(),

@@ -27,6 +27,11 @@ const DEFAULT_RESOLUTION_MODE = 'lenient';
 const STRICT_MIN_CONFIDENCE = 0.6;
 const DEFAULT_STALE_FINDINGS_MAX_AGE_DAYS = 3;
 
+function isTransientSourceReportPath(sourceReportPath) {
+  const basename = path.basename(String(sourceReportPath || '').trim()).toLowerCase();
+  return basename.startsWith('tmp-');
+}
+
 function resolveProjectRoot(projectRoot = PROJECT_ROOT) {
   if (!projectRoot || typeof projectRoot !== 'string') {
     throw new Error('projectRoot is required');
@@ -521,6 +526,7 @@ function summarizeFindingsTrend(projectRoot = PROJECT_ROOT, options = {}) {
 function pruneStaleOpenFindings(projectRoot = PROJECT_ROOT, options = {}) {
   const root = resolveProjectRoot(projectRoot);
   const maxAgeRaw = Number(options.maxAgeDays);
+  const pruneTransientMissing = options.pruneTransientMissing === true;
   const maxAgeDays =
     Number.isFinite(maxAgeRaw) && maxAgeRaw > 0 ? maxAgeRaw : DEFAULT_STALE_FINDINGS_MAX_AGE_DAYS;
   const cutoff = Date.now() - maxAgeDays * 24 * 60 * 60 * 1000;
@@ -534,19 +540,24 @@ function pruneStaleOpenFindings(projectRoot = PROJECT_ROOT, options = {}) {
     const sourceReportPath = String(finding?.sourceReportPath || '').trim();
     if (!sourceReportPath) continue;
 
-    const seenTs = Date.parse(String(finding?.lastSeenAt || finding?.createdAt || ''));
-    if (!Number.isFinite(seenTs) || seenTs > cutoff) continue;
-
     const sourceAbs = path.resolve(root, sourceReportPath);
     const validation = validatePathWithinProject(sourceAbs, root);
     if (!validation.safe) continue;
     if (fs.existsSync(validation.resolvedPath)) continue;
 
+    const transientMissing = pruneTransientMissing && isTransientSourceReportPath(sourceReportPath);
+    if (!transientMissing) {
+      const seenTs = Date.parse(String(finding?.lastSeenAt || finding?.createdAt || ''));
+      if (!Number.isFinite(seenTs) || seenTs > cutoff) continue;
+    }
+
     finding.status = 'resolved';
     finding.resolvedAt = now;
     finding.lastSeenAt = now;
     finding.resolvedByAgent = 'findings-pruner';
-    finding.resolutionNote = 'auto-resolved stale finding due to missing source report';
+    finding.resolutionNote = transientMissing
+      ? 'auto-resolved transient finding due to missing temporary source report'
+      : 'auto-resolved stale finding due to missing source report';
     pruned++;
   }
 
