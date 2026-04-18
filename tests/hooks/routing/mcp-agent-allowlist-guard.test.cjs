@@ -2,7 +2,7 @@
 // Tests for mcp-agent-allowlist-guard.cjs PreToolUse hook
 'use strict';
 
-const { describe, test, before, after } = require('node:test');
+const { describe, test } = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('child_process');
 const path = require('path');
@@ -43,7 +43,11 @@ describe('mcp-agent-allowlist-guard hook', { concurrency: 1 }, () => {
       tool_name: 'mcp__filesystem__write_file',
       tool_input: {},
     };
-    const { code, stdout, stderr } = await runHook(input, {
+    const {
+      code,
+      stdout,
+      stderr: _stderr,
+    } = await runHook(input, {
       MCP_AGENT_ALLOWLIST_ENFORCEMENT: 'off',
       CLAUDE_AGENT_ID: 'router',
     });
@@ -58,7 +62,11 @@ describe('mcp-agent-allowlist-guard hook', { concurrency: 1 }, () => {
       tool_name: 'mcp__filesystem__write_file',
       tool_input: {},
     };
-    const { code, stdout, stderr } = await runHook(input, {
+    const {
+      code,
+      stdout: _stdout,
+      stderr,
+    } = await runHook(input, {
       MCP_AGENT_ALLOWLIST_ENFORCEMENT: 'warn',
       CLAUDE_AGENT_ID: 'router',
     });

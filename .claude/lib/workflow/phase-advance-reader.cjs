@@ -68,6 +68,37 @@ function resolveDomainSpecialist(context) {
   return null;
 }
 
+/**
+ * Flat list of all signals across DOMAIN_SPECIALIST_PATTERNS.
+ * Used by routing-guard Check 7 second-pass negation guard.
+ */
+const DOMAIN_SPECIALIST_SIGNALS_FLAT = Object.freeze(
+  DOMAIN_SPECIALIST_PATTERNS.flatMap(p => p.signals)
+);
+
+/**
+ * Returns true if any of the given signals appear in `text` with a negation
+ * token within 50 characters before the signal. Used to suppress false-positive
+ * domain specialist warnings for prompts like "do NOT use Rust here".
+ *
+ * @param {string} text - The combined prompt+description text (lowercased or not)
+ * @param {readonly string[]} signals - Signal list to check (defaults to DOMAIN_SPECIALIST_SIGNALS_FLAT)
+ * @returns {boolean}
+ */
+function hasNegationNearSignal(text, signals = DOMAIN_SPECIALIST_SIGNALS_FLAT) {
+  const NEGATION = /(?:\b(?:do\s+not|don['’]t|avoid|without|no|never|not)\b)/i;
+  const lower = text.toLowerCase();
+  for (const sig of signals) {
+    const idx = lower.indexOf(sig.toLowerCase());
+    if (idx === -1) continue;
+    const window = lower.slice(Math.max(0, idx - 50), idx);
+    if (NEGATION.test(window)) return true;
+  }
+  return false;
+}
+
 module.exports = {
   resolveDomainSpecialist,
+  hasNegationNearSignal,
+  DOMAIN_SPECIALIST_SIGNALS_FLAT,
 };

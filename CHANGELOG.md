@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- routing-guard: second-pass DOMAIN_SPECIALIST_PATTERNS check with negation guard (env DOMAIN_SPECIALIST_ENFORCEMENT, default warn)
+
+### Fixed
+
+- lint: remove unused vars in mcp-agent-allowlist-guard tests (before/after imports, stdout/stderr destructures)
+
+### Added
+
 - mcp-agent-allowlist-guard: per-agent MCP server enforcement via hookInput.agent_id (env `MCP_AGENT_ALLOWLIST_ENFORCEMENT`, default warn).
 - spawn-prompt-assembler: agent-typed memory notes via identity-memory-section (env `AGENT_TYPED_MEMORY_INJECTION`, default on).
 - spawn-prompt-assembler: keyword-score skill fallback via skill-auto-router (env `SKILL_KEYWORD_FALLBACK`, default on).

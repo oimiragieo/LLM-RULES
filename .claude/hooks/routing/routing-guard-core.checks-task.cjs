@@ -8,6 +8,11 @@ const {
   validateHierarchicalTaskContext,
 } = require('../../lib/routing/sub-router-selection.cjs');
 const {
+  resolveDomainSpecialist,
+  hasNegationNearSignal,
+  DOMAIN_SPECIALIST_SIGNALS_FLAT,
+} = require('../../lib/workflow/phase-advance-reader.cjs');
+const {
   isPlannerSpawn,
   isSecuritySpawn,
   isArchitectSpawn,
@@ -379,7 +384,33 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
     }
   }
 
-  return { pass: true };
+  // Second pass: DOMAIN_SPECIALIST_PATTERNS catches domain-specific work that
+  // the first-pass SPECIALIST_KEYWORD_MAP missed. Only fires when declaredSubagent
+  // is in the developer-spawn gate and no first-pass match was found.
+  // Env DOMAIN_SPECIALIST_ENFORCEMENT: off|warn|block (default warn for rollout).
+  const domainEnforcement = getEnforcementMode('DOMAIN_SPECIALIST_ENFORCEMENT', 'warn');
+  if (domainEnforcement === 'off') return { pass: true };
+
+  if (hasNegationNearSignal(combined, DOMAIN_SPECIALIST_SIGNALS_FLAT)) return { pass: true };
+
+  const domainSpecialist = resolveDomainSpecialist(combined);
+  if (!domainSpecialist || domainSpecialist === declaredSubagent) return { pass: true };
+
+  const domainMessage = `[ROUTING] Developer spawn detected for domain work matching ${domainSpecialist}. Spawn ${domainSpecialist} instead. (DOMAIN_SPECIALIST_PATTERNS match)`;
+  const domainTracker = getViolationTracker();
+  if (domainTracker) {
+    domainTracker.recordViolation({
+      tool: 'Task',
+      action: domainEnforcement === 'block' ? 'blocked' : 'warned',
+      checkName: 'domain-specialist-override',
+      routerMode: 'router',
+      sessionId: process.env.CLAUDE_SESSION_ID || 'unknown',
+      metadata: { suggestedSpecialist: domainSpecialist },
+    });
+  }
+  if (domainEnforcement === 'block')
+    return { pass: false, result: 'block', message: domainMessage };
+  return { pass: true, result: 'warn', message: domainMessage };
 }
 
 function checkTaskListFirstGate(toolName, hookInput = null) {
