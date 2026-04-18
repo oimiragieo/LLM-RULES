@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- mcp-agent-allowlist-guard: per-agent MCP server enforcement via hookInput.agent_id (env `MCP_AGENT_ALLOWLIST_ENFORCEMENT`, default warn).
 - spawn-prompt-assembler: agent-typed memory notes via identity-memory-section (env `AGENT_TYPED_MEMORY_INJECTION`, default on).
 - spawn-prompt-assembler: keyword-score skill fallback via skill-auto-router (env `SKILL_KEYWORD_FALLBACK`, default on).
 - Subagent safe-path Write bypass in `write-pretool-bundle.cjs` (reports/plans/artifacts/tmp/logs/memory/metrics paths).

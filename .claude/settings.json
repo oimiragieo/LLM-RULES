@@ -297,6 +297,16 @@
             "timeout_ms": 5000
           }
         ]
+      },
+      {
+        "matcher": "mcp__*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/mcp-agent-allowlist-guard.cjs",
+            "timeout_ms": 5000
+          }
+        ]
       }
     ],
     "PostToolUse": [
