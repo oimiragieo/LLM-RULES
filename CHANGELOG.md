@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- spawn-prompt-assembler: keyword-score skill fallback via skill-auto-router (env `SKILL_KEYWORD_FALLBACK`, default on).
 - Subagent safe-path Write bypass in `write-pretool-bundle.cjs` (reports/plans/artifacts/tmp/logs/memory/metrics paths).
 - `Agent` added to PostToolUse matcher in `settings.json`.
 - Committed in-flight modules: pre-completion-validation splits, flight-recorder-schema-gate, hooks/benchmarks, tests/monitoring/flight-recorder.test.cjs.

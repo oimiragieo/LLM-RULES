@@ -59,6 +59,7 @@ const {
 } = require('./prompt-assembler-agent.cjs');
 const { loadProjectContext } = require('./prompt-assembler-context.cjs');
 const { detectCacheBreak, _resetHashes } = require('./cache-break-detector.cjs');
+const { recommendSkillsFallback } = require('./skill-recommender-fallback.cjs');
 
 const DEFAULT_SKILL_SECTION_MODE = 'full';
 
@@ -104,6 +105,10 @@ function buildPromptSections({
     if (presetSkills.length > 0) {
       skills = getSkillsByName(presetSkills, maxSkillsInPrompt);
     }
+  }
+  // Keyword-score fallback when semantic index is cold and skills list is empty
+  if (skills.length === 0 && process.env.SKILL_KEYWORD_FALLBACK !== 'off') {
+    skills = recommendSkillsFallback(agentType, { limit: 3, minScore: 0.3 });
   }
 
   const toolsSection = buildToolsSectionInternal(describedTools);
