@@ -28,47 +28,69 @@ test('test script should run actual tests and fail if 0 tests found', () => {
   const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
   const testScript = pkg.scripts['test'];
 
-  // Should not match 0 files
   assert.ok(testScript, 'test script should exist');
-
-  // Verify the script uses a glob pattern that will match test files
-  // The old pattern "tests/*.test.mjs" only matches files directly in tests/
-  // The new pattern "tests/**/*.test.{mjs,cjs}" matches files in subdirectories too
   assert.ok(
-    testScript.includes('tests/**/*.test'),
-    'Test script should use recursive glob pattern (tests/**/*.test) to match test files in subdirectories'
+    testScript.includes('scripts/testing/run-node-tests.cjs'),
+    'test script should use the cross-platform test runner wrapper'
   );
-
   assert.ok(
-    testScript.includes('{mjs,cjs}') || testScript.includes('.mjs') || testScript.includes('.cjs'),
-    'Test script should match both .mjs and .cjs test files'
+    testScript.includes('--pattern=tests/**/*.test.{mjs,cjs}'),
+    'test script should target the recursive .mjs/.cjs test glob via the wrapper'
   );
 });
 
-test('framework test scripts should only reference real tests paths', () => {
+test('framework test scripts should use the cross-platform test runner wrapper', () => {
   const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
   const frameworkScript = pkg.scripts['test:framework'] || '';
   const hooksScript = pkg.scripts['test:framework:hooks'] || '';
+  const libScript = pkg.scripts['test:framework:lib'] || '';
 
   assert.ok(
-    !frameworkScript.includes('.claude/hooks/**/*.test.cjs') &&
-      !frameworkScript.includes('.claude/lib/**/*.test.cjs'),
-    'test:framework should not reference archived .claude test globs'
+    frameworkScript.includes('scripts/testing/run-node-tests.cjs'),
+    'test:framework should use the cross-platform test runner wrapper'
   );
   assert.ok(
-    !hooksScript.includes('.claude/hooks/**/*.test.cjs'),
-    'test:framework:hooks should not reference archived .claude hook globs'
+    hooksScript.includes('scripts/testing/run-node-tests.cjs'),
+    'test:framework:hooks should use the cross-platform test runner wrapper'
   );
   assert.ok(
-    frameworkScript.includes('tests/hooks/*.test.cjs') &&
-      frameworkScript.includes('tests/lib/**/*.test.cjs') &&
-      frameworkScript.includes('tests/cli/*.test.cjs'),
-    'test:framework should target the actual tests/hooks, tests/lib, and tests/cli globs'
+    libScript.includes('scripts/testing/run-node-tests.cjs'),
+    'test:framework:lib should use the cross-platform test runner wrapper'
   );
   assert.ok(
-    hooksScript.includes('tests/hooks/*.test.cjs'),
-    'test:framework:hooks should target the actual tests/hooks glob'
+    frameworkScript.includes('--pattern=tests/hooks/*.test.cjs') &&
+      frameworkScript.includes('--pattern=tests/lib/**/*.test.cjs') &&
+      frameworkScript.includes('--pattern=tests/cli/*.test.cjs'),
+    'test:framework should target the actual framework test globs via the wrapper'
   );
+  assert.ok(
+    hooksScript.includes('--pattern=tests/hooks/*.test.cjs'),
+    'test:framework:hooks should target the hook tests glob via the wrapper'
+  );
+  assert.ok(
+    libScript.includes('--pattern=tests/lib/**/*.test.cjs') &&
+      libScript.includes('--pattern=tests/cli/*.test.cjs'),
+    'test:framework:lib should target the library and cli test globs via the wrapper'
+  );
+});
+
+test('CI-facing node test scripts should avoid shell-quoted globs', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+
+  for (const scriptName of [
+    'test',
+    'test:framework',
+    'test:framework:hooks',
+    'test:framework:lib',
+    'test:ci',
+  ]) {
+    const script = pkg.scripts[scriptName] || '';
+
+    assert.ok(
+      !script.includes('"tests/') && !script.includes("'tests/"),
+      `${scriptName} should not pass shell-quoted tests globs directly to node --test`
+    );
+  }
 });
 
 test('count-all-tests.mjs should report failed test files, not hide them', () => {
