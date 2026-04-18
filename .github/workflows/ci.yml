@@ -59,6 +59,9 @@ jobs:
           else
             base_ref="$(git rev-list --max-count=1 HEAD^ 2>/dev/null || git rev-parse HEAD)"
           fi
+          if ! git rev-parse --verify --quiet "$base_ref^{commit}" >/dev/null; then
+            base_ref="$(git rev-list --max-count=1 HEAD^ 2>/dev/null || git rev-parse HEAD)"
+          fi
           head_ref="${{ github.sha }}"
           git diff --name-only --diff-filter=ACMR "$base_ref" "$head_ref" > "$output_path"
           echo "count=$(wc -l < "$output_path" | tr -d ' ')" >> "$GITHUB_OUTPUT"
@@ -75,7 +78,13 @@ jobs:
 
       - name: Write advisory impacted validation summary
         if: always()
-        run: pnpm ci:summary:write --kind impacted-validation --input .claude/context/ci/impacted-validation.json
+        shell: bash
+        run: |
+          if [[ -f .claude/context/ci/impacted-validation.json ]]; then
+            pnpm ci:summary:write --kind impacted-validation --input .claude/context/ci/impacted-validation.json
+          else
+            echo "Advisory impacted validation output missing; skipping summary."
+          fi
 
       - name: Run advisory release gate
         if: github.event_name == 'pull_request'

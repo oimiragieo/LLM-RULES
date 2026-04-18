@@ -29,6 +29,26 @@ test('ci workflow wires advisory changed-files, impacted-validation, release-gat
   assert.doesNotMatch(workflow, /pnpm release:gate --json/);
 });
 
+test('ci workflow advisory changed-files survives missing push base commits and missing summary inputs', () => {
+  const workflow = readWorkflow('ci.yml');
+
+  assert.match(
+    workflow,
+    /git rev-parse --verify --quiet "\$base_ref\^\{commit\}" >\/dev\/null/,
+    'ci.yml should verify the advisory base ref exists before diffing'
+  );
+  assert.match(
+    workflow,
+    /base_ref="\$\(git rev-list --max-count=1 HEAD\^ 2>\/dev\/null \|\| git rev-parse HEAD\)"/,
+    'ci.yml should fall back to the current branch history when the advisory base ref is unavailable'
+  );
+  assert.match(
+    workflow,
+    /if \[\[ -f \.claude\/context\/ci\/impacted-validation\.json \]\]; then/,
+    'ci.yml should skip the impacted-validation summary when the advisory JSON was not written'
+  );
+});
+
 test('package scripts expose ci summary and artifact index helpers for workflow use', () => {
   const scripts = readPackageJson().scripts;
 
