@@ -1,3 +1,4 @@
+/* eslint max-lines: ["warn", 600] */
 'use strict';
 
 const path = require('path');
@@ -70,6 +71,7 @@ const {
   insertContextModeSection,
   applySemanticMemoryToPrompt,
   applyEntityGraphToPrompt,
+  appendAgentTypedMemoryNotes,
 } = memory;
 
 const {
@@ -315,6 +317,17 @@ async function assemblePromptWithCache({
         !throttleExpensive && (!isObservationalMode() || shouldUseTierB(toolInput, basePrompt));
       if (tierBAllowed) {
         assembled = await applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, stderrLog);
+        if (
+          String(process.env.AGENT_TYPED_MEMORY_INJECTION || 'on')
+            .trim()
+            .toLowerCase() !== 'off'
+        ) {
+          try {
+            assembled = appendAgentTypedMemoryNotes(assembled, agentType);
+          } catch (_atmiErr) {
+            // fail-open
+          }
+        }
         assembled = await applyEntityGraphToPrompt(assembled);
       }
     }
