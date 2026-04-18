@@ -63,6 +63,9 @@ async function runHook(hookPath, input, env = {}) {
       WORKFLOW_STATE_FILE: WF_STATE,
       PHASE_ADVANCE_FILE: PHASE_SIGNAL,
       REFLECTION_ENABLED: 'false',
+      // F-LIFECYCLE: redirect taskupdate-first state to TEST_DIR to prevent production contamination
+      TASKUPDATE_FIRST_STATE_FILE: path.join(TEST_DIR, 'taskupdate-first-state.json'),
+      TASKUPDATE_FIRST_ENFORCEMENT: 'off',
     },
   });
 
@@ -191,6 +194,23 @@ async function testLifecycle() {
   console.log(`Current Phase: ${finalState.currentPhase}`);
   if (finalState.currentPhase !== 'obtain') {
     throw new Error(`Workflow did not advance! Phase is still ${finalState.currentPhase}`);
+  }
+
+  // F-LIFECYCLE: Verify test isolation — production state file must not contain test fixture
+  const prodStateFile = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'runtime',
+    'taskupdate-first-state.json'
+  );
+  if (fs.existsSync(prodStateFile)) {
+    const prod = JSON.parse(fs.readFileSync(prodStateFile, 'utf8'));
+    if (prod.sessions && prod.sessions[sessionId]) {
+      throw new Error(
+        `Test contamination: production state contains test fixture session "${sessionId}"`
+      );
+    }
   }
 
   console.log('\n[PASS] Grand Subagent Lifecycle Test successful.');

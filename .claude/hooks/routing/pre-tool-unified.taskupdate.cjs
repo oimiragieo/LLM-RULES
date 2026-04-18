@@ -355,6 +355,27 @@ function checkTaskUpdateFirst(
       };
     }
 
+    // F-LIFECYCLE: handle deleted/cancelled status — remove session entry and orphan cleanup
+    if (status === 'deleted' || status === 'cancelled') {
+      if (current.sessions[sessionId]) {
+        delete current.sessions[sessionId];
+        writeTaskUpdateFirstState(current, stateFile);
+      }
+      // Remove ANY session whose taskId matches the deletion target (handles orphan test-fixture entries)
+      const targetTaskId = taskId || extractTaskUpdateTaskId(toolInput);
+      if (targetTaskId) {
+        let mutated = false;
+        for (const [sid, entry] of Object.entries(current.sessions)) {
+          if (entry && entry.taskId === targetTaskId) {
+            delete current.sessions[sid];
+            mutated = true;
+          }
+        }
+        if (mutated) writeTaskUpdateFirstState(current, stateFile);
+      }
+      return { checked: true, action: 'allow' };
+    }
+
     if (
       status === 'in_progress' ||
       status === 'in-progress' ||

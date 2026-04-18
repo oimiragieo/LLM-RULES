@@ -33,6 +33,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **F-LIFECYCLE: stale-task phantom elimination** — Fixed three root causes of the task-lifecycle-42
+  phantom that had generated 1023 duplicate gap-log entries over 16 days.
+  (1) `pre-tool-unified.taskupdate.cjs` now handles `TaskUpdate({status:"deleted"/"cancelled"})` by removing
+  the session entry and any orphan entries matching the taskId from `taskupdate-first-state.json`.
+  (2) `stale-task-detector.cjs` adds per-task cooldown suppression (1h default, configurable via
+  `STALE_TASK_EMISSION_COOLDOWN_MS`) via `stale-task-emission-cooldown.json` to bound duplicate emissions.
+  (3) `stale-task-detector.cjs` hard-prunes cross-session orphan entries older than 7 days
+  (`STALE_TASK_HARD_PRUNE_MS`) from `taskupdate-first-state.json`.
+  (4) `tests/hooks/grand-lifecycle.test.cjs` redirects `TASKUPDATE_FIRST_STATE_FILE` env var to TEST_DIR
+  and sets `TASKUPDATE_FIRST_ENFORCEMENT=off` to prevent future test fixture contamination of production
+  runtime state. Includes post-test isolation assertion. New regression tests:
+  `pre-tool-unified-taskupdate-deleted.test.cjs` (3 cases) and
+  `stale-task-detector-deduplication.test.cjs` (3 cases). One-shot runtime remediation cleared
+  the `session-lifecycle-99` orphan and the `task-lifecycle-42` stale queue entry.
+
 - **write-pretool-bundle: allow reflection-agent runtime queue drain (Step 0 IRON LAW unblocked)** — Added a targeted pre-bypass guard that permits `reflection-agent` (identified via `CLAUDE_AGENT_ID`) to write to exactly `.claude/context/runtime/reflection-spawn-request.json` and `.claude/context/runtime/reflection-reminder.txt`, while blocking all other agents from those paths and blocking `reflection-agent` from any other `runtime/` path. Covered by 5 new TDD cases in `tests/hooks/safety/write-pretool-bundle-reflection-allowance.test.cjs`.
 
 - **Flight recorder hot-path regression and benchmark flake** — Removed a duplicate `Date.now()` declaration in `.claude/lib/monitoring/flight-recorder.cjs`, added buffered-write-aware rotation probe skipping plus missing-file debounce coverage in `tests/monitoring/flight-recorder.test.cjs`, and stabilized the telemetry hot-path benchmark so repeated `tests/benchmarks/telemetry-hotpath-latency.test.cjs` runs stay under the suite threshold.

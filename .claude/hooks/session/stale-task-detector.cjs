@@ -26,6 +26,12 @@ const PROJECT_ROOT = (() => {
 })();
 
 const STALE_THRESHOLD_MS = Number(process.env.STALE_TASK_THRESHOLD_MS || 15 * 60 * 1000); // 15 min
+const STALE_EMISSION_COOLDOWN_MS = Number(
+  process.env.STALE_TASK_EMISSION_COOLDOWN_MS || 60 * 60 * 1000 // 1h default
+);
+const STALE_TASK_HARD_PRUNE_MS = Number(
+  process.env.STALE_TASK_HARD_PRUNE_MS || 7 * 24 * 60 * 60 * 1000 // 7 days default
+);
 const GAP_LOG_PATH = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -39,6 +45,14 @@ const TASKUPDATE_STATE_FILE = path.join(
   'context',
   'runtime',
   'taskupdate-first-state.json'
+);
+
+const STALE_EMISSION_COOLDOWN_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'stale-task-emission-cooldown.json'
 );
 const STALE_TASKS_QUEUE_PATH = path.join(
   PROJECT_ROOT,
@@ -72,6 +86,25 @@ function appendGapLog(entry) {
  *
  * @param {Array<{taskId: string, ageMin: number, detectedAt: string, subject: string}>} newEntries
  */
+function readCooldown() {
+  try {
+    if (!fs.existsSync(STALE_EMISSION_COOLDOWN_FILE)) return {};
+    return safeParseJSON(fs.readFileSync(STALE_EMISSION_COOLDOWN_FILE, 'utf8'), null) || {};
+  } catch (_e) {
+    return {};
+  }
+}
+
+function writeCooldown(map) {
+  try {
+    const tmp = STALE_EMISSION_COOLDOWN_FILE + '.tmp.' + process.pid;
+    fs.writeFileSync(tmp, JSON.stringify(map, null, 2), 'utf8');
+    fs.renameSync(tmp, STALE_EMISSION_COOLDOWN_FILE);
+  } catch (_e) {
+    // Non-critical: cooldown write failure does not affect detection
+  }
+}
+
 function writeStaleTasksQueue(newEntries) {
   if ((process.env.STALE_TASK_AUTO_QUEUE || '').trim().toLowerCase() === 'off') return;
   if (!newEntries || newEntries.length === 0) return;
@@ -118,6 +151,27 @@ function main() {
     const now = Date.now();
     const stale = [];
 
+    // F-LIFECYCLE: hard-prune orphan entries older than STALE_TASK_HARD_PRUNE_MS
+    let stateMutated = false;
+    for (const [sid, sentry] of Object.entries(state.sessions)) {
+      if (sentry && sentry.updatedAt) {
+        const entryAge = now - Number(sentry.updatedAt);
+        if (entryAge > STALE_TASK_HARD_PRUNE_MS) {
+          delete state.sessions[sid];
+          stateMutated = true;
+        }
+      }
+    }
+    if (stateMutated) {
+      try {
+        const tmp = TASKUPDATE_STATE_FILE + '.tmp.' + process.pid;
+        fs.writeFileSync(tmp, JSON.stringify(state, null, 2), 'utf8');
+        fs.renameSync(tmp, TASKUPDATE_STATE_FILE);
+      } catch (_e) {
+        // Non-critical: state flush failure; entries will be re-pruned next run
+      }
+    }
+
     for (const [sessionId, entry] of Object.entries(state.sessions)) {
       if (entry && entry.inProgress === true && entry.updatedAt) {
         const ageMs = now - Number(entry.updatedAt);
@@ -131,10 +185,24 @@ function main() {
     }
 
     if (stale.length > 0) {
+      // F-LIFECYCLE: apply per-task cooldown to suppress duplicate emissions
+      const cooldown = readCooldown();
+      const now2 = Date.now();
+      const fresh = stale.filter(({ taskId }) => {
+        const last = Number(cooldown[taskId] || 0);
+        return now2 - last > STALE_EMISSION_COOLDOWN_MS;
+      });
+      if (fresh.length > 0) {
+        for (const { taskId } of fresh) cooldown[taskId] = now2;
+        writeCooldown(cooldown);
+      }
+      // Only process fresh (non-cooldown-suppressed) entries
+      const staleFresh = fresh;
+
       const detectedAt = new Date().toISOString();
       const queueEntries = [];
 
-      for (const { taskId, ageMin, subject } of stale) {
+      for (const { taskId, ageMin, subject } of staleFresh) {
         const msg = `[STALE-TASK] Task "${taskId}" has been in_progress for ${ageMin}m — router may have forgotten to call TaskUpdate(completed)`;
         process.stderr.write(msg + '\n');
         appendGapLog({
