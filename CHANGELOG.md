@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Subagent safe-path Write bypass in `write-pretool-bundle.cjs` (reports/plans/artifacts/tmp/logs/memory/metrics paths).
 - `Agent` added to PostToolUse matcher in `settings.json`.
 - Committed in-flight modules: pre-completion-validation splits, flight-recorder-schema-gate, hooks/benchmarks, tests/monitoring/flight-recorder.test.cjs.
@@ -17,9 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Committed skills/telegram-polling/.
 
 ### Removed
+
 - skill-updater-skill-workflow.md (no consumers).
 
 ### Deferred
+
 - Feature-drop delete pass: identity-memory-section.cjs, memory-tools.cjs, mcp-allowlist-checker.cjs, skill-auto-router.cjs (each needs paired test-block removal).
 - Routing-guard wiring for resolveDomainSpecialist (blueprint P1-06).
 - telegram-polling agent-frontmatter wiring (blueprint P2-02; FILE-PLACEMENT-GUARD blocks automated edit).
@@ -29,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **hook permission_mode and agent_id in sub-agent PreToolUse context** — Confirmed via official Claude Code docs (HOOKS.md): agent_id is ONLY present in SubagentStart/SubagentStop hook events, NOT in PreToolUse stdin payload. permission_mode IS in common hook input fields (values: default, plan, acceptEdits, dontAsk, bypassPermissions). router-tool-lockdown isRouterSession() cannot use hookInput.agent_id for PreToolUse sub-agent detection — falls through to CLAUDE_AGENT_ID env, task_id, allowed_tools, CWD. The [bypass] tag in block messages appears ONLY when permission_mode===bypassPermissions (--dangerously-skip-permissions).
 
 ### Fixed
+
+- **write-pretool-bundle: allow reflection-agent runtime queue drain (Step 0 IRON LAW unblocked)** — Added a targeted pre-bypass guard that permits `reflection-agent` (identified via `CLAUDE_AGENT_ID`) to write to exactly `.claude/context/runtime/reflection-spawn-request.json` and `.claude/context/runtime/reflection-reminder.txt`, while blocking all other agents from those paths and blocking `reflection-agent` from any other `runtime/` path. Covered by 5 new TDD cases in `tests/hooks/safety/write-pretool-bundle-reflection-allowance.test.cjs`.
 
 - **Flight recorder hot-path regression and benchmark flake** — Removed a duplicate `Date.now()` declaration in `.claude/lib/monitoring/flight-recorder.cjs`, added buffered-write-aware rotation probe skipping plus missing-file debounce coverage in `tests/monitoring/flight-recorder.test.cjs`, and stabilized the telemetry hot-path benchmark so repeated `tests/benchmarks/telemetry-hotpath-latency.test.cjs` runs stay under the suite threshold.
 

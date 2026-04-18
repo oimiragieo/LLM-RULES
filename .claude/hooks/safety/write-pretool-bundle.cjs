@@ -58,11 +58,57 @@ async function main() {
     hookInput = await parseHookInputAsync();
     if (!hookInput) process.exit(0);
 
+    // Reflection-agent runtime queue drain (Step 0 IRON LAW).
+    // reflection-agent is permitted to write to EXACTLY two runtime paths:
+    //   - .claude/context/runtime/reflection-spawn-request.json
+    //   - .claude/context/runtime/reflection-reminder.txt
+    // Any other path in runtime/ is blocked even for reflection-agent.
+    // All other agents are blocked from these two paths unconditionally
+    // (they must NOT bypass this check via the general sub-agent bypass below).
+    const _agentId = process.env.CLAUDE_AGENT_ID;
+    const _rawPath =
+      (hookInput &&
+        hookInput.tool_input &&
+        (hookInput.tool_input.file_path || hookInput.tool_input.path)) ||
+      '';
+    const _normPath = _rawPath.split('\\').join('/');
+    const REFLECTION_ALLOWED_PATHS = [
+      '.claude/context/runtime/reflection-spawn-request.json',
+      '.claude/context/runtime/reflection-reminder.txt',
+    ];
+    const _isReflectionPath = REFLECTION_ALLOWED_PATHS.some(p => _normPath.endsWith(p));
+    const _isRuntimePath = _normPath.includes('.claude/context/runtime/');
+    if (_isReflectionPath) {
+      // Only reflection-agent (via env CLAUDE_AGENT_ID) may write these paths.
+      if (_agentId === 'reflection-agent') {
+        process.exit(0);
+      }
+      // Everyone else — including router — is blocked.
+      console.log(
+        JSON.stringify({
+          result: 'block',
+          message:
+            '[REFLECTION-RUNTIME-GUARD] Only reflection-agent may write to reflection runtime queue paths.',
+        })
+      );
+      process.exit(2);
+    }
+    // reflection-agent is restricted to the two allowed paths; block any other runtime/ write.
+    if (_agentId === 'reflection-agent' && _isRuntimePath) {
+      console.log(
+        JSON.stringify({
+          result: 'block',
+          message:
+            '[REFLECTION-RUNTIME-GUARD] reflection-agent may only write reflection-spawn-request.json or reflection-reminder.txt in runtime/.',
+        })
+      );
+      process.exit(2);
+    }
+
     // Sub-agent bypass: non-router sub-agents skip all write safety checks.
     // Matches the precedent in router-tool-lockdown.cjs:171-177 and
     // routing-guard-core.helpers.cjs:29-33 — task_id in hookInput is a
     // definitive signal that a subagent is executing this tool call.
-    const _agentId = process.env.CLAUDE_AGENT_ID;
     const hookTaskId = hookInput && (hookInput.task_id || hookInput.taskId);
     if ((_agentId && _agentId !== 'router') || hookTaskId) {
       process.exit(0);
