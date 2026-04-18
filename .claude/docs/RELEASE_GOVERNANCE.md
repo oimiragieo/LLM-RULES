@@ -73,6 +73,34 @@ Example major-release gate:
 pnpm release:gate --old old.md --new new.md --type agent --commit-message "feat(agent)!: remove write tool" --migration-guide .claude/docs/MIGRATION.md
 ```
 
+## Remote PR Enforcement
+
+`Full Validation` now contains a PR-only `Release Governance` job that is authoritative for remote release classification.
+
+- It diffs governed artifacts from `github.event.pull_request.base.sha` to `github.event.pull_request.head.sha` instead of relying on changed-file heuristics alone
+- It preserves governed deletions and renames instead of flattening them into add-only snapshots
+- It writes a GitHub Actions summary so maintainers can see the required semver class without opening logs
+- It uploads durable release-governance evidence including changed-file metadata, release intent, per-artifact snapshots, and the aggregate `release-gate.json`
+- It blocks semver-major PRs unless both release-intent signaling and a migration guide are present
+
+The remote job currently auto-diffs these governed artifact classes:
+
+- `.claude/agents/**/*.md` except `CLAUDE.md`
+- `.claude/skills/**/SKILL.md`
+- `.claude/schemas/**/*.json`
+
+For remote enforcement, release intent comes from the PR title plus PR body. If a PR is breaking, the title or body must carry either:
+
+- `!` in the conventional-commit header
+- `BREAKING CHANGE:`
+
+Migration-guide detection is intentionally simple:
+
+- Preferred canonical path: `.claude/docs/MIGRATION.md`
+- Also accepted: any changed markdown file matching `*MIGRATION*.md`
+
+If no governed artifacts changed, the remote gate falls back to the non-breaking/docs-only heuristic path.
+
 ## Minor Release Path
 
 Use the minor path when the change is additive, compatibility-preserving, or a bug fix.
@@ -106,7 +134,8 @@ Use the major path when a public contract changes incompatibly:
 Required in addition to the minor path:
 
 - semver-major evidence from `release:gate`
-- migration guide present
+- PR title or body includes `!` or `BREAKING CHANGE:`
+- migration guide present at `.claude/docs/MIGRATION.md` or another changed `*MIGRATION*.md` path
 - changelog breaking-change callout
 - PR-only merge path after all required checks pass
 

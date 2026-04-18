@@ -96,6 +96,12 @@ Full docs: `.claude/docs/TELEGRAM_ARCHITECTURE.md`
 - **Semver-aware release gate added**: New `pnpm release:gate` reuses artifact semver diffing, keeps docs-only changes on the non-breaking path, and enforces migration-guide plus breaking-change signaling for semver-major releases
 - **Release runbook documented**: `.claude/docs/RELEASE_GOVERNANCE.md` now documents branch naming, local verification, required remote checks, and minor-vs-major release handling
 
+### Phase 12 — Remote CI Evidence and Release Ops
+
+- **Advisory CI evidence persisted**: `CI` now uploads impacted-validation and release-gate advisory artifacts so selective validation decisions are inspectable after the run
+- **Authoritative PR release governance added**: `Full Validation` now runs a PR-only `Release Governance` job that diffs governed agent/skill/schema artifacts from the PR base SHA to the PR head SHA, preserves deletions and renames, uploads durable release evidence, reads release intent from the PR title/body, and blocks semver-major changes that do not carry both breaking-change signaling and a migration guide
+- **Scheduled flake ops added**: `CI Flake Ops` aggregates recent advisory/failure artifacts on a schedule, writes a maintainer-facing summary, and opens or updates a tracking issue when recurring failures become actionable
+
 ### Prompt Cache Optimization (Zylos-inspired)
 
 - **Envelope fingerprint**: Stable hash across spawns of same agent type (excludes per-spawn basePrompt). Enables cache hits for tools/skills/safety prefix.
@@ -403,7 +409,7 @@ Use this path if you are proposing changes to the ecosystem itself.
 pnpm run setup
 ```
 
-2. Run baseline validation:
+1. Run baseline validation:
 
 ```bash
 pnpm validate
@@ -413,7 +419,7 @@ pnpm validate:commands
 pnpm validate:routing
 ```
 
-3. Run tests relevant to your change:
+1. Run tests relevant to your change:
 
 ```bash
 pnpm test
@@ -422,14 +428,14 @@ pnpm test:tools
 pnpm test:code-indexing
 ```
 
-4. Enforce style before shipping:
+1. Enforce style before shipping:
 
 ```bash
 pnpm lint
 pnpm format:check
 ```
 
-5. Mission CLI (Factory Droid-aligned orchestration):
+1. Mission CLI (Factory Droid-aligned orchestration):
 
 ```bash
 pnpm mission:init                      # scaffold new mission bundle
@@ -458,7 +464,7 @@ pnpm manifest:generate
 pnpm routing:prototypes
 ```
 
-2. Track memory and operational health:
+1. Track memory and operational health:
 
 ```bash
 pnpm memory:status
@@ -466,14 +472,14 @@ pnpm memory:health
 pnpm worker:summary
 ```
 
-3. Run integration checks before larger pipeline runs:
+1. Run integration checks before larger pipeline runs:
 
 ```bash
 pnpm integration:headless:json
 pnpm validate:full
 ```
 
-4. Reset context safely when sessions get noisy:
+1. Reset context safely when sessions get noisy:
 
 ```bash
 pnpm context:reset --scope soft --force

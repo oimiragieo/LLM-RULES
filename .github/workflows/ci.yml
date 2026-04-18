@@ -20,6 +20,106 @@ permissions:
   contents: read
 
 jobs:
+  advisory-impact-analysis:
+    name: Advisory Impact Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Collect changed files
+        id: changed-files
+        shell: bash
+        run: |
+          mkdir -p .claude/context/ci
+          output_path=".claude/context/ci/changed-files.txt"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base_ref="${{ github.event.pull_request.base.sha }}"
+          elif [[ "${{ github.event_name }}" == "merge_group" && -n "${{ github.event.merge_group.base_sha }}" ]]; then
+            base_ref="${{ github.event.merge_group.base_sha }}"
+          elif [[ "${{ github.event.before }}" != "" && "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]]; then
+            base_ref="${{ github.event.before }}"
+          else
+            base_ref="$(git rev-list --max-count=1 HEAD^ 2>/dev/null || git rev-parse HEAD)"
+          fi
+          if ! git rev-parse --verify --quiet "$base_ref^{commit}" >/dev/null; then
+            base_ref="$(git rev-list --max-count=1 HEAD^ 2>/dev/null || git rev-parse HEAD)"
+          fi
+          head_ref="${{ github.sha }}"
+          git diff --name-only --diff-filter=ACMR "$base_ref" "$head_ref" > "$output_path"
+          echo "count=$(wc -l < "$output_path" | tr -d ' ')" >> "$GITHUB_OUTPUT"
+
+      - name: Run advisory impacted validation
+        shell: bash
+        run: |
+          mkdir -p .claude/context/ci
+          args=()
+          while IFS= read -r file; do
+            [[ -n "$file" ]] && args+=(--file "$file")
+          done < .claude/context/ci/changed-files.txt
+          node .claude/tools/cli/validate-affected.cjs --json "${args[@]}" > .claude/context/ci/impacted-validation.json
+
+      - name: Write advisory impacted validation summary
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f .claude/context/ci/impacted-validation.json ]]; then
+            pnpm ci:summary:write --kind impacted-validation --input .claude/context/ci/impacted-validation.json
+          else
+            echo "Advisory impacted validation output missing; skipping summary."
+          fi
+
+      - name: Run advisory release gate
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p .claude/context/ci
+          args=()
+          while IFS= read -r file; do
+            [[ -n "$file" ]] && args+=(--changed-file "$file")
+          done < .claude/context/ci/changed-files.txt
+          node .claude/tools/cli/release-gate.cjs --json "${args[@]}" > .claude/context/ci/release-gate.json
+
+      - name: Write advisory release gate summary
+        if: github.event_name == 'pull_request' && always()
+        shell: bash
+        run: |
+          if [[ -f .claude/context/ci/release-gate.json ]]; then
+            pnpm ci:summary:write --kind release-gate --input .claude/context/ci/release-gate.json
+          else
+            echo "Advisory release gate output missing; skipping summary."
+          fi
+
+      - name: Upload advisory CI artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-advisory-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: ignore
+          retention-days: 7
+          path: |
+            .claude/context/ci/changed-files.txt
+            .claude/context/ci/impacted-validation.json
+            .claude/context/ci/release-gate.json
+
   lint:
     name: Lint
     runs-on: ubuntu-latest

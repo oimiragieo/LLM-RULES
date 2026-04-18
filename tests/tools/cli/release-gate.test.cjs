@@ -147,6 +147,8 @@ test('parseArgs reads release gate flags', () => {
     'agent',
     '--commit-message',
     'feat(agent)!: breaking change',
+    '--commit-message-file',
+    'release-intent.txt',
     '--migration-guide',
     'MIGRATION.md',
     '--changed-file',
@@ -158,8 +160,57 @@ test('parseArgs reads release gate flags', () => {
   assert.equal(opts.newPath, 'new.md');
   assert.equal(opts.artifactType, 'agent');
   assert.equal(opts.commitMessage, 'feat(agent)!: breaking change');
+  assert.equal(opts.commitMessageFile, 'release-intent.txt');
   assert.equal(opts.migrationGuidePath, 'MIGRATION.md');
   assert.deepEqual(opts.changedFiles, ['README.md']);
+});
+
+test('release-gate accepts commit message from file input', () => {
+  const tmpDir = makeTempDir('release-gate-commit-message-file');
+
+  try {
+    const oldFile = path.join(tmpDir, 'old.md');
+    const newFile = path.join(tmpDir, 'new.md');
+    const migrationGuide = path.join(tmpDir, 'MIGRATION.md');
+    const releaseIntent = path.join(tmpDir, 'release-intent.txt');
+
+    fs.writeFileSync(oldFile, '---\ntools: [Read, Write]\n---', 'utf8');
+    fs.writeFileSync(newFile, '---\ntools: [Read]\n---', 'utf8');
+    fs.writeFileSync(migrationGuide, '# Migration\n', 'utf8');
+    fs.writeFileSync(
+      releaseIntent,
+      'feat(agent): remove write tool\n\nBREAKING CHANGE: write capability was removed',
+      'utf8'
+    );
+
+    const result = spawnSync(
+      'node',
+      [
+        CLI,
+        '--json',
+        '--old',
+        oldFile,
+        '--new',
+        newFile,
+        '--type',
+        'agent',
+        '--commit-message-file',
+        releaseIntent,
+        '--migration-guide',
+        migrationGuide,
+      ],
+      {
+        encoding: 'utf8',
+      }
+    );
+
+    assert.equal(result.status, 0, result.stderr);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(parsed.result.requiredBump, 'major');
+    assert.deepEqual(parsed.result.failures, []);
+  } finally {
+    cleanupTempDir(tmpDir);
+  }
 });
 
 test('release-gate emits JSON result for docs-only evaluation', () => {
