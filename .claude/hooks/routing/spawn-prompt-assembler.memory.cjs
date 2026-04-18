@@ -491,6 +491,19 @@ async function applyEntityGraphToPrompt(assembled) {
   }
 }
 
+function appendAgentTypedMemoryNotes(prompt, agentType) {
+  try {
+    const {
+      formatAgentTypedMemorySection,
+    } = require('../../lib/spawn/prompt-assembler-memory.cjs');
+    const section = formatAgentTypedMemorySection(agentType);
+    if (!section) return prompt;
+    return prompt + '\n\n' + section;
+  } catch (_err) {
+    return prompt;
+  }
+}
+
 module.exports = {
   appendSemanticMatches,
   appendQueryMemories,
@@ -499,4 +512,5 @@ module.exports = {
   applySemanticMemoryToPrompt,
   applyEntityGraphToPrompt,
   sanitizeMemoryContent,
+  appendAgentTypedMemoryNotes,
 };

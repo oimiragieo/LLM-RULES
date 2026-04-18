@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-04-04T21:21:37.814Z
+lastVerifiedAt: 2026-04-18T05:13:39.355Z
 name: artifact-integrator
 version: 1.0.0
 description: >-
@@ -46,6 +46,7 @@ skills:
   - project-onboarding
   - ripgrep
   - task-management-protocol
+  - telegram-polling
   - token-saver-context-compression
   - verification-before-completion
 context_files: null

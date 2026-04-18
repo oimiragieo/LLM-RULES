@@ -511,6 +511,20 @@ async function queryMemoryForSpawn(memoryQuery, { ragLimit, ragThreshold, search
   }
 }
 
+function formatAgentTypedMemorySection(agentType, options = {}) {
+  try {
+    const {
+      generateMemorySection,
+      getSupportedAgentTypes,
+    } = require('../memory/identity-memory-section.cjs');
+    const supported = getSupportedAgentTypes();
+    if (!supported.includes(agentType)) return '';
+    return generateMemorySection(agentType, options);
+  } catch (_err) {
+    return '';
+  }
+}
+
 module.exports = {
   getMemoryMode,
   getMemorySectionBudgets,
@@ -527,4 +541,5 @@ module.exports = {
   queryMemoryForSpawn,
   loadReflectionActionables,
   formatReflectionActionablesSection,
+  formatAgentTypedMemorySection,
 };

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- spawn-prompt-assembler: agent-typed memory notes via identity-memory-section (env `AGENT_TYPED_MEMORY_INJECTION`, default on).
 - spawn-prompt-assembler: keyword-score skill fallback via skill-auto-router (env `SKILL_KEYWORD_FALLBACK`, default on).
 - Subagent safe-path Write bypass in `write-pretool-bundle.cjs` (reports/plans/artifacts/tmp/logs/memory/metrics paths).
 - `Agent` added to PostToolUse matcher in `settings.json`.
@@ -17,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Committed memory-manager-core-impl.cjs facade.
 - Committed phase-advance-reader.cjs domain resolver.
 - Committed skills/telegram-polling/.
+- artifact-integrator: telegram-polling skill now discoverable through agent frontmatter.
 
 ### Removed
 
@@ -24,9 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deferred
 
-- Feature-drop delete pass: identity-memory-section.cjs, memory-tools.cjs, mcp-allowlist-checker.cjs, skill-auto-router.cjs (each needs paired test-block removal).
+- Feature-drop delete pass: memory-tools.cjs, mcp-allowlist-checker.cjs, skill-auto-router.cjs (each needs paired test-block removal). (identity-memory-section.cjs wired in f1-identity-memory-wire-2026-04-17)
 - Routing-guard wiring for resolveDomainSpecialist (blueprint P1-06).
-- telegram-polling agent-frontmatter wiring (blueprint P2-02; FILE-PLACEMENT-GUARD blocks automated edit).
 
 ### Investigated
 
