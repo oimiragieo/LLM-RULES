@@ -53,14 +53,32 @@ function countLines(filePath) {
   return text.split(/\r?\n/).length;
 }
 
+function normalizePathKey(filePath) {
+  return String(filePath).replace(/\\/g, '/');
+}
+
 function loadBaseline(filePath) {
   if (!fs.existsSync(filePath)) return {};
   try {
     const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    return parsed && typeof parsed === 'object' ? parsed : {};
+    if (!parsed || typeof parsed !== 'object') {
+      return {};
+    }
+    const normalized = {};
+    for (const [key, value] of Object.entries(parsed)) {
+      normalized[normalizePathKey(key)] = value;
+    }
+    return normalized;
   } catch (_err) {
     return {};
   }
+}
+
+function lookupBaselineSize(baseline, filePath) {
+  if (!baseline || typeof baseline !== 'object') {
+    return undefined;
+  }
+  return baseline[normalizePathKey(filePath)];
 }
 
 function main(argv = process.argv) {
@@ -84,9 +102,13 @@ function main(argv = process.argv) {
     fs.writeFileSync(opts.baselinePath, JSON.stringify(next, null, 2), 'utf8');
   }
 
-  const newViolations = oversized.filter(entry => baseline[entry.file] === undefined);
+  const newViolations = oversized.filter(
+    entry => lookupBaselineSize(baseline, entry.file) === undefined
+  );
   const growthViolations = oversized.filter(
-    entry => baseline[entry.file] !== undefined && entry.lines > Number(baseline[entry.file])
+    entry =>
+      lookupBaselineSize(baseline, entry.file) !== undefined &&
+      entry.lines > Number(lookupBaselineSize(baseline, entry.file))
   );
 
   const result = {
@@ -127,4 +149,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { main };
+module.exports = { main, lookupBaselineSize, normalizePathKey, loadBaseline };
