@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- evolution-trigger dormant env-gate via AGENT_EVOLUTION_ENABLED (F6 wire-in)
 - routing-guard: second-pass DOMAIN_SPECIALIST_PATTERNS check with negation guard (env DOMAIN_SPECIALIST_ENFORCEMENT, default warn)
 
 ### Fixed

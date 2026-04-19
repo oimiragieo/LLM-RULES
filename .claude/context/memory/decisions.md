@@ -195,3 +195,7 @@
 > ⚠️ Content archived to archive/decisions-2026-04-06.md on 2026-04-06
 
 > ⚠️ Content archived to archive/decisions-2026-04-07.md on 2026-04-07
+
+## ADR: F6 evolution-trigger kept dormant env-gated (2026-04-19)
+
+Decision: evolution-trigger.cjs returns null unless AGENT_EVOLUTION_ENABLED=1. Rationale per LLM consult — natural pipeline link when F8 produces telemetry. Not archived; warn-mode default off.

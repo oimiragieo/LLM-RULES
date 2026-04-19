@@ -50,6 +50,7 @@ class EvolutionTrigger {
    * @returns {{ triggered: object[], skipped: object[], analyzed: number }}
    */
   evaluate(usageTracker) {
+    if (process.env.AGENT_EVOLUTION_ENABLED !== '1') return null;
     const patternDetector = new PatternDetector({
       failingMinInvocations: this._thresholds.minInvocationsForAnalysis,
       failingSuccessRateThreshold: this._thresholds.failureRateAlert,
