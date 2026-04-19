@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### MEv1 Phase 0.5 — Security Hardening Summary
+
+Phase 0.5 of the Mission Engine Wiring v1 plan
+(`.claude/context/plans/next-release-spec-2026-04-19.md`) closes all
+four HIGH security blockers (B1–B4) from the M0.2 threat model and
+reroutes the F7-archived skill effector path. Phase 1 (worker
+dispatch) is now unblocked. New tests live under `tests/security/mev1-*`
+(36 new test cases, all GREEN).
+
 ### Security
 
 - MEv1 B3 (CWE-78): SKILL_ALLOWLIST plus a strict skill-name regex enforced in `worker-features-dispatcher.cjs` rejects shell metachars and path traversal in `feature.skillName` before enqueue. Allowlist source: `.claude/lib/mission/skill-allowlist.json`. Closes B3 from threat model 2026-04-19.
