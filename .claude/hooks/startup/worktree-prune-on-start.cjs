@@ -41,9 +41,17 @@ function ensureSubagentClaudeMd() {
   }
 }
 
+function shouldSkipPruneForHookAudit() {
+  return process.env.A2A_AUTO_START === 'false' && process.env.CHANNEL_AUTO_START === 'false';
+}
+
 function main() {
   try {
     ensureSubagentClaudeMd();
+
+    if (shouldSkipPruneForHookAudit()) {
+      return;
+    }
 
     // We reuse the existing CLI worktree prune script since it already contains
     // the complex timestamp staleness logic and OS file-lock bypasses.
@@ -67,4 +75,4 @@ if (require.main === module) {
 }
 
 // Export for programmatic use by consolidated bundles
-module.exports = { main, ensureSubagentClaudeMd };
+module.exports = { main, ensureSubagentClaudeMd, shouldSkipPruneForHookAudit };

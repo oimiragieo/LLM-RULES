@@ -41,7 +41,6 @@ function formatHookError(err) {
   return text || 'Unknown hook failure (empty error message)';
 }
 
-
 /**
  * Enforces reflection-agent runtime queue isolation.
  * Exits process directly (0=allow, 2=block) when a runtime path is matched.

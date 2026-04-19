@@ -60,7 +60,8 @@ const SESSION_ID_PATH = path.join(RUNTIME_DIR, 'session-id.json');
 /** Safely parse JSON, returning null on any error. */
 function safeParse(raw) {
   try {
-    return safeParseJSON(raw, null, null, null) || null;
+    JSON.parse(raw);
+    return safeParseJSON(raw, null, null, null);
   } catch (_e) {
     return null;
   }

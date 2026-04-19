@@ -67,7 +67,7 @@ function main() {
   }
 
   // 3. Execute
-  const HookRunner = require('../lib/utils/hook-runner.cjs');
+  const HookRunner = require('../../lib/utils/hook-runner.cjs');
   const runner = new HookRunner({ projectRoot, env: buildHookEnv(process.env) });
 
   runner
@@ -86,6 +86,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  main,
   detectProjectRoot,
   resolveHookScriptPath,
   buildHookEnv,

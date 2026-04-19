@@ -5,9 +5,14 @@
  * The actual implementation lives in .claude/tools/cli/run-hook.cjs.
  */
 const {
+  main,
   detectProjectRoot,
   resolveHookScriptPath,
   buildHookEnv,
 } = require('../tools/cli/run-hook.cjs');
 
-module.exports = { detectProjectRoot, resolveHookScriptPath, buildHookEnv };
+module.exports = { main, detectProjectRoot, resolveHookScriptPath, buildHookEnv };
+
+if (require.main === module) {
+  main();
+}
