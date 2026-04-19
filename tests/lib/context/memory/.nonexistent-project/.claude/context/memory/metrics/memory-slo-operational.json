@@ -1,11 +1,11 @@
 {
   "version": 1,
   "windowStartedAt": "2026-02-11T02:45:58.462Z",
-  "updatedAt": "2026-04-19T03:39:28.054Z",
+  "updatedAt": "2026-04-19T19:18:42.452Z",
   "counters": {
     "writesTotal": 0,
     "writesFailed": 0,
-    "readsTotal": 669,
+    "readsTotal": 670,
     "parseAttempts": 0,
     "parseFailures": 0,
     "lockAcquires": 0,
@@ -14,16 +14,73 @@
   },
   "histograms": {
     "writeLatencyMs": {
-      "bucketsMs": [1, 5, 10, 25, 50, 100, 250, 500],
-      "counts": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      "bucketsMs": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "readLatencyMs": {
-      "bucketsMs": [1, 5, 10, 25, 50, 100, 250, 500],
-      "counts": [31, 42, 417, 158, 14, 5, 2, 0, 0]
+      "bucketsMs": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500
+      ],
+      "counts": [
+        31,
+        42,
+        417,
+        159,
+        14,
+        5,
+        2,
+        0,
+        0
+      ]
     },
     "lockWaitMs": {
-      "bucketsMs": [1, 5, 10, 25, 50, 100, 250, 500],
-      "counts": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      "bucketsMs": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     }
   },
   "latest": {

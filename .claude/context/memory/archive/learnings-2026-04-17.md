@@ -7,16 +7,20 @@
 - Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-28)
 - Updated workflow: evolution-workflow (2026-03-28)
 - Updated workflow: missing-workflow-xyz (2026-03-28)
+
 ### Task-Lifecycle-42 Recurring Detector Observation (2026-04-17)
+
 **Pattern**: `task-lifecycle-42` has been generating stale in_progress gap-log entries on every UserPromptSubmit across multiple sessions. The current reflection payload contains 1020+ router gap observations, the overwhelming majority of type `missing_metadata` / stale-task-detector-fired, all referring to this single zombie task. Duration range seen: 17 minutes through 667 minutes in the last 20 entries alone; prior entries in issues.md document durations of 939 min, 1520+ min, and 3400+ min (spanning multiple calendar days).
 **Classification**: SYSTEMIC (not one-off). Rule: 1020+ observations across multiple sessions = systemic. Prior issues.md entries (2026-04-04, 2026-04-09, 2026-04-10) document the same pattern with 383+, 807+, and 846+ gap observations respectively, confirming multi-session persistence. This is a zombie task that will never self-close.
 **Root causes** (previously identified, still unresolved as of 2026-04-17):
+
 1. `task-lifecycle-42` was never closed after its work completed — it is a zombie task
 2. `stale-task-detector.cjs` fires on every UserPromptSubmit, polluting gap-log with noise
 3. `pre-completion-validation.cjs` not blocking (only warning) on missing `metadata.summary`
 4. `post-completion-chain.cjs` carrying fallback strings instead of real metadata into reflection prompts
-**Investigation reference**: Advanced-debugging investigation (A-3) report at `.claude/context/reports/backend/task-lifecycle-42-investigation-2026-04-17.md`
-**Memory classification**: Retain — high reuse signal, recurring systemic failure, critical for pipeline hygiene
+   **Investigation reference**: Advanced-debugging investigation (A-3) report at `.claude/context/reports/backend/task-lifecycle-42-investigation-2026-04-17.md`
+   **Memory classification**: Retain — high reuse signal, recurring systemic failure, critical for pipeline hygiene
+
 - Created new agent: qa-guardian (2026-03-28)
 - Created new agent: contract-check (2026-03-28)
 - Created new agent: bool-action (2026-03-28)

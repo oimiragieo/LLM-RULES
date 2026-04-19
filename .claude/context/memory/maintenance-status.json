@@ -1,15 +1,18 @@
 {
-  "lastMemoryAudit": "2026-03-19T20:05:00.000Z",
+  "lastMemoryAudit": "2026-04-19T00:00:00.000Z",
   "lastMemoryAuditBy": "memory-manager",
-  "lastMemoryAuditScore": 78,
+  "lastMemoryAuditScore": 92,
   "lastMemoryAuditFindings": [
-    "P2-01: Archive snapshot activity (minor, expected rotation)",
-    "P3-02: Named memory API deprecated (RFC required before code removal)",
-    "HEALTHY: All core metrics within safe ranges",
-    "HEALTHY: Cross-system dedup shows zero duplicates",
-    "HEALTHY: CC auto-memory properly maintained at 51 lines"
+    "HEALTHY: learnings.md 16KB (threshold 40KB) — no rotation needed",
+    "HEALTHY: decisions.md 12KB (threshold 80KB) — no rotation needed",
+    "HEALTHY: issues.md 1KB — well within bounds",
+    "HEALTHY: STM 1 active session file, MTM 5 session files (all from today)",
+    "HEALTHY: LTM 112 files / 802KB — no files exceed 30-day mtime threshold",
+    "INFO: 1 delegation PID file (created today, not stale)",
+    "ACTION: compression-reminder.txt deleted",
+    "HEALTHY: deduplicator and smart-pruner returned no findings"
   ],
-  "nextRecommendedAudit": "2026-04-02",
+  "nextRecommendedAudit": "2026-04-26",
   "lastWave6bFixes": "2026-03-19T00:00:00.000Z",
   "wave6bFixesSummary": {
     "issuesMdArchivedLines": 418,
