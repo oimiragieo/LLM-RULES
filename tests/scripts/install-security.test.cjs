@@ -12,10 +12,14 @@ const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert');
 const { mkdirSync, rmSync, existsSync } = require('fs');
 const { resolve, join } = require('path');
-const { execSync } = require('child_process');
 
 const PROJECT_ROOT = resolve(__dirname, '../..');
 const TEST_DIR = join(PROJECT_ROOT, 'tests/fixtures/install-security-test');
+const INSTALL_VALIDATION_MODULE = '../../scripts/installation/install-target-validation.mjs';
+
+async function loadValidationHelper() {
+  return import(INSTALL_VALIDATION_MODULE);
+}
 
 describe('install.mjs security (MEDIUM-001)', () => {
   before(() => {
@@ -44,30 +48,24 @@ describe('install.mjs security (MEDIUM-001)', () => {
     }
   });
 
-  it('should reject path traversal with ".." in target directory', () => {
+  it('should reject path traversal with ".." in target directory', async () => {
     const traversalPath = '../../../etc';
+    const { validateInstallTarget } = await loadValidationHelper();
 
-    try {
-      execSync(`node scripts/install.mjs ${traversalPath} --skip-validation`, {
-        cwd: PROJECT_ROOT,
-        stdio: 'pipe',
-        encoding: 'utf-8',
-      });
-      assert.fail('Should have rejected path traversal attempt');
-    } catch (error) {
-      // Expected to fail
-      const output = error.stderr || error.stdout || error.message;
-      assert.ok(
-        output.includes('path traversal') ||
-          output.includes('cannot contain') ||
-          output.includes('Error'),
-        `Expected error about path traversal, got: ${output}`
-      );
-    }
+    assert.throws(
+      () =>
+        validateInstallTarget({
+          targetArg: traversalPath,
+          cwd: PROJECT_ROOT,
+          force: false,
+        }),
+      /path traversal|cannot contain/i
+    );
   });
 
-  it('should reject target directory outside project when no --force flag', () => {
+  it('should reject target directory outside project when no --force flag', async () => {
     const outsideDir = resolve(PROJECT_ROOT, '../outside-project');
+    const { validateInstallTarget } = await loadValidationHelper();
 
     // Create the directory so it exists (to avoid "does not exist" error)
     if (!existsSync(outsideDir)) {
@@ -75,17 +73,14 @@ describe('install.mjs security (MEDIUM-001)', () => {
     }
 
     try {
-      execSync(`node scripts/install.mjs "${outsideDir}" --skip-validation`, {
-        cwd: PROJECT_ROOT,
-        stdio: 'pipe',
-        encoding: 'utf-8',
-      });
-      assert.fail('Should have rejected external directory without --force');
-    } catch (error) {
-      const output = error.stderr || error.stdout || error.message;
-      assert.ok(
-        output.includes('outside') || output.includes('--force') || output.includes('Warning'),
-        `Expected warning about external directory, got: ${output}`
+      assert.throws(
+        () =>
+          validateInstallTarget({
+            targetArg: outsideDir,
+            cwd: PROJECT_ROOT,
+            force: false,
+          }),
+        /outside current working directory|--force/i
       );
     } finally {
       // Cleanup
@@ -95,44 +90,33 @@ describe('install.mjs security (MEDIUM-001)', () => {
     }
   });
 
-  it('should allow target directory within project root', () => {
+  it('should allow target directory within project root', async () => {
     const safeTarget = join(TEST_DIR, 'safe-target');
     mkdirSync(safeTarget, { recursive: true });
 
-    try {
-      execSync(`node scripts/install.mjs "${safeTarget}" --skip-validation`, {
+    const { validateInstallTarget } = await loadValidationHelper();
+
+    assert.doesNotThrow(() =>
+      validateInstallTarget({
+        targetArg: safeTarget,
         cwd: PROJECT_ROOT,
-        stdio: 'pipe',
-        encoding: 'utf-8',
-      });
-      // Should succeed (may warn about missing bundles, but shouldn't error on path)
-      assert.ok(true, 'Should allow safe target directory');
-    } catch (error) {
-      const output = error.stderr || error.stdout || error.message;
-      // Only fail if error is about path traversal, not missing bundles
-      if (output.includes('path traversal') || output.includes('cannot contain')) {
-        assert.fail(`Should allow safe directory, got: ${output}`);
-      }
-      // Other errors (like missing bundles) are acceptable for this test
-    }
+        force: false,
+      })
+    );
   });
 
-  it('should allow absolute paths that resolve to subdirectories', () => {
+  it('should allow absolute paths that resolve to subdirectories', async () => {
     const absoluteTarget = resolve(TEST_DIR, 'absolute-target');
     mkdirSync(absoluteTarget, { recursive: true });
 
-    try {
-      execSync(`node scripts/install.mjs "${absoluteTarget}" --skip-validation`, {
+    const { validateInstallTarget } = await loadValidationHelper();
+
+    assert.doesNotThrow(() =>
+      validateInstallTarget({
+        targetArg: absoluteTarget,
         cwd: PROJECT_ROOT,
-        stdio: 'pipe',
-        encoding: 'utf-8',
-      });
-      assert.ok(true, 'Should allow absolute paths within project');
-    } catch (error) {
-      const output = error.stderr || error.stdout || error.message;
-      if (output.includes('path traversal') || output.includes('cannot contain')) {
-        assert.fail(`Should allow absolute path, got: ${output}`);
-      }
-    }
+        force: false,
+      })
+    );
   });
 });

@@ -20,6 +20,7 @@ import { copyFileSync, mkdirSync, readdirSync, existsSync, rmSync } from 'fs';
 import { resolve, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
+import { validateInstallTarget } from './install-target-validation.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -89,25 +90,15 @@ function copyDirectory(src, dest, force = false) {
 
 function main() {
   const args = parseArgs();
-  const targetDir = args.targetDir ? resolve(args.targetDir) : process.cwd();
-
-  // SECURITY FIX (MEDIUM-001): Validate target directory for path traversal
-  // Detect path traversal attempts with ".."
-  if (targetDir.includes('..')) {
-    console.error('Error: Target directory cannot contain ".." (path traversal detected)');
-    console.error(`Provided: ${args.targetDir}`);
-    console.error(`Resolved: ${targetDir}`);
-    process.exit(1);
-  }
-
-  // Warn if target is outside current working directory (unless --force is used)
-  const cwd = process.cwd();
-  const isOutsideCwd = !targetDir.startsWith(cwd);
-  if (isOutsideCwd && !args.force) {
-    console.error(`Error: Target directory is outside current working directory`);
-    console.error(`Current: ${cwd}`);
-    console.error(`Target: ${targetDir}`);
-    console.error('Use --force to confirm installation to external directory');
+  let targetDir;
+  try {
+    targetDir = validateInstallTarget({
+      targetArg: args.targetDir,
+      cwd: process.cwd(),
+      force: args.force,
+    });
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
     process.exit(1);
   }
 
