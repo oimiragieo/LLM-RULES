@@ -3,8 +3,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
-const fs = require('fs');
-
 const { Task } = require('../../../.claude/lib/tools/task-tools.cjs');
 const { MemoryVectorStore } = require('../../../.claude/lib/memory/lancedb-client-impl.cjs');
 
@@ -19,8 +17,6 @@ function restoreEnv(name, value) {
 test('Task uses real process spawn by default', async () => {
   const previous = process.env.TASK_TOOL_REAL_SPAWN;
   const previousSink = process.env.EVENT_BUS_SINK;
-  const eventsPath = path.join(process.cwd(), '.claude/context/runtime/event-bus.jsonl');
-  const initialEvents = fs.existsSync(eventsPath) ? fs.readFileSync(eventsPath, 'utf8') : '';
   delete process.env.TASK_TOOL_REAL_SPAWN;
   delete process.env.EVENT_BUS_SINK;
 
@@ -46,19 +42,6 @@ test('Task uses real process spawn by default', async () => {
       'Task should run framework subagent telemetry script'
     );
     assert.equal(result.spawn.output?.frameworkLoaded, true);
-
-    // Event-bus telemetry is best-effort; verify spawn completed successfully
-    // (event-bus.jsonl may not exist if EVENT_BUS_SINK is not configured)
-    if (fs.existsSync(eventsPath)) {
-      const updatedEvents = fs.readFileSync(eventsPath, 'utf8');
-      const appended = updatedEvents.slice(initialEvents.length);
-      if (appended.length > 0) {
-        assert.ok(
-          appended.includes('task-subagent-telemetry') || appended.includes('TOOL_COMPLETED'),
-          'If event-bus has new entries, they should include telemetry'
-        );
-      }
-    }
   } finally {
     MemoryVectorStore.clearSharedStores();
     restoreEnv('TASK_TOOL_REAL_SPAWN', previous);

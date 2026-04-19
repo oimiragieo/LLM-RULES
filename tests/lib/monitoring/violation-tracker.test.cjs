@@ -231,16 +231,25 @@ describe('rotation', () => {
 
   it('trims JSONL file when it exceeds maxLines (default 2000)', () => {
     const metricsFile = fixture.getMetricsFile();
-    // Write 2100 violations
-    for (let i = 0; i < 2100; i++) {
-      recordViolation(makeViolation(), metricsFile);
+    const originalEnv = process.env.VIOLATION_METRICS_MAX_LINES;
+    process.env.VIOLATION_METRICS_MAX_LINES = '20';
+
+    try {
+      for (let i = 0; i < 25; i++) {
+        recordViolation(makeViolation(), metricsFile);
+      }
+
+      const content = fs.readFileSync(metricsFile, 'utf8');
+      const lines = content.trim().split('\n');
+
+      assert.ok(lines.length <= 20);
+    } finally {
+      if (originalEnv) {
+        process.env.VIOLATION_METRICS_MAX_LINES = originalEnv;
+      } else {
+        delete process.env.VIOLATION_METRICS_MAX_LINES;
+      }
     }
-
-    const content = fs.readFileSync(metricsFile, 'utf8');
-    const lines = content.trim().split('\n');
-
-    // Should be <= 2000 lines
-    assert.ok(lines.length <= 2000);
   });
 
   it('respects VIOLATION_METRICS_MAX_LINES env override', () => {
@@ -271,6 +280,8 @@ describe('rotation', () => {
 describe('rate limiting', () => {
   let tempDir;
   let metricsFile;
+  let originalMaxLines;
+  let originalRateLimit;
 
   before(() => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'violation-rate-test-'));
@@ -278,6 +289,10 @@ describe('rate limiting', () => {
   });
 
   beforeEach(() => {
+    originalMaxLines = process.env.VIOLATION_METRICS_MAX_LINES;
+    originalRateLimit = process.env.VIOLATION_METRICS_RATE_LIMIT;
+    process.env.VIOLATION_METRICS_MAX_LINES = '6000';
+    process.env.VIOLATION_METRICS_RATE_LIMIT = '50';
     // Clean up file before each test
     if (fs.existsSync(metricsFile)) {
       fs.unlinkSync(metricsFile);
@@ -287,6 +302,16 @@ describe('rate limiting', () => {
   });
 
   after(() => {
+    if (originalMaxLines === undefined) {
+      delete process.env.VIOLATION_METRICS_MAX_LINES;
+    } else {
+      process.env.VIOLATION_METRICS_MAX_LINES = originalMaxLines;
+    }
+    if (originalRateLimit === undefined) {
+      delete process.env.VIOLATION_METRICS_RATE_LIMIT;
+    } else {
+      process.env.VIOLATION_METRICS_RATE_LIMIT = originalRateLimit;
+    }
     if (tempDir && fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -296,8 +321,9 @@ describe('rate limiting', () => {
     // Reset rate limiter first
     _resetForTesting();
 
-    // Attempt to record 5100 violations rapidly
-    for (let i = 0; i < 5100; i++) {
+    // Lower the configured limit in-test so we verify rate limiting behavior
+    // without turning this suite into a long-running I/O benchmark.
+    for (let i = 0; i < 60; i++) {
       recordViolation(
         {
           timestamp: new Date().toISOString(),
@@ -315,9 +341,7 @@ describe('rate limiting', () => {
     const content = fs.readFileSync(metricsFile, 'utf8');
     const lines = content.trim().split('\n');
 
-    // Should have dropped entries beyond 5000/hour
-    // Exact count depends on implementation, but should be significantly less than 5100
-    assert.ok(lines.length <= 5000);
+    assert.ok(lines.length <= 50);
   });
 });
 

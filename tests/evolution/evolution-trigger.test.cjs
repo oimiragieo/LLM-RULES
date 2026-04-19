@@ -1,6 +1,6 @@
 'use strict';
 
-const { describe, it } = require('node:test');
+const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 
 const { EvolutionTrigger } = require('../../.claude/lib/evolution/evolution-trigger.cjs');
@@ -165,6 +165,16 @@ describe('EvolutionTrigger', () => {
 
   // -----------------------------------------------------------------------
   describe('evaluate(usageTracker)', () => {
+    let savedEnv;
+    before(() => {
+      savedEnv = process.env.AGENT_EVOLUTION_ENABLED;
+      process.env.AGENT_EVOLUTION_ENABLED = '1';
+    });
+    after(() => {
+      if (savedEnv === undefined) delete process.env.AGENT_EVOLUTION_ENABLED;
+      else process.env.AGENT_EVOLUTION_ENABLED = savedEnv;
+    });
+
     it('returns correct structure {triggered, skipped, analyzed}', () => {
       const trigger = new EvolutionTrigger();
       const tracker = makeStubTracker({}, []);
@@ -350,6 +360,59 @@ describe('EvolutionTrigger', () => {
       assert.ok(suggestion.skillName, 'suggestion should have skillName');
       assert.ok(suggestion.reason, 'suggestion should have reason');
       assert.ok(typeof suggestion.confidence === 'number', 'confidence should be a number');
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  describe('AGENT_EVOLUTION_ENABLED env gate', () => {
+    it('no-ops and returns null when AGENT_EVOLUTION_ENABLED is not set', () => {
+      const saved = process.env.AGENT_EVOLUTION_ENABLED;
+      delete process.env.AGENT_EVOLUTION_ENABLED;
+      try {
+        const router = makeStubRouter();
+        const trigger = new EvolutionTrigger({ evolutionRequestRouter: router });
+        const tracker = makeStubTracker(neverUsedStats('idle-skill'), []);
+        const result = trigger.evaluate(tracker);
+        assert.strictEqual(result, null, 'evaluate() should return null when env gate is off');
+        assert.strictEqual(router.calls.length, 0, 'router should not be called when gate is off');
+      } finally {
+        if (saved === undefined) delete process.env.AGENT_EVOLUTION_ENABLED;
+        else process.env.AGENT_EVOLUTION_ENABLED = saved;
+      }
+    });
+
+    it('no-ops and returns null when AGENT_EVOLUTION_ENABLED is "0"', () => {
+      const saved = process.env.AGENT_EVOLUTION_ENABLED;
+      process.env.AGENT_EVOLUTION_ENABLED = '0';
+      try {
+        const trigger = new EvolutionTrigger();
+        const tracker = makeStubTracker(neverUsedStats('idle-skill'), []);
+        const result = trigger.evaluate(tracker);
+        assert.strictEqual(result, null, 'evaluate() should return null when env is "0"');
+      } finally {
+        if (saved === undefined) delete process.env.AGENT_EVOLUTION_ENABLED;
+        else process.env.AGENT_EVOLUTION_ENABLED = saved;
+      }
+    });
+
+    it('runs full pipeline and returns result when AGENT_EVOLUTION_ENABLED is "1"', () => {
+      const saved = process.env.AGENT_EVOLUTION_ENABLED;
+      process.env.AGENT_EVOLUTION_ENABLED = '1';
+      try {
+        const router = makeStubRouter();
+        const trigger = new EvolutionTrigger({ evolutionRequestRouter: router });
+        const tracker = makeStubTracker(neverUsedStats('idle-skill'), []);
+        const result = trigger.evaluate(tracker);
+        assert.ok(result !== null, 'evaluate() should return a result when env gate is on');
+        assert.ok(Object.prototype.hasOwnProperty.call(result, 'triggered'));
+        assert.ok(Object.prototype.hasOwnProperty.call(result, 'skipped'));
+        assert.ok(Object.prototype.hasOwnProperty.call(result, 'analyzed'));
+        assert.strictEqual(result.triggered.length, 1, 'should trigger one suggestion');
+        assert.strictEqual(router.calls.length, 1, 'router should be called when gate is on');
+      } finally {
+        if (saved === undefined) delete process.env.AGENT_EVOLUTION_ENABLED;
+        else process.env.AGENT_EVOLUTION_ENABLED = saved;
+      }
     });
   });
 });

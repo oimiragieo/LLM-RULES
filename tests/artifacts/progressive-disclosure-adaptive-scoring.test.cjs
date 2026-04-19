@@ -15,6 +15,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
+const { performance } = require('node:perf_hooks');
 const path = require('path');
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 
@@ -581,16 +582,20 @@ test('[Performance] Should handle 100 questions without performance degradation'
   const times = [];
 
   for (let i = 0; i < 100; i++) {
-    const start = Date.now();
+    const start = performance.now();
     ca.addAnswer(`Question ${i}?`, `Answer ${i}`, {});
-    times.push(Date.now() - start);
+    times.push(performance.now() - start);
   }
 
   const avgFirst10 = times.slice(0, 10).reduce((a, b) => a + b, 0) / 10;
   const avgLast10 = times.slice(-10).reduce((a, b) => a + b, 0) / 10;
+  const baseline = Math.max(avgFirst10, 0.01);
 
   // Performance should not degrade significantly
-  assert.ok(avgLast10 <= avgFirst10 * 2, 'Performance should not degrade >2x over 100 operations');
+  assert.ok(
+    avgLast10 <= baseline * 2,
+    `Performance should not degrade >2x over 100 operations (first10=${avgFirst10.toFixed(4)}ms, last10=${avgLast10.toFixed(4)}ms)`
+  );
 });
 
 console.log('✅ All 70+ tests written (RED phase complete)');

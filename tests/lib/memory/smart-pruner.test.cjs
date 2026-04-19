@@ -198,12 +198,14 @@ Frontend rendering performance degrades with large virtual DOM trees.
 
 test('pruneResolvedEntries() - removes old resolved entries', () => {
   const pruner = require(path.join(PROJECT_ROOT, '.claude/lib/memory/smart-pruner.cjs'));
+  const oldDate = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const recentDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   const content = `# Issues
 
 ## Old Resolved Bug
 
-**Date:** 2025-12-01
+**Date:** ${oldDate}
 **Status: RESOLVED**
 
 This was resolved over 30 days ago.
@@ -212,7 +214,7 @@ This was resolved over 30 days ago.
 
 ## Recent Resolved Bug
 
-**Date:** 2026-03-01
+**Date:** ${recentDate}
 **Status: RESOLVED**
 
 This was resolved recently (within 30 days).
@@ -247,12 +249,13 @@ This is still open.
 
 test('pruneResolvedEntries() - preserves [PERMANENT] resolved entries', () => {
   const pruner = require(path.join(PROJECT_ROOT, '.claude/lib/memory/smart-pruner.cjs'));
+  const oldDate = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   const content = `# Issues
 
 ## Old Resolved Critical Bug [PERMANENT]
 
-**Date:** 2025-12-01
+**Date:** ${oldDate}
 **Status: RESOLVED**
 
 This was resolved over 30 days ago but is permanently important.
@@ -261,7 +264,7 @@ This was resolved over 30 days ago but is permanently important.
 
 ## Old Resolved Normal Bug
 
-**Date:** 2025-12-01
+**Date:** ${oldDate}
 **Status: RESOLVED**
 
 This was resolved over 30 days ago.

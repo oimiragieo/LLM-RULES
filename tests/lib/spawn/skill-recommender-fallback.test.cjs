@@ -4,7 +4,10 @@
 const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 
-const { recommendSkillsFallback, _resetCache } = require('../../../.claude/lib/spawn/skill-recommender-fallback.cjs');
+const {
+  recommendSkillsFallback,
+  _resetCache,
+} = require('../../../.claude/lib/spawn/skill-recommender-fallback.cjs');
 
 describe('skill-recommender-fallback: recommendSkillsFallback', () => {
   beforeEach(() => _resetCache());

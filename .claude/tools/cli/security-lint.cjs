@@ -102,6 +102,7 @@ const CONFIG = {
     { pathSubstring: 'post-task-unified.cjs', ruleId: 'SEC-011' }, // execSync node with project path (controlled)
     { pathSubstring: 'tests/migration/', ruleId: 'SEC-011' }, // test harness execSync with controlled input
     { pathSubstring: 'count-all-tests.mjs', ruleId: 'SEC-011' }, // internal test counter with controlled input
+    { pathSubstring: 'tests/integration/e2e/phase1a-e2e.test.cjs', ruleId: 'SEC-011' }, // E2E test harness exec() with literal node CLI paths
   ],
 
   // Files explicitly allowed to bypass scanning with security-lint-ignore.
