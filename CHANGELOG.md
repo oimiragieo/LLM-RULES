@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-- MEv1 B3 (CWE-78): SKILL_ALLOWLIST + regex `^[a-z0-9][a-z0-9_-]*$` validation in `worker-features-dispatcher.cjs` rejects shell metachars and path traversal in `feature.skillName` before enqueue. Allowlist source: `.claude/lib/mission/skill-allowlist.json`. Closes B3 from threat model 2026-04-19.
+- MEv1 B3 (CWE-78): SKILL*ALLOWLIST + regex `^[a-z0-9]a-z0-9*-]\*$`validation in`worker-features-dispatcher.cjs`rejects shell metachars and path traversal in`feature.skillName`before enqueue. Allowlist source:`.claude/lib/mission/skill-allowlist.json`. Closes B3 from threat model 2026-04-19.
+
+### Changed
+
+- MEv1 M-F7: `worker-features-dispatcher.cjs` skill resolution rerouted through `resolveSkillViaCreator` proposer pattern (per ADR 2026-04-19, F7 archived for GATE 4 violation). Missing skills now surface a `proposerRequest` payload addressed to `skill-creator` instead of `skill_not_found`. Audit at `.claude/context/reports/backend/mev1-f7-reroute-2026-04-19.md`.
 
 ### Changed
 

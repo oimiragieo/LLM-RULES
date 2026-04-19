@@ -67,6 +67,55 @@ const SKILL_ALLOWLIST_SET = new Set(SKILL_ALLOWLIST);
  * @throws {Error} with `code: 'SKILL_NAME_INVALID'` on regex mismatch,
  *                  or `code: 'SKILL_NOT_ALLOWLISTED'` on allowlist miss.
  */
+/**
+ * MEv1 M-F7 — Skill resolution via proposer/effector pattern.
+ *
+ * Per ADR 2026-04-19 (F7 archived for GATE 4 violation):
+ *   "Roadmap: proposer-only refactor routing through skill-creator as effector."
+ *
+ * Resolves an allowlisted skillName by checking known skill/agent locations.
+ * If absent, returns a `proposerRequest` payload addressed to skill-creator
+ * — the dispatcher does NOT directly write SKILL.md (that would re-violate
+ * GATE 4). The orchestrator/router consumes proposerRequest and dispatches
+ * skill-creator as the effector.
+ *
+ * Defense-in-depth: every path.join uses path.basename(skillName) even though
+ * B3 already blocks separators in the regex.
+ *
+ * @param {string} skillName - already validated by validateSkillName
+ * @param {object} [opts]
+ * @param {string} [opts.cwd] - root for skill lookup (default: process.cwd())
+ * @returns {{ found: boolean, location?: string, proposerRequest?: object }}
+ */
+function resolveSkillViaCreator(skillName, opts = {}) {
+  const cwd = opts.cwd || process.cwd();
+  const safeName = path.basename(skillName);
+  const candidates = [
+    path.join(cwd, '.claude', 'skills', safeName, 'SKILL.md'),
+    path.join(cwd, '.claude', 'agents', 'domain', safeName + '.md'),
+    path.join(cwd, '.claude', 'agents', 'core', safeName + '.md'),
+  ];
+  for (const candidate of candidates) {
+    try {
+      if (fs.existsSync(candidate)) {
+        return { found: true, location: candidate };
+      }
+    } catch (_err) {
+      // continue
+    }
+  }
+  return {
+    found: false,
+    proposerRequest: {
+      effector: 'skill-creator',
+      targetSkill: safeName,
+      reason: 'skill_missing_at_dispatch_time',
+      adr: '2026-04-19/F7-archived',
+      candidatesChecked: candidates,
+    },
+  };
+}
+
 function validateSkillName(skillName) {
   if (typeof skillName !== 'string' || !SKILL_NAME_REGEX.test(skillName)) {
     const err = new Error(
@@ -106,6 +155,7 @@ function dispatchFeature({
   chatId,
   estimatedTokens,
   validateSkills,
+  cwd,
 }) {
   // Normalize paths
   const normalizedFeaturesPath = path.normalize(featuresPath);
@@ -164,30 +214,20 @@ function dispatchFeature({
     throw err;
   }
 
-  // Validate skillName resolves to a real skill (Factory Droid alignment)
-  // Opt-in via validateSkills flag to avoid breaking tests with mock skillNames
+  // MEv1 M-F7 — Skill resolution via proposer/effector pattern.
+  // Per ADR 2026-04-19, dispatcher MUST NOT directly write SKILL.md (F7
+  // archived for GATE 4 violation). When validateSkills is on and the skill
+  // is missing, we surface a proposerRequest addressed to skill-creator
+  // instead of failing silently or attempting in-line creation.
   if (validateSkills && feature.skillName) {
-    const skillPaths = [
-      path.join(process.cwd(), '.claude', 'skills'),
-      path.join(process.cwd(), '.claude', 'agents', 'domain'),
-      path.join(process.cwd(), '.claude', 'agents', 'core'),
-    ];
-    const skillExists = skillPaths.some(sp => {
-      const skillFile = path.join(sp, feature.skillName, 'SKILL.md');
-      const agentFile = path.join(sp, feature.skillName + '.md');
-      try {
-        return fs.existsSync(skillFile) || fs.existsSync(agentFile);
-      } catch {
-        return false;
-      }
-    });
-    if (!skillExists) {
+    const resolution = resolveSkillViaCreator(feature.skillName, { cwd });
+    if (!resolution.found) {
       return {
         dispatched: false,
-        reason: 'skill_not_found',
+        reason: 'skill_proposed',
         featureId: feature.id,
         skillName: feature.skillName,
-        error: `Skill "${feature.skillName}" not found in .claude/skills/ or .claude/agents/. Create the skill first or fix the skillName in features.json.`,
+        proposerRequest: resolution.proposerRequest,
       };
     }
   }
@@ -299,6 +339,7 @@ module.exports = {
   dispatchFeature,
   getDispatchStatus,
   validateSkillName,
+  resolveSkillViaCreator,
   SKILL_NAME_REGEX,
   SKILL_ALLOWLIST,
 };

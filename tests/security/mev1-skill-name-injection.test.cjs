@@ -39,12 +39,9 @@ const allowlistPath = path.resolve(
   'skill-allowlist.json'
 );
 
-const {
-  dispatchFeature,
-  validateSkillName,
-  SKILL_NAME_REGEX,
-  SKILL_ALLOWLIST,
-} = require(dispatcherPath);
+const { dispatchFeature, validateSkillName, SKILL_NAME_REGEX, SKILL_ALLOWLIST } = require(
+  dispatcherPath
+);
 
 test('B3-source: SKILL_ALLOWLIST is exported and non-empty', () => {
   assert.ok(Array.isArray(SKILL_ALLOWLIST), 'SKILL_ALLOWLIST must be an array');
