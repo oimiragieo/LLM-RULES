@@ -54,18 +54,24 @@ function loadTemplate() {
   return fs.readFileSync(TEMPLATE_PATH, 'utf8');
 }
 
+function replaceTemplateToken(template, token, value) {
+  const pattern = new RegExp(`\\{\\s*\\{\\s*${token}\\s*\\}\\s*\\}`, 'g');
+  return template.replace(pattern, value);
+}
+
 function renderFromFileTemplate(template, params) {
-  return template
-    .replace(/\{\{name\}\}/g, params.name)
-    .replace(/\{\{title\}\}/g, params.title)
-    .replace(/\{\{description\}\}/g, params.description)
-    .replace(/\{\{model\}\}/g, params.model)
-    .replace(/\{\{category\}\}/g, params.category)
-    .replace(/\{\{temperature\}\}/g, String(params.temperature))
-    .replace(/\{\{tools_csv\}\}/g, params.tools.join(', '))
-    .replace(/\{\{skills_csv\}\}/g, params.skills.join(', '))
-    .replace(/\{\{skills_yaml\}\}/g, params.skills.map(skill => `  - ${skill}`).join('\n'))
-    .replace(/\{\{lastVerifiedAt\}\}/g, params.lastVerifiedAt);
+  return [
+    ['name', params.name],
+    ['title', params.title],
+    ['description', params.description],
+    ['model', params.model],
+    ['category', params.category],
+    ['temperature', String(params.temperature)],
+    ['tools_csv', params.tools.join(', ')],
+    ['skills_csv', params.skills.join(', ')],
+    ['skills_yaml', params.skills.map(skill => `  - ${skill}`).join('\n')],
+    ['lastVerifiedAt', params.lastVerifiedAt],
+  ].reduce((content, [token, value]) => replaceTemplateToken(content, token, value), template);
 }
 
 function ensureContractSkills(skills) {
@@ -236,7 +242,7 @@ function generateAgent(options) {
   const template = loadTemplate();
   const rendered = renderFromFileTemplate(template, params);
   const fallback = renderAgentTemplate(params);
-  const content = rendered.includes('{{') ? fallback : rendered;
+  const content = /\{\s*\{[\s\S]*?\}\s*\}/.test(rendered) ? fallback : rendered;
   const category = String(options.category || 'domain').trim();
   const outputPath = options.output
     ? path.resolve(PROJECT_ROOT, String(options.output))
