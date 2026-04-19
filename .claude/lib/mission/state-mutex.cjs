@@ -23,6 +23,21 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const lockfile = require('proper-lockfile');
+
+// MEv1 B2 (CWE-362) — TOCTOU mitigation. The previous _load → check →
+// _persist sequence was atomic per-write but NOT atomic across processes:
+// two ticks could both observe lockedBy=null and both succeed, double-
+// dispatching the same feature. proper-lockfile gives us an OS-level file
+// lock so the load → mutate → persist critical section is serialized
+// across processes.
+//   .claude/context/reports/security/mev1-phase0-threat-model-2026-04-19.md (B2)
+// proper-lockfile lockSync does not support retries; we keep stale + realpath
+// only. Brief contention manifests as ELOCKED, which the caller can retry.
+const LOCKFILE_OPTS = {
+  stale: 10_000,
+  realpath: false,
+};
 
 // Default stale lock threshold (30 seconds)
 const DEFAULT_STALE_THRESHOLD_MS = 30000;
@@ -217,7 +232,39 @@ class StateMutex {
    * @returns {Object} - { acquired, turn, staleLockReleased?, recovered? }
    * @throws {Error} With code TURN_VIOLATION, DESIGNATED_WORKER_MISMATCH, or LOCK_HELD
    */
+  /**
+   * MEv1 B2 — wrap a critical section in an OS-level file lock so the
+   * load → mutate → persist sequence is serialized across processes.
+   *
+   * proper-lockfile.lockSync requires the target file to exist; we make
+   * sure of that via initializeState() inside _load, which runs before
+   * we ever ask for the OS lock. The lock file lives at <statePath>.lock
+   * and is removed on release.
+   */
+  _withFileLock(fn) {
+    // Ensure file exists so lockSync has a target.
+    const { state: _initState } = loadState(this.statePath);
+    void _initState;
+    let release;
+    try {
+      release = lockfile.lockSync(this.statePath, LOCKFILE_OPTS);
+      return fn();
+    } finally {
+      if (release) {
+        try {
+          release();
+        } catch (_e) {
+          // ignore unlock errors — stale lock will time out
+        }
+      }
+    }
+  }
+
   acquireLock(options) {
+    return this._withFileLock(() => this._acquireLockUnlocked(options));
+  }
+
+  _acquireLockUnlocked(options) {
     const { requesterType, requesterId } = options;
     const state = this._load();
     const result = { acquired: false, turn: state.turn };
@@ -314,6 +361,10 @@ class StateMutex {
    * @throws {Error} With code NOT_LOCK_OWNER if requester doesn't hold the lock
    */
   releaseLock(options) {
+    return this._withFileLock(() => this._releaseLockUnlocked(options));
+  }
+
+  _releaseLockUnlocked(options) {
     const { requesterId } = options;
     const state = this._load();
 
@@ -350,6 +401,10 @@ class StateMutex {
    * @throws {Error} With code LOCK_HELD if lock is currently held
    */
   transitionTurn(newTurn, options = {}) {
+    return this._withFileLock(() => this._transitionTurnUnlocked(newTurn, options));
+  }
+
+  _transitionTurnUnlocked(newTurn, options = {}) {
     const { designatedWorkerId } = options;
     const state = this._load();
 
@@ -421,6 +476,16 @@ function acquireLock(statePath, options) {
 }
 
 /**
+ * Synchronous acquire that holds the OS file lock across the entire
+ * load → check → persist sequence. Alias of acquireLock now that the
+ * implementation is lockfile-guarded — exported for explicitness.
+ */
+function acquireLockSync(statePath, options) {
+  const mutex = new StateMutex(statePath);
+  return mutex.acquireLock(options);
+}
+
+/**
  * Convenience function to release lock
  *
  * @param {string} statePath - Path to state.json
@@ -435,6 +500,7 @@ function releaseLock(statePath, options) {
 module.exports = {
   StateMutex,
   acquireLock,
+  acquireLockSync,
   releaseLock,
   initializeState,
   loadState,
