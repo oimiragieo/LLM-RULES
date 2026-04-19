@@ -25,6 +25,67 @@ const { loadFeatures } = require('./features-state-machine.cjs');
 const { parseMission } = require('./mission-parser.cjs');
 const { enqueueMessage } = require('../db/queue-operations.cjs');
 
+// ---------------------------------------------------------------------------
+// MEv1 B3 — SKILL_ALLOWLIST + skillName validation (CWE-78)
+// ---------------------------------------------------------------------------
+// Rationale: feature.skillName flowed unvalidated into worker dispatch enqueue.
+// A malicious skillName like "../../etc/passwd" or "tdd; rm -rf /" could later
+// reach a spawn() or path.join() and cause path traversal / command injection.
+//
+// Defense-in-depth:
+//   1. Hard regex `^[a-z0-9][a-z0-9_-]*$` blocks every shell metachar and path
+//      separator before any consumer sees the string.
+//   2. SKILL_ALLOWLIST (loaded from skill-allowlist.json) gates which vetted
+//      skills can be dispatched at all.
+//
+// Source: .claude/context/reports/security/mev1-phase0-threat-model-2026-04-19.md (B3)
+// ---------------------------------------------------------------------------
+
+const SKILL_NAME_REGEX = /^[a-z0-9][a-z0-9_-]*$/;
+const ALLOWLIST_PATH = path.join(__dirname, 'skill-allowlist.json');
+
+let SKILL_ALLOWLIST = [];
+try {
+  const raw = fs.readFileSync(ALLOWLIST_PATH, 'utf8');
+  const parsed = JSON.parse(raw);
+  if (Array.isArray(parsed.allowlist)) {
+    SKILL_ALLOWLIST = parsed.allowlist.filter(
+      s => typeof s === 'string' && SKILL_NAME_REGEX.test(s)
+    );
+  }
+} catch (_err) {
+  // Empty allowlist => deny all dispatches; surfaced via test + logs at first
+  // dispatch attempt. Better to fail closed than open.
+  SKILL_ALLOWLIST = [];
+}
+const SKILL_ALLOWLIST_SET = new Set(SKILL_ALLOWLIST);
+
+/**
+ * Validate a skillName against the regex and the SKILL_ALLOWLIST.
+ *
+ * @param {string} skillName
+ * @throws {Error} with `code: 'SKILL_NAME_INVALID'` on regex mismatch,
+ *                  or `code: 'SKILL_NOT_ALLOWLISTED'` on allowlist miss.
+ */
+function validateSkillName(skillName) {
+  if (typeof skillName !== 'string' || !SKILL_NAME_REGEX.test(skillName)) {
+    const err = new Error(
+      `Invalid skillName: ${JSON.stringify(skillName)}. Must match ${SKILL_NAME_REGEX} (lowercase, kebab-case, no path separators or shell metachars).`
+    );
+    err.code = 'SKILL_NAME_INVALID';
+    err.details = { skillName };
+    throw err;
+  }
+  if (!SKILL_ALLOWLIST_SET.has(skillName)) {
+    const err = new Error(
+      `Skill "${skillName}" is not in SKILL_ALLOWLIST. Update .claude/lib/mission/skill-allowlist.json after security review to permit dispatch.`
+    );
+    err.code = 'SKILL_NOT_ALLOWLISTED';
+    err.details = { skillName };
+    throw err;
+  }
+}
+
 /**
  * Dispatch the next eligible feature to the worker pool.
  *
@@ -75,6 +136,33 @@ function dispatchFeature({
 
   // Select the first eligible feature (lowest array index = highest priority)
   const feature = eligibleFeatures[0];
+
+  // MEv1 B3 — SKILL_ALLOWLIST + regex gate. Enforced for ALL dispatches.
+  // Defense-in-depth: this fires BEFORE budget acquisition and BEFORE enqueue,
+  // so a malicious skillName never touches the worker pool.
+  try {
+    validateSkillName(feature.skillName);
+  } catch (err) {
+    if (err.code === 'SKILL_NAME_INVALID') {
+      return {
+        dispatched: false,
+        reason: 'skill_name_invalid',
+        featureId: feature.id,
+        skillName: feature.skillName,
+        error: err.message,
+      };
+    }
+    if (err.code === 'SKILL_NOT_ALLOWLISTED') {
+      return {
+        dispatched: false,
+        reason: 'skill_not_allowlisted',
+        featureId: feature.id,
+        skillName: feature.skillName,
+        error: err.message,
+      };
+    }
+    throw err;
+  }
 
   // Validate skillName resolves to a real skill (Factory Droid alignment)
   // Opt-in via validateSkills flag to avoid breaking tests with mock skillNames
@@ -210,4 +298,7 @@ function getDispatchStatus(featuresPath) {
 module.exports = {
   dispatchFeature,
   getDispatchStatus,
+  validateSkillName,
+  SKILL_NAME_REGEX,
+  SKILL_ALLOWLIST,
 };

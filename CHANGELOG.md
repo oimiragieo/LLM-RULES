@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- MEv1 B3 (CWE-78): SKILL_ALLOWLIST + regex `^[a-z0-9][a-z0-9_-]*$` validation in `worker-features-dispatcher.cjs` rejects shell metachars and path traversal in `feature.skillName` before enqueue. Allowlist source: `.claude/lib/mission/skill-allowlist.json`. Closes B3 from threat model 2026-04-19.
+
 ### Changed
 
 - skill-auto-creator archived to \_archive/ with disabled stub (F7, GATE 4 conflict)
