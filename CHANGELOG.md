@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-- MEv1 B3 (CWE-78): SKILL*ALLOWLIST + regex `^[a-z0-9]a-z0-9*-]\*$`validation in`worker-features-dispatcher.cjs`rejects shell metachars and path traversal in`feature.skillName`before enqueue. Allowlist source:`.claude/lib/mission/skill-allowlist.json`. Closes B3 from threat model 2026-04-19.
+- MEv1 B3 (CWE-78): SKILL_ALLOWLIST plus a strict skill-name regex enforced in `worker-features-dispatcher.cjs` rejects shell metachars and path traversal in `feature.skillName` before enqueue. Allowlist source: `.claude/lib/mission/skill-allowlist.json`. Closes B3 from threat model 2026-04-19.
+- MEv1 B1 (CWE-400): budget enforcer clamps `estimatedTokens` to `[100, 50_000]` and dispatcher caps payload size at 64 KiB pre-enqueue with `MAX_RETRIES=3`. Closes B1 from threat model 2026-04-19.
 
 ### Changed
 

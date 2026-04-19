@@ -20,6 +20,20 @@
  *   }
  */
 
+// MEv1 B1 (CWE-400) — caller-supplied estimatedTokens must be clamped to a
+// safe range so a malicious feature can neither bypass TPM with 0 nor lock
+// out the pool by claiming a huge value. See:
+//   .claude/context/reports/security/mev1-phase0-threat-model-2026-04-19.md (B1)
+const ESTIMATED_TOKENS_MIN = 100;
+const ESTIMATED_TOKENS_MAX = 50_000;
+
+function clampEstimatedTokens(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < ESTIMATED_TOKENS_MIN) return ESTIMATED_TOKENS_MIN;
+  if (n > ESTIMATED_TOKENS_MAX) return ESTIMATED_TOKENS_MAX;
+  return Math.floor(n);
+}
+
 class BudgetEnforcementService {
   /**
    * @param {object} [opts]
@@ -62,16 +76,20 @@ class BudgetEnforcementService {
   acquireWorkerSlot(estimatedTokens = 1000) {
     this._resetWindowIfExpired();
 
+    // MEv1 B1: clamp to safe range before any check so neither 0 nor huge
+    // values can subvert TPM accounting.
+    const clamped = clampEstimatedTokens(estimatedTokens);
+
     if (this._concurrentCount >= this.maxConcurrentWorkers) {
       return { allowed: false, reason: 'MAX_CONCURRENT', retryAfterMs: 0 };
     }
 
-    if (this.currentMinuteUsage + estimatedTokens > this.maxTokensPerMinute) {
+    if (this.currentMinuteUsage + clamped > this.maxTokensPerMinute) {
       return { allowed: false, reason: 'TPM_EXCEEDED', retryAfterMs: this.msUntilReset() };
     }
 
     this._concurrentCount++;
-    this.currentMinuteUsage += estimatedTokens;
+    this.currentMinuteUsage += clamped;
 
     return {
       allowed: true,
@@ -97,4 +115,9 @@ class BudgetEnforcementService {
   }
 }
 
-module.exports = { BudgetEnforcementService };
+module.exports = {
+  BudgetEnforcementService,
+  ESTIMATED_TOKENS_MIN,
+  ESTIMATED_TOKENS_MAX,
+  clampEstimatedTokens,
+};

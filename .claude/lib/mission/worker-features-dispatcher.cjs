@@ -44,6 +44,11 @@ const { enqueueMessage } = require('../db/queue-operations.cjs');
 const SKILL_NAME_REGEX = /^[a-z0-9][a-z0-9_-]*$/;
 const ALLOWLIST_PATH = path.join(__dirname, 'skill-allowlist.json');
 
+// MEv1 B1 (CWE-400) — payload size cap and retry ceiling.
+//   .claude/context/reports/security/mev1-phase0-threat-model-2026-04-19.md (B1)
+const MAX_PAYLOAD_BYTES = 65536; // 64 KiB
+const MAX_RETRIES = 3;
+
 let SKILL_ALLOWLIST = [];
 try {
   const raw = fs.readFileSync(ALLOWLIST_PATH, 'utf8');
@@ -259,12 +264,27 @@ function dispatchFeature({
     skillName: feature.skillName || 'unknown',
     personaContext,
   };
+  const payloadJson = JSON.stringify(payload);
+
+  // MEv1 B1: enforce 64 KiB payload size cap pre-enqueue. Releases the budget
+  // slot before bailing so we don't leak concurrency.
+  const payloadBytes = Buffer.byteLength(payloadJson, 'utf8');
+  if (payloadBytes > MAX_PAYLOAD_BYTES) {
+    slot.release();
+    return {
+      dispatched: false,
+      reason: 'payload_too_large',
+      featureId: feature.id,
+      payloadBytes,
+      maxPayloadBytes: MAX_PAYLOAD_BYTES,
+    };
+  }
 
   // Enqueue to SQLite worker pool
   try {
     enqueueMessage(db, {
       chatId: chatId || 'mission-engine',
-      text: JSON.stringify(payload),
+      text: payloadJson,
       attachments: [],
     });
 
@@ -342,4 +362,6 @@ module.exports = {
   resolveSkillViaCreator,
   SKILL_NAME_REGEX,
   SKILL_ALLOWLIST,
+  MAX_PAYLOAD_BYTES,
+  MAX_RETRIES,
 };
