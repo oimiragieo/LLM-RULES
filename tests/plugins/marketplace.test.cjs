@@ -11,6 +11,7 @@ const {
   cloneMarketplace,
   updateMarketplace,
   discoverPlugins,
+  validateGitSource,
 } = require('../../.claude/lib/plugins/marketplace.cjs');
 
 // ---------------------------------------------------------------------------
@@ -252,37 +253,14 @@ describe('marketplace', () => {
         );
       });
 
-      it('accepts a valid github.com HTTPS URL (validator pass)', () => {
-        // Validator must NOT throw; actual clone may fail because the URL is
-        // not fetchable in tests — we only care that validation succeeds.
-        // We assert the error (if any) is NOT a validation error.
-        try {
-          cloneMarketplace({
-            name: 'valid-github',
-            gitUrl: 'https://github.com/nonexistent-org/nonexistent-repo.git',
-            marketplacesDir: marketplacesDir(),
-          });
-        } catch (err) {
-          assert.ok(
-            !/Refusing to clone git source|option injection|Invalid git source/.test(err.message),
-            `Validation should not have rejected the URL, but got: ${err.message}`
-          );
-        }
+      it('accepts a valid github.com HTTPS URL at validation time', () => {
+        assert.doesNotThrow(() =>
+          validateGitSource('https://github.com/nonexistent-org/nonexistent-repo.git')
+        );
       });
 
-      it('accepts a valid gitlab.com HTTPS URL (validator pass)', () => {
-        try {
-          cloneMarketplace({
-            name: 'valid-gitlab',
-            gitUrl: 'https://gitlab.com/nonexistent/repo.git',
-            marketplacesDir: marketplacesDir(),
-          });
-        } catch (err) {
-          assert.ok(
-            !/Refusing to clone git source|option injection|Invalid git source/.test(err.message),
-            `Validation should not have rejected the URL, but got: ${err.message}`
-          );
-        }
+      it('accepts a valid gitlab.com HTTPS URL at validation time', () => {
+        assert.doesNotThrow(() => validateGitSource('https://gitlab.com/nonexistent/repo.git'));
       });
 
       it('accepts an existing local absolute path (used by test fixtures)', () => {

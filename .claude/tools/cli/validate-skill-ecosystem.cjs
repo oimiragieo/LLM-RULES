@@ -117,6 +117,21 @@ function hasCompanionTool(toolsRoot, skillBaseName, skillSlug) {
   return ['.cjs', '.mjs', '.js'].some(ext => fileExists(path.join(slugDir, `${skillSlug}${ext}`)));
 }
 
+function hasWorkflowContract(workflowsRoot, skillBaseName, skillSlug) {
+  const names = [skillBaseName, skillSlug].filter(Boolean);
+
+  for (const name of names) {
+    if (fileExists(path.join(workflowsRoot, `${name}-skill-workflow.md`))) {
+      return true;
+    }
+    if (fileExists(path.join(workflowsRoot, 'updaters', `${name}-workflow.yaml`))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 /**
  * Validates a skill's manifest.json against the skill-manifest schema rules.
  * Returns { present, valid, errors } — does NOT affect skill score (warning only).
@@ -272,9 +287,7 @@ function evaluateSkill({ projectRoot, skillRelativePath }) {
       path.join(skillDir, 'references', 'research-requirements.md')
     ),
     'tool.companion': hasCompanionTool(toolsRoot, skillBaseName, skillSlug),
-    'workflow.skill':
-      fileExists(path.join(workflowsRoot, `${skillBaseName}-skill-workflow.md`)) ||
-      fileExists(path.join(workflowsRoot, `${skillSlug}-skill-workflow.md`)),
+    'workflow.skill': hasWorkflowContract(workflowsRoot, skillBaseName, skillSlug),
   };
 
   let score = 0;
@@ -390,9 +403,13 @@ function checkGate(summary, requirePerfect = false, results = [], minScore = nul
     return { ok: true, reason: 'gate_disabled' };
   }
 
-  const needsWorkCount = (results || []).filter(
-    r => !GATE_EXEMPT_SKILLS.has(path.basename(r.skill)) && r.score < 80
-  ).length;
+  const activeResults = (results || []).filter(
+    r => !GATE_EXEMPT_SKILLS.has(path.basename(r.skill))
+  );
+  const needsWorkCount =
+    activeResults.length > 0
+      ? activeResults.filter(r => r.score < 80).length
+      : Number(summary?.scoreBuckets?.needsWork || 0);
   if (needsWorkCount > 0) {
     return { ok: false, reason: 'needs_work_present' };
   }

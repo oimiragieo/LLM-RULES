@@ -60,6 +60,29 @@ describe('validate-skill-ecosystem', () => {
 
     fs.rmSync(root, { recursive: true, force: true });
   });
+
+  test('evaluateSkill recognizes updater yaml workflow as workflow contract', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-audit-'));
+    const skillsRoot = path.join(root, '.claude', 'skills');
+    const workflowsRoot = path.join(root, '.claude', 'workflows', 'updaters');
+
+    const skillPath = path.join(skillsRoot, 'skill-updater');
+    fs.mkdirSync(skillPath, { recursive: true });
+    fs.writeFileSync(path.join(skillPath, 'SKILL.md'), '# updater');
+
+    fs.mkdirSync(workflowsRoot, { recursive: true });
+    fs.writeFileSync(path.join(workflowsRoot, 'skill-updater-workflow.yaml'), 'name: updater');
+
+    const result = evaluateSkill({
+      projectRoot: root,
+      skillRelativePath: 'skill-updater',
+    });
+
+    assert.strictEqual(result.checks['workflow.skill'], true);
+
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
   test('evaluateSkill reports full compliance and perfect score when all contract files exist', () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-audit-'));
     const skillsRoot = path.join(root, '.claude', 'skills');

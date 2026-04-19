@@ -23,6 +23,40 @@ test('package.json should not reference missing boot files', () => {
   );
 });
 
+test('test:framework should use real tests globs, not archived .claude paths', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const script = pkg.scripts['test:framework'] || '';
+
+  assert.ok(script.length > 0, 'test:framework script should be defined');
+  assert.ok(
+    !script.includes('.claude/hooks/**/*.test.cjs'),
+    'test:framework should not reference archived .claude/hooks test globs'
+  );
+  assert.ok(
+    !script.includes('.claude/lib/**/*.test.cjs'),
+    'test:framework should not reference archived .claude/lib test globs'
+  );
+  assert.ok(
+    script.includes('tests/hooks') && script.includes('tests/lib'),
+    'test:framework should point at real tests/hooks and tests/lib globs'
+  );
+});
+
+test('test:framework:hooks should use real tests hooks globs', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const script = pkg.scripts['test:framework:hooks'] || '';
+
+  assert.ok(script.length > 0, 'test:framework:hooks script should be defined');
+  assert.ok(
+    !script.includes('.claude/hooks/**/*.test.cjs'),
+    'test:framework:hooks should not reference archived .claude/hooks test globs'
+  );
+  assert.ok(
+    script.includes('tests/hooks'),
+    'test:framework:hooks should point at real tests/hooks globs'
+  );
+});
+
 test('test script should run actual tests and fail if 0 tests found', () => {
   // The test script should match actual test files
   const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
@@ -114,6 +148,16 @@ test('validate:status-check-governance script should exist', () => {
   assert.ok(
     script.includes('tests/workflows/required-status-checks-config.test.cjs'),
     'validate:status-check-governance should validate required status checks config'
+  );
+});
+
+test('pnpm onlyBuiltDependencies should include better-sqlite3 for native bindings', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const onlyBuiltDependencies = pkg.pnpm?.onlyBuiltDependencies || [];
+
+  assert.ok(
+    onlyBuiltDependencies.includes('better-sqlite3'),
+    'pnpm.onlyBuiltDependencies should include better-sqlite3 so CI builds native bindings'
   );
 });
 

@@ -177,4 +177,13 @@
 - Updated workflow: missing-workflow-xyz (2026-04-18)
 
 ## 2026-04-18 Worktree Cleanup
+
 Removed 50 orphaned worktree directories. Skipped 9 (reasons: 2 registered+locked in git, 6 had untracked/modified work, 1 mtime <24h). 9 total preserved. git worktree prune blocked by bash-pretool-bundle hook (background orchestrator cron handles it). Audit guards: age >=24h AND no untracked work before deletion.
+
+## 2026-04-19 stale-task-detector lacks auto-closure [PATTERN — SYSTEMIC]
+
+- **Pattern**: `stale-task-detector.cjs` fires on every `UserPromptSubmit` event but has NO auto-closure mechanism for tasks that have been stale beyond a configurable threshold (e.g. 60+ minutes). The result is that a single phantom stale task (task-lifecycle-42) generated 18+ gap-log entries spanning 962 minutes (16 hours) across sessions before being closed manually via the "abandoned_task" path in `stale-tasks.json`.
+- **Classification**: Actionable fix — NOT mere noise. The detector correctly identifies stale tasks but cannot self-heal. It requires the router to manually call `TaskUpdate({ status: "completed" })` to close the task, which only happens if a human prompt triggers the router in that session.
+- **Finding**: stale-task-detector lacks auto-closure; router must manually close tasks older than 60 minutes, but this relies on human-initiated session activity and does NOT happen autonomously across session boundaries.
+- **Fix required**: add auto-closure in `stale-task-detector.cjs`: if a task has been `in_progress` for >N minutes (suggested: 60min for intra-session, 24h for cross-session orphans), automatically call `TaskUpdate({ status: "completed", metadata: { autoClosedReason: "stale_timeout" } })` rather than only emitting a gap-log warning.
+- **Source**: reflection of task 5 (2026-04-19 session), gap-log showed 18 `missing_metadata` entries + 1 `abandoned_task` entry for task-lifecycle-42 spanning 962 minutes.

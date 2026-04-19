@@ -68,7 +68,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `spawn-prompt-validator.cjs`: Validates Task spawn prompts.
 - `pre-spawn-hook-check.cjs`: Verifies Agent-tool hook files remain loadable before agent execution.
 - `taskupdate-contract-validator.cjs`: Validates TaskUpdate inputs.
-- `pre-completion-validation.cjs`: Validates task completion quality.
+- `pre-completion-validation.cjs`: Validates task completion quality, required outputs, creator-ecosystem alignment, and router-aware TaskUpdate completion rules before completion claims land.
 - `creator-compliance-validator.cjs`: Validates post-creation compliance.
 - `quality-gate-validator.cjs`: Enforces workflow quality gates.
 - `adaptive-quality-gate.cjs`: Non-blocking edit counter; suggests quality checkpoints at adaptive thresholds based on correction rate.

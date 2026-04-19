@@ -1420,5 +1420,30 @@
       "linked_issues": [],
       "last_audit": "2026-03-13T00:00:00.000Z"
     }
+  },
+  "currentEvolution": {
+    "id": "hook-harden-2026-04-19-se03",
+    "artifactType": "hook",
+    "name": "pre-completion-validation-se03-hardening",
+    "status": "in_progress",
+    "startedAt": "2026-04-19T18:41:10.263Z",
+    "description": "SE-03 hardening: add uncaughtException/unhandledRejection handlers + require() try-catch to pre-completion-validation.cjs to guarantee exit 0 or 2 only.",
+    "research": [
+      {
+        "source": ".claude/rules/safety-rules.md#SE-03",
+        "finding": "SE-03: Hook Exit Codes — Hooks must exit 0 (allow) or 2 (block) — exit 1 is treated as error, NOT block. Always wrap hook body in try/catch and exit 0 on unexpected errors.",
+        "timestamp": "2026-04-19T18:41:10.264Z"
+      },
+      {
+        "source": ".claude/rules/hooks.md#fail-open-vs-fail-closed",
+        "finding": "Fail-Open vs Fail-Closed policy: security hooks fail-closed (exit 2) on errors; advisory hooks fail-open (exit 0). pre-completion-validation blocks TaskUpdate semantics — advisory gate, should fail-open on crashes to avoid blocking entire pipeline on unrelated errors.",
+        "timestamp": "2026-04-19T18:41:10.264Z"
+      },
+      {
+        "source": ".claude/hooks/validation/pre-completion-validation.cjs",
+        "finding": "Current implementation has 15+ top-level require() calls (lines 20-53). Any require failure (syntax error in dependency, missing module, corrupted state file) throws uncaught exception before main() runs, causing process.exit(1) by Node default. Must wrap requires in try/catch and install process-level uncaughtException/unhandledRejection handlers to guarantee exit 0 fallback.",
+        "timestamp": "2026-04-19T18:41:10.264Z"
+      }
+    ]
   }
 }

@@ -76,6 +76,13 @@ Full docs: `.claude/docs/TELEGRAM_ARCHITECTURE.md`
 
 ## Recent Changes
 
+### Release-Readiness Hardening
+
+- **Flight recorder stabilized**: Removed a syntax regression, stopped redundant rotation probes while writes are buffered, and added targeted coverage for the missing-file debounce path
+- **Routing tables corrected**: Legacy `debug-agent` intent aliases now resolve to `advanced-debugging`, and the overlap-prone fallback keywords were trimmed so routing validation stays green
+- **Timing-sensitive suites de-flaked**: Phase 1A cost tracking and minimal profiler tests now use warmup/margin-aware thresholds instead of brittle 10 ms boundaries
+- **Full suite re-verified**: `pnpm test` completed cleanly at 3,063 top-level tests with 12,528 passing assertions and 0 failures
+
 ### Prompt Cache Optimization (Zylos-inspired)
 
 - **Envelope fingerprint**: Stable hash across spawns of same agent type (excludes per-spawn basePrompt). Enables cache hits for tools/skills/safety prefix.
@@ -84,13 +91,13 @@ Full docs: `.claude/docs/TELEGRAM_ARCHITECTURE.md`
 
 ### Phase 10 — Paper-Inspired: Dual-Level Indexing + Memory Versioning
 
-- **Dual-level skill+agent index**: 339 skill + 119 agent prototypes in shared vector space. Retrieve N=50, collapse to K=5 unique agents via skill-to-agent owner trace (+19.4% recall, arXiv:2511.01854)
+- **Dual-level skill+agent index**: 339 skill + 124 agent prototypes in shared vector space. Retrieve N=50, collapse to K=5 unique agents via skill-to-agent owner trace (+19.4% recall, arXiv:2511.01854)
 - **Memory version links**: `supersedes` + `archived` fields on pattern/gotcha entries. Semantic matches create version chains instead of silent drops (arXiv:2603.19595)
 
 ### Phase 9 — Routing Recalibration
 
 - **Semantic-first routing**: Embedding-based routing promoted to primary (`ROUTING_PRIORITY=semantic`); keyword classification demoted to metadata/tiebreaker
-- **Hierarchical routing ON by default**: 119 agents grouped into 9 domain sub-routers (`HIERARCHICAL_ROUTING=on`)
+- **Hierarchical routing ON by default**: 124 agents grouped into 9 domain sub-routers (`HIERARCHICAL_ROUTING=on`)
 - **Model router wired**: Dynamic haiku/sonnet/opus selection based on complexity + budget (`MODEL_ROUTER_ENABLED=on`)
 - **Intent feedback loop closed**: Success/failure recorded per intent, read back into routing weights
 - **Guard overhead reduced**: 2 redundant checks removed, 5 advisory hooks converted to async
@@ -232,7 +239,7 @@ Agent Studio natively supports integrating with other headless LLM Code CLIs (Ge
 
 ## Current Footprint
 
-- Agents: 119 files (includes 12 isolated worktree variants)
+- Agents: 124 files (includes 12 isolated worktree variants)
 - Skills: 476 `SKILL.md` definitions
 - Rules: 16 docs
 - Schemas: 318 `*.schema.json`

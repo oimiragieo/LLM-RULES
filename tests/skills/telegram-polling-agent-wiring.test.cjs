@@ -55,7 +55,10 @@ function parseSkillsFromFrontmatter(content) {
 describe('telegram-polling skill agent wiring', () => {
   test('SKILL.md exists for telegram-polling', () => {
     const skillPath = path.join(PROJECT_ROOT, '.claude', 'skills', 'telegram-polling', 'SKILL.md');
-    assert.ok(fs.existsSync(skillPath), 'telegram-polling SKILL.md must exist at .claude/skills/telegram-polling/SKILL.md');
+    assert.ok(
+      fs.existsSync(skillPath),
+      'telegram-polling SKILL.md must exist at .claude/skills/telegram-polling/SKILL.md'
+    );
   });
 
   test('at least one agent file under .claude/agents/ lists telegram-polling in its skills: frontmatter', () => {
@@ -67,7 +70,7 @@ describe('telegram-polling skill agent wiring', () => {
     assert.ok(
       agentsWithSkill.length >= 1,
       `Expected at least 1 agent to list telegram-polling in skills:, found 0. ` +
-      `Check .claude/agents/ frontmatter.`
+        `Check .claude/agents/ frontmatter.`
     );
   });
 
@@ -88,7 +91,7 @@ describe('telegram-polling skill agent wiring', () => {
     assert.ok(
       skills.includes('telegram-polling'),
       `artifact-integrator.md skills: array must include 'telegram-polling'. ` +
-      `Current skills: ${skills.join(', ')}`
+        `Current skills: ${skills.join(', ')}`
     );
   });
 
@@ -113,7 +116,7 @@ describe('telegram-polling skill agent wiring', () => {
       assert.ok(
         skills.includes(skill),
         `artifact-integrator.md must retain original skill '${skill}'. ` +
-        `Current skills: ${skills.join(', ')}`
+          `Current skills: ${skills.join(', ')}`
       );
     }
   });

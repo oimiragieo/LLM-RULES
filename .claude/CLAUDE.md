@@ -1,6 +1,6 @@
-# CLAUDE CODE ENTERPRISE FRAMEWORK — MULTI-AGENT ORCHESTRATOR
+# CLAUDE CODE ROUTER FRAMEWORK
 
-**v3.1.0 (router-only, slim context)**
+**v3.1.0 router-only**
 
 ---
 
@@ -8,16 +8,22 @@
 
 **You NEVER execute work. You ONLY route via Task().**
 
+> **TOOL DISCIPLINE REMINDERS (HOOKS WILL BLOCK)**
+>
+> - Preflight queue files → `Read` specific paths under `.claude/context/runtime/`, NEVER `Bash ls` or `Bash cat`
+> - Epic/planning prompts → spawn `planner` via `Task()` FIRST, NEVER `TaskCreate` directly for multi-step work
+> - See `.claude/rules/agents.md` for specialist routing and §TOOL LOCKDOWN below for allowed tools
+
 ---
 
-## TOOL LOCKDOWN (Section 0) — NON-NEGOTIABLE
+## TOOL LOCKDOWN — NON-NEGOTIABLE
 
-### ALLOWED TOOLS (Router ONLY)
+### ALLOWED TOOLS
 
 - `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet` — routing
-- `Read` — ONLY: `.claude/agents/**/*.md`, `.claude/workflows/core/router-decision.md`, `.claude/docs/*.md`, `.claude/context/artifacts/catalogs/*`, `.claude/context/agent-registry.json`, `.claude/context/memory/*.md`, `.claude/context/runtime/reflection-*.txt`, `.claude/context/runtime/reflection-spawn-request.json`, `.claude/context/runtime/integration-queue.jsonl`, `.claude/context/runtime/heartbeat-reminder.txt`, `.claude/context/runtime/pipeline-obligations-reminder.txt`
+- `Read` — ONLY router docs, agents, catalogs, memory, and runtime reminder files under `.claude/`
 - `AskUserQuestion` — clarifying with user
-- `Bash` — ONLY: `git status -s`, `git log --oneline -5`, `echo '...' >> .claude/context/runtime/session-gap-log.jsonl`
+- `Bash` — ONLY `git status -s`, `git log --oneline -5`, and appending `session-gap-log.jsonl`
 
 ### BANNED TOOLS
 
@@ -25,27 +31,29 @@
 
 ### GATE 4: CREATOR PATHS (IRON LAW)
 
-Files under `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/workflows/`, `.claude/templates/`, `.claude/schemas/` are FORBIDDEN for `Write`/`Edit`/`NotebookEdit`. Use creator skills: `skill-creator`, `agent-creator`, `hook-creator`, `workflow-creator`, `template-creator`, `schema-creator`.
+Creator paths under `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/workflows/`, `.claude/templates/`, `.claude/schemas/` are FORBIDDEN for `Write`/`Edit`/`NotebookEdit`. Use the matching creator skill.
 
 **Enforcement:** `router-tool-lockdown.cjs`, `unified-creator-guard.cjs`
 
 ### ANTI-BYPASS (IRON LAW)
 
-- Pending reflections in `reflection-spawn-request.json` → spawn reflection-agent via Task()
+- Pending reflections in `reflection-spawn-request.json` → spawn reflection-agent
 - Never wipe queue files or delete reflection-reminder.txt
-- Stale tasks in `stale-tasks.json` → close via TaskUpdate before proceeding
+- Close stale tasks from `stale-tasks.json` before proceeding
 
 ---
 
-## OUTPUT CONTRACT (Section 0.1) — NON-NEGOTIABLE
+## OUTPUT CONTRACT — NON-NEGOTIABLE
 
 ### Pre-flight Sequence (EVERY prompt)
 
-1. `reflection-reminder.txt`+`reflection-spawn-request.json` → spawn reflection-agent if pending
-2. `stale-tasks.json` → close stale tasks via TaskUpdate
-3. `heartbeat-reminder.txt`→heartbeat-orchestrator; `integration-queue.jsonl`→artifact-integrator
-4. Creation preflight → spawn planner for feasibility-gate
-5. Framework changes → spawn QA with proactive-audit
+> **Tool rule**: Use `Read` on specific file paths — NEVER `Bash ls`, `Bash cat`, or any glob. If a file doesn't exist, `Read` errors benignly; catch and move on. Multiple `Read` calls may be issued in parallel.
+
+1. `Read` `.claude/context/runtime/reflection-reminder.txt` + `.claude/context/runtime/reflection-spawn-request.json` → spawn reflection-agent if pending
+2. `Read` `.claude/context/runtime/stale-tasks.json` → close stale tasks
+3. `Read` `.claude/context/runtime/heartbeat-reminder.txt` → heartbeat-orchestrator; `Read` `.claude/context/runtime/integration-queue.jsonl` → artifact-integrator
+4. Creation preflight → planner for feasibility-gate
+5. Framework changes → QA with proactive-audit
 
 Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute requests.
 
@@ -57,25 +65,21 @@ Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute 
 
 ---
 
-## TOOL USAGE & GUARDRAILS (Section 0.2)
+## TOOL USAGE & GUARDRAILS
 
 When agents attempt to use tools, they MUST adhere to the following safety guardrails:
 
-1. **Prevent Token Exhaustion (`MaxFileReadTokenExceededError`)**:
-   - NEVER attempt to full-read large files (>10,000 tokens).
-   - ALWAYS use `offset` and `limit` parameters for the `Read` tool to paginate, or use semantic/regex search tools (`Grep`/`grep_search`) to extract specific content.
-2. **Prevent Directory Read Crashes (`EISDIR`)**:
-   - NEVER invoke the `Read` tool on a directory path (e.g. `C:\dev\projects\reveng-main`). Use listing or architecture exploration tools instead.
-3. **`TaskCreate` Schema Compliance**:
-   - The `TaskCreate` tool absolutely requires the `subject` and `description` string parameters. DO NOT pass an array of nested `tasks: []`.
+1. Prevent `MaxFileReadTokenExceededError`: never full-read huge files; paginate with `offset`/`limit` or search first.
+2. Prevent `EISDIR`: never `Read` a directory path.
+3. `TaskCreate` requires string `subject` and `description`; never pass nested `tasks: []`.
 
 ---
 
-## PRIME DIRECTIVE (Section 1)
+## PRIME DIRECTIVE
 
 ### SPECIALIST-FIRST ROUTING LAW (IRON LAW)
 
-**Developer is LAST RESORT.** 119 agents exist — always use the best-fit specialist. See `.claude/rules/agents.md` for common misrouting examples.
+**Developer is LAST RESORT.** Use the best-fit specialist first. See `.claude/rules/agents.md` for common misrouting examples.
 
 Use `Task(...)` not persona-switching. Include `task_id` in every spawn. Agents invoke skills via `Skill()`.
 
@@ -83,37 +87,47 @@ Routing source of truth: `.claude/workflows/core/router-decision.md`
 
 ---
 
-## SELF-CHECK GATES (Section 1.2)
+## SELF-CHECK GATES
 
-| Gate          | Trigger                               | Action                        |
-| ------------- | ------------------------------------- | ----------------------------- |
-| 0: Reflection | `reflection-reminder.txt` exists      | Process reflections FIRST     |
-| 1: Complexity | multi-step/multi-file/architecture    | Spawn PLANNER first           |
-| 2: Security   | auth/credentials/PII                  | Include SECURITY-ARCHITECT    |
-| 3: Tool       | blacklisted tools needed              | Spawn appropriate agent       |
-| 4: Creator    | writing to creator paths              | Invoke creator skill          |
-| 5: Architect  | code-simplifier/devops/chaos-engineer | Spawn ARCHITECT first         |
-| 6: Audit      | pipeline touched framework artifacts  | Spawn QA with proactive-audit |
+| Gate          | Trigger                               | Action                                                                  |
+| ------------- | ------------------------------------- | ----------------------------------------------------------------------- |
+| 0: Reflection | `reflection-reminder.txt` exists      | Process reflections FIRST                                               |
+| 1: Complexity | multi-step/multi-file/architecture    | Spawn PLANNER first via `Task()` — DO NOT `TaskCreate` an epic yourself |
+| 2: Security   | auth/credentials/PII                  | Include SECURITY-ARCHITECT                                              |
+| 3: Tool       | blacklisted tools needed              | Spawn appropriate agent                                                 |
+| 4: Creator    | writing to creator paths              | Invoke creator skill                                                    |
+| 5: Architect  | code-simplifier/devops/chaos-engineer | Spawn ARCHITECT first                                                   |
+| 6: Audit      | pipeline touched framework artifacts  | Spawn QA with proactive-audit                                           |
 
 ---
 
-## SPAWNING AGENTS (Section 2)
+## SPAWNING AGENTS
 
 ```
 Task({ task_id: 'task-N', subagent_type, prompt, model? })
 ```
 
-- `task_id` REQUIRED (hard-blocked without it)
+- `task_id` REQUIRED
 - After spawn → `TaskUpdate({ taskId, status: "in_progress", owner: "router" })`
-- Subagents: call `TaskUpdate(in_progress)` then `TaskUpdate(completed)`
-- Templates: `universal-agent-spawn.md` (standard) | `orchestrator-spawn.md` (orchestrators)
-- Search: `pnpm search:code` > ripgrep skill > `code-semantic-search` > Grep (fallback)
+- Subagents call `TaskUpdate(in_progress)` then `TaskUpdate(completed)`
+- Templates: `universal-agent-spawn.md` | `orchestrator-spawn.md`
+- Search order: `pnpm search:code` > ripgrep skill > `code-semantic-search` > `Grep`
 
-**Model:** 1. Task `model:` → 2. agent frontmatter → 3. config.yaml → 4. complexity → 5. sonnet. haiku=simple, sonnet=standard, opus=complex/security. See **@MODEL_SELECTION.md**.
+**Model:** task override → agent frontmatter → config → complexity → sonnet. `haiku`=simple, `sonnet`=standard, `opus`=complex/security. See **@MODEL_SELECTION.md**.
+
+### Epic Task Rule (IRON LAW)
+
+For any request that needs 3+ steps, multiple files, or planning (keywords: "plan", "roadmap", "implement X", "add feature Y", "what's next", "build out"):
+
+- **MUST** spawn `planner` via `Task()` FIRST
+- **NEVER** call `TaskCreate` yourself for an epic — the routing-guard hook will block it with `[TASK-CREATE VIOLATION]`
+- Planner owns task decomposition and creates the sub-tasks
+
+**When router MAY use `TaskCreate` directly**: only for single-step, single-file, trivial follow-up tasks that require no planning (e.g., "close out task X", "update task metadata", "mark task Y complete").
 
 ---
 
-## ROUTING TABLE (Section 3)
+## ROUTING TABLE
 
 Default: hierarchical routing (`HIERARCHICAL_ROUTING=on`). Semantic routing primary (`ROUTING_PRIORITY=semantic`).
 
@@ -138,37 +152,38 @@ Full routing: **@AGENT_ROUTING_TABLE.md** | Creator skills: **@CREATOR_SKILLS_TA
 
 ## KEY REFERENCES (load on demand via Read)
 
-| Topic                            | File                         |
-| -------------------------------- | ---------------------------- |
-| Planning, enterprise workflows   | **@ENTERPRISE_WORKFLOWS.md** |
-| Agent routing (119-agent matrix) | **@AGENT_ROUTING_TABLE.md**  |
-| Router operations, gap protocol  | **@ROUTER_OPERATIONS.md**    |
-| Memory protocol (STM/MTM/LTM)    | **@MEMORY_PROTOCOL.md**      |
-| Skill catalog                    | **@SKILL_CATALOG_TABLE.md**  |
-| Model selection                  | **@MODEL_SELECTION.md**      |
-| Hook enforcement                 | **@ENFORCEMENT_HOOKS.md**    |
-| Task tracking guide              | **@TASK_TRACKING_GUIDE.md**  |
+| Topic         | File                         |
+| ------------- | ---------------------------- |
+| Planning      | **@ENTERPRISE_WORKFLOWS.md** |
+| Routing       | **@AGENT_ROUTING_TABLE.md**  |
+| Operations    | **@ROUTER_OPERATIONS.md**    |
+| Memory        | **@MEMORY_PROTOCOL.md**      |
+| Skill catalog | **@SKILL_CATALOG_TABLE.md**  |
+| Models        | **@MODEL_SELECTION.md**      |
+| Hooks         | **@ENFORCEMENT_HOOKS.md**    |
+| Task tracking | **@TASK_TRACKING_GUIDE.md**  |
 
 ---
 
-## MEMORY (Section 8)
+## MEMORY
 
 - Agents write to `learnings.md`, `decisions.md`, `issues.md`
 - Use `MemoryRecord` for structured updates (patterns/gotchas/discoveries)
 - Do not edit `patterns.json` or `gotchas.json` directly; use `MemoryRecord`
 - Context budget: compress at 80K tokens, mandatory at 120K, RED LINE at 150K
+- Use runtime reminder files as the trigger source for compression and reflection checks.
 - If `compression-reminder.txt` exists → handle before spawning
 
 ---
 
-## SKILL INVOCATION (Section 7)
+## SKILL INVOCATION
 
 ```
 Skill({ skill: 'tdd' });     // CORRECT
 // WRONG: Read('.claude/skills/tdd/SKILL.md')
 ```
 
-Catalog: **@SKILL_CATALOG_TABLE.md** | Discovery: read catalog → `Skill({ skill: "<name>" })`
+Catalog: **@SKILL_CATALOG_TABLE.md** | Discovery: read catalog, then `Skill({ skill: "<name>" })`
 
 ---
 
@@ -178,4 +193,4 @@ Catalog: **@SKILL_CATALOG_TABLE.md** | Discovery: read catalog → `Skill({ skil
 
 ## DIRECTORY INDEX
 
-Each subdirectory has its own CLAUDE.md. Key: `agents/` (119 agents), `skills/` (346), `hooks/` (123), `lib/` (50+ modules), `workflows/` (300+), `commands/` (200+), `schemas/` (250+), `context/` (runtime data), `config/` (15 configs), `docs/` (16 @ reference files), `rules/` (14 auto-loaded).
+Each subdirectory has its own CLAUDE.md. Key: `agents/`, `skills/`, `hooks/`, `lib/`, `workflows/`, `commands/`, `schemas/`, `context/`, `config/`, `docs/`, `rules/`.
