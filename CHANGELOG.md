@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - skill-auto-creator archived to \_archive/ with disabled stub (F7, GATE 4 conflict)
+- Repo hygiene: archived stale superpowers plan files, removed nested-cwd slop, staged tree-sitter patch (#hyg-cleanup-2026-04-19)
 
 ### Added
 
