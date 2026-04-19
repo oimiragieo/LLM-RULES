@@ -1,6 +1,20 @@
+---
+name: CLAUDE
+tools:
+  - Read
+  - MemoryRecord
+skills:
+  - memory-search
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+---
+
 # Core Agents
 
 The foundational agents required for every pipeline. These handle the primary development lifecycle — planning, implementation, testing, documentation, and project management.
+
+Search-First Protocol: use `pnpm search:code` or `ripgrep` to inspect the existing agent catalog before editing these index files. When updating the core catalog, document the lookup step with `Skill({ name: 'ripgrep' })` or another search skill invocation in the related worker prompt.
 
 ## Agents
 

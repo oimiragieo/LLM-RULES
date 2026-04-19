@@ -1,6 +1,20 @@
+---
+name: CLAUDE
+tools:
+  - Read
+  - Task
+skills:
+  - memory-search
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+---
+
 # Orchestrator Agents
 
 Multi-agent coordinators that manage complex workflows requiring multiple specialists. They delegate work via `Task()` but never implement directly.
+
+Search-First Protocol: use `pnpm search:code`, `ripgrep`, or hybrid search before changing orchestration routing so delegation rules stay aligned with the underlying agent prompts.
 
 ## Orchestrators
 
