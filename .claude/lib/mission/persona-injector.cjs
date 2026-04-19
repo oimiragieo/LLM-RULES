@@ -15,9 +15,17 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 
 // Default maximum prompt characters
 const DEFAULT_MAX_PROMPT_CHARS = 12000;
+
+// MEv1 B4 — per-spawn UUID-suffixed layer delimiters so attacker text in
+// mission.md cannot impersonate a layer header.
+//   .claude/context/reports/security/mev1-phase0-threat-model-2026-04-19.md (B4)
+function newDelimiterToken() {
+  return crypto.randomUUID().slice(0, 12);
+}
 
 // Fallback string for missing skill templates
 const SKILL_FALLBACK = 'Generic worker - no skill template available.';
@@ -229,23 +237,28 @@ function composePersona(options) {
   // Build mission context
   const missionContext = buildMissionContext(parsedMission, feature || {});
 
+  // MEv1 B4: per-spawn delimiter token. Attacker text in mission.md can never
+  // guess the token, so fake "=== LAYER 1 ===" headers in the user content
+  // do not impersonate ours.
+  const delimiterToken = newDelimiterToken();
+
   // Assemble all layers with delimiters
   const sections = [];
 
   // Layer 1: Base Worker Boilerplate
-  sections.push('=== LAYER 1: BASE WORKER BOILERPLATE ===');
+  sections.push(`=== LAYER 1 [${delimiterToken}]: BASE WORKER BOILERPLATE ===`);
   sections.push(BASE_WORKER_BOILERPLATE);
   sections.push('');
 
   // Layer 2: Skill Template
-  sections.push('=== LAYER 2: SKILL TEMPLATE ===');
+  sections.push(`=== LAYER 2 [${delimiterToken}]: SKILL TEMPLATE ===`);
   sections.push(`Skill: ${skillName || 'unknown'}`);
   sections.push('');
   sections.push(skillTemplate);
   sections.push('');
 
   // Layer 3: Mission Context
-  sections.push('=== LAYER 3: MISSION CONTEXT ===');
+  sections.push(`=== LAYER 3 [${delimiterToken}]: MISSION CONTEXT ===`);
   sections.push(missionContext);
 
   // Combine into full prompt
@@ -278,6 +291,7 @@ function composePersona(options) {
     layerCount: 3,
     truncated,
     originalLength,
+    delimiterToken,
   };
 
   // Freeze the persona object to make it immutable

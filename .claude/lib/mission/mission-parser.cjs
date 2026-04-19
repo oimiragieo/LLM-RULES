@@ -114,13 +114,76 @@ function extractBullets(content, sectionHeader) {
   return bullets;
 }
 
+// MEv1 B4 (OWASP ASI01) — prompt-injection scanner for mission.md.
+// Mirrors the Step 4 prompt-injection scan documented in the
+// content-security-scan skill. Patterns are intentionally conservative
+// (high-precision) to avoid blocking legitimate missions.
+//   .claude/context/reports/security/mev1-phase0-threat-model-2026-04-19.md (B4)
+const INJECTION_PATTERNS = [
+  {
+    id: 'IGNORE_PRIOR',
+    re: /\b(ignore|disregard|forget)\b\s+(?:the\s+)?(?:all\s+)?(?:previous|prior|above|preceding)\s+(?:instructions|directions|prompts?|rules)\b/i,
+    label: 'ignore-previous-instructions',
+  },
+  {
+    id: 'YOU_ARE_NOW',
+    re: /\byou\s+(?:are|act)\s+(?:now\s+)?(?:a|an)\s+\w+/i,
+    label: 'persona-override',
+  },
+  {
+    id: 'SYSTEM_OVERRIDE',
+    re: /\b(?:system|admin|root)\s*[:>]/i,
+    label: 'system-override',
+  },
+  {
+    id: 'FAKE_LAYER',
+    re: /={2,}\s*LAYER\s+\d+\s*[:=]?\s*[A-Z][^\n]*/i,
+    label: 'fake-layer-delimiter',
+  },
+  {
+    id: 'HIDDEN_HTML',
+    re: /<!--[\s\S]*?\b(?:system|prompt|instruction|ignore|override)\b[\s\S]*?-->/i,
+    label: 'hidden-html-instructions',
+  },
+  {
+    id: 'JAILBREAK',
+    re: /\b(?:jailbreak|DAN\s+mode|developer\s+mode\s+enabled)\b/i,
+    label: 'jailbreak-pattern',
+  },
+];
+
 /**
- * Parse a mission.md file and extract structured sections
+ * Scan mission content for prompt-injection patterns.
+ *
+ * @param {string} content
+ * @returns {{ safe: boolean, findings: Array<{id:string, label:string, snippet:string}> }}
+ */
+function scanMissionContent(content) {
+  const findings = [];
+  if (typeof content !== 'string' || content.length === 0) {
+    return { safe: true, findings };
+  }
+  for (const pattern of INJECTION_PATTERNS) {
+    const m = content.match(pattern.re);
+    if (m) {
+      findings.push({ id: pattern.id, label: pattern.label, snippet: m[0].slice(0, 200) });
+    }
+  }
+  return { safe: findings.length === 0, findings };
+}
+
+/**
+ * Parse a mission.md file and extract structured sections.
  *
  * @param {string} missionPath - Path to the mission.md file
- * @returns {Object} - { objectives, antiGoals, architecturalDecisions, rawContent }
+ * @param {object} [opts]
+ * @param {boolean} [opts.strict] - When true, throws MISSION_INJECTION_DETECTED
+ *   if `scanMissionContent` flags the file. Default false (parse-only) so
+ *   existing call sites remain backward-compatible; orchestrator should pass
+ *   `strict: true` at load time per B4.
+ * @returns {Object} - { objectives, antiGoals, architecturalDecisions, rawContent, scan }
  */
-function parseMission(missionPath) {
+function parseMission(missionPath, opts = {}) {
   // Normalize the path
   const normalizedPath = path.normalize(missionPath);
 
@@ -144,6 +207,18 @@ function parseMission(missionPath) {
     return { ...DEFAULT_STRUCTURE };
   }
 
+  // MEv1 B4: scan for prompt-injection patterns. Always runs; in strict
+  // mode throws so the orchestrator refuses to load a poisoned mission.
+  const scan = scanMissionContent(content);
+  if (opts.strict && !scan.safe) {
+    const err = new Error(
+      `mission.md prompt-injection detected: ${scan.findings.map(f => f.label).join(', ')}`
+    );
+    err.code = 'MISSION_INJECTION_DETECTED';
+    err.findings = scan.findings;
+    throw err;
+  }
+
   // Extract sections
   const objectives = extractBullets(content, '## Objectives');
   const antiGoals = extractBullets(content, '## Anti-Goals');
@@ -154,6 +229,7 @@ function parseMission(missionPath) {
     antiGoals,
     architecturalDecisions,
     rawContent: content,
+    scan,
   };
 }
 
@@ -211,5 +287,7 @@ module.exports = {
   parseMission,
   injectMissionContext,
   extractBullets,
+  scanMissionContent,
+  INJECTION_PATTERNS,
   DEFAULT_STRUCTURE,
 };
