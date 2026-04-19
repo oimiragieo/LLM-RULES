@@ -496,6 +496,15 @@
             "timeout_ms": 10000
           }
         ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/monitoring/skill-usage-recorder.cjs"
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
