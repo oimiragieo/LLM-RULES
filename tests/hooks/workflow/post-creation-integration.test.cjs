@@ -5,12 +5,22 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
+const HOOK_PATH = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  '.claude',
+  'hooks',
+  'workflow',
+  'post-creation-integration.cjs'
+);
 const {
   isCreatorCompletion,
   processCreatorCompletion,
   appendToQueueWithImpact,
   MAX_QUEUE_ENTRY_BYTES,
-} = require('./post-creation-integration.cjs');
+} = require(HOOK_PATH);
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const QUEUE_PATH = path.join(

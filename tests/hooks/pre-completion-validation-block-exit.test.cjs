@@ -130,6 +130,7 @@ test('hook subprocess exits with code 2 when artifact validation fails (regressi
 
   const result = runHook(hookInput, {
     CREATOR_ECOSYSTEM_VALIDATOR_PATH: creatorValidatorPath,
+    CLAUDE_AGENT_ID: 'agent-block-exit-regression',
   });
 
   // The critical assertion: must exit 2, not 0

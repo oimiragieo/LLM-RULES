@@ -4,7 +4,7 @@
 /**
  * worktree-prune-on-start.test.cjs
  *
- * Tests for .claude/hooks/session/worktree-prune-on-start.cjs
+ * Tests for .claude/hooks/startup/worktree-prune-on-start.cjs
  *
  * RED phase: All tests are written before the hook exists.
  */
@@ -16,7 +16,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const HOOK = path.resolve(__dirname, '../../../.claude/hooks/session/worktree-prune-on-start.cjs');
+const HOOK = path.resolve(__dirname, '../../../.claude/hooks/startup/worktree-prune-on-start.cjs');
 
 /**
  * Helper: run the hook with stdin and optional env overrides.
@@ -29,6 +29,36 @@ function runHook(stdinData, envOverrides = {}) {
     encoding: 'utf8',
     timeout: 8000,
   });
+}
+
+function makeTempDir(prefix = 'wt-prune-test-') {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return {
+    dir,
+    cleanup: () => fs.rmSync(dir, { recursive: true, force: true }),
+  };
+}
+
+/**
+ * Load an isolated copy of the hook so path-derived side effects land in a
+ * temporary project root instead of the real repo.
+ */
+function loadHookModuleInTempProject() {
+  const { dir, cleanup } = makeTempDir('wt-prune-module-');
+  const hookDir = path.join(dir, '.claude', 'hooks', 'startup');
+  const hookPath = path.join(hookDir, 'worktree-prune-on-start.cjs');
+  fs.mkdirSync(hookDir, { recursive: true });
+  fs.writeFileSync(hookPath, fs.readFileSync(HOOK, 'utf8'), 'utf8');
+  const mod = require(hookPath);
+  return {
+    dir,
+    hookPath,
+    mod,
+    cleanup: () => {
+      delete require.cache[require.resolve(hookPath)];
+      cleanup();
+    },
+  };
 }
 
 /**
@@ -68,39 +98,34 @@ test('exits 0 and allows prompt on valid stdin', () => {
   }
 });
 
-test('creates session flag file after first invocation', () => {
-  const { dir, cleanup } = makeTempRuntime();
+test('ensureSubagentClaudeMd creates the tiered worktree CLAUDE.md when missing', () => {
+  const { dir, mod, cleanup } = loadHookModuleInTempProject();
   try {
-    runHook(VALID_STDIN, { WORKTREE_PRUNE_RUNTIME_DIR: dir });
-    const flagPath = path.join(dir, 'worktree-pruned-this-session.flag');
-    assert.ok(fs.existsSync(flagPath), `Flag file should exist at ${flagPath}`);
+    assert.equal(typeof mod.ensureSubagentClaudeMd, 'function', 'helper export must exist');
+    const tieredClaudeMd = path.join(dir, '.claude', 'worktrees', 'CLAUDE.md');
+    assert.equal(fs.existsSync(tieredClaudeMd), false, 'temp CLAUDE.md should start absent');
+
+    mod.ensureSubagentClaudeMd();
+
+    assert.ok(fs.existsSync(tieredClaudeMd), `CLAUDE.md should exist at ${tieredClaudeMd}`);
+    const content = fs.readFileSync(tieredClaudeMd, 'utf8');
+    assert.match(content, /You are a Subagent/, 'CLAUDE.md should contain subagent guidance');
   } finally {
     cleanup();
   }
 });
 
-test('skips git worktree prune when flag file already exists', () => {
-  const { dir, cleanup } = makeTempRuntime();
+test('exports main and ensureSubagentClaudeMd for programmatic use', () => {
   try {
-    // Pre-create the flag file so the hook should skip git entirely
-    const flagPath = path.join(dir, 'worktree-pruned-this-session.flag');
-    fs.writeFileSync(flagPath, 'already ran', 'utf8');
-
-    // Use a PATH that has no git binary to confirm git is not called
-    // If git were called it would fail and the hook would still exit 0 (fail-open)
-    // We verify by checking stderr — no git output expected
-    const result = runHook(VALID_STDIN, {
-      WORKTREE_PRUNE_RUNTIME_DIR: dir,
-      // Override PATH to empty to verify git is not attempted
-      // (fail-open means even if git fails, exit is 0)
-    });
-    assert.equal(result.status, 0, `Expected exit 0, got ${result.status}`);
-    // Flag file should still exist and be unchanged
-    assert.ok(fs.existsSync(flagPath), 'Flag file should still exist after skip');
-    const content = fs.readFileSync(flagPath, 'utf8');
-    assert.equal(content, 'already ran', 'Flag file content should be unchanged');
+    const exported = require(HOOK);
+    assert.equal(typeof exported.main, 'function', 'main export must exist');
+    assert.equal(
+      typeof exported.ensureSubagentClaudeMd,
+      'function',
+      'ensureSubagentClaudeMd export must exist'
+    );
   } finally {
-    cleanup();
+    delete require.cache[require.resolve(HOOK)];
   }
 });
 
@@ -142,4 +167,6 @@ test('uses shell:false for git command (source check)', () => {
     !src.includes('shell: true') && !src.includes("shell:'true'"),
     'Hook must not use shell: true'
   );
+  assert.ok(src.includes('windowsHide: true'), 'Hook must hide Windows console windows');
+  assert.ok(src.includes('timeout: 15000'), 'Hook must bound prune execution time');
 });

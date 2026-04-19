@@ -18,10 +18,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const HOOK = path.resolve(
-  __dirname,
-  '../../../.claude/hooks/monitoring/skill-usage-recorder.cjs'
-);
+const HOOK = path.resolve(__dirname, '../../../.claude/hooks/monitoring/skill-usage-recorder.cjs');
 
 const TRACKER_PATH = path.resolve(
   __dirname,

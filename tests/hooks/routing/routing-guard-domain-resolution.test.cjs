@@ -27,7 +27,7 @@ describe('F4 routing-guard domain-resolution sentinel tests', { concurrency: 1 }
         prompt: 'build a Next.js app router page with server components',
         description: 'implement the feature',
       },
-      null,
+      null
       // env override: DOMAIN_SPECIALIST_ENFORCEMENT not set → defaults to warn
     );
     assert.equal(result.pass, true, 'warn mode must pass=true');
