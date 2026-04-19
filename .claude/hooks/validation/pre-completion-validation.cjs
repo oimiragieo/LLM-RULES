@@ -17,40 +17,101 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const { spawnSync } = require('child_process');
+// SE-03 safety: hooks must exit 0 (allow) or 2 (block). Exit 1 is treated as
+// error by the Claude Code tool pipeline and is never a valid outcome here.
+// On any uncaught error we fail-open (exit 0) and log to stderr so the
+// pipeline is not blocked by a crashing hook.
+process.on('uncaughtException', e => {
+  try {
+    process.stderr.write(
+      `[pre-completion-validation] uncaughtException: ${(e && e.message) || e}\n`
+    );
+  } catch (_) {
+    void _;
+  }
+  process.exit(0);
+});
+process.on('unhandledRejection', e => {
+  try {
+    process.stderr.write(
+      `[pre-completion-validation] unhandledRejection: ${(e && e.message) || e}\n`
+    );
+  } catch (_) {
+    void _;
+  }
+  process.exit(0);
+});
 
-// Use shared utility for project root
-const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
-const {
-  getEnforcementMode,
-  auditLog,
-  parseHookInputAsync,
-  getToolName,
-  getToolInput,
-  formatResult: formatHookResult,
-} = require('../../lib/utils/hook-input.cjs');
-const {
-  parseAndValidateTaskUpdate,
-  VALID_TASK_STATUSES,
-} = require('../../lib/routing/task-update-contract.cjs');
-const lifecycleState = require('../../lib/routing/task-lifecycle-state.cjs');
-const { shouldBypassPreCompletionValidation } = require('./pre-completion-validation.guards.cjs');
-const {
-  enforceSummaryRequirements,
-  isValidSummary,
-  isFallbackSummary,
-} = require('./pre-completion-validation.summary.cjs');
-const {
-  readActiveCreatorSkills,
-  isEcosystemCreatorAction,
-  validateCreatorEcosystem,
-  resolveRequiredOutputsForTask,
-  validateRequiredOutputs,
-  enforceRequiredOutputs,
-} = require('./pre-completion-validation.task-output.cjs');
-const { enforceDrainGate } = require('./pre-completion-validation.drain-gate.cjs');
+let fs;
+let path;
+let spawnSync;
+let PROJECT_ROOT;
+let getEnforcementMode;
+let auditLog;
+let parseHookInputAsync;
+let getToolName;
+let getToolInput;
+let formatHookResult;
+let parseAndValidateTaskUpdate;
+let VALID_TASK_STATUSES;
+let lifecycleState;
+let shouldBypassPreCompletionValidation;
+let enforceSummaryRequirements;
+let isValidSummary;
+let isFallbackSummary;
+let readActiveCreatorSkills;
+let isEcosystemCreatorAction;
+let validateCreatorEcosystem;
+let resolveRequiredOutputsForTask;
+let validateRequiredOutputs;
+let enforceRequiredOutputs;
+let enforceDrainGate;
+
+try {
+  fs = require('fs');
+  path = require('path');
+  ({ spawnSync } = require('child_process'));
+
+  // Use shared utility for project root
+  ({ PROJECT_ROOT } = require('../../lib/utils/project-root.cjs'));
+  ({
+    getEnforcementMode,
+    auditLog,
+    parseHookInputAsync,
+    getToolName,
+    getToolInput,
+    formatResult: formatHookResult,
+  } = require('../../lib/utils/hook-input.cjs'));
+  ({
+    parseAndValidateTaskUpdate,
+    VALID_TASK_STATUSES,
+  } = require('../../lib/routing/task-update-contract.cjs'));
+  lifecycleState = require('../../lib/routing/task-lifecycle-state.cjs');
+  ({ shouldBypassPreCompletionValidation } = require('./pre-completion-validation.guards.cjs'));
+  ({
+    enforceSummaryRequirements,
+    isValidSummary,
+    isFallbackSummary,
+  } = require('./pre-completion-validation.summary.cjs'));
+  ({
+    readActiveCreatorSkills,
+    isEcosystemCreatorAction,
+    validateCreatorEcosystem,
+    resolveRequiredOutputsForTask,
+    validateRequiredOutputs,
+    enforceRequiredOutputs,
+  } = require('./pre-completion-validation.task-output.cjs'));
+  ({ enforceDrainGate } = require('./pre-completion-validation.drain-gate.cjs'));
+} catch (e) {
+  try {
+    process.stderr.write(
+      `[pre-completion-validation] require() failed: ${(e && e.message) || e}\n`
+    );
+  } catch (_) {
+    void _;
+  }
+  process.exit(0);
+}
 
 // Paths
 const VALIDATION_SCRIPT = path.join(

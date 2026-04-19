@@ -15,9 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - evolution-trigger dormant env-gate via AGENT_EVOLUTION_ENABLED (F6 wire-in)
 - routing-guard: second-pass DOMAIN_SPECIALIST_PATTERNS check with negation guard (env DOMAIN_SPECIALIST_ENFORCEMENT, default warn)
+- Regression test `tests/hooks/validation/pre-completion-validation-exit-safety.test.cjs` covering malformed/empty/valid stdin exit code invariants (SE-03).
 
 ### Fixed
 
+- SE-03 hardening: `pre-completion-validation.cjs` now handles `uncaughtException`/`unhandledRejection` and wraps `require()` to guarantee exit 0 or 2 (never exit 1).
 - lint: remove unused vars in mcp-agent-allowlist-guard tests (before/after imports, stdout/stderr destructures)
 
 ### Added
