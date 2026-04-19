@@ -399,7 +399,7 @@ describe('Dispatcher', () => {
         cancel: () => {},
         child: null,
       });
-      d.executor.executeRalphLoopAsync = (task, opts) => {
+      d.executor.executeRalphLoopAsync = (_task, opts) => {
         const onProgress = opts?.onProgress || (() => {});
         return {
           promise: new Promise(resolve => {
