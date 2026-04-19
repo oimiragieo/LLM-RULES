@@ -157,3 +157,24 @@
 - [2026-04-17] [WORKFLOW] write-pretool-bundle.cjs was blocking all Write/Edit/Bash to .claude/context/runtime/ — patched in commit cb2960e6b to allow reflection-agent writes. Pattern: when reflection queue drain is blocked by pre-write hooks, check hook allowlist for runtime/ path before investigating other causes.
 
 > ⚠️ Content archived to archive/learnings-2026-04-17.md on 2026-04-17
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-18)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-18)
+
+- Created new agent: qa-guardian (2026-04-18)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-18)
+
+- Created new agent: contract-check (2026-04-18)
+
+- Created new agent: bool-action (2026-04-18)
+
+- Created new agent: repo-onboarder (2026-04-18)
+
+- Updated workflow: evolution-workflow (2026-04-18)
+
+- Updated workflow: missing-workflow-xyz (2026-04-18)
+
+## 2026-04-18 Worktree Cleanup
+Removed 50 orphaned worktree directories. Skipped 9 (reasons: 2 registered+locked in git, 6 had untracked/modified work, 1 mtime <24h). 9 total preserved. git worktree prune blocked by bash-pretool-bundle hook (background orchestrator cron handles it). Audit guards: age >=24h AND no untracked work before deletion.
