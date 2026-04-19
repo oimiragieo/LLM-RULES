@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- skill-auto-creator archived to \_archive/ with disabled stub (F7, GATE 4 conflict)
+
 ### Added
 
 - evolution-trigger dormant env-gate via AGENT_EVOLUTION_ENABLED (F6 wire-in)
