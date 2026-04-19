@@ -98,16 +98,18 @@ function loadState(statePath) {
     return { state: { assertions: {} }, recovered: true, created: false };
   }
 
-  // Try to parse JSON
-  let state;
+  // Detect malformed JSON before schema-safe parsing.
+  // safeParseJSON intentionally normalizes parse failures to {} for many callers,
+  // but validation-state corruption must be preserved and backed up.
   try {
-    state = safeParseJSON(content, null);
+    JSON.parse(content);
   } catch (_parseErr) {
-    // Invalid JSON - backup and reinitialize
     createCorruptionBackup(statePath);
     initializeState(statePath);
     return { state: { assertions: {} }, recovered: true, created: false };
   }
+
+  const state = safeParseJSON(content, null);
 
   // Validate required fields exist
   if (typeof state !== 'object' || state === null) {

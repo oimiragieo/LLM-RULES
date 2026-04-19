@@ -191,6 +191,8 @@ const INTENT_TO_AGENT = {
   'verify-docs': 'claude-md-auditor',
   'release-guardian': 'qa',
   'hooks-explainer': 'developer',
+  // Legacy alias kept for older prompts; canonical target is advanced-debugging.
+  'debug-agent': 'advanced-debugging',
 };
 
 module.exports = { INTENT_TO_AGENT };

@@ -292,4 +292,5 @@ module.exports = {
   cloneMarketplace,
   updateMarketplace,
   discoverPlugins,
+  validateGitSource,
 };

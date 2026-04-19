@@ -17,6 +17,7 @@ const MAX_RECORDER_BYTES = Number(process.env.FLIGHT_RECORDER_MAX_BYTES || 5 * 1
 const MAX_RECORDER_FILES = Number(process.env.FLIGHT_RECORDER_MAX_FILES || 20);
 const RETENTION_DAYS = Number(process.env.FLIGHT_RECORDER_RETENTION_DAYS || 7);
 const ROTATED_SUFFIX_RE = /\.flight-recorder\.\d{13}\.jsonl$/;
+const MISSING_FILE_RECHECK_MS = 250;
 
 // Singleton buffer
 const logBuffer = new AsyncLogBuffer();
@@ -41,9 +42,23 @@ function listRotatedFiles(filePath) {
 
 let lastPruneTime = 0;
 const PRUNE_DEBOUNCE_MS = 60 * 1000; // 1 minute
+const rotationProbeCache = new Map();
+
+function hasPendingBufferedWrites(filePath) {
+  return logBuffer.filePath === filePath && !logBuffer.writeStream && logBuffer.buffer.length > 0;
+}
 
 function rotateIfNeeded(filePath) {
-  if (!fs.existsSync(filePath)) return null;
+  const now = Date.now();
+  const cachedProbe = rotationProbeCache.get(filePath);
+  if (cachedProbe && !cachedProbe.exists && now - cachedProbe.checkedAt < MISSING_FILE_RECHECK_MS) {
+    return null;
+  }
+
+  const exists = fs.existsSync(filePath);
+  rotationProbeCache.set(filePath, { exists, checkedAt: now });
+  if (!exists) return null;
+
   const stat = fs.statSync(filePath);
   if (!Number.isFinite(MAX_RECORDER_BYTES) || MAX_RECORDER_BYTES <= 0) return null;
   if (stat.size < MAX_RECORDER_BYTES) return null;
@@ -55,11 +70,12 @@ function rotateIfNeeded(filePath) {
   fs.renameSync(filePath, rotated);
 
   // SEC-IMPL: Prune only during rotation to keep hot-path fast
-  const now = Date.now();
   if (now - lastPruneTime > PRUNE_DEBOUNCE_MS) {
     pruneOldFiles(filePath);
     lastPruneTime = now;
   }
+
+  rotationProbeCache.set(filePath, { exists: false, checkedAt: now });
 
   return rotated;
 }
@@ -131,7 +147,9 @@ function record(event, filePath = getRecorderPath()) {
 
     // compared to write blocking.
 
-    rotateIfNeeded(filePath);
+    if (!hasPendingBufferedWrites(filePath)) {
+      rotateIfNeeded(filePath);
+    }
 
     logBuffer.setPath(filePath);
     logBuffer.write(enriched);
@@ -153,6 +171,7 @@ module.exports = {
   getRotatedPath,
   getRecorderPath,
   listRotatedFiles,
+  hasPendingBufferedWrites,
   DEFAULT_RECORDER_PATH,
   // Export buffer for testing if needed
   _logBuffer: logBuffer,

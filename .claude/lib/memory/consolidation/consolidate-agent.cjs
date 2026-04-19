@@ -2,11 +2,20 @@
 
 const crypto = require('node:crypto');
 
-function ensureConsolidatedAtColumn(db, tableName) {
-  const columns = db.prepare(`PRAGMA table_info(${tableName})`).all();
+function ensureConsolidatedAtColumnFileMemory(db) {
+  // Deviation DR-1: inlined table name to satisfy SEC-011 (no user input; was a constant)
+  const columns = db.prepare('PRAGMA table_info(file_memory)').all();
   const hasColumn = columns.some(column => column.name === 'consolidated_at');
   if (!hasColumn) {
-    db.exec(`ALTER TABLE ${tableName} ADD COLUMN consolidated_at INTEGER`);
+    db.exec('ALTER TABLE file_memory ADD COLUMN consolidated_at INTEGER');
+  }
+}
+
+function ensureConsolidatedAtColumnEpisodicMemory(db) {
+  const columns = db.prepare('PRAGMA table_info(episodic_memory)').all();
+  const hasColumn = columns.some(column => column.name === 'consolidated_at');
+  if (!hasColumn) {
+    db.exec('ALTER TABLE episodic_memory ADD COLUMN consolidated_at INTEGER');
   }
 }
 
@@ -27,8 +36,8 @@ async function consolidate(db) {
     return { processed: 0, insightId: null };
   }
 
-  ensureConsolidatedAtColumn(db, 'file_memory');
-  ensureConsolidatedAtColumn(db, 'episodic_memory');
+  ensureConsolidatedAtColumnFileMemory(db);
+  ensureConsolidatedAtColumnEpisodicMemory(db);
 
   const fileMemoryIds = collectPendingIds(
     db,

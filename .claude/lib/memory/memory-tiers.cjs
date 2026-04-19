@@ -107,6 +107,18 @@ function _writeSTMEntry(sessionData, projectRoot = PROJECT_ROOT) {
   ensureDir(stmDir);
 
   const stmPath = path.join(stmDir, 'session_current.json');
+  const nextSessionId = String(sessionData?.session_id || '').trim();
+
+  if (fs.existsSync(stmPath) && nextSessionId) {
+    const existingEntry = readSTMEntry(projectRoot);
+    const existingSessionId = String(existingEntry?.session_id || '').trim();
+
+    // Preserve the current STM session before a different session overwrites it.
+    if (existingSessionId && existingSessionId !== nextSessionId) {
+      _consolidateSession(existingSessionId, projectRoot);
+    }
+  }
+
   const entry = {
     importance: 0.5,
     consolidated: false,
