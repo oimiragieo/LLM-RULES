@@ -73,6 +73,50 @@
             "timeout_ms": 5000
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/ccusage-statusline.cjs",
+            "async": true,
+            "timeout_ms": 15000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/drift-detector.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/session-budget-watchdog.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/session/stale-task-detector.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -208,6 +252,11 @@
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/task-pretool-orchestrator.cjs",
             "timeout_ms": 10000
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/pre-task-unified.cjs",
+            "timeout_ms": 5000
           }
         ]
       },
@@ -505,6 +554,17 @@
             "command": "node .claude/hooks/monitoring/skill-usage-recorder.cjs"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/validation/flight-recorder-schema-gate.cjs",
+            "async": true,
+            "timeout_ms": 5000
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
@@ -640,6 +700,39 @@
           {
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/lifecycle/session-start-watchpaths.cjs",
+            "timeout_ms": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/channels/channel-auto-start.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/channels/telegram-start.cjs",
+            "async": true,
+            "timeout_ms": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/startup/startup-failopen-audit.cjs",
+            "async": true,
             "timeout_ms": 5000
           }
         ]
