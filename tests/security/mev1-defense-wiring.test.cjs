@@ -19,9 +19,7 @@ const path = require('node:path');
 const os = require('node:os');
 const Database = require('better-sqlite3');
 
-const DISPATCHER_PATH = require.resolve(
-  '../../.claude/lib/mission/worker-features-dispatcher.cjs'
-);
+const DISPATCHER_PATH = require.resolve('../../.claude/lib/mission/worker-features-dispatcher.cjs');
 const BUDGET_PATH = require.resolve('../../.claude/lib/workers/budget-enforcement.cjs');
 const STATE_MUTEX_PATH = require.resolve('../../.claude/lib/mission/state-mutex.cjs');
 const MISSION_PARSER_PATH = require.resolve('../../.claude/lib/mission/mission-parser.cjs');
@@ -44,10 +42,7 @@ function writeFeatures(dir, features) {
 
 function writeMission(dir, content) {
   const missionPath = path.join(dir, 'mission.md');
-  fs.writeFileSync(
-    missionPath,
-    content || '# Test\n\n## Objectives\n- Build feature\n'
-  );
+  fs.writeFileSync(missionPath, content || '# Test\n\n## Objectives\n- Build feature\n');
   return missionPath;
 }
 
@@ -341,11 +336,7 @@ describe('MEv1 Defense Wiring (Phase 0.5)', () => {
   // -------------------------------------------------------------------------
   it('test-7: state-mutex exposes acquireLockSync for synchronous callers', () => {
     const stateMutex = freshRequire(STATE_MUTEX_PATH);
-    assert.equal(
-      typeof stateMutex.acquireLockSync,
-      'function',
-      'acquireLockSync must be exported'
-    );
+    assert.equal(typeof stateMutex.acquireLockSync, 'function', 'acquireLockSync must be exported');
 
     const statePath = path.join(dir, 'state.json');
     const result = stateMutex.acquireLockSync(statePath, {

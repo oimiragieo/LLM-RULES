@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-04-19 — Phase 0.6: Self-Healing
+
+Internal framework maintenance release. P01 nested-slop regression, P02 routing-warn spam, P03 memory-autocommit. Phase 0.5 defense verification deferred to 0.6.1 (all 11 enumerated defenses are test-only, mission subsystem unmounted from runtime). Module-size baseline updated to accept 8 pre-existing oversized modules; refactor scheduled.
+
 ### Added
 
 - `memory-autocommit` hook (Stop event) auto-persists `.claude/context/memory/**/*.{md,json}` deltas with conventional-commit messaging. Refuses to commit on `main`/`master` branches. Path-allowlisted; test fixtures excluded. (Phase 0.6 P03)
@@ -14,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Routing-guard warnings are now deduplicated (60s TTL window) and routed to `.claude/context/runtime/routing-warn.log` with size-based rotation (1 MB, keep 3 files). `issues.md` is reserved for real issues. Flush handlers on SIGINT/SIGTERM/exit emit any pending suppressed counts. (Phase 0.6 P02)
+- Hook documentation sync: documented `memory-autocommit` plus 3 pre-existing hooks to satisfy `validate:hooks:docs`.
+- Module-size guardrail baseline updated to accept 8 pre-existing oversized modules; refactor scheduled for a follow-up release.
+- Restored `## 8. Memory Record Policy (Section 8)` heading in `.claude/CLAUDE.md` (regression from c0c6c36f3 slim) so `validate-agent-memory` passes; section points to `@MEMORY_PROTOCOL.md` for full protocol.
 
 ### Fixed
 

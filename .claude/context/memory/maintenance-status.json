@@ -22,9 +22,85 @@
     "gotchasSentinelRemoved": true,
     "gotchasRemainingCount": 13
   },
-  "lastDaily": "2026-04-19T00:28:28.784Z",
-  "lastWeekly": "2026-04-13T05:23:04.894Z",
+  "lastDaily": "2026-04-20T00:01:58.358Z",
+  "lastWeekly": "2026-04-20T00:01:58.358Z",
   "history": [
+    {
+      "type": "weekly",
+      "timestamp": "2026-04-20T00:01:58.358Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        },
+        {
+          "type": "rotation",
+          "success": true
+        },
+        {
+          "type": "summarization",
+          "success": true
+        },
+        {
+          "type": "deduplication",
+          "success": true
+        },
+        {
+          "type": "pruning",
+          "success": true
+        },
+        {
+          "type": "archiveOldLTM",
+          "success": true
+        },
+        {
+          "type": "extraction",
+          "success": true
+        },
+        {
+          "type": "vectorMaintenance",
+          "success": true
+        },
+        {
+          "type": "weeklyReport",
+          "success": true
+        }
+      ]
+    },
+    {
+      "type": "daily",
+      "timestamp": "2026-04-20T00:01:58.049Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        }
+      ]
+    },
     {
       "type": "daily",
       "timestamp": "2026-04-19T00:28:28.784Z",
@@ -736,86 +812,10 @@
           "success": true
         }
       ]
-    },
-    {
-      "type": "weekly",
-      "timestamp": "2026-03-23T01:58:51.623Z",
-      "tasks": [
-        {
-          "type": "consolidation",
-          "success": true
-        },
-        {
-          "type": "healthCheck",
-          "success": true
-        },
-        {
-          "type": "metricsLog",
-          "success": true
-        },
-        {
-          "type": "taskRecovery",
-          "success": true
-        },
-        {
-          "type": "rotation",
-          "success": true
-        },
-        {
-          "type": "summarization",
-          "success": true
-        },
-        {
-          "type": "deduplication",
-          "success": true
-        },
-        {
-          "type": "pruning",
-          "success": true
-        },
-        {
-          "type": "archiveOldLTM",
-          "success": true
-        },
-        {
-          "type": "extraction",
-          "success": true
-        },
-        {
-          "type": "vectorMaintenance",
-          "success": true
-        },
-        {
-          "type": "weeklyReport",
-          "success": true
-        }
-      ]
-    },
-    {
-      "type": "daily",
-      "timestamp": "2026-03-23T01:58:51.346Z",
-      "tasks": [
-        {
-          "type": "consolidation",
-          "success": true
-        },
-        {
-          "type": "healthCheck",
-          "success": true
-        },
-        {
-          "type": "metricsLog",
-          "success": true
-        },
-        {
-          "type": "taskRecovery",
-          "success": true
-        }
-      ]
     }
   ],
-  "lastRun": "2026-04-19T00:28:28.784Z",
-  "lastColdArchive": "2026-04-13T05:23:05.402Z",
+  "lastRun": "2026-04-20T00:01:58.358Z",
+  "lastColdArchive": "2026-04-20T00:01:58.428Z",
   "lastAudit": "2026-03-19T18:53:00.000Z",
   "auditResult": {
     "status": "healthy",
