@@ -20,10 +20,7 @@ test('bypass-audit-hook DEFAULT_AUDIT_PATH does not contain nested .claude/.clau
   delete require.cache[require.resolve(hookPath)];
   const hook = require(hookPath);
 
-  assert.ok(
-    hook && typeof hook === 'object',
-    'hook module must export an object'
-  );
+  assert.ok(hook && typeof hook === 'object', 'hook module must export an object');
   assert.ok(
     typeof hook.DEFAULT_AUDIT_PATH === 'string',
     'hook must export DEFAULT_AUDIT_PATH as a string'
@@ -45,10 +42,7 @@ test('bypass-audit-hook PROJECT_ROOT does not contain nested .claude/.claude/', 
   delete require.cache[require.resolve(hookPath)];
   const hook = require(hookPath);
 
-  assert.ok(
-    typeof hook.PROJECT_ROOT === 'string',
-    'hook must export PROJECT_ROOT as a string'
-  );
+  assert.ok(typeof hook.PROJECT_ROOT === 'string', 'hook must export PROJECT_ROOT as a string');
 
   const projectRoot = hook.PROJECT_ROOT;
 

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Nested `.claude/.claude/` slop regression — `bypass-audit-hook.cjs` `findProjectRoot()` replaced with deterministic `path.resolve(__dirname, '..', '..', '..')`. Fixes self-reinforcing cycle. (Phase 0.6 P01)
+
 ### MEv1 Phase 0.5 — Security Hardening Summary
 
 Phase 0.5 of the Mission Engine Wiring v1 plan

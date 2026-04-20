@@ -38,18 +38,7 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 // Resolve project root and default audit path
 // ---------------------------------------------------------------------------
 
-function findProjectRoot() {
-  let dir = __dirname;
-  while (dir !== path.parse(dir).root) {
-    if (fs.existsSync(path.join(dir, '.claude'))) {
-      return dir;
-    }
-    dir = path.dirname(dir);
-  }
-  return process.cwd();
-}
-
-const PROJECT_ROOT = findProjectRoot();
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const DEFAULT_AUDIT_PATH = path.join(
   PROJECT_ROOT,
   '.claude',
