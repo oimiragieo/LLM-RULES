@@ -83,19 +83,22 @@ This is the skill template content.
         feature,
       });
 
-      // Verify all 3 layers are present
+      // Verify all 3 layers are present (delimiters now carry MEv1 B4 UUID token)
       assert.ok(persona.prompt, 'Persona should have a prompt');
-      assert.ok(
-        persona.prompt.includes('=== LAYER 1: BASE WORKER BOILERPLATE ==='),
-        'Should have Layer 1 delimiter'
+      assert.match(
+        persona.prompt,
+        /=== LAYER 1 \[[a-f0-9-]+\]: BASE WORKER BOILERPLATE ===/,
+        'Should have Layer 1 delimiter (UUID-suffixed)'
       );
-      assert.ok(
-        persona.prompt.includes('=== LAYER 2: SKILL TEMPLATE ==='),
-        'Should have Layer 2 delimiter'
+      assert.match(
+        persona.prompt,
+        /=== LAYER 2 \[[a-f0-9-]+\]: SKILL TEMPLATE ===/,
+        'Should have Layer 2 delimiter (UUID-suffixed)'
       );
-      assert.ok(
-        persona.prompt.includes('=== LAYER 3: MISSION CONTEXT ==='),
-        'Should have Layer 3 delimiter'
+      assert.match(
+        persona.prompt,
+        /=== LAYER 3 \[[a-f0-9-]+\]: MISSION CONTEXT ===/,
+        'Should have Layer 3 delimiter (UUID-suffixed)'
       );
 
       // Verify Layer 1 content (base boilerplate from PRD)
@@ -298,10 +301,10 @@ This is the skill template content.
         'Should contain fallback string for missing skill'
       );
 
-      // Should still have all 3 layers
-      assert.ok(persona.prompt.includes('=== LAYER 1:'), 'Should still have Layer 1');
-      assert.ok(persona.prompt.includes('=== LAYER 2:'), 'Should still have Layer 2');
-      assert.ok(persona.prompt.includes('=== LAYER 3:'), 'Should still have Layer 3');
+      // Should still have all 3 layers (delimiters now carry MEv1 B4 UUID token)
+      assert.match(persona.prompt, /=== LAYER 1 \[/, 'Should still have Layer 1');
+      assert.match(persona.prompt, /=== LAYER 2 \[/, 'Should still have Layer 2');
+      assert.match(persona.prompt, /=== LAYER 3 \[/, 'Should still have Layer 3');
     });
 
     it('does not throw error for missing SKILL.md', async () => {

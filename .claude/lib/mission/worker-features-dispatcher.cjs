@@ -192,6 +192,20 @@ function dispatchFeature({
   // Select the first eligible feature (lowest array index = highest priority)
   const feature = eligibleFeatures[0];
 
+  // MEv1 B1 — retry ceiling. A feature whose retryCount has already reached
+  // MAX_RETRIES must not be re-dispatched (DoS / runaway loop guard).
+  // Source: .claude/context/reports/security/mev1-phase0-threat-model-2026-04-19.md (B1)
+  const featureRetryCount = Number(feature.retryCount) || 0;
+  if (featureRetryCount >= MAX_RETRIES) {
+    return {
+      dispatched: false,
+      reason: 'max_retries_exceeded',
+      featureId: feature.id,
+      retryCount: featureRetryCount,
+      maxRetries: MAX_RETRIES,
+    };
+  }
+
   // MEv1 B3 — SKILL_ALLOWLIST + regex gate. Enforced for ALL dispatches.
   // Defense-in-depth: this fires BEFORE budget acquisition and BEFORE enqueue,
   // so a malicious skillName never touches the worker pool.

@@ -102,19 +102,19 @@ describe('Worker-to-Features Dispatcher', () => {
   describe('VAL-WD-001: Selects next pending feature with met preconditions', () => {
     it('selects feature with completed preconditions', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'completed', skillName: 'skill-a' },
+        { id: 'feature-a', description: 'Feature A', status: 'completed', skillName: 'tdd' },
         {
           id: 'feature-b',
           description: 'Feature B',
           status: 'pending',
-          skillName: 'skill-b',
+          skillName: 'developer',
           preconditions: ['feature-a'],
         },
         {
           id: 'feature-c',
           description: 'Feature C',
           status: 'pending',
-          skillName: 'skill-c',
+          skillName: 'qa',
           preconditions: ['feature-a', 'feature-b'],
         },
       ]);
@@ -129,12 +129,12 @@ describe('Worker-to-Features Dispatcher', () => {
 
     it('does not select feature with incomplete preconditions', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'skill-a' },
+        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'tdd' },
         {
           id: 'feature-b',
           description: 'Feature B',
           status: 'pending',
-          skillName: 'skill-b',
+          skillName: 'developer',
           preconditions: ['feature-a'],
         },
       ]);
@@ -151,7 +151,7 @@ describe('Worker-to-Features Dispatcher', () => {
   describe('VAL-WD-002: Enqueues to SQLite worker pool with correct payload', () => {
     it('increases pending count after dispatch', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'skill-a' },
+        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'tdd' },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -166,7 +166,7 @@ describe('Worker-to-Features Dispatcher', () => {
 
     it('enqueued message contains featureId and skillName', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'my-feature', description: 'My Feature', status: 'pending', skillName: 'my-skill' },
+        { id: 'my-feature', description: 'My Feature', status: 'pending', skillName: 'tdd' },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -179,14 +179,14 @@ describe('Worker-to-Features Dispatcher', () => {
       // Parse the text field which should contain the dispatch payload
       const payload = JSON.parse(row.text);
       assert.equal(payload.featureId, 'my-feature', 'Should contain featureId');
-      assert.equal(payload.skillName, 'my-skill', 'Should contain skillName');
+      assert.equal(payload.skillName, 'tdd', 'Should contain skillName');
     });
   });
 
   describe('VAL-WD-003: Passes skillName and persona context in enqueued message', () => {
     it('persona context contains mission objectives', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'skill-a' },
+        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'tdd' },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing', 'Ship it fast']);
@@ -210,7 +210,7 @@ describe('Worker-to-Features Dispatcher', () => {
           id: 'feature-a',
           description: 'Feature A description',
           status: 'pending',
-          skillName: 'skill-a',
+          skillName: 'tdd',
           expectedBehavior: ['Works correctly', 'Handles errors'],
           verificationSteps: ['Run tests'],
         },
@@ -235,8 +235,8 @@ describe('Worker-to-Features Dispatcher', () => {
   describe('VAL-WD-004: No-op when no eligible features', () => {
     it('returns dispatched:false when all features completed', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'completed', skillName: 'skill-a' },
-        { id: 'feature-b', description: 'Feature B', status: 'completed', skillName: 'skill-b' },
+        { id: 'feature-a', description: 'Feature A', status: 'completed', skillName: 'tdd' },
+        { id: 'feature-b', description: 'Feature B', status: 'completed', skillName: 'developer' },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -252,7 +252,7 @@ describe('Worker-to-Features Dispatcher', () => {
 
     it('returns dispatched:false when all features in_progress', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'in_progress', skillName: 'skill-a' },
+        { id: 'feature-a', description: 'Feature A', status: 'in_progress', skillName: 'tdd' },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -273,14 +273,14 @@ describe('Worker-to-Features Dispatcher', () => {
           id: 'feature-a',
           description: 'Feature A',
           status: 'pending',
-          skillName: 'skill-a',
+          skillName: 'tdd',
           preconditions: ['feature-b'],
         },
         {
           id: 'feature-b',
           description: 'Feature B',
           status: 'pending',
-          skillName: 'skill-b',
+          skillName: 'developer',
           preconditions: ['feature-a'],
         },
       ]);
@@ -296,12 +296,12 @@ describe('Worker-to-Features Dispatcher', () => {
 
     it('returns dispatched:false when preconditions are in_progress', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'in_progress', skillName: 'skill-a' },
+        { id: 'feature-a', description: 'Feature A', status: 'in_progress', skillName: 'tdd' },
         {
           id: 'feature-b',
           description: 'Feature B',
           status: 'pending',
-          skillName: 'skill-b',
+          skillName: 'developer',
           preconditions: ['feature-a'],
         },
       ]);
@@ -318,7 +318,7 @@ describe('Worker-to-Features Dispatcher', () => {
   describe('VAL-WD-006: Respects worker pool budget', () => {
     it('returns dispatched:false with retryAfterMs when budget exhausted', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'skill-a' },
+        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'tdd' },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -348,8 +348,8 @@ describe('Worker-to-Features Dispatcher', () => {
   describe('VAL-WD-007: Feature priority by array index', () => {
     it('selects lower index feature when both eligible', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-b', description: 'Feature B', status: 'pending', skillName: 'skill-b' },
-        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'skill-a' },
+        { id: 'feature-b', description: 'Feature B', status: 'pending', skillName: 'developer' },
+        { id: 'feature-a', description: 'Feature A', status: 'pending', skillName: 'tdd' },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -362,9 +362,9 @@ describe('Worker-to-Features Dispatcher', () => {
 
     it('processes features in array order through multiple dispatches', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-1', description: 'Feature 1', status: 'pending', skillName: 'skill-1' },
-        { id: 'feature-2', description: 'Feature 2', status: 'pending', skillName: 'skill-2' },
-        { id: 'feature-3', description: 'Feature 3', status: 'pending', skillName: 'skill-3' },
+        { id: 'feature-1', description: 'Feature 1', status: 'pending', skillName: 'tdd' },
+        { id: 'feature-2', description: 'Feature 2', status: 'pending', skillName: 'developer' },
+        { id: 'feature-3', description: 'Feature 3', status: 'pending', skillName: 'qa' },
       ]);
 
       missionPath = createMissionMd(tempDir, ['Build the thing']);
@@ -391,19 +391,19 @@ describe('Worker-to-Features Dispatcher', () => {
   describe('getDispatchStatus', () => {
     it('returns correct status breakdown', () => {
       featuresPath = createFeaturesJson(tempDir, [
-        { id: 'feature-a', description: 'Feature A', status: 'completed', skillName: 'skill-a' },
+        { id: 'feature-a', description: 'Feature A', status: 'completed', skillName: 'tdd' },
         {
           id: 'feature-b',
           description: 'Feature B',
           status: 'pending',
-          skillName: 'skill-b',
+          skillName: 'developer',
           preconditions: ['feature-a'],
         },
         {
           id: 'feature-c',
           description: 'Feature C',
           status: 'pending',
-          skillName: 'skill-c',
+          skillName: 'qa',
           preconditions: ['feature-d'],
         },
       ]);

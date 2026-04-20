@@ -78,6 +78,20 @@ function readFeatures(featuresPath) {
   return JSON.parse(fs.readFileSync(featuresPath, 'utf8')).features;
 }
 
+/**
+ * Compact pending-feature factory. Defaults skillName to 'tdd' (allowlisted)
+ * and preconditions to [] so test fixtures stay one-liners.
+ * @param {string} id
+ * @param {object} [overrides]
+ * @returns {object}
+ */
+function pendingFeature(id, overrides) {
+  return Object.assign(
+    { id, description: id.toUpperCase(), status: 'pending', skillName: 'tdd', preconditions: [] },
+    overrides || {}
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Test suite
 // ---------------------------------------------------------------------------
@@ -131,7 +145,7 @@ describe('DispatchLoop', () => {
   describe('createDispatchLoop', () => {
     it('returns an EventEmitter with start() and stop() methods', () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
       ]);
 
       loop = createDispatchLoop({
@@ -157,7 +171,7 @@ describe('DispatchLoop', () => {
   describe('eligible feature dispatch', () => {
     it('emits worker-dispatched event when eligible feature found', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
       ]);
 
       loop = createDispatchLoop({
@@ -181,7 +195,7 @@ describe('DispatchLoop', () => {
 
     it('transitions feature to in_progress before dispatch', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
       ]);
 
       loop = createDispatchLoop({
@@ -211,7 +225,7 @@ describe('DispatchLoop', () => {
 
     it('acquires a worker slot from budget for each dispatched feature', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
       ]);
 
       loop = createDispatchLoop({
@@ -238,7 +252,7 @@ describe('DispatchLoop', () => {
           description: 'Feature A',
           status: 'pending',
           preconditions: [],
-          skillName: 'my-skill',
+          skillName: 'tdd',
         },
       ]);
 
@@ -264,8 +278,8 @@ describe('DispatchLoop', () => {
 
     it('dispatches multiple eligible features in one poll cycle', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
-        { id: 'feat-b', description: 'Feature B', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
+        pendingFeature('feat-b', { description: 'Feature B' }),
       ]);
 
       const dispatched = [];
@@ -306,7 +320,7 @@ describe('DispatchLoop', () => {
   describe('precondition handling', () => {
     it('does not dispatch feature with unmet preconditions', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
         {
           id: 'feat-b',
           description: 'Feature B',
@@ -345,7 +359,7 @@ describe('DispatchLoop', () => {
 
     it('feature with unmet preconditions stays pending', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
         {
           id: 'feat-b',
           description: 'Feature B',
@@ -380,7 +394,7 @@ describe('DispatchLoop', () => {
   describe('budget exhaustion', () => {
     it('does not dispatch when budget is exhausted', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
       ]);
 
       budget = createMockBudget({ exhausted: true });
@@ -410,7 +424,7 @@ describe('DispatchLoop', () => {
 
     it('emits budget-exhausted event when slot denied', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
       ]);
 
       budget = createMockBudget({ exhausted: true });
@@ -445,7 +459,7 @@ describe('DispatchLoop', () => {
   describe('stop conditions', () => {
     it('stops when state.json shows paused', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
       ]);
 
       // Start in paused state
@@ -469,8 +483,8 @@ describe('DispatchLoop', () => {
 
     it('stops when no pending features remain', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'completed', preconditions: [] },
-        { id: 'feat-b', description: 'Feature B', status: 'completed', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A', status: 'completed' }),
+        pendingFeature('feat-b', { description: 'Feature B', status: 'completed' }),
       ]);
 
       loop = createDispatchLoop({
@@ -495,7 +509,7 @@ describe('DispatchLoop', () => {
 
     it('stop() method halts the polling loop', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
       ]);
 
       // Use exhausted budget so no dispatches happen (avoids the no-pending-features stop)
@@ -525,7 +539,7 @@ describe('DispatchLoop', () => {
 
     it('calling start() multiple times does not create duplicate loops', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
       ]);
 
       const dispatched = [];
@@ -565,7 +579,7 @@ describe('DispatchLoop', () => {
           description: 'Feature X',
           status: 'pending',
           preconditions: [],
-          skillName: 'test-skill',
+          skillName: 'tdd',
         },
       ]);
 
@@ -601,8 +615,8 @@ describe('DispatchLoop', () => {
 
     it('each dispatched feature gets a unique sessionId', async () => {
       featuresPath = writeFeatures(testDir, [
-        { id: 'feat-a', description: 'Feature A', status: 'pending', preconditions: [] },
-        { id: 'feat-b', description: 'Feature B', status: 'pending', preconditions: [] },
+        pendingFeature('feat-a', { description: 'Feature A' }),
+        pendingFeature('feat-b', { description: 'Feature B' }),
       ]);
 
       const sessionIds = [];

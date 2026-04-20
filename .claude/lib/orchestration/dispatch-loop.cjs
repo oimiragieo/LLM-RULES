@@ -27,7 +27,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { FeaturesStateMachine } = require('../mission/features-state-machine.cjs');
-const { enqueueMessage } = require('../db/queue-operations.cjs');
+// MEv1 Phase 0.5 wiring — dispatch loop now delegates each enqueue to the
+// hardened dispatchFeature() so SKILL_ALLOWLIST + payload cap + retry
+// ceiling + proposer/effector resolution all fire on the production path.
+// We require the *module* (not destructure) so test-time monkey-patches of
+// `dispatcherModule.dispatchFeature` are honored.
+const dispatcherModule = require('../mission/worker-features-dispatcher.cjs');
 
 /** Default polling interval: 2 seconds (overridable for tests via pollIntervalMs) */
 const DEFAULT_POLL_INTERVAL_MS = 2000;
@@ -72,7 +77,7 @@ function readState(workspacePath) {
  * @param {string} opts.featuresPath    - Path to features.json
  * @param {import('better-sqlite3').Database} opts.db - SQLite db for enqueueing
  * @param {object} opts.budget          - BudgetEnforcementService instance
- * @param {string} opts.missionPath     - Path to mission.md (reserved for future use)
+ * @param {string} opts.missionPath     - Path to mission.md (forwarded to dispatchFeature for persona context)
  * @param {number} [opts.pollIntervalMs=2000] - Override poll interval (for testing)
  * @returns {EventEmitter & { start: function(): void, stop: function(): void }}
  */
@@ -87,9 +92,6 @@ function createDispatchLoop({
   // Normalise paths once
   const normFeaturesPath = path.normalize(featuresPath);
   const normWorkspacePath = path.normalize(workspacePath);
-
-  // Use missionPath in future when persona injection is wired here
-  void missionPath;
 
   const interval =
     pollIntervalMs !== undefined && pollIntervalMs !== null
@@ -149,49 +151,61 @@ function createDispatchLoop({
     for (const feature of eligibleFeatures) {
       if (!running) break;
 
-      // 4a. Acquire a budget slot — stop dispatching this cycle if denied
-      const slot = budget.acquireWorkerSlot(1000);
-      if (!slot.allowed) {
-        setImmediate(() =>
-          emitter.emit('budget-exhausted', { retryAfterMs: slot.retryAfterMs || 0 })
-        );
+      // 4a. Delegate to the security-hardened dispatcher. This wires the
+      //     Phase 0.5 defenses (SKILL_ALLOWLIST + skillName regex,
+      //     payload-size cap, retry ceiling, proposer/effector resolution,
+      //     budget acquisition + release on error) into the production path.
+      let result;
+      try {
+        result = dispatcherModule.dispatchFeature({
+          db,
+          budget,
+          featuresPath: normFeaturesPath,
+          missionPath,
+          chatId: 'mission-engine',
+          estimatedTokens: 1000,
+          validateSkills: false,
+          cwd: normWorkspacePath,
+        });
+      } catch (dispatchErr) {
+        emitter.emit('error', dispatchErr);
+        continue;
+      }
+
+      // 4b. Translate dispatcher result into loop events.
+      if (!result || result.dispatched === false) {
+        if (result && result.reason === 'budget_exhausted') {
+          setImmediate(() =>
+            emitter.emit('budget-exhausted', { retryAfterMs: result.retryAfterMs || 0 })
+          );
+          break;
+        }
+        // Other rejections (skill_name_invalid, payload_too_large,
+        // max_retries_exceeded, skill_not_allowlisted, skill_proposed,
+        // enqueue_error, no_eligible_features) surface as error/info events
+        // without blocking the loop.
+        if (result && result.reason && result.reason !== 'no_eligible_features') {
+          const dispatchErr = new Error(
+            `dispatchFeature rejected feature ${result.featureId || 'n/a'}: ${result.reason}`
+          );
+          dispatchErr.code = result.reason;
+          dispatchErr.featureId = result.featureId;
+          emitter.emit('error', dispatchErr);
+        }
+        // Stop iterating eligible features — dispatcher only handles one per call
         break;
       }
 
-      // 4b. Transition feature to in_progress
+      // 4c. Successful dispatch — transition state machine and emit event.
       try {
-        machine.transition(feature.id, 'in_progress');
+        machine.transition(result.featureId || feature.id, 'in_progress');
       } catch (transitionErr) {
-        slot.release();
         emitter.emit('error', transitionErr);
         continue;
       }
 
-      // 4c. Generate worker session ID
       const sessionId = generateSessionId();
-
-      // 4d. Enqueue dispatch payload to the worker pool
-      const payload = {
-        featureId: feature.id,
-        skillName: feature.skillName || 'unknown',
-        sessionId,
-      };
-
-      try {
-        enqueueMessage(db, {
-          chatId: 'mission-engine',
-          text: JSON.stringify(payload),
-          attachments: [],
-        });
-        slot.release();
-      } catch (enqueueErr) {
-        slot.release();
-        emitter.emit('error', enqueueErr);
-        continue;
-      }
-
-      // 4e. Emit worker-dispatched event (setImmediate per testing-quirks.md)
-      const dispatchPayload = { featureId: feature.id, sessionId };
+      const dispatchPayload = { featureId: result.featureId || feature.id, sessionId };
       setImmediate(() => emitter.emit('worker-dispatched', dispatchPayload));
     }
 

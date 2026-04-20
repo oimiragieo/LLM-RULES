@@ -210,8 +210,11 @@ class StateMutex {
    */
   _load() {
     const { state, recovered, created } = loadState(this.statePath);
-    this._recovered = recovered;
-    this._created = created;
+    // Preserve recovery flag if a prior _withFileLock priming load already
+    // detected and remediated corruption — otherwise this second load (where
+    // the file is now valid) would erroneously clear the flag.
+    this._recovered = this._recovered || recovered;
+    this._created = this._created || created;
     return state;
   }
 
@@ -242,9 +245,12 @@ class StateMutex {
    * and is removed on release.
    */
   _withFileLock(fn) {
-    // Ensure file exists so lockSync has a target.
-    const { state: _initState } = loadState(this.statePath);
-    void _initState;
+    // Ensure file exists so lockSync has a target. Capture recovery flag
+    // here so the caller's _load() inside fn() does not erase it (the file
+    // is now valid after this priming load and would report recovered:false).
+    const priming = loadState(this.statePath);
+    this._recovered = !!priming.recovered;
+    this._created = !!priming.created;
     let release;
     try {
       release = lockfile.lockSync(this.statePath, LOCKFILE_OPTS);

@@ -146,6 +146,7 @@ describe('Orchestrator E2E', () => {
           description: 'Feature A — first feature in milestone 1',
           status: 'pending',
           milestone: MILESTONE_1,
+          skillName: 'tdd',
           preconditions: [],
           verificationSteps: [],
           fulfills: [],
@@ -155,6 +156,7 @@ describe('Orchestrator E2E', () => {
           description: 'Feature B — second feature in milestone 1',
           status: 'pending',
           milestone: MILESTONE_1,
+          skillName: 'tdd',
           preconditions: [],
           verificationSteps: [],
           fulfills: [],
@@ -164,6 +166,7 @@ describe('Orchestrator E2E', () => {
           description: 'Feature C — sole feature in milestone 2',
           status: 'pending',
           milestone: MILESTONE_2,
+          skillName: 'tdd',
           // Preconditions enforce that M1 must complete before M2 is dispatched.
           preconditions: ['feat-a', 'feat-b'],
           verificationSteps: [],
