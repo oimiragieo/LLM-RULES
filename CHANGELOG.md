@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Routing-guard warnings are now deduplicated (60s TTL window) and routed to `.claude/context/runtime/routing-warn.log` with size-based rotation (1 MB, keep 3 files). `issues.md` is reserved for real issues. Flush handlers on SIGINT/SIGTERM/exit emit any pending suppressed counts. (Phase 0.6 P02)
+
 ### Fixed
 
 - Nested `.claude/.claude/` slop regression — `bypass-audit-hook.cjs` `findProjectRoot()` replaced with deterministic `path.resolve(__dirname, '..', '..', '..')`. Fixes self-reinforcing cycle. (Phase 0.6 P01)

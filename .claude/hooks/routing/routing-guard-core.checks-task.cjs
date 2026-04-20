@@ -361,20 +361,23 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
         }
 
         try {
-          const fs = require('node:fs');
+          // Route to deduped routing-warn log (NOT issues.md).
+          // See .claude/lib/routing/routing-warn-dedupe.cjs (Phase 0.6 P02).
           const path = require('node:path');
-          let currentDir = __dirname;
-          while (
-            currentDir !== path.parse(currentDir).root &&
-            !fs.existsSync(path.join(currentDir, '.claude'))
-          ) {
-            currentDir = path.dirname(currentDir);
-          }
-          const issuesPath = path.join(currentDir, '.claude', 'context', 'memory', 'issues.md');
-          if (fs.existsSync(issuesPath)) {
-            const entry = `\n- [ROUTING WARN] Developer task routing warned. Keyword "${phrase}" suggests specialist "${specialist}". Prompt triggered warning instead of block. Date: ${new Date().toISOString()}`;
-            fs.appendFileSync(issuesPath, entry + '\n', 'utf8');
-          }
+          const { emitRoutingWarn } = require('../../lib/routing/routing-warn-dedupe.cjs');
+          // Deterministic project root: this file is at
+          // <root>/.claude/hooks/routing/routing-guard-core.checks-task.cjs
+          // so 3 levels up (..,..,..) reaches <root>.
+          const projectRoot = path.resolve(__dirname, '..', '..', '..');
+          const logPath = path.join(
+            projectRoot,
+            '.claude',
+            'context',
+            'runtime',
+            'routing-warn.log'
+          );
+          const entry = `Developer task routing warned. Keyword "${phrase}" suggests specialist "${specialist}". Prompt triggered warning instead of block.`;
+          emitRoutingWarn(entry, { logPath });
         } catch (_err) {
           // Best effort logging
         }
