@@ -176,6 +176,12 @@ Full routing: **@AGENT_ROUTING_TABLE.md** | Creator skills: **@CREATOR_SKILLS_TA
 
 ---
 
+## 8. Memory Record Policy (Section 8)
+
+Structured memory writes MUST go through `MemoryRecord` — do not edit `patterns.json` or `gotchas.json` directly. `MemoryRecord` enforces schema validation, dedupe, and tier routing (STM/MTM/LTM). Direct edits to `patterns.json` or `gotchas.json` are blocked by hook enforcement. See **@MEMORY_PROTOCOL.md** for full memory architecture and APIs.
+
+---
+
 ## SKILL INVOCATION
 
 ```
