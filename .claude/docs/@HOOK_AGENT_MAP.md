@@ -60,6 +60,10 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `subagent-start-iron-law.cjs`       | x      | x           | x        | x          | x            | x          |
 | `user-prompt-advisory-bundle.cjs`   | x      |             |          |            |              |            |
 | `trajectory-logger.cjs`             | x      | x           | x        | x          | x            | x          |
+| `mcp-agent-allowlist-guard.cjs`     | x      | x           | x        | x          | x            | x          |
+| `skill-usage-recorder.cjs`          | x      | x           | x        | x          | x            | x          |
+| `memory-autocommit.cjs`             | x      |             |          |            |              |            |
+| `telegram-start.cjs`                | x      |             |          |            |              |            |
 
 **Agent Archetype Definitions:**
 
@@ -77,6 +81,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 ### SessionStart (all agents)
 
 1. `session-start-watchpaths.cjs` — registers watch paths for runtime-critical files (sync)
+2. `telegram-start.cjs` — launches the channel daemon as a hidden background process if not already running (async, fail-open)
 
 ### SubagentStart (all agents)
 
@@ -103,6 +108,10 @@ This document provides a comprehensive mapping between enforcement hooks and age
 ### PreToolUse (all tools)
 
 1. `context-monitor.cjs` — injects advisory warnings at 70%/85% context budget (async)
+
+### PreToolUse (mcp\_\_\*)
+
+1. `mcp-agent-allowlist-guard.cjs` — enforces per-agent MCP server allowlist (warn|block|off via `MCP_AGENT_ALLOWLIST_ENFORCEMENT`; fail-open)
 
 ### PreToolUse (Bash)
 
@@ -138,6 +147,17 @@ This document provides a comprehensive mapping between enforcement hooks and age
 
 1. `post-tool-advisory-bundle.cjs` — consolidated: metrics, context window, hook error detection, recurring issue detection (async)
 2. `trajectory-logger.cjs` — logs each tool call as ATIF-compatible JSONL to `.claude/context/logs/trajectory-YYYY-MM-DD.jsonl` (async, fail-open)
+
+### PostToolUse (Skill)
+
+1. `skill-usage-recorder.cjs` — records Skill invocations to `skill-usage.jsonl` (gated by `AGENT_EVOLUTION_ENABLED=1`; fail-open)
+
+### Stop (all agents)
+
+1. `check-console-log.cjs` — scans for console.log in production code
+2. `pre-compact.cjs` — snapshots state before session compaction
+3. `sanitize-debug-log.cjs` — final log cleanup
+4. `memory-autocommit.cjs` — auto-commits `.claude/context/memory/**/*.{md,json}` deltas; branch-guarded (skips main/master); fail-open
 
 ### PostToolUse (TaskUpdate)
 

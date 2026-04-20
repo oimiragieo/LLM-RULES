@@ -75,6 +75,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `spawn-token-guard.cjs`: Estimates spawn prompt token count on every `Task` call. Writes `compression-reminder.txt` and warns at 80K tokens; blocks the spawn at 120K tokens to prevent "Prompt is too long" failures. Fail-open (advisory).
 - `finish-only-guard.cjs`: Blocks `TaskCreate` and `Task` calls when the session is in drain mode (finishing state). Prevents new work from being started while existing tasks are being completed. Fail-open (advisory).
 - `context-monitor.cjs`: Monitors agent context window usage before each tool call and injects advisory warnings at 70% (WARNING) and 85% (CRITICAL) thresholds. Reads token budget from `budget-tracker.json`. Fail-open (advisory).
+- `mcp-agent-allowlist-guard.cjs`: Enforces per-agent MCP server access policies for `mcp__*` tool calls. Resolves agent identity from hook input or `CLAUDE_AGENT_ID` and consults the allowlist checker; unknown agents default to permissive. Mode controlled by `MCP_AGENT_ALLOWLIST_ENFORCEMENT` (warn|block|off, default warn). Fail-open (advisory).
 
 ### PostToolUse
 
@@ -106,6 +107,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `post-tool-advisory-bundle.cjs`: Consolidated advisory bundle that runs 4 PostToolUse sub-checks per tool call (metrics/error tracking, context window monitoring, stale worktree hook detection, recurring issue detection). Fail-open (async).
 - `slo-alert-gate.cjs`: SLO enforcement gate. Reads hook latency and recorder failure rate metrics from the SLO metrics file and blocks if p95 hook latency exceeds `HOOK_P95_MAX_MS` (default 5ms) or recorder failure rate exceeds `RECORDER_FAILURE_RATE_MAX` (default 1%). Fail-open when metrics file is absent.
 - `trajectory-logger.cjs`: Logs each tool call as a structured ATIF-compatible JSONL record to `.claude/context/logs/trajectory-YYYY-MM-DD.jsonl`. Fires on every PostToolUse event and captures tool name, sanitized input/output summaries, session ID, agent type, and task ID. Fail-open (always exits 0).
+- `skill-usage-recorder.cjs`: Records Skill tool invocations to `skill-usage.jsonl` via `SkillUsageTracker`. Matcher: `Skill`. Off by default; enable with `AGENT_EVOLUTION_ENABLED=1`. Overhead target <5ms per invocation. Fail-open (never blocks tool calls).
 
 ### SessionEnd
 
@@ -121,10 +123,12 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `check-console-log.cjs`: Scans for console.log statements in production code.
 - `pre-compact.cjs`: Snapshots state before session compaction.
 - `sanitize-debug-log.cjs`: Final log cleanup.
+- `memory-autocommit.cjs`: Auto-commits session learnings in `.claude/context/memory/**/*.{md,json}` when the Stop event fires. Path-allowlisted (only the memory tree is staged); branch-guarded (refuses commits on `main`/`master`); idempotent when nothing is dirty. Uses `spawnSync` with `shell:false`. Fail-open (always exits 0). Added in Phase 0.6.
 
 ### SessionStart
 
 - `session-start-watchpaths.cjs`: Returns a `watchPaths` array of runtime-critical files for Claude Code to monitor (agent registry, settings.json, runtime state directory). Paths are validated for existence before inclusion. Fail-open (sync).
+- `telegram-start.cjs`: Launches the channel daemon (`scripts/channels/daemon/index.cjs`) as a hidden background process on session start. Loads `.env`, checks for an already-running daemon via PID file + HTTP health check on port 3101, then spawns if needed. Async; 10s timeout. Fail-open (advisory).
 
 ### SubagentStart
 
