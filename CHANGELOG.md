@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `memory-autocommit` hook (Stop event) auto-persists `.claude/context/memory/**/*.{md,json}` deltas with conventional-commit messaging. Refuses to commit on `main`/`master` branches. Path-allowlisted; test fixtures excluded. (Phase 0.6 P03)
+
 ### Changed
 
 - Routing-guard warnings are now deduplicated (60s TTL window) and routed to `.claude/context/runtime/routing-warn.log` with size-based rotation (1 MB, keep 3 files). `issues.md` is reserved for real issues. Flush handlers on SIGINT/SIGTERM/exit emit any pending suppressed counts. (Phase 0.6 P02)

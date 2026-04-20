@@ -663,6 +663,12 @@
             "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/monitoring/slo-alert-gate.cjs",
             "timeout_ms": 5000
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/memory/memory-autocommit.cjs",
+            "description": "Auto-commit memory deltas on session end (skips main/master)",
+            "timeout_ms": 5000
           }
         ]
       }
