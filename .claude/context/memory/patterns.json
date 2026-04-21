@@ -461,5 +461,53 @@
     "area": "tooling",
     "timestamp": "2026-03-21T18:10:25.057Z",
     "id": "pattern-destructive-cli-safety-2026-03-21"
+  },
+  {
+    "text": "Pre-release gate: always run validate:full AND confirm CHANGELOG completeness BEFORE cutting the version bump commit. v2.1.0 required 3 post-implementation REL-FIX commits (undocumented hooks, module-size baseline missing, CLAUDE.md Section 8 absent) because this gate was skipped. Saves N REL-FIX commits per release.",
+    "area": "main",
+    "timestamp": "2026-04-21T01:18:53.512Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "4624431728cd2e686db6bcde5cbffb762af85d29",
+    "importance": 0.5
+  },
+  {
+    "text": "TDD red-green-cleanup commit structure for self-healing features: 1 regression test commit (RED) + 1 implementation commit (GREEN). Each feature has clear before/after boundary in git history. Apply consistently to all P0x/P1 self-healing deliverables in Phase 0.6.1 and beyond.",
+    "area": "main",
+    "timestamp": "2026-04-21T01:19:09.915Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "c7fb92dcb36cb72ed433b39668bfab5a6fe88d6c",
+    "importance": 0.5
+  },
+  {
+    "text": "Session handoff commit practice: write the session handoff log as a final git commit (docs(handoff): ...) at every major milestone before session close. This preserves cross-session context in git history even if memory is lost or compressed. High-value for multi-session feature releases.",
+    "area": "main",
+    "timestamp": "2026-04-21T01:19:38.841Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "a311b7b9de5c3a21f1a4ddfdbf5bf4f6b7d6f25b",
+    "importance": 0.5
+  },
+  {
+    "text": "[CODE] TDD P01 (2026-04-20): Replace findProjectRoot() ancestor-walk with path.resolve(__dirname,'..','..','..') in hook files. CWD-relative root detection drifts when hooks run from .claude/.claude/ nested dirs. Evidence: bypass-audit-hook.cjs commit b90fb64f. Signal: presence of .claude/.claude/ double-prefix dir.",
+    "area": "main",
+    "timestamp": "2026-04-21T01:21:56.829Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "6107640b5a6b4a37bac66d0f96cb65f9f245dba9",
+    "importance": 0.5
   }
 ]

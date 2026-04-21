@@ -134,3 +134,11 @@ Removed 50 orphaned worktree directories. Skipped 9 (reasons: 2 registered+locke
 - **Finding**: stale-task-detector lacks auto-closure; router must manually close tasks older than 60 minutes, but this relies on human-initiated session activity and does NOT happen autonomously across session boundaries.
 - **Fix required**: add auto-closure in `stale-task-detector.cjs`: if a task has been `in_progress` for >N minutes (suggested: 60min for intra-session, 24h for cross-session orphans), automatically call `TaskUpdate({ status: "completed", metadata: { autoClosedReason: "stale_timeout" } })` rather than only emitting a gap-log warning.
 - **Source**: reflection of task 5 (2026-04-19 session), gap-log showed 18 `missing_metadata` entries + 1 `abandoned_task` entry for task-lifecycle-42 spanning 962 minutes.
+
+## Phase 0.6 Self-Healing — 2026-04-19
+
+- Shipped v2.1.0 with P01 (nested slop), P02 (routing-warn dedupe+log), P03 (memory autocommit). P04 Phase 0.5 verification deferred to Phase 0.6.1 — all 11 defenses test-only; mission subsystem unmounted from runtime.
+- Release unblocked by three docs-and-baseline fixes: HOOKS_REFERENCE + @HOOK_AGENT_MAP for 4 hooks; module-size baseline for 8 pre-existing oversized modules; CLAUDE.md Section 8 restoration.
+- Pattern learned: planner stalls at ~180-190K tokens without skeleton-first directive; with skeleton-first + bundled research, completes cleanly.
+- Pattern learned: `developer` agent auto-worktrees (~150K context injection); use `general-purpose` for <10 LOC edits to avoid "Prompt too long".
+- Scheduled: Phase 0.6.1 mission-engine runtime wiring; Phase 0.7 module-size refactor candidates (state-mutex, pre-tool-unified.taskupdate, routing-table, routing-guard-core, memory-tiers, spawn-prompt-assembler × 2, prompt-assembler-memory).

@@ -146,5 +146,41 @@
     "area": "security",
     "timestamp": "2026-03-21T18:10:33.007Z",
     "id": "gotcha-hook-exit-code-silent-bypass-2026-03-21"
+  },
+  {
+    "text": "task-lifecycle-42 phantom stale task generates recurring gap-log noise (1034+ entries). This is a known phantom from test-fixture leak in grand-lifecycle.test.cjs. Do NOT re-investigate in future reflections — treat as resolved background noise pending F-LIFECYCLE fix. Root cause fully documented in .claude/context/reports/backend/task-lifecycle-42-investigation-2026-04-17.md",
+    "area": "main",
+    "timestamp": "2026-04-21T01:19:23.988Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "de124cb1c0c6984050dacbc2cd070245ac1f4a48",
+    "importance": 0.5
+  },
+  {
+    "text": "[WORKFLOW] Stale task orphan accumulation (2026-04-20): task-lifecycle-42 generated 17+ missing_metadata gap-log entries over 962 min. Root cause: grand-lifecycle.test.cjs fixture leak (F-LIFECYCLE spec, not yet implemented). Gotcha: stale-task-detector.cjs fires a warning but cannot self-heal — requires router to manually close tasks. Fix: add auto-closure after >60min.",
+    "area": "main",
+    "timestamp": "2026-04-21T01:21:57.028Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "8532902b7277efc50685d73bd384efc6b4f4af7f",
+    "importance": 0.5
+  },
+  {
+    "text": "[WORKFLOW] task-lifecycle-42 stale orphan gotcha (2026-04-20): stale-task-detector.cjs fires missing_metadata warnings on every UserPromptSubmit but CANNOT self-heal — only emits gap-log entry, does NOT auto-close. A single phantom task (grand-lifecycle.test.cjs fixture leak) generated 17+ entries over 962 min across sessions. Fix spec F-LIFECYCLE exists but not yet implemented.",
+    "area": "main",
+    "timestamp": "2026-04-21T01:22:10.388Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "7edd26486e26d139d9c2443bd81ac448d1940491",
+    "importance": 0.5
   }
 ]
