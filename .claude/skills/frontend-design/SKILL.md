@@ -22,6 +22,9 @@ best_practices:
   - Match code complexity to vision — elaborate for maximalist, restrained for minimalist
 error_handling: strict
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 6d2998f14963c88a
 ---
 
 # Frontend Design

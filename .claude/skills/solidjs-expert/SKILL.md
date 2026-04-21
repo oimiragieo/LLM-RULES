@@ -18,6 +18,9 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 9f6cbbafff4d9e98
 ---
 
 # Solidjs Expert

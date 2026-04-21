@@ -16,6 +16,9 @@ best_practices:
   - Validate findings with primary sources
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: aa4a7a8cd5041d32
 ---
 
 # Deep Research

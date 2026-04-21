@@ -17,6 +17,9 @@ streaming: supported
 templates: [unit-test, integration-test, e2e-test, api-test]
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 35a3ef4d4e3f2d26
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.

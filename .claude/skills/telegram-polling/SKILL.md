@@ -10,6 +10,9 @@ invoked_by: both
 user_invocable: true
 error_handling: graceful
 verified: true
+source: builtin
+trust_score: 100
+provenance_sha: fc0aa51889e7ff03
 ---
 
 # Telegram Polling

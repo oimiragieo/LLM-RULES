@@ -20,6 +20,9 @@ streaming: supported
 output_location: .claude/workflows/
 verified: true
 lastVerifiedAt: '2026-02-28'
+source: builtin
+trust_score: 100
+provenance_sha: 22a2b0467e79ff37
 ---
 
 # Workflow Creator Skill

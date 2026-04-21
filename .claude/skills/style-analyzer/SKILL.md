@@ -5,6 +5,9 @@ description: >-
   JSON style profile with vocabulary patterns, sentence structure, tone markers, and formatting preferences.
   Invoke before voice-clone-generator to establish style constraints.
 version: 1.0.0
+source: builtin
+trust_score: 100
+provenance_sha: ea6529cef8be6cc7
 ---
 
 # Style Analyzer

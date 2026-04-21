@@ -8,6 +8,9 @@ tools:
   - Read
   - Write
   - Edit
+source: builtin
+trust_score: 100
+provenance_sha: 01f50af5e6647bce
 ---
 
 # Google Workspace Integration Skill

@@ -12,9 +12,11 @@ best_practices:
   - Consider hidden complexity in optional features
 error_handling: graceful
 streaming: supported
-source: auto-claude
+source: community
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+trust_score: 100
+provenance_sha: 7652f9aa7a58db3f
 ---
 
 # Complexity Assessment Skill

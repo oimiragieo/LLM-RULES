@@ -16,6 +16,9 @@ streaming: supported
 templates: [architecture-diagram, database-diagram, component-diagram, sequence-diagram]
 verified: true
 lastVerifiedAt: 2026-03-15T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: be44b78f364f1c89
 ---
 
 <identity>

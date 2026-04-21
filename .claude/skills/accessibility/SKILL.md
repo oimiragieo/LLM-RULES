@@ -19,6 +19,9 @@ best_practices:
   - Do not require cognitive function tests in authentication flows
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 2a8a150aa22634b9
 ---
 
 # Accessibility Skill

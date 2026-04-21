@@ -15,6 +15,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: d6268e4c76fb5e05
 ---
 
 # Nodejs Expert

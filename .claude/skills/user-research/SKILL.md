@@ -31,6 +31,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-03-03'
+source: builtin
+trust_score: 100
+provenance_sha: a621c779a5e70dbe
 ---
 
 # User Research Skill

@@ -16,6 +16,9 @@ error_handling: graceful
 streaming: not_applicable
 verified: true
 lastVerifiedAt: 2026-03-15T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 4658c37a3793b006
 ---
 
 # Excel Spreadsheet Generation (xlsx)

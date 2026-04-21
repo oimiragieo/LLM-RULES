@@ -19,6 +19,9 @@ agents: [security-architect, developer, penetration-tester]
 category: security
 verified: true
 lastVerifiedAt: 2026-03-01T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: ab41e447fed58613
 ---
 
 # Building Secure Contracts Skill

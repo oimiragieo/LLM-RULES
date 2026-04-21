@@ -32,7 +32,7 @@
   ".claude\\lib\\memory\\memory-dashboard.cjs": 582,
   ".claude\\lib\\error-pattern-detector.cjs": 580,
   ".claude\\hooks\\safety\\validators\\database-validators.cjs": 579,
-  ".claude\\hooks\\routing\\spawn-prompt-assembler.runtime.cjs": 574,
+  ".claude\\hooks\\routing\\spawn-prompt-assembler.runtime.cjs": 615,
   ".claude\\lib\\memory\\findings-registry.cjs": 574,
   ".claude\\hooks\\routing\\post-task-unified.cjs": 573,
   ".claude\\lib\\creators\\creator-commons.cjs": 571,

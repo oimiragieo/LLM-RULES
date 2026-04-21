@@ -41,6 +41,9 @@ tags:
     dead-code,
     diagnostics,
   ]
+source: builtin
+trust_score: 100
+provenance_sha: 105804d94098c130
 ---
 
 # LSP Navigator

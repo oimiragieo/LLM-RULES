@@ -22,6 +22,9 @@ best_practices:
   - Preserve authorial voice and preferences across sections
 error_handling: strict
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: e765802e9e6abdd1
 ---
 
 # Doc Co-Authoring Workflow

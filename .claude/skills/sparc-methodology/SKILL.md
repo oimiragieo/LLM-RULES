@@ -22,6 +22,9 @@ tools:
   - Skill
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 39d235c8689bd68b
 ---
 
 # SPARC Methodology - Comprehensive Development Framework

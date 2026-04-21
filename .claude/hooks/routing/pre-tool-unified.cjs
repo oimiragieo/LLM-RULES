@@ -248,7 +248,11 @@ async function main() {
       const message = applyCircuitBreakerMessage(toolName, readSafetyResult.message, hookInput);
       console.log(formatResult('block', message));
       await emitToolBlocked(toolName, 'read_safety_violation');
-      process.exit(2);
+      // Deviation DR-1: converted ambiguous-read block to exit 3 (escalate) per ADR-2026-04-21.
+      // Read safety violations are policy-ambiguous: they may need human confirmation rather than
+      // a hard block. Exit 3 defers the tool call and surfaces a TaskUpdate(blocked) to the router.
+      console.error(`ESCALATE: blockerType=safety needsFrom=user blocker=read_safety_violation`);
+      process.exit(3);
     }
     if (readSafetyResult.action === 'rewrite' && readSafetyResult.rewrittenToolInput) {
       if (readSafetyResult.bypassWarning) {

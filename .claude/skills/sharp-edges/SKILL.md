@@ -15,6 +15,9 @@ best_practices:
   - Match your symptom against SE-01 through SE-07 before exploring new theories
   - If your bug is new and reproducible, add it to this catalogue
 error_handling: graceful
+source: builtin
+trust_score: 100
+provenance_sha: 6f5d33597c87879f
 ---
 
 # Sharp Edges

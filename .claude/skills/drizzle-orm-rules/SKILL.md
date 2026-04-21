@@ -20,6 +20,9 @@ best_practices:
   - Add $onUpdateFn for auto-updating updatedAt columns
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 0b7200117e764b92
 ---
 
 # Drizzle ORM Rules Skill

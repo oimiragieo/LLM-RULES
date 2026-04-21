@@ -1,6 +1,9 @@
 ---
 name: system-health-check
 description: Verifies repository baseline test passing state and available memory/GPU resources to ensure safe mission execution.
+source: builtin
+trust_score: 100
+provenance_sha: 60047103ac9e7045
 ---
 
 # System Health Check (Pre-Flight)

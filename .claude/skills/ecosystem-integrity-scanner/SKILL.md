@@ -24,6 +24,9 @@ error_handling: strict
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: b5a1fc74c0c14d01
 ---
 
 # Ecosystem Integrity Scanner

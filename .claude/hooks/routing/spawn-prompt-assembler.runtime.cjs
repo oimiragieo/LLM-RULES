@@ -1,8 +1,17 @@
-/* eslint max-lines: ["warn", 600] */
+/* eslint max-lines: ["warn", 650] */
 'use strict';
 
 const path = require('path');
 const fs = require('fs');
+
+// Token governor — pre-spawn budget check (S3)
+// Wrapped in try/catch so a missing module never blocks spawns (fail-open).
+let _tokenGovernor = null;
+try {
+  _tokenGovernor = require('../../lib/routing/token-governor.cjs');
+} catch (_e) {
+  // Fail-open: governor unavailable should never block spawns
+}
 
 const core = require('./spawn-prompt-assembler.core.cjs');
 const taskTools = require('./spawn-prompt-assembler.task-tools.cjs');
@@ -192,6 +201,38 @@ function prepareTaskSpawnContext(hookInput, sessionId) {
   }
 
   basePrompt = sanitizeTaskPrompt(basePrompt);
+
+  // === TOKEN GOVERNOR: pre-spawn budget check (S3) ===
+  if (_tokenGovernor) {
+    try {
+      const governorSessionId =
+        process.env.CLAUDE_SESSION_ID ||
+        process.env.SESSION_ID ||
+        hookInput.session_id ||
+        'unknown';
+      const budgetResult = _tokenGovernor.checkSpawnBudget(spawnAgentType, governorSessionId);
+      if (!budgetResult.allowed) {
+        return {
+          blockMessage:
+            `[TOKEN-GOVERNOR] Spawn blocked: agent "${spawnAgentType}" has exceeded its token budget ` +
+            `(TOKEN_GOVERNOR_HARD=on). Remaining: ${budgetResult.remaining}. ` +
+            'Reduce scope or disable TOKEN_GOVERNOR_HARD to override.',
+        };
+      }
+      if (budgetResult.warning) {
+        const warningTag =
+          budgetResult.warning === 'approaching_budget'
+            ? '[TOKEN-GOVERNOR WARNING] This agent is approaching its token budget. ' +
+              `Remaining: ${budgetResult.remaining} tokens. Be concise and efficient.`
+            : '[TOKEN-GOVERNOR WARNING] This agent has exceeded its token budget. ' +
+              `Remaining: ${budgetResult.remaining} tokens. TOKEN_GOVERNOR_HARD is off — spawn allowed.`;
+        basePrompt = `${warningTag}\n\n${basePrompt}`;
+      }
+    } catch (_govErr) {
+      // Fail-open: governor errors must never block spawns
+    }
+  }
+  // === END TOKEN GOVERNOR ===
 
   const explicitTaskId = toolInput.task_id || toolInput.id || null;
   basePrompt = normalizeTaskIdReferences(basePrompt, explicitTaskId);

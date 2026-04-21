@@ -20,6 +20,9 @@ error_handling: strict
 streaming: not_supported
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 1218b5a52d8f08cb
 ---
 
 # Template Renderer

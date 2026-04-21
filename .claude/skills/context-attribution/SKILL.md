@@ -15,6 +15,9 @@ best_practices:
   - Present results as a table with cumulative totals
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 31dc087efe2d9636
 ---
 
 # Context Attribution

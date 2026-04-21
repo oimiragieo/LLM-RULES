@@ -16,6 +16,9 @@ best_practices:
   - Use format-output.mjs to strip conversational text framing from JSON responses
 error_handling: graceful
 streaming: not_supported
+source: builtin
+trust_score: 100
+provenance_sha: 86c4c11e9df7f0cd
 ---
 
 # Claude CLI Skill

@@ -1,3 +1,9 @@
+---
+source: builtin
+trust_score: 100
+provenance_sha: 64ce784f47914cbd
+---
+
 # Codebase Exploration
 
 ## Overview

@@ -6,6 +6,9 @@ metadata:
   skill-author: K-Dense Inc.
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 1bdd2cc0fd4df8f9
 ---
 
 # scvi-tools

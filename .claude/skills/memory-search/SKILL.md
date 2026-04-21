@@ -28,6 +28,9 @@ best_practices:
   - Pair high-similarity results with explicit file reads for critical decisions
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: b17fbd9a4c17f016
 ---
 
 # Memory Search

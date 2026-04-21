@@ -19,6 +19,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-03-01T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 4f99f4c1be688483
 ---
 
 # YARA Authoring Skill

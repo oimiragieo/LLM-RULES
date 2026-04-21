@@ -7,6 +7,9 @@ invoked_by: [reverse-engineer, security-architect]
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: e85538ff632da926
 ---
 
 # Binary Analysis Patterns

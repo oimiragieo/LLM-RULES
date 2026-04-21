@@ -7,6 +7,9 @@ invoked_by: [reverse-engineer, security-architect]
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 36d61085315a22aa
 ---
 
 # Protocol Reverse Engineering

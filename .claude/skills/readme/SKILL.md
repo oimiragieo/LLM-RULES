@@ -10,6 +10,9 @@ tools:
   - Glob
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 10b7131c57ec2bc5
 ---
 
 # Readme Skill

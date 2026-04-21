@@ -27,6 +27,9 @@ tags:
   - chrome
 verified: true
 lastVerifiedAt: '2026-03-01T06:07:51.950Z'
+source: builtin
+trust_score: 100
+provenance_sha: f35ab7b318c94a5c
 ---
 
 # WebMCP Browser Tools

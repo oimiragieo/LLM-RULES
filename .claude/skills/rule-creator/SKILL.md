@@ -18,6 +18,9 @@ output_location: .claude/rules/
 verified: true
 lastVerifiedAt: '2026-02-28'
 dependencies: [research-synthesis]
+source: builtin
+trust_score: 100
+provenance_sha: 541cc04a82aab316
 ---
 
 # Rule Creator

@@ -15,6 +15,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: cd76bf9a59942cc5
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.

@@ -15,6 +15,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 299b19f0b54b849e
 ---
 
 # Mobile Ui Development Rule Skill

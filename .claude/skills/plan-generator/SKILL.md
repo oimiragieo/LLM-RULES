@@ -18,6 +18,9 @@ streaming: supported
 related_skills: [template-renderer, writing-plans]
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 7455ae00951a0074
 ---
 
 # Plan Generator Skill

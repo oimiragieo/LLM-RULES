@@ -31,6 +31,9 @@ streaming: supported
 output_location: .claude/context/artifacts/research-reports/
 verified: true
 lastVerifiedAt: '2026-02-28'
+source: builtin
+trust_score: 100
+provenance_sha: 41e818cfdae02d7a
 ---
 
 # Research Synthesis Skill

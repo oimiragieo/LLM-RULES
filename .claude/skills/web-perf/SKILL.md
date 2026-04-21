@@ -10,6 +10,9 @@ verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 version: 1.0.0
 tools: []
+source: builtin
+trust_score: 100
+provenance_sha: 9d50b4972d515fa3
 ---
 
 # Web Performance Audit

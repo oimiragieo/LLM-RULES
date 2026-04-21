@@ -17,6 +17,9 @@ best_practices:
   - Verify no conflicts after integration
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: d97d655a7c7ce130
 ---
 
 # Dispatching Parallel Agents

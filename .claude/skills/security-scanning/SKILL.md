@@ -12,6 +12,9 @@ tools:
   - Read
   - Write
   - Grep
+source: builtin
+trust_score: 100
+provenance_sha: c6195cf3c263847d
 ---
 
 # Security Scanning Skill

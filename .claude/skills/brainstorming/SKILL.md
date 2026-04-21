@@ -19,6 +19,9 @@ best_practices:
   - Explore 2-3 alternative approaches
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 4d97e8ca56ab52b0
 ---
 
 # Brainstorming Ideas Into Designs

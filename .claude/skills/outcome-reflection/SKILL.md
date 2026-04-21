@@ -31,6 +31,9 @@ related_skills:
   [reflection-agent, plan-generator, verification-before-completion, instinct-learning]
 verified: false
 lastVerifiedAt: 2026-03-23T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 94316edab5dba275
 ---
 
 # Outcome Reflection

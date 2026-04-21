@@ -9,6 +9,9 @@ tools: [Read, Bash]
 agents: [planner, architect, developer]
 category: 'Validation & Quality'
 tags: [planning, validation, quality, verification, plan]
+source: builtin
+trust_score: 100
+provenance_sha: 39175016f8e2f8ec
 ---
 
 # Plan Quality Verifier

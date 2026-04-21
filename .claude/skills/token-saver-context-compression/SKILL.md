@@ -1,3 +1,9 @@
+---
+source: builtin
+trust_score: 100
+provenance_sha: d2c972832558e537
+---
+
 # Token Saver Context Compression
 
 Alias for `context-compressor`. Provides context window optimization by compressing large payloads before reasoning.

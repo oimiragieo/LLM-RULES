@@ -15,6 +15,9 @@ dependencies: [research-synthesis]
 category: framework-management
 tags: [templates, updater, maintenance, framework]
 aliases: [update-template, refresh-template]
+source: builtin
+trust_score: 100
+provenance_sha: ed53cddae9aa5d7c
 ---
 
 # Template Updater

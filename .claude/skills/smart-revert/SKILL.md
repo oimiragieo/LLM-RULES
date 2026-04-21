@@ -19,6 +19,9 @@ best_practices:
   - Verify plan state after revert completes
 error_handling: strict
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 665f8d72f1662bda
 ---
 
 # Smart Revert

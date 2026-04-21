@@ -4,6 +4,9 @@ description: Document toolkit (.docx). Create/edit documents, tracked changes, c
 license: Proprietary. LICENSE.txt has complete terms
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 03c2145f9f944d51
 ---
 
 # DOCX creation, editing, and analysis

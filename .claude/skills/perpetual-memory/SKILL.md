@@ -2,6 +2,9 @@
 name: perpetual-memory
 description: Use when you need to auto-log all tool interactions into a self-organizing vector DB with instant recall. Intercepts interactions, extracts key information, generates embeddings, stores in LanceDB, auto-categorizes, and builds a retrieval index. Inspired by OpenClaw SQLite LCM + summary DAG pattern.
 version: 1.0.0
+source: builtin
+trust_score: 100
+provenance_sha: 68efb747a552dc90
 ---
 
 # Perpetual Memory

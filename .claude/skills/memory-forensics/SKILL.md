@@ -7,6 +7,9 @@ invoked_by: [reverse-engineer, security-architect, incident-responder]
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 7f3ede585d3c577a
 ---
 
 # Memory Forensics

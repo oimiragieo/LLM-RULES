@@ -15,6 +15,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: b4b5f8c3dd654f49
 ---
 
 # Tauri Svelte Ui Components Skill

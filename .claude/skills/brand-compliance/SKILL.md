@@ -18,6 +18,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-03-02T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: d89c3fa73b2ed997
 ---
 
 # Brand Compliance Skill

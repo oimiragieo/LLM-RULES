@@ -19,6 +19,9 @@ best_practices:
   - Privacy-by-design must be verified at design time, not retrofitted
 verified: true
 lastVerifiedAt: 2026-03-02T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: ae2e5e6290bfe9fe
 ---
 
 # Regulatory Compliance Skill

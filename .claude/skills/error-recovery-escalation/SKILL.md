@@ -18,6 +18,9 @@ error_handling:
   - If error type is ambiguous, default to level 2 (nudge)
   - If a level's timeout expires with no progress, escalate immediately
   - If level 5 is reached and still no output, emit empty partial result with explanation
+source: builtin
+trust_score: 100
+provenance_sha: cc29dc31711a102f
 ---
 
 # Error Recovery Escalation

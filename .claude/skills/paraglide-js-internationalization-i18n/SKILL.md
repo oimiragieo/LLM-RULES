@@ -18,6 +18,9 @@ best_practices:
   - Use as reference when writing new code
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 47af01232da0041b
 ---
 
 # Paraglide Js Internationalization I18n Skill

@@ -15,6 +15,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-03-15T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: a361ffad126b532e
 ---
 
 # Database Expert

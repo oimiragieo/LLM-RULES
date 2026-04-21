@@ -22,6 +22,9 @@ streaming: supported
 safety_level: high
 verified: true
 lastVerifiedAt: 2026-02-19T06:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: dfb83247cd099cff
 ---
 
 # Docker Compose Skill

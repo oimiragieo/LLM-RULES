@@ -27,6 +27,9 @@ streaming: supported
 output_location: .claude/templates/
 verified: true
 lastVerifiedAt: '2026-02-28'
+source: builtin
+trust_score: 100
+provenance_sha: 2464fc762fb36f07
 ---
 
 **Mode: Cognitive/Prompt-Driven** -- No standalone utility script; use via agent context.

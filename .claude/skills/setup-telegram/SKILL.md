@@ -10,6 +10,9 @@ invoked_by: user
 user_invocable: true
 error_handling: graceful
 verified: true
+source: builtin
+trust_score: 100
+provenance_sha: be8990003effcb06
 ---
 
 # Setup Telegram

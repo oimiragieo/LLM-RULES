@@ -7,6 +7,9 @@ invoked_by: [devops]
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: db6be73e2db8914d
 ---
 
 # Kubernetes Manifest Generator

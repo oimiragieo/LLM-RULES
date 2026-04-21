@@ -8,6 +8,9 @@ user_invocable: true
 tools: [Read, Write, Edit]
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 37123d88ce015615
 ---
 
 # Code Structural Search

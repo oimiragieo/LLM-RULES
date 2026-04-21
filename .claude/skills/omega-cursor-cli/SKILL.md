@@ -17,6 +17,9 @@ error_handling: graceful
 streaming: not_supported
 verified: true
 lastVerifiedAt: 2026-02-24T04:26:35.324Z
+source: builtin
+trust_score: 100
+provenance_sha: b58306e870296cba
 ---
 
 # Cursor CLI Skill

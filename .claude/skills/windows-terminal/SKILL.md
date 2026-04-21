@@ -17,6 +17,9 @@ best_practices:
   - Always use shell:false with array args (no shell injection risk)
   - Always call child.unref() after detached spawn
 error_handling: graceful
+source: builtin
+trust_score: 100
+provenance_sha: a39356dd7d195fe7
 ---
 
 # Windows Terminal Skill

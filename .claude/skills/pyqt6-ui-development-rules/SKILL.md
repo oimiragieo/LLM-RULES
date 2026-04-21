@@ -20,6 +20,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-03-01'
+source: builtin
+trust_score: 100
+provenance_sha: aab9454f75a64219
 ---
 
 # PyQt6 UI Development Rules Skill

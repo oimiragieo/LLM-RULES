@@ -13,6 +13,9 @@ user_invocable: true
 verified: true
 created_by: direct (retroactive attribution)
 compliance_status: legacy-direct-creation
+source: builtin
+trust_score: 100
+provenance_sha: b38f5f0d41d9a5b7
 ---
 
 <!-- Agent: nodejs-pro | Task: #12 | Session: 2026-03-08 -->

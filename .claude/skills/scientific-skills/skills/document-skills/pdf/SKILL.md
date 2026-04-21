@@ -4,6 +4,9 @@ description: PDF manipulation toolkit. Extract text/tables, create PDFs, merge/s
 license: Proprietary. LICENSE.txt has complete terms
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: bae75be7d13607e0
 ---
 
 # PDF Processing Guide

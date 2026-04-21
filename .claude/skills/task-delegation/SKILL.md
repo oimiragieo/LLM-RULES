@@ -9,6 +9,9 @@ tools:
   - TaskCreate
   - TaskUpdate
   - TaskGet
+source: builtin
+trust_score: 100
+provenance_sha: b185fcd399a7eb4e
 ---
 
 # Task Delegation Skill

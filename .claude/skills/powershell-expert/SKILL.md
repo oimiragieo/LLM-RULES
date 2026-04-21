@@ -19,6 +19,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-03-01'
+source: builtin
+trust_score: 100
+provenance_sha: e9a647ca32cddd3f
 ---
 
 # PowerShell Expert Skill

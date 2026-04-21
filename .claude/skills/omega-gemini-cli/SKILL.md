@@ -18,6 +18,9 @@ best_practices:
   - Set user expectations: simple queries ~2 min, large file/codebase review ~5-10 min
 error_handling: graceful
 streaming: not_supported
+source: builtin
+trust_score: 100
+provenance_sha: 2c82246edc8159e1
 ---
 
 # Gemini CLI Skill

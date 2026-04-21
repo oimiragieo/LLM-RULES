@@ -8,6 +8,9 @@ tools:
   - WebFetch
   - Read
   - Write
+source: builtin
+trust_score: 100
+provenance_sha: d770a4930c7ac77e
 ---
 
 # Atlassian Integration Skill

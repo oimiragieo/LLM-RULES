@@ -25,6 +25,9 @@ metadata:
   source: google-labs-code/stitch-skills
 verified: false
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 2e607d81f25f63b9
 ---
 
 # Enhance Prompt

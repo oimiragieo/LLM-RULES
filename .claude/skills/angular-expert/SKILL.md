@@ -20,6 +20,9 @@ best_practices:
   - Prioritize type safety and strict TypeScript
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: b8db4d5afb95f9de
 ---
 
 # Angular Expert

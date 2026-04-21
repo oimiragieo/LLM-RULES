@@ -28,6 +28,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-03-01'
+source: builtin
+trust_score: 100
+provenance_sha: e91a4c35aa7c28e0
 ---
 
 # Feature Flag Management Skill

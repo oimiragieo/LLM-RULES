@@ -15,6 +15,9 @@ best_practices:
   - Use shrinkage to get minimal counterexamples on failure
   - Combine with unit tests — property tests find edge cases, unit tests document examples
 error_handling: graceful
+source: builtin
+trust_score: 100
+provenance_sha: 5cad2a35e425e814
 ---
 
 # Property-Based Testing

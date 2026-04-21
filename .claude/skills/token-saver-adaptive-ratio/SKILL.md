@@ -1,3 +1,9 @@
+---
+source: builtin
+trust_score: 100
+provenance_sha: 31cd24bf51f50786
+---
+
 # Token Saver Adaptive Ratio
 
 Computes adaptive skeleton ratio based on corpus token count for context compression.

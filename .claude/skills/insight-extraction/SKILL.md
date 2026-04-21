@@ -12,9 +12,11 @@ best_practices:
   - Be specific about files, patterns, and gotchas
 error_handling: graceful
 streaming: supported
-source: auto-claude
+source: community
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+trust_score: 100
+provenance_sha: 33afe5ee90a44df9
 ---
 
 # Insight Extraction Skill

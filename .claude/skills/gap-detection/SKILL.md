@@ -15,6 +15,9 @@ best_practices:
   - Prioritize gaps by blast radius (public API > internal > test helpers)
   - Cross-reference README vs actual file structure
 error_handling: strict
+source: builtin
+trust_score: 100
+provenance_sha: 1e137837856ad9a8
 ---
 
 # Gap Detection

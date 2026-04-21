@@ -7,6 +7,9 @@ invoked_by: [devops]
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 74167dc2bb6175e6
 ---
 
 # Kubernetes Security Policies

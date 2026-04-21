@@ -14,6 +14,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 8bd467ca5da90b74
 ---
 
 <EXTREMELY-IMPORTANT>

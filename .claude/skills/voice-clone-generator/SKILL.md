@@ -5,6 +5,9 @@ description: >-
   profile from style-analyzer, constructs a style-constrained system prompt, generates content, and
   performs A/B comparison against original samples for quality verification.
 version: 1.0.0
+source: builtin
+trust_score: 100
+provenance_sha: bfc77010f8713433
 ---
 
 # Voice Clone Generator

@@ -2,6 +2,9 @@
 name: auto-recall
 description: Use when you need semantic retrieval from perpetual memory at query time. Parses query intent, searches vector store, ranks by relevance and recency, and injects context. Complements memory-search.cjs with the perpetual_memory LanceDB table.
 version: 1.0.0
+source: builtin
+trust_score: 100
+provenance_sha: 3d65fa4f13109af6
 ---
 
 # Auto-Recall

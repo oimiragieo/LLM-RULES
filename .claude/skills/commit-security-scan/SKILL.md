@@ -15,6 +15,9 @@ best_practices:
   - Handle errors gracefully
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: ac8c5507731d6d2c
 ---
 
 # Commit Security Scan

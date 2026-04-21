@@ -18,6 +18,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: d5c2f65fef572878
 ---
 
 # Astro Expert

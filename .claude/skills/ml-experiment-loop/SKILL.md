@@ -16,7 +16,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-03-14T00:00:00.000Z
-source: https://github.com/karpathy/autoresearch (MIT)
+source: community
+trust_score: 100
+provenance_sha: 09da70a2997c2199
 ---
 
 # ML Experiment Loop

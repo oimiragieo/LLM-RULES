@@ -13,6 +13,9 @@ invoked_by: both
 user_invocable: true
 error_handling: graceful
 verified: true
+source: builtin
+trust_score: 100
+provenance_sha: a3396a489b6a7e31
 ---
 
 # Scheduled Tasks & Heartbeat Skill

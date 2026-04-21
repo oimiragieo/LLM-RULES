@@ -21,6 +21,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-03-01'
+source: builtin
+trust_score: 100
+provenance_sha: 8b510b7ff762a6a6
 ---
 
 # Modern Python Skill

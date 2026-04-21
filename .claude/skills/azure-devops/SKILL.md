@@ -8,6 +8,9 @@ tools:
   - WebFetch
   - Read
   - Write
+source: builtin
+trust_score: 100
+provenance_sha: b474ce94dcd3e04a
 ---
 
 # Azure DevOps Skill

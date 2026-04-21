@@ -20,6 +20,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-03-15'
+source: builtin
+trust_score: 100
+provenance_sha: b90b8973d37f9886
 ---
 
 # Web Application Testing Skill

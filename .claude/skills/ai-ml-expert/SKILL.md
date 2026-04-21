@@ -16,6 +16,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-19T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 54c7d87f033bd4e4
 ---
 
 # AI/ML Expert

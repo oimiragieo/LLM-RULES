@@ -3,6 +3,9 @@ name: cron-runner
 description: 'Background orchestrator that drains the system-wide cron-actions-queue.jsonl queue safely, preventing LLM context pollution in the primary router.'
 type: agent-skill
 version: 1.0.0
+source: builtin
+trust_score: 100
+provenance_sha: 4624fb36de469fd2
 ---
 
 # Cron-Runner Background Subprocess

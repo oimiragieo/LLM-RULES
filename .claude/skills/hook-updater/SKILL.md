@@ -15,6 +15,9 @@ dependencies: [research-synthesis]
 category: framework-management
 tags: [hooks, updater, maintenance, framework]
 aliases: [update-hook, refresh-hook]
+source: builtin
+trust_score: 100
+provenance_sha: 88c33a7109c17122
 ---
 
 # Hook Updater

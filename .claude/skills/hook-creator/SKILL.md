@@ -21,6 +21,9 @@ streaming: supported
 output_location: .claude/hooks/
 verified: true
 lastVerifiedAt: '2026-02-28'
+source: builtin
+trust_score: 100
+provenance_sha: 27744e5a4bd0cae1
 ---
 
 # Hook Creator Skill

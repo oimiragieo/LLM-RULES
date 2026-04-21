@@ -24,6 +24,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-03-21'
+source: builtin
+trust_score: 100
+provenance_sha: d63e410901559410
 ---
 
 # Forum Monitor

@@ -16,6 +16,9 @@ best_practices:
   - Always specify output directory to keep files organized
   - Use --lang to skip auto-detection when the source language is known
 error_handling: strict
+source: builtin
+trust_score: 100
+provenance_sha: 37086464e5001125
 ---
 
 # Transcription

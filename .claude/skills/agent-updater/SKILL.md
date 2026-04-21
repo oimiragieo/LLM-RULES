@@ -12,6 +12,9 @@ streaming: supported
 verified: true
 lastVerifiedAt: '2026-02-28'
 dependencies: [research-synthesis]
+source: builtin
+trust_score: 100
+provenance_sha: 2bfb640149144c09
 ---
 
 # Agent Updater

@@ -8,6 +8,9 @@ user_invocable: true
 tools: [Read, Write, Edit, Bash, Grep, Glob]
 verified: true
 lastVerifiedAt: 2026-02-19T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: cd81656a1f27a001
 ---
 
 # Rust Expert

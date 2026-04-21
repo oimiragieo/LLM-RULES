@@ -19,6 +19,9 @@ best_practices:
   - Fix issues directly, don't just report
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: ae8aa9a72a7360f5
 ---
 
 # Specification Critique Skill

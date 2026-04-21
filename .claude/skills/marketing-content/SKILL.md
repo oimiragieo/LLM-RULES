@@ -17,6 +17,9 @@ best_practices:
   - Use human-AI collaboration model for highest quality
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: e44d2f5b4e49348d
 ---
 
 # Marketing Content Skill

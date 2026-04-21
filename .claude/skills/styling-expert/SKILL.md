@@ -15,6 +15,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 73eefcb5c7dbc0d6
 ---
 
 # Styling Expert

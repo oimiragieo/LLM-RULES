@@ -7,6 +7,9 @@ tools:
   - Bash
   - Write
   - Read
+source: builtin
+trust_score: 100
+provenance_sha: a198d112e1b44605
 ---
 
 # Imagen Generation Skill

@@ -1,3 +1,9 @@
+---
+source: builtin
+trust_score: 100
+provenance_sha: 2de56f048397bca1
+---
+
 # MCP Catalog Skill
 
 <!-- Agent: developer | Task: #task-mega-w3-wave4a | Session: 2026-03-14 -->

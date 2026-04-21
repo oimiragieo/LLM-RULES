@@ -6,6 +6,9 @@ metadata:
   skill-author: K-Dense Inc.
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 8b60c38523872ff0
 ---
 
 # COBRApy - Constraint-Based Reconstruction and Analysis

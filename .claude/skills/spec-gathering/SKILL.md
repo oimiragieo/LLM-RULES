@@ -12,9 +12,11 @@ best_practices:
   - Identify services and dependencies early
 error_handling: graceful
 streaming: supported
-source: auto-claude
+source: community
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+trust_score: 100
+provenance_sha: 88ad84d796ca19ad
 ---
 
 # Requirements Gathering Skill

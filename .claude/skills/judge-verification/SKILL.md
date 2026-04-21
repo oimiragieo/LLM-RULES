@@ -10,6 +10,9 @@ agents: [qa, developer, master-orchestrator, planner, code-reviewer]
 category: 'Validation & Quality'
 tags: [verification, judge, llm-evaluation, completion-gate, quality-assurance]
 error_handling: strict
+source: builtin
+trust_score: 100
+provenance_sha: 384542540f4ecdf3
 ---
 
 # Judge Verification

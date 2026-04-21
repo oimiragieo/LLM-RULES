@@ -22,6 +22,9 @@ tags:
     swarm,
     hierarchical,
   ]
+source: builtin
+trust_score: 100
+provenance_sha: f26244608372ac6b
 ---
 
 # Multi-Agent Architecture Reference

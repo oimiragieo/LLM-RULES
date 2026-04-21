@@ -16,6 +16,9 @@ best_practices:
   - Use bounded repair loops and anti-test-hacking checks before completion
 error_handling: strict
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 290a7fd993785874
 ---
 
 # Test-Driven Development (TDD)

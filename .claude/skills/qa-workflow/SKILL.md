@@ -18,6 +18,9 @@ best_practices:
   - Fix what QA found, don't add features
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 20cc308c655217c9
 ---
 
 # QA Workflow Skill

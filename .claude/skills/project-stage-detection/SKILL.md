@@ -9,6 +9,9 @@ tools: [Read, Bash, Glob, Grep]
 agents: [planner, architect, developer, master-orchestrator]
 category: 'Validation & Quality'
 tags: [project-health, onboarding, maturity, detection, routing]
+source: builtin
+trust_score: 100
+provenance_sha: 2ecf6e7022656fd9
 ---
 
 # Project Stage Detection

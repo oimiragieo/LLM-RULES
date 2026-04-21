@@ -22,6 +22,9 @@ best_practices:
   - Keep all state in React — no external APIs unless explicitly requested
 error_handling: strict
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 3a18fe16895a3c27
 ---
 
 # Web Artifacts Builder

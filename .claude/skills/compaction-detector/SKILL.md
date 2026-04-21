@@ -15,6 +15,9 @@ best_practices:
   - Handle errors gracefully
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 4d2a925398265bc8
 ---
 
 # Compaction Detector

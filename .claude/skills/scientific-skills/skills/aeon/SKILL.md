@@ -6,6 +6,9 @@ metadata:
   skill-author: K-Dense Inc.
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 01e8b7eabdb072a0
 ---
 
 # Aeon Time Series Machine Learning

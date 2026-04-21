@@ -13,6 +13,9 @@ tools:
   - Grep
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 2ca856bc090f3a52
 ---
 
 # Context-Driven Development

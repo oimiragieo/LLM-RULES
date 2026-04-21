@@ -17,6 +17,9 @@ streaming: supported
 templates: [dependency-report, update-plan, security-audit]
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 30a049f886416e48
 ---
 
 # Dependency Analyzer Skill

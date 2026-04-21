@@ -14,6 +14,9 @@ best_practices:
   - Report structured results for downstream consumption
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: a1cc590ab2e08efb
 ---
 
 # Goal-Backward Verification

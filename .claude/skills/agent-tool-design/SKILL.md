@@ -17,6 +17,9 @@ best_practices:
   - Tools are idempotent (safe to retry)
   - Partial failure returns partial results rather than throws
 error_handling: graceful
+source: builtin
+trust_score: 100
+provenance_sha: 4e11dcf3976f7b80
 ---
 
 # Agent Tool Design

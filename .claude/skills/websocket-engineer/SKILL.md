@@ -16,6 +16,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-03-14T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: b764f6418ee0192b
 ---
 
 # WebSocket Engineer Skill

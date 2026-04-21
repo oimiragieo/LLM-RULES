@@ -23,6 +23,9 @@ error_handling: strict
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 89a1a99e97a88406
 ---
 
 # Stale Module Pruner

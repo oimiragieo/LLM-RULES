@@ -7,6 +7,9 @@ metadata:
   skill-author: K-Dense Inc.
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 2dc0e4565fc3175a
 ---
 
 # Benchling Integration

@@ -18,6 +18,9 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 9ea3a61c1e3fa4e8
 ---
 
 # Elixir Expert

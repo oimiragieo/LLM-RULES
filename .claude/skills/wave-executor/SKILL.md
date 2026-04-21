@@ -27,6 +27,9 @@ best_practices:
   - Monitor inventory file for progress between waves
 error_handling: strict
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: e54358fefd08d215
 ---
 
 # Wave Executor

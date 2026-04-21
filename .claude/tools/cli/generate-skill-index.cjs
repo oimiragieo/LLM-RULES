@@ -277,12 +277,21 @@ function scanSkillFilesRecursively(baseDir, relativePath = '') {
           // e.g. 'scientific-skills/skills/rdkit' -> 'scientific-skills/rdkit'
           skillKey = skillKey.replace(/\/skills\//g, '/');
 
+          // Extract provenance fields for ArXiv [2504.19951]+[2602.14798] tool-squatting defense
+          const yaml2 = frontmatterMatch ? frontmatterMatch[1] : '';
+          const srcM = yaml2.match(/^source:\s*(.+)$/m);
+          const tsM = yaml2.match(/^trust_score:\s*(\d+)$/m);
+          const shaM = yaml2.match(/^provenance_sha:\s*([0-9a-fA-F]{16})$/m);
+
           skills[skillKey] = {
             name: skillKey,
             hasSkillFile: true,
             hasFrontmatter: !!frontmatterMatch,
             description,
             tools,
+            provenanceSource: srcM ? srcM[1].trim() : null,
+            provenanceTrustScore: tsM ? parseInt(tsM[1], 10) : null,
+            provenanceSha: shaM ? shaM[1].trim() : null,
           };
 
           // Stop recursing if this is already a full skill to avoid phantom sub-skills in its subdirectories
@@ -645,6 +654,40 @@ function main() {
       process.exit(0);
     } else {
       console.log('\nIndex validation failed.');
+      process.exit(1);
+    }
+  }
+
+  // Provenance validation gate — every SKILL.md must have source, trust_score, provenance_sha
+  // Validates ArXiv [2504.19951] + [2602.14798] against tool-squatting
+  if (scan) {
+    const {
+      validateSkillProvenance: _validateProv,
+    } = require('../../lib/validation/skill-provenance.cjs');
+    const scannedForProv = scanSkillFilesRecursively(SKILLS_DIR);
+    const missingProv = [];
+    for (const [skillKey, meta] of Object.entries(scannedForProv)) {
+      if (isArchivedSkillName(skillKey)) continue;
+      const result = _validateProv(
+        {
+          source: meta.provenanceSource,
+          trust_score: meta.provenanceTrustScore,
+          provenance_sha: meta.provenanceSha,
+        },
+        skillKey + '/SKILL.md'
+      );
+      if (!result.valid) missingProv.push({ skillKey, errors: result.errors });
+    }
+    if (missingProv.length > 0) {
+      console.error('\nProvenance validation FAILED — missing fields in SKILL.md files:');
+      for (const { skillKey, errors } of missingProv) {
+        console.error(`\n  ${skillKey}/SKILL.md:`);
+        for (const err of errors) console.error(`    - ${err}`);
+      }
+      console.error(`\n${missingProv.length} skill(s) missing provenance fields.`);
+      console.error(
+        'Run: node .claude/tools/cli/skills-provenance-migrate.cjs to add them automatically.'
+      );
       process.exit(1);
     }
   }

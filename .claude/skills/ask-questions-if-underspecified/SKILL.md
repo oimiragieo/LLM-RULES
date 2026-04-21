@@ -17,6 +17,9 @@ best_practices:
   - Handle errors gracefully
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 5fa7e785c76f411b
 ---
 
 # Ask Questions If Underspecified

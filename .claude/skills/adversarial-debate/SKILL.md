@@ -20,6 +20,9 @@ streaming: supported
 related_skills: [llm-council, advanced-elicitation, plan-generator, sequential-thinking]
 verified: false
 lastVerifiedAt: 2026-03-23T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 7224309708e7a1c4
 ---
 
 # Adversarial Debate

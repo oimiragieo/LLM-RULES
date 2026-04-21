@@ -22,6 +22,9 @@ best_practices:
   - Never truncate user inputs — discuss options instead
 error_handling: strict
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 13eb18938323db2e
 ---
 
 # Claude API & Agent SDK

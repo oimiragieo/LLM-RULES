@@ -17,6 +17,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: bef705454e10ccb7
 ---
 
 # Gemini CLI Security Skill

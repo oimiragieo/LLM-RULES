@@ -19,6 +19,9 @@ best_practices:
   - Access tokens ≤15 minutes, refresh token rotation required
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 4d76970b6c00ad18
 ---
 
 # Authentication Flow Rules Skill

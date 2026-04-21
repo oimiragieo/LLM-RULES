@@ -15,6 +15,9 @@ best_practices:
   - Set confidence honestly; overconfidence poisons the global pool
   - Review promoted instincts for cross-project validity before relying on them
 error_handling: strict
+source: builtin
+trust_score: 100
+provenance_sha: 6bed08492dc2f1d0
 ---
 
 # Instinct Learning

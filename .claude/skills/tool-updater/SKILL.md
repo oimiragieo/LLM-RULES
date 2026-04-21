@@ -15,6 +15,9 @@ dependencies: [research-synthesis]
 category: framework-management
 tags: [tools, cli, updater, maintenance, framework]
 aliases: [update-tool, refresh-tool]
+source: builtin
+trust_score: 100
+provenance_sha: 414c640407561b93
 ---
 
 # Tool Updater

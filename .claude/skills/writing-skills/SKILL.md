@@ -16,6 +16,9 @@ error_handling: strict
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: d03c39de69a26581
 ---
 
 # Writing Skills

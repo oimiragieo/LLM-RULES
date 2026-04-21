@@ -16,6 +16,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 0417ac48c5242cbc
 ---
 
 # Architecture Review Skill

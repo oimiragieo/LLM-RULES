@@ -12,6 +12,9 @@ invoked_by: both
 user_invocable: true
 error_handling: graceful
 verified: false
+source: builtin
+trust_score: 100
+provenance_sha: 9af60d6bb6fffa11
 ---
 
 <!-- Agent: nodejs-pro | Task: #7 | Session: 2026-03-09 -->

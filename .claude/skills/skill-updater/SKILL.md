@@ -12,6 +12,9 @@ streaming: supported
 verified: true
 lastVerifiedAt: '2026-02-28'
 dependencies: [research-synthesis]
+source: builtin
+trust_score: 100
+provenance_sha: 0c2596850aeda316
 ---
 
 # Skill Updater

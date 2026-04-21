@@ -15,6 +15,9 @@ best_practices:
 error_handling: graceful
 verified: true
 lastVerifiedAt: 2026-03-01T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 0218e724e27c08a5
 ---
 
 # Context Degradation Monitor

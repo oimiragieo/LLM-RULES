@@ -15,6 +15,9 @@ best_practices:
   - Track phase state in .claude/context/plans/ for resumability
   - Never advance to the next phase without explicit exit criteria verification
 error_handling: strict
+source: builtin
+trust_score: 100
+provenance_sha: afba8c1693518474
 ---
 
 # Team Orchestration

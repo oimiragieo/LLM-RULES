@@ -9,6 +9,9 @@ tools: [Read, Write, Edit, Bash]
 agents: [developer, devops]
 category: 'DevOps & Infrastructure'
 tags: [cloudflare, workers, edge, durable-objects, kv, r2, d1, ai-gateway, workers-ai, wrangler]
+source: builtin
+trust_score: 100
+provenance_sha: fd9a3b7a605ad643
 ---
 
 # Cloudflare Workers Skill

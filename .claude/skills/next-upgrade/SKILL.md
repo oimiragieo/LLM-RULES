@@ -26,6 +26,9 @@ metadata:
   source: vercel-labs/next-skills
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 26f89a058b387527
 ---
 
 # Next.js Upgrade Workflow

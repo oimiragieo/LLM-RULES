@@ -11,6 +11,9 @@ user_invocable: false
 model: sonnet
 error_handling: graceful
 verified: true
+source: builtin
+trust_score: 100
+provenance_sha: f10e877f6b0f2fb9
 ---
 
 <!-- Agent: developer | Task: #task-23 | Session: 2026-03-15 -->

@@ -20,6 +20,9 @@ best_practices:
   - Always await all Promises in Convex functions
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: c5db9a093b5c8dff
 ---
 
 # Convex Development General Skill

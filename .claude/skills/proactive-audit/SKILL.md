@@ -24,6 +24,9 @@ error_handling: strict
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-23T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 7cb12aa5e0ac92fe
 ---
 
 # Proactive Audit

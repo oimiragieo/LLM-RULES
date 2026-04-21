@@ -9,6 +9,9 @@ compatibility: Python 3.10+
 tools: [Read, Write, Bash]
 verified: true
 lastVerifiedAt: '2026-03-18'
+source: builtin
+trust_score: 100
+provenance_sha: 564ef982c99ea814
 ---
 
 # Context Compressor

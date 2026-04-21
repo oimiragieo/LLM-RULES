@@ -27,6 +27,9 @@ tags:
   - peft
   - lora
   - spaces
+source: builtin
+trust_score: 100
+provenance_sha: b9c9f0f8263cfe4f
 ---
 
 # Hugging Face Skill

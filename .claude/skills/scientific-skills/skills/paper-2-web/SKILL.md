@@ -7,6 +7,9 @@ metadata:
   skill-author: K-Dense Inc.
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 6ab9e66801e37071
 ---
 
 # Paper2All: Academic Paper Transformation Pipeline

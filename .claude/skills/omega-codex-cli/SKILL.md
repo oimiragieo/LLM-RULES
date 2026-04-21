@@ -16,6 +16,9 @@ best_practices:
   - Use --sandbox for isolated workspace-write mode
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 66a8622b60104fdd
 ---
 
 # Codex CLI Skill

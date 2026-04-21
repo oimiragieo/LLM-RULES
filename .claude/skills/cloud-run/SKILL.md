@@ -17,6 +17,9 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: false
+source: builtin
+trust_score: 100
+provenance_sha: b13db5d3a2eee6b1
 ---
 
 # Cloud Run

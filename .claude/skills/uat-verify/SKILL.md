@@ -8,6 +8,9 @@ tools:
   - Grep
   - Glob
   - TaskUpdate
+source: builtin
+trust_score: 100
+provenance_sha: be9f7b3ee10b09d8
 ---
 
 # UAT Verify Skill

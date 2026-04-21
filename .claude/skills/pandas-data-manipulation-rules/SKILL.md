@@ -15,6 +15,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 37a6c0310100895f
 ---
 
 # Pandas Data Manipulation Rules Skill

@@ -15,6 +15,9 @@ best_practices:
   - Run load tests against staging, never production
   - Fuzz boundary conditions (empty strings, max integers, unicode)
 error_handling: graceful
+source: builtin
+trust_score: 100
+provenance_sha: 65133b6e97f991e4
 ---
 
 # API Testing

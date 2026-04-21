@@ -17,6 +17,9 @@ streaming: supported
 templates: [api-docs, developer-guide, architecture-docs, user-manual]
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: adc762ab56c3f8b3
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.

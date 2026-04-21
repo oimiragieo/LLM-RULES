@@ -25,6 +25,9 @@ output_location: .claude/agents/
 verified: true
 lastVerifiedAt: '2026-02-28'
 dependencies: [research-synthesis]
+source: builtin
+trust_score: 100
+provenance_sha: 7c35f8976f0fcb92
 ---
 
 **Mode: Script-First** - Use `scripts/main.cjs` as the canonical path for generation and validation, then use this guide for research, skill assignment, and integration follow-through.

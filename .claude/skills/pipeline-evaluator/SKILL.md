@@ -11,6 +11,9 @@ tags:
   - quality
   - pipeline
   - metrics
+source: builtin
+trust_score: 100
+provenance_sha: 01f1aaf20ca83662
 ---
 
 # Pipeline Evaluator

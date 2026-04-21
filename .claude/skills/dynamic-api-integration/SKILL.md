@@ -20,6 +20,9 @@ best_practices:
   - Handle errors explicitly with retry logic for transient failures
 error_handling: strict
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: ef94e12361c4dee5
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.

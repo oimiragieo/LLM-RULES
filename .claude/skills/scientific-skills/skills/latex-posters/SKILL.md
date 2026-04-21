@@ -7,6 +7,9 @@ metadata:
   skill-author: K-Dense Inc.
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: b0391dc60c310b17
 ---
 
 # LaTeX Research Posters

@@ -17,6 +17,9 @@ error_handling: strict
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 484c1a6d58730563
 ---
 
 # Finishing a Development Branch

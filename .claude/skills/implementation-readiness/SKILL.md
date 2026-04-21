@@ -14,6 +14,9 @@ best_practices:
   - Produce structured pass/fail verdict with reasons
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 3b709cb6f8c80bf6
 ---
 
 # Implementation Readiness Gate

@@ -4,6 +4,9 @@ description: Presentation toolkit (.pptx). Create/edit slides, layouts, content,
 license: Proprietary. LICENSE.txt has complete terms
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 169c069da0c2d8d6
 ---
 
 # PPTX creation, editing, and analysis

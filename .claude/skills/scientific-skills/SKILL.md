@@ -24,6 +24,9 @@ tools:
   - Task
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 6ef5e44f42f7ff66
 ---
 
 # Claude Scientific Skills

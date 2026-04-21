@@ -18,6 +18,9 @@ best_practices:
   - Handle errors gracefully
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: eaa0ef4d6249ad4e
 ---
 
 # Hooks Explainer

@@ -4,6 +4,9 @@ description: Design system lookup, CSS best practices, and AI-driven UI componen
 version: 1.0.0
 category: frontend
 agents: [frontend-pro, ui-components-expert, mobile-ux-reviewer]
+source: builtin
+trust_score: 100
+provenance_sha: fefc201ea6bce701
 ---
 
 # Design Systems

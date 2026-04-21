@@ -10,6 +10,9 @@ args: '[--auto-fix] [--report-only]'
 agents: [memory-manager, qa, architect, developer]
 category: 'Memory & Context'
 tags: [memory, audit, health-check, observability, dedup]
+source: builtin
+trust_score: 100
+provenance_sha: 4bed29f9a7558a70
 ---
 
 # Memory Audit

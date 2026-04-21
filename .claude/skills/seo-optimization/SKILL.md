@@ -35,6 +35,9 @@ tags:
   - ai-search
   - marketing
   - aso
+source: builtin
+trust_score: 100
+provenance_sha: a6e25d039c93512e
 ---
 
 <!-- Agent: developer | Task: #14 | Session: 2026-03-02 -->

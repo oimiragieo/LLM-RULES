@@ -1,3 +1,9 @@
+---
+source: builtin
+trust_score: 100
+provenance_sha: 323f2531fc4f8d0f
+---
+
 # Token Saver Memory Dedup
 
 Deduplicates memory records against existing memory files to prevent duplicate entries.

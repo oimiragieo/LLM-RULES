@@ -16,6 +16,9 @@ best_practices:
   - Use CHANNEL_AUTO_START=true in .env only for supervised production environments
 error_handling: strict
 streaming: not-applicable
+source: builtin
+trust_score: 100
+provenance_sha: 76303e7de92f80e4
 ---
 
 # Channel Management

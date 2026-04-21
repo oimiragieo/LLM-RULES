@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { findProjectRoot } = require('../../lib/utils/project-root.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
+const { dispatchExitCode } = require('../../lib/routing/hook-exit-dispatcher.cjs');
 
 function detectProjectRoot(cwd = process.cwd()) {
   const fromCwd = findProjectRoot(cwd);
@@ -70,9 +71,18 @@ function main() {
   const HookRunner = require('../../lib/utils/hook-runner.cjs');
   const runner = new HookRunner({ projectRoot, env: buildHookEnv(process.env) });
 
+  // Capture stderr for exit-code dispatcher (codes 3/4 need stderr for trailer parsing)
+  const taskId = process.env.CLAUDE_TASK_ID || process.env.TASK_ID || null;
+
   runner
-    .run(scriptPath, hookArgs)
-    .then(code => {
+    .runProcess(scriptPath, hookArgs, { captureStderr: true })
+    .then(result => {
+      const { code, stderr } = typeof result === 'object' ? result : { code: result, stderr: '' };
+      const dispatch = dispatchExitCode({ code, stderr, hookName }, { taskId });
+      if (dispatch.action === 'noop' && dispatch.anomaly) {
+        console.error(`[run-hook] anomaly: ${dispatch.anomaly.message}`);
+      }
+      // Dispatcher result is informational for routing layer; hook exit code is authoritative
       process.exit(code);
     })
     .catch(err => {

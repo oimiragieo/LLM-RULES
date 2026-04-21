@@ -18,6 +18,9 @@ best_practices:
   - Use as reference when writing new code
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 6f97772f668a2607
 ---
 
 # Fiber Logging And Project Structure Skill

@@ -1,6 +1,9 @@
 ---
 name: init
 description: Auto-evolution skill to initialize a new repository with AGENTS.md localized context.
+source: builtin
+trust_score: 100
+provenance_sha: f09da555064b0ec3
 ---
 
 # Ecosystem Initialization (Init Skill)

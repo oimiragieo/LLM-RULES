@@ -15,6 +15,9 @@ best_practices:
   - Never load entire session file into memory — use grep + head/tail
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 7d5ff1504fb773e1
 ---
 
 # Session Log Analyzer

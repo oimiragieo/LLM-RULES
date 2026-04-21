@@ -9,6 +9,9 @@ created_by: skill-creator
 compliance_status: created-via-research-synthesis
 research_synthesis: true
 verified: true
+source: builtin
+trust_score: 100
+provenance_sha: 16e3fa3301dfb5c6
 ---
 
 # MarkItDown Converter Skill

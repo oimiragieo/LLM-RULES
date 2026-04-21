@@ -17,6 +17,9 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: false
+source: builtin
+trust_score: 100
+provenance_sha: 835ae2fba8301b6f
 ---
 
 # Figma

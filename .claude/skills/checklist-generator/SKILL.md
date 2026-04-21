@@ -16,6 +16,9 @@ error_handling: strict
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 7f32590284a76ab2
 ---
 
 # Quality Checklist Generator

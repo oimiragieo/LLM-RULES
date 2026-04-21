@@ -10,6 +10,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-04-04T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 4fc4c548f837b0f1
 ---
 
 # Assimilate

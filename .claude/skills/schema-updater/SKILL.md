@@ -15,6 +15,9 @@ dependencies: [research-synthesis]
 category: framework-management
 tags: [schemas, updater, maintenance, framework, json-schema]
 aliases: [update-schema, refresh-schema]
+source: builtin
+trust_score: 100
+provenance_sha: 4865f95be2ca25db
 ---
 
 # Schema Updater

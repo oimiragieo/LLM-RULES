@@ -22,6 +22,9 @@ output_location: .claude/schemas/
 verified: true
 lastVerifiedAt: '2026-02-28'
 dependencies: [research-synthesis]
+source: builtin
+trust_score: 100
+provenance_sha: 03770a6e40541670
 ---
 
 # Schema Creator Skill

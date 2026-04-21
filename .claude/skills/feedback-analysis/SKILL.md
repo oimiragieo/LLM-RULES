@@ -20,6 +20,9 @@ best_practices:
   - Always produce an actionable output — analysis without action has no value
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: db198bf01e37b2d9
 ---
 
 # Feedback Analysis

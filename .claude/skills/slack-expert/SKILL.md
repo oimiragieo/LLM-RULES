@@ -16,6 +16,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-03-14T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 5d2e560139ce9700
 ---
 
 # Slack Expert Skill

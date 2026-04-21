@@ -22,6 +22,9 @@ best_practices:
   - Create 10 independent evaluation questions per server
 error_handling: strict
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: 45d11b9bdbe993f2
 ---
 
 # MCP Server Development Guide

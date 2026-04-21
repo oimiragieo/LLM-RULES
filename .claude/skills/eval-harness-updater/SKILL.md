@@ -11,6 +11,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-02-28'
+source: builtin
+trust_score: 100
+provenance_sha: f594f3fa3d95dc6a
 ---
 
 # Eval Harness Updater

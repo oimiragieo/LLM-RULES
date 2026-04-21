@@ -15,6 +15,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 84d68686d5e39800
 ---
 
 # Code Quality Expert

@@ -19,6 +19,9 @@ best_practices:
   - Document evaluation verdicts in task metadata for traceability
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: cd4fd70eeb53b06c
 ---
 
 # Agent Evaluation

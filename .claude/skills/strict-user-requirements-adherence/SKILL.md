@@ -18,6 +18,9 @@ best_practices:
   - Use as reference when writing new code
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: bd1ece891a015ee3
 ---
 
 # Strict User Requirements Adherence Skill

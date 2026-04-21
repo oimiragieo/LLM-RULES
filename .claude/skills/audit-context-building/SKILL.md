@@ -18,6 +18,9 @@ streaming: supported
 agents: [security-architect, code-reviewer, developer]
 verified: true
 lastVerifiedAt: 2026-03-01T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: d501e2508e0a2fa2
 ---
 
 # Audit Context Building Skill

@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-04-21 — Durability, Observability, Guardrails
+
+Hygiene+ minor release adding pipeline-resilience primitives: distributed tracing, per-agent token budgeting, a formal hook exit-code contract, saga-style compensation on task failure, and skill provenance enforcement.
+
+### Added
+
+- **S1** — Unified-creator-guard regression suite (9 tests) locking in plan-path permissiveness (`tests/hooks/unified-creator-guard-planner-exemption.test.cjs`)
+- **S2** — `trace-recorder` PostToolUse hook emitting OpenTelemetry GenAI JSONL traces; `pnpm trace:view` CLI with `--agent`, `--session`, `--limit`, `--tail` filters; registered in `settings.json`
+- **S3** — Per-agent token governor (`lib/routing/token-governor.cjs`) with pre-spawn budget check wired into `spawn-prompt-assembler.runtime.cjs`; soft-WARN default, HARD block via `TOKEN_GOVERNOR_MODE=hard`
+- **S4** — Hook exit-code contract ADR (`context/artifacts/analysis/hook-exit-code-contract-2026-04-21.md`); `hook-exit-dispatcher.cjs` — exit 3 escalates via `TaskUpdate(blocked)`, exit 4 retries with haiku (max 2); pilot conversion of `pre-tool-unified.cjs` read-safety violations to exit 3
+- **S5** — Saga compensation (`lib/hooks/saga-compensation.cjs`) on `TaskUpdate(failed)`: reopens blocked-by deps, git-stash if staged changes, append-only compensation log; wired into `post-task-unified.cjs`
+- **S6** — Skill provenance fields (`source`, `trust_score`, `provenance_sha`) enforced by skills-index validator; `skills-provenance-migrate.cjs` CLI + `lib/validation/skill-provenance.cjs`; 484 skills retrofitted
+- **S7** — Briefings directory scaffold (`.claude/context/reports/briefings/.gitkeep`)
+
+### Changed
+
+- `heartbeat` SKILL.md → v1.1.0: explicit cron session-scope callout (subagents cannot `CronCreate`)
+- `pre-tool-unified.cjs` read-safety block now uses exit 3 (escalate) instead of exit 2 (hard block)
+- Module-size baseline updated: `spawn-prompt-assembler.runtime.cjs` 574 → 615 lines (S3 integration)
+- `saga-compensation.cjs` git stash spawn uses `windowsHide: true` (windows-hide guardrail)
+
+### Docs
+
+- ADR: `hook-exit-code-contract-2026-04-21.md` — formal contract for hook exit codes 0/2/3/4
+
+### Research Validation
+
+- ArXiv [2503.11951] SagaLLM — transactional compensation for multi-agent planning (S5)
+- ArXiv [2604.11088] — negative-constraint hooks outperform positive directives (S4)
+- ArXiv [2504.19951] + [2602.14798] — tool squatting via untrusted registries (S6)
+- OpenTelemetry GenAI semantic conventions Q1 2026 ratified (S2)
+
+### Tests
+
+40 new slice tests (9 + 5 + 6 + 8 + 6 + 6). Total: 6298 pass, 1 skip, 0 fail.
+
 ## [2.2.0] - 2026-04-21
 
 ### Changed

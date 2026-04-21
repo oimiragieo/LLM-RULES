@@ -5,11 +5,13 @@ version: 1.1.0
 model: sonnet
 invoked_by: agent
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-source: trailofbits/skills
+source: community
 source_license: CC-BY-SA-4.0
 source_url: https://github.com/trailofbits/skills/tree/main/skills/insecure-defaults
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+trust_score: 100
+provenance_sha: 39b0e977cef0cc24
 ---
 
 <!-- Source: Trail of Bits | License: CC-BY-SA-4.0 | Adapted: 2026-02-09 -->

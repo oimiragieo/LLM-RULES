@@ -14,6 +14,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: e27d7e9dff54753d
 ---
 
 # Google Cloud CLI Skill

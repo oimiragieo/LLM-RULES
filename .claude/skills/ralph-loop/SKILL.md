@@ -25,6 +25,9 @@ skills:
   - context-compressor
   - verification-before-completion
   - memory-search
+source: builtin
+trust_score: 100
+provenance_sha: 221ae87fea360d43
 ---
 
 # Ralph Loop

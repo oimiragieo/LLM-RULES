@@ -15,6 +15,9 @@ best_practices:
   - Handle API rate limits with exponential backoff
   - Validate text length before API call (OpenAI max 4096 chars per request)
 error_handling: strict
+source: builtin
+trust_score: 100
+provenance_sha: e5bb24bfa4f8179d
 ---
 
 # TTS Generation

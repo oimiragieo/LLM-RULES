@@ -18,6 +18,9 @@ best_practices:
   - Enforce in CI/CD pipelines
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: ef16e68537194a80
 ---
 
 **References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — commit validation logic inspired by claude-flow v3 git-commit hook, everything-claude-code commitlint.

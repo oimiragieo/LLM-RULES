@@ -16,6 +16,9 @@ error_handling: graceful
 streaming: not_applicable
 verified: false
 lastVerifiedAt: 2026-03-14T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 80f0f303c91643b1
 ---
 
 # Electron Pro Skill

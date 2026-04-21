@@ -11,6 +11,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
+source: builtin
+trust_score: 100
+provenance_sha: 0b1bc6cde6c722e2
 ---
 
 # Compliance Policy Check

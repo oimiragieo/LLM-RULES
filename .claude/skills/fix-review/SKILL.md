@@ -20,6 +20,9 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-03-01'
+source: builtin
+trust_score: 100
+provenance_sha: 8295c8c9743146ad
 ---
 
 # Fix Review Skill

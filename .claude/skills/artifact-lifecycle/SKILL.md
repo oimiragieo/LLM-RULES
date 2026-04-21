@@ -17,6 +17,9 @@ metadata:
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 tools: [Read, Write, Edit, Bash, Glob, Grep]
+source: builtin
+trust_score: 100
+provenance_sha: e810e2c430ad41d9
 ---
 
 # Artifact Lifecycle Skill

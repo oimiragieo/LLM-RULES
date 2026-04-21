@@ -15,6 +15,9 @@ error_handling: graceful
 streaming: supported
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: d4c9b0135b6f98d8
 ---
 
 # Seo And Meta Tags In Sveltekit Skill

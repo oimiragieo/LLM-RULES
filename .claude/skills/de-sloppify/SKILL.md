@@ -15,6 +15,9 @@ best_practices:
   - Produce a diff so reviewers can verify no logic was altered
   - Run pnpm lint:fix and pnpm format after cleanup completes
 error_handling: strict
+source: builtin
+trust_score: 100
+provenance_sha: 48a60a5cbfbc95d4
 ---
 
 # De-Sloppify

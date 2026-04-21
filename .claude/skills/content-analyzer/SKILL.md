@@ -23,6 +23,9 @@ best_practices:
   - Report confidence levels alongside every finding
 error_handling: graceful
 streaming: supported
+source: builtin
+trust_score: 100
+provenance_sha: ebf8346cd1354006
 ---
 
 <!-- Agent: developer | Task: #14 | Session: 2026-03-21 -->

@@ -10,6 +10,9 @@ verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 version: 1.0.0
 tools: []
+source: builtin
+trust_score: 100
+provenance_sha: 1576a2d30e4b3591
 ---
 
 # shadcn/ui Expert

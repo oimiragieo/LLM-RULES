@@ -5,11 +5,13 @@ version: 1.1.0
 model: sonnet
 invoked_by: agent
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-source: trailofbits/skills
+source: community
 source_license: CC-BY-SA-4.0
 source_url: https://github.com/trailofbits/skills/tree/main/skills/semgrep-rule-creator
 verified: true
 lastVerifiedAt: '2026-02-28'
+trust_score: 100
+provenance_sha: 4b056242d048e9e6
 ---
 
 <!-- Source: Trail of Bits | License: CC-BY-SA-4.0 | Adapted: 2026-02-09 -->

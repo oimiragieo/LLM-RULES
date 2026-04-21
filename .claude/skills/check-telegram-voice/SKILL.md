@@ -16,6 +16,9 @@ best_practices:
   - Clean up temp files after the reply is sent
 error_handling: strict
 streaming: not-applicable
+source: builtin
+trust_score: 100
+provenance_sha: 908a9a406e74832a
 ---
 
 # Telegram Voice Pipeline

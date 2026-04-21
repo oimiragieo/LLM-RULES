@@ -10,6 +10,9 @@ agents: [developer, qa, master-orchestrator, planner]
 category: 'Validation & Quality'
 tags: [loop-detection, agent-safety, escalation, monitoring, behavioral]
 error_handling: strict
+source: builtin
+trust_score: 100
+provenance_sha: 6c03c65351067b21
 ---
 
 # Behavioral Loop Detection

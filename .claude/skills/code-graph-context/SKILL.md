@@ -14,6 +14,9 @@ tools:
   - mcp__CodeGraphContext__find_dead_code
   - mcp__CodeGraphContext__get_module_deps
   - mcp__CodeGraphContext__query_graph
+source: builtin
+trust_score: 100
+provenance_sha: 345f20639591782a
 ---
 
 # CodeGraphContext Skill

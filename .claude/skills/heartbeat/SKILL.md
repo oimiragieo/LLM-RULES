@@ -15,6 +15,9 @@ error_handling: graceful
 verified: true
 created_by: direct (retroactive attribution)
 compliance_status: legacy-direct-creation
+source: builtin
+trust_score: 100
+provenance_sha: 7d69437c7bdc3180
 ---
 
 <!-- Agent: developer | Task: #heartbeat-skill | Session: 2026-03-07 -->

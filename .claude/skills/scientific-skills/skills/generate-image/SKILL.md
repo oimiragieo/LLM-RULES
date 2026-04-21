@@ -7,6 +7,9 @@ metadata:
   skill-author: K-Dense Inc.
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
+source: builtin
+trust_score: 100
+provenance_sha: 3384b5a9b9f3ccf7
 ---
 
 # Generate Image
