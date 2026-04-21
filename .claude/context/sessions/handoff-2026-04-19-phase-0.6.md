@@ -39,19 +39,19 @@ Explicit list of claims made in this session that have NOT been validated end-to
 
 ## What shipped (v2.1.0)
 
-| Commit | Purpose |
-|--------|---------|
-| d07d70e59 | test(regression): nested .claude prefix guard (P01 RED) |
-| b90fb64f3 | fix(hooks): harden bypass-audit PROJECT_ROOT (P01 GREEN) |
-| bea2a9de3 | chore(hygiene): remove nested .claude/.claude/ slop |
-| cc1b0a657 | test(regression): routing-warn dedupe (P02 RED) |
-| aa87e95d7 | feat(routing): routing-warn dedupe + separate log (P02) |
-| 88672e897 | test(regression): memory-autocommit (P03 RED) |
-| daa558670 | feat(hooks): memory-autocommit Stop hook (P03 GREEN) |
-| d07045bf8 | docs(hooks): HOOKS_REFERENCE + @HOOK_AGENT_MAP for 4 hooks |
+| Commit    | Purpose                                                           |
+| --------- | ----------------------------------------------------------------- |
+| d07d70e59 | test(regression): nested .claude prefix guard (P01 RED)           |
+| b90fb64f3 | fix(hooks): harden bypass-audit PROJECT_ROOT (P01 GREEN)          |
+| bea2a9de3 | chore(hygiene): remove nested .claude/.claude/ slop               |
+| cc1b0a657 | test(regression): routing-warn dedupe (P02 RED)                   |
+| aa87e95d7 | feat(routing): routing-warn dedupe + separate log (P02)           |
+| 88672e897 | test(regression): memory-autocommit (P03 RED)                     |
+| daa558670 | feat(hooks): memory-autocommit Stop hook (P03 GREEN)              |
+| d07045bf8 | docs(hooks): HOOKS_REFERENCE + @HOOK_AGENT_MAP for 4 hooks        |
 | 9cb1f3927 | chore(validation): baseline 8 pre-existing module-size violations |
-| c02967988 | docs(claude): restore Section 8 memory record policy |
-| b07c98d5f | chore(release): bump to 2.1.0 for Phase 0.6 Self-Healing |
+| c02967988 | docs(claude): restore Section 8 memory record policy              |
+| b07c98d5f | chore(release): bump to 2.1.0 for Phase 0.6 Self-Healing          |
 
 Tag: `v2.1.0` (annotated, "Phase 0.6: Self-Healing").
 

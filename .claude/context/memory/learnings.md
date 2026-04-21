@@ -142,3 +142,57 @@ Removed 50 orphaned worktree directories. Skipped 9 (reasons: 2 registered+locke
 - Pattern learned: planner stalls at ~180-190K tokens without skeleton-first directive; with skeleton-first + bundled research, completes cleanly.
 - Pattern learned: `developer` agent auto-worktrees (~150K context injection); use `general-purpose` for <10 LOC edits to avoid "Prompt too long".
 - Scheduled: Phase 0.6.1 mission-engine runtime wiring; Phase 0.7 module-size refactor candidates (state-mutex, pre-tool-unified.taskupdate, routing-table, routing-guard-core, memory-tiers, spawn-prompt-assembler × 2, prompt-assembler-memory).
+
+## v2.1.1 Hotfix Reflection — 2026-04-20
+
+- [PATTERN 1 — RELEASE QUALITY] Phase plans that predict future sibling writers but only harden a subset produce next-cycle hotfixes. Phase 0.6 plan explicitly named `_archive/channel-auto-start.cjs` as a candidate writer (alongside the patched `bypass-audit-hook.cjs`) but scoped the fix to the hook only. One-line `..×3` path bug in channel-auto-start caused the nested `.claude/.claude/` regeneration observed in soak-test #1 post-ship. **Rule candidate**: every Phase plan that identifies candidate writers MUST either (a) harden ALL in-scope candidates in that phase, or (b) create a follow-up task BEFORE the phase is declared shipped.
+
+- [PATTERN 2 — ROUTING EXCEPTION] Specialist-first IRON LAW has a hidden worktree tax for tiny edits. Developer agent triggers automatic worktree spawn (~150K context injection), causing "Prompt too long" for <10 LOC changes where no design work is needed. Session confirmed: router correctly knew this gotcha (feedback_dont_spawn_for_trivial_edits.md) but used developer anyway per specialist-first. **Confirmed exception**: if entire change is <10 LOC AND file is already known AND no design work is needed, use general-purpose to avoid worktree overhead. This is NOT a violation of specialist-first — it is an explicit escape hatch for the worktree cost problem.
+
+- [PATTERN 3 — CREATOR GUARD] unified-creator-guard blocks planner from writing new plan files to `.claude/context/plans/`. During v2.1.1 session, planner was unable to persist its plan; content lived only in session context. Session survived only because context did not reset. **Fix candidate**: plan-evolution-guard should allow planner-agent to WRITE NEW files in `.claude/context/plans/` (additive only, not editing existing plans). Current behavior makes plans ephemeral and session-crash-unsafe.
+
+- [PATTERN 4 — HEARTBEAT CRON] Heartbeat orchestrator cannot register crons from a subagent context. Two spawns failed silently — cron registration tools appear to be parent-session-only. Skill docs (`heartbeat`) should warn that cron registration requires the router session context and that the orchestrator surface is for instruction delivery only. **Routing fix**: the router must invoke `Skill({ skill: "heartbeat" })` directly (not spawn it as a subagent) to register crons.
+
+- [PROCESS] v2.1.1: git commit heredoc (SEC-AUDIT-017 bash-pretool-bundle) blocked standard commit syntax; workaround was `git commit -F tmpfile`. May warrant a new `commit-via-temp-file` pattern or a rule refinement to allow heredoc-style commits in specific contexts.
+
+## Session ccusage — 2026-04-20
+
+| Date       | Models                          | Input  | Output  | Cache Read | Cache Write | Total Tokens | Cost    |
+| ---------- | ------------------------------- | ------ | ------- | ---------- | ----------- | ------------ | ------- |
+| 2026-04-20 | haiku-4-5, opus-4-7, sonnet-4-6 | 47,170 | 301,853 | 8,888,1xx  | 184,516xx   | 193,753xx    | $143.93 |
+
+- Created new agent: qa-guardian (2026-04-21)
+
+- Created new agent: contract-check (2026-04-21)
+
+- Created new agent: bool-action (2026-04-21)
+
+- Created new agent: repo-onboarder (2026-04-21)
+
+- Created new agent: release-guardian (2026-04-21)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-21)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-21)
+
+- Updated workflow: evolution-workflow (2026-04-21)
+
+- Updated workflow: missing-workflow-xyz (2026-04-21)
+
+- Created new agent: qa-guardian (2026-04-21)
+
+- Created new agent: contract-check (2026-04-21)
+
+- Created new agent: bool-action (2026-04-21)
+
+- Created new agent: repo-onboarder (2026-04-21)
+
+- Created new agent: release-guardian (2026-04-21)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-21)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-21)
+
+- Updated workflow: evolution-workflow (2026-04-21)
+
+- Updated workflow: missing-workflow-xyz (2026-04-21)

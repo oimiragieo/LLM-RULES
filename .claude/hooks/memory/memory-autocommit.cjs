@@ -148,7 +148,7 @@ function autocommitMemoryDeltas(opts = {}) {
     const diffRes = gitRun(cwd, ['diff', '--cached', '--name-only']);
     const staged = (diffRes.stdout || '')
       .split(/\r?\n/)
-      .map((s) => s.trim())
+      .map(s => s.trim())
       .filter(Boolean);
     if (staged.length === 0) {
       return { committed: false, reason: 'nothing-to-commit' };
