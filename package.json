@@ -1,6 +1,6 @@
 {
   "name": "agent-studio",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Multi-platform agent configuration bundle for Claude Code, Cursor IDE, and Factory Droid",
   "type": "module",
   "private": true,
@@ -245,6 +245,7 @@
     "tree-sitter-rust": "^0.24.0",
     "tree-sitter-typescript": "^0.23.2",
     "ws": "^8.20.0",
+    "yaml": "^2.8.3",
     "zod": "^4.3.6"
   },
   "optionalDependencies": {
@@ -260,7 +261,8 @@
       "picomatch": ">=4.0.4",
       "brace-expansion": ">=5.0.5",
       "hono": ">=4.12.14",
-      "@hono/node-server": ">=1.19.13"
+      "@hono/node-server": ">=1.19.13",
+      "protobufjs": ">=7.5.5"
     },
     "onlyBuiltDependencies": [
       "@ast-grep/cli",

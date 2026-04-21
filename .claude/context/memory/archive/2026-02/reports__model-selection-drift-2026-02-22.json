@@ -1,0 +1,13 @@
+{
+  "reportDate": "2026-02-22",
+  "generatedAt": "2026-02-22T20:24:43.587Z",
+  "summary": {
+    "totalSpawns": 0,
+    "mismatches": 0,
+    "mismatchRate": "0%",
+    "totalCostImpact": "$0.0000",
+    "alertTriggered": false
+  },
+  "byAgent": {},
+  "mismatches": []
+}

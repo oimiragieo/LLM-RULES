@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-04-21
+
+### Changed
+
+- Bulk-archived 500+ February 2026 historical reports to `.claude/context/memory/archive/2026-02/` for cleanliness
+- Pruned 9 documented-but-unimplemented env vars from `.env.example` (REVIEW_PIPELINE, GUARDRAIL_ENGINE, HOOK_ERROR_LOGGING, MEMORY_INGESTION_PIPELINE, METRICS_EVAL, GITHUB_INTEGRATION, PLUGIN_SYSTEM, MCP_CONNECTION_NONBLOCKING, MCP_SERVER_CONNECTION_BATCH_SIZE)
+- Uncommented 9 actively-guarded feature flags in `.env.example` with `=false` defaults (runtime code paths are gated on them)
+- Archived 3 superseded microservices-blueprint ADRs to `.claude/context/memory/archive/adrs/`
+- Regenerated `skill-index.json` — corrects stale 330 skill claim to actual 342/348 count
+- Fixed heartbeat Loop 4 (indexing) mtime path — was checking non-existent `bm25-index.json` causing unnecessary 4h reindex
+
+### Removed
+
+- `.claude/context/artifacts/research-reports/test.txt` (2-byte slop)
+- `tests/clients/`, `tests/migration/`, `tests/pilot/` (each held only a single `.archived` file)
+- 666MB of stale content from `.claude/context/tmp/` per `cleanup-always` policy
+
+### Fixed
+
+- Dependabot #29 (protobufjs RCE) — confirmed transitively resolved to 8.0.1 via existing overrides
+- Cleaned 2 untracked nested-slop files at `.claude/.claude/` (root cause was fixed in v2.1.1; these were pre-fix leftovers)
+
+### Security
+
+- Bumped protobufjs to non-vulnerable version via lockfile resolution (GHSA advisory)
+
 ## [2.1.1] - 2026-04-21 — Phase 0.6 Hotfix
 
 Sibling fix to v2.1.0 P01. The `_archive/channel-auto-start.cjs` writer produced the same nested `.claude/.claude/` slop because its `ROOT` resolution was off by one directory level.

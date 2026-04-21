@@ -22,7 +22,7 @@ Decision: Moved to \_archive/ with disabled stub. Rationale per LLM consult — 
 
 ## ADR-2026-03-22: Monolith-to-Microservices v4.0 Architecture Update (2026-03-22)
 
-**Status:** Proposed
+**Status:** Archived 2026-04-21 — never acted upon (blueprint only)
 **Date:** 2026-03-22
 **Source:** Architect agent, general-purpose migration blueprint v4.0
 

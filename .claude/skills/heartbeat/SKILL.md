@@ -38,7 +38,7 @@ Run these `/loop` commands in your Claude Code session:
 ```
 
 ```
-/loop 4h Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-indexing-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to check bm25-index.json mtime and reindex if stale. Reply HEARTBEAT_OK after spawning.
+/loop 4h Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-indexing-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to check mtime of .claude/context/code-index/metadata.json and reindex if older than 4 hours or missing. Reply HEARTBEAT_OK after spawning.
 ```
 
 ```
@@ -104,7 +104,8 @@ Keeps hybrid search index fresh.
 ```javascript
 CronCreate({
   schedule: '0 */4 * * *',
-  task: "Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-indexing-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to execute this tick. The orchestrator must: (1) call TaskUpdate(in_progress), (2) check mtime of .claude/context/data/bm25-index.json via Bash; if older than 4 hours or missing, run `pnpm code:index:reindex`, (3) call TaskUpdate(completed) and exit. Do NOT run the script directly in the router session. Reply HEARTBEAT_OK immediately after spawning.",
+  // Fixed 2026-04-21: was bm25-index.json which never exists — real artifact is metadata.json
+  task: "Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-indexing-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to execute this tick. The orchestrator must: (1) call TaskUpdate(in_progress), (2) check mtime of .claude/context/code-index/metadata.json via Bash; if older than 4 hours or missing, run `pnpm code:index:reindex`, (3) call TaskUpdate(completed) and exit. Do NOT run the script directly in the router session. Reply HEARTBEAT_OK immediately after spawning.",
 });
 ```
 
