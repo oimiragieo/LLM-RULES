@@ -20,7 +20,7 @@ const fs = require('fs');
 const { execFileSync } = require('child_process');
 const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
-const ROOT = path.resolve(__dirname, '..', '..', '..');
+const ROOT = path.resolve(__dirname, '..', '..', '..', '..');
 const RUNTIME = path.join(ROOT, '.claude', 'context', 'runtime');
 const LOCKFILE = path.join(RUNTIME, 'channel-autostart-cooldown.lock');
 const COOLDOWN_MS = 120000; // 2 minutes

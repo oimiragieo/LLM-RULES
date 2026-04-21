@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-04-21 — Phase 0.6 Hotfix
+
+Sibling fix to v2.1.0 P01. The `_archive/channel-auto-start.cjs` writer produced the same nested `.claude/.claude/` slop because its `ROOT` resolution was off by one directory level.
+
+### Added
+
+- P04 regression tests for `_archive/channel-auto-start.cjs` covering `LOCKFILE`, `CHANNEL_SENTINEL_PATH`, and `RUNTIME` path resolution (`tests/regression/nested-claude-prefix.test.cjs`).
+
+### Fixed
+
+- `channel-auto-start` hook no longer regenerates nested `.claude/.claude/` paths — sibling writer to P01 (Phase 0.6 hotfix).
+
 ## [2.1.0] - 2026-04-19 — Phase 0.6: Self-Healing
 
 Internal framework maintenance release. P01 nested-slop regression, P02 routing-warn spam, P03 memory-autocommit. Phase 0.5 defense verification deferred to 0.6.1 (all 11 enumerated defenses are test-only, mission subsystem unmounted from runtime). Module-size baseline updated to accept 8 pre-existing oversized modules; refactor scheduled.

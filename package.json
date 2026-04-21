@@ -1,6 +1,6 @@
 {
   "name": "agent-studio",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Multi-platform agent configuration bundle for Claude Code, Cursor IDE, and Factory Droid",
   "type": "module",
   "private": true,
