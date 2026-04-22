@@ -12,6 +12,16 @@
  *   gen_ai.tool.name        — tool name (string)
  *   gen_ai.tool.args_hash   — SHA-256(args) truncated to 16 hex chars
  *   gen_ai.tool.result_hash — SHA-256(result) truncated to 16 hex chars
+ *   gen_ai.usage.total_tokens  — total tokens (when payload provides usage data)
+ *   gen_ai.usage.input_tokens  — prompt tokens (when payload provides input_tokens)
+ *   gen_ai.usage.output_tokens — completion tokens (when payload provides output_tokens)
+ *
+ * Token usage availability:
+ *   Claude Code PostToolUse hooks in the current harness do NOT reliably populate
+ *   usage fields in all tool contexts. Fields are emitted only when present in the
+ *   hook payload — never fabricated. If absent, token-governor.cjs will count 0
+ *   for that trace entry.
+ *   TODO: Reassess once Claude Code SDK guarantees usage in PostToolUse events.
  *
  * Additional attributes:
  *   timestamp   — ISO 8601
@@ -86,17 +96,13 @@ function buildTraceRecord(hookInput) {
   const toolOutput = hookInput.tool_output ?? hookInput.output ?? {};
 
   const sessionId =
-    process.env.CLAUDE_SESSION_ID ||
-    process.env.SESSION_ID ||
-    hookInput.session_id ||
-    'unknown';
+    process.env.CLAUDE_SESSION_ID || process.env.SESSION_ID || hookInput.session_id || 'unknown';
 
-  const agentId =
-    process.env.AGENT_TYPE || hookInput.agent_type || hookInput.agent_id || '';
+  const agentId = process.env.AGENT_TYPE || hookInput.agent_type || hookInput.agent_id || '';
 
   const taskId = process.env.TASK_ID || hookInput.task_id || '';
 
-  return {
+  const record = {
     timestamp: new Date().toISOString(),
     'gen_ai.tool.name': toolName,
     'gen_ai.tool.args_hash': sha256trunc16(toolInput),
@@ -106,6 +112,32 @@ function buildTraceRecord(hookInput) {
     task_id: taskId,
     session_id: sessionId,
   };
+
+  // ---------------------------------------------------------------------------
+  // Token usage extraction (OTel GenAI semantic conventions)
+  // Source: hookInput.usage.* (Claude Code PostToolUse payload)
+  // LIMITATION: Claude Code PostToolUse hook in this harness version does NOT
+  // reliably populate usage fields in all tool contexts. When present, we emit
+  // them. When absent, we omit the fields entirely — we do NOT fabricate or
+  // heuristic-estimate values.
+  // TODO: Re-evaluate when Claude Code SDK emits usage in PostToolUse events.
+  // ---------------------------------------------------------------------------
+  const usage = hookInput.usage ?? {};
+  const hasTotal = typeof usage.total_tokens === 'number' && !isNaN(usage.total_tokens);
+  const hasInput = typeof usage.input_tokens === 'number' && !isNaN(usage.input_tokens);
+  const hasOutput = typeof usage.output_tokens === 'number' && !isNaN(usage.output_tokens);
+
+  if (hasTotal) {
+    record['gen_ai.usage.total_tokens'] = usage.total_tokens;
+  } else if (hasInput && hasOutput) {
+    record['gen_ai.usage.input_tokens'] = usage.input_tokens;
+    record['gen_ai.usage.output_tokens'] = usage.output_tokens;
+    record['gen_ai.usage.total_tokens'] = usage.input_tokens + usage.output_tokens;
+  }
+  // If neither total nor input+output are present, omit usage fields entirely.
+  // Never emit null, 0, or fabricated values.
+
+  return record;
 }
 
 /**

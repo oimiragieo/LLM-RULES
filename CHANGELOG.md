@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-04-22
+
+### Changed
+
+- trace-recorder hook now conditionally emits OpenTelemetry GenAI usage fields (total/input/output tokens) when PostToolUse payload provides them. Token-governor (S3 from v2.3.0) can now tally per-agent tokens when harness surfaces usage data. Schema is additive — usage fields are omitted when data unavailable (no fabrication).
+
+### Security
+
+- Dependabot alert #29 (protobufjs RCE) auto-resolved by GitHub at 2026-04-21 20:37 UTC via v2.2.0 pnpm-lock.yaml override to 8.0.1. Zero open critical alerts.
+
 ## [2.3.0] - 2026-04-21 — Durability, Observability, Guardrails
 
 Hygiene+ minor release adding pipeline-resilience primitives: distributed tracing, per-agent token budgeting, a formal hook exit-code contract, saga-style compensation on task failure, and skill provenance enforcement.

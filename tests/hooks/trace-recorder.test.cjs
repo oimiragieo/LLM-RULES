@@ -209,3 +209,109 @@ test('args/result are hashed (SHA-256 trunc 16) not stored verbatim', () => {
   assert.ok(!lineStr.includes('file_path'), 'args must not appear verbatim in trace');
   assert.ok(!lineStr.includes('hello world'), 'result must not appear verbatim in trace');
 });
+
+// ---------------------------------------------------------------------------
+// Test 6: payload with toolUseResult.usage.total_tokens emits that value
+// ---------------------------------------------------------------------------
+test('Test 6: payload with usage.total_tokens emits gen_ai.usage.total_tokens', () => {
+  const projectRoot = mkProjectRoot();
+  // Bust module cache so env changes are reflected
+  const modulePath = require.resolve('../../.claude/hooks/audit/trace-recorder.cjs');
+  delete require.cache[modulePath];
+  const { appendTraceLine } = require('../../.claude/hooks/audit/trace-recorder.cjs');
+
+  const payload = buildPayload({
+    session_id: 'sess-tokens-total',
+    usage: { total_tokens: 4200 },
+  });
+  appendTraceLine(payload, projectRoot);
+
+  const traceFile = path.join(
+    projectRoot,
+    '.claude',
+    'context',
+    'runtime',
+    'traces',
+    'sess-tokens-total.jsonl'
+  );
+  const line = JSON.parse(fs.readFileSync(traceFile, 'utf8').trim());
+
+  assert.ok(
+    Object.prototype.hasOwnProperty.call(line, 'gen_ai.usage.total_tokens'),
+    'gen_ai.usage.total_tokens must be present when usage.total_tokens is in payload'
+  );
+  assert.equal(line['gen_ai.usage.total_tokens'], 4200, 'must equal payload usage.total_tokens');
+});
+
+// ---------------------------------------------------------------------------
+// Test 7: payload with input_tokens + output_tokens emits all three usage fields
+// ---------------------------------------------------------------------------
+test('Test 7: payload with input_tokens+output_tokens emits derived total + sub-fields', () => {
+  const projectRoot = mkProjectRoot();
+  const modulePath = require.resolve('../../.claude/hooks/audit/trace-recorder.cjs');
+  delete require.cache[modulePath];
+  const { appendTraceLine } = require('../../.claude/hooks/audit/trace-recorder.cjs');
+
+  const payload = buildPayload({
+    session_id: 'sess-tokens-split',
+    usage: { input_tokens: 1500, output_tokens: 700 },
+  });
+  appendTraceLine(payload, projectRoot);
+
+  const traceFile = path.join(
+    projectRoot,
+    '.claude',
+    'context',
+    'runtime',
+    'traces',
+    'sess-tokens-split.jsonl'
+  );
+  const line = JSON.parse(fs.readFileSync(traceFile, 'utf8').trim());
+
+  assert.ok(
+    Object.prototype.hasOwnProperty.call(line, 'gen_ai.usage.input_tokens'),
+    'gen_ai.usage.input_tokens must be present'
+  );
+  assert.ok(
+    Object.prototype.hasOwnProperty.call(line, 'gen_ai.usage.output_tokens'),
+    'gen_ai.usage.output_tokens must be present'
+  );
+  assert.ok(
+    Object.prototype.hasOwnProperty.call(line, 'gen_ai.usage.total_tokens'),
+    'gen_ai.usage.total_tokens must be derived when only input+output supplied'
+  );
+  assert.equal(line['gen_ai.usage.input_tokens'], 1500, 'input_tokens value mismatch');
+  assert.equal(line['gen_ai.usage.output_tokens'], 700, 'output_tokens value mismatch');
+  assert.equal(line['gen_ai.usage.total_tokens'], 2200, 'total_tokens must equal input+output');
+});
+
+// ---------------------------------------------------------------------------
+// Test 8: payload with no usage data — gen_ai.usage.total_tokens absent (not fabricated)
+// ---------------------------------------------------------------------------
+test('Test 8: payload with no usage data omits gen_ai.usage.total_tokens entirely', () => {
+  const projectRoot = mkProjectRoot();
+  const modulePath = require.resolve('../../.claude/hooks/audit/trace-recorder.cjs');
+  delete require.cache[modulePath];
+  const { appendTraceLine } = require('../../.claude/hooks/audit/trace-recorder.cjs');
+
+  // Standard payload with no usage field at all
+  const payload = buildPayload({ session_id: 'sess-tokens-absent' });
+  appendTraceLine(payload, projectRoot);
+
+  const traceFile = path.join(
+    projectRoot,
+    '.claude',
+    'context',
+    'runtime',
+    'traces',
+    'sess-tokens-absent.jsonl'
+  );
+  const line = JSON.parse(fs.readFileSync(traceFile, 'utf8').trim());
+
+  // Field must be absent (not fabricated as heuristic or zero)
+  // This prevents the token-governor from mistaking absent data for 0 tokens spent.
+  assert.ok(
+    !Object.prototype.hasOwnProperty.call(line, 'gen_ai.usage.total_tokens'),
+    'gen_ai.usage.total_tokens must NOT be emitted when no usage data is present — do not fabricate'
+  );
+});
