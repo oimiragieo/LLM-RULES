@@ -4,13 +4,14 @@
 /**
  * post-tool-advisory-bundle.cjs — PostToolUse consolidated advisory hook
  *
- * Consolidates 4 PostToolUse wildcard (matcher: "") advisory scripts into a
+ * Consolidates 5 PostToolUse wildcard (matcher: "") advisory scripts into a
  * single process to reduce process-spawn overhead per tool call:
  *
  *   1. post-tool-metrics-unified.cjs  — metrics, error tracking, anomaly detection
  *   2. context-window-monitor.cjs     — context window usage warnings
  *   3. hook-error-detector.cjs        — stale worktree hook path detection
  *   4. recurring-issue-detector.cjs   — recurring error pattern detection
+ *   5. spend-guard-trigger.cjs        — per-session spend ceiling advisory
  *
  * Error isolation: each sub-function is wrapped in its own try/catch.
  * A throw in one sub-function NEVER prevents others from executing.
@@ -53,8 +54,39 @@ const recurringIssueDetector = require(
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'monitoring', 'recurring-issue-detector.cjs')
 );
 
+// Sub-module 5: token-governor — spend ceiling check (spend-guard-trigger consolidation)
+const { checkSpendCeiling } = require(
+  path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'token-governor.cjs')
+);
+
 // ─── Invariant checker event accumulator (resets per-process) ────────────────
 const invariantEvents = [];
+
+// ─── Sub-function 5 helper: spend-guard-trigger ──────────────────────────────
+// Extracted to reduce complexity of main(). Returns advisory string or null.
+function runSpendGuard(sessionId) {
+  if ((process.env.SPEND_GUARD || '').toLowerCase() === 'off') return null;
+  try {
+    const spendResult = checkSpendCeiling(sessionId);
+    if (!spendResult.downgrade) return null;
+    const costStr =
+      typeof spendResult.sessionCostUsd === 'number'
+        ? `$${spendResult.sessionCostUsd.toFixed(2)}`
+        : '(unknown)';
+    const ceilingStr =
+      typeof spendResult.ceilingUsd === 'number'
+        ? `$${spendResult.ceilingUsd.toFixed(2)}`
+        : '(unknown)';
+    const advisory =
+      `[spend-guard] Session cost ${costStr} exceeds ceiling ${ceilingStr}. ` +
+      `Downgrading next spawn to haiku. ` +
+      `See .claude/context/runtime/spend-guard-override.json`;
+    process.stderr.write(`[spend-guard] ADVISORY: ${advisory}\n`);
+    return advisory;
+  } catch (_err) {
+    return null;
+  }
+}
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
@@ -113,7 +145,16 @@ async function main() {
     // Error in this sub-function must not prevent others from running
   }
 
-  // ── Sub-function 5: nyquist-validator (feature-flagged) ───────────────────
+  // ── Sub-function 5: spend-guard-trigger ──────────────────────────────────
+  // Checks per-session spend ceiling; emits downgrade-to-haiku advisory when
+  // the configured ceiling is reached. Kill switch: SPEND_GUARD=off.
+  const spendAdvisory = runSpendGuard(safeInput.session_id || 'default');
+  if (spendAdvisory) {
+    // Override additionalContext — spend advisory takes precedence
+    additionalContext = spendAdvisory;
+  }
+
+  // ── Sub-function 7: nyquist-validator (feature-flagged) ───────────────────
   // Validates plan coverage after Write/Edit to plan files.
   if (process.env.NYQUIST_VALIDATION === 'true') {
     try {
@@ -138,7 +179,7 @@ async function main() {
     }
   }
 
-  // ── Sub-function 6: invariant-checker (feature-flagged) ──────────────────
+  // ── Sub-function 8: invariant-checker (feature-flagged) ──────────────────
   // Validates tool events against routing invariants (banned tools, TaskUpdate).
   if (process.env.INVARIANT_CHECK === 'true') {
     try {
@@ -159,7 +200,7 @@ async function main() {
     }
   }
 
-  // ── Sub-function 6: task-output-chain capture (feature-flagged) ──────────
+  // ── Sub-function 9: task-output-chain capture (feature-flagged) ──────────
   // Captures task outputs from TaskUpdate(completed) metadata for downstream chaining.
   if (process.env.TASK_OUTPUT_CHAIN === 'true') {
     try {

@@ -1,6 +1,6 @@
 {
   "name": "agent-studio",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "Multi-platform agent configuration bundle for Claude Code, Cursor IDE, and Factory Droid",
   "type": "module",
   "private": true,
@@ -163,6 +163,7 @@
     "search:code": "node .claude/tools/cli/hybrid-search.cjs",
     "search:compress": "node .claude/tools/cli/hybrid-search.cjs --compress",
     "trace:query": "node .claude/tools/cli/trace-query.cjs",
+    "session:audit": "node .claude/tools/cli/session-audit.cjs",
     "search:structure": "node .claude/tools/cli/hybrid-search.cjs --structure",
     "search:tokens": "node .claude/tools/cli/hybrid-search.cjs --tokens",
     "search:file": "node .claude/tools/cli/hybrid-search.cjs --file",

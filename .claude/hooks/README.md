@@ -118,6 +118,26 @@ Ensures memory files maintain consistent format and structure.
 **When it runs:** After memory file updates
 **What it does:** Validates YAML frontmatter, sorts entries, removes duplicates
 
+### Monitoring Hooks
+
+Located in `.claude/hooks/monitoring/`
+
+#### Spend Guard Trigger (`spend-guard-trigger.cjs`)
+
+Advisory PostToolUse hook that checks per-session spend against a configured ceiling and emits a downgrade-to-haiku hint when exceeded. Solves Reddit pain #5 (cost unpredictability).
+
+**When it runs:** After every tool call (PostToolUse, matcher: ""), async: true
+**What it does:**
+
+- Reads current session cost from `ccusage-status.txt`
+- Compares against `SPEND_GUARD_CEILING_USD` (default $5.00)
+- When ceiling is exceeded: writes `spend-guard-override.json` and emits `additionalContext` advisory
+- Always exits 0 (fail-open — never blocks tool execution)
+
+**Kill switch:** `SPEND_GUARD=off`
+**Test file:** `tests/hooks/spend-guard-trigger.test.cjs`
+**Related:** `token-governor.cjs` (`checkSpendCeiling`), `ccusage-statusline.cjs`
+
 ## Using the Validator System
 
 ### Basic Usage

@@ -7,10 +7,10 @@
  * Tests for post-tool-advisory-bundle.cjs — the consolidated PostToolUse wildcard hook.
  *
  * Verifies:
- * - VAL-HO-005: 4 PostToolUse wildcard scripts consolidated into 1 entry point
+ * - VAL-HO-005: 5 PostToolUse wildcard scripts consolidated into 1 entry point
  * - VAL-HO-012: Error isolation — throw in one sub-function doesn't prevent others
  * - Bundle always exits 0 (advisory, fail-open)
- * - All 4 sub-modules are imported
+ * - All 5 sub-modules are imported
  * - settings.json has exactly 1 PostToolUse wildcard registration using the bundle
  */
 
@@ -143,6 +143,14 @@ test('bundle imports recurring-issue-detector (contains reference)', () => {
   );
 });
 
+test('bundle imports spend-guard-trigger / token-governor (contains reference)', () => {
+  const source = fs.readFileSync(BUNDLE_PATH, 'utf8');
+  assert.ok(
+    source.includes('spend-guard-trigger') || source.includes('token-governor'),
+    'Bundle must include spend-guard-trigger consolidation (token-governor reference)'
+  );
+});
+
 test('bundle has try/catch per sub-function for error isolation (VAL-HO-012)', () => {
   const source = fs.readFileSync(BUNDLE_PATH, 'utf8');
   const tryCatchCount = (source.match(/}\s*catch\s*\(/g) || []).length;
@@ -190,6 +198,7 @@ test('individual PostToolUse wildcard scripts are NOT separately registered (VAL
     'hook-error-detector.cjs',
     'recurring-issue-detector.cjs',
     'post-tool-metrics-unified.cjs',
+    'spend-guard-trigger.cjs',
   ];
 
   for (const script of consolidated) {

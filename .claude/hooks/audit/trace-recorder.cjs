@@ -102,6 +102,12 @@ function buildTraceRecord(hookInput) {
 
   const taskId = process.env.TASK_ID || hookInput.task_id || '';
 
+  // OTel GenAI span hierarchy — additive fields (Slice S1, v2.4.0)
+  // span_type defaults to "tool-call"; callers may pass "session" or "task"
+  // parent_span_id follows GenAI conventions: nearest parent context identifier
+  const spanType = hookInput.span_type || 'tool-call';
+  const parentSpanId = taskId || sessionId;
+
   const record = {
     timestamp: new Date().toISOString(),
     'gen_ai.tool.name': toolName,
@@ -111,6 +117,8 @@ function buildTraceRecord(hookInput) {
     agent_id: agentId,
     task_id: taskId,
     session_id: sessionId,
+    span_type: spanType,
+    parent_span_id: parentSpanId,
   };
 
   // ---------------------------------------------------------------------------
@@ -142,13 +150,24 @@ function buildTraceRecord(hookInput) {
 
 /**
  * Resolve the trace file path for a given session ID.
+ *
+ * Resolution order:
+ *   1. `projectRoot` argument (test injection)
+ *   2. `TRACE_DIR_OVERRIDE` env (test isolation — points directly to traces dir)
+ *   3. Derived from PROJECT_ROOT (production path)
+ *
  * @param {string} sessionId
  * @param {string} [projectRoot]
  * @returns {string} Absolute path to the .jsonl trace file
  */
 function getTracePath(sessionId, projectRoot) {
-  const root = projectRoot || PROJECT_ROOT;
-  return path.join(root, '.claude', 'context', 'runtime', 'traces', `${sessionId}.jsonl`);
+  if (projectRoot) {
+    return path.join(projectRoot, '.claude', 'context', 'runtime', 'traces', `${sessionId}.jsonl`);
+  }
+  if (process.env.TRACE_DIR_OVERRIDE) {
+    return path.join(process.env.TRACE_DIR_OVERRIDE, `${sessionId}.jsonl`);
+  }
+  return path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'traces', `${sessionId}.jsonl`);
 }
 
 /**

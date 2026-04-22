@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-04-22 — Production-Grade Observability & Cost Control
+
+Agent Studio goes production-grade. This release directly addresses the top two community pain points — "black box" agent execution and cost unpredictability — with structured OpenTelemetry tracing, per-session spend ceilings, and pre-flight context budget enforcement.
+
+Research validation: ArXiv [2604.17055] Agent Observability Protocol, ArXiv [2506.09289] LLM Cost Efficiency, OpenTelemetry GenAI semantic conventions Q1 2026 ratified, Exa industry review (LangSmith OTel convergence).
+
+### Added
+
+- **OTel span hierarchy** — `trace-recorder` hook now emits `parent_span_id` and `span_type` fields on every GenAI JSONL trace event, enabling tree reconstruction of agent → skill → tool call chains. Compliant with OpenTelemetry GenAI semantic conventions Q1 2026.
+- **`pnpm session:audit <session-id>` CLI** — per-component token burn table showing agent × skill × tool breakdown with colored output. Reads from trace-recorder JSONL; no external services required.
+- **Spawn-budget pre-flight hook** — warns before spawn when projected context exceeds threshold (default 50K tokens, configurable via `SPAWN_BUDGET_DEFAULT_CONTEXT`). Hard-block mode available via `SPAWN_BUDGET_HARD=on`.
+- **Spend-guard auto-downgrade** — extends token-governor; automatically switches spawned agents from sonnet to haiku when session cost approaches the per-session ceiling (default `$5`, configurable via `SPEND_GUARD_CEILING_USD`). Kill switch: `SPEND_GUARD=off`.
+
+### Changed
+
+- **spend-guard-trigger** consolidated into `post-tool-advisory-bundle` for clean hook architecture; no standalone hook file required.
+
+### Security / Performance
+
+- Per-session spend ceiling prevents runaway API cost on long autonomous sessions. Community-reported burn rates of 30–67K tokens per spawn now gated at pre-flight.
+- Context budget warning at spawn time prevents token bleed before it reaches the compression threshold.
+
+### Research Citations
+
+- ArXiv [2604.17055] — Agent Observability Protocol (span hierarchy design)
+- ArXiv [2506.09289] — LLM Cost Efficiency patterns (spend-guard ceiling rationale)
+- OpenTelemetry GenAI Q1 2026 — `parent_span_id`, `span_type` field conventions
+
 ## [2.3.1] - 2026-04-22
 
 ### Changed

@@ -191,13 +191,119 @@ function checkSpawnBudget(agentId, sessionId, opts = {}) {
 }
 
 // ---------------------------------------------------------------------------
+// Spend Guard — per-session cost ceiling with auto-downgrade hint
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the spend ceiling in USD from env or default ($5).
+ * Configurable via SPEND_GUARD_CEILING_USD.
+ * @returns {number}
+ */
+function getSpendCeiling() {
+  const raw = process.env.SPEND_GUARD_CEILING_USD;
+  if (raw) {
+    const parsed = parseFloat(raw);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+  return 5.0;
+}
+
+/**
+ * Read current session cost (USD) from ccusage-status.txt.
+ * Format expected on line 1: "... | Cost: $X.XXXX"
+ * Fail-open: returns null if file is missing or unparseable.
+ * @returns {number|null}
+ */
+function readSessionCost() {
+  const statusFile =
+    process.env.SPEND_GUARD_STATUS_FILE ||
+    path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'ccusage-status.txt');
+
+  if (!fs.existsSync(statusFile)) return null;
+
+  let content;
+  try {
+    content = fs.readFileSync(statusFile, 'utf8');
+  } catch (_e) {
+    return null;
+  }
+
+  // Extract "Cost: $X.XXXX" from the first line
+  const match = content.match(/Cost:\s*\$([0-9]+(?:\.[0-9]+)?)/);
+  if (!match) return null;
+
+  const cost = parseFloat(match[1]);
+  return isNaN(cost) ? null : cost;
+}
+
+/**
+ * Check whether current session spend has reached the configured ceiling.
+ * When ceiling is reached, returns downgrade hint to haiku and writes
+ * spend-guard-override.json for next agent spawn to consume.
+ *
+ * Fail-open: if ccusage-status.txt is missing → { downgrade: false }
+ *
+ * @param {string} sessionId
+ * @param {object} [opts]
+ * @param {number} [opts.ceiling] - Override ceiling in USD
+ * @returns {{ downgrade: boolean, suggestedModel?: string, sessionCostUsd?: number, ceilingUsd?: number }}
+ */
+function checkSpendCeiling(sessionId, opts = {}) {
+  const ceiling = (opts && opts.ceiling) || getSpendCeiling();
+  const sessionCost = readSessionCost();
+
+  // Fail-open: missing or unparseable file
+  if (sessionCost === null) {
+    return { downgrade: false };
+  }
+
+  if (sessionCost < ceiling) {
+    return { downgrade: false };
+  }
+
+  // At or above ceiling — emit downgrade hint
+  const result = {
+    downgrade: true,
+    suggestedModel: 'haiku',
+    sessionCostUsd: sessionCost,
+    ceilingUsd: ceiling,
+  };
+
+  // Write override hint file for next spawn to consume
+  const overrideFile =
+    process.env.SPEND_GUARD_OVERRIDE_FILE ||
+    path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'spend-guard-override.json');
+
+  try {
+    fs.mkdirSync(path.dirname(overrideFile), { recursive: true });
+    fs.writeFileSync(
+      overrideFile,
+      JSON.stringify({
+        suggestedModel: 'haiku',
+        sessionCostUsd: sessionCost,
+        ceilingUsd: ceiling,
+        timestamp: new Date().toISOString(),
+      }),
+      'utf8'
+    );
+  } catch (_e) {
+    // Fail-open: never throw on file write failure
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
 module.exports = {
   tallyAgentTokens,
   checkSpawnBudget,
+  checkSpendCeiling,
   getTracePath,
   getDefaultBudget,
   isHardMode,
+  getSpendCeiling,
+  readSessionCost,
 };

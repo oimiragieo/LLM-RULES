@@ -74,6 +74,56 @@ ELEVENLABS_API_KEY=<key>      # or OPENAI_API_KEY for fallback
 
 Full docs: `.claude/docs/TELEGRAM_ARCHITECTURE.md`
 
+## Observability & Cost Control (v2.4.0)
+
+Agent Studio v2.4.0 is the "production-grade" release. It addresses the two most-reported community pain points: opaque agent execution and unpredictable API spend.
+
+### Structured Tracing
+
+Every agent spawn, skill invocation, and tool call now emits a structured OpenTelemetry GenAI event with `parent_span_id` and `span_type`. You can reconstruct the full call tree for any session.
+
+```bash
+# Inspect per-component token burn for a session
+pnpm session:audit <session-id>
+```
+
+Output: a colored table showing token consumption broken down by agent, skill, and tool — no external observability service required.
+
+### Cost Ceilings
+
+Spend-guard auto-downgrade switches agents from sonnet to haiku when session cost approaches the configured ceiling:
+
+```bash
+# Set per-session spend ceiling (default: $5)
+SPEND_GUARD_CEILING_USD=5
+
+# Disable entirely
+SPEND_GUARD=off
+```
+
+### Context Budget Pre-flight
+
+Before any agent spawn, the budget hook checks projected context size and warns before the session reaches the compression threshold:
+
+```bash
+# Warning threshold in tokens (default: 50000)
+SPAWN_BUDGET_DEFAULT_CONTEXT=50000
+
+# Hard-block spawns that exceed 1.6x threshold
+SPAWN_BUDGET_HARD=on
+```
+
+### New Environment Variables (v2.4.0)
+
+| Variable                       | Default | Purpose                                         |
+| ------------------------------ | ------- | ----------------------------------------------- |
+| `SPAWN_BUDGET_DEFAULT_CONTEXT` | `50000` | Token threshold for spawn pre-flight warning    |
+| `SPAWN_BUDGET_HARD`            | `off`   | Set `on` to hard-block over-budget spawns       |
+| `SPEND_GUARD_CEILING_USD`      | `5`     | Per-session cost ceiling before haiku downgrade |
+| `SPEND_GUARD`                  | `on`    | Set `off` to disable spend-guard entirely       |
+
+See `CHANGELOG.md` and `.claude/docs/HOOKS_REFERENCE.md` for full details.
+
 ## Recent Changes
 
 ### Release-Readiness Hardening

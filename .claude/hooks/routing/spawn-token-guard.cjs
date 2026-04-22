@@ -23,6 +23,18 @@ function parseThreshold(envVal, fallback) {
 const WARN_THRESHOLD = parseThreshold(process.env.CONTEXT_THRESHOLD_WARN, DEFAULT_WARN);
 const BLOCK_THRESHOLD = parseThreshold(process.env.CONTEXT_THRESHOLD_BLOCK, DEFAULT_BLOCK);
 
+// Spawn-budget pre-flight (S3): projected context = skills + memory + prompt
+// Default warn at 50K tokens; hard block at WARN_BUDGET * 1.6 (~80K for default)
+const DEFAULT_SPAWN_BUDGET = 50_000;
+const SPAWN_BUDGET_HARD_MULTIPLIER = 1.6;
+
+const SPAWN_BUDGET_WARN = parseThreshold(
+  process.env.SPAWN_BUDGET_DEFAULT_CONTEXT,
+  DEFAULT_SPAWN_BUDGET
+);
+const SPAWN_BUDGET_HARD_LIMIT = Math.floor(SPAWN_BUDGET_WARN * SPAWN_BUDGET_HARD_MULTIPLIER);
+const SPAWN_BUDGET_HARD_MODE = (process.env.SPAWN_BUDGET_HARD || '').toLowerCase() === 'on';
+
 const RUNTIME_DIR = path.join(__dirname, '../../context/runtime');
 const COMPRESSION_REMINDER = path.join(RUNTIME_DIR, 'compression-reminder.txt');
 
@@ -68,6 +80,37 @@ process.stdin.on('end', () => {
         })
       );
       process.exit(0);
+    }
+
+    // -----------------------------------------------------------------------
+    // Spawn-budget pre-flight: projected context = skills + memory + prompt
+    // Only fires when _spawn_budget_meta is present (backward compatible).
+    // -----------------------------------------------------------------------
+    try {
+      const meta = input?.tool_input?._spawn_budget_meta;
+      if (meta && typeof meta === 'object') {
+        const skillsChars = Number(meta.skills_context_chars) || 0;
+        const memoryChars = Number(meta.memory_payload_chars) || 0;
+        const totalChars = prompt.length + skillsChars + memoryChars;
+        const projectedTokens = Math.floor(totalChars / 4);
+
+        if (projectedTokens >= SPAWN_BUDGET_WARN) {
+          const warningMsg = `CONTEXT BUDGET WARNING: projected ~${projectedTokens.toLocaleString()} tokens (skills + memory + prompt)`;
+
+          if (projectedTokens >= SPAWN_BUDGET_HARD_LIMIT && SPAWN_BUDGET_HARD_MODE) {
+            process.stderr.write(
+              `spawn-token-guard: BLOCKED — ${warningMsg}. Reduce skill/memory payload before spawning.\n`
+            );
+            process.exit(2);
+          }
+
+          // Warn (soft): allow but surface the message
+          process.stdout.write(JSON.stringify({ allow: true, message: warningMsg }));
+          process.exit(0);
+        }
+      }
+    } catch (_budgetErr) {
+      // Fail open — projected-context check must never block workflow
     }
 
     process.stdout.write(JSON.stringify({ allow: true }));
