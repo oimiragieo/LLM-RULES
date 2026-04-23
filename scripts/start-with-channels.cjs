@@ -12,7 +12,7 @@
  * Environment variables (read from .env):
  *   TELEGRAM_BOT_TOKEN     — required to enable channel auto-start
  *   CHANNEL_AUTO_START     — set to "true" to enable (default: false)
- *   CHANNEL_PLUGINS        — channel identifier (default: server:telegram-relay)
+ *   CHANNEL_PLUGINS        — channel identifier passed to --channels (default: server:telegram-relay)
  *   CHANNEL_PERMISSIONS    — extra flags passed to claude (e.g. --dangerously-skip-permissions)
  */
 
@@ -71,9 +71,9 @@ const shouldStartChannels = botToken && autoStart === 'true';
 let claudeArgs;
 
 if (shouldStartChannels) {
-  // Build: claude [CHANNEL_PERMISSIONS flags...] --dangerously-load-development-channels <CHANNEL_PLUGINS>
+  // Build: claude [CHANNEL_PERMISSIONS flags...] --channels <CHANNEL_PLUGINS>
   const permissionsArgs = channelPermissions ? channelPermissions.split(/\s+/).filter(Boolean) : [];
-  claudeArgs = [...permissionsArgs, '--dangerously-load-development-channels', channelPlugins];
+  claudeArgs = [...permissionsArgs, '--channels', channelPlugins];
   console.log('[start-with-channels] Channel mode enabled, launching with:', claudeArgs.join(' '));
 } else {
   claudeArgs = [];
