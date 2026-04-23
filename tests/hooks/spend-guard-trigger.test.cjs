@@ -138,10 +138,7 @@ describe('SpendGuardTrigger (PostToolUse hook)', () => {
       typeof parsed.additionalContext === 'string' && parsed.additionalContext.length > 0,
       'Hook must include additionalContext advisory message when ceiling exceeded'
     );
-    assert.ok(
-      fs.existsSync(overridePath),
-      'Override file should be written when ceiling exceeded'
-    );
+    assert.ok(fs.existsSync(overridePath), 'Override file should be written when ceiling exceeded');
 
     const override = JSON.parse(fs.readFileSync(overridePath, 'utf8'));
     assert.equal(override.suggestedModel, 'haiku', 'Override must suggest haiku');

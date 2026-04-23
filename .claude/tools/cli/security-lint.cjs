@@ -87,6 +87,7 @@ const CONFIG = {
     { pathSubstring: 'spawn-assembly-metrics-summary.cjs', ruleId: 'SEC-030' }, // CLI metrics summary (aggregates, not secrets)
     { pathSubstring: 'step-validators.cjs', ruleId: 'SEC-013' }, // new Function() for dynamic workflow validation (controlled input)
     { pathSubstring: 'generate-tool-manifest.cjs', ruleId: 'SEC-030' }, // CLI diagnostic logging
+    { pathSubstring: 'migrate-2x-to-3.cjs', ruleId: 'SEC-030' }, // CLI migration guide output — user-facing text about env var names, not credentials
     { pathSubstring: 'run-workflow-tests.cjs', ruleId: 'SEC-030' }, // CLI test suite help output (not sensitive)
     { pathSubstring: 'ecosystem-assessor/', ruleId: 'SEC-030' }, // CLI analysis tool diagnostic output
     { pathSubstring: 'project-analyzer/', ruleId: 'SEC-030' }, // CLI analysis tool diagnostic output

@@ -81,19 +81,33 @@ async function main() {
   }
 
   const validation = validateAgentContent(incomingContent, { requireMarker: true });
-  if (validation.valid) {
-    console.log(formatResult('allow'));
-    process.exit(0);
+  if (!validation.valid) {
+    const message = `[AGENT-TEMPLATE-CONTRACT] ${validation.errors.join(' | ')}`;
+    if (mode === 'warn') {
+      console.log(formatResult('allow', message));
+      process.exit(0);
+    }
+    console.log(formatResult('block', message));
+    process.exit(2);
   }
 
-  const message = `[AGENT-TEMPLATE-CONTRACT] ${validation.errors.join(' | ')}`;
-  if (mode === 'warn') {
-    console.log(formatResult('allow', message));
-    process.exit(0);
+  // BC-2: v3.0.0 manifest block check (gated — only when V3_MANIFEST_REQUIRED=on)
+  if (process.env.V3_MANIFEST_REQUIRED === 'on') {
+    const hasManifestBlock = /^manifest\s*:/m.test(incomingContent);
+    if (!hasManifestBlock) {
+      const bc2Message =
+        '[AGENT-TEMPLATE-CONTRACT] BC-2: manifest block required in v3.0.0; run pnpm migrate:2x-to-3';
+      if (mode === 'warn') {
+        console.log(formatResult('allow', bc2Message));
+        process.exit(0);
+      }
+      console.log(formatResult('block', bc2Message));
+      process.exit(2);
+    }
   }
 
-  console.log(formatResult('block', message));
-  process.exit(2);
+  console.log(formatResult('allow'));
+  process.exit(0);
 }
 
 if (require.main === module) {

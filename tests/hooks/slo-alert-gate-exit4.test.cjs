@@ -16,10 +16,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const HOOK_PATH = path.resolve(
-  __dirname,
-  '../../.claude/hooks/monitoring/slo-alert-gate.cjs'
-);
+const HOOK_PATH = path.resolve(__dirname, '../../.claude/hooks/monitoring/slo-alert-gate.cjs');
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 
 let tmpDir;

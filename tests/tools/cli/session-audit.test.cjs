@@ -54,9 +54,21 @@ function writeFixture(dir, sessionId, records) {
 
 test('aggregates 3 tool calls by same agent into one table row with token total', () => {
   const records = [
-    makeRecord({ agent_id: 'developer', 'gen_ai.tool.name': 'Read', 'gen_ai.usage.total_tokens': 100 }),
-    makeRecord({ agent_id: 'developer', 'gen_ai.tool.name': 'Read', 'gen_ai.usage.total_tokens': 200 }),
-    makeRecord({ agent_id: 'developer', 'gen_ai.tool.name': 'Read', 'gen_ai.usage.total_tokens': 300 }),
+    makeRecord({
+      agent_id: 'developer',
+      'gen_ai.tool.name': 'Read',
+      'gen_ai.usage.total_tokens': 100,
+    }),
+    makeRecord({
+      agent_id: 'developer',
+      'gen_ai.tool.name': 'Read',
+      'gen_ai.usage.total_tokens': 200,
+    }),
+    makeRecord({
+      agent_id: 'developer',
+      'gen_ai.tool.name': 'Read',
+      'gen_ai.usage.total_tokens': 300,
+    }),
   ];
 
   const agg = aggregateByAgent(records, {});
@@ -77,9 +89,21 @@ test('aggregates 3 tool calls by same agent into one table row with token total'
 
 test('groups output per agent and per tool when multiple agents present', () => {
   const records = [
-    makeRecord({ agent_id: 'developer', 'gen_ai.tool.name': 'Read', 'gen_ai.usage.total_tokens': 100 }),
-    makeRecord({ agent_id: 'developer', 'gen_ai.tool.name': 'Write', 'gen_ai.usage.total_tokens': 150 }),
-    makeRecord({ agent_id: 'planner', 'gen_ai.tool.name': 'Task', 'gen_ai.usage.total_tokens': 200 }),
+    makeRecord({
+      agent_id: 'developer',
+      'gen_ai.tool.name': 'Read',
+      'gen_ai.usage.total_tokens': 100,
+    }),
+    makeRecord({
+      agent_id: 'developer',
+      'gen_ai.tool.name': 'Write',
+      'gen_ai.usage.total_tokens': 150,
+    }),
+    makeRecord({
+      agent_id: 'planner',
+      'gen_ai.tool.name': 'Task',
+      'gen_ai.usage.total_tokens': 200,
+    }),
   ];
 
   const agg = aggregateByAgent(records, {});
@@ -142,8 +166,16 @@ test('parseArgs returns error flag when session id is missing', () => {
 
 test('--agent filter limits aggregation output to specified agent', () => {
   const records = [
-    makeRecord({ agent_id: 'developer', 'gen_ai.tool.name': 'Read', 'gen_ai.usage.total_tokens': 100 }),
-    makeRecord({ agent_id: 'planner', 'gen_ai.tool.name': 'Task', 'gen_ai.usage.total_tokens': 200 }),
+    makeRecord({
+      agent_id: 'developer',
+      'gen_ai.tool.name': 'Read',
+      'gen_ai.usage.total_tokens': 100,
+    }),
+    makeRecord({
+      agent_id: 'planner',
+      'gen_ai.tool.name': 'Task',
+      'gen_ai.usage.total_tokens': 200,
+    }),
     makeRecord({ agent_id: 'qa', 'gen_ai.tool.name': 'Bash', 'gen_ai.usage.total_tokens': 50 }),
   ];
 
@@ -159,8 +191,16 @@ test('--agent filter limits aggregation output to specified agent', () => {
 
 test('renderJson emits valid JSON with agent and token data', () => {
   const records = [
-    makeRecord({ agent_id: 'developer', 'gen_ai.tool.name': 'Read', 'gen_ai.usage.total_tokens': 500 }),
-    makeRecord({ agent_id: 'developer', 'gen_ai.tool.name': 'Write', 'gen_ai.usage.total_tokens': 300 }),
+    makeRecord({
+      agent_id: 'developer',
+      'gen_ai.tool.name': 'Read',
+      'gen_ai.usage.total_tokens': 500,
+    }),
+    makeRecord({
+      agent_id: 'developer',
+      'gen_ai.tool.name': 'Write',
+      'gen_ai.usage.total_tokens': 300,
+    }),
   ];
 
   const agg = aggregateByAgent(records, {});
@@ -183,7 +223,11 @@ test('loadTraceRecords reads a jsonl file and returns parsed records', () => {
   try {
     const sessionId = 'test-session-xyz';
     const records = [
-      makeRecord({ session_id: sessionId, agent_id: 'developer', 'gen_ai.usage.total_tokens': 100 }),
+      makeRecord({
+        session_id: sessionId,
+        agent_id: 'developer',
+        'gen_ai.usage.total_tokens': 100,
+      }),
       makeRecord({ session_id: sessionId, agent_id: 'planner', 'gen_ai.usage.total_tokens': 200 }),
     ];
     writeFixture(tmpDir, sessionId, records);

@@ -5,7 +5,44 @@ All notable changes to Agent Studio are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.0.0] - 2026-04-22 — Ecosystem-Native
+
+v3.0.0 makes agent-studio interoperable with the MCP + A2A agent ecosystem while locking in the self-hosted moat (multi-model routing, data sovereignty, skill ownership).
+
+### ⚠ BREAKING CHANGES
+
+- **BC-1 (MCP transport)**: `mcp.transport: "sse"` is removed. HTTP+SSE EOL June 2026. Set `MCP_TRANSPORT=streamable-http` and run `pnpm migrate:2x-to-3`.
+- **BC-2 (Agent Manifest required)**: agents without a `manifest:` frontmatter block fail startup when `V3_MANIFEST_REQUIRED=on`. Run `pnpm migrate:2x-to-3` to backfill minimal manifests. Default remains OFF until operators opt in.
+- **BC-3 (AIP Capability Tokens)**: `Task()` spawns require an Invocation-Bound Capability Token in production mode. Router auto-injects. Escape via `AIP_TOKENS=off`.
+- **BC-4 (Agent Registry v3)**: v2-pinned registries not auto-loaded. Run `pnpm agents:registry` to regenerate.
+
+### Added
+
+- **MCP Streamable HTTP transport** (`.claude/lib/mcp/streamable-http-client.cjs`, validator hook) — session-ID threading per arXiv [2603.24747] gap analysis.
+- **Agent Manifest v1.0 schema** (`.claude/schemas/agent-manifest.schema.json`) — declarative capability contract covering tools, memory tier, cost envelope, session type, a2a_interop flags. Enables interop with Microsoft Agent Framework + Claude Managed Agents orchestrators.
+- **AIP Invocation-Bound Capability Tokens** (`.claude/lib/aip/capability-tokens.cjs`) — cryptographic delegation for Task() spawns per arXiv [2603.24775]. HMAC-SHA256 signing, TTL + capability scope enforcement. ~2.35ms overhead target (actual: see benchmarks).
+- **Managed-Agents Importer** (`pnpm claude:import <managed-agent-id>`) — one-way rescue from Claude Managed Agents back to self-hosted. Directly addresses Reddit community pain #1 (vendor lock-in reversal).
+- **Migration tooling** (`pnpm migrate:2x-to-3`) — backfills minimal Agent Manifests, flags SSE transport configs, creates backups.
+- Per-agent session:audit now emits OTel GenAI span hierarchy (parent_span_id, span_type) — carried from v2.4.0.
+
+### Research validation
+
+- arXiv [2603.23801] AgentRFC Composition Safety
+- arXiv [2603.24775] AIP Invocation-Bound Capability Tokens
+- arXiv [2603.24747] Formal MCP session semantics
+- MCP 2026 Roadmap (Streamable HTTP stabilization)
+- Microsoft Agent Framework 1.0 GA (2026-04-03)
+- Claude Managed Agents public beta (2026-04-08)
+
+### Tests
+
+- 76/76 new v3.0.0 slice tests across S1-S5.
+- Zero regression on the 6265+ v2.x test base.
+- 27/27 validators green.
+
+### Migration
+
+See README "Migrating from 2.x to 3.0" section for the 7-step upgrade checklist. Run `pnpm migrate:2x-to-3` first; it's safe (dry-run available, backups created).
 
 ## [2.5.1] - 2026-04-22
 

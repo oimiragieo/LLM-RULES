@@ -1,0 +1,198 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/agent-manifest",
+  "title": "Agent Manifest Schema",
+  "description": "v3.0.0 Capability Contract — every agent declares its tools, memory tier, cost envelope, session type, and interop targets. BC-2: agents without a manifest block fail startup.",
+  "type": "object",
+  "required": [
+    "manifest_version",
+    "agent_id",
+    "agent_type",
+    "capabilities",
+    "memory_tier",
+    "cost_envelope",
+    "session_type",
+    "a2a_interop"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "manifest_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Manifest schema version. Only '1.0' is valid for v3.0.0."
+    },
+    "agent_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "minLength": 2,
+      "maxLength": 100,
+      "description": "Unique agent identifier in lowercase-kebab-case. Must match the agent file name."
+    },
+    "agent_type": {
+      "type": "string",
+      "enum": [
+        "core",
+        "specialized",
+        "orchestrator",
+        "security",
+        "domain",
+        "creator",
+        "monitor",
+        "imported"
+      ],
+      "description": "Functional category of the agent."
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "Enumeration of tool permissions with optional rate limits.",
+      "minItems": 0,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "required": ["tool_name", "allowed"],
+        "additionalProperties": false,
+        "properties": {
+          "tool_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Name of the tool (e.g. 'Read', 'Write', 'Bash', 'Task')."
+          },
+          "allowed": {
+            "type": "boolean",
+            "description": "Whether this tool is permitted for the agent."
+          },
+          "rate_limit": {
+            "type": "object",
+            "description": "Optional rate limit for this tool.",
+            "required": ["calls_per_task"],
+            "additionalProperties": false,
+            "properties": {
+              "calls_per_task": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000,
+                "description": "Maximum number of calls allowed per task execution."
+              },
+              "burst": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000,
+                "description": "Optional burst allowance above the per-task rate."
+              }
+            }
+          }
+        }
+      }
+    },
+    "memory_tier": {
+      "type": "string",
+      "enum": ["STM", "MTM", "LTM", "NONE"],
+      "description": "Memory persistence tier. STM = session-only, MTM = cross-session medium-term, LTM = permanent, NONE = stateless."
+    },
+    "cost_envelope": {
+      "type": "object",
+      "description": "Spending and token constraints for this agent. Integrates with token-governor and spend-guard.",
+      "required": ["max_tokens_per_task", "max_usd_per_session", "preferred_model"],
+      "additionalProperties": false,
+      "properties": {
+        "max_tokens_per_task": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 2000000,
+          "description": "Hard token ceiling per task execution. Enforced by token-governor."
+        },
+        "max_usd_per_session": {
+          "type": "number",
+          "minimum": 0.001,
+          "maximum": 1000.0,
+          "description": "Maximum USD spend allowed per session. Enforced by spend-guard."
+        },
+        "preferred_model": {
+          "type": "string",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus",
+            "inherit",
+            "claude-haiku-4-5",
+            "claude-sonnet-4-5",
+            "claude-sonnet-4-6",
+            "claude-opus-4-5-20251101"
+          ],
+          "description": "Preferred model for cost/capability trade-off. 'inherit' defers to router config."
+        }
+      }
+    },
+    "session_type": {
+      "type": "string",
+      "enum": ["ephemeral", "persistent", "delegated"],
+      "description": "Session lifecycle. ephemeral = no state survives; persistent = state survives across sessions; delegated = lifecycle managed by parent orchestrator."
+    },
+    "a2a_interop": {
+      "type": "object",
+      "description": "Agent-to-agent and ecosystem interoperability flags.",
+      "required": ["supports_mcp", "supports_aip_tokens", "supports_maf"],
+      "additionalProperties": false,
+      "properties": {
+        "supports_mcp": {
+          "type": "boolean",
+          "description": "Whether this agent speaks MCP Streamable HTTP (v3.0.0 transport)."
+        },
+        "supports_aip_tokens": {
+          "type": "boolean",
+          "description": "Whether this agent validates AIP invocation-bound capability tokens (arXiv 2603.24775)."
+        },
+        "supports_maf": {
+          "type": "boolean",
+          "description": "Whether this agent exports a Microsoft Agent Framework 1.0-compatible agent card."
+        },
+        "maf_input_modes": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["text", "file", "data", "code"] },
+          "maxItems": 10,
+          "description": "MAF inputModes field — modalities this agent can accept."
+        },
+        "maf_output_modes": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["text", "file", "data", "code"] },
+          "maxItems": 10,
+          "description": "MAF outputModes field — modalities this agent can produce."
+        }
+      }
+    },
+    "schema_upgrade_hint": {
+      "type": "string",
+      "description": "Present when manifest_version is behind the current schema. Contains upgrade instructions.",
+      "maxLength": 500
+    }
+  },
+  "examples": [
+    {
+      "manifest_version": "1.0",
+      "agent_id": "developer",
+      "agent_type": "core",
+      "capabilities": [
+        { "tool_name": "Read", "allowed": true },
+        { "tool_name": "Write", "allowed": true },
+        { "tool_name": "Edit", "allowed": true },
+        { "tool_name": "Bash", "allowed": true, "rate_limit": { "calls_per_task": 50 } },
+        { "tool_name": "Task", "allowed": false }
+      ],
+      "memory_tier": "MTM",
+      "cost_envelope": {
+        "max_tokens_per_task": 100000,
+        "max_usd_per_session": 2.0,
+        "preferred_model": "sonnet"
+      },
+      "session_type": "ephemeral",
+      "a2a_interop": {
+        "supports_mcp": true,
+        "supports_aip_tokens": true,
+        "supports_maf": true,
+        "maf_input_modes": ["text", "code"],
+        "maf_output_modes": ["text", "code"]
+      }
+    }
+  ]
+}

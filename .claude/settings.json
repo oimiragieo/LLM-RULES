@@ -196,6 +196,16 @@
         "hooks": [
           {
             "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/aip-token-injector.cjs",
+            "timeout_ms": 2000
+          },
+          {
+            "type": "command",
+            "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/routing/aip-token-validator.cjs",
+            "timeout_ms": 2000
+          },
+          {
+            "type": "command",
             "command": "cd \"C:/dev/projects/agent-studio\" && node .claude/hooks/safety/worktree-preflight-check.cjs",
             "timeout_ms": 5000
           },

@@ -115,6 +115,10 @@ describe('slo-alert-gate: Site 4 — SLO violation → exit 4 DEGRADE', () => {
       recorder: { failureRate: 0.001 },
     });
     const result = runHook({ HOOK_P95_MAX_MS: '5', RECORDER_FAILURE_RATE_MAX: '0.01' });
-    assert.strictEqual(result.exitCode, 0, `Expected exit 0 when SLOs pass, got ${result.exitCode}`);
+    assert.strictEqual(
+      result.exitCode,
+      0,
+      `Expected exit 0 when SLOs pass, got ${result.exitCode}`
+    );
   });
 });

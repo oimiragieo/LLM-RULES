@@ -14,10 +14,7 @@ const assert = require('node:assert/strict');
 const { spawnSync } = require('child_process');
 const path = require('path');
 
-const HOOK_PATH = path.resolve(
-  __dirname,
-  '../../.claude/hooks/benchmarks/perf-gate.cjs'
-);
+const HOOK_PATH = path.resolve(__dirname, '../../.claude/hooks/benchmarks/perf-gate.cjs');
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 
 function runHook(env = {}) {

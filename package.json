@@ -1,6 +1,6 @@
 {
   "name": "agent-studio",
-  "version": "2.5.1",
+  "version": "3.0.0",
   "description": "Multi-platform agent configuration bundle for Claude Code, Cursor IDE, and Factory Droid",
   "type": "module",
   "private": true,
@@ -92,6 +92,8 @@
     "diagnostics": "node .claude/tools/cli/diagnostics.cjs",
     "diagnostics:dead-code": "node .claude/tools/cli/lsp-diagnostics-runner.cjs --check dead-exports",
     "diagnostics:broken-imports": "node .claude/tools/cli/lsp-diagnostics-runner.cjs --check broken-imports",
+    "migrate:2x-to-3": "node .claude/tools/cli/migrate-2x-to-3.cjs",
+    "claude:import": "node .claude/tools/cli/claude-import.cjs",
     "diagnostics:all": "node .claude/tools/cli/lsp-diagnostics-runner.cjs",
     "profile": "node .claude/tools/cli/performance-profile.cjs",
     "test": "node --test --test-concurrency=1 \"tests/**/*.test.{mjs,cjs}\"",

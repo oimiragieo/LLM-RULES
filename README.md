@@ -124,6 +124,49 @@ SPAWN_BUDGET_HARD=on
 
 See `CHANGELOG.md` and `.claude/docs/HOOKS_REFERENCE.md` for full details.
 
+## Migrating from 2.x to 3.0
+
+v3.0.0 introduces four breaking changes. The migration script handles most of them automatically.
+
+### Copy-Paste Checklist
+
+```bash
+# 1. Pull latest and install
+git pull && pnpm install
+
+# 2. Preview changes (no files written)
+pnpm migrate:2x-to-3 --dry-run
+
+# 3. Apply changes (backfills agent manifests, flags SSE transport)
+pnpm migrate:2x-to-3
+
+# 4. Review backups created for modified agents
+#    .claude/context/tmp/agents-pre-v3-migration/
+
+# 5. Update any mcp.transport: "sse" entries in config to "streamable-http"
+#    (BC-1 — the script flags locations but does not rewrite config files)
+
+# 6. Regenerate agent registry in v3 schema format
+pnpm agents:registry
+
+# 7. Enable enforcement when ready (optional — off by default)
+#    Set V3_MANIFEST_REQUIRED=on in .env
+
+# 8. Verify
+pnpm test:framework
+```
+
+### Breaking Changes Summary
+
+| #    | Change                                        | Fix                                               |
+| ---- | --------------------------------------------- | ------------------------------------------------- |
+| BC-1 | `mcp.transport: "sse"` rejected               | Update to `"streamable-http"` in config           |
+| BC-2 | Agents without `manifest:` block fail startup | Run `pnpm migrate:2x-to-3`                        |
+| BC-3 | `Task()` spawns require AIP token             | Router auto-injects; set `AIP_TOKENS=off` for dev |
+| BC-4 | `agent-registry.json` v2 not auto-loaded      | Run `pnpm agents:registry`                        |
+
+Full guide: `docs/migration/v2-to-v3.md`
+
 ## Recent Changes
 
 ### Release-Readiness Hardening

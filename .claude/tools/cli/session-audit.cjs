@@ -194,7 +194,8 @@ function renderTable(agg) {
         pad('TOKENS', COL_TOKENS) +
         pad('p50ms', COL_P50) +
         pad('p95ms', COL_P95)
-    ) + '\n' +
+    ) +
+    '\n' +
     ANSI.dim('─'.repeat(COL_AGENT + COL_TOOL + COL_CALLS + COL_TOKENS + COL_P50 + COL_P95)) +
     '\n';
 
@@ -241,8 +242,7 @@ function renderTable(agg) {
 
     // Agent subtotal line
     const agentTokenStr =
-      agentData.totalTokens === 0 &&
-      !Object.values(agentData.tools).some(t => t.hasTokenData)
+      agentData.totalTokens === 0 && !Object.values(agentData.tools).some(t => t.hasTokenData)
         ? '—'
         : String(agentData.totalTokens);
 
@@ -326,7 +326,9 @@ function main() {
   const opts = parseArgs(process.argv);
 
   if (opts.error === 'missing-session-id') {
-    console.error('Usage: pnpm session:audit <session-id> [--agent <id>] [--tool <name>] [--format json]');
+    console.error(
+      'Usage: pnpm session:audit <session-id> [--agent <id>] [--tool <name>] [--format json]'
+    );
     process.exit(1);
   }
 
