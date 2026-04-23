@@ -5,6 +5,28 @@ All notable changes to Agent Studio are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.2] - 2026-04-20 — design.md Pattern Completion (Token Refs + Severity Tiers)
+
+### Added
+
+- Token Reference resolver (`.claude/lib/token-reference/resolver.cjs`) — `{skill.X}`, `{agent.X}`, `{hook.X}` syntax per design.md Token Reference pattern. `pnpm skills:index` audits agent manifests for unresolvable references (non-fatal warnings).
+- Warning-severity tier (`.claude/lib/hooks/severity.cjs`) — `asWarning()`, `asNotice()`, `asError()`, `formatForStderr()` helpers. `guardrail-result.schema.json` extended with optional `severity` enum (`"error"|"warning"|"notice"`). Default remains `"error"` for backward compat.
+
+### Changed
+
+- `pre-completion-validation.cjs` + `pre-task-unified-core.cjs` migrated from `console.warn()` to structured severity emission.
+- `eslint.config.js`: removed stale ignore entry for `.claude/lib/token-reference/**` (module is now landed and lints clean).
+
+### Research
+
+- Finishes design.md pattern adoption started in v3.1.0. Token Reference enables cross-artifact pointers; severity tier enables schema evolution without breaking old consumers.
+
+### Tests
+
+- 16 new (9 resolver + 7 severity) + existing regression green. 36/36 pass across TR + WS + pre-completion suites.
+
+---
+
 ## [3.1.1] - 2026-04-23 — Reflection Cleanup Drain Fix
 
 ### Fixed

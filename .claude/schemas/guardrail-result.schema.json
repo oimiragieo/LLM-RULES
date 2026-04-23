@@ -30,9 +30,15 @@
             "type": "string",
             "maxLength": 500,
             "description": "Human-readable result message"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["error", "warning", "notice"],
+            "default": "error",
+            "description": "Severity tier of this check result. Absent severity is treated as 'error' for backward compatibility."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": true
       },
       "minItems": 1,
       "maxItems": 20,

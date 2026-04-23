@@ -30,6 +30,18 @@ const a2aDispatch = libRequire(path.join('routing', 'a2a-dispatch.cjs'));
 const state = require('./pre-task-unified-state.cjs');
 const helpers = require('./pre-task-unified-helpers.cjs');
 const ownership = require('./pre-task-unified-ownership.cjs');
+
+// Severity helpers — fail-open: graceful fallback if unavailable
+let _asWarning;
+let _formatForStderr;
+try {
+  ({ asWarning: _asWarning, formatForStderr: _formatForStderr } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'hooks', 'severity.cjs')
+  ));
+} catch (_) {
+  _asWarning = msg => ({ severity: 'warning', message: String(msg || '') });
+  _formatForStderr = result => `[WARNING] ${(result && result.message) || ''}`;
+}
 const TOOL_GOVERNANCE_STATE_FILE = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -248,7 +260,7 @@ Spawn PLANNER first: Task({ task_id: 'task-1', description: 'Planner designing..
       if (plannerEnforcement === 'block') {
         return { pass: false, result: 'block', message };
       }
-      console.warn(message);
+      process.stderr.write(_formatForStderr(_asWarning(message)) + '\n');
     }
   }
 
@@ -266,7 +278,7 @@ Spawn SECURITY-ARCHITECT first to review security implications.`;
         if (securityEnforcement === 'block') {
           return { pass: false, result: 'block', message };
         }
-        console.warn(message);
+        process.stderr.write(_formatForStderr(_asWarning(message)) + '\n');
       }
     }
   }

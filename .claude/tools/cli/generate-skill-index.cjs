@@ -24,6 +24,7 @@
 
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
+const { auditAgentSkillRefs } = require('../../lib/token-reference/resolver.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -41,6 +42,7 @@ const CATALOG_PATH_LEGACY = path.join(
   'skill-catalog.md'
 );
 const SKILLS_DIR = path.join(PROJECT_ROOT, '.claude', 'skills');
+const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
 const AGENT_SKILL_MATRIX_PATH = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -528,6 +530,79 @@ function logGeneratedIndexSummary(verbose, index) {
   console.log(`  - ${generatedAgentAssignmentCount} agent assignments`);
 }
 /**
+ * Recursively collect all *.md files under a directory (non-archived).
+ * Returns an array of absolute file paths.
+ */
+function collectAgentManifests(dir) {
+  const manifests = [];
+  try {
+    if (!fs.existsSync(dir)) return manifests;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        manifests.push(...collectAgentManifests(fullPath));
+      } else if (entry.isFile() && entry.name.endsWith('.md') && entry.name !== 'CLAUDE.md') {
+        manifests.push(fullPath);
+      }
+    }
+  } catch (_err) {
+    // Non-fatal: skip unreadable entries
+  }
+  return manifests;
+}
+
+/**
+ * Parse an agent manifest file and extract the `skills:` YAML array.
+ * Only handles the simple inline list style used in agent frontmatter.
+ * Returns { agentId, skills[] } or null if no skills array found.
+ */
+function parseAgentManifestSkills(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!fmMatch) return null;
+    const yaml = fmMatch[1];
+
+    // Match the `skills:` block — list items (`  - skillname`)
+    const skillsBlockMatch = yaml.match(/^skills:\s*\n((?:[ \t]+-[^\n]*\n?)*)/m);
+    if (!skillsBlockMatch) return null;
+
+    const lines = skillsBlockMatch[1].split('\n');
+    const skills = [];
+    for (const line of lines) {
+      const m = line.match(/^\s+-\s+(.+)/);
+      if (m) skills.push(m[1].trim());
+    }
+
+    if (skills.length === 0) return null;
+
+    // Derive agent id from filename (strip .md)
+    const agentId = path.basename(filePath, '.md');
+    return { agentId, skills };
+  } catch (_err) {
+    return null;
+  }
+}
+
+/**
+ * Audit all agent manifests under AGENTS_DIR for unresolvable {skill.*} tokens.
+ * Read-only — does not mutate any files.
+ * Returns an array of warning strings.
+ */
+function auditAllAgentManifests(skillsRegistry) {
+  const allWarnings = [];
+  const manifests = collectAgentManifests(AGENTS_DIR);
+  for (const filePath of manifests) {
+    const parsed = parseAgentManifestSkills(filePath);
+    if (!parsed) continue;
+    const warnings = auditAgentSkillRefs(parsed.agentId, parsed.skills, skillsRegistry);
+    allWarnings.push(...warnings);
+  }
+  return allWarnings;
+}
+
+/**
  * Generate the skill index
  */
 function generateIndex(options = {}) {
@@ -725,6 +800,19 @@ function main() {
     console.log('\nWarning: Generated index has validation issues:');
     validation.errors.forEach(e => console.log(`  - ${e}`));
   }
+
+  // TR-001: Audit agent manifests for unresolvable {skill.*} token references
+  // Build a flat skills registry from the generated index for lookup
+  const skillsRegistry = {};
+  for (const skillName of Object.keys(index.skills)) {
+    skillsRegistry[skillName] = skillName;
+  }
+  const refAuditWarnings = auditAllAgentManifests(skillsRegistry);
+  if (refAuditWarnings.length > 0) {
+    console.log('\nRef-audit: unresolvable {skill.*} references in agent manifests:');
+    refAuditWarnings.forEach(w => console.log(`  [WARN] ${w}`));
+    console.log(`\n${refAuditWarnings.length} unresolvable ref(s) found (warnings only — index generation succeeded).`);
+  }
 }
 
 // Run if called directly
@@ -742,4 +830,7 @@ module.exports = {
   parseSkillCatalog,
   scanSkillFiles,
   scanSkillFilesRecursively,
+  auditAllAgentManifests,
+  collectAgentManifests,
+  parseAgentManifestSkills,
 };

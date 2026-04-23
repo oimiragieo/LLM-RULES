@@ -113,6 +113,17 @@ try {
   process.exit(0);
 }
 
+// Severity helpers — fail-open: if unavailable the warn fallbacks below still work
+let asWarning;
+let formatForStderr;
+try {
+  ({ asWarning, formatForStderr } = require('../../lib/hooks/severity.cjs'));
+} catch (_) {
+  // Graceful fallback: emit plain [WARNING] prefix manually
+  asWarning = msg => ({ severity: 'warning', message: String(msg || '') });
+  formatForStderr = result => `[WARNING] ${(result && result.message) || ''}`;
+}
+
 // Paths
 const VALIDATION_SCRIPT = path.join(
   PROJECT_ROOT,
@@ -416,7 +427,7 @@ async function main() {
             console.log(formatHookResult('block', msg));
             process.exit(2);
           } else {
-            console.warn(`[WARN] ${msg}`);
+            process.stderr.write(formatForStderr(asWarning(msg)) + '\n');
           }
         } else {
           const currentStatus = readTaskStatus(taskId);
@@ -430,7 +441,7 @@ async function main() {
               console.log(formatHookResult('block', msg));
               process.exit(2);
             } else {
-              console.warn(`[WARN] ${msg}`);
+              process.stderr.write(formatForStderr(asWarning(msg)) + '\n');
             }
           } else {
             // Valid transition - allow but don't write yet.
