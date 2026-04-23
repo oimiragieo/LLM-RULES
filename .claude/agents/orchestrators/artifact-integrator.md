@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-04-22T11:47:33.920Z
+lastVerifiedAt: 2026-04-23T21:55:32.007Z
 name: artifact-integrator
 version: 1.0.0
 description: >-

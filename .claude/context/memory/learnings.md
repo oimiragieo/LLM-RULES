@@ -137,3 +137,21 @@ Removed 50 orphaned worktree directories. Skipped 9 (reasons: 2 registered+locke
 - Refreshed agent: .claude/agents/orchestrators/heartbeat-orchestrator.md (2026-04-23)
 
 - [2026-04-20] [BUG FIX] heartbeat-orchestrator was clearing reflection-spawn-request.json on QUEUED_ACTIONS:N output (iron law violation). Fixed via agent-updater: step 4 of Tick Callback Handling now explicitly prohibits clearing/writing queue files. Added "Queue Preservation (IRON LAW)" section with absolute prohibition on Write/Edit to reflection-spawn-request.json. Queue is now treated as read-only for heartbeat-orchestrator; Router Gate 0 drains it on next UserPromptSubmit.
+
+- Created new agent: qa-guardian (2026-04-23)
+
+- Created new agent: contract-check (2026-04-23)
+
+- Created new agent: bool-action (2026-04-23)
+
+- Created new agent: repo-onboarder (2026-04-23)
+
+- Created new agent: release-guardian (2026-04-23)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-23)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-23)
+
+- Updated workflow: evolution-workflow (2026-04-23)
+
+- Updated workflow: missing-workflow-xyz (2026-04-23)
