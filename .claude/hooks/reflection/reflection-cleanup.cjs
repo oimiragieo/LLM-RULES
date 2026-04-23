@@ -20,12 +20,18 @@ const {
 const {
   removeRequests,
   readSpawnRequestsFile,
+  removeStaleRequests,
 } = require('../../lib/reflection/spawn-request-contract.cjs');
 const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
+const MAX_REFLECTION_AGE_MS = Number(process.env.REFLECTION_MAX_AGE_HOURS || 24) * 60 * 60 * 1000;
+
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
-const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
+// SPAWN_REQUEST_PATH_OVERRIDE allows tests to redirect to a temp file
+const SPAWN_REQUEST_PATH =
+  process.env.SPAWN_REQUEST_PATH_OVERRIDE ||
+  path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
 const REMINDER_PATH = path.join(RUNTIME_DIR, 'reflection-reminder.txt');
 const REFLECTION_LOG_PATH =
   process.env.REFLECTION_LOG_FILE_PATH ||
@@ -63,6 +69,25 @@ async function main() {
 
     const toolName = getToolName(input);
     const toolInput = getToolInput(input);
+
+    // Stale-entry prune: runs on every PostToolUse, regardless of tool type.
+    // Prevents queue entries from persisting across sessions when agents complete
+    // without emitting processedReflectionIds in TaskUpdate metadata (the primary
+    // drain path). Acts as a safety-net side-channel.
+    const stalePruneCount = removeStaleRequests(SPAWN_REQUEST_PATH, MAX_REFLECTION_AGE_MS);
+    if (stalePruneCount > 0) {
+      auditLog('reflection-cleanup', 'pruned_stale_requests', {
+        count: stalePruneCount,
+        maxAgeHours: MAX_REFLECTION_AGE_MS / (60 * 60 * 1000),
+      });
+      appendJsonl(REFLECTION_LOG_PATH, {
+        trigger: 'stale_prune',
+        timestamp: new Date().toISOString(),
+        processedReflectionIds: [],
+        stalePruneCount,
+        source: 'cleanup_stale',
+      });
+    }
 
     if (toolName !== 'TaskUpdate') process.exit(0);
 

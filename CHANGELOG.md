@@ -5,6 +5,19 @@ All notable changes to Agent Studio are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.1] - 2026-04-23 — Reflection Cleanup Drain Fix
+
+### Fixed
+
+- `reflection-cleanup.cjs` post-hook now adds a stale-entry side-channel prune path that runs on every PostToolUse event. Entries older than `REFLECTION_MAX_AGE_HOURS` (default 24h) are pruned even when agents complete without emitting `processedReflectionIds` in TaskUpdate metadata. Fixes stuck queue entry from 2026-04-22 that was re-processed 5+ times without being drained.
+- `issues.md`: marked "planner creator-guard blocks plan writes" entry as RESOLVED. v2.3.0 S1 investigation confirmed guard is path-based (not agent-based); `.claude/context/plans/` was never in `CREATOR_CONFIGS`. The original symptom was a CWD path resolution issue, not a guard violation. No exemption needed.
+
+### Tests
+
+- 4 new tests in `tests/hooks/reflection-cleanup.test.cjs` (Suite 5): stale-prune on TaskUpdate without processedReflectionIds, fresh-entry non-prune, prune on non-TaskUpdate tool events, `REFLECTION_MAX_AGE_HOURS` env var override.
+
+---
+
 ## [3.1.0] - 2026-04-23 — Dual-Layer Schemas
 
 Inspired by Google Labs' DESIGN.md — adopt dual-layer persistence pattern (machine-parseable YAML + prose rationale) across skill + plan artifacts.

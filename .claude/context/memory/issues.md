@@ -1,12 +1,12 @@
 > ⚠️ Content archived to archive/issues-2026-04-19.md on 2026-04-19
 
-## Issue: unified-creator-guard blocks planner from writing plan files (2026-04-20)
+## ~~Issue: unified-creator-guard blocks planner from writing plan files~~ — RESOLVED (2026-04-23)
 
-- **Symptom**: During v2.1.1 release session, planner agent could not persist its plan file to `.claude/context/plans/`. unified-creator-guard treated planner writing to creator paths as a violation.
-- **Impact**: Plans exist only in session context; a context crash or reset would destroy the plan with no recovery path.
-- **Root cause**: unified-creator-guard blanket-blocks all Write/Edit to creator paths. The guard does not distinguish between (a) an agent editing an existing skill/agent artifact (prohibited) and (b) the planner-agent creating a new plan document in plans/ (legitimate).
-- **Fix candidate**: Add a guard exemption: if `agent_type == "planner"` AND `path matches .claude/context/plans/**` AND operation is Write (new file creation, not edit of existing creator artifact), allow the write.
-- **Source**: v2.1.1 soak-test session; confirmed by router observation that plan content was session-only.
+- **Status**: RESOLVED — confirmed FALSE POSITIVE
+- **Resolution**: v2.3.0 S1 investigation (commit history ~`9efc68706` era) confirmed the guard is **path-based, not agent-based**. `.claude/context/plans/` was never listed in `CREATOR_CONFIGS` within `unified-creator-guard.cjs`. The guard only blocks writes to `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/workflows/`, `.claude/templates/`, and `.claude/schemas/`. Plans always wrote successfully to `context/plans/`.
+- **Original symptom (v2.1.1)**: Planner plan file appeared session-only — this was a separate issue (plan file path was resolved relative to CWD rather than PROJECT_ROOT in that session), not a guard violation.
+- **No fix needed**: Guard exemption proposed in original issue is unnecessary. Guard is correctly scoped.
+- **Source**: v2.3.0 S1 investigation; see commit history around 9efc68706.
 
 ## Issue: heartbeat orchestrator cron registration fails from subagent context (2026-04-20)
 

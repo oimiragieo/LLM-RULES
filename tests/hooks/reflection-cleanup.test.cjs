@@ -379,3 +379,148 @@ describe('spawn-request-contract: stale cleanup (age-based, cross-session scenar
     assert.strictEqual(requestsAfterCleanup.length, 0, 'readSpawnRequestsFile confirms no pending');
   });
 });
+
+// ---------------------------------------------------------------------------
+// Test Suite 5: Hook stale-prune side-channel (age-based, via hook process)
+// Covers the fix for the stuck queue drain bug: entries older than
+// MAX_REFLECTION_AGE_HOURS must be pruned by the hook itself even when
+// processedReflectionIds is not present in the TaskUpdate metadata.
+// ---------------------------------------------------------------------------
+
+describe('reflection-cleanup hook: stale-prune side-channel (age-based)', () => {
+  let tmpDir;
+  let spawnRequestPath;
+
+  beforeEach(() => {
+    tmpDir = makeTempDir();
+    spawnRequestPath = path.join(tmpDir, 'reflection-spawn-request.json');
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  test('hook prunes stale entries (>24h) on any PostToolUse even without processedReflectionIds', () => {
+    // Write a stale entry — 26 hours old (exceeds default 24h threshold)
+    const staleEntry = makeSpawnRequest('stale-cross-session-id', 26 * 60 * 60 * 1000);
+    writeSpawnRequests(spawnRequestPath, [staleEntry]);
+
+    // Fire the hook with a TaskUpdate that has NO processedReflectionIds
+    const hookInput = {
+      tool_name: 'TaskUpdate',
+      tool_input: {
+        taskId: 'some-unrelated-task',
+        status: 'completed',
+        // deliberately no metadata.processedReflectionIds
+      },
+    };
+    const result = spawnSync(process.execPath, [HOOK_PATH], {
+      input: JSON.stringify(hookInput),
+      env: {
+        ...process.env,
+        SPAWN_REQUEST_PATH_OVERRIDE: spawnRequestPath,
+        REFLECTION_MAX_AGE_HOURS: '24',
+      },
+      encoding: 'utf8',
+    });
+    assert.strictEqual(result.status, 0, `Hook must exit 0. stderr: ${result.stderr}`);
+
+    // The stale entry should have been pruned by the side-channel
+    const remaining = readSpawnRequests(spawnRequestPath);
+    assert.strictEqual(
+      remaining.length,
+      0,
+      `Stale entry should have been pruned by the hook. Remaining: ${JSON.stringify(remaining)}`
+    );
+  });
+
+  test('hook does NOT prune fresh entries (< 24h) on PostToolUse without processedReflectionIds', () => {
+    // Write a fresh entry — only 2 hours old (well within threshold)
+    const freshEntry = makeSpawnRequest('fresh-current-session-id', 2 * 60 * 60 * 1000);
+    writeSpawnRequests(spawnRequestPath, [freshEntry]);
+
+    const hookInput = {
+      tool_name: 'TaskUpdate',
+      tool_input: {
+        taskId: 'some-unrelated-task',
+        status: 'completed',
+      },
+    };
+    const result = spawnSync(process.execPath, [HOOK_PATH], {
+      input: JSON.stringify(hookInput),
+      env: {
+        ...process.env,
+        SPAWN_REQUEST_PATH_OVERRIDE: spawnRequestPath,
+        REFLECTION_MAX_AGE_HOURS: '24',
+      },
+      encoding: 'utf8',
+    });
+    assert.strictEqual(result.status, 0, `Hook must exit 0. stderr: ${result.stderr}`);
+
+    // Fresh entry must NOT be pruned
+    const remaining = readSpawnRequests(spawnRequestPath);
+    assert.strictEqual(remaining.length, 1, 'Fresh entry should NOT be pruned by the hook');
+    assert.strictEqual(remaining[0].id, 'fresh-current-session-id');
+  });
+
+  test('hook prunes stale entries even on non-TaskUpdate tool events (Write, Bash, etc.)', () => {
+    // Write a stale entry
+    const staleEntry = makeSpawnRequest('stale-id-on-write', 48 * 60 * 60 * 1000); // 48h old
+    writeSpawnRequests(spawnRequestPath, [staleEntry]);
+
+    // Fire with a Write tool event (not TaskUpdate)
+    const hookInput = {
+      tool_name: 'Write',
+      tool_input: {
+        file_path: '/some/file.txt',
+        content: 'hello',
+      },
+    };
+    const result = spawnSync(process.execPath, [HOOK_PATH], {
+      input: JSON.stringify(hookInput),
+      env: {
+        ...process.env,
+        SPAWN_REQUEST_PATH_OVERRIDE: spawnRequestPath,
+        REFLECTION_MAX_AGE_HOURS: '24',
+      },
+      encoding: 'utf8',
+    });
+    assert.strictEqual(result.status, 0, `Hook must exit 0. stderr: ${result.stderr}`);
+
+    // Stale entry should have been pruned
+    const remaining = readSpawnRequests(spawnRequestPath);
+    assert.strictEqual(
+      remaining.length,
+      0,
+      `Stale entry should be pruned on Write tool event. Remaining: ${JSON.stringify(remaining)}`
+    );
+  });
+
+  test('hook respects REFLECTION_MAX_AGE_HOURS env var override', () => {
+    // Entry is 2 hours old — stale under a 1h threshold, fresh under 24h
+    const entry = makeSpawnRequest('age-sensitive-id', 2 * 60 * 60 * 1000);
+    writeSpawnRequests(spawnRequestPath, [entry]);
+
+    const hookInput = {
+      tool_name: 'TaskUpdate',
+      tool_input: { taskId: 'x', status: 'completed' },
+    };
+    const result = spawnSync(process.execPath, [HOOK_PATH], {
+      input: JSON.stringify(hookInput),
+      env: {
+        ...process.env,
+        SPAWN_REQUEST_PATH_OVERRIDE: spawnRequestPath,
+        REFLECTION_MAX_AGE_HOURS: '1', // very short threshold — 2h entry is stale
+      },
+      encoding: 'utf8',
+    });
+    assert.strictEqual(result.status, 0, `Hook must exit 0. stderr: ${result.stderr}`);
+
+    const remaining = readSpawnRequests(spawnRequestPath);
+    assert.strictEqual(
+      remaining.length,
+      0,
+      'Entry older than REFLECTION_MAX_AGE_HOURS=1 should be pruned'
+    );
+  });
+});
