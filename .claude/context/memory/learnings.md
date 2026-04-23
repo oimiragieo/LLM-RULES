@@ -1,10 +1,3 @@
-- Created new agent: repo-onboarder (2026-04-17)
-- Created new agent: release-guardian (2026-04-17)
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
-- Updated workflow: evolution-workflow (2026-04-17)
-- Updated workflow: missing-workflow-xyz (2026-04-17)
-- Created new agent: qa-guardian (2026-04-17)
 - Created new agent: contract-check (2026-04-17)
 - Created new agent: bool-action (2026-04-17)
 - Created new agent: repo-onboarder (2026-04-17)
@@ -14,78 +7,6 @@
 - Updated workflow: evolution-workflow (2026-04-17)
 - Updated workflow: missing-workflow-xyz (2026-04-17)
 - Created new agent: qa-guardian (2026-04-17)
-- Created new agent: contract-check (2026-04-17)
-- Created new agent: bool-action (2026-04-17)
-- Created new agent: repo-onboarder (2026-04-17)
-- Created new agent: release-guardian (2026-04-17)
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
-- Updated workflow: evolution-workflow (2026-04-17)
-- Updated workflow: missing-workflow-xyz (2026-04-17)
-- Created new agent: qa-guardian (2026-04-17)
-- Created new agent: contract-check (2026-04-17)
-- Created new agent: bool-action (2026-04-17)
-- Created new agent: repo-onboarder (2026-04-17)
-- Created new agent: release-guardian (2026-04-17)
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
-- Updated workflow: evolution-workflow (2026-04-17)
-- Updated workflow: missing-workflow-xyz (2026-04-17)
-- Created new agent: qa-guardian (2026-04-17)
-- Created new agent: contract-check (2026-04-17)
-- Created new agent: bool-action (2026-04-17)
-- Created new agent: repo-onboarder (2026-04-17)
-- Created new agent: release-guardian (2026-04-17)
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
-- Updated workflow: evolution-workflow (2026-04-17)
-- Updated workflow: missing-workflow-xyz (2026-04-17)
-- Created new agent: qa-guardian (2026-04-17)
-- Created new agent: contract-check (2026-04-17)
-- Created new agent: bool-action (2026-04-17)
-- Created new agent: repo-onboarder (2026-04-17)
-- Created new agent: release-guardian (2026-04-17)
-- Created new agent: qa-guardian (2026-04-17)
-- Created new agent: contract-check (2026-04-17)
-- Created new agent: bool-action (2026-04-17)
-
----
-
-- Created new agent: contract-check (2026-04-17)
-- Created new agent: bool-action (2026-04-17)
-- Created new agent: repo-onboarder (2026-04-17)
-- Created new agent: release-guardian (2026-04-17)
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
-- Updated workflow: evolution-workflow (2026-04-17)
-- Updated workflow: missing-workflow-xyz (2026-04-17)
-- Created new agent: qa-guardian (2026-04-17)
-- Created new agent: contract-check (2026-04-17)
-- Created new agent: bool-action (2026-04-17)
-- Created new agent: repo-onboarder (2026-04-17)
-- Created new agent: release-guardian (2026-04-17)
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
-- Updated workflow: evolution-workflow (2026-04-17)
-- Updated workflow: missing-workflow-xyz (2026-04-17)
-- Created new agent: qa-guardian (2026-04-17)
-- Created new agent: contract-check (2026-04-17)
-- Created new agent: bool-action (2026-04-17)
-- Created new agent: repo-onboarder (2026-04-17)
-- Created new agent: release-guardian (2026-04-17)
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
-- Updated workflow: evolution-workflow (2026-04-17)
-- Updated workflow: missing-workflow-xyz (2026-04-17)
-- Created new agent: qa-guardian (2026-04-17)
-- Created new agent: contract-check (2026-04-17)
-- Created new agent: bool-action (2026-04-17)
-- Created new agent: repo-onboarder (2026-04-17)
-- Created new agent: release-guardian (2026-04-17)
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-17)
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-17)
-- Updated workflow: evolution-workflow (2026-04-17)
-- Updated workflow: missing-workflow-xyz (2026-04-17)
 
 > ⚠️ Content archived to archive/learnings-2026-04-17.md on 2026-04-17
 
@@ -98,6 +19,14 @@
 - [2026-04-17] [WORKFLOW] Dead-code audit A-1 (2026-04-17): 21 new dead-code candidates beyond known 8. 15 unregistered hooks (superseded), 5 orphaned evolution lib modules (test-only), 1 perf-gate stub. Top 3 wire-in candidates: evolution-trigger.cjs (threshold quality monitoring), skill-auto-creator.cjs (conflict-detector POST-GATE), skill-usage-tracker.cjs (post-tool metrics). Blueprint at `.claude/context/plans/dead-code-rewiring-blueprint-2026-04-17.md`.
 
 - [2026-04-17] [TOOLING] knip dead-code analysis misclassifies CJS module.exports patterns as unresolved (issue #465). Fallback: rg-based export/import cross-reference. Note: phase-advance-reader.cjs was misclassified as orphan by knip — it is a live production routing contract gap, not dead code.
+
+- [2026-04-22] [WORKFLOW] Heartbeat-orchestrator must NOT clear the reflection queue itself. Correct pattern: heartbeat reports QUEUED_ACTIONS:N to signal pending work, then preserves the queue intact for Router Gate 0 to process. Subagents that drain the queue without spawning reflection-agent break the reflection loop silently.
+
+- [2026-04-22] [CODE] `runSpendGuard` helper in post-tool-advisory-bundle.cjs is declared-but-unused after the complexity fix — latent dead code, cleanup candidate. Use lsp-diagnostics-runner or rg to confirm zero call-sites before removing.
+
+- [2026-04-22] [WORKFLOW] Large-scope docs agents should checkpoint intermediate state. S6 docs agent stalled at 94K tokens mid-update; required a resumption spawn. Pattern: any docs agent expected to touch >5 files or accumulate >60K tokens should write a .snapshot.json at each phase boundary to enable safe resumption.
+
+- [2026-04-22] [WORKFLOW] Research-driven planning (Exa + ArXiv + Reddit) successfully converged v2.4.0 scope on observability + cost control themes with zero scope drift during execution. Pattern: front-loading multi-source research before task decomposition prevents mid-sprint pivots on large release cycles.
 
 - [2026-04-17] [TOOLING] Exa MCP and Ref MCP tools unavailable in current execution environment (NoSuchToolError). Fallback: WebSearch + WebFetch to github.com. Do not rely on these MCP tools in non-interactive agent pipelines; check availability before dependency.
 
@@ -179,20 +108,26 @@ Removed 50 orphaned worktree directories. Skipped 9 (reasons: 2 registered+locke
 
 - Updated workflow: missing-workflow-xyz (2026-04-21)
 
-- Created new agent: qa-guardian (2026-04-21)
+- Created new agent: qa-guardian (2026-04-22)
 
-- Created new agent: contract-check (2026-04-21)
+- Created new agent: contract-check (2026-04-22)
 
-- Created new agent: bool-action (2026-04-21)
+- Created new agent: bool-action (2026-04-22)
 
-- Created new agent: repo-onboarder (2026-04-21)
+- Created new agent: repo-onboarder (2026-04-22)
 
-- Created new agent: release-guardian (2026-04-21)
+- Created new agent: release-guardian (2026-04-22)
 
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-21)
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-22)
 
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-21)
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-22)
 
-- Updated workflow: evolution-workflow (2026-04-21)
+- Updated workflow: evolution-workflow (2026-04-22)
 
-- Updated workflow: missing-workflow-xyz (2026-04-21)
+- Updated workflow: missing-workflow-xyz (2026-04-22)
+
+> ⚠️ Content archived to archive/learnings-2026-04-22.md on 2026-04-22
+
+- Refreshed agent: .claude/agents/orchestrators/heartbeat-orchestrator.md (2026-04-23)
+
+- [2026-04-20] [BUG FIX] heartbeat-orchestrator was clearing reflection-spawn-request.json on QUEUED_ACTIONS:N output (iron law violation). Fixed via agent-updater: step 4 of Tick Callback Handling now explicitly prohibits clearing/writing queue files. Added "Queue Preservation (IRON LAW)" section with absolute prohibition on Write/Edit to reflection-spawn-request.json. Queue is now treated as read-only for heartbeat-orchestrator; Router Gate 0 drains it on next UserPromptSubmit.
