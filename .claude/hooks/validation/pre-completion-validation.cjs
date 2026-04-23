@@ -226,6 +226,124 @@ function validateArtifact(artifactPath) {
 }
 
 /**
+ * CANONICAL_PLAN_SECTIONS: the 6 required headings in required order.
+ * Pre-completion-validation warns (severity: warning) when a plan file in
+ * .claude/context/plans/ is missing a section or has them out of order.
+ *
+ * Controlled by env PLAN_SECTION_ORDER_STRICT:
+ *   'warn' (default) — emit warning to stderr, do not block
+ *   'off'            — check disabled entirely
+ */
+const CANONICAL_PLAN_SECTIONS = [
+  '## Problem',
+  '## Decision',
+  '## Scope',
+  '## Risks',
+  '## Steps',
+  '## Done Criteria',
+];
+
+/**
+ * Validate that a plan file contains all canonical sections in the correct order.
+ *
+ * @param {string} filePath - Absolute path to the plan markdown file
+ * @returns {{ passed: boolean, missing: string[], outOfOrder: string[] }}
+ */
+function validatePlanSectionOrder(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      return { passed: true, missing: [], outOfOrder: [] };
+    }
+    const content = fs.readFileSync(filePath, 'utf8');
+    const lines = content.split('\n');
+
+    // Collect found sections in order of appearance
+    const found = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      const matchedSection = CANONICAL_PLAN_SECTIONS.find(
+        s => trimmed === s || trimmed.startsWith(s + ' ')
+      );
+      if (matchedSection && !found.includes(matchedSection)) {
+        found.push(matchedSection);
+      }
+    }
+
+    const missing = CANONICAL_PLAN_SECTIONS.filter(s => !found.includes(s));
+
+    // Check ordering: for all found sections, their position in CANONICAL_PLAN_SECTIONS
+    // must be strictly increasing
+    const outOfOrder = [];
+    const foundIndices = found.map(s => CANONICAL_PLAN_SECTIONS.indexOf(s));
+    for (let i = 1; i < foundIndices.length; i++) {
+      if (foundIndices[i] < foundIndices[i - 1]) {
+        outOfOrder.push(found[i]);
+      }
+    }
+
+    return {
+      passed: missing.length === 0 && outOfOrder.length === 0,
+      missing,
+      outOfOrder,
+    };
+  } catch (_e) {
+    // Fail-open: if we can't read the file, don't block
+    return { passed: true, missing: [], outOfOrder: [] };
+  }
+}
+
+/**
+ * Check whether a file path refers to a plan file in .claude/context/plans/.
+ * @param {string} filePath
+ * @returns {boolean}
+ */
+function isPlanFile(filePath) {
+  if (!filePath) return false;
+  const normalized = filePath.replace(/\\/g, '/');
+  return normalized.includes('/.claude/context/plans/') && normalized.endsWith('.md');
+}
+
+/**
+ * Enforce canonical plan section ordering on plan files listed in filesModified.
+ * Severity: warning (never blocks) unless PLAN_SECTION_ORDER_STRICT is 'block'.
+ * Controlled by PLAN_SECTION_ORDER_STRICT env var.
+ *
+ * @param {string[]} filesModified - List of file paths from task metadata
+ */
+function enforcePlanSectionOrder(filesModified) {
+  const mode = getEnforcementMode('PLAN_SECTION_ORDER_STRICT', 'warn');
+  if (mode === 'off') return;
+
+  if (!Array.isArray(filesModified)) return;
+
+  const planFiles = filesModified.filter(isPlanFile);
+  if (planFiles.length === 0) return;
+
+  const warnings = [];
+  for (const planFile of planFiles) {
+    const result = validatePlanSectionOrder(planFile);
+    if (!result.passed) {
+      const parts = [];
+      if (result.missing.length > 0) {
+        parts.push(`missing sections: ${result.missing.join(', ')}`);
+      }
+      if (result.outOfOrder.length > 0) {
+        parts.push(`out-of-order sections: ${result.outOfOrder.join(', ')}`);
+      }
+      warnings.push(
+        `PLAN SECTION ORDER WARNING: ${planFile} — ${parts.join('; ')}. ` +
+          `Canonical order: ${CANONICAL_PLAN_SECTIONS.join(' → ')}. ` +
+          `Set PLAN_SECTION_ORDER_STRICT=off to disable.`
+      );
+    }
+  }
+
+  for (const w of warnings) {
+    process.stderr.write(`[pre-completion-validation] WARNING: ${w}\n`);
+  }
+}
+
+/**
  * Enforce reflection score integrity — block/warn when a numeric score is emitted
  * without a dataQuality field that verifies it was not fabricated.
  * @param {object} toolParams - Raw TaskUpdate parameters
@@ -513,6 +631,11 @@ async function main() {
     }
 
     const metadata = extractTaskMetadata(toolParams);
+
+    // PLAN_SECTION_ORDER_STRICT: warn when plan files in .claude/context/plans/
+    // are missing canonical sections or have them out of order.
+    enforcePlanSectionOrder(metadata.filesModified);
+
     const artifacts = detectArtifacts(metadata.filesModified);
 
     if (artifacts.length === 0) process.exit(0);
@@ -564,4 +687,9 @@ module.exports = {
   validateRequiredOutputs,
   isValidSummary,
   isFallbackSummary,
+  // Plan section order enforcement (SD slice)
+  CANONICAL_PLAN_SECTIONS,
+  validatePlanSectionOrder,
+  isPlanFile,
+  enforcePlanSectionOrder,
 };

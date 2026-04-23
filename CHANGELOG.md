@@ -5,6 +5,32 @@ All notable changes to Agent Studio are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-04-23 — Dual-Layer Schemas
+
+Inspired by Google Labs' DESIGN.md — adopt dual-layer persistence pattern (machine-parseable YAML + prose rationale) across skill + plan artifacts.
+
+### Added
+
+- Optional `frontmatter` block in `skill-definition.schema.json` — agents can parse `triggers[]`, `output_schema_ref`, `token_budget`, `requires_skills` without reading full prose.
+- `skill-creator` skill emits new SKILL.md with frontmatter block by default (backward compat: 348 existing skills without it still validate).
+- `skill-updater` skill backfills frontmatter during refresh via `backfillFrontmatter()` — additive-only, never overwrites existing.
+- Canonical plan section order enforced on `.claude/context/plans/*.md`: Problem → Decision → Scope → Risks → Steps → Done Criteria. Gate in `pre-completion-validation.cjs`, configurable via `PLAN_SECTION_ORDER_STRICT=warn|off` (default: warn).
+
+### Research
+
+- Inspired by [google-labs-code/design.md](https://github.com/google-labs-code/design.md) — adopts the "YAML + Markdown dual-layer" contract for non-code artifacts.
+- Research digest validated pattern reuse: machine-parseable frontmatter + prose body is the emerging agent-artifact standard.
+
+### Tests
+
+- 48 new tests (5 schema + 7 creator + 22 updater + 26 plan-order + regression).
+
+### Migration
+
+No migration needed. All additions are additive; existing skills/plans continue to validate.
+
+---
+
 ## [3.0.0] - 2026-04-22 — Ecosystem-Native
 
 v3.0.0 makes agent-studio interoperable with the MCP + A2A agent ecosystem while locking in the self-hosted moat (multi-model routing, data sovereignty, skill ownership).

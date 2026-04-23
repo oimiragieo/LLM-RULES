@@ -113,6 +113,32 @@
     "disable-model-invocation": {
       "type": "boolean",
       "description": "If true, the skill content is injected directly without LLM invocation"
+    },
+    "frontmatter": {
+      "type": "object",
+      "description": "v3.1.0: machine-parseable metadata block per design.md dual-layer pattern. Agents can inspect this without reading full prose.",
+      "properties": {
+        "triggers": {
+          "type": "array",
+          "description": "Patterns that should invoke this skill",
+          "items": { "type": "string" }
+        },
+        "output_schema_ref": {
+          "type": "string",
+          "description": "Pointer to schema defining this skill's structured output, if any"
+        },
+        "token_budget": {
+          "type": "integer",
+          "minimum": 1000,
+          "description": "Estimated token cost for invoking this skill"
+        },
+        "requires_skills": {
+          "type": "array",
+          "description": "Skills this one depends on (resolved by skill index)",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

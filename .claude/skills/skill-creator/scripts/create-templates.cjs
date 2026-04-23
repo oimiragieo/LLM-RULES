@@ -163,6 +163,12 @@ best_practices:
 ${defaultBestPractices.map(p => `  - ${p}`).join('\n')}
 error_handling: graceful
 streaming: supported
+frontmatter:
+  triggers:
+    - ${name}
+  token_budget: 10000  # estimated token cost for invoking this skill
+  # output_schema_ref: (set to .claude/schemas/skill-${name}-output.schema.json if applicable)
+  # requires_skills: []  # list dependent skill names here
 ---
 
 # ${titleCase}

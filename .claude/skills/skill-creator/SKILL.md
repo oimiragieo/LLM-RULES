@@ -18,7 +18,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: '2026-02-28'
+lastVerifiedAt: '2026-04-20'
 dependencies: [research-synthesis]
 source: builtin
 trust_score: 100
@@ -181,6 +181,12 @@ args: "<required> [optional]"
 agents: [developer, qa]
 category: "Validation & Quality"
 tags: [testing, validation]
+frontmatter:
+  triggers:
+    - <pattern or trigger phrase that should invoke this skill>
+  token_budget: 10000  # estimated token cost for invoking this skill
+  # output_schema_ref: (set if a skill-*-output.schema.json exists for this skill)
+  # requires_skills: []  # list dependent skill names here
 ---
 
 # Skill Name
@@ -196,6 +202,19 @@ Concrete invocation or workflow examples.
 ```
 
 Required frontmatter fields that must stay explicit: `name`, `description`, `version`, `agents`, `category`, `tags`, `tools`, `invoked_by`, and `user_invocable`.
+
+### v3.1.0 Schema Addition: `frontmatter` block
+
+The `frontmatter` object is an **optional, machine-parseable metadata block** introduced in v3.1.0. Agents can inspect it without parsing full prose. The `create` action emits it by default in all new SKILL.md files.
+
+| Field               | Type       | Required | Purpose                                                                 |
+| ------------------- | ---------- | -------- | ----------------------------------------------------------------------- |
+| `triggers`          | `string[]` | No       | Patterns that should cause the skill to be invoked                      |
+| `token_budget`      | `integer`  | No       | Estimated token cost (min 1000); used by planner for budgeting          |
+| `output_schema_ref` | `string`   | No       | Path to the skill's output schema (e.g. `skill-foo-output.schema.json`) |
+| `requires_skills`   | `string[]` | No       | Names of skills this skill depends on (resolved by skill index)         |
+
+All `frontmatter` fields are optional. Existing SKILL.md files without the `frontmatter` block remain valid — the schema uses `additionalProperties: true` at the root level, and the `frontmatter` property is not in `required`. Do NOT add `frontmatter` to existing skills during unrelated updates; add it only when the skill is being intentionally refreshed or verified.
 
 ## Post-Creation Checklist
 

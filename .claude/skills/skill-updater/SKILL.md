@@ -178,6 +178,52 @@ Skill({ skill: 'research-synthesis' });
 Skill({ skill: 'assimilate' });
 ```
 
+### Step 3.5: v3.1.0 Frontmatter Backfill (CONDITIONAL)
+
+> **v3.1.0 Dual-Layer Design Rationale**: Agent Studio v3.1.0 adopts a two-layer metadata pattern
+> for skill files. **Layer 1** is the machine-parseable YAML frontmatter (the `frontmatter:` nested
+> block inside the existing `---` block). **Layer 2** is the human-readable Markdown prose body.
+> The `frontmatter` nested block lets agents inspect routing triggers, token budgets, and skill
+> dependencies at parse time — without loading the full prose body into context. This mirrors the
+> SA schema (`skill-definition.schema.json` §`frontmatter`) and the SB creator work that stamps new
+> skills with this block at creation time.
+
+**Trigger**: Run this step whenever the target skill's YAML frontmatter does NOT already contain a
+`frontmatter:` nested block (i.e., missing the v3.1.0 dual-layer upgrade).
+
+**Procedure**:
+
+1. Call `backfillFrontmatter(skillPath)` from `scripts/main.cjs`:
+
+   ```javascript
+   const { backfillFrontmatter } = require('.claude/skills/skill-updater/scripts/main.cjs');
+   const result = backfillFrontmatter('.claude/skills/<target>/SKILL.md');
+   ```
+
+2. If `result.action === 'already_present'` → skip; no changes needed.
+
+3. If `result.action === 'proposed'` → show the agent the proposed block:
+
+   ```yaml
+   frontmatter:
+     triggers: [<auto-extracted keywords from description>]
+     token_budget: 10000 # override if known; minimum 1000 per schema
+     requires_skills: [] # fill in actual skill dependencies if known
+   ```
+
+4. **Confirm before writing** — agent reviews the proposal for accuracy. User may override
+   `token_budget` or `requires_skills`. Only then call `applyFrontmatterBackfill(skillPath, proposed)`.
+
+5. If `result.action === 'error'` → log and skip; do not block the overall update.
+
+**Guard Rules**:
+
+- `backfillFrontmatter` NEVER overwrites an existing `frontmatter:` block (idempotent).
+- The nested `frontmatter:` block is ADDITIVE — it does not alter existing frontmatter fields.
+- `additionalProperties: false` on the `frontmatter` object means only `triggers`,
+  `output_schema_ref`, `token_budget`, and `requires_skills` are allowed; validate before writing.
+- Schema: `.claude/schemas/skill-definition.schema.json` §`frontmatter` is authoritative.
+
 ### Step 3: Gap Analysis
 
 Compare current skill against enterprise bundle expectations:

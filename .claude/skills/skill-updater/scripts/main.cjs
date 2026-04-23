@@ -235,6 +235,167 @@ function updateRoutingTableKeywords(name, _description) {
   }
 }
 
+/**
+ * Tokenize a description string into keyword triggers.
+ * Extracts meaningful words (3+ chars, not stop words).
+ * @param {string} description
+ * @returns {string[]}
+ */
+function tokenizeDescription(description) {
+  const STOP_WORDS = new Set([
+    'the',
+    'and',
+    'for',
+    'with',
+    'this',
+    'that',
+    'from',
+    'use',
+    'used',
+    'when',
+    'into',
+    'via',
+    'are',
+    'all',
+    'any',
+    'can',
+    'each',
+    'its',
+    'not',
+    'but',
+    'has',
+    'have',
+    'been',
+    'will',
+    'also',
+    'per',
+    'our',
+  ]);
+  const words = (description || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length >= 3 && !STOP_WORDS.has(w));
+  // deduplicate and take first 8
+  return [...new Set(words)].slice(0, 8);
+}
+
+/**
+ * Check whether a parsed frontmatter attributes object already has the v3.1.0
+ * `frontmatter` nested block.
+ * @param {object} attributes
+ * @returns {boolean}
+ */
+function hasFrontmatterBlock(attributes) {
+  return (
+    attributes !== null &&
+    typeof attributes === 'object' &&
+    'frontmatter' in attributes &&
+    attributes.frontmatter !== null &&
+    typeof attributes.frontmatter === 'object'
+  );
+}
+
+/**
+ * Propose minimal v3.1.0 frontmatter defaults derived from the skill's existing
+ * description field. Never overwrites an existing frontmatter block.
+ *
+ * Design rationale (v3.1.0 dual-layer pattern):
+ *   - The YAML frontmatter acts as machine-parseable metadata (Layer 1).
+ *   - The Markdown body is human-readable prose (Layer 2).
+ *   The `frontmatter` nested block bridges these layers so agents can inspect
+ *   routing triggers, token budgets, and skill dependencies without parsing
+ *   the full prose body. See `.claude/schemas/skill-definition.schema.json`
+ *   for the authoritative schema.
+ *
+ * @param {string} skillPath  - relative path (e.g. `.claude/skills/tdd/SKILL.md`)
+ * @param {{ token_budget?: number, requires_skills?: string[] }} [overrides]
+ * @returns {{
+ *   action: 'already_present'|'proposed'|'error',
+ *   skillPath: string,
+ *   proposed?: { triggers: string[], token_budget: number, requires_skills: string[] },
+ *   message: string,
+ * }}
+ */
+function backfillFrontmatter(skillPath, overrides = {}) {
+  const absolutePath = path.join(PROJECT_ROOT, skillPath);
+  if (!fs.existsSync(absolutePath)) {
+    return {
+      action: 'error',
+      skillPath,
+      message: `Skill file not found: ${skillPath}`,
+    };
+  }
+
+  const content = fs.readFileSync(absolutePath, 'utf8');
+  const parsed = parseFrontmatter(content);
+  if (!parsed) {
+    return {
+      action: 'error',
+      skillPath,
+      message: 'Could not parse YAML frontmatter from skill file',
+    };
+  }
+
+  // Guard: never overwrite an existing frontmatter block
+  if (hasFrontmatterBlock(parsed.attributes)) {
+    return {
+      action: 'already_present',
+      skillPath,
+      message: 'Skill already has a v3.1.0 frontmatter block — no changes made',
+    };
+  }
+
+  const description = String(parsed.attributes.description || '');
+  const triggers = tokenizeDescription(description);
+  const proposed = {
+    triggers: triggers.length > 0 ? triggers : [String(parsed.attributes.name || 'skill')],
+    token_budget: typeof overrides.token_budget === 'number' ? overrides.token_budget : 10000,
+    requires_skills: Array.isArray(overrides.requires_skills) ? overrides.requires_skills : [],
+  };
+
+  return {
+    action: 'proposed',
+    skillPath,
+    proposed,
+    message:
+      'Proposed frontmatter block derived from description. Agent must confirm before writing.',
+  };
+}
+
+/**
+ * Apply the proposed frontmatter block to the skill file on disk.
+ * Only call this after the agent has confirmed the proposal from backfillFrontmatter().
+ * @param {string} skillPath
+ * @param {{ triggers: string[], token_budget: number, requires_skills: string[] }} proposed
+ * @returns {{ ok: boolean, message: string }}
+ */
+function applyFrontmatterBackfill(skillPath, proposed) {
+  const absolutePath = path.join(PROJECT_ROOT, skillPath);
+  if (!fs.existsSync(absolutePath)) {
+    return { ok: false, message: `Skill file not found: ${skillPath}` };
+  }
+
+  const content = fs.readFileSync(absolutePath, 'utf8');
+  const parsed = parseFrontmatter(content);
+  if (!parsed) {
+    return { ok: false, message: 'Could not parse YAML frontmatter' };
+  }
+
+  if (hasFrontmatterBlock(parsed.attributes)) {
+    return { ok: false, message: 'frontmatter block already present — refusing to overwrite' };
+  }
+
+  parsed.attributes.frontmatter = {
+    triggers: proposed.triggers,
+    token_budget: proposed.token_budget,
+    requires_skills: proposed.requires_skills,
+  };
+
+  fs.writeFileSync(absolutePath, serializeFrontmatter(parsed.attributes, parsed.body), 'utf8');
+  return { ok: true, message: `frontmatter block added to ${skillPath}` };
+}
+
 function buildResult(input) {
   const trigger = ['reflection', 'evolve', 'manual', 'stale_skill'].includes(input.trigger)
     ? input.trigger
@@ -388,5 +549,9 @@ module.exports = {
   buildResult,
   validateFixedSections,
   applyPreservingFixedSections,
+  tokenizeDescription,
+  hasFrontmatterBlock,
+  backfillFrontmatter,
+  applyFrontmatterBackfill,
   main,
 };

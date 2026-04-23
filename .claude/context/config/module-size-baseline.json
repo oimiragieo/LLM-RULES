@@ -36,7 +36,7 @@
   ".claude\\lib\\memory\\findings-registry.cjs": 574,
   ".claude\\hooks\\routing\\post-task-unified.cjs": 573,
   ".claude\\lib\\creators\\creator-commons.cjs": 571,
-  ".claude\\hooks\\validation\\pre-completion-validation.cjs": 568,
+  ".claude\\hooks\\validation\\pre-completion-validation.cjs": 696,
   ".claude\\lib\\workflow\\artifact-graph.cjs": 551,
   ".claude\\lib\\utils\\hook-input.cjs": 550,
   ".claude\\hooks\\routing\\spawn-prompt-assembler.core.cjs": 547,

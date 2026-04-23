@@ -435,6 +435,27 @@ Skill({
 </formatting_example>
 </examples>
 
+## Canonical Section Order (IRON LAW)
+
+Every plan emitted by plan-generator MUST contain exactly these 6 top-level sections in this exact order:
+
+1. `## Problem` — why this work matters; the pain point or gap being addressed
+2. `## Decision` — what is being done; the chosen approach (not the steps, just the choice)
+3. `## Scope` — what is IN scope; explicitly list what is OUT of scope
+4. `## Risks` — what could go wrong; include mitigations and rollback commands
+5. `## Steps` — ordered implementation checklist using `- [ ]` task format
+6. `## Done Criteria` — acceptance criteria; objective conditions that prove the work is complete
+
+**Rules:**
+
+- All 6 sections MUST be present — plans missing any section are invalid
+- Sections MUST appear in the order listed above — reordering is invalid
+- Each section must have substantive content (not a placeholder like "TBD")
+- Sub-sections and additional detail are allowed within each section
+- The pre-completion-validation hook enforces this order at task completion (severity: warning)
+
+**Why fixed order?** AI-generated plans frequently reorder sections or omit scope/risks, causing incomplete execution. Fixed ordering enables automated validation and catches AI-slopped plans before they reach execution.
+
 ## Iron Laws
 
 1. **ALWAYS** include an executable command in every task — a task without a command is a wish, not an action; plans with wishes stall at execution because agents have nothing to run.
@@ -443,6 +464,7 @@ Skill({
 4. **NEVER** generate a plan without explicit rollback commands for destructive operations — a plan without rollback paths is unrecoverable; rollback must be specified before the operation is attempted.
 5. **ALWAYS** coordinate specialist input (Analyst, PM, Architect) before finalizing a plan — plans generated without domain expert review routinely miss implicit requirements, producing incomplete execution paths.
 6. **ALWAYS** include a mandatory "Final: Self-review + token report" task as the LAST task in every plan — without this task, pipelines complete without cost visibility or quality self-assessment, and post-pipeline hooks never trigger.
+7. **ALWAYS** emit the 6 canonical sections (Problem → Decision → Scope → Risks → Steps → Done Criteria) in exactly that order — plans with missing or reordered sections are rejected by pre-completion-validation.
 
 ## MANDATORY FINAL TASK (IRON LAW — NEVER SKIP)
 
