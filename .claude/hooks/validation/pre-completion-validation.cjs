@@ -248,7 +248,10 @@ function enforceReflectionScore(toolParams) {
       '[pre-completion-validation] Reflection score emitted without dataQuality field — cannot verify score was not fabricated. Add metadata.dataQuality: "full"|"partial"|"insufficient"';
     if (reflectionMode === 'block') {
       console.log(formatHookResult('block', reflectionMsg));
-      process.exit(2);
+      process.stderr.write(
+        'ESCALATE: blockerType=data_quality needsFrom=user blocker=missing_dataquality_field\n'
+      );
+      process.exit(3);
     } else if (reflectionMode !== 'off') {
       process.stderr.write(reflectionMsg + '\n');
     }
@@ -412,7 +415,10 @@ async function main() {
             'or (b) include metadata.selfReviewCompleted:true. Set MILESTONE_SELF_REVIEW_ENFORCEMENT=off to disable.';
           if (selfReviewMode === 'block') {
             console.log(formatHookResult('block', selfReviewMsg));
-            process.exit(2);
+            process.stderr.write(
+              'ESCALATE: blockerType=self_review needsFrom=user blocker=self_review_not_performed\n'
+            );
+            process.exit(3);
           } else {
             process.stderr.write(`[pre-completion-validation] WARNING: ${selfReviewMsg}\n`);
           }
@@ -435,7 +441,10 @@ async function main() {
             'Run ccusage and include token stats in metadata or summary. Set CCUSAGE_REPORT_ENFORCEMENT=off to disable.';
           if (ccusageMode === 'block') {
             console.log(formatHookResult('block', ccusageMsg));
-            process.exit(2);
+            process.stderr.write(
+              'ESCALATE: blockerType=cost_tracking needsFrom=user blocker=ccusage_missing\n'
+            );
+            process.exit(3);
           } else {
             process.stderr.write(`[pre-completion-validation] WARNING: ${ccusageMsg}\n`);
           }
@@ -471,7 +480,10 @@ async function main() {
               'Set PLANNER_TOKEN_ESTIMATION_ENFORCEMENT=off to disable.';
             if (plannerEstMode === 'block') {
               console.log(formatHookResult('block', plannerMsg));
-              process.exit(2);
+              process.stderr.write(
+                'ESCALATE: blockerType=planner_metadata needsFrom=user blocker=missing_token_estimate\n'
+              );
+              process.exit(3);
             } else {
               process.stderr.write(`[pre-completion-validation] WARNING: ${plannerMsg}\n`);
             }

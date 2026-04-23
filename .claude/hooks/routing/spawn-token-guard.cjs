@@ -62,7 +62,8 @@ process.stdin.on('end', () => {
       process.stderr.write(
         `spawn-token-guard: BLOCKED — spawn prompt ~${tokens.toLocaleString()} tokens exceeds ${BLOCK_THRESHOLD.toLocaleString()} hard limit. Run context compression first (context-compressor skill).\n`
       );
-      process.exit(2);
+      process.stderr.write(`DEGRADE: reason=context_too_large threshold=${BLOCK_THRESHOLD}\n`);
+      process.exit(4);
     }
 
     if (tokens >= WARN_THRESHOLD) {
@@ -101,7 +102,10 @@ process.stdin.on('end', () => {
             process.stderr.write(
               `spawn-token-guard: BLOCKED — ${warningMsg}. Reduce skill/memory payload before spawning.\n`
             );
-            process.exit(2);
+            process.stderr.write(
+              `DEGRADE: reason=projected_budget_exceeded threshold=${SPAWN_BUDGET_HARD_LIMIT}\n`
+            );
+            process.exit(4);
           }
 
           // Warn (soft): allow but surface the message

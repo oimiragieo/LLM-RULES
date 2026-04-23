@@ -135,9 +135,10 @@ describe('SBP: Spawn Budget Pre-flight', () => {
   });
 
   // -------------------------------------------------------------------------
-  // SBP-003: projected context > 80K AND SPAWN_BUDGET_HARD=on → block (exit 2)
+  // SBP-003: projected context > 80K AND SPAWN_BUDGET_HARD=on → DEGRADE (exit 4)
+  // (v2.5.0: converted from exit 2 per hook-exit-code-contract-2026-04-21.md ADR)
   // -------------------------------------------------------------------------
-  it('SBP-003: projected context > 80K with SPAWN_BUDGET_HARD=on blocks spawn (exit 2)', () => {
+  it('SBP-003: projected context > 80K with SPAWN_BUDGET_HARD=on degrades spawn (exit 4)', () => {
     // 90K tokens = 360K chars. Split: 200K prompt + 100K skills + 60K memory
     const input = makeProjectedInput({
       promptLength: 200_000,
@@ -153,7 +154,7 @@ describe('SBP: Spawn Budget Pre-flight', () => {
       CONTEXT_THRESHOLD_BLOCK: '9999999',
     });
 
-    assert.equal(result.exitCode, 2, 'Should exit 2 (block) when projected > 80K with HARD=on');
+    assert.equal(result.exitCode, 4, 'Should exit 4 (DEGRADE) when projected > 80K with HARD=on');
   });
 
   // -------------------------------------------------------------------------

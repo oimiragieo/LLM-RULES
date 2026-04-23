@@ -29,7 +29,9 @@ function main() {
 
   if (violations.length > 0) {
     console.error(`[slo-alert-gate] ${violations.join('; ')}`);
-    process.exit(2);
+    const metricName = p95 > hookP95Max ? 'hook_p95_latency' : 'recorder_failure_rate';
+    process.stderr.write(`DEGRADE: reason=slo_breach metric=${metricName}\n`);
+    process.exit(4);
   }
 
   console.log('[slo-alert-gate] PASS');

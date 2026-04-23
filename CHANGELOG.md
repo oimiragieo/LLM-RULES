@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-04-22 — Exit-Code Dispatcher Adoption
+
+### Changed
+- Converted 9 `process.exit(2)` sites to exit 3 (ESCALATE) or exit 4 (DEGRADE) per v2.3.0 S4p1 ADR `hook-exit-code-contract-2026-04-21.md`.
+
+### Added — exit 4 DEGRADE (cost/capacity → haiku downgrade)
+- `spawn-token-guard.cjs` context-too-large and projected-budget-exceeded blocks now emit `DEGRADE: reason=...` and exit 4 (previously hard-blocked at exit 2).
+- `perf-gate.cjs` latency regression block → DEGRADE on exit 4.
+- `slo-alert-gate.cjs` SLO violation → DEGRADE with metric name in trailer.
+
+### Added — exit 3 ESCALATE (policy-ambiguous → user judgment via TaskUpdate(blocked))
+- `pre-completion-validation.cjs` missing dataQuality, missing self-review, missing ccusage, missing planner token estimate — all now ESCALATE instead of hard-block.
+- `evolution-state-guard.cjs` concurrent-evolution lock → ESCALATE (user can override).
+
+### Tests
+- 16 new EXIT-3 tests across 2 files, 9 new EXIT-4 tests across 3 files.
+- All 34 regression tests green across converted hooks (+ SBP-003 updated to expect exit 4).
+
+### Unchanged (73 remaining exit-2 sites)
+- All safety/authz/data-integrity blocks correctly retain exit 2 (hard block by design).
+
 ## [2.4.1] - 2026-04-22
 
 ### Fixed

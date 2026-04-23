@@ -311,7 +311,10 @@ async function main() {
         const msg = `[EVOLUTION LOCK] Evolution already in progress (owner: ${currentLock.owner || 'unknown'}, since: ${currentLock.since || 'unknown'}). Cannot start a concurrent evolution run. Wait for the current run to complete or expire (TTL: 30 minutes).`;
         if (enforcement === 'block') {
           console.log(JSON.stringify({ result: 'block', message: msg }));
-          process.exit(2);
+          process.stderr.write(
+            'ESCALATE: blockerType=concurrent_evolution needsFrom=user blocker=evolution_lock_active\n'
+          );
+          process.exit(3);
         } else {
           console.log(JSON.stringify({ result: 'warn', message: msg }));
           process.exit(0);
