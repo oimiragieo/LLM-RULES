@@ -13,13 +13,13 @@
 
 ## Rubric Scores
 
-| Dimension       | Score | Notes                                                                                    |
-| --------------- | ----- | ---------------------------------------------------------------------------------------- |
-| **Completeness** | 0.95  | All 7 capabilities documented; research → implementation → integration → config phases complete |
-| **Accuracy**    | 0.90  | Cursor Debug Mode methodology correctly interpreted; env var default (false) is correct   |
-| **Clarity**     | 0.85  | Skill documentation clear; methodology explained via worked example; integration status transparent |
-| **Consistency** | 0.85  | Follows sequential skill-updater workflow pattern; catalog entry consistent with agent assignments |
-| **Actionability** | 0.85 | Developers can immediately use SMART_DEBUG_HITL env var; Phase 6 code paths are explicit |
+| Dimension         | Score | Notes                                                                                               |
+| ----------------- | ----- | --------------------------------------------------------------------------------------------------- |
+| **Completeness**  | 0.95  | All 7 capabilities documented; research → implementation → integration → config phases complete     |
+| **Accuracy**      | 0.90  | Cursor Debug Mode methodology correctly interpreted; env var default (false) is correct             |
+| **Clarity**       | 0.85  | Skill documentation clear; methodology explained via worked example; integration status transparent |
+| **Consistency**   | 0.85  | Follows sequential skill-updater workflow pattern; catalog entry consistent with agent assignments  |
+| **Actionability** | 0.85  | Developers can immediately use SMART_DEBUG_HITL env var; Phase 6 code paths are explicit            |
 
 **Weighted Total**: 0.88 (0.25×0.95 + 0.25×0.90 + 0.15×0.85 + 0.15×0.85 + 0.20×0.85) = **EXCELLENT**
 
@@ -71,6 +71,7 @@
 ### Pattern: Env Var Default Strategy for Optional Features
 
 **Evidence**: SMART_DEBUG_HITL env var designed with default=false (auto-reproduce by default), enabling HITL only if:
+
 - User explicitly sets env var, OR
 - Auto-reproduction fails (caught by Phase 6 conditional logic)
 
@@ -113,6 +114,7 @@
 **Status**: ✅ Excellent integration — artifact is fully wired into ecosystem and ready for production use.
 
 The skill is:
+
 - Discoverable by agents (in catalog + assigned to 3 agents)
 - Documented (SKILL.md + worked example)
 - Validated (lint/format + verified flag)
@@ -122,14 +124,14 @@ The skill is:
 
 ## Memory Curation Decisions
 
-| Candidate                                      | Decision    | Score | Rationale                                                              |
-| ---------------------------------------------- | ----------- | ----- | ---------------------------------------------------------------------- |
-| Sequential skill-update workflow pattern       | **Retain**  | 0.95  | High reuse value; applicable to future major skill updates             |
-| Env var default strategy pattern               | **Retain**  | 0.90  | High reuse value; generalizable to optional features across codebase   |
-| Cursor Debug Mode methodology (evidence-based) | **Retain**  | 0.95  | Core debugging philosophy; directly applicable to agent training       |
-| Skill index regeneration gotcha                | **Retain**  | 0.85  | Prevents repeated mistakes; medium reuse value                         |
-| Integration score (92%)                        | **Archive** | 0.60  | Specific to this artifact; lower general reuse                         |
-| Task 4 HITL env var implementation detail      | **Compress**| 0.70  | Evidence is solid; compress to "default false, HITL on demand" summary |
+| Candidate                                      | Decision     | Score | Rationale                                                              |
+| ---------------------------------------------- | ------------ | ----- | ---------------------------------------------------------------------- |
+| Sequential skill-update workflow pattern       | **Retain**   | 0.95  | High reuse value; applicable to future major skill updates             |
+| Env var default strategy pattern               | **Retain**   | 0.90  | High reuse value; generalizable to optional features across codebase   |
+| Cursor Debug Mode methodology (evidence-based) | **Retain**   | 0.95  | Core debugging philosophy; directly applicable to agent training       |
+| Skill index regeneration gotcha                | **Retain**   | 0.85  | Prevents repeated mistakes; medium reuse value                         |
+| Integration score (92%)                        | **Archive**  | 0.60  | Specific to this artifact; lower general reuse                         |
+| Task 4 HITL env var implementation detail      | **Compress** | 0.70  | Evidence is solid; compress to "default false, HITL on demand" summary |
 
 **Retention Rationale**: All 4 retained learnings have strong evidence and expected reuse across future skill/workflow updates. Compressed evidence is sufficient for memory (specific implementation details not needed long-term).
 

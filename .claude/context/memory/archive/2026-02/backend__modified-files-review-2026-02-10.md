@@ -102,13 +102,16 @@ module.exports = {
 #### Code Quality Assessment
 
 **✅ Strengths:**
+
 - Clear single source of truth pattern - `spawn-request.json` is authoritative
 - Defensive cleanup prevents deadlock scenarios
 - Best-effort error handling appropriate for file cleanup
 - Function properly exported for testing
 
 **⚠️ Minor Observations:**
+
 1. **Silent error handling in clearReminderIfStale**: The catch block swallows all errors. While this is labeled "best-effort", consider logging to stderr for debugging:
+
    ```javascript
    } catch (err) {
      // Best-effort cleanup - non-critical if fails
@@ -121,11 +124,13 @@ module.exports = {
 2. **Race condition potential**: If another process creates `reflection-reminder.txt` between the `hasPendingReflections()` check and `clearReminderIfStale()` call, the reminder could be prematurely deleted. However, this is unlikely and the "source of truth" pattern mitigates impact.
 
 **Edge Cases Covered:**
+
 - ✅ No spawn requests + stale reminder file = cleanup
 - ✅ File doesn't exist = no-op
 - ✅ File deletion failure = graceful fallback
 
 **Recommendations:**
+
 - Consider adding debug logging for cleanup operations
 - Current implementation is production-ready
 
@@ -206,6 +211,7 @@ module.exports = {
 #### Code Quality Assessment
 
 **✅ Strengths:**
+
 - Consistent pattern application across 3 functions (checkRouterModeReset, checkRouterEnforcement, runAllChecks)
 - Early-return optimization in runAllChecks prevents unnecessary work
 - Clear documentation explaining the purpose (prevent recursive routing churn)
@@ -213,11 +219,13 @@ module.exports = {
 - Function exported for testing
 
 **✅ Excellent Design:**
+
 1. **Centralized detection** - `isTaskNotificationPrompt` is a single function used everywhere
 2. **Defense-in-depth** - Check applied at multiple layers (reset, enforcement, runAllChecks)
 3. **Proper skip semantics** - Uses `skipped: true, reason: 'task_notification'` consistently
 
 **Edge Cases Covered:**
+
 - ✅ null/undefined prompt
 - ✅ non-string prompt
 - ✅ Partial XML-like structure (requires all 3 tags)
@@ -226,6 +234,7 @@ module.exports = {
 **Potential Issues:** None identified.
 
 **Recommendations:**
+
 - Current implementation is production-ready
 - Consider adding metrics for how often task notifications are bypassed (for monitoring)
 
@@ -242,17 +251,20 @@ This file was already staged, so no git diff available. However, from reading th
 **Code Quality Assessment:**
 
 **✅ Strengths:**
+
 - Uses shared `getPendingReflectionState()` helper that handles cleanup logic
 - Properly detects task notification payloads to avoid blocking internal system events
 - Clean separation of concerns - state reading vs. blocking logic
 - Exit code semantics are clear (0 = allow, 2 = block)
 
 **Pattern Consistency:**
+
 - Uses same `isTaskNotificationPrompt` pattern as user-prompt-unified.cjs
 - Reuses `readSpawnRequests` from reflection-step0-guard.cjs for consistency
 - Cleanup logic aligns with reflection-step0-guard.cjs approach
 
 **Edge Cases Covered:**
+
 - ✅ Stale reminder file cleanup when 0 pending requests
 - ✅ Task notification bypass
 - ✅ JSONL logging for spawn events
@@ -268,6 +280,7 @@ This file was already staged, so no git diff available. However, from reading th
 **Coverage: Excellent ✅**
 
 **New Test Coverage (Task Notification Bypass):**
+
 ```javascript
 it('should detect task-notification payloads', () => {
   const payload = `<task-notification>
@@ -296,6 +309,7 @@ it('runAllChecks should short-circuit on task notifications', async () => {
 ```
 
 **Test Quality:**
+
 - ✅ Tests positive detection (valid task notification)
 - ✅ Tests negative case (normal prompt)
 - ✅ Tests integration at each layer (detection → reset → enforcement → runAllChecks)
@@ -303,6 +317,7 @@ it('runAllChecks should short-circuit on task notifications', async () => {
 
 **Missing Test Cases:**
 None critical. Possible additions for completeness:
+
 - Test with missing `<task-id>` tag (should return false)
 - Test with malformed XML (should return false)
 - Test with task-notification in middle of user text (should still detect)
@@ -316,6 +331,7 @@ None critical. Possible additions for completeness:
 **Coverage: Good ✅**
 
 **Key Change:**
+
 ```diff
 - test('hasPendingReflections detects reminder or spawn requests', () => {
 + test('hasPendingReflections only uses spawn requests as source of truth', () => {
@@ -329,6 +345,7 @@ None critical. Possible additions for completeness:
 ```
 
 **New Test:**
+
 ```javascript
 test('clearReminderIfStale removes stale reminder file', () => {
   fs.mkdirSync(runtimeDir, { recursive: true });
@@ -345,6 +362,7 @@ test('clearReminderIfStale removes stale reminder file', () => {
 ```
 
 **Test Quality:**
+
 - ✅ Verifies behavioral change (reminder file no longer triggers pending state)
 - ✅ Tests cleanup function separately
 - ✅ Uses snapshot/restore pattern to avoid test pollution
@@ -352,6 +370,7 @@ test('clearReminderIfStale removes stale reminder file', () => {
 
 **Missing Test Cases:**
 Minor edge cases:
+
 - Test `clearReminderIfStale()` when file doesn't exist (should return false)
 - Test `clearReminderIfStale()` when file deletion fails (permission error)
 
@@ -364,6 +383,7 @@ Minor edge cases:
 **Coverage: Minimal but Sufficient ✅**
 
 **Tests:**
+
 ```javascript
 it('getPendingReflectionState clears stale reminder when no requests', () => {
   // Setup: no spawn requests, stale reminder file exists
@@ -378,12 +398,14 @@ it('isTaskNotificationPrompt detects internal task payload', () => {
 ```
 
 **Test Quality:**
+
 - ✅ Tests the primary cleanup scenario (stale reminder with 0 requests)
 - ✅ Tests task notification detection
 - ✅ Minimal but focused test suite
 
 **Missing Test Cases:**
 Additional scenarios that could be tested:
+
 - Test with spawn requests present (should NOT clean reminder)
 - Test `isTaskNotificationPrompt` with malformed XML
 - Test `isTaskNotificationPrompt` with missing tags
@@ -548,12 +570,14 @@ All code is production-ready as-is.
 ## Diff Summary
 
 ### reflection-step0-guard.cjs
+
 - ➕ Added `clearReminderIfStale()` function (13 lines)
 - ♻️ Simplified `hasPendingReflections()` logic (removed fallback check)
 - ♻️ Updated comments to clarify source of truth
 - 📤 Exported `clearReminderIfStale` for testing
 
 ### user-prompt-unified.cjs
+
 - ➕ Added `isTaskNotificationPrompt()` function (9 lines)
 - ♻️ Added task notification bypass in `checkRouterModeReset()` (7 lines)
 - ♻️ Added task notification bypass in `checkRouterEnforcement()` (7 lines)
@@ -562,6 +586,7 @@ All code is production-ready as-is.
 - 📤 Exported `isTaskNotificationPrompt` for testing
 
 ### Tests
+
 - ➕ Added 3 new tests in `user-prompt-unified.test.cjs` (task notification bypass)
 - ♻️ Updated 1 test in `reflection-step0-guard.test.cjs` (source of truth behavior)
 - ➕ Added 1 new test in `reflection-step0-guard.test.cjs` (clearReminderIfStale)
@@ -573,6 +598,7 @@ All code is production-ready as-is.
 **Overall Code Quality**: ⭐⭐⭐⭐⭐ (5/5)
 
 **Strengths:**
+
 - Clear, well-documented code with consistent patterns
 - Comprehensive test coverage for new functionality
 - All tests passing with no regressions
@@ -580,12 +606,14 @@ All code is production-ready as-is.
 - Good separation of concerns
 
 **Areas for Improvement:**
+
 - Minor: Add debug logging for cleanup operations
 - Nice-to-have: Additional edge case tests
 
 **Approval Status**: ✅ **APPROVED FOR MERGE**
 
 All critical paths are tested, no bugs identified, code quality is excellent. The changes successfully address the two stated goals:
+
 1. Prevent deadlock from stale reminder files
 2. Prevent recursive routing from task notifications
 
@@ -594,11 +622,13 @@ All critical paths are tested, no bugs identified, code quality is excellent. Th
 ## Files Reviewed
 
 ### Implementation Files
+
 1. ✅ `.claude/hooks/reflection/force-step0-execution.cjs` (STAGED)
 2. ✅ `.claude/hooks/reflection/reflection-step0-guard.cjs` (UNSTAGED)
 3. ✅ `.claude/hooks/routing/user-prompt-unified.cjs` (UNSTAGED)
 
 ### Test Files
+
 4. ✅ `tests/hooks/user-prompt-unified.test.cjs` (UNSTAGED) - 36 tests passing
 5. ✅ `tests/reflection-step0-guard.test.cjs` (UNSTAGED) - 3 tests passing
 6. ✅ `tests/hooks/force-step0-execution.test.cjs` (NEW/UNTRACKED) - 2 tests passing

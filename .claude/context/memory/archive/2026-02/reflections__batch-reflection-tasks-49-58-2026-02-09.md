@@ -39,6 +39,7 @@ The Hybrid Search Integration pipeline executed successfully across 8 phases wit
 All detailed analysis, architecture decisions, and learnings were documented in the full reflection completed in task #58. This batch note serves as a pointer and archive.
 
 **Key Learnings Preserved:**
+
 - Hybrid search integration patterns (see `.claude/context/memory/learnings.md`)
 - ADR decisions (see `.claude/context/memory/decisions.md`)
 - Integration blockers and workarounds (see `.claude/context/memory/issues.md`)

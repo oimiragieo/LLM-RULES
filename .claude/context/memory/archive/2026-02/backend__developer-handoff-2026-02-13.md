@@ -1,6 +1,7 @@
 <!-- Agent: context-compressor | Task: #3 | Session: 2026-02-13 -->
 
 # Developer Handoff — P0/P1 Remediation Sprint
+
 **Date:** 2026-02-13 | **Total Effort:** 16-24 hours P0 + 3-4 weeks P1
 **Target:** Eliminate 5 P0 blockers within 1 week, resolve 8 P1 high-priority items within 1 month
 
@@ -15,11 +16,13 @@
 **Problem:** `contextual-memory.cjs` and `memory-query.cjs` both import shared utilities, creating refactoring fragility.
 
 **Solution:**
+
 1. Create `.claude/lib/memory/core/memory-utils.cjs` with `buildSemanticContext()` extracted (100 lines)
 2. Update imports in both modules to use `memory-utils.cjs`
 3. Test: `npx madge --circular .claude/lib/memory/` → should report "No circular dependencies found!"
 
 **Verification:**
+
 ```bash
 npx madge --circular .claude/lib/memory/
 pnpm test tests/lib/memory/integration/circular-import.test.cjs
@@ -33,17 +36,20 @@ node -e "const { readMemory } = require('./.claude/lib/memory/core/index.cjs'); 
 **Files:** `.claude/lib/memory/smart-pruner.cjs`, `.claude/lib/memory/memory-scheduler.cjs`
 
 **Problem:**
+
 - `memory-scheduler.cjs` expects `pruneResult.entriesRemoved` but `smart-pruner.cjs` returns `pruneResult.removed`
 - `memory-scheduler.cjs` passes `{ similarityThreshold: 0.6 }` but `smart-pruner.cjs` expects `{ threshold: 0.6 }`
 - Result: Memory pruning silently fails → learnings.md 2.65x over budget
 
 **Solution:**
+
 1. Standardize return contract: Add `removed` field to `smart-pruner.cjs` deduplication result
 2. Fix caller in `memory-scheduler.cjs`: Change `dedupResult.duplicatesRemoved` → `dedupResult.removed || 0`
 3. Add runtime validation: Export `validateResultContract()` in smart-pruner.cjs to fail loudly on contract violations
 4. Integration test: `tests/lib/memory/integration/scheduler-pruner.test.cjs` with 4 test cases
 
 **Verification:**
+
 ```bash
 pnpm test tests/lib/memory/integration/scheduler-pruner.test.cjs
 node .claude/lib/memory/memory-scheduler.cjs task deduplication
@@ -59,12 +65,14 @@ ls -lh .claude/context/memory/learnings.md  # Should be <20KB
 **Problem:** Queue accumulates but is never auto-processed. Router Step 0.5 is a SHOULD (easily skipped). Result: 70% orphan rate (354/454 skills never cataloged).
 
 **Solution:**
+
 1. Create `.claude/lib/workflow/artifact-integrator-spawner.cjs` (100 lines) with `spawnArtifactIntegrator()`
 2. Enhance `.claude/hooks/workflow/post-creation-integration.cjs`: Add auto-spawn when queue size ≥ 5
 3. Add integration health check to `.claude/tools/gates/metrics-ci.cjs`
 4. Add `pnpm metrics:integration` script to package.json
 
 **Verification:**
+
 ```bash
 # Create 5 test artifacts
 for i in {1..5}; do mkdir -p .claude/skills/test-skill-$i && echo "# Test" > .claude/skills/test-skill-$i/SKILL.md; done
@@ -85,6 +93,7 @@ pnpm metrics:ci
 **Problem:** No filtering before writing to memory (learnings.md, decisions.md, issues.md). Malicious entries could execute code via pattern matching: `eval()`, `new Function()`, shell commands, etc.
 
 **Solution:**
+
 1. Create `.claude/lib/memory/memory-sanitizer.cjs` (250 lines) with:
    - `detectDangerousPatterns()` — check for 30+ dangerous patterns
    - `sanitizeContent()` — strip dangerous code, scripts, injection patterns
@@ -93,12 +102,14 @@ pnpm metrics:ci
 3. Add security tests: `tests/security/memory-poisoning.test.cjs` (200 lines, 17 attack vector tests)
 
 **Attack vectors blocked:**
+
 - Code: `eval()`, `new Function()`, `require('child_process')`
-- Shells: `rm -rf`, `` ```bash\n... ```, curl piped to bash
+- Shells: `rm -rf`, `` `bash\n... `, curl piped to bash
 - HTML: `<script>`, `<iframe>`, `javascript:` URIs
 - Injection: "ignore previous instructions", "DAN mode", "jailbreak"
 
 **Verification:**
+
 ```bash
 pnpm test tests/security/memory-poisoning.test.cjs
 # Run manual test
@@ -123,6 +134,7 @@ try {
 **Problem:** No locking for concurrent writes to memory/state files. TOCTOU scenario: Agent A reads, Agent B reads, Agent A writes, Agent B writes (overwrites A's write).
 
 **Solution:**
+
 1. Create `.claude/lib/utils/file-locker.cjs` (90 lines) using `proper-lockfile` npm package
    - `acquireLock()` — atomic lock acquire with retry logic
    - `withLock()` — automatic acquire + release wrapper
@@ -135,6 +147,7 @@ try {
 4. Add concurrency tests: `tests/security/concurrent-writes.test.cjs` (100 lines, 3 test cases)
 
 **Verification:**
+
 ```bash
 pnpm add proper-lockfile
 pnpm test tests/security/concurrent-writes.test.cjs
@@ -160,6 +173,7 @@ grep -c "Entry" .claude/context/memory/test.md  # Should be 100
 **Files to Test:** `loop-state-manager.cjs` (SECURITY CRITICAL), `metrics-reader.cjs`, `dashboard-renderer.cjs`, `production-alerts.cjs`, `metrics-schema.cjs`
 
 **Create test files:**
+
 - `tests/lib/workflow/loop-state-manager.test.cjs` (12+ test cases, security focus)
 - `tests/lib/monitoring/metrics-reader.test.cjs` (8+ test cases)
 - `tests/lib/monitoring/dashboard-renderer.test.cjs` (6+ test cases)
@@ -169,6 +183,7 @@ grep -c "Entry" .claude/context/memory/test.md  # Should be 100
 **Target:** ≥80% coverage for all 5 modules
 
 **Verification:**
+
 ```bash
 pnpm test:coverage
 grep -E "loop-state-manager|metrics-reader" coverage-report.txt  # Should show ≥80%
@@ -179,6 +194,7 @@ grep -E "loop-state-manager|metrics-reader" coverage-report.txt  # Should show �
 ### P1-002: Memory Budget Rotation (2 hours immediate + 4 hours fix)
 
 **Immediate Action:**
+
 1. Manually rotate learnings.md NOW
    - Move entries older than 30 days to `.claude/context/memory/archive/learnings-2026-02.md`
    - Keep only last 30 days in `learnings.md`
@@ -193,12 +209,14 @@ grep -E "loop-state-manager|metrics-reader" coverage-report.txt  # Should show �
 **Files:** `.claude/hooks/routing/user-prompt-unified.cjs` (add input filter), `.claude/hooks/safety/post-tool-output-filter.cjs` (NEW)
 
 **Solution:**
+
 1. Add input sanitization to `user-prompt-unified.cjs`: Block patterns like "ignore previous instructions", "disregard all rules", "DAN mode", "jailbreak"
 2. Create `post-tool-output-filter.cjs` (NEW hook): Detect leaked system prompts/CLAUDE.md content in agent outputs
 3. Add to `.claude/settings.json`: Register output filter hook
 4. Security tests: `tests/security/prompt-injection.test.cjs` (15+ attack vector tests)
 
 **Verification:**
+
 ```bash
 pnpm test tests/security/prompt-injection.test.cjs
 grep "post-tool-output-filter" .claude/settings.json  # Should be registered
@@ -211,12 +229,14 @@ grep "post-tool-output-filter" .claude/settings.json  # Should be registered
 **Files:** 3 lib files (reveal via test)
 
 **Solution:**
+
 1. Run test: `pnpm test tests/lib/utils/windows-hide-compliance.test.cjs`
 2. Identifies 3 files missing `windowsHide: true` in spawn calls
 3. Add `windowsHide: true` to all spawn/spawnSync options
 4. Verify test passes after fix
 
 **Verification:**
+
 ```bash
 pnpm test tests/lib/utils/windows-hide-compliance.test.cjs
 grep -r "spawnSync\|spawn(" .claude/lib/ | grep -v "windowsHide: true"  # Should be empty
@@ -231,11 +251,13 @@ grep -r "spawnSync\|spawn(" .claude/lib/ | grep -v "windowsHide: true"  # Should
 **Problem:** Hook→Lib→Hook coupling (hooks should be leaf nodes)
 
 **Solution:**
+
 1. Move `getRouterMode()` from `router-state.cjs` to new `.claude/lib/routing/routing-utils.cjs`
 2. Update imports in both hooks to use `routing-utils`
 3. Verify: `npx madge --circular .claude/hooks/` → no cycles
 
 **Verification:**
+
 ```bash
 npx madge --circular .claude/hooks/
 grep "routing-utils" .claude/hooks/routing/routing-guard.cjs
@@ -261,12 +283,14 @@ Implement file-based locking for memory/state files.
 **Files:** All hooks using raw `JSON.parse` (audit required)
 
 **Solution:**
+
 1. Audit all hooks: `grep -r "JSON.parse" .claude/hooks/ --include="*.cjs"`
 2. Replace with `safeParseJSON` from `.claude/lib/utils/safe-json-parse.cjs`
 3. Add ESLint rule: Block `JSON.parse` in hooks
 4. Update `.claude/lib/hooks/hook-input.cjs` stdin parsing to use `safeParseJSON`
 
 **Verification:**
+
 ```bash
 grep -r "JSON.parse" .claude/hooks/ --include="*.cjs"  # Should be empty
 pnpm lint .claude/hooks/  # ESLint rule should fail on JSON.parse
@@ -277,17 +301,19 @@ pnpm lint .claude/hooks/  # ESLint rule should fail on JSON.parse
 ## SPRINT SCHEDULE
 
 ### Week 1: P0 Blockers
-| Day | Tasks | Effort | Owner |
-|-----|-------|--------|-------|
-| Mon | C-001 (Circular) + C-002 (Fields) | 6h | Dev 1 |
-| Tue | P0-002 (Test failures) | 4h | QA + Dev |
-| Wed | C-003 (Queue automation) | 6h | Dev 2 |
-| Thu | P0-005 (Sanitization 1/2) | 4h | Dev 1 |
-| Fri | P0-005 (Sanitization 2/2) + P0-006 (Locking 1/2) | 4h | Dev 1 |
+
+| Day | Tasks                                            | Effort | Owner    |
+| --- | ------------------------------------------------ | ------ | -------- |
+| Mon | C-001 (Circular) + C-002 (Fields)                | 6h     | Dev 1    |
+| Tue | P0-002 (Test failures)                           | 4h     | QA + Dev |
+| Wed | C-003 (Queue automation)                         | 6h     | Dev 2    |
+| Thu | P0-005 (Sanitization 1/2)                        | 4h     | Dev 1    |
+| Fri | P0-005 (Sanitization 2/2) + P0-006 (Locking 1/2) | 4h     | Dev 1    |
 
 **Checkpoint:** All P0 tests passing, integration queue automated
 
 ### Week 2-3: Security + Coverage
+
 - Day 1-2: P0-006 finish (4h) + P1-001 tests (8h)
 - Day 3-4: P1-003 prompt injection (12h)
 - Day 5: P1-004 windowsHide (1h) + P1-005 coupling (1h) + buffer (6h)
@@ -327,6 +353,7 @@ pnpm lint:fix && pnpm format
 ## FILES CREATED/MODIFIED
 
 **New Files (10 total):**
+
 - `.claude/lib/memory/core/memory-utils.cjs`
 - `.claude/lib/memory/memory-sanitizer.cjs`
 - `.claude/lib/utils/file-locker.cjs`
@@ -339,6 +366,7 @@ pnpm lint:fix && pnpm format
 - `.claude/schemas/memory-entry.json`
 
 **Modified Files (15 total):**
+
 - `.claude/lib/memory/contextual-memory.cjs`
 - `.claude/lib/memory/memory-query.cjs`
 - `.claude/lib/memory/smart-pruner.cjs`

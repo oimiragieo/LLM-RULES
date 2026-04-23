@@ -20,6 +20,7 @@ Completed the final cleanup items from EPIC framework audit Wave 15B follow-up. 
 Added 4 new hook sections (15-18) following the existing documentation format:
 
 ### 15. conflict-detector.cjs
+
 - **Location:** `.claude/hooks/evolution/conflict-detector.cjs`
 - **Event Type:** PreToolUse(Write)
 - **Default Enforcement:** block
@@ -30,6 +31,7 @@ Added 4 new hook sections (15-18) following the existing documentation format:
   - Environment variable: `CONFLICT_DETECTOR=block|warn|off`
 
 ### 16. validate-skill-invocation.cjs
+
 - **Location:** `.claude/hooks/safety/validate-skill-invocation.cjs`
 - **Event Type:** PreToolUse(Read)
 - **Default Enforcement:** warn (informational, never blocks)
@@ -40,6 +42,7 @@ Added 4 new hook sections (15-18) following the existing documentation format:
   - Always allows operation (advisory only)
 
 ### 17. code-index-updater.cjs
+
 - **Location:** `.claude/hooks/routing/code-index-updater.cjs`
 - **Event Type:** PostToolUse(Write|Edit)
 - **Default Enforcement:** N/A (monitoring only)
@@ -52,6 +55,7 @@ Added 4 new hook sections (15-18) following the existing documentation format:
   - Environment variables: `CODE_INDEX_AUTO_UPDATE`, `CODE_INDEX_DEBOUNCE_MS`
 
 ### 18. state-reset.cjs
+
 - **Location:** `.claude/hooks/session/state-reset.cjs`
 - **Event Type:** UserPromptSubmit
 - **Default Enforcement:** N/A (always enabled)
@@ -63,6 +67,7 @@ Added 4 new hook sections (15-18) following the existing documentation format:
   - Complements staleness detection in routing-guard.cjs
 
 **Documentation Standards Met:**
+
 - ✅ Consistent section structure (Location, Event Type, Enforcement, Purpose)
 - ✅ Environment variable tables with defaults
 - ✅ Code examples with ✅/❌ patterns
@@ -76,21 +81,25 @@ Added 4 new hook sections (15-18) following the existing documentation format:
 Updated 3 tool entries with status clarifications:
 
 ### tool_search.mjs
+
 **Before:** `Not scripted`
 **After:** `Deprecated: use SkillCatalog.search() instead`
 **Reason:** Tool superseded by Node.js library-based search
 
 ### repo-rag/
+
 **Before:** `Not scripted`
 **After:** `Experimental: not production-ready, use code-semantic-search skill instead`
 **Reason:** Clarifies experimental status and provides production alternative
 
 ### sequential-thinking/
+
 **Before:** `Not scripted`
 **After:** `MCP skill: mcp__sequential-thinking__sequentialthinking`
 **Reason:** Documents MCP integration status
 
 **Catalog Standards Met:**
+
 - ✅ Clear deprecation warnings
 - ✅ Alternative recommendations
 - ✅ MCP integration documented
@@ -105,6 +114,7 @@ Removed orphan workflow reference:
 **Removed:** `chrome-browser-skill-workflow.md` entry (file does not exist)
 
 **Catalog Integrity:**
+
 - ✅ All remaining 17 workflows have verified file paths
 - ✅ Table alignment preserved
 - ✅ Category groupings maintained
@@ -130,17 +140,20 @@ Removed orphan workflow reference:
 ## Quality Verification
 
 ### Documentation Completeness
+
 - ✅ All hook sections include environment variables
 - ✅ All hook sections include enforcement modes
 - ✅ All hook sections include "Why This Matters"
 - ✅ Code examples follow existing patterns
 
 ### Catalog Accuracy
+
 - ✅ Tool statuses accurately reflect current state
 - ✅ Deprecated tools have alternatives documented
 - ✅ MCP integrations clearly marked
 
 ### Reference Integrity
+
 - ✅ No broken workflow references remain
 - ✅ All listed workflows have verified file paths
 

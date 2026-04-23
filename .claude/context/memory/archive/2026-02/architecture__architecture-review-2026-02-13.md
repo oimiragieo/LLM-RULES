@@ -19,17 +19,20 @@ The agent-studio framework demonstrates **strong architectural foundation** with
 ### Key Findings
 
 **✅ STRENGTHS:**
+
 1. Hook chain-of-responsibility pattern optimized (6→2 unified hooks, <500ms overhead)
 2. Memory facade (ADR-111) reduces cognitive load from 15→4 modules
 3. Lazy code indexing eliminates 2+ hour startup cost (BM25 fast path)
 4. Routing table simplified (2,472→1,030 lines, 58% reduction, zero regression)
 
 **⚠️ CRITICAL ISSUES (P0):**
+
 1. **C-001:** Circular dependency risk in memory modules (contextual-memory ↔ memory-query)
 2. **C-002:** Integration bugs in memory rotation (field name mismatches bypass pruning)
 3. **C-003:** Integration queue not processed automatically (70% orphan rate)
 
 **🔴 HIGH PRIORITY (P1):**
+
 1. **H-001:** Hook-to-hook coupling chain (routing-guard → router-state → spawn-prompt-assembler)
 2. **H-002:** Memory budget violations (learnings.md 2.65x over 20KB limit)
 3. **H-003:** Integration health scoring not calculated (no observability)
@@ -74,6 +77,7 @@ const { buildSemanticContext } = require('./contextual-memory.cjs'); // CIRCULAR
 ```
 
 **Impact:**
+
 - **Refactoring breaks**: Changing one module breaks the other
 - **Initialization order fragile**: Depends on Node.js module cache behavior
 - **Testability reduced**: Cannot mock cleanly due to cycle
@@ -82,6 +86,7 @@ const { buildSemanticContext } = require('./contextual-memory.cjs'); // CIRCULAR
 **Root Cause:** `buildSemanticContext()` is a shared utility but lives in contextual-memory.cjs (not neutral location).
 
 **Recommendation:**
+
 1. Extract `buildSemanticContext()` to new `.claude/lib/memory/core/memory-utils.cjs`
 2. Break cycle: `contextual-memory.cjs` → `memory-utils.cjs` ← `memory-query.cjs`
 3. Update imports in both files
@@ -105,11 +110,13 @@ routing-guard.cjs (hook)
 
 **Why This Matters:**
 Hooks should be **leaf nodes** in dependency graph. When hook A depends on lib that depends on hook B, we have:
+
 - **Circular dependency risk** (same pattern as C-001)
 - **Maintenance burden** (change one hook, check 3 files)
 - **Testing complexity** (must mock entire chain)
 
 **Recommendation:**
+
 1. Move `getRouterMode()` from router-state.cjs to new `.claude/lib/routing/routing-utils.cjs`
 2. Both hooks import routing-utils (neutral module)
 3. Break chain: hooks consume utils, never other hooks
@@ -124,6 +131,7 @@ Hooks should be **leaf nodes** in dependency graph. When hook A depends on lib t
 **✅ STRENGTH: Clean Subsystem Boundaries**
 
 Most subsystems have clear responsibilities:
+
 - **routing/**: Intent matching, agent selection, routing table
 - **safety/**: Input validation, command allowlists, sanitization
 - **workflow/**: State machine, phase advancement, quality gates
@@ -177,6 +185,7 @@ Benefits:
 **Verdict:** Hook consolidation is **complete and optimal**. No further merging recommended.
 
 **Rationale:**
+
 - routing-guard.cjs has 12 checks (at upper maintainability limit)
 - Further consolidation would create monolithic hooks (anti-pattern)
 - Current structure balances performance, maintainability, testability
@@ -245,17 +254,20 @@ Task #13 discovered 2 integration bugs that NO unit test caught:
 ```
 
 **Impact:**
+
 - Memory pruning **fails silently** (field name mismatch → undefined → no pruning)
 - Deduplication logic **bypassed** (wrong parameter name → falls back to default)
 - HOT tier files **exceed budget** → context overflow
 - **Root cause pattern:** Unit tests mocked interfaces, not actual implementations
 
 **Why This Is Critical:**
+
 - Validates ADR-103 finding: "Unit Test Isolation Can Hide Integration Bugs"
 - Memory subsystem is **core infrastructure** — silent failures accumulate
 - 41/41 unit tests passing gave **false confidence**
 
 **Recommendation (per ADR-103):**
+
 1. Add integration tests validating **actual module contracts** (not mocks)
 2. Test real pruner + real scheduler interaction
 3. Add runtime contract validation (fail loudly on mismatch):
@@ -281,6 +293,7 @@ Active memory footprint: ~82KB total
 ```
 
 **Impact:**
+
 - **Context window pressure**: 30-40% of 200K token budget consumed
 - **Attention degradation**: "Lost in the middle" problem at 130K+ tokens (2026 research)
 - **Rotation not triggering**: Memory rotator has integration bugs (C-002)
@@ -288,6 +301,7 @@ Active memory footprint: ~82KB total
 **Root Cause:** Automatic rotation disabled after discovering integration bugs in Task #13.
 
 **Recommendation:**
+
 1. **Immediate (P1):** Manually rotate learnings.md NOW (split to `learnings-2026-02.md` archive)
 2. **Short-term (P0):** Fix integration bugs (C-002) to re-enable automatic rotation
 3. **Long-term (P2):** Add rotation trigger in sync-memory-index.cjs hook
@@ -312,6 +326,7 @@ await writeMemory('learnings', 'New pattern: ...');
 ```
 
 **✅ STRENGTH:** Ergonomic facade reduces 15 modules → 4 clear layers:
+
 - `memory-storage.cjs` (read/write files)
 - `memory-query.cjs` (search, entity-query)
 - `memory-extraction.cjs` (extractor + writer merged)
@@ -365,6 +380,7 @@ Routing Table Simplification (Adopted from pro-workflow):
 ### 🟡 MEDIUM FINDING M-002: Fuzzy Intent Matcher Lacks Metrics
 
 **Current Implementation:**
+
 - fuzzy-intent-matcher.cjs uses Jaccard coefficient for semantic similarity
 - Falls back to ROUTING_TABLE on low confidence
 - **No telemetry** tracking accuracy, usage frequency, confidence distribution
@@ -372,6 +388,7 @@ Routing Table Simplification (Adopted from pro-workflow):
 **Issue:** Cannot validate if fuzzy matcher is actually beneficial.
 
 **Recommendation:**
+
 1. Add metric logging: `fuzzy_match_used: true/false`, `confidence_score: 0-1`
 2. Track accuracy (was correct agent selected?) via post-task validation
 3. Review quarterly: if <70% accuracy, deprecate feature
@@ -442,6 +459,7 @@ BM25-Only Fast Path (default):
 **Issue:** Prewarm must be manually invoked (`pnpm search:daemon:prewarm`). Cold daemon first query: 1.35s (3.4x slower than prewarmed 0.40s).
 
 **Recommendation:**
+
 - Add auto-prewarm on first search query (lazy trigger)
 - OR prewarm in background during session startup (non-blocking)
 
@@ -474,6 +492,7 @@ Orphan Rate: 70%+ (354/454 skills never cataloged)
 ```
 
 **Impact:**
+
 - Artifacts created but **never integrated** → invisible to Router/agents
 - Integration gaps **accumulate over time** (70% orphan rate)
 - Manual router step easily forgotten
@@ -492,12 +511,14 @@ if (isCreatorCompletion(metadata)) {
 
 // NEW: Auto-spawn artifact-integrator when queue exceeds threshold
 const queueSize = getQueueSize('.claude/context/runtime/integration-queue.jsonl');
-if (queueSize >= INTEGRATION_BATCH_SIZE) {  // e.g., 5 entries
+if (queueSize >= INTEGRATION_BATCH_SIZE) {
+  // e.g., 5 entries
   spawnArtifactIntegrator({ mode: 'batch', maxEntries: queueSize });
 }
 ```
 
 **Benefits:**
+
 - **Automated processing** (no manual router step)
 - **Batched analysis** (process 5-10 entries → efficiency)
 - **Non-blocking** (runs in background via Task tool)
@@ -520,6 +541,7 @@ Impact: Cannot track improvement over time, no RBT diagnosis for gaps.
 ```
 
 **Recommendation:**
+
 1. Update artifact-integrator skill to invoke `quickIntegrationCheck(artifactId)` for each artifact
 2. Include health score in task completion metadata
 3. Add integration-health-dashboard.cjs tracking orphan rate trend
@@ -551,6 +573,7 @@ Configuration Sprawl (6+ config locations):
 ```
 
 **Impact:**
+
 - **Merge conflict risk** (6 files change frequently)
 - **Developer confusion** (where to set enforcement mode?)
 - **Inconsistent defaults** (environment.cjs vs config.yaml discrepancies)
@@ -571,12 +594,18 @@ Configuration Consolidation — 6 files → 2 files (config.yaml + .env)
 
 ```javascript
 function checkPlannerFirst(toolInput, state) {
-  if (isRouterMode(state)) {                                    // Level 1
-    if (toolInput.complexity === 'HIGH' || toolInput.complexity === 'EPIC') {  // Level 2
-      if (!state.plannerSpawned) {                             // Level 3
-        if (!state.hasExplicitOverride) {                      // Level 4
-          if (getEnforcementMode('PLANNER_FIRST_ENFORCEMENT') === 'block') {  // Level 5
-            if (!dedupe.dedupe) {                              // Level 6
+  if (isRouterMode(state)) {
+    // Level 1
+    if (toolInput.complexity === 'HIGH' || toolInput.complexity === 'EPIC') {
+      // Level 2
+      if (!state.plannerSpawned) {
+        // Level 3
+        if (!state.hasExplicitOverride) {
+          // Level 4
+          if (getEnforcementMode('PLANNER_FIRST_ENFORCEMENT') === 'block') {
+            // Level 5
+            if (!dedupe.dedupe) {
+              // Level 6
               return { allow: false, message: '...' };
             }
           }
@@ -589,11 +618,13 @@ function checkPlannerFirst(toolInput, state) {
 ```
 
 **Metrics:**
+
 - **Nesting depth:** 6 levels (exceeds recommended 3-4)
 - **Cyclomatic complexity:** ~8-10 (exceeds recommended 5)
 - **Total lines:** 12 checks × ~150 lines/check = ~1,800 lines
 
 **Impact:**
+
 - **Hard to test**: 2^6 = 64 conditional paths per check
 - **Hard to understand**: High cognitive load
 - **Refactoring risk**: Change one condition → break entire check
@@ -623,11 +654,11 @@ function checkPlannerFirst(toolInput, state) {
 
 ### Critical (P0 - Fix Immediately)
 
-| ID    | Finding                               | Impact              | Effort  |
-| ----- | ------------------------------------- | ------------------- | ------- |
-| C-001 | Circular dependency (memory modules)  | Refactoring breaks  | 2 hours |
-| C-002 | Integration bugs (memory rotation)    | Context overflow    | 4 hours |
-| C-003 | Integration queue not automated       | 70% orphan rate     | 6 hours |
+| ID    | Finding                              | Impact             | Effort  |
+| ----- | ------------------------------------ | ------------------ | ------- |
+| C-001 | Circular dependency (memory modules) | Refactoring breaks | 2 hours |
+| C-002 | Integration bugs (memory rotation)   | Context overflow   | 4 hours |
+| C-003 | Integration queue not automated      | 70% orphan rate    | 6 hours |
 
 **Total P0 Effort:** 12 hours
 
@@ -635,13 +666,13 @@ function checkPlannerFirst(toolInput, state) {
 
 ### High Priority (P1 - Fix This Week)
 
-| ID    | Finding                          | Impact                      | Effort   |
-| ----- | -------------------------------- | --------------------------- | -------- |
-| H-001 | Hook → Lib → Hook coupling       | Maintenance burden          | 1 hour   |
-| H-002 | Memory budget violations         | Context pressure            | 2 hours  |
-| H-003 | Integration health not tracked   | No trend visibility         | 4 hours  |
-| H-004 | Configuration sprawl (6 files)   | Merge conflicts             | 2 weeks  |
-| H-005 | Deeply nested routing-guard      | Maintainability + testing   | 8 hours  |
+| ID    | Finding                        | Impact                    | Effort  |
+| ----- | ------------------------------ | ------------------------- | ------- |
+| H-001 | Hook → Lib → Hook coupling     | Maintenance burden        | 1 hour  |
+| H-002 | Memory budget violations       | Context pressure          | 2 hours |
+| H-003 | Integration health not tracked | No trend visibility       | 4 hours |
+| H-004 | Configuration sprawl (6 files) | Merge conflicts           | 2 weeks |
+| H-005 | Deeply nested routing-guard    | Maintainability + testing | 8 hours |
 
 **Total P1 Effort:** ~3 weeks
 
@@ -649,11 +680,11 @@ function checkPlannerFirst(toolInput, state) {
 
 ### Medium Priority (P2 - Next Sprint)
 
-| ID    | Finding                              | Impact                  | Effort  |
-| ----- | ------------------------------------ | ----------------------- | ------- |
-| M-001 | Hook registration order              | Correctness             | 5 mins  |
-| M-002 | Fuzzy matcher lacks metrics          | Observability gap       | 4 hours |
-| M-003 | Daemon prewarm not automated         | UX (first query slow)   | 2 hours |
+| ID    | Finding                      | Impact                | Effort  |
+| ----- | ---------------------------- | --------------------- | ------- |
+| M-001 | Hook registration order      | Correctness           | 5 mins  |
+| M-002 | Fuzzy matcher lacks metrics  | Observability gap     | 4 hours |
+| M-003 | Daemon prewarm not automated | UX (first query slow) | 2 hours |
 
 **Total P2 Effort:** ~6 hours
 
@@ -675,17 +706,18 @@ function checkPlannerFirst(toolInput, state) {
 
 **Overall: 7.8/10** (GOOD, with critical gaps)
 
-| Dimension              | Score | Rationale                                         |
-| ---------------------- | ----- | ------------------------------------------------- |
-| Separation of Concerns | 8/10  | Well-layered (lib/hooks/tools), minor coupling    |
-| Maintainability        | 7/10  | Deep nesting, config sprawl                       |
-| Performance            | 8/10  | Hook overhead <500ms, lazy indexing optimal       |
-| Testability            | 7/10  | Integration bugs found (unit tests insufficient)  |
+| Dimension              | Score | Rationale                                          |
+| ---------------------- | ----- | -------------------------------------------------- |
+| Separation of Concerns | 8/10  | Well-layered (lib/hooks/tools), minor coupling     |
+| Maintainability        | 7/10  | Deep nesting, config sprawl                        |
+| Performance            | 8/10  | Hook overhead <500ms, lazy indexing optimal        |
+| Testability            | 7/10  | Integration bugs found (unit tests insufficient)   |
 | Security               | 8/10  | Spawn sanitization, shell hardening, safeParseJSON |
-| Scalability            | 9/10  | Lazy indexing, tiered memory, BM25 fast path      |
-| Observability          | 6/10  | Missing integration health, fuzzy matcher metrics |
+| Scalability            | 9/10  | Lazy indexing, tiered memory, BM25 fast path       |
+| Observability          | 6/10  | Missing integration health, fuzzy matcher metrics  |
 
 **Blockers to 9/10:**
+
 - Configuration sprawl (6 files)
 - Deep nesting in routing-guard (6+ levels)
 - Integration queue manual processing
@@ -728,6 +760,7 @@ function checkPlannerFirst(toolInput, state) {
 - **P0+P1 addressed:** LOW RISK (production-ready)
 
 **Path to 9/10:**
+
 - Address P0+P1 items (4 weeks effort)
 - Configuration consolidation (ADR-085)
 - Integration automation (C-003)
@@ -737,6 +770,7 @@ function checkPlannerFirst(toolInput, state) {
 **End of Report**
 
 **Next Steps:**
+
 1. Review findings with team
 2. Prioritize P0 fixes (12 hours this week)
 3. Schedule P1 fixes (3-week sprint)

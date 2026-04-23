@@ -32,15 +32,15 @@ Duration: 1077.4336ms
 
 ### Test Coverage by Domain
 
-| Domain                      | Tests | Pass | Coverage                                       |
-| --------------------------- | ----- | ---- | ---------------------------------------------- |
-| Safe JSON (structured clone) | 22    | 22   | Deep copy, circular refs, Date preservation   |
-| Safe JSON (bounded set)      | 8     | 8    | Deduplication, capacity limits, TTL           |
-| Safe JSON (strip dangerous)  | 17    | 17   | Prototype pollution, nested stripping         |
-| Memory LTM Eviction          | 9     | 9    | Capacity thresholds, FIFO eviction            |
-| Memory Tiers                 | 14    | 14   | STM/MTM/LTM transitions, isolation            |
-| File Cache                   | 12    | 12   | Read-through, TTL cleanup, concurrent access  |
-| Memory Locking               | 11    | 11   | File locking, race conditions, atomic writes  |
+| Domain                       | Tests | Pass | Coverage                                     |
+| ---------------------------- | ----- | ---- | -------------------------------------------- |
+| Safe JSON (structured clone) | 22    | 22   | Deep copy, circular refs, Date preservation  |
+| Safe JSON (bounded set)      | 8     | 8    | Deduplication, capacity limits, TTL          |
+| Safe JSON (strip dangerous)  | 17    | 17   | Prototype pollution, nested stripping        |
+| Memory LTM Eviction          | 9     | 9    | Capacity thresholds, FIFO eviction           |
+| Memory Tiers                 | 14    | 14   | STM/MTM/LTM transitions, isolation           |
+| File Cache                   | 12    | 12   | Read-through, TTL cleanup, concurrent access |
+| Memory Locking               | 11    | 11   | File locking, race conditions, atomic writes |
 
 **Key Findings:**
 
@@ -64,6 +64,7 @@ Output:
 ```
 
 **Assessment:**
+
 - 0 errors (zero blocking issues)
 - 1 warning: `memory-tiers.cjs` exceeds 500-line limit by 2 lines
 - **Action taken:** Issue documented but not blocking (file is core memory system with complex lifecycle)
@@ -121,6 +122,7 @@ Coverage: 100% (5/5 hooks protected)
 ```
 
 **Security Implications:**
+
 - ✅ All Tier-1 hooks protected against JSON crash vectors
 - ✅ No prototype pollution vectors in hook input parsing
 - ✅ Malformed JSON handled gracefully (safe fallback)
@@ -130,22 +132,22 @@ Coverage: 100% (5/5 hooks protected)
 
 ### Memory Subsystem
 
-| Component                    | Status | Notes                                      |
-| ---------------------------- | ------ | ------------------------------------------ |
-| STM (Short-Term Memory)      | ✅     | Session isolation verified (14 tests)      |
-| MTM (Mid-Term Memory)        | ✅     | 10-session rotation working (9 tests)      |
-| LTM (Long-Term Memory)       | ✅     | Capacity eviction at 5K entries (9 tests)  |
-| File Locking                 | ✅     | Atomic writes with proper-lockfile (11)    |
-| Deep Copy Operations         | ✅     | Structured clone preserves objects (22)    |
+| Component               | Status | Notes                                     |
+| ----------------------- | ------ | ----------------------------------------- |
+| STM (Short-Term Memory) | ✅     | Session isolation verified (14 tests)     |
+| MTM (Mid-Term Memory)   | ✅     | 10-session rotation working (9 tests)     |
+| LTM (Long-Term Memory)  | ✅     | Capacity eviction at 5K entries (9 tests) |
+| File Locking            | ✅     | Atomic writes with proper-lockfile (11)   |
+| Deep Copy Operations    | ✅     | Structured clone preserves objects (22)   |
 
 ### Security Fixes Validated
 
-| Vulnerability              | Fix                    | Status | Test Coverage |
-| -------------------------- | ---------------------- | ------ | ------------- |
-| Prototype pollution        | `__proto__` stripping  | ✅     | 5 tests       |
-| JSON crash vectors         | safeParseJSON adoption | ✅     | 8 tests       |
-| Race conditions            | File-based locking     | ✅     | 11 tests      |
-| Data loss (circular refs)  | structuredClone API    | ✅     | 4 tests       |
+| Vulnerability             | Fix                    | Status | Test Coverage |
+| ------------------------- | ---------------------- | ------ | ------------- |
+| Prototype pollution       | `__proto__` stripping  | ✅     | 5 tests       |
+| JSON crash vectors        | safeParseJSON adoption | ✅     | 8 tests       |
+| Race conditions           | File-based locking     | ✅     | 11 tests      |
+| Data loss (circular refs) | structuredClone API    | ✅     | 4 tests       |
 
 ## Test Quality Metrics
 
@@ -176,24 +178,24 @@ Assertion Types:
 
 ### Pre-Deployment Checklist
 
-| Item                           | Status | Evidence                    |
-| ------------------------------ | ------ | --------------------------- |
-| Test Pass Rate ≥ 95%           | ✅     | 33/33 = 100%                |
-| Lint errors = 0                | ✅     | 0 blocking errors            |
-| Format check = clean           | ✅     | 0 changes needed            |
-| JSON.parse migration = done    | ✅     | 5/5 hooks protected         |
-| Security gates = passed        | ✅     | Prototype pollution fixed   |
-| No regression in hot paths     | ✅     | Memory tiers working        |
-| Integration suite = passing    | ✅     | 14 integration tests pass   |
+| Item                        | Status | Evidence                  |
+| --------------------------- | ------ | ------------------------- |
+| Test Pass Rate ≥ 95%        | ✅     | 33/33 = 100%              |
+| Lint errors = 0             | ✅     | 0 blocking errors         |
+| Format check = clean        | ✅     | 0 changes needed          |
+| JSON.parse migration = done | ✅     | 5/5 hooks protected       |
+| Security gates = passed     | ✅     | Prototype pollution fixed |
+| No regression in hot paths  | ✅     | Memory tiers working      |
+| Integration suite = passing | ✅     | 14 integration tests pass |
 
 ### Risk Assessment
 
-| Risk Category        | Status | Mitigation                                  |
-| -------------------- | ------ | ------------------------------------------- |
-| Data Loss            | ✅ LOW | Deep copy tests + atomic writes verified    |
-| Security             | ✅ LOW | JSON parsing protected, prototype pollution fixed |
-| Performance          | ✅ LOW | File cache + memory tier isolation         |
-| Session Contamination | ✅ LOW | STM/MTM/LTM isolation verified             |
+| Risk Category         | Status | Mitigation                                        |
+| --------------------- | ------ | ------------------------------------------------- |
+| Data Loss             | ✅ LOW | Deep copy tests + atomic writes verified          |
+| Security              | ✅ LOW | JSON parsing protected, prototype pollution fixed |
+| Performance           | ✅ LOW | File cache + memory tier isolation                |
+| Session Contamination | ✅ LOW | STM/MTM/LTM isolation verified                    |
 
 ## Blockers & Known Issues
 

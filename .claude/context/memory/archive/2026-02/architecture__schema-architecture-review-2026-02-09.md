@@ -75,15 +75,15 @@ All schemas follow a consistent nested structure:
 
 **Measured Against Structure B**:
 
-| Dimension | Consistency | Notes |
-|-----------|-------------|-------|
-| Envelope (status + output) | 98% | 2 edge cases in test fixtures |
-| unevaluatedProperties | 100% | All 27 core + 60 domain schemas |
-| $schema declaration | 95% | 3 schemas still on Draft-07 |
-| $id URL pattern | 100% | `https://agent-studio.dev/schemas/{name}` |
-| Required fields | 95% | Most have ["status", "output"] |
-| additionalProperties | 100% | All set to false |
-| Pattern validation | 98% | Naming conventions enforced |
+| Dimension                  | Consistency | Notes                                     |
+| -------------------------- | ----------- | ----------------------------------------- |
+| Envelope (status + output) | 98%         | 2 edge cases in test fixtures             |
+| unevaluatedProperties      | 100%        | All 27 core + 60 domain schemas           |
+| $schema declaration        | 95%         | 3 schemas still on Draft-07               |
+| $id URL pattern            | 100%        | `https://agent-studio.dev/schemas/{name}` |
+| Required fields            | 95%         | Most have ["status", "output"]            |
+| additionalProperties       | 100%        | All set to false                          |
+| Pattern validation         | 98%         | Naming conventions enforced               |
 
 **High-Variance Areas Identified:**
 
@@ -129,20 +129,22 @@ All schemas follow a consistent nested structure:
 
 **Naming Convention Analysis**:
 
-| Type | Pattern | Example | Consistency |
-|------|---------|---------|-------------|
-| Skills | `skill-{name}-output.schema.json` | `skill-tdd-output.schema.json` | 100% |
-| Agents | `agent-*.schema.json` | `agent-definition.schema.json` | 100% |
-| Metadata | `{entity}-definition.schema.json` | `workflow-definition.schema.json` | 95% |
-| Base | `generic-*.schema.json` | `generic-skill-output-base.schema.json` | 100% |
+| Type     | Pattern                           | Example                                 | Consistency |
+| -------- | --------------------------------- | --------------------------------------- | ----------- |
+| Skills   | `skill-{name}-output.schema.json` | `skill-tdd-output.schema.json`          | 100%        |
+| Agents   | `agent-*.schema.json`             | `agent-definition.schema.json`          | 100%        |
+| Metadata | `{entity}-definition.schema.json` | `workflow-definition.schema.json`       | 95%         |
+| Base     | `generic-*.schema.json`           | `generic-skill-output-base.schema.json` | 100%        |
 
 **Strengths:**
+
 - Self-documenting filenames
 - Clear intent (output vs definition)
 - Kebab-case throughout
 - 27 core + 60 domain = 87 schemas total, all named consistently
 
 **Minor Gaps:**
+
 - No date versioning in schema names (schemas are versionless)
 - Recommendation: Consider `skill-{name}-output-v2.schema.json` pattern if breaking changes arise
 
@@ -182,13 +184,13 @@ Generic skill output schema is NOT inherited via $ref. Instead:
 
 **Assessment**:
 
-| Aspect | Status | Notes |
-|--------|--------|-------|
-| DRY principle (avoid duplication) | ⚠️ MILD VIOLATION | Status envelope repeated 60+ times |
-| Composition over inheritance | ✅ GOOD | Explicit > implicit $ref chains |
-| Readability | ✅ EXCELLENT | No need to trace $ref chains |
-| Maintainability | ✅ GOOD | Each schema self-contained |
-| Extensibility | ⚠️ BOUNDED | Breaking change to base affects all |
+| Aspect                            | Status            | Notes                               |
+| --------------------------------- | ----------------- | ----------------------------------- |
+| DRY principle (avoid duplication) | ⚠️ MILD VIOLATION | Status envelope repeated 60+ times  |
+| Composition over inheritance      | ✅ GOOD           | Explicit > implicit $ref chains     |
+| Readability                       | ✅ EXCELLENT      | No need to trace $ref chains        |
+| Maintainability                   | ✅ GOOD           | Each schema self-contained          |
+| Extensibility                     | ⚠️ BOUNDED        | Breaking change to base affects all |
 
 **Recommendation**: Consider adding a "Base Extension" pattern:
 
@@ -211,6 +213,7 @@ Generic skill output schema is NOT inherited via $ref. Instead:
 ```
 
 **Verdict**: Current approach (explicit repetition) is reasonable for:
+
 - 60 schemas (small enough that duplication is manageable)
 - Low change frequency (status enum rarely changes)
 - Clarity (no $ref chains to debug)
@@ -222,11 +225,13 @@ Generic skill output schema is NOT inherited via $ref. Instead:
 **Growth Capacity Analysis**:
 
 **Current State**:
+
 - 27 core framework schemas
 - 60+ domain/skill schemas
 - 87 total in catalog
 
 **Projected Growth**:
+
 - 10-15 new skills per quarter
 - +5-10 new domain agents per quarter
 - Agent-specific output schemas needed (25+ planned)
@@ -253,6 +258,7 @@ Generic skill output schema is NOT inherited via $ref. Instead:
 **Recommendations for Future**:
 
 1. **Schema Versioning Strategy**:
+
    ```
    Define in .claude/context/memory/decisions.md:
    - Breaking change threshold (e.g., required field removal)
@@ -261,6 +267,7 @@ Generic skill output schema is NOT inherited via $ref. Instead:
    ```
 
 2. **Base Schema Composition** (Optional):
+
    ```
    If 100+ schemas, consider:
    - $ref pattern with "allOf"
@@ -284,11 +291,13 @@ Generic skill output schema is NOT inherited via $ref. Instead:
 **Assessment**: ✅ **WELL-APPLIED**
 
 Each schema has one purpose:
+
 - `skill-tdd-output.schema.json`: TDD skill output only
 - `agent-definition.schema.json`: Agent frontmatter only
 - Framework concerns separated: hooks, workflows, agents
 
 **Example**:
+
 ```json
 // Good separation
 "skill-tdd-output.schema.json" → Test execution results
@@ -311,17 +320,23 @@ Each schema has one purpose:
 **Assessment**: ✅ **APPLICABLE AT INVOCATION LEVEL**
 
 All skill outputs conform to:
+
 ```json
 {
   "status": "success|partial|failed",
-  "output": { /* domain-specific */ }
+  "output": {
+    /* domain-specific */
+  }
 }
 ```
 
 Invocation logic can treat all skills uniformly:
+
 ```javascript
 const result = invokeSkill(skillName);
-if (result.status === "success") { usOutput(result.output); }
+if (result.status === 'success') {
+  usOutput(result.output);
+}
 ```
 
 ### Interface Segregation (I)
@@ -350,14 +365,17 @@ if (result.status === "success") { usOutput(result.output); }
 **Status**: ⚠️ **MONITORING REQUIRED**
 
 Current:
+
 - 87 schemas across .claude/schemas/
 
 Concern:
+
 - Each new skill adds schema
 - Risk: 200+ schemas in 2 years
 - Management burden increases
 
 **Mitigation**:
+
 - Catalog (.claude/context/artifacts/catalogs/schema-catalog.md) tracks all 112 schemas
 - Schema-creator skill enforces patterns
 - Post-creation integration verifies catalog entry
@@ -369,6 +387,7 @@ Concern:
 **Status**: ✅ **NOT PRESENT**
 
 All schemas enforce `additionalProperties: false`, preventing:
+
 - Typos in property names
 - Accidental new fields
 - API contract violations
@@ -380,16 +399,19 @@ All schemas enforce `additionalProperties: false`, preventing:
 **Status**: ⚠️ **ACCEPTABLE TRADE-OFF**
 
 Generic base schema allows:
+
 ```json
 "output": { "type": "object", "minProperties": 0 }
 ```
 
 Rationale:
+
 - Early-stage skills need flexibility
 - Schemas evolve as patterns emerge
 - No breaking changes to existing consumers
 
 **Recommendation**: Document evolution path:
+
 ```
 Phase 1 (Emerging): Generic output, only "status" validated
 Phase 2 (Stable): Output properties added as patterns solidify
@@ -403,26 +425,30 @@ Phase 3 (Mature): Full validation with comprehensive output schema
 **Catalog Status**: `.claude/context/artifacts/catalogs/schema-catalog.md`
 
 **Contents**:
+
 - 27 core framework schemas documented
 - 60+ skill output schemas listed
 - Integration status for each
 - Routing keywords for discovery
 
 **Strengths**:
+
 - Complete inventory prevents orphans
 - Descriptions enable discovery
 - Links to schema files
 
 **Gap**:
+
 - No "last updated" timestamps
 - No "maturity level" (emerging/stable/mature)
 
 **Recommendation**:
+
 ```markdown
-| Schema | Maturity | Updated | Files | Status |
-|--------|----------|---------|-------|--------|
-| skill-tdd-output.schema.json | Mature | 2026-02-09 | tdd/* | ✅ |
-| skill-new-skill-output.schema.json | Emerging | 2026-02-08 | new-skill/* | ⚠️ |
+| Schema                             | Maturity | Updated    | Files        | Status |
+| ---------------------------------- | -------- | ---------- | ------------ | ------ |
+| skill-tdd-output.schema.json       | Mature   | 2026-02-09 | tdd/\*       | ✅     |
+| skill-new-skill-output.schema.json | Emerging | 2026-02-08 | new-skill/\* | ⚠️     |
 ```
 
 ---
@@ -437,11 +463,13 @@ Phase 3 (Mature): Full validation with comprehensive output schema
 **Description**: No versioning strategy if skill output format changes (e.g., adding required field).
 
 **Impact**:
+
 - Old consumers break if schema changes
 - No deprecation path documented
 - Risk of silent failures
 
 **Mitigation**:
+
 1. Document versioning strategy in decisions.md
 2. Add "schema-version" metadata to schema definitions
 3. Pre-commit hook validates version increments
@@ -454,10 +482,12 @@ Phase 3 (Mature): Full validation with comprehensive output schema
 **Description**: All 60+ schemas depend on `status: ["success", "partial", "failed"]` convention.
 
 **Impact**:
+
 - Single point of failure (status enum)
 - Changing to ["ok", "warning", "error"] breaks all consumers
 
 **Mitigation**:
+
 1. Treat status enum as immutable contract
 2. Add comment in base schema: "DO NOT CHANGE - breaks 60+ consumers"
 3. Consider alternative enum values in discussions (but keep current)
@@ -470,11 +500,13 @@ Phase 3 (Mature): Full validation with comprehensive output schema
 **Description**: Early-stage skills use generic `output: {type: object}`, accepting any properties.
 
 **Impact**:
+
 - Invalid outputs slip through validation
 - Consumer code may crash accessing missing properties
 - Difficult to debug (no schema contract)
 
 **Mitigation**:
+
 1. Mark generic-skill-output-base as "temporary" in comments
 2. Establish "stabilization" process (generic → specific schema after 3+ uses)
 3. Document in skill-creator workflow: "Replace generic output schema when pattern stabilizes"
@@ -552,11 +584,13 @@ Phase 3 (Mature): Full validation with comprehensive output schema
 **Decision**: All schemas use two-level envelope (status + output) with strict validation.
 
 **Rationale**:
+
 - Decouples invocation result from payload
 - Consistent across all 87 schemas
 - Enables uniform error handling
 
 **Consequences**:
+
 - All skill invocations have status wrapper
 - Generic output layer requires gradual schema refinement
 - Supports future versioning strategies
@@ -572,6 +606,7 @@ Phase 3 (Mature): Full validation with comprehensive output schema
 **Proposed Artifact**: `schema:status-envelope-standard`
 
 **Affected Components**:
+
 - skill-tdd-output.schema.json
 - skill-debugging-output.schema.json
 - ... (60+ skill schemas)
@@ -620,6 +655,7 @@ Phase 3 (Mature): Full validation with comprehensive output schema
 The schema standardization represents **mature architectural thinking** with strong discipline in pattern application. The three-phase approach (foundation → standardization → completion) demonstrates careful planning and execution.
 
 The Structure B pattern provides excellent balance between:
+
 - **Strictness** (unevaluatedProperties: false prevents bugs)
 - **Flexibility** (generic base allows emerging skills)
 - **Clarity** (explicit schemas beat complex $ref chains)
@@ -629,6 +665,7 @@ The Structure B pattern provides excellent balance between:
 The schema architecture is ready for scaling from 87 to 150+ schemas. The recommended enhancements (Priority 1-2 above) are important for hygiene and maintainability, not blocking concerns.
 
 **Next Steps**:
+
 1. Execute Priority 1 recommendations (versioning strategy, Draft 2020-12 completion)
 2. Implement Priority 2 enhancements (catalog enhancement, stabilization process)
 3. Revisit composition pattern at 150-schema threshold

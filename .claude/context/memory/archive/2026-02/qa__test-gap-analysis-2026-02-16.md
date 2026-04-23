@@ -19,6 +19,7 @@
 - **Major Concern:** High-value modules lack tests (routing-guard core logic, task lifecycle state machine, workflow cycle detection)
 
 **Risk Assessment:**
+
 - **P0 (Critical):** 3 gaps that could cause production incidents
 - **P1 (High):** 3 gaps that reduce system reliability
 
@@ -29,20 +30,21 @@
 ### 1.1 Test Files vs Source Files
 
 **Test Discovery:**
+
 - Test files found: 98+ in `tests/` directory
 - Source files in `.claude/lib/`: 110+ CJS modules
 - Source files in `.claude/hooks/`: 100+ CJS modules
 
 **Coverage Distribution:**
 
-| Area | Test Files | Source Files | Coverage |
-|------|------------|--------------|----------|
-| Code Indexing | 20 | 12 | ✅ Excellent |
-| Memory | 15 | 25 | ⚠️ Partial |
-| Routing | 10 | 15 | ❌ **Critical gaps** |
-| Hooks | 15 | 100+ | ❌ **Many untested** |
-| Workflow | 5 | 15 | ⚠️ Partial |
-| Utils | 10 | 30 | ⚠️ Partial |
+| Area          | Test Files | Source Files | Coverage             |
+| ------------- | ---------- | ------------ | -------------------- |
+| Code Indexing | 20         | 12           | ✅ Excellent         |
+| Memory        | 15         | 25           | ⚠️ Partial           |
+| Routing       | 10         | 15           | ❌ **Critical gaps** |
+| Hooks         | 15         | 100+         | ❌ **Many untested** |
+| Workflow      | 5          | 15           | ⚠️ Partial           |
+| Utils         | 10         | 30           | ⚠️ Partial           |
 
 ### 1.2 Untested Critical Modules
 
@@ -96,21 +98,24 @@
 
 **Untested Scenarios:**
 
-| Check | Description | Risk | Test Exists? |
-|-------|-------------|------|--------------|
-| Check 1 | Planner-first enforcement (HIGH/EPIC complexity) | Developer implements EPIC task without plan | ❌ No |
-| Check 5 | Architect-first for code-simplifier/devops/chaos-engineer | High-risk specialists bypass architecture review | ❌ No |
-| Check 7 | Specialist keyword override (59 agents) | Developer spawned for "update docs" instead of technical-writer | ❌ No |
+| Check   | Description                                               | Risk                                                            | Test Exists? |
+| ------- | --------------------------------------------------------- | --------------------------------------------------------------- | ------------ |
+| Check 1 | Planner-first enforcement (HIGH/EPIC complexity)          | Developer implements EPIC task without plan                     | ❌ No        |
+| Check 5 | Architect-first for code-simplifier/devops/chaos-engineer | High-risk specialists bypass architecture review                | ❌ No        |
+| Check 7 | Specialist keyword override (59 agents)                   | Developer spawned for "update docs" instead of technical-writer | ❌ No        |
 
 **Memory Evidence:**
+
 > "routing-guard.cjs (2599 LOC) identified as over-complex but salvageable... 93% extraction potential confirmed"
 
 **Remediation:**
+
 - 20 integration tests (2 days effort)
 - Test matrix: 3 checks × 3 complexity levels × 2 enforcement modes = 18 tests
 - Add 2 tests for edge cases (unknown agent, missing config)
 
 **Example Test Pattern:**
+
 ```javascript
 test('Check 7: should route "update docs" to technical-writer, not developer', async () => {
   const hookInput = {
@@ -119,9 +124,9 @@ test('Check 7: should route "update docs" to technical-writer, not developer', a
       input: {
         task_id: 'task-123',
         subagent_type: 'developer',
-        prompt: 'update documentation in README.md'
-      }
-    }
+        prompt: 'update documentation in README.md',
+      },
+    },
   };
 
   const result = runHook(hookInput);
@@ -137,26 +142,29 @@ test('Check 7: should route "update docs" to technical-writer, not developer', a
 
 **Untested State Transitions:**
 
-| From | To | Valid? | Test Exists? |
-|------|-------|--------|--------------|
-| not_started | in_progress | ✅ Yes | ✅ Yes |
-| in_progress | completed | ✅ Yes | ✅ Yes |
-| in_progress | blocked | ✅ Yes | ❌ No |
-| blocked | in_progress | ✅ Yes | ❌ No |
-| completed | in_progress | ❌ Invalid | ❌ No |
-| not_started | completed | ❌ Invalid | ❌ No |
+| From        | To          | Valid?     | Test Exists? |
+| ----------- | ----------- | ---------- | ------------ |
+| not_started | in_progress | ✅ Yes     | ✅ Yes       |
+| in_progress | completed   | ✅ Yes     | ✅ Yes       |
+| in_progress | blocked     | ✅ Yes     | ❌ No        |
+| blocked     | in_progress | ✅ Yes     | ❌ No        |
+| completed   | in_progress | ❌ Invalid | ❌ No        |
+| not_started | completed   | ❌ Invalid | ❌ No        |
 
 **Risk Scenarios:**
+
 - Task marked completed without starting (skips work)
 - Task stuck in blocked state (never unblocks)
 - Duplicate task claims (two agents work on same task)
 
 **Remediation:**
+
 - 15 state transition tests (1 day effort)
 - Test matrix: 6 states × 6 states = 36 transitions (filter invalid)
 - Add 3 tests for concurrent claims
 
 **Example Test Pattern:**
+
 ```javascript
 test('should reject completed → in_progress transition', async () => {
   const taskId = 'task-456';
@@ -178,26 +186,28 @@ test('should reject completed → in_progress transition', async () => {
 
 **Untested Scenarios:**
 
-| Cycle Type | Description | Impact | Test Exists? |
-|------------|-------------|--------|--------------|
-| Self-loop | Phase A → Phase A | Infinite loop | ❌ No |
-| Two-phase loop | Phase A → Phase B → Phase A | Infinite oscillation | ❌ No |
-| Three-phase loop | Phase A → B → C → A | Slow resource exhaustion | ❌ No |
+| Cycle Type       | Description                 | Impact                   | Test Exists? |
+| ---------------- | --------------------------- | ------------------------ | ------------ |
+| Self-loop        | Phase A → Phase A           | Infinite loop            | ❌ No        |
+| Two-phase loop   | Phase A → Phase B → Phase A | Infinite oscillation     | ❌ No        |
+| Three-phase loop | Phase A → B → C → A         | Slow resource exhaustion | ❌ No        |
 
 **Risk:** Workflow phase advances infinitely, never exits
 
 **Remediation:**
+
 - 10 cycle detection tests (0.5 day effort)
 - Test matrix: 3 cycle types × 3 detection strategies (depth limit, visited set, timeout)
 - Add 1 test for valid DAG (no cycles)
 
 **Example Test Pattern:**
+
 ```javascript
 test('should detect self-loop cycle', async () => {
   const workflow = {
     phases: [
-      { id: 'design', next: 'design' } // Self-loop
-    ]
+      { id: 'design', next: 'design' }, // Self-loop
+    ],
   };
 
   const result = detectCycle(workflow);
@@ -248,12 +258,14 @@ test('should detect self-loop cycle', async () => {
 ### 3.2 Test Quality Patterns (General)
 
 **Strengths:**
+
 - ✅ Tests use `node:test` (no external framework dependency)
 - ✅ Tests are isolated (no shared state)
 - ✅ Edge cases covered (e.g., buffer overflow, process exit)
 - ✅ Good use of temp directories for file I/O tests
 
 **Weaknesses:**
+
 - ⚠️ Some timing-dependent tests (heartbeat test)
 - ⚠️ Hardcoded test IDs (could cause collisions)
 - ⚠️ Missing cleanup in some tests (temp files left behind)
@@ -262,11 +274,13 @@ test('should detect self-loop cycle', async () => {
 ### 3.3 Edge Case Coverage
 
 **Well-Covered:**
+
 - Buffer overflow (telemetry test)
 - Process exit (drain test)
 - Invalid state transitions (state sync test)
 
 **Poorly-Covered:**
+
 - Null/undefined inputs (no systematic null checks)
 - Empty arrays/objects (not consistently tested)
 - Boundary values (max buffer size, max recursion depth)
@@ -279,16 +293,19 @@ test('should detect self-loop cycle', async () => {
 ### 4.1 Test Runner Configuration
 
 **Current Setup:**
+
 - Runner: `node --test` (native Node.js test runner)
 - Concurrency: `--test-concurrency=1` (sequential execution)
 - Pattern: `tests/**/*.test.{mjs,cjs}`
 - Coverage: Not enabled (no `--experimental-test-coverage` flag)
 
 **Strengths:**
+
 - ✅ No external dependencies (fast CI)
 - ✅ Sequential execution (prevents flakiness)
 
 **Weaknesses:**
+
 - ❌ No coverage reporting (blind to untested paths)
 - ⚠️ No timeout configuration (could hang on infinite loops)
 
@@ -303,6 +320,7 @@ test('should detect self-loop cycle', async () => {
 ### 4.3 Flaky Test Patterns
 
 **Identified:**
+
 1. **Timing-dependent tests:** `task-heartbeat.test.cjs` (expects 3+ heartbeats in 210ms)
    - **Fix:** Increase timeout tolerance (expect 2-4 heartbeats)
 2. **Hardcoded IDs:** `taskupdate-state-sync.test.cjs` (uses `test-sync-task-123`)
@@ -317,16 +335,19 @@ test('should detect self-loop cycle', async () => {
 ### 5.1 Immediate Actions (P0 - Critical)
 
 **Priority 1: Routing-Guard Core Logic Tests (2 days)**
+
 - Add 20 integration tests for routing-guard-core.impl.cjs
 - Test matrix: Check 1 (planner-first), Check 5 (architect-first), Check 7 (specialist override)
 - Prevent: Developer spawned for specialist work (59 agents wasted)
 
 **Priority 2: Task Lifecycle State Machine Tests (1 day)**
+
 - Add 15 state transition tests for pre-task-unified-core.cjs
 - Test invalid transitions (completed → in_progress, not_started → completed)
 - Prevent: Stuck tasks, duplicate work, workflow stalls
 
 **Priority 3: Workflow Cycle Detection Tests (0.5 day)**
+
 - Add 10 cycle detection tests for cycle-detector.cjs
 - Test self-loop, two-phase loop, three-phase loop
 - Prevent: Infinite workflow loops, resource exhaustion
@@ -334,16 +355,19 @@ test('should detect self-loop cycle', async () => {
 ### 5.2 High Priority Actions (P1 - 1 week)
 
 **Priority 4: Batch Creation Detection Tests (0.5 day)**
+
 - Add 10 tests for user-prompt-unified.cjs batch creation logic
 - Test: "create 10 agents" → orchestrator (not 10 developers)
 - Prevent: Invisible artifacts, missing catalog entries
 
 **Priority 5: Event-Types Validation Tests (0.5 day)**
+
 - Add 15 tests for event-types.cjs validation
 - Test: validateEvent() for all 32 event types
 - Prevent: Invalid events bypass validation, corrupted event bus
 
 **Priority 6: Async-Log-Buffer Tests (0.5 day)**
+
 - Add 10 tests for async-log-buffer.cjs
 - Test: Buffer flush timing, overflow, process exit
 - Prevent: Data loss, undetected failures
@@ -351,6 +375,7 @@ test('should detect self-loop cycle', async () => {
 ### 5.3 Test Infrastructure Improvements
 
 **Enable Coverage Reporting:**
+
 ```json
 // package.json
 "scripts": {
@@ -359,38 +384,43 @@ test('should detect self-loop cycle', async () => {
 ```
 
 **Add Test Timeout:**
+
 ```javascript
 // In each test file
 test.setTimeout(5000); // 5s timeout per test
 ```
 
 **Fix Flaky Tests:**
+
 - `task-heartbeat.test.cjs`: Increase timeout tolerance (expect 2-4 heartbeats, not 3+)
 - All tests: Use UUID for test IDs (not hardcoded strings)
 
 ### 5.4 Long-Term Improvements
 
 **Property-Based Testing:**
+
 - Add `fast-check` library for algorithmic correctness (cycle detection, state machines)
 
 **Mutation Testing:**
+
 - Add Stryker to verify test quality (do tests catch intentional bugs?)
 
 **Integration Test Harness:**
+
 - Build test harness for hook integration tests (reduce spawn boilerplate)
 
 ---
 
 ## 6. Test Gap Matrix (Summary)
 
-| Module | LOC | Tests | Risk | Priority | Effort |
-|--------|-----|-------|------|----------|--------|
-| routing-guard-core.impl.cjs | 2599 | ❌ None | **P0** | 1 | 2 days |
-| pre-task-unified-core.cjs | ~500 | ⚠️ Partial | **P0** | 2 | 1 day |
-| cycle-detector.cjs | ~200 | ❌ None | **P0** | 3 | 0.5 day |
-| user-prompt-unified.cjs (batch) | ~300 | ❌ None | **P1** | 4 | 0.5 day |
-| event-types.cjs | 337 | ❌ None | **P1** | 5 | 0.5 day |
-| async-log-buffer.cjs | 50+ | ❌ None | **P1** | 6 | 0.5 day |
+| Module                          | LOC  | Tests      | Risk   | Priority | Effort  |
+| ------------------------------- | ---- | ---------- | ------ | -------- | ------- |
+| routing-guard-core.impl.cjs     | 2599 | ❌ None    | **P0** | 1        | 2 days  |
+| pre-task-unified-core.cjs       | ~500 | ⚠️ Partial | **P0** | 2        | 1 day   |
+| cycle-detector.cjs              | ~200 | ❌ None    | **P0** | 3        | 0.5 day |
+| user-prompt-unified.cjs (batch) | ~300 | ❌ None    | **P1** | 4        | 0.5 day |
+| event-types.cjs                 | 337  | ❌ None    | **P1** | 5        | 0.5 day |
+| async-log-buffer.cjs            | 50+  | ❌ None    | **P1** | 6        | 0.5 day |
 
 **Total Estimated Effort:** 5 days (P0: 3.5 days, P1: 1.5 days)
 
@@ -399,14 +429,17 @@ test.setTimeout(5000); // 5s timeout per test
 ## 7. Cross-References
 
 **Related Reports:**
+
 - Previous QA audit: `.claude/context/reports/qa-audit-2026-02-15.md` (100% test pass rate, but coverage gaps noted)
 - Memory learnings: `.claude/context/memory/learnings.md` (line 41-90: Test coverage gaps P0 findings)
 
 **Related Workflows:**
+
 - `.claude/workflows/qa-workflow.md` - Systematic QA validation
 - `.claude/rules/testing.md` - Test-Driven Development standards
 
 **Related Skills:**
+
 - `tdd` - For creating failing tests (RED phase)
 - `test-generator` - For comprehensive test case generation
 - `verification-before-completion` - Pre-completion gate enforcement
@@ -437,6 +470,7 @@ pnpm test
 ## Appendix B: Test Quality Checklist
 
 **For each new test:**
+
 - [ ] Tests actual behavior (not just "doesn't throw")
 - [ ] Isolated (no shared mutable state)
 - [ ] Edge cases covered (null, undefined, empty, boundary)
@@ -452,6 +486,7 @@ pnpm test
 Test suite has good baseline quality (well-structured, isolated tests), but **critical gaps in routing logic, state machine, and workflow cycle detection create HIGH regression risk**. Recommend **5-day sprint to close P0 gaps** (routing-guard, task lifecycle, cycle detector) before next production deployment.
 
 **Next Actions:**
+
 1. Implement P0 tests (3.5 days)
 2. Enable coverage reporting
 3. Fix flaky tests

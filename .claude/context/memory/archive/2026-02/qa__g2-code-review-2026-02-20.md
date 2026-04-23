@@ -1,4 +1,5 @@
 <!-- Agent: code-reviewer | Task: #23 | Session: 2026-02-20 -->
+
 # G2 Code Review — 2026-02-20
 
 ## Summary: APPROVED_WITH_NOTES
@@ -18,12 +19,12 @@ Three test failures require attention before this branch can be merged. Two are 
 
 ## Test Results
 
-| Test file | Pass | Fail | Total |
-|---|---|---|---|
-| `bypass-audit-hook.test.cjs` | 28 | 0 | 28 |
-| `reflection-step0-guard-staleness.test.cjs` | 1 | 1 | 2 |
-| `spawn-request-contract-concurrency.test.cjs` | 8 | 2 | 10 |
-| **Total (G2 scope)** | **37** | **3** | **40** |
+| Test file                                     | Pass   | Fail  | Total  |
+| --------------------------------------------- | ------ | ----- | ------ |
+| `bypass-audit-hook.test.cjs`                  | 28     | 0     | 28     |
+| `reflection-step0-guard-staleness.test.cjs`   | 1      | 1     | 2      |
+| `spawn-request-contract-concurrency.test.cjs` | 8      | 2     | 10     |
+| **Total (G2 scope)**                          | **37** | **3** | **40** |
 
 ### Failure Detail
 
@@ -114,24 +115,31 @@ Both variables were scaffolded for helper infrastructure during TDD red phase bu
 ## Security Notes (bypass-audit-hook.cjs)
 
 **safeParseJSON:**
+
 - NOT used (see Issue 1 above). Two occurrences of raw `JSON.parse` are present. The outer `catch` blocks prevent crashes, but the pattern violates project policy. Fix before merge.
 
 **shell: false / child_process:**
+
 - No `child_process` usage in `bypass-audit-hook.cjs`. No shell injection risk.
 
 **JSONL append-only:**
+
 - PASS. `appendRecord` uses `fs.appendFileSync`. The file is never truncated by the hook. The `_writeCriticalAlertFile` function uses `fs.writeFileSync` on a separate alert file (correct — it represents current critical state).
 
 **Error handling / no crash if audit dir missing:**
+
 - PASS. `ensureDir` calls `fs.mkdirSync({ recursive: true })` inside a try/catch, silently swallowing errors. `appendRecord` also wraps everything in try/catch and writes to stderr on failure without rethrowing. The hook will never crash the host process.
 
 **OWASP A09:2025 (Security Logging):**
+
 - PASS. The hook provides an audit trail for bypassPermissions scenarios. Records include timestamp, correlationId, pid, tool, filePath, and blockingHook. The tiered alert system (INFO/WARN/ALERT/CRITICAL) implements proportionate alerting.
 
 **ASI02 (Tool Misuse) / ASI10 (Rogue Agents):**
+
 - PASS. This hook directly addresses both risks by detecting when a tool executed despite a block verdict. The cumulative count and CRITICAL alert file provide escalating signals for review.
 
 **settings.json hook position:**
+
 - PASS. `bypass-audit-hook.cjs` is registered first in the `Edit|Write|NotebookEdit` PostToolUse array, ensuring it fires before memory sync. This is the correct order for an audit hook.
 
 ---

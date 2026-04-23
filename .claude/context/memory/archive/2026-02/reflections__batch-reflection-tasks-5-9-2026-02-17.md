@@ -3,6 +3,7 @@
 # Reflection Report: Batch — Tasks #5, #6, #7, #8, #9 (Codebase Audit Remediation)
 
 **Reflection IDs Processed:**
+
 - `task_completion:2026-02-17T02:27:29.690Z:9` (task 9 — revert out-of-scope changes)
 - `task_completion:2026-02-17T02:30:45.866Z:5` (task 5 — security fixes)
 - `task_completion:2026-02-17T02:30:47.316Z:6` (task 6 — medium fixes)
@@ -17,13 +18,13 @@
 
 ## Overall Assessment
 
-| Task | Description          | Score | Threshold |
-|------|----------------------|-------|-----------|
-| #9   | Revert out-of-scope  | 0.42  | WARNING   |
-| #5   | Security fixes       | 0.42  | WARNING   |
-| #6   | Medium fixes         | 0.42  | WARNING   |
-| #7   | Verification         | 0.42  | WARNING   |
-| #8   | Regression fixes     | 0.42  | WARNING   |
+| Task | Description         | Score | Threshold |
+| ---- | ------------------- | ----- | --------- |
+| #9   | Revert out-of-scope | 0.42  | WARNING   |
+| #5   | Security fixes      | 0.42  | WARNING   |
+| #6   | Medium fixes        | 0.42  | WARNING   |
+| #7   | Verification        | 0.42  | WARNING   |
+| #8   | Regression fixes    | 0.42  | WARNING   |
 
 **Batch Average Score:** 0.42 / 1.0 (WARNING — 4th consecutive batch below pass threshold)
 
@@ -37,13 +38,13 @@
 
 Using `agent_output` weights (completeness: 0.25, accuracy: 0.30, clarity: 0.15, consistency: 0.15, actionability: 0.15):
 
-| Dimension      | Score | Weight | Weighted | Notes                                          |
-|----------------|-------|--------|----------|------------------------------------------------|
-| Completeness   | 0.35  | 0.25   | 0.088    | No summary, no files list, no artifacts        |
-| Accuracy       | 0.50  | 0.30   | 0.150    | Work appears done (git commits) but unverified |
-| Clarity        | 0.45  | 0.15   | 0.068    | No completion narrative                        |
-| Consistency    | 0.40  | 0.15   | 0.060    | Breaks TaskUpdate protocol every time          |
-| Actionability  | 0.40  | 0.15   | 0.060    | No next steps declared by agent                |
+| Dimension     | Score | Weight | Weighted | Notes                                          |
+| ------------- | ----- | ------ | -------- | ---------------------------------------------- |
+| Completeness  | 0.35  | 0.25   | 0.088    | No summary, no files list, no artifacts        |
+| Accuracy      | 0.50  | 0.30   | 0.150    | Work appears done (git commits) but unverified |
+| Clarity       | 0.45  | 0.15   | 0.068    | No completion narrative                        |
+| Consistency   | 0.40  | 0.15   | 0.060    | Breaks TaskUpdate protocol every time          |
+| Actionability | 0.40  | 0.15   | 0.060    | No next steps declared by agent                |
 
 **Overall Score:** 0.42 (WARNING — below pass threshold of 0.70)
 
@@ -78,6 +79,7 @@ Using `agent_output` weights (completeness: 0.25, accuracy: 0.30, clarity: 0.15,
 This batch is the first time we have clear evidence of haiku-specific scope creep behavior:
 
 **What happened:**
+
 1. Tasks 5-8 assigned to haiku agents for audit remediation
 2. Agents received implicit scope: "fix security issues / medium issues / verify / fix regressions"
 3. Agents interpreted scope broadly, deleting 200+ test fixtures in `tests/` directory and modifying unrelated files
@@ -85,11 +87,13 @@ This batch is the first time we have clear evidence of haiku-specific scope cree
 5. Multiple revert rounds required
 
 **Why haiku is higher risk:**
+
 - Haiku model has lower instruction-following precision for scope-bounded tasks
 - When given a high-level goal without explicit file boundaries, haiku may "optimize" by removing test fixtures it considers redundant
 - Sonnet and opus have better precision for "only touch these files" constraints
 
 **Evidence from git log:**
+
 ```
 569a89f9 feat: implement 8 TDD finding fixes — workflow, memory, guardrails, handoff
 4d0647a6 feat: add pipeline finalization guards and TDD tests
@@ -120,12 +124,12 @@ The commits show substantial work was done — but scope control was absent.
 
 ## Memory Curation Decisions
 
-| Item                                         | Decision   | Rationale                                                              | Score |
-|----------------------------------------------|------------|------------------------------------------------------------------------|-------|
-| Haiku scope creep pattern                    | **Retain** | First clear documentation; high reuse in all future haiku agent spawns | 0.95  |
-| TaskUpdate compliance failure (7th+)          | **Retain** | Critical escalation; pattern now demands hook enforcement solution     | 0.95  |
-| Revert task as quality signal                | **Retain** | Actionable diagnostic: task 9 type = upstream scope failure            | 0.85  |
-| Individual task scores (5-8)                 | **Compress** | All 4 share identical pattern; batch entry sufficient                 | 0.50  |
+| Item                                 | Decision     | Rationale                                                              | Score |
+| ------------------------------------ | ------------ | ---------------------------------------------------------------------- | ----- |
+| Haiku scope creep pattern            | **Retain**   | First clear documentation; high reuse in all future haiku agent spawns | 0.95  |
+| TaskUpdate compliance failure (7th+) | **Retain**   | Critical escalation; pattern now demands hook enforcement solution     | 0.95  |
+| Revert task as quality signal        | **Retain**   | Actionable diagnostic: task 9 type = upstream scope failure            | 0.85  |
+| Individual task scores (5-8)         | **Compress** | All 4 share identical pattern; batch entry sufficient                  | 0.50  |
 
 ---
 

@@ -24,17 +24,24 @@ test('VAL-1: StreamableHttpClient.connect() resolves with sessionId header', asy
   const { StreamableHttpClient } = require(CLIENT_PATH);
 
   // Mock a minimal server that returns Mcp-Session-Id header
-  const mockResponder = (_req) => ({
+  const mockResponder = _req => ({
     status: 200,
     headers: { 'mcp-session-id': 'sess-abc123' },
     body: { jsonrpc: '2.0', id: 1, result: { protocolVersion: '2025-03-26', capabilities: {} } },
   });
 
-  const client = new StreamableHttpClient({ endpoint: 'http://localhost:4999/mcp', _mockResponder: mockResponder });
+  const client = new StreamableHttpClient({
+    endpoint: 'http://localhost:4999/mcp',
+    _mockResponder: mockResponder,
+  });
   const session = await client.connect();
 
   assert.ok(session.sessionId, 'sessionId should be set after connect()');
-  assert.strictEqual(session.sessionId, 'sess-abc123', 'sessionId should match Mcp-Session-Id header');
+  assert.strictEqual(
+    session.sessionId,
+    'sess-abc123',
+    'sessionId should match Mcp-Session-Id header'
+  );
   assert.ok(session.connected, 'connected should be true');
 });
 
@@ -44,20 +51,26 @@ test('VAL-2: Tool calls include Mcp-Session-Id in request headers (trust-pinning
   const { StreamableHttpClient } = require(CLIENT_PATH);
 
   const requests = [];
-  const mockResponder = (req) => {
+  const mockResponder = req => {
     requests.push(req);
     const isInit = req.body?.method === 'initialize';
     return {
       status: 200,
       headers: isInit ? { 'mcp-session-id': 'sess-thread-xyz' } : {},
-      body: { jsonrpc: '2.0', id: req.body?.id ?? 1, result: isInit
-        ? { protocolVersion: '2025-03-26', capabilities: {} }
-        : { content: [{ type: 'text', text: 'ok' }] }
+      body: {
+        jsonrpc: '2.0',
+        id: req.body?.id ?? 1,
+        result: isInit
+          ? { protocolVersion: '2025-03-26', capabilities: {} }
+          : { content: [{ type: 'text', text: 'ok' }] },
       },
     };
   };
 
-  const client = new StreamableHttpClient({ endpoint: 'http://localhost:4999/mcp', _mockResponder: mockResponder });
+  const client = new StreamableHttpClient({
+    endpoint: 'http://localhost:4999/mcp',
+    _mockResponder: mockResponder,
+  });
   await client.connect();
 
   // Tool call after connect
@@ -67,7 +80,11 @@ test('VAL-2: Tool calls include Mcp-Session-Id in request headers (trust-pinning
   const toolCallReq = requests.find(r => r.body?.method === 'tools/call');
   assert.ok(toolCallReq, 'tools/call request must have been made');
   const sentSessionId = toolCallReq.headers?.['mcp-session-id'];
-  assert.strictEqual(sentSessionId, 'sess-thread-xyz', 'tool call must thread session-ID in headers');
+  assert.strictEqual(
+    sentSessionId,
+    'sess-thread-xyz',
+    'tool call must thread session-ID in headers'
+  );
 });
 
 // ─── VAL-3: BC-1 — SSE transport config rejected ─────────────────────────────
@@ -77,7 +94,7 @@ test('VAL-3: SSE transport config throws BC-1 error with migration hint', () => 
 
   assert.throws(
     () => createMcpTransport({ transport: 'sse', endpoint: 'http://localhost:4999' }),
-    (err) => {
+    err => {
       assert.ok(err instanceof Error, 'must throw Error');
       assert.ok(
         err.message.includes('BC-1'),
@@ -102,7 +119,7 @@ test('VAL-4: Missing session-ID in response → stateless mode + warning logged'
   const { StreamableHttpClient } = require(CLIENT_PATH);
 
   const warnings = [];
-  const mockResponder = (_req) => ({
+  const mockResponder = _req => ({
     status: 200,
     headers: {}, // no Mcp-Session-Id header
     body: { jsonrpc: '2.0', id: 1, result: { protocolVersion: '2025-03-26', capabilities: {} } },
@@ -111,7 +128,7 @@ test('VAL-4: Missing session-ID in response → stateless mode + warning logged'
   const client = new StreamableHttpClient({
     endpoint: 'http://localhost:4999/mcp',
     _mockResponder: mockResponder,
-    _warnSink: (msg) => warnings.push(msg),
+    _warnSink: msg => warnings.push(msg),
   });
 
   const session = await client.connect();
@@ -150,7 +167,11 @@ test('VAL-5: mcp-transport-validator hook blocks spawn with invalid transport co
   });
 
   // Hook must exit 2 (block) for invalid transport config
-  assert.strictEqual(result.status, 2, `hook must exit 2 (block), got ${result.status}. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    2,
+    `hook must exit 2 (block), got ${result.status}. stderr: ${result.stderr}`
+  );
 
   // Stdout must include a parseable block message
   const stdout = result.stdout.trim();

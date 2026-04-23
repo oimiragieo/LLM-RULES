@@ -29,11 +29,11 @@ The skill expansion introduced ~299 new files across four artifact categories: s
 
 Three distinct quality tiers were identified from sampling 18 schema files:
 
-| Tier | Count (est.) | Characteristics | Examples |
-|------|-------------|-----------------|----------|
-| **A: Well-Structured** | ~15 (17%) | Domain-specific properties, type constraints, enums, `additionalProperties:false`, meaningful validation | tdd, debugging, static-analysis, differential-review, workflow-patterns, sequential-thinking, advanced-elicitation |
-| **B: Medium Quality** | ~17 (20%) | Has `skillName`/`version`/`output` envelope with nested properties, but missing `additionalProperties:false` and `$id` | plan-generator, security-architect, complexity-assessment, react-expert |
-| **C: Hollow Stub** | ~55 (63%) | Only `{status: enum, output: object}` with no constraints on output | ai-ml-expert, readme, consensus-voting, memory-forensics, swarm-coordination, writing-skills |
+| Tier                   | Count (est.) | Characteristics                                                                                                        | Examples                                                                                                           |
+| ---------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **A: Well-Structured** | ~15 (17%)    | Domain-specific properties, type constraints, enums, `additionalProperties:false`, meaningful validation               | tdd, debugging, static-analysis, differential-review, workflow-patterns, sequential-thinking, advanced-elicitation |
+| **B: Medium Quality**  | ~17 (20%)    | Has `skillName`/`version`/`output` envelope with nested properties, but missing `additionalProperties:false` and `$id` | plan-generator, security-architect, complexity-assessment, react-expert                                            |
+| **C: Hollow Stub**     | ~55 (63%)    | Only `{status: enum, output: object}` with no constraints on output                                                    | ai-ml-expert, readme, consensus-voting, memory-forensics, swarm-coordination, writing-skills                       |
 
 ### 1.3 Hollow Stub Problem (CRITICAL)
 
@@ -55,13 +55,13 @@ Three distinct quality tiers were identified from sampling 18 schema files:
 
 ### 1.4 Naming Convention Inconsistencies
 
-| Field | Archetype A (pre-existing) | Archetype B (expansion) |
-|-------|---------------------------|------------------------|
-| Root required fields | `skillName`, `version`, `timestamp`, `output` | `status`, `output` |
-| Skill name field | `skillName` (camelCase) | N/A (not present) |
-| Some pre-existing | `skill_name` (snake_case) | N/A |
-| `$id` domain | `https://claude-code.anthropic.com/schemas/` | `https://agent-studio.dev/schemas/` |
-| `additionalProperties` | Present (false) | Absent |
+| Field                  | Archetype A (pre-existing)                    | Archetype B (expansion)             |
+| ---------------------- | --------------------------------------------- | ----------------------------------- |
+| Root required fields   | `skillName`, `version`, `timestamp`, `output` | `status`, `output`                  |
+| Skill name field       | `skillName` (camelCase)                       | N/A (not present)                   |
+| Some pre-existing      | `skill_name` (snake_case)                     | N/A                                 |
+| `$id` domain           | `https://claude-code.anthropic.com/schemas/`  | `https://agent-studio.dev/schemas/` |
+| `additionalProperties` | Present (false)                               | Absent                              |
 
 **Impact:** Two incompatible schema archetypes coexist. Pre-existing well-structured schemas use one pattern; expansion stubs use another. No unified schema template was enforced during expansion.
 
@@ -84,11 +84,11 @@ Per SEC-FND-001 from prior security review, schemas without `additionalPropertie
 
 ### 2.2 Quality Tiers
 
-| Tier | Count (est.) | Characteristics | Examples |
-|------|-------------|-----------------|----------|
-| **Comprehensive** | ~65 (67%) | Detailed Core Principles, Standards, Anti-Patterns, Integration Points, Related References | tdd.md, debugging.md, security-architect.md, plan-generator.md, code-analyzer.md |
-| **Adequate** | ~18 (19%) | Core Principles and basic Integration Points, but lacks depth | react-expert.md, java-expert.md, go-expert.md (follow a template but are domain-specific) |
-| **Minimal Stub** | ~14 (14%) | Only "When to Use", "Usage", "Related References" (~10-15 lines total) | consensus-voting.md, swarm-coordination.md, memory-forensics.md, binary-analysis-patterns.md, git-expert.md, scientific-skills.md, doc-generator.md, writing-skills.md, readme.md, summarize-changes.md, diagram-generator.md, test-generator.md, protocol-reverse-engineering.md, ai-ml-expert.md |
+| Tier              | Count (est.) | Characteristics                                                                            | Examples                                                                                                                                                                                                                                                                                           |
+| ----------------- | ------------ | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Comprehensive** | ~65 (67%)    | Detailed Core Principles, Standards, Anti-Patterns, Integration Points, Related References | tdd.md, debugging.md, security-architect.md, plan-generator.md, code-analyzer.md                                                                                                                                                                                                                   |
+| **Adequate**      | ~18 (19%)    | Core Principles and basic Integration Points, but lacks depth                              | react-expert.md, java-expert.md, go-expert.md (follow a template but are domain-specific)                                                                                                                                                                                                          |
+| **Minimal Stub**  | ~14 (14%)    | Only "When to Use", "Usage", "Related References" (~10-15 lines total)                     | consensus-voting.md, swarm-coordination.md, memory-forensics.md, binary-analysis-patterns.md, git-expert.md, scientific-skills.md, doc-generator.md, writing-skills.md, readme.md, summarize-changes.md, diagram-generator.md, test-generator.md, protocol-reverse-engineering.md, ai-ml-expert.md |
 
 ### 2.3 Context Overload Concern (ARCH-EXP-001)
 
@@ -103,6 +103,7 @@ Claude Code auto-loads ALL `.claude/rules/*.md` files into agent context. With 9
 ### 2.4 Required Sections Check
 
 **Well-structured rules files include:**
+
 - Core Principles/Rules section
 - Standards or best practices
 - Anti-Patterns
@@ -123,11 +124,11 @@ Claude Code auto-loads ALL `.claude/rules/*.md` files into agent context. With 9
 
 ### 3.2 Thin-Delegation Pattern Compliance
 
-| Category | Count | Description |
-|----------|-------|-------------|
-| **Compliant (new)** | ~79 | Follow thin-delegation pattern: `disable-model-invocation: true` + "Invoke the {skill} skill..." |
-| **Pre-existing (different pattern)** | ~2 | `setup-pm.md` (standalone), `build-fix.md` (enriched delegation) |
-| **Minor formatting variants** | ~11 | Have extra `description:` field in frontmatter or blank line differences |
+| Category                             | Count | Description                                                                                      |
+| ------------------------------------ | ----- | ------------------------------------------------------------------------------------------------ |
+| **Compliant (new)**                  | ~79   | Follow thin-delegation pattern: `disable-model-invocation: true` + "Invoke the {skill} skill..." |
+| **Pre-existing (different pattern)** | ~2    | `setup-pm.md` (standalone), `build-fix.md` (enriched delegation)                                 |
+| **Minor formatting variants**        | ~11   | Have extra `description:` field in frontmatter or blank line differences                         |
 
 ### 3.3 Pattern Compliance Result
 
@@ -149,7 +150,7 @@ Claude Code auto-loads ALL `.claude/rules/*.md` files into agent context. With 9
 
 - **Catalog claims:** 98 total active schemas (75 skill output schemas)
 - **`skill-*-output.schema.json` on disk:** 87
-- **Non-skill schemas on disk:** ~11 (agent-*, evolution-*, workflow-*, hook-*, etc.)
+- **Non-skill schemas on disk:** ~11 (agent-_, evolution-_, workflow-_, hook-_, etc.)
 - **Assessment:** Catalog count (98) matches approximate on-disk count (~87 skill + 11 non-skill = 98). CONSISTENT.
 
 ### 4.3 Command Catalog
@@ -204,22 +205,23 @@ Rules files on disk that appear to be missing from the rules catalog:
 
 Every skill should have: SKILL.md + rules file + schema + command. Cross-referencing reveals gaps:
 
-| Skill | SKILL.md | Rules | Schema | Command | Catalog Entry |
-|-------|----------|-------|--------|---------|---------------|
-| `on-call-handoff-patterns` | YES | NO | NO | NO | YES (skill catalog) |
-| `database-architect` | YES | NO (referenced in others) | NO | NO | YES |
-| `accessibility` | YES | NO (only in rules-catalog.md as separate entry) | NO | NO | YES |
-| `context-compressor` | Pre-existing | NO new rule | NO new schema | Pre-existing `/compress` | YES |
-| `artifact-updater` | Listed in catalog | NO | NO | NO | YES |
-| `command-creator` | Listed in catalog | NO | NO | NO | YES |
-| `rule-creator` | Listed in catalog | NO | NO | NO | YES |
-| `tool-creator` | Listed in catalog | NO | NO | NO | YES |
+| Skill                      | SKILL.md          | Rules                                           | Schema        | Command                  | Catalog Entry       |
+| -------------------------- | ----------------- | ----------------------------------------------- | ------------- | ------------------------ | ------------------- |
+| `on-call-handoff-patterns` | YES               | NO                                              | NO            | NO                       | YES (skill catalog) |
+| `database-architect`       | YES               | NO (referenced in others)                       | NO            | NO                       | YES                 |
+| `accessibility`            | YES               | NO (only in rules-catalog.md as separate entry) | NO            | NO                       | YES                 |
+| `context-compressor`       | Pre-existing      | NO new rule                                     | NO new schema | Pre-existing `/compress` | YES                 |
+| `artifact-updater`         | Listed in catalog | NO                                              | NO            | NO                       | YES                 |
+| `command-creator`          | Listed in catalog | NO                                              | NO            | NO                       | YES                 |
+| `rule-creator`             | Listed in catalog | NO                                              | NO            | NO                       | YES                 |
+| `tool-creator`             | Listed in catalog | NO                                              | NO            | NO                       | YES                 |
 
 **Finding:** At least 8 skills in the catalog lack one or more companion artifacts (rules file, schema, command), representing incomplete integration.
 
 ### 5.2 Rules-to-SKILL.md Path References
 
 Spot-checked 15 rules files for correct Related References paths:
+
 - All checked rules files reference `.claude/skills/{skill-name}/SKILL.md` which corresponds to actual files on disk.
 - **Result: PASS** (no broken references found in sample)
 
@@ -229,12 +231,12 @@ Spot-checked 15 rules files for correct Related References paths:
 
 ### 6.1 Files Without Catalog Registration
 
-| Category | Orphan Count | Impact |
-|----------|-------------|--------|
-| Commands | 11 | Low (Claude Code auto-discovers from directory) |
-| Rules | 11 | Medium (rules auto-loaded, but not discoverable via catalog search) |
-| Schemas | 0 | N/A |
-| Skills | ~5-8 | Medium (skills missing companion artifacts) |
+| Category | Orphan Count | Impact                                                              |
+| -------- | ------------ | ------------------------------------------------------------------- |
+| Commands | 11           | Low (Claude Code auto-discovers from directory)                     |
+| Rules    | 11           | Medium (rules auto-loaded, but not discoverable via catalog search) |
+| Schemas  | 0            | N/A                                                                 |
+| Skills   | ~5-8         | Medium (skills missing companion artifacts)                         |
 
 ### 6.2 Orphan Pattern
 
@@ -298,30 +300,30 @@ Skill({ skill: '{skill-name}' });
 
 ### Critical Findings
 
-| ID | Finding | Severity | Count |
-|----|---------|----------|-------|
-| QA-001 | Hollow stub schemas validate nothing | CRITICAL | 55/87 (63%) |
-| QA-002 | Two incompatible schema archetypes coexist | HIGH | 2 archetypes |
-| QA-003 | Missing `additionalProperties: false` | HIGH | 72/87 (83%) |
-| QA-004 | Context overload from 97 auto-loaded rules | HIGH | 97 files, ~30-80K tokens |
+| ID     | Finding                                    | Severity | Count                    |
+| ------ | ------------------------------------------ | -------- | ------------------------ |
+| QA-001 | Hollow stub schemas validate nothing       | CRITICAL | 55/87 (63%)              |
+| QA-002 | Two incompatible schema archetypes coexist | HIGH     | 2 archetypes             |
+| QA-003 | Missing `additionalProperties: false`      | HIGH     | 72/87 (83%)              |
+| QA-004 | Context overload from 97 auto-loaded rules | HIGH     | 97 files, ~30-80K tokens |
 
 ### Medium Findings
 
-| ID | Finding | Severity | Count |
-|----|---------|----------|-------|
-| QA-005 | 11 commands missing from command catalog | MEDIUM | 11 orphans |
-| QA-006 | 11 rules missing from rules catalog | MEDIUM | 11 orphans |
-| QA-007 | 14 minimal stub rules provide no value | MEDIUM | 14/97 (14%) |
-| QA-008 | 8+ skills missing companion artifacts | MEDIUM | 8+ skills |
-| QA-009 | Schema naming inconsistency (camelCase vs snake_case) | MEDIUM | 2 conventions |
-| QA-010 | Schema $id domain inconsistency | MEDIUM | 2 domains |
+| ID     | Finding                                               | Severity | Count         |
+| ------ | ----------------------------------------------------- | -------- | ------------- |
+| QA-005 | 11 commands missing from command catalog              | MEDIUM   | 11 orphans    |
+| QA-006 | 11 rules missing from rules catalog                   | MEDIUM   | 11 orphans    |
+| QA-007 | 14 minimal stub rules provide no value                | MEDIUM   | 14/97 (14%)   |
+| QA-008 | 8+ skills missing companion artifacts                 | MEDIUM   | 8+ skills     |
+| QA-009 | Schema naming inconsistency (camelCase vs snake_case) | MEDIUM   | 2 conventions |
+| QA-010 | Schema $id domain inconsistency                       | MEDIUM   | 2 domains     |
 
 ### Low Findings
 
-| ID | Finding | Severity | Count |
-|----|---------|----------|-------|
-| QA-011 | Minor frontmatter formatting inconsistencies in commands | LOW | ~11 files |
-| QA-012 | 55 identical hollow schemas could be consolidated | LOW | 55 files |
+| ID     | Finding                                                  | Severity | Count     |
+| ------ | -------------------------------------------------------- | -------- | --------- |
+| QA-011 | Minor frontmatter formatting inconsistencies in commands | LOW      | ~11 files |
+| QA-012 | 55 identical hollow schemas could be consolidated        | LOW      | 55 files  |
 
 ---
 
@@ -351,6 +353,7 @@ Skill({ skill: '{skill-name}' });
 ### Priority 4: Standardize Schema Archetype (QA-002, QA-009, QA-010)
 
 **Action:** Define a single canonical schema template with:
+
 - Consistent field naming (pick either camelCase or snake_case)
 - Single `$id` domain (`agent-studio.dev`)
 - Required `additionalProperties: false` on all schemas
@@ -373,6 +376,7 @@ Skill({ skill: '{skill-name}' });
 ### Files Sampled
 
 **Schemas (18 sampled of 87):**
+
 - Well-structured: skill-tdd-output, skill-debugging-output, skill-static-analysis-output, skill-differential-review-output, skill-diagram-generator-output, skill-advanced-elicitation-output, skill-workflow-patterns-output, skill-sequential-thinking-output
 - Medium: skill-plan-generator-output, skill-security-architect-output, skill-complexity-assessment-output, skill-react-expert-output
 - Hollow stubs: skill-ai-ml-expert-output, skill-readme-output, skill-consensus-voting-output, skill-memory-forensics-output, skill-swarm-coordination-output, skill-writing-skills-output
@@ -388,12 +392,12 @@ skill-catalog.md, command-catalog.md, schema-catalog.md, rules-catalog.md - all 
 
 ### Cross-Reference Matrix
 
-| Dimension | Files on Disk | Catalog Count | Orphans | Duplicates |
-|-----------|--------------|---------------|---------|------------|
-| Schemas | 87 | 75 (skill) + 23 (other) = 98 | 0 | 55 identical stubs |
-| Rules | 97 | 86 | 11 | 14 minimal stubs |
-| Commands | 92 | 81 | 11 | 0 |
-| Skills | 92 SKILL.md | 100 (catalog) | 0 | 0 |
+| Dimension | Files on Disk | Catalog Count                | Orphans | Duplicates         |
+| --------- | ------------- | ---------------------------- | ------- | ------------------ |
+| Schemas   | 87            | 75 (skill) + 23 (other) = 98 | 0       | 55 identical stubs |
+| Rules     | 97            | 86                           | 11      | 14 minimal stubs   |
+| Commands  | 92            | 81                           | 11      | 0                  |
+| Skills    | 92 SKILL.md   | 100 (catalog)                | 0       | 0                  |
 
 ---
 
@@ -404,6 +408,7 @@ The skill expansion achieved its goal of comprehensive artifact coverage for all
 The expansion's strongest dimension is command file quality (97% compliant with thin-delegation pattern). The weakest dimension is schema quality (63% hollow stubs).
 
 **Next Steps:**
+
 1. File this report for architecture decision-making
 2. Create ADR for schema standardization
 3. Execute Priority 1-2 recommendations (LOW effort, HIGH impact)
@@ -411,4 +416,4 @@ The expansion's strongest dimension is command file quality (97% compliant with 
 
 ---
 
-*Report generated by QA agent, 2026-02-09*
+_Report generated by QA agent, 2026-02-09_

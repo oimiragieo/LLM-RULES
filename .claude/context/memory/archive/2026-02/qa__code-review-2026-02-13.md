@@ -23,7 +23,7 @@
 **Deviations from Plan:**
 
 1. ✅ **P0 Test Failures Fixed** — 2 test failures remediated (sync-memory-index race condition, reflection JSON parsing)
-2. ⚠️ **windowsHide Compliance INCOMPLETE** — Applied to chrome-browser.cjs but NOT applied to 3 critical files identified by test (skill-creator/create.cjs, skill-creator/convert.cjs, orchestrators/__tests__/run-all-tests.cjs)
+2. ⚠️ **windowsHide Compliance INCOMPLETE** — Applied to chrome-browser.cjs but NOT applied to 3 critical files identified by test (skill-creator/create.cjs, skill-creator/convert.cjs, orchestrators/**tests**/run-all-tests.cjs)
 3. ✅ **JSON Parsing Safety** — safeParseJSON adoption in reflection hooks implemented correctly
 4. ✅ **Shell Execution Safety** — shell:false pattern maintained throughout
 5. ✅ **DB Lock Race Condition** — File-based locking added to sync-memory-index
@@ -53,6 +53,7 @@
 #### CRITICAL #1: windowsHide Compliance Test Failures (BLOCKING)
 
 **Issue:** Test `windows-hide-compliance.test.cjs` fails with 3 violations:
+
 - `.claude/skills/skill-creator/scripts/create.cjs:1061`
 - `.claude/skills/skill-creator/scripts/convert.cjs:387`
 - `.claude/agents/orchestrators/__tests__/run-all-tests.cjs:34`
@@ -65,6 +66,7 @@
 
 **File:** `tests/lib/utils/windows-hide-compliance.test.cjs:32`
 **Issue:** Regex pattern is overly simplistic and will miss multi-line spawn calls:
+
 ```javascript
 const spawnRegex = /spawn(?:Sync)?\s*\(\s*['"`][^'"`]+['"`]\s*,\s*[^,)]+\s*,\s*\{([^}]+)\}/g;
 ```
@@ -116,6 +118,7 @@ const spawnRegex = /spawn(?:Sync)?\s*\(\s*['"`][^'"`]+['"`]\s*,\s*[^,)]+\s*,\s*\
 **Status:** INCOMPLETE — No artifact-graph.json update visible
 
 **Missing Integrations:**
+
 - New test files not in artifact graph
 - Skill alias system changes not documented
 - Routing guard delegation pattern not in graph
@@ -127,6 +130,7 @@ const spawnRegex = /spawn(?:Sync)?\s*\(\s*['"`][^'"`]+['"`]\s*,\s*[^,)]+\s*,\s*\
 ## Test Results
 
 ### Current Status
+
 ```
 Tests: BLOCKED
 ├─ windows-hide-compliance.test.cjs: FAIL (3 violations)
@@ -149,6 +153,7 @@ Tests: BLOCKED
 **Verdict: REQUEST_CHANGES**
 
 ### To Approve:
+
 1. ✓ Fix 3 windowsHide violations in spawn calls
 2. ✓ Improve windowsHide detection regex or use AST-based validation
 3. ✓ Restore Task #13 reflection metadata

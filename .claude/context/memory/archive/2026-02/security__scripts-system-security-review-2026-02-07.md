@@ -116,22 +116,29 @@ Add an interactive confirmation prompt when `--force` is used with destructive s
 
 ```javascript
 // After line 63 (before executeReset)
-if (!parsed.dryRun && !parsed.force && (normalizedScope === 'memory' || normalizedScope === 'full')) {
+if (
+  !parsed.dryRun &&
+  !parsed.force &&
+  (normalizedScope === 'memory' || normalizedScope === 'full')
+) {
   const readline = require('readline');
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
-  rl.question(`Are you sure you want to delete ${plan.targets.length} items? (yes/no): `, (answer) => {
-    if (answer.toLowerCase() !== 'yes') {
-      console.log('Reset cancelled.');
+  rl.question(
+    `Are you sure you want to delete ${plan.targets.length} items? (yes/no): `,
+    answer => {
+      if (answer.toLowerCase() !== 'yes') {
+        console.log('Reset cancelled.');
+        rl.close();
+        process.exit(0);
+      }
       rl.close();
-      process.exit(0);
+      // Continue with executeReset
     }
-    rl.close();
-    // Continue with executeReset
-  });
+  );
 } else {
   const result = executeReset(plan, { dryRun: shouldDryRun });
   // ... existing code
@@ -239,12 +246,18 @@ Low - The project currently uses kebab-case naming conventions, so existing temp
 All file operations use Node.js built-in functions with validated paths:
 
 **Example: `reset-context.cjs`**
+
 ```javascript
 // Uses context-reset.cjs library which validates paths against PROJECT_ROOT
-const { buildResetPlan, executeReset, normalizeScope } = require('../.claude/lib/utils/context-reset.cjs');
+const {
+  buildResetPlan,
+  executeReset,
+  normalizeScope,
+} = require('../.claude/lib/utils/context-reset.cjs');
 ```
 
 **Example: `validate-config.mjs`**
+
 ```javascript
 // Resolves paths relative to rootDir, prevents path traversal
 const fullPath = resolve(rootDir, path);
@@ -258,6 +271,7 @@ if (!existsSync(fullPath)) {
 Scripts avoid string interpolation in `exec` commands. Where `execSync` is used, it's with static strings:
 
 **Example: `install.mjs`**
+
 ```javascript
 // ✅ SAFE: Static command string
 execSync('pnpm install', {
@@ -271,6 +285,7 @@ execSync('pnpm install', {
 All JSON parsing includes try-catch blocks to handle malformed input:
 
 **Example: `validate-config.mjs`**
+
 ```javascript
 try {
   const content = readFileSync(fullPath, 'utf-8');
@@ -287,6 +302,7 @@ Zero instances of `eval()`, `new Function()`, or `vm.runInContext()` across all 
 ### 5. Principle of Least Privilege
 
 Scripts request only necessary permissions:
+
 - Read-only validation scripts do not modify files
 - Write operations are explicit and logged
 - Destructive operations (reset-context.cjs) default to dry-run mode
@@ -297,12 +313,12 @@ Scripts request only necessary permissions:
 
 The scripts system avoids all vulnerabilities identified in Tools System Security Review:
 
-| Pipeline #7 Finding | Scripts System Status |
-|---------------------|----------------------|
-| SEC-TOOL-001 (HIGH): `new Function()` in decision-handler | ✅ No dynamic code execution |
-| SEC-TOOL-002 (MEDIUM): Command injection in eslint-batch-fix | ✅ Static execSync commands only |
-| SEC-TOOL-003 (MEDIUM): Path traversal in document-query | ✅ All paths validated against PROJECT_ROOT |
-| SEC-TOOL-004 (MEDIUM): Credentials in Docker env vars | N/A (no Docker usage in scripts) |
+| Pipeline #7 Finding                                          | Scripts System Status                       |
+| ------------------------------------------------------------ | ------------------------------------------- |
+| SEC-TOOL-001 (HIGH): `new Function()` in decision-handler    | ✅ No dynamic code execution                |
+| SEC-TOOL-002 (MEDIUM): Command injection in eslint-batch-fix | ✅ Static execSync commands only            |
+| SEC-TOOL-003 (MEDIUM): Path traversal in document-query      | ✅ All paths validated against PROJECT_ROOT |
+| SEC-TOOL-004 (MEDIUM): Credentials in Docker env vars        | N/A (no Docker usage in scripts)            |
 
 ---
 
@@ -313,6 +329,7 @@ The scripts system avoids all vulnerabilities identified in Tools System Securit
 **Threat:** Could an attacker impersonate a legitimate script?
 
 **Assessment:** LOW RISK
+
 - Scripts are executed directly via `node <script>.cjs`, not via PATH lookup
 - Shebang lines (`#!/usr/bin/env node`) use system `node` binary
 - No credential validation or authentication mechanisms needed
@@ -326,11 +343,13 @@ The scripts system avoids all vulnerabilities identified in Tools System Securit
 **Threat:** Could script inputs/outputs be maliciously modified?
 
 **Assessment:** LOW RISK
+
 - All scripts operate on local filesystem under user's permissions
 - No inter-process communication that could be intercepted
 - File writes are atomic (Node.js `fs.writeFileSync`)
 
 **Findings:**
+
 - `install.mjs` copies files to user-specified target - vulnerable to race conditions if target is on shared filesystem (LOW severity)
 
 **Mitigation:** Document that install.mjs should only be used on local, single-user filesystems.
@@ -342,6 +361,7 @@ The scripts system avoids all vulnerabilities identified in Tools System Securit
 **Threat:** Could actions be performed without audit trail?
 
 **Assessment:** LOW RISK
+
 - Scripts log operations to stdout/stderr
 - `reset-context.cjs` lists targets before deletion
 - No structured logging or audit trail mechanism
@@ -366,6 +386,7 @@ if (args.includes('--log-file')) {
 **Threat:** Could scripts leak sensitive data?
 
 **Assessment:** VERY LOW RISK
+
 - No handling of credentials, API keys, or PII
 - File paths logged to stdout could reveal directory structure (benign for local dev tool)
 - `validate-config.mjs` validates `.mcp.json` but does not log sensitive server configurations
@@ -381,6 +402,7 @@ if (args.includes('--log-file')) {
 **Assessment:** LOW RISK
 
 **Findings:**
+
 - `validate-all-references.mjs` recursively scans directories without depth limit (could hang on circular symlinks)
 - `install.mjs` `execSync` lacks timeout (addressed in LOW-002)
 
@@ -401,6 +423,7 @@ if (stat.isSymbolicLink()) {
 **Threat:** Could scripts gain unauthorized access?
 
 **Assessment:** NO RISK
+
 - All scripts run with user's existing permissions
 - No `sudo`, `setuid`, or privilege escalation mechanisms
 - No spawning of processes with different user contexts
@@ -420,11 +443,13 @@ if (stat.isSymbolicLink()) {
 
 **Status:** ✅ SECURE
 **Analysis:**
+
 - No SQL injection vectors (no database queries)
 - No command injection (see Positive Pattern #2)
 - No template injection (no template rendering with user input)
 
 **Evidence:**
+
 ```javascript
 // All execSync calls use static commands
 execSync('pnpm install', { stdio: 'inherit', cwd: targetDir });
@@ -437,6 +462,7 @@ execSync('node scripts/validate-config.mjs', { stdio: 'inherit', cwd: targetDir 
 
 **Status:** ✅ SECURE
 **Analysis:**
+
 - No hardcoded credentials found
 - Error messages do not leak stack traces to end users (logged to console, appropriate for dev tools)
 - Default permissions are restrictive (scripts inherit user's umask)
@@ -447,6 +473,7 @@ execSync('node scripts/validate-config.mjs', { stdio: 'inherit', cwd: targetDir 
 
 **Status:** ✅ SECURE
 **Analysis:**
+
 - Scripts use only Node.js built-in modules (`fs`, `path`, `child_process`, `readline`)
 - `js-yaml` is the only external dependency (for YAML parsing)
 - `js-yaml` is actively maintained and has no known critical vulnerabilities
@@ -466,13 +493,14 @@ execSync('node scripts/validate-config.mjs', { stdio: 'inherit', cwd: targetDir 
 
 The following security controls from `.claude/context/artifacts/security-controls-catalog.md` are implemented:
 
-| Control ID | Control Name | Implementation | File |
-|------------|--------------|----------------|------|
-| SEC-002 | Path Validation | All user paths resolved and validated against root | Multiple scripts |
-| SEC-003 | Input Sanitization | JSON parsing with error handling | `validate-config.mjs` |
-| SEC-008 | Resource Limits | Dry-run mode prevents accidental destructive operations | `reset-context.cjs` |
+| Control ID | Control Name       | Implementation                                          | File                  |
+| ---------- | ------------------ | ------------------------------------------------------- | --------------------- |
+| SEC-002    | Path Validation    | All user paths resolved and validated against root      | Multiple scripts      |
+| SEC-003    | Input Sanitization | JSON parsing with error handling                        | `validate-config.mjs` |
+| SEC-008    | Resource Limits    | Dry-run mode prevents accidental destructive operations | `reset-context.cjs`   |
 
 **Controls NOT Implemented (by design):**
+
 - SEC-001: Token Whitelist - Not applicable (scripts don't use LLM API)
 - SEC-004: Transparency Markers - Not applicable (no LLM-generated content)
 - SEC-005/006/007: Credential handling - Not applicable (scripts don't handle secrets)
@@ -502,6 +530,7 @@ None - no critical or high-severity findings.
 The scripts system demonstrates excellent security posture, adhering to secure coding practices established in previous security reviews. The identified findings are minor and do not pose immediate risk. The system can be safely used in production with recommended improvements applied as enhancement opportunities.
 
 **Security Score:** 95/100
+
 - Deducted 3 points for MEDIUM-001 (path validation)
 - Deducted 2 points for LOW-001, LOW-002, LOW-003 (best practice improvements)
 
@@ -521,21 +550,26 @@ The scripts system demonstrates excellent security posture, adhering to secure c
 ### Project Root Scripts (26 files)
 
 **Generation:**
+
 - `scripts/generation/generate-prebuilt-rule-index.mjs`
 - `scripts/generation/generate-rule-index.mjs`
 
 **Installation:**
+
 - `scripts/installation/install.mjs`
 
 **Maintenance:**
+
 - `scripts/maintenance/format-tracked.mjs`
 
 **Testing:**
+
 - `scripts/testing/benchmark-ml-performance.cjs`
 - `scripts/testing/count-all-tests.mjs`
 - `scripts/testing/test-version-validation.mjs`
 
 **Validation:**
+
 - `scripts/validation/validate-all-references.mjs` ⭐ (most complex)
 - `scripts/validation/validate-config.mjs` ⭐ (most complex)
 - `scripts/validation/validate-index.mjs`
@@ -544,6 +578,7 @@ The scripts system demonstrates excellent security posture, adhering to secure c
 - `scripts/validation/validate-workflow.mjs`
 
 **Root-level wrappers:**
+
 - `scripts/format-tracked.mjs` (delegates to maintenance/)
 - `scripts/generate-prebuilt-rule-index.mjs` (delegates to generation/)
 - `scripts/generate-rule-index.mjs` (delegates to generation/)

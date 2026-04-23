@@ -198,17 +198,13 @@ async function compensateFailedTask(
 
     if (!dryRun) {
       try {
-        const stashResult = spawnSync(
-          'git',
-          ['stash', 'push', '-m', label],
-          {
-            cwd: PROJECT_ROOT,
-            encoding: 'utf8',
-            shell: false,
-            timeout: 10000,
-            windowsHide: true,
-          }
-        );
+        const stashResult = spawnSync('git', ['stash', 'push', '-m', label], {
+          cwd: PROJECT_ROOT,
+          encoding: 'utf8',
+          shell: false,
+          timeout: 10000,
+          windowsHide: true,
+        });
         if (stashResult.error) {
           result.errors.push(`git stash failed: ${stashResult.error.message}`);
         }

@@ -11,9 +11,10 @@
 Validated all changes from the audit fix pipeline. Overall validation **PASSED** with 3 non-blocking test failures in new comprehensive test suites. All critical security fixes verified, architecture consolidation completed, and code quality gates passed.
 
 **Critical Gates Status:**
+
 - ✅ Lint: 0 errors
 - ✅ Format: No changes (all files formatted)
-- ⚠️  Tests: 433 pass, 3 fail (99.3% pass rate)
+- ⚠️ Tests: 433 pass, 3 fail (99.3% pass rate)
 - ✅ Security fixes: Verified
 - ✅ Registry split: Verified
 - ✅ Memory facades: Verified
@@ -25,6 +26,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **Command:** `pnpm test`
 
 **Results:**
+
 - Total tests: 433
 - Passed: 430
 - Failed: 3
@@ -40,6 +42,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **Command:** `pnpm lint:fix`
 
 **Results:**
+
 ```
 > agent-studio@2.0.0 lint:fix C:\dev\projects\agent-studio
 > eslint . --ext .js,.cjs,.mjs --fix
@@ -54,6 +57,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **Command:** `pnpm format`
 
 **Results:**
+
 - Files processed: 3042
 - Changes: 0 (all files already formatted)
 
@@ -66,12 +70,14 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **Command:** `node --test tests/hooks/routing-guard-comprehensive.test.cjs`
 
 **Results:**
+
 - Tests: 45
 - Passed: 43
 - Failed: 2
 - Pass rate: 95.6%
 
 **Failures:**
+
 1. **Check 0, Test 4:** "should block non-whitelisted bash commands in router mode"
    - Location: routing-guard-comprehensive.test.cjs:71
    - Issue: Test expects blocking but command was allowed
@@ -89,12 +95,14 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **Command:** `node --test tests/hooks/unified-creator-guard-comprehensive.test.cjs`
 
 **Results:**
+
 - Tests: 40
 - Passed: 39
 - Failed: 1
 - Pass rate: 97.5%
 
 **Failure:**
+
 1. **Gate 4, Test 4:** "should block write after creator TTL expires"
    - Location: unified-creator-guard-comprehensive.test.cjs:68
    - Issue: TTL expiration test timing issue
@@ -107,6 +115,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **Command:** `node --test tests/hooks/spawn-prompt-assembler-enrich-allowed-tools.test.cjs`
 
 **Results:**
+
 - Tests: 13
 - Passed: 13
 - Failed: 0
@@ -121,6 +130,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **File:** `.claude/hooks/safety/validators/shell-validators.cjs`
 
 **Verified new patterns present:**
+
 - ✅ OR command chaining (`||`) blocked
 - ✅ Non-standard line separators (`\r\n\v\f\x00`) blocked
 - ✅ Shell expansions (`${`, `$(`) blocked (parameter + arithmetic)
@@ -131,6 +141,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 - ✅ Brace expansion blocked
 
 **Comments:**
+
 - Lines 34-76 contain all 8 dangerous patterns with explanatory comments
 - FIX HIGH-001 annotations present confirming security audit remediation
 
@@ -141,6 +152,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **File:** `.claude/hooks/routing/spawn-prompt-assembler.cjs`
 
 **Verified sanitization function present:**
+
 - ✅ `sanitizeTaskPrompt()` function defined (lines 69-96)
 - ✅ Blocks instruction override patterns:
   - `IGNORE (PREVIOUS|ALL PRIOR|SYSTEM) INSTRUCTIONS`
@@ -163,6 +175,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 ### Step 6: Registry Split Verification ✅
 
 **Files found:**
+
 1. `.claude/context/agent-registry-core.json`
 2. `.claude/context/agent-registry-domain.json`
 3. `.claude/context/agent-registry-orchestrators.json`
@@ -171,6 +184,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **Loader file:** `.claude/lib/routing/agent-registry-loader.cjs` (verified)
 
 **Additional registry files:**
+
 - `.claude/lib/routing/agent-registry-resolver.cjs`
 - `.claude/lib/tools/agent-registry-generator.cjs`
 
@@ -181,6 +195,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **Directory:** `.claude/lib/memory/core/`
 
 **Files found:**
+
 1. `memory-storage.cjs` - Storage operations
 2. `memory-query.cjs` - Query interface
 3. `memory-extraction.cjs` - Data extraction
@@ -204,6 +219,7 @@ Validated all changes from the audit fix pipeline. Overall validation **PASSED**
 **NONE - All critical validation passed**
 
 The 3 test failures are in new comprehensive test suites and represent:
+
 1. Workflow enforcement edge cases (non-security)
 2. Test infrastructure timing issues
 3. No impact on existing functionality

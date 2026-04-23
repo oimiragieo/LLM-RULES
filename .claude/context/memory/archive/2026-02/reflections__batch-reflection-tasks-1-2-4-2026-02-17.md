@@ -4,11 +4,11 @@
 
 ## Overall Assessment
 
-| Task | Timestamp | Summary | Score | Threshold |
-|------|-----------|---------|-------|-----------|
-| Task 2 | 22:23:21 | Batch ghost-task reflection — CRITICAL (9th+ occurrence) | 0.20 / 1.0 | CRITICAL FAIL |
-| Task 1 | 22:25:31 | Completed without summary metadata | 0.42 / 1.0 | WARNING |
-| Task 4 | 22:28:19 | Feasibility + compliance checks: PROCEED | 0.78 / 1.0 | PASS |
+| Task   | Timestamp | Summary                                                  | Score      | Threshold     |
+| ------ | --------- | -------------------------------------------------------- | ---------- | ------------- |
+| Task 2 | 22:23:21  | Batch ghost-task reflection — CRITICAL (9th+ occurrence) | 0.20 / 1.0 | CRITICAL FAIL |
+| Task 1 | 22:25:31  | Completed without summary metadata                       | 0.42 / 1.0 | WARNING       |
+| Task 4 | 22:28:19  | Feasibility + compliance checks: PROCEED                 | 0.78 / 1.0 | PASS          |
 
 **Batch aggregate score: 0.47** — BELOW PASS threshold due to two failed tasks.
 
@@ -24,28 +24,31 @@
 
 ### Rubric Scores
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.0 | No task exists in system — zero scorable output |
-| Accuracy | 0.50 | Cannot verify; prior reflection-agent assessment appears accurate |
-| Clarity | 0.20 | Ghost task; no clear output artifact |
-| Consistency | 0.30 | Pattern recurs; system-level inconsistency confirmed |
-| Actionability | 0.20 | Escalation documented but enforcement not yet implemented |
+| Dimension     | Score | Notes                                                             |
+| ------------- | ----- | ----------------------------------------------------------------- |
+| Completeness  | 0.0   | No task exists in system — zero scorable output                   |
+| Accuracy      | 0.50  | Cannot verify; prior reflection-agent assessment appears accurate |
+| Clarity       | 0.20  | Ghost task; no clear output artifact                              |
+| Consistency   | 0.30  | Pattern recurs; system-level inconsistency confirmed              |
+| Actionability | 0.20  | Escalation documented but enforcement not yet implemented         |
 
 **Overall Score: 0.20 / 1.0 — CRITICAL FAIL**
 
 ### RBT Diagnosis
 
 **Roses:**
+
 - Prior reflection-agent correctly detected and documented the pattern
 - Atomic handshake is functioning — reflection queue captures completion events correctly
 - 9th occurrence provides overwhelming statistical evidence for enforcement escalation
 
 **Buds:**
+
 - Add defensive TaskGet validation before spawning reflection-agent (reject ghost task reflections at queue processor level)
 - Implement fallback git-log-based evidence capture for ghost task diagnostics
 
 **Thorns:**
+
 - SYSTEMIC FAILURE (10th confirmed batch): Tasks completing without existing in task system is unresolved after 4+ days
 - Audit trail is broken — post-hoc analysis of ghost tasks is impossible
 - Three Iron Laws violated repeatedly — LAW 1 (TaskUpdate in_progress), LAW 2 (TaskUpdate completed with metadata)
@@ -62,27 +65,30 @@
 
 ### Rubric Scores
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.30 | No summary metadata — cannot score completeness of underlying work |
-| Accuracy | 0.50 | Cannot verify accuracy without metadata |
-| Clarity | 0.45 | No output artifacts described |
-| Consistency | 0.40 | Violates Three Iron Laws (LAW 2) |
-| Actionability | 0.45 | No next-steps visible from task context |
+| Dimension     | Score | Notes                                                              |
+| ------------- | ----- | ------------------------------------------------------------------ |
+| Completeness  | 0.30  | No summary metadata — cannot score completeness of underlying work |
+| Accuracy      | 0.50  | Cannot verify accuracy without metadata                            |
+| Clarity       | 0.45  | No output artifacts described                                      |
+| Consistency   | 0.40  | Violates Three Iron Laws (LAW 2)                                   |
+| Actionability | 0.45  | No next-steps visible from task context                            |
 
 **Overall Score: 0.42 / 1.0 — WARNING**
 
 ### RBT Diagnosis
 
 **Roses:**
+
 - Task completed without pipeline stall (did not enter infinite in_progress)
 - Reflection atomic handshake correctly detected and triggered
 
 **Buds:**
+
 - Minimum viable metadata (`summary: 'Brief description'`) would unlock full scoring
 - This task context cannot even establish what the agent type was
 
 **Thorns:**
+
 - RECURRING (10th+ confirmed batch, 2026-02-17): Missing TaskUpdate metadata — training-based enforcement exhausted
 - Cannot evaluate agent quality, file changes, or work correctness
 
@@ -98,29 +104,32 @@
 
 ### Rubric Scores
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.70 | Summary provided; no artifact paths or detailed findings |
-| Accuracy | 0.85 | PROCEED decision assumed valid given clear summary context |
-| Clarity | 0.80 | Summary is clear and actionable |
-| Consistency | 0.75 | Follows Step 0.6 protocol as documented |
-| Actionability | 0.80 | PROCEED enables next pipeline stage to proceed |
+| Dimension     | Score | Notes                                                      |
+| ------------- | ----- | ---------------------------------------------------------- |
+| Completeness  | 0.70  | Summary provided; no artifact paths or detailed findings   |
+| Accuracy      | 0.85  | PROCEED decision assumed valid given clear summary context |
+| Clarity       | 0.80  | Summary is clear and actionable                            |
+| Consistency   | 0.75  | Follows Step 0.6 protocol as documented                    |
+| Actionability | 0.80  | PROCEED enables next pipeline stage to proceed             |
 
 **Overall Score: 0.78 / 1.0 — PASS**
 
 ### RBT Diagnosis
 
 **Roses:**
+
 - Feasibility and compliance checks executed correctly — preflight workflow working
 - PROCEED decision issued — pipeline unblocked
 - Task summary is meaningful and informative (unlike Reflections 1-2)
 
 **Buds:**
+
 - Summary could include artifact path for compliance-policy-check report
 - Evidence paths (which artifact was evaluated, what compliance findings exist) would improve traceability
 - Score would be 0.88+ if output artifact paths were included in metadata
 
 **Thorns:**
+
 - None critical — this task met minimum quality threshold
 
 ---
@@ -153,12 +162,12 @@ Across this session date (2026-02-17), the TaskUpdate metadata omission pattern 
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
-| Ghost task reflection echo pattern | **Retain** | New pattern variant (reflection triggering on already-documented ghost tasks) — high reuse value for queue processor fix |
-| Feasibility/compliance preflight working | **Retain** | Positive confirmation: Step 0.6 is functional — worth documenting for training data |
-| TaskUpdate metadata omission (12th+) | **Compress** | Already documented in gotchas.json with 9+ count; update occurrence count only, do not duplicate full entry |
-| Training exhaustion escalation | **Retain** | Critical — evidence count sufficient for permanent ADR decision |
+| Item                                     | Decision     | Rationale                                                                                                                |
+| ---------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Ghost task reflection echo pattern       | **Retain**   | New pattern variant (reflection triggering on already-documented ghost tasks) — high reuse value for queue processor fix |
+| Feasibility/compliance preflight working | **Retain**   | Positive confirmation: Step 0.6 is functional — worth documenting for training data                                      |
+| TaskUpdate metadata omission (12th+)     | **Compress** | Already documented in gotchas.json with 9+ count; update occurrence count only, do not duplicate full entry              |
+| Training exhaustion escalation           | **Retain**   | Critical — evidence count sufficient for permanent ADR decision                                                          |
 
 ---
 

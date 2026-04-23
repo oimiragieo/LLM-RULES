@@ -24,8 +24,8 @@ _None_
 
 ### MEDIUM
 
-| ID   | File                                   | Check | Detail                                                                                                                                                    | Remediation                                                                                                             |
-| ---- | -------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| ID   | File                                       | Check                     | Detail                                                                                                                                                       | Remediation                                                                                                                |
+| ---- | ------------------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | S-05 | research-synthesis/SKILL.md (pre-existing) | Orphaned agent references | `planner.md`, `pm.md`, `technical-program-manager.md`, `scientific-research-expert.md`, `researcher.md` list the skill but agents not in skill-catalog index | Update skill-catalog index to add these agents as agentPrimary/agentSupporting (pre-existing, not introduced this session) |
 
 ### LOW
@@ -34,17 +34,17 @@ _None_
 
 ### PASS
 
-| ID   | File                                           | Check                          | Result                                                     |
-| ---- | ---------------------------------------------- | ------------------------------ | ---------------------------------------------------------- |
-| H-01 | hooks/workflow/workflow-watchdog-hook.cjs      | Syntax validity                | OK — `node --check` passed                                 |
-| H-02 | hooks/workflow/workflow-watchdog-hook.cjs      | SE-02: no raw JSON.parse       | OK — no `JSON.parse(` found                                |
-| H-03 | hooks/workflow/workflow-watchdog-hook.cjs      | SE-01: no shell:true           | OK — no `shell: true` found                                |
-| H-04 | hooks/workflow/workflow-watchdog-hook.cjs      | Registered in settings.json    | OK — entry found under PostToolUse/TaskUpdate with timeout |
-| H-05 | hooks/workflow/workflow-watchdog-hook.cjs      | Exit code correctness          | OK — try/catch wrapping present, always exits 0 (SE-03)    |
-| S-01 | skills/research-synthesis/SKILL.md            | In skill-catalog.md            | OK — found in catalog                                      |
-| S-02 | skills/research-synthesis/SKILL.md            | Agent assignment               | OK — 5 agents reference skill: planner, pm, technical-program-manager, scientific-research-expert, researcher (evolution-orchestrator also references it)                        |
-| S-03 | skills/research-synthesis/SKILL.md            | In CLAUDE.md Section 8.5       | OK — found at lines 392, 440                               |
-| S-04 | skills/research-synthesis/SKILL.md            | Valid frontmatter              | OK — `name:`, `description:`, `version:` all present      |
+| ID   | File                                      | Check                       | Result                                                                                                                                                    |
+| ---- | ----------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H-01 | hooks/workflow/workflow-watchdog-hook.cjs | Syntax validity             | OK — `node --check` passed                                                                                                                                |
+| H-02 | hooks/workflow/workflow-watchdog-hook.cjs | SE-02: no raw JSON.parse    | OK — no `JSON.parse(` found                                                                                                                               |
+| H-03 | hooks/workflow/workflow-watchdog-hook.cjs | SE-01: no shell:true        | OK — no `shell: true` found                                                                                                                               |
+| H-04 | hooks/workflow/workflow-watchdog-hook.cjs | Registered in settings.json | OK — entry found under PostToolUse/TaskUpdate with timeout                                                                                                |
+| H-05 | hooks/workflow/workflow-watchdog-hook.cjs | Exit code correctness       | OK — try/catch wrapping present, always exits 0 (SE-03)                                                                                                   |
+| S-01 | skills/research-synthesis/SKILL.md        | In skill-catalog.md         | OK — found in catalog                                                                                                                                     |
+| S-02 | skills/research-synthesis/SKILL.md        | Agent assignment            | OK — 5 agents reference skill: planner, pm, technical-program-manager, scientific-research-expert, researcher (evolution-orchestrator also references it) |
+| S-03 | skills/research-synthesis/SKILL.md        | In CLAUDE.md Section 8.5    | OK — found at lines 392, 440                                                                                                                              |
+| S-04 | skills/research-synthesis/SKILL.md        | Valid frontmatter           | OK — `name:`, `description:`, `version:` all present                                                                                                      |
 
 ## Summary
 

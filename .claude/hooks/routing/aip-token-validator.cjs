@@ -88,9 +88,7 @@ process.stdin.on('end', () => {
       process.exit(2);
     }
 
-    process.stderr.write(
-      `[aip-token-validator] PASSED: Task(${subagentType}) token verified OK\n`
-    );
+    process.stderr.write(`[aip-token-validator] PASSED: Task(${subagentType}) token verified OK\n`);
     process.stdout.write(JSON.stringify({ allow: true }));
     process.exit(0);
   } catch (err) {

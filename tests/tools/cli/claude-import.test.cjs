@@ -13,10 +13,7 @@ const ADAPTER_PATH = path.resolve(
   '../../../.claude/lib/import/managed-agent-adapter.cjs'
 );
 const CLI_PATH = path.resolve(__dirname, '../../../.claude/tools/cli/claude-import.cjs');
-const SCHEMA_PATH = path.resolve(
-  __dirname,
-  '../../../.claude/schemas/agent-manifest.schema.json'
-);
+const SCHEMA_PATH = path.resolve(__dirname, '../../../.claude/schemas/agent-manifest.schema.json');
 
 // ---------------------------------------------------------------------------
 // Fixture: minimal Anthropic Managed Agent export JSON (public beta shape)
@@ -44,7 +41,11 @@ const FIXTURE_WITH_UNKNOWN_TOOLS = {
   name: 'Agent With Unknown Tools',
   tools: [
     { name: 'search_knowledge_base', description: 'KB search', type: 'custom' },
-    { name: 'anthropic_proprietary_tool', description: 'No local equivalent', type: 'managed_only' },
+    {
+      name: 'anthropic_proprietary_tool',
+      description: 'No local equivalent',
+      type: 'managed_only',
+    },
     { name: 'another_unknown_tool', description: 'Another missing tool', type: 'managed_only' },
   ],
 };
@@ -163,15 +164,15 @@ test('adapter: unknown tools produce warnings in import report and are skipped',
 
   // Warnings must mention the unrecognised tool names
   const warningText = result.importReport.warnings.join(' ');
-  assert.match(warningText, /anthropic_proprietary_tool|managed_only|unknown/i,
+  assert.match(
+    warningText,
+    /anthropic_proprietary_tool|managed_only|unknown/i,
     'Warning must reference the unrecognised tool type or name'
   );
 
   // The unknown tools must NOT appear as allowed capabilities in manifest
   const { manifest } = result;
-  const allowedToolNames = manifest.capabilities
-    .filter(c => c.allowed)
-    .map(c => c.tool_name);
+  const allowedToolNames = manifest.capabilities.filter(c => c.allowed).map(c => c.tool_name);
   assert.ok(
     !allowedToolNames.includes('anthropic_proprietary_tool'),
     'anthropic_proprietary_tool must not be in allowed capabilities'
@@ -194,7 +195,11 @@ test('CLI: --dry-run prints agent content without writing files', () => {
 
   assert.strictEqual(result.status, 0, `CLI dry-run failed: ${result.stderr}`);
   assert.match(result.stdout, /---/, 'dry-run output must include YAML frontmatter delimiters');
-  assert.match(result.stdout, /DRY RUN|dry-run|would write/i, 'dry-run must indicate no write occurred');
+  assert.match(
+    result.stdout,
+    /DRY RUN|dry-run|would write/i,
+    'dry-run must indicate no write occurred'
+  );
 
   // Confirm no .md file was written
   const mdFiles = fs.readdirSync(tmpDir).filter(f => f.endsWith('.md'));
@@ -233,19 +238,15 @@ test('CLI: --output-dir writes imported agent to specified directory', () => {
 // ---------------------------------------------------------------------------
 test('CLI: missing API credentials produce clear error pointing to env var', () => {
   // Remove the API key from env and try to fetch a real agent (no --fixture)
-  const result = spawnSync(
-    process.execPath,
-    [CLI_PATH, 'agent_nonexistent123'],
-    {
-      encoding: 'utf8',
-      timeout: 15000,
-      env: {
-        ...process.env,
-        ANTHROPIC_API_KEY: '',
-        ANTHROPIC_MANAGED_AGENTS_API_URL: 'http://localhost:0', // unreachable
-      },
-    }
-  );
+  const result = spawnSync(process.execPath, [CLI_PATH, 'agent_nonexistent123'], {
+    encoding: 'utf8',
+    timeout: 15000,
+    env: {
+      ...process.env,
+      ANTHROPIC_API_KEY: '',
+      ANTHROPIC_MANAGED_AGENTS_API_URL: 'http://localhost:0', // unreachable
+    },
+  });
 
   assert.notStrictEqual(result.status, 0, 'CLI must exit non-zero when credentials are missing');
   const combinedOutput = (result.stdout || '') + (result.stderr || '');

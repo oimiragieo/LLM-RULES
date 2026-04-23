@@ -48,7 +48,9 @@ function validateSkillProvenance(frontmatter, filePath) {
 
   // Validate `source`
   if (frontmatter.source === undefined || frontmatter.source === null) {
-    errors.push(`Missing required field "source"${loc} — must be one of: ${VALID_SOURCES.join(', ')}`);
+    errors.push(
+      `Missing required field "source"${loc} — must be one of: ${VALID_SOURCES.join(', ')}`
+    );
   } else if (!VALID_SOURCES.includes(frontmatter.source)) {
     errors.push(
       `Invalid source "${frontmatter.source}"${loc} — must be one of: ${VALID_SOURCES.join(', ')}`

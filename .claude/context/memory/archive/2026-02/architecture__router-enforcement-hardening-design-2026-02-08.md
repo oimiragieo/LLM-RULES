@@ -27,13 +27,13 @@ Five enforcement gaps were identified in the router protocol. These gaps collect
 
 **Severity Assessment:**
 
-| Gap | Description | Severity | Exploitation Difficulty |
-|-----|-------------|----------|------------------------|
-| Gap 1 | routing-guard.cjs missing from Edit/Write/NotebookEdit matcher | HIGH | Trivial - Router just uses Edit directly |
-| Gap 2 | routing-guard.cjs missing from Read matcher | LOW | Low impact - Read is on Router whitelist |
-| Gap 3 | No TaskList-first gate for non-Task tools | MEDIUM | Moderate - Router can Grep/Glob without TaskList |
-| Gap 4 | Stale router-state.json across sessions | MEDIUM | Accidental - state persists from prior session |
-| Gap 5 | Prompt-level identity conflict | LOW | Behavioral - LLM may ignore Router identity |
+| Gap   | Description                                                    | Severity | Exploitation Difficulty                          |
+| ----- | -------------------------------------------------------------- | -------- | ------------------------------------------------ |
+| Gap 1 | routing-guard.cjs missing from Edit/Write/NotebookEdit matcher | HIGH     | Trivial - Router just uses Edit directly         |
+| Gap 2 | routing-guard.cjs missing from Read matcher                    | LOW      | Low impact - Read is on Router whitelist         |
+| Gap 3 | No TaskList-first gate for non-Task tools                      | MEDIUM   | Moderate - Router can Grep/Glob without TaskList |
+| Gap 4 | Stale router-state.json across sessions                        | MEDIUM   | Accidental - state persists from prior session   |
+| Gap 5 | Prompt-level identity conflict                                 | LOW      | Behavioral - LLM may ignore Router identity      |
 
 **Recommended Priority:** Gap 1 > Gap 4 > Gap 3 > Gap 5 > Gap 2
 
@@ -45,18 +45,18 @@ Five enforcement gaps were identified in the router protocol. These gaps collect
 
 The following table maps every PreToolUse matcher to the hooks it triggers:
 
-| Matcher | Hooks Registered | routing-guard? |
-|---------|-----------------|----------------|
-| `""` (wildcard) | pre-tool-unified.cjs (session-cleanup, execution-limit, tool-scope) | NO |
-| `Bash` | bash-command-validator, shell-injection-validator, windows-null-sanitizer, **routing-guard.cjs** | YES |
-| `Glob\|Grep\|WebSearch` | **routing-guard.cjs** | YES |
-| `Edit\|Write\|NotebookEdit` | unified-creator-guard, unified-pre-write-hook, evolution-state-guard, research-enforcement, quality-gate-validator | **NO** |
-| `Write` | conflict-detector | NO |
-| `Read` | validate-skill-invocation | NO |
-| `TaskList` | reflection-step0-guard | NO |
-| `TaskCreate` | **routing-guard.cjs** | YES |
-| `Task` | intent-agent-match, spawn-prompt-assembler, **pre-task-unified.cjs** (contains routing checks), config-model-validator, spawn-prompt-validator | YES (via pre-task-unified) |
-| `TaskUpdate` | task-status-enforcement, pre-completion-validation, quality-gate-validator | NO |
+| Matcher                     | Hooks Registered                                                                                                                               | routing-guard?             |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| `""` (wildcard)             | pre-tool-unified.cjs (session-cleanup, execution-limit, tool-scope)                                                                            | NO                         |
+| `Bash`                      | bash-command-validator, shell-injection-validator, windows-null-sanitizer, **routing-guard.cjs**                                               | YES                        |
+| `Glob\|Grep\|WebSearch`     | **routing-guard.cjs**                                                                                                                          | YES                        |
+| `Edit\|Write\|NotebookEdit` | unified-creator-guard, unified-pre-write-hook, evolution-state-guard, research-enforcement, quality-gate-validator                             | **NO**                     |
+| `Write`                     | conflict-detector                                                                                                                              | NO                         |
+| `Read`                      | validate-skill-invocation                                                                                                                      | NO                         |
+| `TaskList`                  | reflection-step0-guard                                                                                                                         | NO                         |
+| `TaskCreate`                | **routing-guard.cjs**                                                                                                                          | YES                        |
+| `Task`                      | intent-agent-match, spawn-prompt-assembler, **pre-task-unified.cjs** (contains routing checks), config-model-validator, spawn-prompt-validator | YES (via pre-task-unified) |
+| `TaskUpdate`                | task-status-enforcement, pre-completion-validation, quality-gate-validator                                                                     | NO                         |
 
 **Key Observation:** routing-guard.cjs fires for `Bash`, `Glob|Grep|WebSearch`, and `TaskCreate`. The `Task` matcher gets equivalent coverage through `pre-task-unified.cjs` which duplicates routing-guard checks. But `Edit|Write|NotebookEdit` and `Read` have NO routing-guard coverage.
 
@@ -64,16 +64,16 @@ The following table maps every PreToolUse matcher to the hooks it triggers:
 
 The routing-guard has 8 checks (0-7):
 
-| Check | Name | Applies To | What It Does |
-|-------|------|-----------|--------------|
-| 0 | router-bash-check | Bash only | Blocks non-whitelisted Bash commands in router mode |
-| 1 | router-self-check | All blacklisted tools | Blocks Glob/Grep/Edit/Write/NotebookEdit/WebSearch in router mode |
-| 2 | planner-first | Task only | Requires PLANNER for high/epic complexity |
-| 3 | task-create-guard | TaskCreate only | Blocks TaskCreate without PLANNER |
-| 4 | security-review | Task only | Requires SECURITY-ARCHITECT for security-sensitive tasks |
-| 5 | router-write-guard | Edit/Write/NotebookEdit | Blocks direct writes without agent context |
-| 6 | memory-pressure | Task only | Blocks spawning under memory pressure |
-| 7 | specialist-override | Task only | Warns developer spawn for specialist tasks |
+| Check | Name                | Applies To              | What It Does                                                      |
+| ----- | ------------------- | ----------------------- | ----------------------------------------------------------------- |
+| 0     | router-bash-check   | Bash only               | Blocks non-whitelisted Bash commands in router mode               |
+| 1     | router-self-check   | All blacklisted tools   | Blocks Glob/Grep/Edit/Write/NotebookEdit/WebSearch in router mode |
+| 2     | planner-first       | Task only               | Requires PLANNER for high/epic complexity                         |
+| 3     | task-create-guard   | TaskCreate only         | Blocks TaskCreate without PLANNER                                 |
+| 4     | security-review     | Task only               | Requires SECURITY-ARCHITECT for security-sensitive tasks          |
+| 5     | router-write-guard  | Edit/Write/NotebookEdit | Blocks direct writes without agent context                        |
+| 6     | memory-pressure     | Task only               | Blocks spawning under memory pressure                             |
+| 7     | specialist-override | Task only               | Warns developer spawn for specialist tasks                        |
 
 **Critical Finding:** Check 1 (router-self-check) ALREADY blocks Edit/Write/NotebookEdit. Check 5 (router-write-guard) ALREADY blocks writes without agent context. But neither check is ever triggered for those tools because routing-guard.cjs is not registered on the `Edit|Write|NotebookEdit` matcher in settings.json.
 
@@ -102,13 +102,13 @@ pre-tool-unified.cjs (wildcard) --> session cleanup, execution limits, tool scop
 
 **State fields relevant to enforcement:**
 
-| Field | Set By | Used By | Purpose |
-|-------|--------|---------|---------|
-| `mode` | state-reset (router), enterAgentMode (agent), exitAgentMode (router) | routing-guard checks | Router vs Agent context |
-| `taskSpawned` | state-reset (false), enterAgentMode (true) | routing-guard checks | Whether a Task was spawned |
-| `taskListCalledSincePrompt` | state-reset (false*), setTaskListCalled (true) | pre-task-unified Check 0 | TaskList-first enforcement |
-| `complexity` | state-reset (trivial), user-prompt-unified | planner-first check | Task complexity level |
-| `requiresPlannerFirst` | state-reset (false), user-prompt-unified | planner-first check | Whether PLANNER needed |
+| Field                       | Set By                                                               | Used By                  | Purpose                    |
+| --------------------------- | -------------------------------------------------------------------- | ------------------------ | -------------------------- |
+| `mode`                      | state-reset (router), enterAgentMode (agent), exitAgentMode (router) | routing-guard checks     | Router vs Agent context    |
+| `taskSpawned`               | state-reset (false), enterAgentMode (true)                           | routing-guard checks     | Whether a Task was spawned |
+| `taskListCalledSincePrompt` | state-reset (false\*), setTaskListCalled (true)                      | pre-task-unified Check 0 | TaskList-first enforcement |
+| `complexity`                | state-reset (trivial), user-prompt-unified                           | planner-first check      | Task complexity level      |
+| `requiresPlannerFirst`      | state-reset (false), user-prompt-unified                             | planner-first check      | Whether PLANNER needed     |
 
 **CRITICAL BUG IN state-reset.cjs:** The `resetState()` function in `state-reset.cjs` (line 53-70) does NOT include `taskListCalledSincePrompt` in its default state object. However, `router-state.cjs` `getDefaultState()` (line 116) DOES include it. This means:
 
@@ -136,8 +136,8 @@ The `taskListCalledSincePrompt` flag currently only blocks the `Task` tool via `
 {
   "matcher": "Edit|Write|NotebookEdit",
   "hooks": [
-    "unified-creator-guard.cjs",      // Gate 4: creator workflow
-    "unified-pre-write-hook.cjs",     // 11 safety checks
+    "unified-creator-guard.cjs", // Gate 4: creator workflow
+    "unified-pre-write-hook.cjs", // 11 safety checks
     "evolution-state-guard.cjs",
     "research-enforcement.cjs",
     "quality-gate-validator.cjs"
@@ -162,7 +162,7 @@ No routing-guard.cjs present. This means:
 {
   "matcher": "Read",
   "hooks": [
-    "validate-skill-invocation.cjs"   // Warns Read vs Skill() usage
+    "validate-skill-invocation.cjs" // Warns Read vs Skill() usage
   ]
 }
 ```
@@ -182,7 +182,7 @@ No routing-guard.cjs present. However, Read is in the WHITELISTED_TOOLS constant
 ```javascript
 function checkTaskListFirst(toolName) {
   if (toolName !== 'Task') {
-    return { pass: true };  // <-- All other tools bypass this check
+    return { pass: true }; // <-- All other tools bypass this check
   }
   // ...
 }
@@ -396,7 +396,7 @@ const defaultState = {
   taskSpawnedAt: null,
   taskDescription: null,
   sessionId: sessionId,
-  taskListCalledSincePrompt: false,  // <-- ADD THIS
+  taskListCalledSincePrompt: false, // <-- ADD THIS
   complexity: 'trivial',
   requiresPlannerFirst: false,
   plannerSpawned: false,
@@ -406,7 +406,7 @@ const defaultState = {
   lastTaskUpdateTaskId: null,
   lastTaskUpdateStatus: null,
   taskUpdatesThisSession: 0,
-  currentSpawnTaskId: null,           // <-- ADD THIS (matches getDefaultState)
+  currentSpawnTaskId: null, // <-- ADD THIS (matches getDefaultState)
   version: Date.now() % 10000,
 };
 ```
@@ -426,7 +426,7 @@ function isStateStale(state) {
   if (isNaN(resetTime)) return true;
 
   const staleThresholdMs = parseInt(process.env.STATE_STALE_THRESHOLD_MS || '600000', 10); // 10 min
-  return (Date.now() - resetTime) > staleThresholdMs;
+  return Date.now() - resetTime > staleThresholdMs;
 }
 ```
 
@@ -478,14 +478,14 @@ This single line addition reinforces the Router identity at the highest-priority
 
 ### Risk Matrix
 
-| Fix | What Could Break? | Likelihood | Impact | Mitigation |
-|-----|-------------------|-----------|--------|------------|
-| Fix 1 | Agent writes blocked by routing-guard false positive (state race: agent mode not yet set) | LOW | HIGH | `isAlwaysAllowedWrite()` exemption; `enterAgentMode()` called in pre-task-unified before Task executes |
-| Fix 1 | Increased latency on Edit/Write/NotebookEdit (one more process spawn) | CERTAIN | LOW | routing-guard is already optimized (cached state, single file read). ~15-25ms overhead. |
-| Fix 3 | Router cannot do Step 0 reflection check before TaskList | LOW | MEDIUM | Read is not a routing-guard watched tool, so Step 0 file reads are unaffected. Only blacklisted tools blocked. |
-| Fix 3 | Router Bash (git status) blocked before TaskList | LOW | LOW | Check 8 exempts router-mode Bash since it only applies to blacklisted tools. But Bash IS in ALL_WATCHED_TOOLS. Need to ensure Check 8 runs BEFORE Check 0 (bash-check) and allows Bash if it is a whitelisted git command. |
-| Fix 4 | Staleness detection false positive (state not stale, just long-running agent) | LOW | MEDIUM | 10-minute threshold is generous. Agents that run >10 min should have `enterAgentMode()` called, which updates `lastReset` indirectly via `saveStateWithRetry` version bumps. |
-| Fix 5 | Identity text too aggressive, confuses subagent prompts | VERY LOW | LOW | The text is in CLAUDE.md which loads for the Router session only, not in subagent prompts. |
+| Fix   | What Could Break?                                                                         | Likelihood | Impact | Mitigation                                                                                                                                                                                                                 |
+| ----- | ----------------------------------------------------------------------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fix 1 | Agent writes blocked by routing-guard false positive (state race: agent mode not yet set) | LOW        | HIGH   | `isAlwaysAllowedWrite()` exemption; `enterAgentMode()` called in pre-task-unified before Task executes                                                                                                                     |
+| Fix 1 | Increased latency on Edit/Write/NotebookEdit (one more process spawn)                     | CERTAIN    | LOW    | routing-guard is already optimized (cached state, single file read). ~15-25ms overhead.                                                                                                                                    |
+| Fix 3 | Router cannot do Step 0 reflection check before TaskList                                  | LOW        | MEDIUM | Read is not a routing-guard watched tool, so Step 0 file reads are unaffected. Only blacklisted tools blocked.                                                                                                             |
+| Fix 3 | Router Bash (git status) blocked before TaskList                                          | LOW        | LOW    | Check 8 exempts router-mode Bash since it only applies to blacklisted tools. But Bash IS in ALL_WATCHED_TOOLS. Need to ensure Check 8 runs BEFORE Check 0 (bash-check) and allows Bash if it is a whitelisted git command. |
+| Fix 4 | Staleness detection false positive (state not stale, just long-running agent)             | LOW        | MEDIUM | 10-minute threshold is generous. Agents that run >10 min should have `enterAgentMode()` called, which updates `lastReset` indirectly via `saveStateWithRetry` version bumps.                                               |
+| Fix 5 | Identity text too aggressive, confuses subagent prompts                                   | VERY LOW   | LOW    | The text is in CLAUDE.md which loads for the Router session only, not in subagent prompts.                                                                                                                                 |
 
 ### Backward Compatibility
 
@@ -499,12 +499,12 @@ All fixes are backward-compatible:
 
 ### Performance Impact
 
-| Fix | Additional Overhead Per Tool Call | Affected Tools |
-|-----|----------------------------------|----------------|
-| Fix 1 | +1 process spawn (~15-25ms) | Edit, Write, NotebookEdit |
+| Fix   | Additional Overhead Per Tool Call                               | Affected Tools                  |
+| ----- | --------------------------------------------------------------- | ------------------------------- |
+| Fix 1 | +1 process spawn (~15-25ms)                                     | Edit, Write, NotebookEdit       |
 | Fix 3 | +1 function call within existing routing-guard process (~0.1ms) | All routing-guard watched tools |
-| Fix 4 | +1 timestamp comparison (~0.01ms) | All routing-guard watched tools |
-| Fix 5 | +~30 tokens in CLAUDE.md context | All prompts |
+| Fix 4 | +1 timestamp comparison (~0.01ms)                               | All routing-guard watched tools |
+| Fix 5 | +~30 tokens in CLAUDE.md context                                | All prompts                     |
 
 Total worst-case: ~25ms additional latency on Edit/Write, negligible on other tools.
 
@@ -515,11 +515,13 @@ Total worst-case: ~25ms additional latency on Edit/Write, negligible on other to
 ### Phase 1: Low-Risk Fixes (Can deploy immediately)
 
 **Step 1:** Fix 4a -- Add missing fields to state-reset.cjs default state
+
 - File: `.claude/hooks/session/state-reset.cjs`
 - Change: Add `taskListCalledSincePrompt: false` and `currentSpawnTaskId: null` to `defaultState` object
 - Risk: None (additive, no behavior change)
 
 **Step 2:** Fix 5 -- Add tool restriction line to CLAUDE.md
+
 - File: `.claude/CLAUDE.md`
 - Change: Add one line after "SYSTEM OVERRIDE" block
 - Risk: None (documentation change)
@@ -527,6 +529,7 @@ Total worst-case: ~25ms additional latency on Edit/Write, negligible on other to
 ### Phase 2: Medium-Risk Fixes (Deploy with warn mode first)
 
 **Step 3:** Fix 1 -- Register routing-guard.cjs for Edit|Write|NotebookEdit
+
 - File: `.claude/settings.json`
 - Change: Add routing-guard.cjs as FIRST hook in Edit|Write|NotebookEdit matcher
 - Deploy with `ROUTER_SELF_CHECK=warn` first to monitor false positives
@@ -534,12 +537,14 @@ Total worst-case: ~25ms additional latency on Edit/Write, negligible on other to
 - Risk: Agent writes may be incorrectly blocked if state race condition occurs
 
 **Step 4:** Fix 4b -- Add staleness detection to routing-guard.cjs
+
 - File: `.claude/hooks/routing/routing-guard.cjs`
 - Change: Add `isStateStale()` function, call at start of `getCachedRouterState()`
 - Deploy with `STATE_STALE_THRESHOLD_MS=600000` (10 min, conservative)
 - Risk: Long-running agents may trigger false stale detection
 
 **Step 5:** Fix 4c -- Improve state-reset error visibility
+
 - File: `.claude/hooks/session/state-reset.cjs`
 - Change: Add error logging (already fail-open, just more visible)
 - Risk: None
@@ -547,6 +552,7 @@ Total worst-case: ~25ms additional latency on Edit/Write, negligible on other to
 ### Phase 3: New Enforcement (Deploy with warn mode)
 
 **Step 6:** Fix 3 -- TaskList-first gate in routing-guard.cjs
+
 - File: `.claude/hooks/routing/routing-guard.cjs`
 - Change: Add Check 8 (`checkTaskListFirstGate`), insert before Check 0 in `runAllChecks()`
 - Deploy with `TASKLIST_FIRST_ENFORCEMENT=warn` to monitor impact
@@ -556,6 +562,7 @@ Total worst-case: ~25ms additional latency on Edit/Write, negligible on other to
 ### Phase 4: Verification
 
 **Step 7:** Add tests for all new enforcement paths
+
 - Test routing-guard fires for Edit/Write (Fix 1)
 - Test staleness detection (Fix 4b)
 - Test TaskList-first gate for Glob/Grep/Bash (Fix 3)
@@ -601,40 +608,40 @@ Additionally, the TaskList-first enforcement only applies to the Task tool, not 
 
 ## Appendix A: File Change Summary
 
-| File | Change Type | Description |
-|------|------------|-------------|
-| `.claude/settings.json` | MODIFY | Add routing-guard.cjs to Edit\|Write\|NotebookEdit matcher |
-| `.claude/hooks/routing/routing-guard.cjs` | MODIFY | Add Check 8 (TaskList-first gate), add staleness detection |
-| `.claude/hooks/session/state-reset.cjs` | MODIFY | Add missing default fields, improve error logging |
-| `.claude/CLAUDE.md` | MODIFY | Add tool restriction line to SYSTEM OVERRIDE block |
-| Tests (new) | CREATE | Tests for Fix 1, Fix 3, Fix 4 enforcement paths |
+| File                                      | Change Type | Description                                                |
+| ----------------------------------------- | ----------- | ---------------------------------------------------------- |
+| `.claude/settings.json`                   | MODIFY      | Add routing-guard.cjs to Edit\|Write\|NotebookEdit matcher |
+| `.claude/hooks/routing/routing-guard.cjs` | MODIFY      | Add Check 8 (TaskList-first gate), add staleness detection |
+| `.claude/hooks/session/state-reset.cjs`   | MODIFY      | Add missing default fields, improve error logging          |
+| `.claude/CLAUDE.md`                       | MODIFY      | Add tool restriction line to SYSTEM OVERRIDE block         |
+| Tests (new)                               | CREATE      | Tests for Fix 1, Fix 3, Fix 4 enforcement paths            |
 
 ## Appendix B: Environment Variable Reference
 
-| Variable | Default | Values | Purpose |
-|----------|---------|--------|---------|
-| `ROUTER_SELF_CHECK` | block | block/warn/off | Controls Check 1 enforcement |
-| `ROUTER_WRITE_GUARD` | block | block/warn/off | Controls Check 5 enforcement |
-| `ROUTER_BASH_GUARD` | block | block/warn/off | Controls Check 0 enforcement |
-| `TASKLIST_FIRST_ENFORCEMENT` | block | block/warn/off | Controls Check 8 enforcement (NEW) |
-| `STATE_STALE_THRESHOLD_MS` | 600000 | milliseconds | Staleness detection threshold (NEW) |
-| `PLANNER_FIRST_ENFORCEMENT` | block | block/warn/off | Controls Check 2 enforcement |
-| `SECURITY_REVIEW_ENFORCEMENT` | block | block/warn/off | Controls Check 4 enforcement |
-| `SPECIALIST_ROUTING_ENFORCEMENT` | warn | warn/block/off | Controls Check 7 enforcement |
+| Variable                         | Default | Values         | Purpose                             |
+| -------------------------------- | ------- | -------------- | ----------------------------------- |
+| `ROUTER_SELF_CHECK`              | block   | block/warn/off | Controls Check 1 enforcement        |
+| `ROUTER_WRITE_GUARD`             | block   | block/warn/off | Controls Check 5 enforcement        |
+| `ROUTER_BASH_GUARD`              | block   | block/warn/off | Controls Check 0 enforcement        |
+| `TASKLIST_FIRST_ENFORCEMENT`     | block   | block/warn/off | Controls Check 8 enforcement (NEW)  |
+| `STATE_STALE_THRESHOLD_MS`       | 600000  | milliseconds   | Staleness detection threshold (NEW) |
+| `PLANNER_FIRST_ENFORCEMENT`      | block   | block/warn/off | Controls Check 2 enforcement        |
+| `SECURITY_REVIEW_ENFORCEMENT`    | block   | block/warn/off | Controls Check 4 enforcement        |
+| `SPECIALIST_ROUTING_ENFORCEMENT` | warn    | warn/block/off | Controls Check 7 enforcement        |
 
 ## Appendix C: Hook Firing Matrix (After Fixes)
 
-| Tool | pre-tool-unified | routing-guard | creator-guard | pre-write-hook | pre-task-unified | Other |
-|------|:---:|:---:|:---:|:---:|:---:|-------|
-| Edit | Y | **Y (NEW)** | Y | Y | - | evolution hooks |
-| Write | Y | **Y (NEW)** | Y | Y | - | evolution hooks, conflict-detector |
-| NotebookEdit | Y | **Y (NEW)** | Y | Y | - | evolution hooks |
-| Bash | Y | Y | - | - | - | bash-validator, shell-injection, windows-null |
-| Glob | Y | Y | - | - | - | - |
-| Grep | Y | Y | - | - | - | - |
-| WebSearch | Y | Y | - | - | - | - |
-| Task | Y | - | - | - | Y | intent-match, spawn-assembler, config-validator, spawn-validator |
-| TaskCreate | Y | Y | - | - | - | - |
-| TaskList | Y | - | - | - | - | reflection-step0-guard |
-| TaskUpdate | Y | - | - | - | - | task-status, pre-completion, quality-gate |
-| Read | Y | - | - | - | - | validate-skill-invocation |
+| Tool         | pre-tool-unified | routing-guard | creator-guard | pre-write-hook | pre-task-unified | Other                                                            |
+| ------------ | :--------------: | :-----------: | :-----------: | :------------: | :--------------: | ---------------------------------------------------------------- |
+| Edit         |        Y         |  **Y (NEW)**  |       Y       |       Y        |        -         | evolution hooks                                                  |
+| Write        |        Y         |  **Y (NEW)**  |       Y       |       Y        |        -         | evolution hooks, conflict-detector                               |
+| NotebookEdit |        Y         |  **Y (NEW)**  |       Y       |       Y        |        -         | evolution hooks                                                  |
+| Bash         |        Y         |       Y       |       -       |       -        |        -         | bash-validator, shell-injection, windows-null                    |
+| Glob         |        Y         |       Y       |       -       |       -        |        -         | -                                                                |
+| Grep         |        Y         |       Y       |       -       |       -        |        -         | -                                                                |
+| WebSearch    |        Y         |       Y       |       -       |       -        |        -         | -                                                                |
+| Task         |        Y         |       -       |       -       |       -        |        Y         | intent-match, spawn-assembler, config-validator, spawn-validator |
+| TaskCreate   |        Y         |       Y       |       -       |       -        |        -         | -                                                                |
+| TaskList     |        Y         |       -       |       -       |       -        |        -         | reflection-step0-guard                                           |
+| TaskUpdate   |        Y         |       -       |       -       |       -        |        -         | task-status, pre-completion, quality-gate                        |
+| Read         |        Y         |       -       |       -       |       -        |        -         | validate-skill-invocation                                        |

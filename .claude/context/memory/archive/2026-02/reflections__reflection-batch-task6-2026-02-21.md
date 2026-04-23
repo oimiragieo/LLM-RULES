@@ -11,14 +11,14 @@
 
 ## Phase 0: Data Sufficiency Gate
 
-| Reflection ID | Data Quality | Summary Available |
-|---|---|---|
-| `task_completion:2026-02-21T00:33:40.930Z:task-2` | **FULL** | smart-debug skill correctly wired; missing CLAUDE.md ref and debugging.md cross-reference |
-| `task_completion:2026-02-21T00:38:05.799Z:3` | **INSUFFICIENT** | "Task 3 completed without summary metadata" |
-| `task_completion:2026-02-21T00:38:05.533Z:2` | **INSUFFICIENT** | "Task 2 completed without summary metadata" |
-| `task_completion:2026-02-21T00:38:29.044Z:1` | **INSUFFICIENT** | "Task 1 completed without summary metadata" |
-| `task_completion:2026-02-21T00:53:36.949Z:5` | **INSUFFICIENT** | "Task 5 completed without summary metadata" (PLANNER: 14-microtask plan for skill-registration + reflection improvement) |
-| `task_completion:2026-02-21T00:54:04.223Z:4` | **INSUFFICIENT** | "Task 4 completed without summary metadata" (reflection batch for audit session) |
+| Reflection ID                                     | Data Quality     | Summary Available                                                                                                        |
+| ------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `task_completion:2026-02-21T00:33:40.930Z:task-2` | **FULL**         | smart-debug skill correctly wired; missing CLAUDE.md ref and debugging.md cross-reference                                |
+| `task_completion:2026-02-21T00:38:05.799Z:3`      | **INSUFFICIENT** | "Task 3 completed without summary metadata"                                                                              |
+| `task_completion:2026-02-21T00:38:05.533Z:2`      | **INSUFFICIENT** | "Task 2 completed without summary metadata"                                                                              |
+| `task_completion:2026-02-21T00:38:29.044Z:1`      | **INSUFFICIENT** | "Task 1 completed without summary metadata"                                                                              |
+| `task_completion:2026-02-21T00:53:36.949Z:5`      | **INSUFFICIENT** | "Task 5 completed without summary metadata" (PLANNER: 14-microtask plan for skill-registration + reflection improvement) |
+| `task_completion:2026-02-21T00:54:04.223Z:4`      | **INSUFFICIENT** | "Task 4 completed without summary metadata" (reflection batch for audit session)                                         |
 
 **Note:** IDs 3, 2, 1, 5, 4 all have `context: null` in spawn-request.json. The system-level context (from the task prompt header) describes what tasks 5 and 4 were, but the actual TaskUpdate metadata was missing — fallback summary strings only.
 
@@ -31,16 +31,17 @@
 **Scoreable tasks:** 1 of 6 (task-2 only)
 
 **Score for task_completion:2026-02-21T00:33:40.930Z:task-2:**
+
 - **Output Type:** agent_output (skill audit / integration check)
 - **Data Quality:** full
 
-| Dimension | Score | Notes |
-|---|---|---|
-| Completeness | 0.80 | Smart-debug correctly wired (frontmatter, catalog, index, agent assignments). Missing CLAUDE.md ref and debugging.md cross-reference identified. |
-| Accuracy | 0.90 | Accurate gap identification: CLAUDE.md Section 8.5 absence confirmed, skill-index.json agentPrimary narrowing verified |
-| Clarity | 0.85 | Summary clearly describes what is correct vs what is missing |
-| Consistency | 0.85 | Follows audit pattern consistently |
-| Actionability | 0.80 | Gap list is actionable (specific files to update) |
+| Dimension     | Score | Notes                                                                                                                                            |
+| ------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Completeness  | 0.80  | Smart-debug correctly wired (frontmatter, catalog, index, agent assignments). Missing CLAUDE.md ref and debugging.md cross-reference identified. |
+| Accuracy      | 0.90  | Accurate gap identification: CLAUDE.md Section 8.5 absence confirmed, skill-index.json agentPrimary narrowing verified                           |
+| Clarity       | 0.85  | Summary clearly describes what is correct vs what is missing                                                                                     |
+| Consistency   | 0.85  | Follows audit pattern consistently                                                                                                               |
+| Actionability | 0.80  | Gap list is actionable (specific files to update)                                                                                                |
 
 **Overall Score (task-2):** 0.84 / 1.0 — PASS
 
@@ -90,11 +91,11 @@ Without cleanup, stale entries in reflection-spawn-request.json accumulate. 4 en
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|---|---|---|
-| reflection-cleanup-handshake-broken gotcha | **Retain** | P1 systemic issue, high reuse value, evidence quality strong (confirmed by cross-referencing reflection-log.jsonl line 14 vs spawn-request.json current state) |
-| issues.md P1 entry for cleanup hook | **Retain** | Investigation steps provided, concrete fix path documented |
-| Tasks 1-5 INSUFFICIENT data entries | **Archive** — do not persist in active memory | Zero signal for quality assessment; preserve in reflection-log only as audit trail |
+| Item                                       | Decision                                      | Rationale                                                                                                                                                      |
+| ------------------------------------------ | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| reflection-cleanup-handshake-broken gotcha | **Retain**                                    | P1 systemic issue, high reuse value, evidence quality strong (confirmed by cross-referencing reflection-log.jsonl line 14 vs spawn-request.json current state) |
+| issues.md P1 entry for cleanup hook        | **Retain**                                    | Investigation steps provided, concrete fix path documented                                                                                                     |
+| Tasks 1-5 INSUFFICIENT data entries        | **Archive** — do not persist in active memory | Zero signal for quality assessment; preserve in reflection-log only as audit trail                                                                             |
 
 ---
 

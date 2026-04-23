@@ -16,16 +16,19 @@
 **Archived Code:** 2 findings (excluded from remediation)
 
 **Severity Distribution:**
+
 - **ERROR (Critical/High):** 30 findings
 - **WARNING (Medium):** 25 findings
 
 **Key Risk Areas:**
+
 1. **JavaScript child_process usage (9 findings)** - Command injection risks
 2. **Python XML parsing (19 findings)** - XML External Entity (XXE) vulnerabilities
 3. **Python urllib usage (22 findings)** - SSRF and dynamic URL construction risks
 4. **Other (5 findings)** - Hash algorithm, pickle deserialization, nginx config
 
 **Disposition:**
+
 - **New Critical Findings:** 2 (not previously documented in issues.md)
 - **Cross-Referenced Findings:** Confirm existing SEC-LIB-001, SEC-TOOL-002
 - **Scientific Skills:** 46 findings in scientific-skills subdirectory (separate audit track)
@@ -45,8 +48,9 @@
 **File:** `.claude/hooks/validation/pre-completion-validation.cjs:95`
 
 **Code Context:**
+
 ```javascript
-execSync(`git diff --exit-code ${artifactPath}`)
+execSync(`git diff --exit-code ${artifactPath}`);
 ```
 
 **Risk:** `artifactPath` derived from function argument. If user-controllable or constructed from untrusted input, could enable command injection.
@@ -54,11 +58,13 @@ execSync(`git diff --exit-code ${artifactPath}`)
 **Cross-Reference:** **NEW FINDING** (not in issues.md)
 
 **Severity Assessment:**
+
 - **Exploitability:** Medium (depends on how `artifactPath` is derived)
 - **Impact:** High (arbitrary command execution in git hook context)
 - **Actual Risk:** Low (artifactPath comes from hookLogger internal sanitization)
 
 **Recommendation:**
+
 - Use `spawnSync` with array args instead of string interpolation
 - Validate `artifactPath` against PROJECT_ROOT (path traversal check)
 - Add to SEC-LIB command injection remediation (P1)
@@ -68,8 +74,9 @@ execSync(`git diff --exit-code ${artifactPath}`)
 **File:** `.claude/lib/memory/contextual-memory.cjs:645`
 
 **Code Context:**
+
 ```javascript
-execSync(`"${binPath}" --version`)
+execSync(`"${binPath}" --version`);
 ```
 
 **Risk:** `binPath` derived from function argument. Same command injection pattern.
@@ -77,11 +84,13 @@ execSync(`"${binPath}" --version`)
 **Cross-Reference:** **NEW FINDING** (not in issues.md)
 
 **Severity Assessment:**
+
 - **Exploitability:** Medium (depends on binPath source)
 - **Impact:** High (arbitrary command execution)
 - **Actual Risk:** Medium (binPath typically from package-manager detection)
 
 **Recommendation:**
+
 - Use `spawnSync([binPath, '--version'], { shell: false })`
 - Validate binPath is absolute and within expected locations
 - Add to SEC-LIB command injection remediation (P1)
@@ -91,8 +100,9 @@ execSync(`"${binPath}" --version`)
 **File:** `.claude/lib/workflow/run-workflow-tests.cjs:139`
 
 **Code Context:**
+
 ```javascript
-execSync(`node ${testPath}`)
+execSync(`node ${testPath}`);
 ```
 
 **Risk:** `testPath` derived from `suiteKey` function argument.
@@ -100,11 +110,13 @@ execSync(`node ${testPath}`)
 **Cross-Reference:** Partially covered by SEC-LIB-001 (hybrid-lazy-indexer.cjs), same pattern
 
 **Severity Assessment:**
+
 - **Exploitability:** Low (suiteKey from internal workflow test registry)
 - **Impact:** High (arbitrary command execution)
 - **Actual Risk:** Low (trusted input)
 
 **Recommendation:**
+
 - Use `spawnSync(['node', testPath], { shell: false })`
 - Validate testPath against PROJECT_ROOT
 - Include in SEC-LIB command injection sweep (P1)
@@ -112,6 +124,7 @@ execSync(`node ${testPath}`)
 #### 1.4-1.9 Remaining Command Injection Findings
 
 **Files (6 findings):**
+
 - `.claude/tools/cli/git-notes-verify.cjs` (2 findings)
 - `.claude/skills/skill-creator/scripts/convert.cjs` (2 findings)
 - `.claude/hooks/_archive/audit/git-notes-audit.cjs` (1 finding, ARCHIVED)
@@ -120,6 +133,7 @@ execSync(`node ${testPath}`)
 **Archived Files:** Not actionable (already archived, zero consumers)
 
 **Active Files (tools/cli, skills):**
+
 - Same pattern: `execSync` with string interpolation
 - Lower risk: internal tooling, not exposed to untrusted input
 - **Recommendation:** Include in P2 command injection hardening sweep
@@ -133,6 +147,7 @@ execSync(`node ${testPath}`)
 **Pattern:** Use of Python `xml.etree.ElementTree` without defusedxml library.
 
 **Affected Files:** All in `.claude/skills/scientific-skills/`:
+
 - `skills/document-skills/docx/ooxml/scripts/validation/redlining.py` (5 findings)
 - `skills/document-skills/pptx/ooxml/scripts/validation/redlining.py` (5 findings)
 - `skills/kegg-database/scripts/kegg_api.py` (uses `xml.dom.minidom`)
@@ -141,6 +156,7 @@ execSync(`node ${testPath}`)
 - `skills/citation-management/scripts/extract_metadata.py` (1 finding)
 
 **Risk:** XML External Entity (XXE) attacks can:
+
 - Read arbitrary files from the filesystem
 - Cause denial of service (XML bombs)
 - Perform SSRF attacks to internal network resources
@@ -148,12 +164,15 @@ execSync(`node ${testPath}`)
 **Cross-Reference:** **NEW FINDING** (scientific-skills not audited in previous security reviews)
 
 **Severity Assessment:**
+
 - **Exploitability:** High (if XML content from external sources like APIs)
 - **Impact:** High (file disclosure, DoS, SSRF)
 - **Actual Risk:** Medium-High (scientific skills fetch data from external APIs like KEGG, STRING, NCBI)
 
 **Recommendation:**
+
 1. **Immediate (P1):** Replace all `xml.etree.ElementTree` with `defusedxml.ElementTree`:
+
    ```python
    # OLD (vulnerable)
    import xml.etree.ElementTree as ET
@@ -181,6 +200,7 @@ execSync(`node ${testPath}`)
 **Affected Files:** Same scientific-skills files as XXE findings.
 
 **Risk:** Server-Side Request Forgery (SSRF) if URL construction uses untrusted input:
+
 - Access internal network resources (169.254.169.254 AWS metadata)
 - Port scanning internal infrastructure
 - Data exfiltration through DNS tunneling
@@ -188,11 +208,13 @@ execSync(`node ${testPath}`)
 **Cross-Reference:** Confirms **H-003: WebFetch/WebSearch SSRF** (issues.md, Pipeline #16)
 
 **Severity Assessment:**
+
 - **Exploitability:** Medium (depends on how URLs are constructed)
 - **Impact:** High (internal network exposure)
 - **Actual Risk:** Medium (most URLs use trusted API base URLs + validated query params)
 
 **Example Vulnerable Pattern:**
+
 ```python
 # KEGG API example
 base_url = "http://rest.kegg.jp/get/"
@@ -202,12 +224,14 @@ urllib.request.urlopen(url)
 ```
 
 **Recommendation:**
+
 1. **Validate URL construction:**
    - Use `urllib.parse.urljoin()` for safe URL joining
    - Validate gene_id/query params against allowlist patterns (alphanumeric + underscore)
    - Block private IP ranges: `10.x.x.x`, `172.16-31.x.x`, `192.168.x.x`, `127.x.x.x`, `169.254.x.x`
 
 2. **Add timeout and size limits:**
+
    ```python
    import socket
    socket.setdefaulttimeout(10)  # 10 second timeout
@@ -240,6 +264,7 @@ urllib.request.urlopen(url)
 **Context:** Need to inspect usage (likely for content hashing, not crypto).
 
 **Recommendation:**
+
 - If for file integrity: replace with SHA-256
 - If for non-crypto hashing: acceptable but document intent
 
@@ -254,6 +279,7 @@ urllib.request.urlopen(url)
 **Risk:** Pickle can execute arbitrary code during deserialization.
 
 **Recommendation:**
+
 - Use JSON for data serialization
 - If ML models require pickle: validate source trust, use `RestrictedUnpickler`
 
@@ -268,6 +294,7 @@ urllib.request.urlopen(url)
 **Risk:** `$http_host` and `$host` variables may contain attacker-controlled values from Host header.
 
 **Recommendation:**
+
 - Use explicitly configured host value instead of `$http_host`
 - Or validate against allowlist before use
 
@@ -373,6 +400,7 @@ urllib.request.urlopen(url)
 4. **Security Tests:** Attempt to exploit the fixed vulnerability (penetration testing)
 
 **Test Evidence Required:**
+
 - Pre-fix: Demonstrate vulnerability (e.g., XXE file read)
 - Post-fix: Confirm vulnerability is mitigated
 - Regression: Confirm functionality still works
@@ -392,11 +420,13 @@ urllib.request.urlopen(url)
 **Description:**
 
 Scientific skills use Python's native `xml.etree.ElementTree` without defusedxml protection. This creates XML External Entity (XXE) vulnerability allowing:
+
 - Arbitrary file read from filesystem
 - Denial of service (XML bombs)
 - SSRF attacks to internal network
 
 **Affected Files:**
+
 - `.claude/skills/scientific-skills/skills/document-skills/docx/ooxml/scripts/validation/redlining.py` (5 instances)
 - `.claude/skills/scientific-skills/skills/document-skills/pptx/ooxml/scripts/validation/redlining.py` (5 instances)
 - `.claude/skills/scientific-skills/skills/kegg-database/scripts/kegg_api.py`
@@ -451,6 +481,7 @@ Scientific skills use Python's native `xml.etree.ElementTree` without defusedxml
 ## Appendix A: Full Finding List
 
 **JavaScript Command Injection (9 findings):**
+
 1. `.claude/hooks/validation/pre-completion-validation.cjs:95` (ERROR)
 2. `.claude/lib/memory/contextual-memory.cjs:645` (ERROR)
 3. `.claude/lib/workflow/run-workflow-tests.cjs:139` (ERROR)
@@ -462,32 +493,31 @@ Scientific skills use Python's native `xml.etree.ElementTree` without defusedxml
 **Python XXE Vulnerabilities (19 findings):**
 8-13. `docx/ooxml/scripts/validation/redlining.py` (5 instances, ERROR)
 14-19. `pptx/ooxml/scripts/validation/redlining.py` (5 instances, ERROR)
-20-26. `kegg-database`, `string-database`, `gene-database` scripts (7 instances, ERROR)
-27. `citation-management/scripts/extract_metadata.py` (ERROR)
+20-26. `kegg-database`, `string-database`, `gene-database` scripts (7 instances, ERROR) 27. `citation-management/scripts/extract_metadata.py` (ERROR)
 
 **Python Dynamic urllib (22 findings):**
 28-49. Same files as XXE findings (WARNING)
 
-**Other (5 findings):**
-50. MD5 hash usage (WARNING)
-51. Pickle deserialization (WARNING)
-52. Nginx $http_host (WARNING)
+**Other (5 findings):** 50. MD5 hash usage (WARNING) 51. Pickle deserialization (WARNING) 52. Nginx $http_host (WARNING)
 
 ---
 
 ## Appendix B: Semgrep Command
 
 **Command used:**
+
 ```bash
 set PYTHONIOENCODING=utf-8 && semgrep scan --config "p/security-audit" --config "p/owasp-top-ten" .claude/ --json -o .claude/context/reports/security/semgrep-security-audit-2026-02-07.json
 ```
 
 **Additional scan (JavaScript-only):**
+
 ```bash
 set PYTHONIOENCODING=utf-8 && semgrep scan --config "p/javascript" --config "p/nodejs" .claude/ --json -o .claude/context/reports/security/semgrep-results-2026-02-07.json
 ```
 
 **Rulesets used:**
+
 - `p/javascript` (68 rules, 712 files)
 - `p/nodejs` (74 rules)
 - `p/security-audit` (194 Python rules, 15 multilang rules)
@@ -500,11 +530,13 @@ set PYTHONIOENCODING=utf-8 && semgrep scan --config "p/javascript" --config "p/n
 **Security Posture:** MODERATE with HIGH-priority gaps in scientific-skills subsystem.
 
 **Key Takeaways:**
+
 1. **Scientific Skills:** 41 findings (XXE + SSRF) require immediate remediation before external API usage
 2. **Command Injection:** 9 findings confirm SEC-LIB-001 is systemic across hooks/lib/tools
 3. **Cross-Reference:** Confirms H-003 (SSRF) from Pipeline #16, extends to Python urllib
 
 **Next Steps:**
+
 1. Update issues.md with 3 new findings (SEC-SKILL-001, SEC-HOOK-005, SEC-MEM-001)
 2. Create P1 remediation tasks (XXE, SSRF, command injection)
 3. Schedule security review for scientific-skills subsystem (not covered in Pipelines #11-16)

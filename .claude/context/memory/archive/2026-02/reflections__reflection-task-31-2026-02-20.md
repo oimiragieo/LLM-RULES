@@ -12,6 +12,7 @@
 ## Task Summary
 
 Task #31 completed two objectives:
+
 1. Added Write tool to the code-reviewer agent (code-reviewer.md tools array)
 2. Reverted a corrupt routing-table change that was introduced in an earlier task
 
@@ -19,14 +20,14 @@ Task #31 completed two objectives:
 
 ## Rubric Scores
 
-| Dimension     | Score | Notes                                           |
-| ------------- | ----- | ----------------------------------------------- |
-| Completeness  | 1.0   | Both objectives fully completed                |
-| Accuracy      | 0.95  | Correct syntax, valid agent definition format  |
-| Clarity       | 0.85  | Clear summary, could benefit from more detail  |
-| Consistency   | 0.95  | Follows framework conventions                  |
-| Actionability | 0.80  | Immediately usable, minor doc gaps             |
-| **Weighted**  | 0.91  | Strong delivery overall                        |
+| Dimension     | Score | Notes                                         |
+| ------------- | ----- | --------------------------------------------- |
+| Completeness  | 1.0   | Both objectives fully completed               |
+| Accuracy      | 0.95  | Correct syntax, valid agent definition format |
+| Clarity       | 0.85  | Clear summary, could benefit from more detail |
+| Consistency   | 0.95  | Follows framework conventions                 |
+| Actionability | 0.80  | Immediately usable, minor doc gaps            |
+| **Weighted**  | 0.91  | Strong delivery overall                       |
 
 ## RBT Diagnosis
 
@@ -56,6 +57,7 @@ Task #31 completed two objectives:
 ### Pattern: Agent Tool Scope Expansion
 
 When adding a new tool to an agent's tools array, three steps are required:
+
 1. Add tool to tools array in agent definition frontmatter
 2. Update agent role definition/prompt to include usage instructions for the new tool
 3. Verify downstream code paths actually invoke the new tool (avoid "phantom capability")
@@ -77,6 +79,7 @@ The routing-table change that was reverted was "corrupt" but the exact type of c
 **Artifact Analyzed**: agent:code-reviewer
 
 **Integration Status**: Good
+
 - ✅ Agent registered in `.claude/context/agent-registry.json`
 - ✅ Routing keywords present (review, pr)
 - ✅ CLAUDE.md references updated (verified in @AGENT_ROUTING_TABLE.md)
@@ -104,6 +107,7 @@ The routing-table change that was reverted was "corrupt" but the exact type of c
 ## Memory Updates
 
 **Learnings Updated**: `.claude/context/memory/learnings.md`
+
 - Added Task #31 entry documenting code-reviewer tool expansion pattern and gotcha about "phantom capability"
 
 **Gotchas Not Updated**: Routing-table corruption type remains undocumented (data insufficient)
@@ -126,6 +130,7 @@ The routing-table change that was reverted was "corrupt" but the exact type of c
 - Memory files updated
 
 **Next Actions**:
+
 - Verify code-reviewer.md Write tool usage (recommend grep check)
 - Document routing-table corruption pattern (recommend issues.md entry)
 - Consider regression testing for routing-table validation

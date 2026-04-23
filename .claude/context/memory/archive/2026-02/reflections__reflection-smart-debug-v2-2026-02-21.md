@@ -4,6 +4,7 @@
 
 **Date**: 2026-02-21
 **Processed Reflection IDs**:
+
 - task_completion:2026-02-20T23:54:02.389Z:1
 - task_completion:2026-02-20T23:59:04.548Z:2
 - task_completion:2026-02-21T00:06:39.638Z:3
@@ -14,13 +15,13 @@
 
 ## Phase 0: Data Sufficiency
 
-| Task | Data Quality | Score Decision |
-|------|-------------|----------------|
-| Task 1 | INSUFFICIENT (fallback string only) | WITHHELD |
-| Task 2 | FULL — core v2.0 implementation | Scored |
-| Task 3 | FULL — catalog + debugging integration | Scored |
-| Task 4 | FULL — HITL opt-in via env var | Scored |
-| Task 5 | FULL — env var wired in .env/.env.example | Scored |
+| Task   | Data Quality                              | Score Decision |
+| ------ | ----------------------------------------- | -------------- |
+| Task 1 | INSUFFICIENT (fallback string only)       | WITHHELD       |
+| Task 2 | FULL — core v2.0 implementation           | Scored         |
+| Task 3 | FULL — catalog + debugging integration    | Scored         |
+| Task 4 | FULL — HITL opt-in via env var            | Scored         |
+| Task 5 | FULL — env var wired in .env/.env.example | Scored         |
 
 **Note on Task 1**: Summary is the fallback string "Task 1 completed without summary metadata". Score withheld per Iron Law. This reflects the recurring missing-metadata pattern (gotcha: `missing-taskupdate-metadata-recurring`).
 
@@ -40,49 +41,49 @@ Confidence: HIGH (4/5 tasks have full metadata)
 
 ### Task 2 — smart-debug v2.0 Core Implementation
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.90 | All 7 v2.0 features delivered: hypothesis gate, session-scoped logs, HITL gate, log analysis gate, cleanup, Write/Edit tools, skill index regen |
-| Accuracy | 0.95 | SKILL.md matches described behavior; workflow is internally consistent |
-| Clarity | 0.85 | Cursor Debug Mode workflow is well-structured with clear section headers |
-| Consistency | 0.85 | Pattern aligns with existing debugging SKILL.md phase structure |
-| Actionability | 0.90 | Iron Law explicit, reproduction gate clearly conditioned on SMART_DEBUG_HITL |
+| Dimension     | Score | Notes                                                                                                                                           |
+| ------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.90  | All 7 v2.0 features delivered: hypothesis gate, session-scoped logs, HITL gate, log analysis gate, cleanup, Write/Edit tools, skill index regen |
+| Accuracy      | 0.95  | SKILL.md matches described behavior; workflow is internally consistent                                                                          |
+| Clarity       | 0.85  | Cursor Debug Mode workflow is well-structured with clear section headers                                                                        |
+| Consistency   | 0.85  | Pattern aligns with existing debugging SKILL.md phase structure                                                                                 |
+| Actionability | 0.90  | Iron Law explicit, reproduction gate clearly conditioned on SMART_DEBUG_HITL                                                                    |
 
 **Score: 0.90 (EXCELLENT)**
 
 ### Task 3 — Catalog + debugging SKILL.md Integration
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.85 | Catalog entry added, debugging SKILL.md updated with instrumentation gate and cleanup |
-| Accuracy | 0.90 | Cross-referencing confirmed (debugging SKILL.md Phase 4 Step 4 aligned with smart-debug cleanup) |
-| Clarity | 0.85 | Skill index regeneration explicitly noted |
-| Consistency | 0.85 | catalog entry format follows existing patterns |
-| Actionability | 0.80 | Skill index regeneration workaround documented (issues.md) |
+| Dimension     | Score | Notes                                                                                            |
+| ------------- | ----- | ------------------------------------------------------------------------------------------------ |
+| Completeness  | 0.85  | Catalog entry added, debugging SKILL.md updated with instrumentation gate and cleanup            |
+| Accuracy      | 0.90  | Cross-referencing confirmed (debugging SKILL.md Phase 4 Step 4 aligned with smart-debug cleanup) |
+| Clarity       | 0.85  | Skill index regeneration explicitly noted                                                        |
+| Consistency   | 0.85  | catalog entry format follows existing patterns                                                   |
+| Actionability | 0.80  | Skill index regeneration workaround documented (issues.md)                                       |
 
 **Score: 0.85 (PASS)**
 
 ### Task 4 — HITL Opt-in (SMART_DEBUG_HITL env var)
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.90 | Default changed to auto-reproduction; HITL fallback behavior still supported |
-| Accuracy | 0.90 | Configuration table accurate; fallback logic clearly described |
-| Clarity | 0.90 | Clear bifurcation: auto-reproduce → succeed (proceed) | fail (HITL fallback) |
-| Consistency | 0.85 | env var pattern follows existing framework conventions (other vars in Section 2 Feature Flags) |
-| Actionability | 0.85 | Concrete behavior change documented |
+| Dimension     | Score | Notes                                                                                          |
+| ------------- | ----- | ---------------------------------------------------------------------------------------------- | -------------------- |
+| Completeness  | 0.90  | Default changed to auto-reproduction; HITL fallback behavior still supported                   |
+| Accuracy      | 0.90  | Configuration table accurate; fallback logic clearly described                                 |
+| Clarity       | 0.90  | Clear bifurcation: auto-reproduce → succeed (proceed)                                          | fail (HITL fallback) |
+| Consistency   | 0.85  | env var pattern follows existing framework conventions (other vars in Section 2 Feature Flags) |
+| Actionability | 0.85  | Concrete behavior change documented                                                            |
 
 **Score: 0.88 (PASS)**
 
 ### Task 5 — .env + .env.example Wiring
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.85 | Both .env and .env.example updated |
-| Accuracy | 0.90 | Placed in Section 2 (Feature Flags) with descriptive comment |
-| Clarity | 0.80 | Minimal change; descriptive comment added |
-| Consistency | 0.90 | Section placement consistent with other feature flags |
-| Actionability | 0.85 | Env var discoverable for future operators |
+| Dimension     | Score | Notes                                                        |
+| ------------- | ----- | ------------------------------------------------------------ |
+| Completeness  | 0.85  | Both .env and .env.example updated                           |
+| Accuracy      | 0.90  | Placed in Section 2 (Feature Flags) with descriptive comment |
+| Clarity       | 0.80  | Minimal change; descriptive comment added                    |
+| Consistency   | 0.90  | Section placement consistent with other feature flags        |
+| Actionability | 0.85  | Env var discoverable for future operators                    |
 
 **Score: 0.86 (PASS)**
 
@@ -130,6 +131,7 @@ This prevents the common failure mode of adding broad logging "to see what's hap
 ### Learning 2: Opt-in HITL Pattern for Debugging Skills
 
 The SMART_DEBUG_HITL=false default (auto-reproduce first) is the correct pattern for AI debugging agents:
+
 - Auto-reproduction via tests/scripts works for most bugs (~80% of cases)
 - HITL fallback available when programmatic reproduction fails
 - Environment variable allows operators to force HITL mode when needed (UI-dependent bugs, hardware-specific issues)
@@ -141,6 +143,7 @@ This avoids blocking the agent on every debug session waiting for a human to rep
 ### Learning 3: Session-Scoped Debug Instrumentation
 
 Using `debug-{sessionId}.log` in `.claude/context/tmp/` for debug instrumentation is cleanly composable:
+
 - Session ID ties all log lines to one debugging session
 - Cleanup is deterministic: grep for session ID, delete one file
 - No contamination of other debug sessions or production logs
@@ -158,13 +161,13 @@ Long-term fix: auto-watch `.claude/skills/*/SKILL.md` frontmatter for changes, t
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
-| Hypothesis-driven debugging pattern | RETAIN | High reuse value, well-evidenced by v2.0 implementation |
-| Session-scoped log pattern | RETAIN | Specific enough to be actionable for future debugging sessions |
-| Opt-in HITL pattern | RETAIN | Architectural decision applicable to all human-gated skills |
-| Skill index regeneration issue | RETAIN (already in issues.md) | Recurring MEDIUM issue with documented workaround |
-| Task 1 missing metadata | COMPRESS | Already documented in gotchas.json; no new information |
+| Item                                | Decision                      | Rationale                                                      |
+| ----------------------------------- | ----------------------------- | -------------------------------------------------------------- |
+| Hypothesis-driven debugging pattern | RETAIN                        | High reuse value, well-evidenced by v2.0 implementation        |
+| Session-scoped log pattern          | RETAIN                        | Specific enough to be actionable for future debugging sessions |
+| Opt-in HITL pattern                 | RETAIN                        | Architectural decision applicable to all human-gated skills    |
+| Skill index regeneration issue      | RETAIN (already in issues.md) | Recurring MEDIUM issue with documented workaround              |
+| Task 1 missing metadata             | COMPRESS                      | Already documented in gotchas.json; no new information         |
 
 ---
 
@@ -174,6 +177,7 @@ Long-term fix: auto-watch `.claude/skills/*/SKILL.md` frontmatter for changes, t
 **Integration check**: Manual
 
 The smart-debug skill was updated (not created), so integration completeness focuses on the updated frontmatter:
+
 - Catalog entry: ADDED in Task 3 (skill catalog updated)
 - Frontmatter tools: Updated (Write, Edit added)
 - Skill index: Regenerated in Task 2

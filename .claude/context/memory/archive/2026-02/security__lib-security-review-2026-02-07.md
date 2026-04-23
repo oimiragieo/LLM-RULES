@@ -20,13 +20,13 @@ The lib subsystem demonstrates strong security practices in some areas (prototyp
 
 ## Executive Summary
 
-| Severity | Count | Status |
-|----------|-------|--------|
-| CRITICAL | 2     | Open   |
-| HIGH     | 5     | Open   |
-| MEDIUM   | 5     | Open   |
-| LOW      | 3     | Open   |
-| **Total** | **15** | |
+| Severity  | Count  | Status |
+| --------- | ------ | ------ |
+| CRITICAL  | 2      | Open   |
+| HIGH      | 5      | Open   |
+| MEDIUM    | 5      | Open   |
+| LOW       | 3      | Open   |
+| **Total** | **15** |        |
 
 ### Key Risk Areas
 
@@ -52,13 +52,15 @@ The lib subsystem demonstrates strong security practices in some areas (prototyp
 
 ```javascript
 const safeQuery = query.replace(/"/g, '\\"');
-const output = execSync(
-  `"${rgPath}" "${safeQuery}" ${args.join(' ')} "${this.projectRoot}"`,
-  { encoding: 'utf8', timeout: options.timeout || this.config.ripgrepTimeoutMs, maxBuffer: 10 * 1024 * 1024 }
-);
+const output = execSync(`"${rgPath}" "${safeQuery}" ${args.join(' ')} "${this.projectRoot}"`, {
+  encoding: 'utf8',
+  timeout: options.timeout || this.config.ripgrepTimeoutMs,
+  maxBuffer: 10 * 1024 * 1024,
+});
 ```
 
 **Vulnerability:** The `safeQuery` sanitization only escapes double quotes. It does NOT escape:
+
 - Shell metacharacters: `$()`, backticks, `|`, `&&`, `;`
 - Newlines: `\n`, `\r`
 - Null bytes: `\0`
@@ -72,6 +74,7 @@ Additional `execSync` calls in `getFileTree()` (line 406), `manualTree()` (line 
 **Impact:** Remote code execution on the host system. An attacker who can influence search queries (e.g., through crafted filenames, memory content, or API input) can execute arbitrary commands with the privileges of the Node.js process.
 
 **Remediation:**
+
 1. Use `spawnSync` with array arguments instead of `execSync` with string interpolation (as swarm-coordination.cjs already does correctly with `shell: false`)
 2. Sanitize `query` against all shell metacharacters, not just double quotes
 3. Validate `projectRoot` against a hardcoded allowlist or `PROJECT_ROOT` constant
@@ -106,6 +109,7 @@ The `command` parameter comes directly from `task.payload.command` in the schedu
 **Impact:** If an attacker can modify the scheduler store file (via file write, prototype pollution, or state tampering), they can execute arbitrary commands. Since the store is a JSON file on disk, any write access to the file grants code execution.
 
 **Remediation:**
+
 1. Implement a command allowlist (only permit known, safe commands)
 2. Use `spawnSync` with array arguments and `shell: false`
 3. Validate the command against a strict regex pattern
@@ -120,6 +124,7 @@ The `command` parameter comes directly from `task.payload.command` in the schedu
 #### SEC-LIB-003: Unsafe YAML Deserialization (5 modules)
 
 **Files:**
+
 - `C:\dev\projects\agent-studio\.claude\lib\utils\agent-config-reader.cjs` (line 113)
 - `C:\dev\projects\agent-studio\.claude\lib\utils\config-loader.cjs` (line 79)
 - `C:\dev\projects\agent-studio\.claude\lib\config\context-mode-loader.cjs` (line 54)
@@ -145,6 +150,7 @@ The `command` parameter comes directly from `task.payload.command` in the schedu
 **Prior Reference:** SEC-CTX-003 (Pipeline #12)
 
 **Description:** The `loadConstitutionContext()` function reads `constitution.md` and `behaviour.md` from `.claude/context/memory/` and injects their raw content into ALL agent spawn prompts via `appendConstitutionSection()`. There is:
+
 - NO integrity verification (no HMAC, no checksum)
 - NO content sanitization
 - NO validation of file contents
@@ -152,6 +158,7 @@ The `command` parameter comes directly from `task.payload.command` in the schedu
 **Impact:** An attacker who can modify these files (e.g., through a compromised agent writing to memory files, or through file system access) can inject arbitrary instructions into every spawned agent. This is a persistent prompt injection vector affecting ALL agents in the system.
 
 **Remediation:**
+
 1. Implement HMAC integrity verification for constitution.md and behaviour.md
 2. Add content sanitization to strip potentially harmful directives
 3. Implement file modification detection (hash comparison on load)
@@ -170,12 +177,13 @@ The `command` parameter comes directly from `task.payload.command` in the schedu
 
 ```javascript
 // When no schema matches:
-return JSON.parse(content);  // No Object.create(null), no key filtering
+return JSON.parse(content); // No Object.create(null), no key filtering
 ```
 
 **Impact:** Any caller that uses `safeJSONParse()` without specifying a valid schema name gets zero protection. This creates a false sense of security - callers believe they are using "safe" JSON parsing but receive none of the safety guarantees.
 
 **Remediation:**
+
 1. Default to `Object.create(null)` + deep copy even when no schema is provided
 2. Log a warning when fallback path is used
 3. Consider requiring a schema for all calls (throw error if no schema)
@@ -218,6 +226,7 @@ An absolute path bypasses the `projectRoot` containment entirely. A relative pat
 **Impact:** An attacker who can control the `filePath` parameter can read arbitrary files on the system, including sensitive files like `/etc/passwd`, environment files, or credential stores.
 
 **Remediation:**
+
 1. Use `path-validator.cjs` to validate the resolved path stays within `projectRoot`
 2. Reject absolute paths or validate they are within `projectRoot`
 3. Normalize the path and check for traversal sequences
@@ -245,6 +254,7 @@ For non-string values (numbers, booleans), the raw value is substituted directly
 **Impact:** If workflow context values are attacker-controllable, they can manipulate conditional routing decisions by injecting boolean operators or comparison expressions into the condition string.
 
 **Remediation:**
+
 1. Coerce all context values to string literals before substitution
 2. Or pass context values as a parameter map to the parser (avoid string substitution entirely)
 3. Validate context values against a strict type schema
@@ -286,6 +296,7 @@ For non-string values (numbers, booleans), the raw value is substituted directly
 **OWASP:** A08 (Software and Data Integrity)
 
 **Description:** Checkpoint state is serialized to gzipped JSON files and deserialized with `JSON.parse()` without:
+
 - HMAC integrity verification
 - Schema validation
 - Prototype pollution protection
@@ -294,7 +305,7 @@ For non-string values (numbers, booleans), the raw value is substituted directly
 function decompressState(compressed) {
   const buffer = zlib.gunzipSync(compressed);
   const json = buffer.toString('utf-8');
-  return JSON.parse(json);  // No integrity check, no safe parsing
+  return JSON.parse(json); // No integrity check, no safe parsing
 }
 ```
 
@@ -360,31 +371,31 @@ function decompressState(compressed) {
 
 ## STRIDE Threat Model Summary
 
-| Threat | Findings | Severity Range |
-|--------|----------|---------------|
-| **Spoofing** | SEC-LIB-004, SEC-LIB-014 | HIGH-LOW |
-| **Tampering** | SEC-LIB-001, SEC-LIB-002, SEC-LIB-003, SEC-LIB-005, SEC-LIB-006, SEC-LIB-008, SEC-LIB-011 | CRITICAL-MEDIUM |
-| **Repudiation** | No findings (logging is adequate) | N/A |
-| **Information Disclosure** | SEC-LIB-007, SEC-LIB-009 | HIGH-MEDIUM |
-| **Denial of Service** | No specific findings | N/A |
-| **Elevation of Privilege** | SEC-LIB-001, SEC-LIB-002, SEC-LIB-003, SEC-LIB-010 | CRITICAL-MEDIUM |
+| Threat                     | Findings                                                                                  | Severity Range  |
+| -------------------------- | ----------------------------------------------------------------------------------------- | --------------- |
+| **Spoofing**               | SEC-LIB-004, SEC-LIB-014                                                                  | HIGH-LOW        |
+| **Tampering**              | SEC-LIB-001, SEC-LIB-002, SEC-LIB-003, SEC-LIB-005, SEC-LIB-006, SEC-LIB-008, SEC-LIB-011 | CRITICAL-MEDIUM |
+| **Repudiation**            | No findings (logging is adequate)                                                         | N/A             |
+| **Information Disclosure** | SEC-LIB-007, SEC-LIB-009                                                                  | HIGH-MEDIUM     |
+| **Denial of Service**      | No specific findings                                                                      | N/A             |
+| **Elevation of Privilege** | SEC-LIB-001, SEC-LIB-002, SEC-LIB-003, SEC-LIB-010                                        | CRITICAL-MEDIUM |
 
 ---
 
 ## OWASP Top 10 Coverage
 
-| OWASP Category | Findings | Status |
-|----------------|----------|--------|
-| A01: Broken Access Control | SEC-LIB-007, SEC-LIB-009 | Gaps found |
-| A02: Cryptographic Failures | None | No crypto in scope |
-| A03: Injection | SEC-LIB-001, SEC-LIB-002, SEC-LIB-004, SEC-LIB-005, SEC-LIB-006, SEC-LIB-008 | Major gaps |
-| A04: Insecure Design | None | Adequate |
-| A05: Security Misconfiguration | SEC-LIB-010, SEC-LIB-015 | Minor gaps |
-| A06: Vulnerable Components | Not assessed (dependency audit out of scope) | N/A |
-| A07: Identification and Authentication Failures | SEC-LIB-014 | Minor gap |
-| A08: Software and Data Integrity | SEC-LIB-003, SEC-LIB-011, SEC-LIB-013 | Gaps found |
-| A09: Logging Failures | None | Adequate |
-| A10: SSRF | None | Not applicable |
+| OWASP Category                                  | Findings                                                                     | Status             |
+| ----------------------------------------------- | ---------------------------------------------------------------------------- | ------------------ |
+| A01: Broken Access Control                      | SEC-LIB-007, SEC-LIB-009                                                     | Gaps found         |
+| A02: Cryptographic Failures                     | None                                                                         | No crypto in scope |
+| A03: Injection                                  | SEC-LIB-001, SEC-LIB-002, SEC-LIB-004, SEC-LIB-005, SEC-LIB-006, SEC-LIB-008 | Major gaps         |
+| A04: Insecure Design                            | None                                                                         | Adequate           |
+| A05: Security Misconfiguration                  | SEC-LIB-010, SEC-LIB-015                                                     | Minor gaps         |
+| A06: Vulnerable Components                      | Not assessed (dependency audit out of scope)                                 | N/A                |
+| A07: Identification and Authentication Failures | SEC-LIB-014                                                                  | Minor gap          |
+| A08: Software and Data Integrity                | SEC-LIB-003, SEC-LIB-011, SEC-LIB-013                                        | Gaps found         |
+| A09: Logging Failures                           | None                                                                         | Adequate           |
+| A10: SSRF                                       | None                                                                         | Not applicable     |
 
 ---
 
@@ -417,13 +428,13 @@ function decompressState(compressed) {
 
 This review confirms findings from prior pipeline security assessments:
 
-| Prior Finding | Status in lib/ | This Review |
-|---------------|---------------|-------------|
-| SEC-TOOL-001 (eval in decision-handler) | FIXED (SafeExpressionParser) | SEC-LIB-008 (residual context injection) |
-| SEC-CTX-003 (memory file integrity) | OPEN | SEC-LIB-004 (confirmed, expanded scope) |
-| SEC-TMPL-001 (path traversal in prompts) | FIXED | SEC-LIB-007 (new path traversal in indexer) |
-| I-WF-001 (prompt injection via spawn) | OPEN | SEC-LIB-004, SEC-LIB-006 (confirmed) |
-| SEC-009 (command injection) | FIXED in swarm-coordination | SEC-LIB-001 (still open in hybrid-lazy-indexer) |
+| Prior Finding                            | Status in lib/               | This Review                                     |
+| ---------------------------------------- | ---------------------------- | ----------------------------------------------- |
+| SEC-TOOL-001 (eval in decision-handler)  | FIXED (SafeExpressionParser) | SEC-LIB-008 (residual context injection)        |
+| SEC-CTX-003 (memory file integrity)      | OPEN                         | SEC-LIB-004 (confirmed, expanded scope)         |
+| SEC-TMPL-001 (path traversal in prompts) | FIXED                        | SEC-LIB-007 (new path traversal in indexer)     |
+| I-WF-001 (prompt injection via spawn)    | OPEN                         | SEC-LIB-004, SEC-LIB-006 (confirmed)            |
+| SEC-009 (command injection)              | FIXED in swarm-coordination  | SEC-LIB-001 (still open in hybrid-lazy-indexer) |
 
 **Systemic Pattern:** Injection vulnerabilities (command injection, prompt injection, YAML deserialization) appear across multiple modules. The codebase lacks a centralized input sanitization utility that all modules can use consistently.
 
@@ -489,41 +500,41 @@ This review confirms findings from prior pipeline security assessments:
 
 ## Appendix A: Files Reviewed
 
-| File | Lines | Risk Level | Finding(s) |
-|------|-------|------------|------------|
-| `lib/utils/hook-input.cjs` | 494 | LOW | None (exemplary) |
-| `lib/utils/safe-json.cjs` | 282 | MEDIUM | SEC-LIB-005 |
-| `lib/utils/agent-config-reader.cjs` | 330 | HIGH | SEC-LIB-003 |
-| `lib/utils/path-validator.cjs` | 159 | MEDIUM | SEC-LIB-010 |
-| `lib/utils/config-loader.cjs` | ~100 | HIGH | SEC-LIB-003 |
-| `lib/workflow/decision-handler.mjs` | 428 | MEDIUM | SEC-LIB-008, SEC-LIB-009 |
-| `lib/workflow/checkpoint-manager.cjs` | ~220 | MEDIUM | SEC-LIB-011 |
-| `lib/routing/routing-table.cjs` | 2025 | LOW | None |
-| `lib/routing/router-state.cjs` | ~120 | LOW | None (exemplary) |
-| `lib/code-indexing/hybrid-lazy-indexer.cjs` | ~500 | CRITICAL | SEC-LIB-001, SEC-LIB-007 |
-| `lib/scheduler/scheduler-tick.cjs` | 69 | CRITICAL | SEC-LIB-002 |
-| `lib/coordination/swarm-coordination.cjs` | 296 | LOW | None (exemplary) |
-| `lib/memory/memory-manager.cjs` | ~500 | LOW | SEC-LIB-012 |
-| `lib/memory/memory-search.cjs` | 51 | LOW | None |
-| `lib/memory/run-extraction-pipeline.cjs` | ~80 | LOW | None |
-| `lib/config/context-mode-loader.cjs` | ~100 | HIGH | SEC-LIB-003 |
-| `lib/agents/agent-parser.cjs` | ~100 | HIGH | SEC-LIB-003 |
-| `lib/tools/agent-registry-generator.cjs` | ~250 | HIGH | SEC-LIB-003 |
-| `lib/ml/anomaly-detector.cjs` | ~120 | LOW | SEC-LIB-015 |
-| `lib/evolution-state-sync.cjs` | ~100 | LOW | SEC-LIB-013 |
-| `hooks/routing/spawn-prompt-assembler.cjs` | ~500 | HIGH | SEC-LIB-004, SEC-LIB-006, SEC-LIB-014 |
-| `lib/spawn/prompt-factory.cjs` | 102 | LOW | None (exemplary) |
-| `lib/spawn/prompt-assembler.cjs` | ~150 | LOW | None |
+| File                                        | Lines | Risk Level | Finding(s)                            |
+| ------------------------------------------- | ----- | ---------- | ------------------------------------- |
+| `lib/utils/hook-input.cjs`                  | 494   | LOW        | None (exemplary)                      |
+| `lib/utils/safe-json.cjs`                   | 282   | MEDIUM     | SEC-LIB-005                           |
+| `lib/utils/agent-config-reader.cjs`         | 330   | HIGH       | SEC-LIB-003                           |
+| `lib/utils/path-validator.cjs`              | 159   | MEDIUM     | SEC-LIB-010                           |
+| `lib/utils/config-loader.cjs`               | ~100  | HIGH       | SEC-LIB-003                           |
+| `lib/workflow/decision-handler.mjs`         | 428   | MEDIUM     | SEC-LIB-008, SEC-LIB-009              |
+| `lib/workflow/checkpoint-manager.cjs`       | ~220  | MEDIUM     | SEC-LIB-011                           |
+| `lib/routing/routing-table.cjs`             | 2025  | LOW        | None                                  |
+| `lib/routing/router-state.cjs`              | ~120  | LOW        | None (exemplary)                      |
+| `lib/code-indexing/hybrid-lazy-indexer.cjs` | ~500  | CRITICAL   | SEC-LIB-001, SEC-LIB-007              |
+| `lib/scheduler/scheduler-tick.cjs`          | 69    | CRITICAL   | SEC-LIB-002                           |
+| `lib/coordination/swarm-coordination.cjs`   | 296   | LOW        | None (exemplary)                      |
+| `lib/memory/memory-manager.cjs`             | ~500  | LOW        | SEC-LIB-012                           |
+| `lib/memory/memory-search.cjs`              | 51    | LOW        | None                                  |
+| `lib/memory/run-extraction-pipeline.cjs`    | ~80   | LOW        | None                                  |
+| `lib/config/context-mode-loader.cjs`        | ~100  | HIGH       | SEC-LIB-003                           |
+| `lib/agents/agent-parser.cjs`               | ~100  | HIGH       | SEC-LIB-003                           |
+| `lib/tools/agent-registry-generator.cjs`    | ~250  | HIGH       | SEC-LIB-003                           |
+| `lib/ml/anomaly-detector.cjs`               | ~120  | LOW        | SEC-LIB-015                           |
+| `lib/evolution-state-sync.cjs`              | ~100  | LOW        | SEC-LIB-013                           |
+| `hooks/routing/spawn-prompt-assembler.cjs`  | ~500  | HIGH       | SEC-LIB-004, SEC-LIB-006, SEC-LIB-014 |
+| `lib/spawn/prompt-factory.cjs`              | 102   | LOW        | None (exemplary)                      |
+| `lib/spawn/prompt-assembler.cjs`            | ~150  | LOW        | None                                  |
 
 ## Appendix B: Grep Scan Results
 
-| Pattern | Matches | Concern |
-|---------|---------|---------|
-| `eval\|new Function\|vm.run` | 0 real | No dynamic code execution (good) |
-| `execSync\|child_process` | 4 modules | SEC-LIB-001, SEC-LIB-002 |
-| `__proto__\|prototype\[\|constructor\[` | 3 modules | All protective (good) |
-| `yaml.load` (without safe schema) | 5 modules | SEC-LIB-003 |
-| `JSON.parse` (without safe wrapper) | Multiple | SEC-LIB-005, SEC-LIB-006 |
+| Pattern                                 | Matches   | Concern                          |
+| --------------------------------------- | --------- | -------------------------------- |
+| `eval\|new Function\|vm.run`            | 0 real    | No dynamic code execution (good) |
+| `execSync\|child_process`               | 4 modules | SEC-LIB-001, SEC-LIB-002         |
+| `__proto__\|prototype\[\|constructor\[` | 3 modules | All protective (good)            |
+| `yaml.load` (without safe schema)       | 5 modules | SEC-LIB-003                      |
+| `JSON.parse` (without safe wrapper)     | Multiple  | SEC-LIB-005, SEC-LIB-006         |
 
 ---
 

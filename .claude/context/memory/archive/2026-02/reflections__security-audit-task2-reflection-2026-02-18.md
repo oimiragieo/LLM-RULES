@@ -11,11 +11,11 @@
 
 ## Rubric Scores
 
-| Dimension         | Score | Evidence                                                                   |
-| ----------------- | ----- | -------------------------------------------------------------------------- |
-| **Completeness**  | 0.60  | Summary enumerated but lacks vulnerability descriptions or remediation     |
+| Dimension         | Score | Evidence                                                                  |
+| ----------------- | ----- | ------------------------------------------------------------------------- |
+| **Completeness**  | 0.60  | Summary enumerated but lacks vulnerability descriptions or remediation    |
 | **Accuracy**      | 0.75  | Standard severity classification (CRITICAL/HIGH/MEDIUM/LOW) appears valid |
-| **Clarity**       | 0.65  | Summary is clear but lacks actionable next steps                           |
+| **Clarity**       | 0.65  | Summary is clear but lacks actionable next steps                          |
 | **Consistency**   | 0.70  | Follows standard severity classification scheme                           |
 | **Actionability** | 0.55  | No prioritization guidance or remediation timelines provided              |
 
@@ -52,6 +52,7 @@
 **Finding**: Summary provides vulnerability counts but no detailed findings.
 
 **What's Missing**:
+
 - Affected components/modules (e.g., "SQL injection in user registration endpoint")
 - CWE/CVE identifiers for reference and vulnerability tracking
 - Exploit complexity assessment (easy/moderate/difficult)
@@ -61,6 +62,7 @@
 **Impact**: Remediation teams cannot prioritize or act without deeper analysis.
 
 **Recommendation**: Create detailed findings section:
+
 ```
 ### Finding #1: SQL Injection in User Registration (CRITICAL)
 - Component: src/routes/auth/register.js (line 45)
@@ -76,6 +78,7 @@
 **Finding**: No remediation roadmap or prioritization guidance.
 
 **What's Missing**:
+
 - SLA targets (when must each severity be fixed)
 - Prioritization matrix (which fixes are quick wins vs architectural changes)
 - Effort estimates per severity level
@@ -83,6 +86,7 @@
 - Blocking criteria (which findings block production deployment)
 
 **Recommendation**: Add remediation roadmap section:
+
 ```
 ### Remediation Roadmap
 
@@ -106,15 +110,18 @@
 **Status**: Unable to assess (data insufficient)
 
 **Reason**: No output artifact path provided in reflection trigger. If security audit report exists at `.claude/context/reports/security/`, integration score would depend on:
+
 - Report visibility (is it in catalog/registry?)
 - Agent assignment (which agents can discover this report?)
 - Routing references (CLAUDE.md, workflows, skills reference it?)
 
 **Estimated Impact**:
+
 - If report exists: integration score ~70-80% (report present but may lack routing references)
 - If report missing: integration score ~30% (critical gap — audit output is invisible)
 
 **Recommendation**: Ensure security audit outputs include:
+
 1. Provenance header: `<!-- Agent: security-architect | Task: #2 | Session: 2026-02-18 -->`
 2. Standard location: `.claude/context/reports/security/security-audit-2026-02-18.md`
 3. Routing reference in CLAUDE.md or workflow files
@@ -126,6 +133,7 @@
 **Observation**: Vulnerability counts (summary statistics) without detailed findings cannot drive remediation actions.
 
 **Why it matters**: Teams need specificity to:
+
 - Understand attack vectors and business impact
 - Estimate fix effort and complexity
 - Schedule work across sprints
@@ -138,6 +146,7 @@
 **Observation**: Audit output should generate TaskCreate entries for remediation tracking.
 
 **Why it matters**: Without task integration:
+
 - Findings may be forgotten or deprioritized
 - No visibility into remediation progress
 - No accountability for fix timelines

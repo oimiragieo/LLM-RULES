@@ -1,4 +1,5 @@
 # Security Audit Report - Agent Studio Framework
+
 **Date**: 2026-02-10
 **Scope**: `.claude/hooks/`, `.claude/lib/`, `.claude/tools/`, root config files
 **Focus**: Command Injection, Path Traversal, Input Validation, Secret Exposure, Unsafe Deserialization, Log Injection, Race Conditions
@@ -8,6 +9,7 @@
 ## Executive Summary
 
 Comprehensive security audit of the agent-studio framework identified **12 findings** across **7 security categories**:
+
 - **0 CRITICAL** vulnerabilities requiring immediate remediation
 - **3 HIGH** severity issues needing prompt attention
 - **6 MEDIUM** severity findings for near-term remediation
@@ -20,40 +22,42 @@ Comprehensive security audit of the agent-studio framework identified **12 findi
 ## Findings Summary
 
 ### CRITICAL Findings (0)
-*None identified*
+
+_None identified_
 
 ### HIGH Severity Findings (3)
 
-| ID | CWE | Category | File | Issue |
-|---|---|---|---|---|
-| H-01 | CWE-78 | Command Injection | `.claude/lib/utils/logical-unit-tracker.cjs` | Unsanitized commit hash in execSync |
-| H-02 | CWE-209 | Log Injection | `.claude/hooks/` (multiple) | 103 console.log/console.error instances |
-| H-03 | CWE-502 | Unsafe Deserialization | `.claude/hooks/`, `.claude/lib/` | 193 JSON.parse() instances without try/catch |
+| ID   | CWE     | Category               | File                                         | Issue                                        |
+| ---- | ------- | ---------------------- | -------------------------------------------- | -------------------------------------------- |
+| H-01 | CWE-78  | Command Injection      | `.claude/lib/utils/logical-unit-tracker.cjs` | Unsanitized commit hash in execSync          |
+| H-02 | CWE-209 | Log Injection          | `.claude/hooks/` (multiple)                  | 103 console.log/console.error instances      |
+| H-03 | CWE-502 | Unsafe Deserialization | `.claude/hooks/`, `.claude/lib/`             | 193 JSON.parse() instances without try/catch |
 
 ### MEDIUM Severity Findings (6)
 
-| ID | CWE | Category | File | Issue |
-|---|---|---|---|---|
-| M-01 | CWE-367 | Race Condition | `.claude/hooks/memory/sync-memory-index.cjs` | TOCTOU in file existence check |
-| M-02 | CWE-78 | Command Injection | `.claude/tools/cli/check-gpu.cjs` | execSync without input validation |
-| M-03 | CWE-116 | Log Injection | `.claude/hooks/routing/spawn-prompt-assembler.cjs` | Unsanitized user input in debug logs |
-| M-04 | CWE-200 | Information Disclosure | `.claude/hooks/routing/user-prompt-unified.cjs` | Verbose error messages expose system paths |
-| M-05 | CWE-326 | Weak Cryptography | Project-wide | No cryptographic hashing/encryption detected |
-| M-06 | CWE-22 | Path Traversal | `.claude/hooks/routing/pre-tool-unified.cjs` | Incomplete path normalization validation |
+| ID   | CWE     | Category               | File                                               | Issue                                        |
+| ---- | ------- | ---------------------- | -------------------------------------------------- | -------------------------------------------- |
+| M-01 | CWE-367 | Race Condition         | `.claude/hooks/memory/sync-memory-index.cjs`       | TOCTOU in file existence check               |
+| M-02 | CWE-78  | Command Injection      | `.claude/tools/cli/check-gpu.cjs`                  | execSync without input validation            |
+| M-03 | CWE-116 | Log Injection          | `.claude/hooks/routing/spawn-prompt-assembler.cjs` | Unsanitized user input in debug logs         |
+| M-04 | CWE-200 | Information Disclosure | `.claude/hooks/routing/user-prompt-unified.cjs`    | Verbose error messages expose system paths   |
+| M-05 | CWE-326 | Weak Cryptography      | Project-wide                                       | No cryptographic hashing/encryption detected |
+| M-06 | CWE-22  | Path Traversal         | `.claude/hooks/routing/pre-tool-unified.cjs`       | Incomplete path normalization validation     |
 
 ### LOW Severity Findings (3)
 
-| ID | CWE | Category | File | Issue |
-|---|---|---|---|---|
-| L-01 | CWE-311 | Missing Encryption | `.env.example` | No encryption for sensitive config values |
-| L-02 | CWE-807 | Untrusted Input | `.claude/hooks/validation/check-console-log.cjs` | Git command output not validated |
-| L-03 | CWE-400 | Resource Exhaustion | `.claude/hooks/memory/sync-memory-index.cjs` | Unbounded file write operations |
+| ID   | CWE     | Category            | File                                             | Issue                                     |
+| ---- | ------- | ------------------- | ------------------------------------------------ | ----------------------------------------- |
+| L-01 | CWE-311 | Missing Encryption  | `.env.example`                                   | No encryption for sensitive config values |
+| L-02 | CWE-807 | Untrusted Input     | `.claude/hooks/validation/check-console-log.cjs` | Git command output not validated          |
+| L-03 | CWE-400 | Resource Exhaustion | `.claude/hooks/memory/sync-memory-index.cjs`     | Unbounded file write operations           |
 
 ---
 
 ## Detailed Findings
 
 ### H-01: Command Injection via Unsanitized Git Commit Hash
+
 **Severity**: HIGH
 **CWE**: CWE-78 (Improper Neutralization of Special Elements in OS Command)
 **File**: `.claude/lib/utils/logical-unit-tracker.cjs`
@@ -74,11 +78,13 @@ execSync(`git notes add -f -m "${updatedNote}" ${commit.hash}`, { cwd: repoPath 
 ```
 
 **Attack Vector**:
+
 1. Attacker creates commit with hash-like string containing shell metacharacters
 2. Malicious hash passes through git log parsing
 3. execSync executes injected command
 
 **Remediation**:
+
 1. Validate commit hashes match regex `^[0-9a-f]{7,40}$` before use in execSync
 2. Use array-style arguments with `spawnSync()` instead of shell command strings
 3. Sanitize `updatedNote` content to escape double quotes and shell metacharacters
@@ -97,13 +103,14 @@ if (!isValidCommitHash(commit.hash)) {
 const { spawnSync } = require('child_process');
 spawnSync('git', ['revert', '--no-edit', commit.hash], {
   cwd: repoPath,
-  shell: false  // Prevents shell injection
+  shell: false, // Prevents shell injection
 });
 ```
 
 ---
 
 ### H-02: Log Injection via Uncontrolled Console Logging
+
 **Severity**: HIGH
 **CWE**: CWE-209 (Generation of Error Message Containing Sensitive Information), CWE-117 (Improper Output Neutralization for Logs)
 **File**: `.claude/hooks/` (multiple files)
@@ -113,17 +120,20 @@ spawnSync('git', ['revert', '--no-edit', commit.hash], {
 Extensive use of `console.log()` and `console.error()` without input sanitization throughout hooks and library modules enables log injection attacks and potential information disclosure.
 
 **Findings**:
+
 - **103 console.log/console.error instances** in safety and routing hooks
 - User-controlled data logged without sanitization
 - Logs may contain sensitive paths, API keys, or internal state
 - No log rotation or retention policies enforced
 
 **Attack Vector**:
+
 1. Attacker provides input containing newline characters and ANSI escape codes
 2. Malicious input written to console logs unsanitized
 3. Log injection allows log forgery, terminal manipulation, or information disclosure
 
 **Remediation**:
+
 1. Replace direct console.log/console.error with structured logging utility
 2. Sanitize all user input before logging (remove newlines, control characters)
 3. Use audit logging utility `auditLog()` from `hook-input.cjs` which includes sanitization
@@ -138,7 +148,7 @@ console.error('User input:', userInput);
 
 // Use:
 auditLog('info', 'User input received', {
-  sanitizedInput: sanitizeForLogging(userInput)
+  sanitizedInput: sanitizeForLogging(userInput),
 });
 
 function sanitizeForLogging(input) {
@@ -151,6 +161,7 @@ function sanitizeForLogging(input) {
 ---
 
 ### H-03: Unsafe JSON Deserialization Without Error Handling
+
 **Severity**: HIGH
 **CWE**: CWE-502 (Deserialization of Untrusted Data)
 **File**: `.claude/hooks/`, `.claude/lib/` (multiple files)
@@ -160,17 +171,20 @@ function sanitizeForLogging(input) {
 Widespread use of `JSON.parse()` without try/catch error handling creates denial-of-service and crash vectors. Malformed JSON from external sources (hook input, file reads, process output) can crash hooks or agents.
 
 **Findings**:
+
 - **193 JSON.parse() calls** detected across hooks and library modules
 - Many parsing untrusted hook input without validation
 - No schema validation before deserialization
 - Crashes could bypass security hooks (fail-open scenario)
 
 **Attack Vector**:
+
 1. Attacker provides malformed JSON in hook input or file writes
 2. JSON.parse() throws exception
 3. Hook crashes, potentially bypassing security validation
 
 **Examples**:
+
 ```javascript
 // Unsafe pattern found in multiple files:
 const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -180,6 +194,7 @@ const hookInput = JSON.parse(stdin);
 ```
 
 **Remediation**:
+
 1. Wrap ALL JSON.parse() calls in try/catch blocks
 2. Implement safe JSON parsing utility with schema validation
 3. Use JSON Schema validation (Ajv) for hook input deserialization
@@ -219,6 +234,7 @@ if (!result.success) {
 ---
 
 ### M-01: Time-of-Check Time-of-Use (TOCTOU) Race Condition
+
 **Severity**: MEDIUM
 **CWE**: CWE-367 (Time-of-check Time-of-use Race Condition)
 **File**: `.claude/hooks/memory/sync-memory-index.cjs`
@@ -229,26 +245,31 @@ The `sync-memory-index.cjs` hook checks file existence before spawning a backgro
 
 ```javascript
 // Line 189-195
-if (fs.existsSync(absPath)) {  // TIME-OF-CHECK
+if (fs.existsSync(absPath)) {
+  // TIME-OF-CHECK
   const { spawn } = require('child_process');
-  const child = spawn(process.execPath, [generatorPath, '--file', absPath], {  // TIME-OF-USE
+  const child = spawn(process.execPath, [generatorPath, '--file', absPath], {
+    // TIME-OF-USE
     detached: true,
-    stdio: 'ignore'
+    stdio: 'ignore',
   });
 }
 ```
 
 **Attack Vector**:
+
 1. Attacker triggers file write hook with valid file
 2. Hook performs existsSync() check (file exists)
 3. Attacker deletes/replaces file in race window
 4. spawn() executes with deleted/malicious file path
 
 **Impact**:
+
 - Background indexer crashes on missing file (DoS)
 - Indexer processes malicious file if replaced (code execution)
 
 **Remediation**:
+
 1. Pass file descriptor instead of path to spawned process
 2. Use atomic file operations (open with O_CREAT | O_EXCL)
 3. Add file modification time check before and after spawn
@@ -265,7 +286,7 @@ try {
   // Pass FD to child process instead of path
   const child = spawn(process.execPath, [generatorPath, '--fd', fd.toString()], {
     detached: true,
-    stdio: ['ignore', 'ignore', 'ignore', fd]
+    stdio: ['ignore', 'ignore', 'ignore', fd],
   });
 
   // Close FD after child inherits it
@@ -278,6 +299,7 @@ try {
 ---
 
 ### M-02: Command Injection in GPU Check Tool
+
 **Severity**: MEDIUM
 **CWE**: CWE-78 (OS Command Injection)
 **File**: `.claude/tools/cli/check-gpu.cjs`
@@ -288,18 +310,23 @@ The `check-gpu.cjs` tool uses `execSync()` to execute system commands without va
 
 ```javascript
 // Line 24 - nvidia-smi execution
-const output = execSync('nvidia-smi --query-gpu=... --format=csv', { encoding: 'utf-8', stdio: 'pipe' });
+const output = execSync('nvidia-smi --query-gpu=... --format=csv', {
+  encoding: 'utf-8',
+  stdio: 'pipe',
+});
 
 // Line 123 - nvcc version check
 const nvccOutput = execSync('nvcc --version', { encoding: 'utf-8', stdio: 'pipe' });
 ```
 
 **Attack Vector**:
+
 1. Attacker sets malicious PATH environment variable
 2. `execSync()` resolves `nvidia-smi` or `nvcc` to attacker-controlled binary
 3. Malicious binary executes with framework privileges
 
 **Remediation**:
+
 1. Use absolute paths to system binaries (`/usr/bin/nvidia-smi`)
 2. Validate PATH environment variable before execSync
 3. Use spawn with shell:false to prevent shell expansion
@@ -314,18 +341,20 @@ if (!fs.existsSync(nvidiaSmiBin)) {
   throw new Error('nvidia-smi not found at expected path');
 }
 
-const result = spawnSync(nvidiaSmiBin, [
-  '--query-gpu=name,memory.total,memory.used',
-  '--format=csv,noheader,nounits'
-], {
-  encoding: 'utf-8',
-  shell: false  // Prevent shell injection
-});
+const result = spawnSync(
+  nvidiaSmiBin,
+  ['--query-gpu=name,memory.total,memory.used', '--format=csv,noheader,nounits'],
+  {
+    encoding: 'utf-8',
+    shell: false, // Prevent shell injection
+  }
+);
 ```
 
 ---
 
 ### M-03: Log Injection in Spawn Prompt Assembler
+
 **Severity**: MEDIUM
 **CWE**: CWE-116 (Improper Encoding or Escaping of Output)
 **File**: `.claude/hooks/routing/spawn-prompt-assembler.cjs`
@@ -343,11 +372,13 @@ debugLog('spawn-prompt-assembler', 'Memory query retrieval failed (ignored)', qu
 ```
 
 **Attack Vector**:
+
 1. Attacker crafts input to trigger controlled error messages
 2. Error message contains newline characters or ANSI escape codes
 3. Log injection allows log forgery or terminal manipulation
 
 **Remediation**:
+
 1. Sanitize error messages before logging
 2. Use structured logging with separate error field
 3. Redact system paths from error messages
@@ -358,7 +389,7 @@ function sanitizeErrorForLog(err) {
   const message = err.message || String(err);
   return {
     message: message.replace(/[\n\r\t\x00-\x1f]/g, ''),
-    stack: err.stack ? 'REDACTED' : undefined
+    stack: err.stack ? 'REDACTED' : undefined,
   };
 }
 
@@ -368,6 +399,7 @@ debugLog('spawn-prompt-assembler', 'Memory query failed', sanitizeErrorForLog(qu
 ---
 
 ### M-04: Information Disclosure in Error Messages
+
 **Severity**: MEDIUM
 **CWE**: CWE-200 (Exposure of Sensitive Information)
 **File**: `.claude/hooks/routing/user-prompt-unified.cjs`
@@ -377,11 +409,13 @@ debugLog('spawn-prompt-assembler', 'Memory query failed', sanitizeErrorForLog(qu
 Verbose error messages in routing hooks expose internal system paths, module names, and stack traces which could aid attackers in reconnaissance.
 
 **Attack Vector**:
+
 1. Attacker triggers error conditions in hooks
 2. Error messages reveal absolute paths, module structures
 3. Information used to craft targeted attacks
 
 **Remediation**:
+
 1. Use generic error messages for external-facing errors
 2. Log detailed errors internally but return sanitized messages
 3. Redact system paths from user-visible errors
@@ -395,7 +429,7 @@ try {
   auditLog('error', 'Hook execution failed', {
     error: err.message,
     stack: err.stack,
-    file: __filename
+    file: __filename,
   });
 
   // External error message (sanitized)
@@ -407,6 +441,7 @@ try {
 ---
 
 ### M-05: No Cryptographic Hashing or Encryption Detected
+
 **Severity**: MEDIUM
 **CWE**: CWE-326 (Inadequate Encryption Strength)
 **Scope**: Project-wide
@@ -415,17 +450,20 @@ try {
 No cryptographic operations detected across hooks, library modules, or tools. Framework appears to handle sensitive data (spawn requests, memory indices, task metadata) without encryption at rest or cryptographic integrity verification.
 
 **Findings**:
+
 - No use of `crypto.createHash()`, `crypto.createCipher()`, or equivalent
 - Sensitive files (spawn-log.jsonl, reflection-spawn-request.json) stored in plaintext
 - No HMAC or signature verification on inter-process messages
 - Memory database (SQLite) not encrypted
 
 **Risk**:
+
 - Sensitive data at rest (spawn requests, memory indices) readable by unauthorized processes
 - Inter-process hook communication lacks integrity verification
 - Logs could be tampered without detection
 
 **Remediation**:
+
 1. Encrypt sensitive files at rest using AES-256-GCM
 2. Implement HMAC signatures for hook input/output
 3. Use SQLite encryption extension (SQLCipher) for memory database
@@ -448,7 +486,7 @@ function encryptSensitiveData(plaintext, key) {
   return {
     encrypted,
     iv: iv.toString('hex'),
-    authTag
+    authTag,
   };
 }
 
@@ -463,6 +501,7 @@ function signHookMessage(message, secret) {
 ---
 
 ### M-06: Incomplete Path Traversal Validation
+
 **Severity**: MEDIUM
 **CWE**: CWE-22 (Path Traversal)
 **File**: `.claude/hooks/routing/pre-tool-unified.cjs`
@@ -472,12 +511,14 @@ function signHookMessage(message, secret) {
 The `pre-tool-unified.cjs` hook performs path normalization and validation but may not catch all path traversal vectors, particularly those using Windows path conventions or URL-encoded directory traversal.
 
 **Potential Bypass Vectors**:
+
 - URL-encoded traversal: `..%2F..%2F..%2Fetc%2Fpasswd`
 - Double-encoded: `%252e%252e%252f`
 - Windows UNC paths: `\\server\share\..\..`
 - Backslash normalization order (if done after validation)
 
 **Current Protection**:
+
 ```javascript
 // Existing validation (needs enhancement)
 const normalized = path.normalize(filePath);
@@ -487,6 +528,7 @@ if (normalized.includes('..')) {
 ```
 
 **Remediation**:
+
 1. Decode URL-encoded paths before validation
 2. Normalize both forward and backward slashes
 3. Use path.resolve() and verify result is within allowed directory
@@ -509,7 +551,7 @@ function validatePath(filePath, allowedBase) {
   if (!resolved.startsWith(base + path.sep)) {
     return {
       allowed: false,
-      reason: `Path outside allowed directory: ${base}`
+      reason: `Path outside allowed directory: ${base}`,
     };
   }
 
@@ -520,6 +562,7 @@ function validatePath(filePath, allowedBase) {
 ---
 
 ### L-01: No Encryption for Sensitive Configuration
+
 **Severity**: LOW
 **CWE**: CWE-311 (Missing Encryption of Sensitive Data)
 **File**: `.env.example`
@@ -528,6 +571,7 @@ function validatePath(filePath, allowedBase) {
 The `.env.example` file templates environment variables without recommending encryption for sensitive values. Framework lacks guidance on secret management.
 
 **Recommendation**:
+
 1. Add documentation for using encrypted environment variables
 2. Recommend secret management tools (HashiCorp Vault, AWS Secrets Manager)
 3. Provide example integration with encrypted secret stores
@@ -535,6 +579,7 @@ The `.env.example` file templates environment variables without recommending enc
 ---
 
 ### L-02: Untrusted Git Command Output
+
 **Severity**: LOW
 **CWE**: CWE-807 (Reliance on Untrusted Inputs in Security Decision)
 **File**: `.claude/hooks/validation/check-console-log.cjs`
@@ -557,6 +602,7 @@ Validate git command output format before processing.
 ---
 
 ### L-03: Unbounded File Write Operations
+
 **Severity**: LOW
 **CWE**: CWE-400 (Uncontrolled Resource Consumption)
 **File**: `.claude/hooks/memory/sync-memory-index.cjs`
@@ -565,6 +611,7 @@ Validate git command output format before processing.
 Memory indexing hook writes to database without size limits, creating potential for resource exhaustion via large file ingestion.
 
 **Remediation**:
+
 1. Implement file size limits before indexing
 2. Use streaming writes instead of loading entire file
 3. Add rate limiting for index operations
@@ -580,12 +627,14 @@ The audit identified several **strong security practices** already implemented:
 **Files**: `.claude/hooks/safety/bash-command-validator.cjs`, `.claude/hooks/safety/shell-injection-validator.cjs`
 
 **Strengths**:
+
 - **Multi-layered validation**: bash-command-validator.cjs validates against registry of dangerous patterns
 - **Shell injection prevention**: shell-injection-validator.cjs blocks command chaining, substitution, eval, dangerous targets
 - **Fail-closed by default**: Exits with code 2 on errors (SEC-008 compliance)
 - **Configurable enforcement**: SHELL_INJECTION_VALIDATOR environment variable allows warn/block/off modes
 
 **Pattern Coverage**:
+
 ```javascript
 // Blocked patterns include:
 - Chained commands: "; rm -rf /", "&& malicious", "| dangerous"
@@ -603,18 +652,20 @@ The audit identified several **strong security practices** already implemented:
 **Files**: `.claude/hooks/routing/unified-creator-guard.cjs`
 
 **Strengths**:
+
 - **Creator workflow enforcement**: Prevents direct writes to artifact paths without invoking proper workflow
 - **Fail-closed design**: SEC-008 compliance with exit code 2 on errors
 - **Configuration-driven**: CREATOR_CONFIGS array maps patterns to required creators
 - **Critical infrastructure protection**: Protects settings.json, agent-registry.json as Step 1 security fixes
 
 **Protected Artifact Types**:
+
 1. Skills (SKILL.md files)
-2. Agents (*.md in core/domain/specialized/orchestrators)
-3. Hooks (*.cjs in routing/safety/memory/evolution)
-4. Workflows (*.md in core/enterprise/operations)
+2. Agents (\*.md in core/domain/specialized/orchestrators)
+3. Hooks (\*.cjs in routing/safety/memory/evolution)
+4. Workflows (\*.md in core/enterprise/operations)
 5. Templates (all template files)
-6. Schemas (*.schema.json files)
+6. Schemas (\*.schema.json files)
 7. Config files (settings.json, agent-registry.json)
 
 **Recommendation**: ✅ MAINTAIN this control. Addresses finding M-06 for creator artifacts.
@@ -626,6 +677,7 @@ The audit identified several **strong security practices** already implemented:
 **Files**: `.claude/lib/utils/hook-input.cjs`
 
 **Strengths**:
+
 - **PERF-006 compliance**: Shared utility eliminates code duplication
 - **Sanitization utilities**: `auditLog()` provides structured, sanitized logging
 - **Audit trail**: `auditSecurityOverride()` logs enforcement mode changes
@@ -640,6 +692,7 @@ The audit identified several **strong security practices** already implemented:
 **Files**: `.claude/hooks/safety/validators/registry.cjs`, `.claude/hooks/safety/validators/*-validators.cjs`
 
 **Strengths**:
+
 - **Modular validators**: Separate validators for database, filesystem, git, network, process, shell
 - **Maintainable**: Registry pattern allows adding/removing validators without hook changes
 - **Domain-specific**: Each validator file handles one domain (database, network, etc.)
@@ -654,6 +707,7 @@ The audit identified several **strong security practices** already implemented:
 **Files**: `.claude/lib/events/event-bus.cjs`, `.claude/lib/events/event-types.cjs`
 
 **Strengths**:
+
 - **Centralized audit trail**: EventBus provides publish/subscribe for security events
 - **Graceful degradation**: Hooks continue if EventBus unavailable
 - **Structured events**: EventTypes enumeration defines event schemas
@@ -691,13 +745,13 @@ The audit identified several **strong security practices** already implemented:
 
 ### OWASP Top 10 (2021) Coverage
 
-| OWASP Category | Finding | Status |
-|---|---|---|
-| A03: Injection | H-01 (Command Injection), M-02 (GPU Tool) | ⚠️ Partial - needs remediation |
-| A04: Insecure Design | None | ✅ PASS - defense-in-depth design |
-| A05: Security Misconfiguration | L-01 (No encryption docs) | ⚠️ Partial - needs documentation |
+| OWASP Category                   | Finding                                             | Status                              |
+| -------------------------------- | --------------------------------------------------- | ----------------------------------- |
+| A03: Injection                   | H-01 (Command Injection), M-02 (GPU Tool)           | ⚠️ Partial - needs remediation      |
+| A04: Insecure Design             | None                                                | ✅ PASS - defense-in-depth design   |
+| A05: Security Misconfiguration   | L-01 (No encryption docs)                           | ⚠️ Partial - needs documentation    |
 | A08: Software and Data Integrity | H-03 (Unsafe Deserialization), M-05 (No encryption) | ⚠️ Partial - needs integrity checks |
-| A09: Security Logging Failures | H-02 (Log Injection), M-03 (Assembler logs) | ⚠️ Partial - needs sanitization |
+| A09: Security Logging Failures   | H-02 (Log Injection), M-03 (Assembler logs)         | ⚠️ Partial - needs sanitization     |
 
 ### CWE Coverage
 
@@ -741,6 +795,7 @@ The audit identified several **strong security practices** already implemented:
 The agent-studio framework demonstrates **strong security fundamentals** with mature validation hooks, defense-in-depth controls, and fail-closed design. The identified vulnerabilities are **primarily hardening opportunities** rather than critical exploits.
 
 **Key Security Strengths**:
+
 1. Robust shell injection prevention (bash-command-validator, shell-injection-validator)
 2. Comprehensive path validation (unified-creator-guard)
 3. Modular validation registry pattern
@@ -748,6 +803,7 @@ The agent-studio framework demonstrates **strong security fundamentals** with ma
 5. Event-driven audit trail (EventBus)
 
 **Priority Remediation**:
+
 1. **HIGH**: Add commit hash validation, safe JSON parsing, log sanitization
 2. **MEDIUM**: Fix TOCTOU race, enhance path traversal validation, add encryption
 3. **LOW**: Document secret management, validate git output, add resource limits

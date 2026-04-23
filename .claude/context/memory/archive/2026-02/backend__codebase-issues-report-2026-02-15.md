@@ -7,6 +7,7 @@
 Comprehensive analysis of the agent-studio codebase identified **6 CRITICAL**, **12 HIGH**, **8 MEDIUM**, and **5 LOW** severity issues across hooks, libraries, and tools. The primary concern is widespread unsafe JSON parsing without try-catch blocks, which could crash hooks and cause cascading failures. Secondary concerns include missing null/undefined checks and potential race conditions in file operations.
 
 **Key Risk Areas:**
+
 - JSON parsing crashes (31 instances without proper error handling)
 - Missing boundary checks on string operations
 - Race conditions in atomic write operations
@@ -17,13 +18,16 @@ Comprehensive analysis of the agent-studio codebase identified **6 CRITICAL**, *
 ## Critical Issues (Must Fix)
 
 ### CRITICAL-001: Unsafe JSON.parse in Memory Extraction Pipeline
+
 **File:** `.claude/lib/memory/memory-extractor.cjs:68`
 **Issue:** Unprotected JSON.parse in caller processing untrusted session data
 **Impact:** Hook crash if memory extraction encounters malformed JSON
 **Severity:** CRITICAL
 
 ### CRITICAL-002: Unprotected JSON.parse in 31+ Files
-**Files:** 
+
+**Files:**
+
 - `.claude/lib/agents/agent-config.cjs:22`
 - `.claude/lib/config/resolve-runtime-context.cjs:15`
 - `.claude/lib/code-indexing/embedding-generator.cjs:359`
@@ -42,6 +46,7 @@ Comprehensive analysis of the agent-studio codebase identified **6 CRITICAL**, *
 **Severity:** CRITICAL
 
 **Fix:** Use safeParseJSON utility:
+
 ```javascript
 const { success, data } = safeParseJSON(jsonString, defaultValue);
 if (!success) {
@@ -51,6 +56,7 @@ if (!success) {
 ```
 
 ### CRITICAL-003: Unsafe String Split on User-Controlled Data
+
 **File:** `.claude/lib/code-indexing/gpu-detector.cjs:39`
 **Issue:** No check if array has elements before accessing [0]
 **Code:** `const parts = lines[0].split(',');` - crashes if lines[0] undefined
@@ -58,9 +64,11 @@ if (!success) {
 **Severity:** CRITICAL
 
 ### CRITICAL-004: Race Condition in Atomic Write (Windows)
+
 **File:** `.claude/lib/utils/atomic-write.cjs:65-84`
 **Issue:** CPU-spinning busy-wait loop blocks event loop
-**Code:** 
+**Code:**
+
 ```javascript
 function sleep(ms) {
   while (Date.now() - start < ms) {
@@ -68,16 +76,19 @@ function sleep(ms) {
   }
 }
 ```
+
 **Impact:** Causes 100% CPU during file writes, potential deadlock
 **Severity:** CRITICAL
 
 ### CRITICAL-005: Missing Null Check in Evolution State Sync
+
 **File:** `.claude/lib/evolution-state-sync.cjs:124`
 **Issue:** JSON.parse on potentially empty file content
 **Impact:** Silent failure, returns defaults, state lost
 **Severity:** CRITICAL
 
 ### CRITICAL-006: Index Out of Bounds in Result Processing
+
 **File:** `.claude/lib/code-indexing/hybrid-lazy-indexer-methods-b.cjs:315`
 **Issue:** Destructuring split without checking array length
 **Code:** `const [file, num, ...rest] = line.split(':');` - num undefined if < 2 colons
@@ -89,10 +100,12 @@ function sleep(ms) {
 ## High Severity Issues (12 Found)
 
 ### HIGH-001: Unhandled Empty Array Access
+
 **File:** `.claude/lib/code-indexing/hybrid-lazy-indexer-methods-b.cjs:276`
 **Issue:** `.pop()` on split result without checking if array is empty
 
 ### HIGH-002-007: Similar JSON.parse Issues in Multiple Files
+
 - Event bus integration gaps
 - Regex injection in ast-grep wrapper
 - Missing validation in BM25 indexer
@@ -101,6 +114,7 @@ function sleep(ms) {
 - Silent error swallowing patterns
 
 ### HIGH-008-012: Additional Safety Issues
+
 - Missing bounds checks in TDD check
 - Silent failures in memory loading
 - Unvalidated path operations
@@ -111,14 +125,17 @@ function sleep(ms) {
 ## Medium Severity Issues (8 Found)
 
 ### MEDIUM-001: Missing Input Validation in Memory Extraction
+
 **File:** `.claude/lib/memory/memory-extractor.cjs:39-56`
 **Issue:** No array type checks before slice/join operations
 
 ### MEDIUM-002: Duplicate Module Checks
+
 **File:** Multiple locations
 **Issue:** Hook input parsing logic duplicated across files
 
 ### MEDIUM-003-008: Additional Issues
+
 - Missing bounds check in unified pre-write hook
 - Silent error swallowing in atomic write
 - Inconsistent error handling patterns
@@ -137,12 +154,12 @@ function sleep(ms) {
 
 ## Summary by Severity
 
-| Severity | Count | Status |
-|----------|-------|--------|
-| CRITICAL | 6 | Must fix immediately |
-| HIGH | 12 | Should fix this sprint |
-| MEDIUM | 8 | Refactor next iteration |
-| LOW | 5 | Nice to have |
+| Severity | Count | Status                  |
+| -------- | ----- | ----------------------- |
+| CRITICAL | 6     | Must fix immediately    |
+| HIGH     | 12    | Should fix this sprint  |
+| MEDIUM   | 8     | Refactor next iteration |
+| LOW      | 5     | Nice to have            |
 
 ---
 
@@ -182,4 +199,3 @@ echo "CRITICAL: 6 | HIGH: 12 | MEDIUM: 8 | LOW: 5"
 - `.claude/rules/code-standards.md` - Code organization
 - `.claude/rules/performance.md` - Performance guidance
 - CLAUDE.md Section 0 - Safety protocols
-

@@ -24,49 +24,49 @@ The agent-studio codebase has **104+ test files** covering critical functionalit
 
 ### 1. Hooks (`/.claude/hooks/`)
 
-**Total Active Hooks:** ~28 (excluding _archive/)
+**Total Active Hooks:** ~28 (excluding \_archive/)
 **Tested:** ~16 hooks
 **Untested:** ~12 hooks
 **Coverage:** ~57%
 
 #### ✅ Hooks WITH Tests (Good Coverage)
 
-| Hook File                         | Test File                                        | Quality |
-| --------------------------------- | ------------------------------------------------ | ------- |
-| `shell-injection-validator.cjs`   | `tests/hooks/shell-injection-validator.test.cjs` | ✅ Good |
-| `code-index-updater.cjs`          | `tests/hooks/code-index-updater.test.cjs`        | ✅ Good |
-| `conflict-detector.cjs`           | `tests/hooks/conflict-detector.test.cjs`         | ✅ Good |
-| `check-console-log.cjs`           | `tests/hooks/check-console-log.test.cjs`         | ✅ Good |
-| `reflection-queue-processor.cjs`  | `tests/hooks/reflection-queue-processor.test.cjs`| ✅ Good |
-| `spawn-prompt-assembler-*.cjs`    | Multiple test files (5+)                         | ✅ Comprehensive |
-| `state-reset.cjs`                 | `tests/hooks/state-reset.test.cjs`               | ✅ Good |
-| `validate-skill-invocation.cjs`   | `tests/hooks/validate-skill-invocation.test.cjs` | ✅ Good |
-| `quality-gate-validator.cjs`      | `tests/hooks/quality-gate-validator.test.cjs`    | ✅ Good |
-| `research-enforcement.cjs`        | `tests/hooks/research-enforcement.test.cjs`      | ✅ Good |
-| `evolution-state-guard.cjs`       | `tests/hooks/evolution-state-guard.test.cjs`     | ✅ Good |
-| `metrics-collector.cjs`           | `tests/hooks/metrics-collector.test.cjs`         | ✅ Good |
-| `pre-compact.cjs`                 | `tests/hooks/pre-compact.test.mjs`               | ✅ Good |
-| `post-edit-scanner.cjs`           | `tests/hooks/post-edit-scanner.test.mjs`         | ✅ Good |
-| `adaptive-quality-gate.cjs`       | `tests/hooks/adaptive-quality-gate.test.mjs`     | ✅ Good |
+| Hook File                        | Test File                                         | Quality          |
+| -------------------------------- | ------------------------------------------------- | ---------------- |
+| `shell-injection-validator.cjs`  | `tests/hooks/shell-injection-validator.test.cjs`  | ✅ Good          |
+| `code-index-updater.cjs`         | `tests/hooks/code-index-updater.test.cjs`         | ✅ Good          |
+| `conflict-detector.cjs`          | `tests/hooks/conflict-detector.test.cjs`          | ✅ Good          |
+| `check-console-log.cjs`          | `tests/hooks/check-console-log.test.cjs`          | ✅ Good          |
+| `reflection-queue-processor.cjs` | `tests/hooks/reflection-queue-processor.test.cjs` | ✅ Good          |
+| `spawn-prompt-assembler-*.cjs`   | Multiple test files (5+)                          | ✅ Comprehensive |
+| `state-reset.cjs`                | `tests/hooks/state-reset.test.cjs`                | ✅ Good          |
+| `validate-skill-invocation.cjs`  | `tests/hooks/validate-skill-invocation.test.cjs`  | ✅ Good          |
+| `quality-gate-validator.cjs`     | `tests/hooks/quality-gate-validator.test.cjs`     | ✅ Good          |
+| `research-enforcement.cjs`       | `tests/hooks/research-enforcement.test.cjs`       | ✅ Good          |
+| `evolution-state-guard.cjs`      | `tests/hooks/evolution-state-guard.test.cjs`      | ✅ Good          |
+| `metrics-collector.cjs`          | `tests/hooks/metrics-collector.test.cjs`          | ✅ Good          |
+| `pre-compact.cjs`                | `tests/hooks/pre-compact.test.mjs`                | ✅ Good          |
+| `post-edit-scanner.cjs`          | `tests/hooks/post-edit-scanner.test.mjs`          | ✅ Good          |
+| `adaptive-quality-gate.cjs`      | `tests/hooks/adaptive-quality-gate.test.mjs`      | ✅ Good          |
 
 **Validator Suite:** `tests/hooks/database-validators.test.cjs`, `filesystem-validators.test.cjs`, `git-validators.test.cjs`, `network-validators.test.cjs`, `process-validators.test.cjs` (✅ Comprehensive)
 
 #### ❌ Hooks WITHOUT Tests (CRITICAL GAPS)
 
-| Hook File                             | Category     | Risk Level | Why Critical                                      |
-| ------------------------------------- | ------------ | ---------- | ------------------------------------------------- |
-| `routing-guard.cjs`                   | Routing      | **HIGH**   | 12 checks, 500+ LOC, core routing enforcement     |
-| `unified-creator-guard.cjs`           | Routing      | **HIGH**   | Blocks artifact writes, gate 4 enforcement        |
-| `user-prompt-orchestrator.cjs`        | Session      | **HIGH**   | Orchestrates 4+ hooks, race condition risks       |
-| `user-prompt-unified.cjs`             | Routing      | **HIGH**   | User prompt transformation and preset handling    |
-| `pre-tool-unified.cjs`                | Safety       | **MEDIUM** | 11 consolidated safety checks                     |
-| `post-tool-metrics-unified.cjs`       | Monitoring   | **MEDIUM** | Metrics collection, event bus integration         |
-| `unified-reflection-handler.cjs`      | Reflection   | **MEDIUM** | Reflection queue management                       |
-| `sync-memory-index.cjs`               | Memory       | **MEDIUM** | Memory index updates after edits                  |
-| `post-creation-integration.cjs`       | Workflow     | **MEDIUM** | Artifact integration detection                    |
-| `drift-detector.cjs`                  | Session      | **LOW**    | Session drift detection                           |
-| `force-step0-execution.cjs`           | Reflection   | **LOW**    | Step 0 reflection enforcement                     |
-| `hybrid-search-enforcer.cjs`          | Safety       | **LOW**    | Hybrid search policy enforcement                  |
+| Hook File                        | Category   | Risk Level | Why Critical                                   |
+| -------------------------------- | ---------- | ---------- | ---------------------------------------------- |
+| `routing-guard.cjs`              | Routing    | **HIGH**   | 12 checks, 500+ LOC, core routing enforcement  |
+| `unified-creator-guard.cjs`      | Routing    | **HIGH**   | Blocks artifact writes, gate 4 enforcement     |
+| `user-prompt-orchestrator.cjs`   | Session    | **HIGH**   | Orchestrates 4+ hooks, race condition risks    |
+| `user-prompt-unified.cjs`        | Routing    | **HIGH**   | User prompt transformation and preset handling |
+| `pre-tool-unified.cjs`           | Safety     | **MEDIUM** | 11 consolidated safety checks                  |
+| `post-tool-metrics-unified.cjs`  | Monitoring | **MEDIUM** | Metrics collection, event bus integration      |
+| `unified-reflection-handler.cjs` | Reflection | **MEDIUM** | Reflection queue management                    |
+| `sync-memory-index.cjs`          | Memory     | **MEDIUM** | Memory index updates after edits               |
+| `post-creation-integration.cjs`  | Workflow   | **MEDIUM** | Artifact integration detection                 |
+| `drift-detector.cjs`             | Session    | **LOW**    | Session drift detection                        |
+| `force-step0-execution.cjs`      | Reflection | **LOW**    | Step 0 reflection enforcement                  |
+| `hybrid-search-enforcer.cjs`     | Safety     | **LOW**    | Hybrid search policy enforcement               |
 
 **Test Status Note:** `routing-guard.cjs` DOES have a test file (`tests/hooks/spawn-prompt-assembler-enrich-allowed-tools.test.cjs` imports it), but coverage is MINIMAL (only exports validated, not the 12 enforcement checks).
 
@@ -81,63 +81,63 @@ The agent-studio codebase has **104+ test files** covering critical functionalit
 
 #### ✅ Libraries WITH Good Test Coverage
 
-| Module Category       | Coverage | Notes                                 |
-| --------------------- | -------- | ------------------------------------- |
-| `lib/code-indexing/`  | ✅ 95%   | 24 test files, comprehensive coverage |
-| `lib/routing/`        | ✅ 90%   | Intent matching, routing tables       |
-| `lib/memory/`         | ✅ 85%   | Search, extraction, LanceDB           |
-| `lib/utils/`          | ✅ 75%   | Platform, JSON, error handling        |
-| `lib/workflow/`       | ✅ 70%   | Step validation, cross-workflow       |
-| `lib/qa/`             | ✅ 100%  | Criteria, report generation           |
-| `lib/plan/`           | ✅ 100%  | Implementation plans, progress        |
+| Module Category      | Coverage | Notes                                 |
+| -------------------- | -------- | ------------------------------------- |
+| `lib/code-indexing/` | ✅ 95%   | 24 test files, comprehensive coverage |
+| `lib/routing/`       | ✅ 90%   | Intent matching, routing tables       |
+| `lib/memory/`        | ✅ 85%   | Search, extraction, LanceDB           |
+| `lib/utils/`         | ✅ 75%   | Platform, JSON, error handling        |
+| `lib/workflow/`      | ✅ 70%   | Step validation, cross-workflow       |
+| `lib/qa/`            | ✅ 100%  | Criteria, report generation           |
+| `lib/plan/`          | ✅ 100%  | Implementation plans, progress        |
 
 #### ❌ Libraries WITHOUT Tests (Gaps)
 
-| File Path                                    | Risk Level | Why Important                          |
-| -------------------------------------------- | ---------- | -------------------------------------- |
-| `lib/routing/router-state.cjs`               | **HIGH**   | Router state management, presets       |
-| `lib/tools/orchestrator-tool.cjs`            | **HIGH**   | Orchestrator tool implementation       |
-| `lib/tools/skill-tool.cjs`                   | **MEDIUM** | Skill invocation logic                 |
-| `lib/tools/task-tools.cjs`                   | **MEDIUM** | Task tool implementations              |
-| `lib/tools/standard-tools.cjs`               | **MEDIUM** | Standard tool definitions              |
-| `lib/memory/memory-deduplicator.cjs`         | **MEDIUM** | Memory deduplication logic             |
-| `lib/memory/memory-retention-config.cjs`     | **LOW**    | Retention policies                     |
-| `lib/utils/compression-trigger.cjs`          | **MEDIUM** | Context compression decisions          |
-| `lib/utils/context-accumulator.cjs`          | **MEDIUM** | Context window management              |
-| `lib/utils/bottleneck-analyzer.cjs`          | **LOW**    | Performance analysis                   |
-| `lib/utils/brownfield-assessor.cjs`          | **LOW**    | Brownfield project assessment          |
-| `lib/utils/cost-calculator.cjs`              | **LOW**    | Token cost estimation                  |
-| `lib/utils/feature-flags.cjs`                | **LOW**    | Feature flag management                |
-| `lib/utils/memory-monitor.cjs`               | **LOW**    | Memory usage monitoring                |
-| `lib/utils/tech-stack-detector.cjs`          | **LOW**    | Tech stack detection                   |
-| `lib/utils/token-budget-tracker.cjs`         | **LOW**    | Token budget tracking                  |
-| `lib/workflow/lazy-loader.cjs`               | **LOW**    | Lazy loading utilities                 |
-| `lib/workflow/state-sync-manager.cjs`        | **LOW**    | Workflow state synchronization         |
-| `lib/workflow/system-adapters.cjs`           | **LOW**    | System adapter interfaces              |
+| File Path                                | Risk Level | Why Important                    |
+| ---------------------------------------- | ---------- | -------------------------------- |
+| `lib/routing/router-state.cjs`           | **HIGH**   | Router state management, presets |
+| `lib/tools/orchestrator-tool.cjs`        | **HIGH**   | Orchestrator tool implementation |
+| `lib/tools/skill-tool.cjs`               | **MEDIUM** | Skill invocation logic           |
+| `lib/tools/task-tools.cjs`               | **MEDIUM** | Task tool implementations        |
+| `lib/tools/standard-tools.cjs`           | **MEDIUM** | Standard tool definitions        |
+| `lib/memory/memory-deduplicator.cjs`     | **MEDIUM** | Memory deduplication logic       |
+| `lib/memory/memory-retention-config.cjs` | **LOW**    | Retention policies               |
+| `lib/utils/compression-trigger.cjs`      | **MEDIUM** | Context compression decisions    |
+| `lib/utils/context-accumulator.cjs`      | **MEDIUM** | Context window management        |
+| `lib/utils/bottleneck-analyzer.cjs`      | **LOW**    | Performance analysis             |
+| `lib/utils/brownfield-assessor.cjs`      | **LOW**    | Brownfield project assessment    |
+| `lib/utils/cost-calculator.cjs`          | **LOW**    | Token cost estimation            |
+| `lib/utils/feature-flags.cjs`            | **LOW**    | Feature flag management          |
+| `lib/utils/memory-monitor.cjs`           | **LOW**    | Memory usage monitoring          |
+| `lib/utils/tech-stack-detector.cjs`      | **LOW**    | Tech stack detection             |
+| `lib/utils/token-budget-tracker.cjs`     | **LOW**    | Token budget tracking            |
+| `lib/workflow/lazy-loader.cjs`           | **LOW**    | Lazy loading utilities           |
+| `lib/workflow/state-sync-manager.cjs`    | **LOW**    | Workflow state synchronization   |
+| `lib/workflow/system-adapters.cjs`       | **LOW**    | System adapter interfaces        |
 
 ---
 
 ### 3. Tools (`/.claude/tools/`)
 
-**Total Active Tools:** ~66 (excluding _archive/)
+**Total Active Tools:** ~66 (excluding \_archive/)
 **Tested:** ~45 tools
 **Untested:** ~21 tools
 **Coverage:** ~68%
 
 #### ❌ Tools WITHOUT Tests (Selected High-Priority)
 
-| Tool File                              | Category       | Risk Level | Why Important                      |
-| -------------------------------------- | -------------- | ---------- | ---------------------------------- |
-| `cli/hybrid-search-daemon.cjs`         | Search         | **HIGH**   | Daemon process management          |
-| `cli/memory-dashboard.cjs`             | Memory         | **MEDIUM** | Memory visualization (HAS test)    |
-| `cli/integration-health-dashboard.cjs` | Analysis       | **MEDIUM** | Integration health monitoring      |
-| `cli/runtime-health-summary.cjs`       | Monitoring     | **MEDIUM** | Runtime health checks              |
-| `cli/security-lint.cjs`                | Security       | **MEDIUM** | Security linting                   |
-| `cli/bootstrap-artifact-graph.cjs`     | Analysis       | **LOW**    | Artifact graph generation          |
-| `cli/router-churn-summary.cjs`         | Analysis       | **LOW**    | Router metrics analysis            |
-| `cli/spawn-assembly-metrics-summary.cjs` | Monitoring   | **LOW**    | Spawn assembly metrics             |
-| `analysis/ecosystem-assessor/*.mjs`    | Analysis       | **LOW**    | Ecosystem assessment               |
-| `visualization/diagram-generator/*.mjs`| Visualization  | **LOW**    | Diagram generation                 |
+| Tool File                                | Category      | Risk Level | Why Important                   |
+| ---------------------------------------- | ------------- | ---------- | ------------------------------- |
+| `cli/hybrid-search-daemon.cjs`           | Search        | **HIGH**   | Daemon process management       |
+| `cli/memory-dashboard.cjs`               | Memory        | **MEDIUM** | Memory visualization (HAS test) |
+| `cli/integration-health-dashboard.cjs`   | Analysis      | **MEDIUM** | Integration health monitoring   |
+| `cli/runtime-health-summary.cjs`         | Monitoring    | **MEDIUM** | Runtime health checks           |
+| `cli/security-lint.cjs`                  | Security      | **MEDIUM** | Security linting                |
+| `cli/bootstrap-artifact-graph.cjs`       | Analysis      | **LOW**    | Artifact graph generation       |
+| `cli/router-churn-summary.cjs`           | Analysis      | **LOW**    | Router metrics analysis         |
+| `cli/spawn-assembly-metrics-summary.cjs` | Monitoring    | **LOW**    | Spawn assembly metrics          |
+| `analysis/ecosystem-assessor/*.mjs`      | Analysis      | **LOW**    | Ecosystem assessment            |
+| `visualization/diagram-generator/*.mjs`  | Visualization | **LOW**    | Diagram generation              |
 
 **Note:** Many tools in `cli/` are tested indirectly through integration tests or are simple CLI wrappers.
 
@@ -192,16 +192,16 @@ The agent-studio codebase has **104+ test files** covering critical functionalit
 
 ### 5. Missing Test Categories
 
-| Test Type               | Current State           | Gap Description                                      |
-| ----------------------- | ----------------------- | ---------------------------------------------------- |
-| **Security Tests**      | Minimal (5% coverage)   | No penetration testing, OWASP coverage minimal       |
-| **Performance Tests**   | None                    | No benchmarks, load tests, or performance regression |
-| **Mutation Tests**      | None                    | No mutation testing to validate test quality         |
-| **Property-Based**      | None                    | No property-based tests (fast-check, jqwik)          |
-| **Fuzz Tests**          | None                    | No fuzzing for input validation (hooks, tools)       |
-| **Load Tests**          | None                    | No concurrent agent spawn tests, stress tests        |
-| **Chaos Tests**         | None                    | No failure injection, resilience testing             |
-| **Contract Tests**      | None                    | No API contract validation, schema validation tests  |
+| Test Type             | Current State         | Gap Description                                      |
+| --------------------- | --------------------- | ---------------------------------------------------- |
+| **Security Tests**    | Minimal (5% coverage) | No penetration testing, OWASP coverage minimal       |
+| **Performance Tests** | None                  | No benchmarks, load tests, or performance regression |
+| **Mutation Tests**    | None                  | No mutation testing to validate test quality         |
+| **Property-Based**    | None                  | No property-based tests (fast-check, jqwik)          |
+| **Fuzz Tests**        | None                  | No fuzzing for input validation (hooks, tools)       |
+| **Load Tests**        | None                  | No concurrent agent spawn tests, stress tests        |
+| **Chaos Tests**       | None                  | No failure injection, resilience testing             |
+| **Contract Tests**    | None                  | No API contract validation, schema validation tests  |
 
 ---
 
@@ -290,9 +290,11 @@ The agent-studio codebase has **104+ test files** covering critical functionalit
    - Add failure cases, boundary conditions, edge inputs
 
 3. **Run skipped test audit:**
+
    ```bash
    git grep -r "test.skip\|it.skip\|describe.skip" tests/
    ```
+
    - Re-enable or document why skipped
 
 #### Short-Term (Next 2 Sprints)
@@ -341,12 +343,14 @@ The agent-studio codebase has **104+ test files** covering critical functionalit
 **Test Infrastructure:** Well-structured, mirrors source layout
 
 **Positive Observations:**
+
 - Tests use proper isolation (mocking, dependency injection)
 - Fast execution (no slow integration tests blocking dev flow)
 - Clear test names and assertion messages
 - Good use of `before`/`beforeEach` hooks for setup
 
 **Issues Observed:**
+
 - Some tests emit debug logs (should suppress in test mode)
 - No test coverage reporting (no `c8` or `nyc` integration)
 - No CI test execution visible (should verify CI runs all tests)

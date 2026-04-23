@@ -9,10 +9,12 @@
 Successfully created rules, schemas, and commands for **19 skills** across 5 groups:
 
 ### Group 2: Thinking (2 skills)
+
 - ✓ advanced-elicitation
 - ✓ sequential-thinking
 
 ### Group 3: Workflow (5 skills)
+
 - ✓ workflow-patterns
 - ✓ sparc-methodology
 - ✓ track-management
@@ -20,6 +22,7 @@ Successfully created rules, schemas, and commands for **19 skills** across 5 gro
 - ✓ consensus-voting
 
 ### Group 4: Documentation (6 skills)
+
 - ✓ doc-generator (had schema, created rule+command)
 - ✓ diagram-generator (had schema, created rule+command)
 - ✓ test-generator (had schema, created rule+command)
@@ -28,11 +31,13 @@ Successfully created rules, schemas, and commands for **19 skills** across 5 gro
 - ✓ readme
 
 ### Group 5: Analysis (3 skills)
+
 - ✓ memory-forensics
 - ✓ protocol-reverse-engineering
 - ✓ binary-analysis-patterns
 
 ### Group 6: Specialized (3 skills)
+
 - ✓ git-expert
 - ✓ scientific-skills
 - ✓ ai-ml-expert

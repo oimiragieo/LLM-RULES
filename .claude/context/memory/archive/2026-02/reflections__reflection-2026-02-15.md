@@ -12,13 +12,13 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 
 ### Quality Metrics
 
-| Dimension | Score | Evidence |
-|-----------|-------|----------|
-| **Completeness** | 0.90 | All major guardrail strengthening completed; TaskOutput polling removed from critical path |
-| **Accuracy** | 0.95 | Commit messages reflect actual changes; no false claims in ADRs |
-| **Clarity** | 0.85 | Clear commit structure; some technical depth in microtask contracts could be documented |
-| **Consistency** | 0.92 | Enforcement patterns consistent across routing/agent/creator workflows |
-| **Actionability** | 0.92 | Clear next steps identified; framework now more robust |
+| Dimension         | Score | Evidence                                                                                   |
+| ----------------- | ----- | ------------------------------------------------------------------------------------------ |
+| **Completeness**  | 0.90  | All major guardrail strengthening completed; TaskOutput polling removed from critical path |
+| **Accuracy**      | 0.95  | Commit messages reflect actual changes; no false claims in ADRs                            |
+| **Clarity**       | 0.85  | Clear commit structure; some technical depth in microtask contracts could be documented    |
+| **Consistency**   | 0.92  | Enforcement patterns consistent across routing/agent/creator workflows                     |
+| **Actionability** | 0.92  | Clear next steps identified; framework now more robust                                     |
 
 **Overall Score: 0.92 / 1.0 (EXCELLENT)**
 
@@ -29,53 +29,63 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 ### Completeness (0.90)
 
 **Strengths:**
+
 - All TaskOutput polling loops systematically removed
 - Router guardrails extensively hardened with new checks
 - Microtask ownership contracts explicitly defined
 - Creator/updater alignment patterns standardized
 
 **Minor Gaps:**
+
 - No documentation of specific TaskOutput → TaskList migration paths for existing code
 - Microtask ownership ADR lacks worked examples
 
 ### Accuracy (0.95)
 
 **Strengths:**
+
 - Commit messages accurately describe changes
 - No contradictions between ADRs and implementation
 - Test results match commit scope
 
 **Minor Issues:**
+
 - One edge case in creator-updater alignment not covered by tests (estimated low probability)
 
 ### Clarity (0.85)
 
 **Strengths:**
+
 - Clear commit structure (fix/feat/chore categories)
 - Router hardening purpose explicit in commit messages
 
 **Growth Opportunities:**
+
 - Microtask contract documentation could include flow diagrams
 - TaskOutput deprecation guidance scattered; could be consolidated
 
 ### Consistency (0.92)
 
 **Strengths:**
+
 - Iron Laws enforced uniformly across all routing paths
 - Guardrails follow existing hook patterns
 - Test naming conventions match framework standards
 
 **Minor Variance:**
+
 - Some enforcement hooks use warn/block modes; standardization could improve
 
 ### Actionability (0.92)
 
 **Strengths:**
+
 - Clear pathway: TaskOutput removal → TaskList polling pattern
 - Router guardrails enable agents to self-validate requests
 - Microtask contracts define explicit owner responsibilities
 
 **Possible Improvements:**
+
 - Effort estimates for TaskOutput migration in existing codebase not provided
 - Downstream migration checklist for agents could be more granular
 
@@ -107,7 +117,7 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 
 ### Thorns (Issues)
 
-🚫 **Console.log Migration Blocked:** 646 console.* calls across codebase remain. ADR-122 proposes AST-based migration but implementation not yet started. Affects production-readiness (console output should be structured, not ad-hoc).
+🚫 **Console.log Migration Blocked:** 646 console.\* calls across codebase remain. ADR-122 proposes AST-based migration but implementation not yet started. Affects production-readiness (console output should be structured, not ad-hoc).
 
 🚫 **Circular Dependency Count:** 23 circular dependencies documented in ADR-120. Manual DI pattern chosen (good decision), but no timeline for refactoring. Creates technical debt.
 
@@ -125,6 +135,7 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 **Score: 88% (GOOD)**
 
 **Wiring Status:**
+
 - ✅ Router guardrails: 100% (all 5 gates registered, 100% test coverage)
 - ✅ Creator enforcement: 100% (unified-creator-guard.cjs fully integrated)
 - ✅ Microtask contracts: 95% (documented in ADRs, 1 edge case uncovered)
@@ -132,6 +143,7 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 - ⚠️ Agent migration: 85% (estimate: 5-10 agents need TaskOutput → TaskList updates)
 
 **Integration Gaps:**
+
 - [ ] Document TaskOutput deprecation in agent templates
 - [ ] Create migration guide for agents using TaskOutput polling
 - [ ] Verify hook protocol updates with ADR-120 circular dependency resolution
@@ -146,6 +158,7 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 ### Pattern: Non-Blocking Guardrail Enforcement
 
 **Discovery:** Router guardrails (Gates 1-5) block invalid operations without blocking valid operations. Pattern:
+
 1. Gate triggers on specific condition (e.g., multi-step task without planner)
 2. Enforcement mode (block/warn/off) provides flexibility
 3. Error message directs user/agent to remediation
@@ -159,6 +172,7 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 ### Pattern: Ownership Transfer via Metadata
 
 **Discovery:** Microtask metadata enables explicit ownership transfer (creator → implementer). Pattern:
+
 1. Creator task includes `created_by: 'skill-creator'` + artifact path
 2. Implementer task references creator task, updates `owned_by: 'developer'`
 3. Post-completion validation verifies ownership chain
@@ -172,6 +186,7 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 ### Pattern: Anti-Pattern Removal via Deprecation Cycle
 
 **Discovery:** TaskOutput polling (anti-pattern: unbounded blocking loops) successfully removed by:
+
 1. Phase 1: Document anti-pattern (TaskOutput polling violates non-blocking principle)
 2. Phase 2: Implement alternative (TaskList polling for agents)
 3. Phase 3: Enforce via hook (block TaskOutput usage in new code)
@@ -188,16 +203,19 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 ### Retain (High Signal)
 
 **Pattern: Non-Blocking Guardrail Enforcement** (score: 0.95)
+
 - Reuse value: HIGH - applicable to any safety constraint needing gradual rollout
 - Evidence quality: EXCELLENT - backed by ADR-105 full implementation + 124 tests
 - Retrieval relevance: HIGH - framework safety is core concern
 
 **Pattern: Ownership Transfer via Metadata** (score: 0.92)
+
 - Reuse value: HIGH - scalable to any multi-phase creation workflow
 - Evidence quality: EXCELLENT - ADR-120 with 23 circular dependency resolutions
 - Retrieval relevance: HIGH - creator ecosystem relies on this pattern
 
 **Pattern: Anti-Pattern Removal via Deprecation Cycle** (score: 0.88)
+
 - Reuse value: MEDIUM - applies to framework evolution, not general development
 - Evidence quality: GOOD - TaskOutput polling removal documented
 - Retrieval relevance: MEDIUM - useful for future deprecations
@@ -205,11 +223,13 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 ### Compress
 
 **ADR-122 Console Migration Proposal** (score: 0.65)
+
 - Evidence quality: FAIR - proposal phase, not implemented
 - Retrieval relevance: LOW until implementation starts
 - Action: Compress to 1-line summary: "ADR-122: AST-based console.log migration (proposed, 646 calls)"
 
 **ADR-121 Module Size Enforcement** (score: 0.70)
+
 - Evidence quality: FAIR - rule exists, but 6 modules non-compliant
 - Retrieval relevance: MEDIUM - impacts code organization
 - Action: Compress roadmap; keep only enforcement rule + non-compliant list
@@ -217,6 +237,7 @@ Recent commits demonstrate systematic improvements to router/agent guardrails wi
 ### Archive
 
 **Circular Dependency Count Inventory** (score: 0.60)
+
 - Evidence quality: FAIR - listed but no resolution timeline
 - Retrieval relevance: LOW unless actively refactoring
 - Action: Move ADR-120 detail inventory to .claude/context/data/circular-deps-map.json

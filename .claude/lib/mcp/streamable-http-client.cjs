@@ -74,7 +74,7 @@ class StreamableHttpClient {
     this._endpoint = options.endpoint;
     this._timeout = options.timeout || 30_000;
     this._mockResponder = options._mockResponder || null;
-    this._warnSink = options._warnSink || ((msg) => process.stderr.write(`[mcp-warn] ${msg}\n`));
+    this._warnSink = options._warnSink || (msg => process.stderr.write(`[mcp-warn] ${msg}\n`));
 
     this._sessionId = null;
     this._connected = false;
@@ -246,9 +246,9 @@ class StreamableHttpClient {
         headers: reqHeaders,
       };
 
-      const req = transport.request(options, (res) => {
+      const req = transport.request(options, res => {
         const chunks = [];
-        res.on('data', (chunk) => chunks.push(chunk));
+        res.on('data', chunk => chunks.push(chunk));
         res.on('end', () => {
           try {
             const raw = Buffer.concat(chunks).toString('utf8');

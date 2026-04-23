@@ -5,6 +5,7 @@
 ## 1. What the Old Code Had That We Are Correctly Excluding
 
 **Archived memory-rotator.cjs (751 lines):**
+
 - Separate `parseDecisions()` and `parseIssues()` parsers with duplicated logic (lines 150-206, 241-311). The new design unifies this into a single generic `parseSections()`. Correct exclusion.
 - Line-count-based rotation trigger (`ROTATION_TRIGGER: 1500` lines). The new design uses KB-based thresholds (20KB). Correct -- KB is more meaningful for token budget management.
 - Dedicated `rotateDecisions()` and `rotateIssues()` functions (lines 369-562) with nearly identical control flow. The new `rotateIfNeeded(filePath)` is generic. Correct exclusion of duplication.
@@ -12,6 +13,7 @@
 - `fs.writeFileSync()` used directly (lines 441, 455, 540, 554) instead of `atomicWriteSync()`. Correctly identified as a bug; new design mandates atomic writes.
 
 **Archived smart-pruner.cjs (736 lines):**
+
 - Utility-based scoring system with exponential decay, logarithmic frequency, importance markers (lines 69-180). This operated on JSON arrays with `accessCount`/`lastAccessed` metadata. The new design targets markdown files, not JSON. Correct exclusion -- markdown sections lack access metadata.
 - `IMPORTANCE_MARKERS` pattern matching with 8 weighted regex patterns (lines 47-56). Over-engineered; never had real access frequency data to score against. Correct exclusion.
 - `RETENTION_LIMITS` per tier (STM: 5, MTM: 15, LTM: 100) with `enforceRetention()` and `archiveLowValue()` (lines 345-477). These limits are meaningless for markdown rotation. Correct exclusion.
@@ -19,6 +21,7 @@
 - `deduplicateAndPrune()` combined pipeline (lines 506-541). Over-integrated; the new design keeps dedup and pruning as separate callable functions. Correct simplification.
 
 **Archived cold-storage.cjs (336 lines):**
+
 - LanceDB vector store integration for cold search (lines 149-182, 285-308). Required async code, external dependency, and `MemoryVectorStore`. The new design uses plain JSONL substring search. Correct exclusion -- vector search for cold archives is overkill.
 - Gzip compression (`zlib.gzipSync`, line 281). The new design uses plain JSONL. Correct for current volumes (<6MB/year projected).
 - `memory-retention-config.cjs` dependency for retention options. The new design uses config.yaml directly. Correct -- removes a dependency layer.
@@ -37,11 +40,13 @@
 ## 3. Simplification Opportunities in Existing Code
 
 **memory-scheduler.cjs (893 lines):**
+
 - `runArchiveOldLTM()` (lines 395-462) spawns a child Node process with ESM `import` syntax to call archived `cold-storage.cjs`. This entire function is dead code that always fails silently. The new wiring will replace it entirely, which is correct.
 - `runDailyMaintenance()` and `runWeeklyMaintenance()` (lines 559-709) duplicate the event-bus emission pattern (24 lines each, nearly identical). This could be extracted to a shared helper, but is outside the current task scope.
 - `readStatus()` at line 122 uses bare `JSON.parse()` -- flagged by security review as prototype pollution risk. The developer should use `safeParseJSON()` here.
 
 **memory-manager.cjs (1504 lines):**
+
 - `checkAndArchiveLearnings()` (lines 494-557) uses `fs.appendFileSync()` for archive writes and a line-count approach (keep last 50 lines). This will become redundant once the new rotator handles all markdown files with section-based rotation. **Suggestion:** After the new system is wired, deprecate this function with a comment pointing to `memory-rotator.rotateIfNeeded()`.
 - `getMemoryHealth()` (lines 1134-1209) checks learnings.md and decisions.md sizes but not issues.md (the largest file at 53KB). **Suggestion:** Add issues.md to the health check while touching this area.
 - `_pruneOldSessions()` (line 562) manages legacy `sessions/` directory. This is dead functionality per the health check warning at line 1198. Not urgent to remove but worth noting.

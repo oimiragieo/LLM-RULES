@@ -67,6 +67,7 @@
 **Discovery:** When archiving modules, consumers often remain in active code. Direct removal causes MODULE_NOT_FOUND crashes. Rewriting all consumers is time-consuming and risky.
 
 **Solution:** Create minimal stub modules that:
+
 1. Export same function names as original
 2. Return safe defaults (null, false, empty objects, `{ success: false }`)
 3. Document "archived" status via JSDoc
@@ -81,6 +82,7 @@
 **Discovery:** agent-config.json (49 agents) vs agent-registry.json (59 agents) drift = 10 missing agents
 
 **Solution:** Validate both directions:
+
 - A→B: All agents in config exist in registry
 - B→A: All agents in registry exist in config
 
@@ -125,6 +127,7 @@
 ### Integration Assessment
 
 ⚠️ Integration gaps found - recommend adding:
+
 1. CI script: `pnpm audit:stubs` to detect orphaned stubs
 2. Test coverage: stub loading tests in `tests/stubs/`
 3. Artifact graph entries for stub modules
@@ -217,6 +220,7 @@ Config sync revealed the value of bidirectional validation:
 Drift occurred because only unidirectional validation existed (implicit). Bidirectional validation catches both orphans and gaps.
 
 **Application:** Any time two files reference each other:
+
 - Routing table ↔ Agent registry
 - Schema catalog ↔ Schema files
 - Hook settings.json ↔ Hook files

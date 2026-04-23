@@ -125,11 +125,7 @@ describe('TokenGovernor', () => {
     const sessionId = 'sess-tg002';
     const agentId = 'developer';
 
-    writeTraceFile(
-      sessionId,
-      [makeTraceEntry({ agentId, sessionId, totalTokens: 50000 })],
-      tmpDir
-    );
+    writeTraceFile(sessionId, [makeTraceEntry({ agentId, sessionId, totalTokens: 50000 })], tmpDir);
 
     process.env.TRACE_DIR_OVERRIDE = path.join(tmpDir, 'traces');
     process.env.TOKEN_GOVERNOR_DEFAULT_TASK_BUDGET = '100000';
@@ -150,11 +146,7 @@ describe('TokenGovernor', () => {
     const sessionId = 'sess-tg003';
     const agentId = 'qa';
 
-    writeTraceFile(
-      sessionId,
-      [makeTraceEntry({ agentId, sessionId, totalTokens: 95000 })],
-      tmpDir
-    );
+    writeTraceFile(sessionId, [makeTraceEntry({ agentId, sessionId, totalTokens: 95000 })], tmpDir);
 
     process.env.TRACE_DIR_OVERRIDE = path.join(tmpDir, 'traces');
     process.env.TOKEN_GOVERNOR_DEFAULT_TASK_BUDGET = '100000';
@@ -219,11 +211,7 @@ describe('TokenGovernor', () => {
     const agentId = 'planner';
 
     // 60000 tokens with custom budget of 50000 → should exceed
-    writeTraceFile(
-      sessionId,
-      [makeTraceEntry({ agentId, sessionId, totalTokens: 60000 })],
-      tmpDir
-    );
+    writeTraceFile(sessionId, [makeTraceEntry({ agentId, sessionId, totalTokens: 60000 })], tmpDir);
 
     process.env.TRACE_DIR_OVERRIDE = path.join(tmpDir, 'traces');
     process.env.TOKEN_GOVERNOR_DEFAULT_TASK_BUDGET = '50000';

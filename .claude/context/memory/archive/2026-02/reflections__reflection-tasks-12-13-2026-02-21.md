@@ -4,14 +4,15 @@
 
 ## Phase 0: Data Sufficiency Gate
 
-| Task | Summary Provided | filesModified | dataQuality |
-|------|-----------------|---------------|-------------|
-| Task 12 | "Task 12 completed without summary metadata" — fallback string | None | `insufficient` |
-| Task 13 | "Task 13 completed without summary metadata" — fallback string | None | `insufficient` |
+| Task    | Summary Provided                                               | filesModified | dataQuality    |
+| ------- | -------------------------------------------------------------- | ------------- | -------------- |
+| Task 12 | "Task 12 completed without summary metadata" — fallback string | None          | `insufficient` |
+| Task 13 | "Task 13 completed without summary metadata" — fallback string | None          | `insufficient` |
 
 **Decision (per Iron Law)**: Direct scores WITHHELD for both tasks due to insufficient metadata.
 
 **Forensic Recovery Applied**: Git status at session start reveals three untracked workflow files:
+
 - `.claude/workflows/building-secure-contracts-skill-workflow.md`
 - `.claude/workflows/feature-flag-management-skill-workflow.md`
 - `.claude/workflows/spec-to-code-compliance-skill-workflow.md`
@@ -19,6 +20,7 @@
 Corresponding SKILL.md files have `lastVerifiedAt` timestamps in the 19:39–19:40Z window (approx 50–72 minutes before the task 12 and 13 completion timestamps of 20:32Z and 20:51Z). This allows forensic partial assessment.
 
 **Inferred task scope:**
+
 - Task 12 (completed ~20:32Z): Created or finalized skill(s) in the VoltAgent/awesome-agent-skills assimilation batch — likely `feature-flag-management` and/or `spec-to-code-compliance` skills + their workflow stubs.
 - Task 13 (completed ~20:51Z): Created or finalized remaining skill(s) — likely `building-secure-contracts` skill + its workflow stub.
 
@@ -28,12 +30,13 @@ Corresponding SKILL.md files have `lastVerifiedAt` timestamps in the 19:39–19:
 
 ## Overall Assessment
 
-| Task | Score | Threshold | Notes |
-|------|-------|-----------|-------|
-| Task 12 | **WITHHELD** (forensic: ~0.45) | — | Insufficient metadata; score withheld per Iron Law |
-| Task 13 | **WITHHELD** (forensic: ~0.45) | — | Insufficient metadata; score withheld per Iron Law |
+| Task    | Score                          | Threshold | Notes                                              |
+| ------- | ------------------------------ | --------- | -------------------------------------------------- |
+| Task 12 | **WITHHELD** (forensic: ~0.45) | —         | Insufficient metadata; score withheld per Iron Law |
+| Task 13 | **WITHHELD** (forensic: ~0.45) | —         | Insufficient metadata; score withheld per Iron Law |
 
 **Forensic estimate basis**: Skills were created (SKILL.md files exist, lastVerifiedAt set) and workflow stubs created. However:
+
 - Skill catalog NOT updated (grep of skill-catalog.md returns 0 matches for all 3 skills)
 - SKILL.md content is minimal boilerplate (identity + capabilities sections only)
 - Workflow files are 8-line stubs (invocation-only, no workflow steps)
@@ -45,6 +48,7 @@ Corresponding SKILL.md files have `lastVerifiedAt` timestamps in the 19:39–19:
 ### Artifact Quality Assessment
 
 The three created skills share an identical structure pattern:
+
 - **SKILL.md**: 30-line boilerplate with no substantive workflow content
   - `verified: true` flag is set — but verification of a nearly empty file is misleading
   - `lastVerifiedAt` timestamps are set but represent scaffold completion, not quality validation
@@ -57,13 +61,13 @@ The three created skills share an identical structure pattern:
 
 **Rubric Assessment (forensic)**:
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.20 | SKILL.md is a scaffold; workflow is a stub; no substantive content |
-| Accuracy | 0.60 | Descriptions (smart contract security, feature flags, spec compliance) are accurate |
-| Clarity | 0.30 | Identity + capabilities are present but no workflow steps for clarity to apply to |
-| Consistency | 0.40 | Frontmatter is consistent; content is not consistent with framework skill standards |
-| Actionability | 0.10 | No agent can invoke these skills and receive useful guidance — empty capability section |
+| Dimension     | Score | Notes                                                                                   |
+| ------------- | ----- | --------------------------------------------------------------------------------------- |
+| Completeness  | 0.20  | SKILL.md is a scaffold; workflow is a stub; no substantive content                      |
+| Accuracy      | 0.60  | Descriptions (smart contract security, feature flags, spec compliance) are accurate     |
+| Clarity       | 0.30  | Identity + capabilities are present but no workflow steps for clarity to apply to       |
+| Consistency   | 0.40  | Frontmatter is consistent; content is not consistent with framework skill standards     |
+| Actionability | 0.10  | No agent can invoke these skills and receive useful guidance — empty capability section |
 
 **Forensic estimate**: ~0.32 (WARNING — critical fail territory)
 
@@ -76,6 +80,7 @@ The three created skills share an identical structure pattern:
 ### Issue 1: Skill catalog not updated (BLOCKING)
 
 All three skills are missing from `skill-catalog.md`. This means:
+
 - Agents browsing the catalog cannot discover these skills
 - The ecosystem integration step was skipped or not completed
 - `skill-creator` post-creation blocking step (catalog entry) was not enforced
@@ -85,6 +90,7 @@ All three skills are missing from `skill-catalog.md`. This means:
 ### Issue 2: Skill content is minimal scaffold (WARNING)
 
 The three SKILL.md files have no substantive workflow content. An agent invoking `Skill({ skill: 'feature-flag-management' })` would receive only:
+
 ```
 Feature Flag Management primary function
 Integration with agent ecosystem
@@ -105,11 +111,11 @@ The three `*-skill-workflow.md` files are 8-line stubs with only skill location 
 
 ## Step 4.5: Integration Health Check (ADR-100)
 
-| Skill | Catalog | Skill Index | Agent Assignment | Integration Score |
-|-------|---------|-------------|------------------|-------------------|
-| building-secure-contracts | MISSING | Present (category: Other) | Present (multiple agents) | 50% |
-| feature-flag-management | MISSING | Present (category: Other) | Present (multiple agents) | 50% |
-| spec-to-code-compliance | MISSING | Present (category: Other) | Present (multiple agents) | 50% |
+| Skill                     | Catalog | Skill Index               | Agent Assignment          | Integration Score |
+| ------------------------- | ------- | ------------------------- | ------------------------- | ----------------- |
+| building-secure-contracts | MISSING | Present (category: Other) | Present (multiple agents) | 50%               |
+| feature-flag-management   | MISSING | Present (category: Other) | Present (multiple agents) | 50%               |
+| spec-to-code-compliance   | MISSING | Present (category: Other) | Present (multiple agents) | 50%               |
 
 **Integration Score**: 50% (Gaps — Bud classification)
 
@@ -125,11 +131,11 @@ The three `*-skill-workflow.md` files are 8-line stubs with only skill location 
 
 **Artifacts checked**: building-secure-contracts, feature-flag-management, spec-to-code-compliance
 
-| Skill | Catalog Presence | Index Presence | Agent Assignment | Orphan Status |
-|-------|-----------------|----------------|------------------|---------------|
-| building-secure-contracts | CATALOG_MISSING | PRESENT (category: Other) | AGENT_ASSIGNED (multiple) | Not orphaned |
-| feature-flag-management | CATALOG_MISSING | PRESENT (category: Other) | AGENT_ASSIGNED (multiple) | Not orphaned |
-| spec-to-code-compliance | CATALOG_MISSING | PRESENT (category: Other) | AGENT_ASSIGNED (multiple) | Not orphaned |
+| Skill                     | Catalog Presence | Index Presence            | Agent Assignment          | Orphan Status |
+| ------------------------- | ---------------- | ------------------------- | ------------------------- | ------------- |
+| building-secure-contracts | CATALOG_MISSING  | PRESENT (category: Other) | AGENT_ASSIGNED (multiple) | Not orphaned  |
+| feature-flag-management   | CATALOG_MISSING  | PRESENT (category: Other) | AGENT_ASSIGNED (multiple) | Not orphaned  |
+| spec-to-code-compliance   | CATALOG_MISSING  | PRESENT (category: Other) | AGENT_ASSIGNED (multiple) | Not orphaned  |
 
 **Findings**: 3 `CATALOG_MISSING` issues. All three skills are in skill-index.json and assigned to multiple agents (developer, security-architect, qa confirmed from skill-index.json agent arrays), but are not in the human-visible skill-catalog.md.
 
@@ -189,12 +195,12 @@ The three `*-skill-workflow.md` files are 8-line stubs with only skill location 
 
 ## Memory Curation Decisions
 
-| Item | Decision | Score | Rationale |
-|------|----------|-------|-----------|
-| Scaffold-first creation pattern | **Retain** | 0.75 | Reuse value: MEDIUM; applies to batch creation workflows |
-| Skill catalog missing after batch creation | **Retain as gotcha** | 0.85 | High reuse value; prevents repeated integration gaps |
-| Missing TaskUpdate metadata (tasks 12-13) | **Compress** | 0.60 | Already documented exhaustively in gotchas.json; this instance adds no new evidence |
-| Premature verified flag pattern | **Retain** | 0.80 | Prevention value: HIGH; misleads future reflection scoring |
+| Item                                       | Decision             | Score | Rationale                                                                           |
+| ------------------------------------------ | -------------------- | ----- | ----------------------------------------------------------------------------------- |
+| Scaffold-first creation pattern            | **Retain**           | 0.75  | Reuse value: MEDIUM; applies to batch creation workflows                            |
+| Skill catalog missing after batch creation | **Retain as gotcha** | 0.85  | High reuse value; prevents repeated integration gaps                                |
+| Missing TaskUpdate metadata (tasks 12-13)  | **Compress**         | 0.60  | Already documented exhaustively in gotchas.json; this instance adds no new evidence |
+| Premature verified flag pattern            | **Retain**           | 0.80  | Prevention value: HIGH; misleads future reflection scoring                          |
 
 ---
 

@@ -5,18 +5,21 @@
 ## Executive Summary
 
 **Scope**: Comprehensive analysis of test coverage, test quality, script reliability, and edge case handling across:
+
 - `tests/` directory (213+ test files)
 - `.claude/tools/` directory (403 tool files)
 - `package.json` scripts (159 scripts)
 - `.claude/lib/code-indexing/` (indexer code)
 
 **Key Findings**:
+
 - **Test Pass Rate**: Tests are passing but detailed results need verification
 - **Script Health**: 159 npm scripts with varying execution reliability
 - **Code Quality**: Several areas with technical debt and missing edge case handling
 - **Critical Gaps**: Missing tests for critical framework paths
 
 **Priority Distribution**:
+
 - CRITICAL (P0): 8 issues
 - HIGH (P1): 12 issues
 - MEDIUM (P2): 15 issues
@@ -31,16 +34,19 @@
 **Location**: `.claude/hooks/routing/routing-guard.cjs` (2599 LOC, split into `routing-guard-core.cjs`)
 
 **Issue**: No integration tests for critical routing checks:
+
 - Check 1 (planner-first enforcement)
 - Check 5 (architect-first for high-risk specialists)
 - Check 7 (specialist override enforcement)
 
 **Impact**:
+
 - **Regression Risk**: HIGH - routing is framework backbone
 - **Misrouting**: Could spawn `developer` instead of `technical-writer`, `code-simplifier`, `qa`
 - **Wasted Resources**: 59 agents exist; misrouting wastes specialist expertise
 
 **Evidence from Memory**:
+
 ```
 learnings.md line 47-51:
 1. **Routing-guard.cjs integration tests missing** (2599 LOC → split into modular routing-guard-core.cjs)
@@ -49,13 +55,14 @@ learnings.md line 47-51:
 ```
 
 **Suggested Fix**:
+
 ```javascript
 // tests/hooks/routing-guard-integration.test.cjs
 describe('Routing Guard - Check 1: Planner First', () => {
   it('should block TaskCreate for HIGH complexity without planner', () => {
     const input = {
       tool: 'TaskCreate',
-      params: { subject: 'Complex multi-file refactor' }
+      params: { subject: 'Complex multi-file refactor' },
     };
     const result = preToolUse(input);
     expect(result.allow).toBe(false);
@@ -75,8 +82,8 @@ describe('Routing Guard - Check 7: Specialist Override', () => {
       tool: 'Task',
       params: {
         subagent_type: 'developer',
-        prompt: 'update the README documentation'
-      }
+        prompt: 'update the README documentation',
+      },
     };
     const result = preToolUse(input);
     expect(result.allow).toBe(false);
@@ -88,8 +95,8 @@ describe('Routing Guard - Check 7: Specialist Override', () => {
       tool: 'Task',
       params: {
         subagent_type: 'developer',
-        prompt: 'review this code for quality issues'
-      }
+        prompt: 'review this code for quality issues',
+      },
     };
     const result = preToolUse(input);
     expect(result.allow).toBe(false);
@@ -101,6 +108,7 @@ describe('Routing Guard - Check 7: Specialist Override', () => {
 **Estimated Effort**: 20 tests, 2 days
 
 **Files to Test**:
+
 - `.claude/hooks/routing/routing-guard-core.cjs` (line 1-800)
 - `.claude/lib/routing/fuzzy-intent-matcher.cjs` (semantic matching)
 - `.claude/lib/routing/routing-table.cjs` (intent → agent mapping)
@@ -110,21 +118,25 @@ describe('Routing Guard - Check 7: Specialist Override', () => {
 ### 2. **Task Lifecycle State Machine Untested**
 
 **Location**:
+
 - `.claude/lib/task/task-lifecycle-state.cjs`
 - `.claude/hooks/routing/pre-task-unified-core.cjs`
 
 **Issue**: No state transition tests for task status changes:
+
 - `not_started` → `in_progress`
 - `in_progress` → `completed`
 - `in_progress` → `blocked`
 - Invalid transitions (e.g., `completed` → `in_progress`)
 
 **Impact**:
+
 - **Workflow Stalls**: Tasks stuck in `in_progress` forever
 - **Duplicate Work**: Multiple agents claim same task
 - **Task Corruption**: Invalid state transitions break workflow
 
 **Evidence from Memory**:
+
 ```
 learnings.md line 53-58:
 2. **Task lifecycle state machine untested** (task-lifecycle-state.cjs, pre-task-unified-core.cjs)
@@ -134,6 +146,7 @@ learnings.md line 53-58:
 ```
 
 **Suggested Fix**:
+
 ```javascript
 // tests/lib/task/task-lifecycle-state.test.cjs
 describe('Task Lifecycle State Machine', () => {
@@ -174,11 +187,13 @@ describe('Task Lifecycle State Machine', () => {
 **Issue**: No tests for infinite loop detection in workflow phase advancement
 
 **Impact**:
+
 - **System Hang**: Workflow advances infinitely through phases
 - **Resource Exhaustion**: Memory/CPU consumed until crash
 - **Session Crash**: Context overflow from infinite spawning
 
 **Evidence from Memory**:
+
 ```
 learnings.md line 59-64:
 3. **Workflow cycle detection untested** (workflow/cycle-detector.cjs)
@@ -188,6 +203,7 @@ learnings.md line 59-64:
 ```
 
 **Suggested Fix**:
+
 ```javascript
 // tests/hooks/workflow-cycle-detector.test.cjs
 describe('Workflow Cycle Detection', () => {
@@ -229,6 +245,7 @@ describe('Workflow Cycle Detection', () => {
 **Issue**: Memory configuration may cause OOM on large projects (>10K files)
 
 **Evidence**:
+
 ```javascript
 // index-manager.cjs line 29-49
 const memoryConfig = calculateSafeMemoryConfig();
@@ -237,7 +254,9 @@ class IndexManager {
   constructor(options = {}) {
     // Caps concurrency but not total memory footprint
     if (this.options.concurrency > safeConfig.concurrency) {
-      console.log(`[INDEX] Config concurrency ${this.options.concurrency} capped to memory-safe ${safeConfig.concurrency}`);
+      console.log(
+        `[INDEX] Config concurrency ${this.options.concurrency} capped to memory-safe ${safeConfig.concurrency}`
+      );
       this.options.concurrency = safeConfig.concurrency;
     }
     // ⚠️ No cap on total files in memory
@@ -246,11 +265,13 @@ class IndexManager {
 ```
 
 **Impact**:
+
 - **OOM Crashes**: Indexing 40K files crashes with heap exhaustion
 - **Async Pipeline Fragmentation**: Promise.race/inFlight patterns fragment V8 heap
 - **No Graceful Degradation**: Hard crash instead of partial indexing
 
 **Evidence from Memory**:
+
 ```
 learnings.md:
 Code Indexer Architecture
@@ -261,14 +282,16 @@ Code Indexer Architecture
 ```
 
 **Suggested Fix**:
+
 1. Add memory budget tracking:
+
 ```javascript
 class IndexManager {
   constructor(options = {}) {
     this.memoryBudget = {
       maxFiles: parseInt(process.env.INDEX_MAX_FILES || '5000', 10),
       maxChunks: parseInt(process.env.INDEX_MAX_CHUNKS || '50000', 10),
-      maxMemoryMB: parseInt(process.env.INDEX_MAX_MEMORY_MB || '2048', 10)
+      maxMemoryMB: parseInt(process.env.INDEX_MAX_MEMORY_MB || '2048', 10),
     };
   }
 
@@ -286,17 +309,18 @@ class IndexManager {
 ```
 
 2. Add tests:
+
 ```javascript
 // tests/code-indexing/index-manager-memory.test.cjs
 describe('Index Manager Memory Safety', () => {
   it('should split large file sets into batches', async () => {
     const manager = new IndexManager({
       projectRoot: '/tmp/test',
-      maxFiles: 100
+      maxFiles: 100,
     });
 
     // Mock 1000 files
-    const files = Array.from({length: 1000}, (_, i) => `/file${i}.js`);
+    const files = Array.from({ length: 1000 }, (_, i) => `/file${i}.js`);
 
     const result = await manager.indexDirectory('/tmp/test');
 
@@ -320,11 +344,13 @@ describe('Index Manager Memory Safety', () => {
 **Location**: 68 occurrences across 36 files (76% unprotected)
 
 **Issue**: Raw `JSON.parse()` calls without validation allow:
+
 - **Prototype Pollution**: `{ "__proto__": { isAdmin: true } }`
 - **Crash Vectors**: Malformed JSON crashes hook process
 - **Memory Exhaustion**: Deeply nested objects cause stack overflow
 
 **Evidence from Memory**:
+
 ```
 learnings.md line 306-310:
 **Pattern: JSON.parse Vulnerability Cascade (2026-02-14)**
@@ -334,10 +360,12 @@ learnings.md line 306-310:
 ```
 
 **Current State**:
+
 - ✅ Tier-1 hooks (5/5) using `safeParseJSON()` (reflection, metrics, config loaders)
 - ❌ 31 remaining files still using raw `JSON.parse()`
 
 **Affected Files** (sample):
+
 ```
 .claude/hooks/routing/user-prompt-unified.cjs
 .claude/hooks/routing/routing-guard-core.cjs
@@ -346,8 +374,10 @@ learnings.md line 306-310:
 ```
 
 **Suggested Fix**:
+
 1. Immediate: Audit and replace all `JSON.parse()` with `safeParseJSON()`
 2. Add ESLint rule:
+
 ```javascript
 // .eslintrc.cjs
 rules: {
@@ -362,6 +392,7 @@ rules: {
 ```
 
 3. Add tests for all migration targets:
+
 ```javascript
 // tests/lib/utils/safe-json-migration.test.cjs
 describe('safeParseJSON Migration Validation', () => {
@@ -390,12 +421,14 @@ describe('safeParseJSON Migration Validation', () => {
 **Location**: `.claude/tools/cli/*.cjs` (66 tool files)
 
 **Issue**: Many CLI tools lack:
+
 - Exit code validation
 - Error message user-friendliness
 - Graceful degradation on failure
 - Input validation
 
 **Evidence**:
+
 ```bash
 # Sample of tools with TODO/FIXME comments
 .claude/tools/cli/doctor.mjs
@@ -403,6 +436,7 @@ describe('safeParseJSON Migration Validation', () => {
 ```
 
 **Example Vulnerable Pattern**:
+
 ```javascript
 // ❌ BAD: No error handling
 async function runTool() {
@@ -438,12 +472,14 @@ async function runTool() {
 ```
 
 **Suggested Fix**:
+
 1. Audit all 66 CLI tools for error handling patterns
 2. Create error handling template:
+
 ```javascript
 // .claude/lib/cli/error-handler.cjs
 function wrapCLITool(toolFn) {
-  return async function(...args) {
+  return async function (...args) {
     try {
       const result = await toolFn(...args);
       process.exit(0);
@@ -461,6 +497,7 @@ function wrapCLITool(toolFn) {
 ```
 
 3. Add tests:
+
 ```javascript
 // tests/cli/error-handling.test.cjs
 describe('CLI Tool Error Handling', () => {
@@ -488,11 +525,13 @@ describe('CLI Tool Error Handling', () => {
 **Location**: Various test files using hardcoded paths
 
 **Issue**: Tests use Unix-style paths that fail on Windows:
+
 - `path.relative()` returns backslash on Windows
 - Glob patterns expect forward slashes
 - Regex patterns don't match backslashes
 
 **Evidence from Memory**:
+
 ```
 learnings.md:
 ## Windows Path Issues (Critical)
@@ -503,7 +542,9 @@ learnings.md:
 ```
 
 **Suggested Fix**:
+
 1. Create path normalization utility:
+
 ```javascript
 // .claude/lib/utils/path-utils.cjs
 function normalizePath(p) {
@@ -517,6 +558,7 @@ function normalizeGlobPattern(pattern) {
 ```
 
 2. Update all tests to use normalized paths:
+
 ```javascript
 // ❌ BAD
 expect(result.path).toBe('src\\utils\\helper.js');
@@ -526,6 +568,7 @@ expect(normalizePath(result.path)).toBe('src/utils/helper.js');
 ```
 
 3. Add cross-platform test suite:
+
 ```javascript
 // tests/lib/utils/path-normalization.test.cjs
 describe('Path Normalization (Cross-Platform)', () => {
@@ -555,6 +598,7 @@ describe('Path Normalization (Cross-Platform)', () => {
 **Issue**: No validation that scripts reference existing files
 
 **Examples of Potential Issues**:
+
 ```json
 {
   "scripts": {
@@ -569,12 +613,15 @@ describe('Path Normalization (Cross-Platform)', () => {
 ```
 
 **Impact**:
+
 - Scripts point to archived tests (no-op commands)
 - Users expect tests to run but get echo messages
 - CI pipelines may silently pass when they should fail
 
 **Suggested Fix**:
+
 1. Create script validator:
+
 ```javascript
 // scripts/validate-package-scripts.mjs
 import { execSync } from 'child_process';
@@ -611,6 +658,7 @@ console.log('✅ All package.json scripts validated');
 ```
 
 2. Add to validation suite:
+
 ```json
 {
   "scripts": {
@@ -633,12 +681,14 @@ console.log('✅ All package.json scripts validated');
 **Issue**: No tests for batch creation detection ("create 10 agents" → orchestrator routing)
 
 **Impact**:
+
 - 10 developers write artifacts directly (bypassing creator skills)
 - Missing catalog entries
 - CLAUDE.md out of sync
 - Routing failures
 
 **Evidence from Memory**:
+
 ```
 learnings.md line 66-70:
 4. **Batch creation detection untested** (user-prompt-unified.cjs line ~500-800)
@@ -648,6 +698,7 @@ learnings.md line 66-70:
 ```
 
 **Suggested Tests**:
+
 ```javascript
 // tests/hooks/batch-creation-detection.test.cjs
 describe('Batch Creation Detection', () => {
@@ -678,18 +729,20 @@ describe('Batch Creation Detection', () => {
 **Issue**: Constitution/behaviour loading tests exist, but no memory mode validation (STM/MTM/LTM)
 
 **Impact**:
+
 - Agents spawned without project learnings context
 - Decisions made without historical knowledge
 - Repeat same mistakes
 
 **Suggested Tests**:
+
 ```javascript
 // tests/hooks/spawn-prompt-memory-mode.test.cjs
 describe('Spawn Prompt Memory Injection', () => {
   it('should inject STM context for current session', () => {
     const prompt = assembleSpawnPrompt({
       agentType: 'developer',
-      memoryMode: 'hybrid'
+      memoryMode: 'hybrid',
     });
     expect(prompt).toContain('## Current Session Context');
     expect(prompt).toContain('STM:');
@@ -698,7 +751,7 @@ describe('Spawn Prompt Memory Injection', () => {
   it('should inject MTM for recent sessions', () => {
     const prompt = assembleSpawnPrompt({
       agentType: 'planner',
-      memoryDepth: true
+      memoryDepth: true,
     });
     expect(prompt).toContain('## Recent Sessions (MTM)');
   });
@@ -706,7 +759,7 @@ describe('Spawn Prompt Memory Injection', () => {
   it('should inject LTM for exploratory tasks', () => {
     const prompt = assembleSpawnPrompt({
       agentType: 'researcher',
-      memoryDepth: true
+      memoryDepth: true,
     });
     expect(prompt).toContain('## Permanent Knowledge (LTM)');
   });
@@ -724,11 +777,13 @@ describe('Spawn Prompt Memory Injection', () => {
 **Issue**: No tests for ambiguous intent classification
 
 **Examples**:
+
 - "review code" → should route to `code-reviewer`, NOT `developer`
 - "update docs" → should route to `technical-writer`, NOT `developer`
 - "refactor code" → should route to `code-simplifier`, NOT `developer`
 
 **Suggested Tests**:
+
 ```javascript
 // tests/lib/routing/intent-disambiguation.test.cjs
 describe('Intent Disambiguation', () => {
@@ -763,6 +818,7 @@ describe('Intent Disambiguation', () => {
 **Risk**: Command injection vulnerabilities if hooks fail
 
 **Suggested Tests**:
+
 ```javascript
 // tests/hooks/shell-injection-validator.test.cjs
 describe('Shell Injection Protection', () => {
@@ -773,14 +829,14 @@ describe('Shell Injection Protection', () => {
     'cat file; rm file',
     'echo $(whoami)',
     'echo `whoami`',
-    'file with spaces'
+    'file with spaces',
   ];
 
   dangerousPatterns.forEach(pattern => {
     it(`should block dangerous pattern: ${pattern}`, () => {
       const input = {
         tool: 'Bash',
-        params: { command: pattern }
+        params: { command: pattern },
       };
       const result = preToolUse(input);
       expect(result.allow).toBe(false);
@@ -790,7 +846,7 @@ describe('Shell Injection Protection', () => {
   it('should allow safe commands', () => {
     const input = {
       tool: 'Bash',
-      params: { command: 'ls -la' }
+      params: { command: 'ls -la' },
     };
     const result = preToolUse(input);
     expect(result.allow).toBe(true);
@@ -809,6 +865,7 @@ describe('Shell Injection Protection', () => {
 **Issue**: Tests that depend on timing can be flaky on slower CI systems
 
 **Example Anti-Pattern**:
+
 ```javascript
 // ❌ BAD: Timing-dependent
 it('should process within 100ms', async () => {
@@ -820,6 +877,7 @@ it('should process within 100ms', async () => {
 ```
 
 **Suggested Fix**:
+
 ```javascript
 // ✅ GOOD: Use condition-based waiting
 it('should process successfully', async () => {
@@ -834,6 +892,7 @@ it('should complete within reasonable time', async () => {
 ```
 
 **Suggested Action**:
+
 1. Audit all tests for timing assertions
 2. Replace with condition-based assertions
 3. Use proper test timeouts instead of duration checks
@@ -847,11 +906,13 @@ it('should complete within reasonable time', async () => {
 **Location**: `.claude/lib/memory/memory-tiers.cjs`
 
 **Issue**: LTM eviction logic may not handle edge cases:
+
 - What happens when all sessions exceed retention limit?
 - How does eviction handle concurrent writes?
 - What if eviction fails mid-process?
 
 **Suggested Tests**:
+
 ```javascript
 // tests/lib/memory/memory-tiers-eviction.test.cjs
 describe('Memory Tier Eviction Edge Cases', () => {
@@ -885,11 +946,13 @@ describe('Memory Tier Eviction Edge Cases', () => {
 **Location**: `.claude/tools/cli/validate-agent-template-contract.cjs`
 
 **Issue**: Agent frontmatter validation may miss:
+
 - Invalid model names
 - Missing required fields
 - Conflicting tool assignments
 
 **Suggested Tests**:
+
 ```javascript
 // tests/cli/agent-frontmatter-validation.test.cjs
 describe('Agent Frontmatter Validation', () => {
@@ -910,7 +973,7 @@ describe('Agent Frontmatter Validation', () => {
     // Router should not have Edit/Write tools
     const frontmatter = {
       type: 'router',
-      tools: ['Task', 'Edit', 'Write']
+      tools: ['Task', 'Edit', 'Write'],
     };
     const result = validateAgentFrontmatter(frontmatter);
     expect(result.valid).toBe(false);
@@ -929,6 +992,7 @@ describe('Agent Frontmatter Validation', () => {
 **Issue**: What happens when semantic search fails? Does it fall back to BM25-only?
 
 **Suggested Tests**:
+
 ```javascript
 // tests/code-indexing/hybrid-search-fallback.test.cjs
 describe('Hybrid Search Fallback', () => {
@@ -965,6 +1029,7 @@ describe('Hybrid Search Fallback', () => {
 **Issue**: What happens when `learnings.md`, `decisions.md`, `issues.md` are empty or missing?
 
 **Suggested Tests**:
+
 ```javascript
 // tests/lib/memory/memory-manager-edge-cases.test.cjs
 describe('Memory Manager Edge Cases', () => {
@@ -1000,6 +1065,7 @@ describe('Memory Manager Edge Cases', () => {
 **Issue**: Some tools may not be executable due to missing shebang
 
 **Audit Results**:
+
 ```bash
 # Found 20 executable tools with shebang
 .claude/tools/chrome-browser/chrome-browser.cjs
@@ -1009,7 +1075,9 @@ describe('Memory Manager Edge Cases', () => {
 ```
 
 **Suggested Fix**:
+
 1. Audit all tool files:
+
 ```bash
 find .claude/tools -name "*.cjs" -o -name "*.mjs" | while read f; do
   if ! head -1 "$f" | grep -q "^#!/usr/bin/env node"; then
@@ -1019,6 +1087,7 @@ done
 ```
 
 2. Add shebang to all CLI tools:
+
 ```javascript
 #!/usr/bin/env node
 'use strict';
@@ -1027,6 +1096,7 @@ done
 ```
 
 3. Make executable:
+
 ```bash
 chmod +x .claude/tools/cli/*.cjs
 ```
@@ -1042,12 +1112,14 @@ chmod +x .claude/tools/cli/*.cjs
 **Issue**: No validation that registered hooks exist and are loadable
 
 **Evidence from Memory**:
+
 ```
 learnings.md:
 - 10 active hooks unregistered in settings.json; verify bash-command-validator, shell-injection-validator, windows-null-sanitizer are wired through alternative mechanism.
 ```
 
 **Suggested Tests**:
+
 ```javascript
 // tests/hooks/hook-registration.test.cjs
 const settings = require('../../.claude/settings.json');
@@ -1095,13 +1167,12 @@ describe('Hook Registration Validation', () => {
 **Issue**: File locking under high concurrency may have edge cases
 
 **Suggested Tests**:
+
 ```javascript
 // tests/lib/memory/file-locking-concurrency.test.cjs
 describe('File Locking Under Concurrency', () => {
   it('should handle 10 concurrent writes safely', async () => {
-    const writes = Array.from({length: 10}, (_, i) =>
-      writeMemoryWithLock(`entry-${i}`)
-    );
+    const writes = Array.from({ length: 10 }, (_, i) => writeMemoryWithLock(`entry-${i}`));
 
     await Promise.all(writes);
 
@@ -1137,6 +1208,7 @@ describe('File Locking Under Concurrency', () => {
 **Issue**: Tests use hardcoded paths that may not exist on all systems
 
 **Example**:
+
 ```javascript
 // ❌ BAD
 const configPath = 'C:\\Users\\user\\.claude\\config.json';
@@ -1157,6 +1229,7 @@ const configPath = path.join(os.homedir(), '.claude', 'config.json');
 **Issue**: Some async tests may hang indefinitely without timeout
 
 **Suggested Fix**:
+
 ```javascript
 // ✅ Add default timeout
 describe('Async Operations', () => {
@@ -1174,6 +1247,7 @@ describe('Async Operations', () => {
 **Location**: `.claude/lib/memory/memory-rotator.cjs`
 
 **Issue**: No tests for:
+
 - What happens when archive directory is full?
 - How rotation handles concurrent writes?
 - Rotation rollback on failure?
@@ -1190,14 +1264,16 @@ describe('Async Operations', () => {
 **Issue**: No validation that required env vars are set
 
 **Example**:
+
 ```javascript
 const config = {
-  maxMemory: parseInt(process.env.INDEX_MAX_MEMORY_MB || '2048', 10)
+  maxMemory: parseInt(process.env.INDEX_MAX_MEMORY_MB || '2048', 10),
 };
 // What if INDEX_MAX_MEMORY_MB is 'invalid'? NaN!
 ```
 
 **Suggested Fix**:
+
 ```javascript
 function getEnvInt(key, defaultValue) {
   const val = process.env[key];
@@ -1222,6 +1298,7 @@ function getEnvInt(key, defaultValue) {
 **Location**: `package.json`
 
 **Issue**: Scripts point to archived tests:
+
 ```json
 {
   "test:hooks": "echo 'Hook tests archived - see .claude.archive/.claude.old/tests/'",
@@ -1232,6 +1309,7 @@ function getEnvInt(key, defaultValue) {
 **Impact**: Users expect tests to run but get echo messages
 
 **Suggested Fix**: Either:
+
 1. Remove archived scripts from package.json
 2. Add `deprecated:` prefix: `"deprecated:test:hooks"`
 3. Create stub tests that skip with message
@@ -1268,6 +1346,7 @@ function getEnvInt(key, defaultValue) {
 **Issue**: Production code using `console.log` instead of structured logging
 
 **Evidence from Memory**:
+
 ```
 learnings.md:
 architecture (107KB skill-creator, 23 circular deps), code review (646 console bypass)
@@ -1303,6 +1382,7 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 ## Summary by Category
 
 ### Test Coverage Gaps (Critical)
+
 1. Routing guard core logic (20 tests needed)
 2. Task lifecycle state machine (15 tests needed)
 3. Workflow cycle detection (10 tests needed)
@@ -1310,16 +1390,19 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 5. Spawn prompt memory injection (8 tests needed)
 
 ### Security Vulnerabilities (Critical)
+
 1. JSON.parse unprotected (36 files to fix)
 2. Shell injection tests incomplete (10 tests needed)
 3. Memory tier eviction edge cases (8 tests needed)
 
 ### Script Reliability (High)
+
 1. CLI tool error handling (66 tools to audit)
 2. Package.json script validation (159 scripts)
 3. Missing shebang lines (audit needed)
 
 ### Edge Case Handling (Medium)
+
 1. Windows path normalization
 2. Empty memory files
 3. Environment variable validation
@@ -1330,9 +1413,11 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 ## Recommended Remediation Plan
 
 ### Sprint 1 (Week 1) - P0 Critical Path
+
 **Goal**: Close security vulnerabilities and critical test gaps
 
 **Tasks**:
+
 1. **JSON.parse Migration** (2 days)
    - Replace 68 occurrences with safeParseJSON()
    - Add ESLint rule
@@ -1351,9 +1436,11 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 ---
 
 ### Sprint 2 (Week 2) - P0 Completion + P1 Start
+
 **Goal**: Complete P0 items, start high-priority improvements
 
 **Tasks**:
+
 1. **Workflow Cycle Detection** (0.5 day)
    - 10 tests for infinite loop detection
 
@@ -1379,9 +1466,11 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 ---
 
 ### Sprint 3 (Week 3) - P1 Completion
+
 **Goal**: Complete high-priority test gaps and reliability improvements
 
 **Tasks**:
+
 1. **Batch Creation Detection** (0.5 day) - 10 tests
 2. **Memory Mode Validation** (0.5 day) - 8 tests
 3. **Intent Disambiguation** (1 day) - 12 tests
@@ -1395,9 +1484,11 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 ---
 
 ### Sprint 4 (Week 4) - P1/P2 Completion
+
 **Goal**: Complete remaining high-priority and start medium-priority items
 
 **Tasks**:
+
 1. **Hybrid Search Fallback** (1 day) - 8 tests
 2. **Memory Manager Edge Cases** (0.5 day) - 6 tests
 3. **Script Shebang Audit** (0.5 day)
@@ -1424,18 +1515,21 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 ## Test Execution Summary
 
 **Current State** (as of 2026-02-16):
+
 - Test command: `pnpm test`
 - Test concurrency: 1 (sequential execution)
 - Test files: 213+ test files in `tests/` directory
 - Package scripts: 159 npm scripts
 
 **Execution Notes**:
+
 - Tests run with `node --test --test-concurrency=1`
 - Output format: TAP (Test Anything Protocol)
 - Some tests have memory/performance benchmarks
 - Test categories: unit, integration, framework, tools
 
 **Next Steps**:
+
 1. Complete test execution to get exact pass/fail count
 2. Run `pnpm lint:fix` to verify code quality gates
 3. Run `pnpm format` to verify formatting compliance
@@ -1446,6 +1540,7 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 ## Appendix A: Test File Inventory
 
 **Test Categories**:
+
 - Agents: `tests/agents/`
 - Artifacts: `tests/artifacts/`
 - Benchmarks: `tests/benchmarks/`
@@ -1462,6 +1557,7 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 ## Appendix B: Script Inventory
 
 **Package.json Scripts** (159 total):
+
 - Test scripts: 23
 - Validation scripts: 27
 - Metrics scripts: 24
@@ -1475,6 +1571,7 @@ architecture (107KB skill-creator, 23 circular deps), code review (646 console b
 ## Appendix C: Memory Learnings Reference
 
 This report incorporates learnings from:
+
 - Enterprise Pipeline Execution (2026-02-15)
 - QA Audit: Test Coverage Gaps (2026-02-15)
 - Tri-Audit Learnings (2026-02-13)
@@ -1486,6 +1583,7 @@ This report incorporates learnings from:
 **Report Complete**
 
 **Next Actions**:
+
 1. Review and prioritize findings with stakeholders
 2. Create GitHub issues for P0/P1 items
 3. Begin Sprint 1 remediation

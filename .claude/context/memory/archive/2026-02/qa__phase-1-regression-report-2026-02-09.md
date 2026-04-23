@@ -29,12 +29,12 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 **Command:** `pnpm test`
 **Exit Code:** 0 ✅
 
-| Metric      | Result | Baseline | Status |
-| ----------- | ------ | -------- | ------ |
-| Tests       | 0      | 0        | ✅ PASS |
-| Suites      | 0      | 0        | ✅ PASS |
-| Failures    | 0      | 0        | ✅ PASS |
-| Duration    | 6.7ms  | 6.9ms    | ✅ PASS |
+| Metric   | Result | Baseline | Status  |
+| -------- | ------ | -------- | ------- |
+| Tests    | 0      | 0        | ✅ PASS |
+| Suites   | 0      | 0        | ✅ PASS |
+| Failures | 0      | 0        | ✅ PASS |
+| Duration | 6.7ms  | 6.9ms    | ✅ PASS |
 
 **Analysis:** Test suite baseline maintained. No pre-existing tests, no new test failures.
 
@@ -50,6 +50,7 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 #### Error Details
 
 **File: `.claude/hooks/session/adaptive-quality-gate.cjs`**
+
 - Line 34: `'err' is defined but never used` (no-unused-vars)
 - Line 49: `'err' is defined but never used` (no-unused-vars)
 - Line 82: `'err' is defined but never used` (no-unused-vars)
@@ -57,10 +58,12 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 - Line 151: `'innerErr' is defined but never used` (no-unused-vars)
 
 **File: `.claude/hooks/session/drift-detector.cjs`**
+
 - Line 243: `'stdinBuffer' is assigned a value but never used` (no-unused-vars)
 - Line 244: `'stdin' is assigned a value but never used` (no-unused-vars)
 
 **Root Cause:**
+
 - Catch block error variables not prefixed with underscore (`_err`, `_innerErr`)
 - Unused variables in main execution block not matching allowed pattern
 
@@ -68,11 +71,11 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 
 **Baseline Comparison:**
 
-| Metric         | Result   | Baseline | Status   |
-| -------------- | -------- | -------- | -------- |
-| Exit Code      | 1        | 0        | ❌ FAIL   |
-| Linting Errors | 7        | 0        | ❌ FAIL   |
-| Auto-fix       | Applied  | Applied  | ✅ PASS   |
+| Metric         | Result  | Baseline | Status  |
+| -------------- | ------- | -------- | ------- |
+| Exit Code      | 1       | 0        | ❌ FAIL |
+| Linting Errors | 7       | 0        | ❌ FAIL |
+| Auto-fix       | Applied | Applied  | ✅ PASS |
 
 ---
 
@@ -81,11 +84,11 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 **Command:** `pnpm format`
 **Exit Code:** 0 ✅
 
-| Metric               | Result | Baseline | Status |
-| -------------------- | ------ | -------- | ------ |
-| Files Formatted      | 2853   | 2853     | ✅ PASS |
-| Files Changed        | 0      | 0        | ✅ PASS |
-| Chunks Processed     | 6      | 6        | ✅ PASS |
+| Metric           | Result | Baseline | Status  |
+| ---------------- | ------ | -------- | ------- |
+| Files Formatted  | 2853   | 2853     | ✅ PASS |
+| Files Changed    | 0      | 0        | ✅ PASS |
+| Chunks Processed | 6      | 6        | ✅ PASS |
 
 **Analysis:** All files properly formatted. No changes needed. Baseline maintained.
 
@@ -99,8 +102,8 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 **Exit Code:** 0 ✅
 **Duration:** 5102.3ms
 
-| Test Case                                     | Status |
-| --------------------------------------------- | ------ |
+| Test Case                                     | Status  |
+| --------------------------------------------- | ------- |
 | First prompt creates state file               | ✅ PASS |
 | First prompt extracts intent from first sent. | ✅ PASS |
 | First prompt extracts keywords correctly      | ✅ PASS |
@@ -125,9 +128,9 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 **Exit Code:** 0 ✅
 **Duration:** 8296.9ms
 
-| Test Case                                                    | Status |
-| ------------------------------------------------------------ | ------ |
-| First edit creates counter file with count=1                | ✅ PASS |
+| Test Case                                                    | Status  |
+| ------------------------------------------------------------ | ------- |
+| First edit creates counter file with count=1                 | ✅ PASS |
 | 5th edit triggers first threshold warning                    | ✅ PASS |
 | 10th edit triggers second threshold warning                  | ✅ PASS |
 | 20th edit triggers repeat warning at interval of 10          | ✅ PASS |
@@ -146,16 +149,16 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 **Exit Code:** 0 ✅
 **Duration:** 1798.9ms
 
-| Test Case                                             | Status |
-| ----------------------------------------------------- | ------ |
-| Detects console.log in .js file                       | ✅ PASS |
-| Ignores console.log in comments                       | ✅ PASS |
-| Detects print() in .py file only                      | ✅ PASS |
-| Detects TODO/FIXME/XXX/HACK markers (case-insensitive)| ✅ PASS |
-| Detects hardcoded secret patterns                     | ✅ PASS |
-| Reports max 5 issues (truncation)                     | ✅ PASS |
-| Handles missing file gracefully (no crash)            | ✅ PASS |
-| Always passes through original JSON to stdout         | ✅ PASS |
+| Test Case                                              | Status  |
+| ------------------------------------------------------ | ------- |
+| Detects console.log in .js file                        | ✅ PASS |
+| Ignores console.log in comments                        | ✅ PASS |
+| Detects print() in .py file only                       | ✅ PASS |
+| Detects TODO/FIXME/XXX/HACK markers (case-insensitive) | ✅ PASS |
+| Detects hardcoded secret patterns                      | ✅ PASS |
+| Reports max 5 issues (truncation)                      | ✅ PASS |
+| Handles missing file gracefully (no crash)             | ✅ PASS |
+| Always passes through original JSON to stdout          | ✅ PASS |
 
 **Summary:** 8/8 tests passed ✅
 
@@ -165,12 +168,12 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 
 ### Baseline Comparison Matrix
 
-| Check              | Baseline | Current | Regression | Severity   |
-| ------------------ | -------- | ------- | ---------- | ---------- |
-| **Tests Pass**     | 0/0      | 0/0     | ✅ No       | -          |
-| **Lint Clean**     | ✅ Pass   | ❌ Fail  | ❌ Yes      | 🔴 BLOCKING |
-| **Format Clean**   | ✅ Pass   | ✅ Pass  | ✅ No       | -          |
-| **New Hook Tests** | N/A      | 29/29   | ✅ No       | -          |
+| Check              | Baseline | Current | Regression | Severity    |
+| ------------------ | -------- | ------- | ---------- | ----------- |
+| **Tests Pass**     | 0/0      | 0/0     | ✅ No      | -           |
+| **Lint Clean**     | ✅ Pass  | ❌ Fail | ❌ Yes     | 🔴 BLOCKING |
+| **Format Clean**   | ✅ Pass  | ✅ Pass | ✅ No      | -           |
+| **New Hook Tests** | N/A      | 29/29   | ✅ No      | -           |
 
 ### Regression Summary
 
@@ -184,6 +187,7 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
    - **Fix Required:** Rename error variables to match ESLint pattern
 
 **No Other Regressions:**
+
 - ✅ Test suite baseline maintained (0 tests → 0 tests)
 - ✅ Format baseline maintained (2853 files, 0 changes)
 - ✅ All 29 new hook tests pass
@@ -194,12 +198,12 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 
 ### BLOCKING Requirements (from testing.md)
 
-| Gate                 | Status   | Evidence                                 |
-| -------------------- | -------- | ---------------------------------------- |
-| All tests pass       | ✅ PASS   | 0 failures (baseline maintained)         |
-| **Lint clean**       | ❌ FAIL   | **7 errors in 2 files**                  |
-| **Format clean**     | ✅ PASS   | 2853 files formatted, 0 changes          |
-| New tests pass       | ✅ PASS   | 29/29 hook tests passed                  |
+| Gate             | Status  | Evidence                         |
+| ---------------- | ------- | -------------------------------- |
+| All tests pass   | ✅ PASS | 0 failures (baseline maintained) |
+| **Lint clean**   | ❌ FAIL | **7 errors in 2 files**          |
+| **Format clean** | ✅ PASS | 2853 files formatted, 0 changes  |
+| New tests pass   | ✅ PASS | 29/29 hook tests passed          |
 
 **Completion Blocked:** Lint errors must be fixed before marking task complete.
 
@@ -247,17 +251,20 @@ Phase 1 hook creation introduced **7 linting errors** in 2 new hooks. All new ho
 Phase 1 hook creation successfully added 3 new hooks with comprehensive test coverage (29 tests, all passing). However, **7 lint errors were introduced**, blocking task completion.
 
 **Required Before Completion:**
+
 1. Fix 7 lint errors (rename error variables to match ESLint pattern)
 2. Re-run `pnpm lint:fix` → exit 0
 3. Verify no new format changes
 4. Mark task complete only after all quality gates pass
 
 **Test Quality:** Excellent
+
 - 29 new tests, 100% passing
 - Comprehensive edge case coverage
 - Error handling validated
 
 **Code Quality:** Requires Fix
+
 - 7 lint errors introduced
 - Simple fix (variable renaming)
 - No functional issues

@@ -6,12 +6,7 @@ const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 const SEVERITY_MODULE = path.join(PROJECT_ROOT, '.claude', 'lib', 'hooks', 'severity.cjs');
-const SCHEMA_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'schemas',
-  'guardrail-result.schema.json'
-);
+const SCHEMA_PATH = path.join(PROJECT_ROOT, '.claude', 'schemas', 'guardrail-result.schema.json');
 
 // ---------------------------------------------------------------------------
 // Test 1: asWarning returns { severity:"warning", message, ts }
@@ -21,7 +16,10 @@ test('asWarning returns object with severity warning, message, and ts', () => {
   const result = asWarning('something looks off');
   assert.strictEqual(result.severity, 'warning', 'severity must be "warning"');
   assert.strictEqual(result.message, 'something looks off', 'message must be passed through');
-  assert.ok(typeof result.ts === 'string' && result.ts.length > 0, 'ts must be a non-empty ISO string');
+  assert.ok(
+    typeof result.ts === 'string' && result.ts.length > 0,
+    'ts must be a non-empty ISO string'
+  );
   // Verify ts parses as a valid date
   assert.ok(!isNaN(Date.parse(result.ts)), 'ts must be a parseable ISO timestamp');
 });
@@ -97,7 +95,11 @@ test('guardrail-result schema accepts check item with severity "warning"', () =>
     assert.ok(true, 'validation skipped (Ajv unavailable) — schema test counts as passing');
     return;
   }
-  assert.strictEqual(result.valid, true, `Schema should accept severity:"warning". Errors: ${JSON.stringify(result.errors)}`);
+  assert.strictEqual(
+    result.valid,
+    true,
+    `Schema should accept severity:"warning". Errors: ${JSON.stringify(result.errors)}`
+  );
 });
 
 // ---------------------------------------------------------------------------

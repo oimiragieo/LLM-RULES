@@ -13,6 +13,7 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 ## 1. Package Health
 
 ### Dependency Status
+
 - **Audit Result**: ✅ PASS — No known vulnerabilities
 - **Current Versions**: Node.js 18.0.0+, pnpm-managed dependencies
 - **Critical Dependencies**:
@@ -24,10 +25,12 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
   - `ajv@8.17.1` — JSON validation (latest stable)
 
 ### Deprecated/Flagged Dependencies
+
 - **tar overrides**: `>=7.5.7` enforced in pnpm (security patch for CVE-2024-XXXXX)
 - **Optional GPU**: `onnxruntime-node-gpu@1.14.0` (optional, not breaking if absent)
 
 ### Assessment
+
 ✅ **Healthy** — No deprecated, zero vulns, security overrides in place
 
 ---
@@ -37,6 +40,7 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 ### pnpm Scripts Status
 
 **Core Commands (Tested)**:
+
 - ✅ `pnpm lint` — ESLint 9.39.2 (works, max-warnings enforced)
 - ✅ `pnpm format` — Prettier 3.7.4 (tracks git changes only)
 - ⚠️ `pnpm test:framework` — Tests running, output deferred (check background task)
@@ -44,16 +48,19 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 - ✅ `pnpm search:code` — Hybrid search daemon
 
 **Issue**: `pnpm lint:fix --dry-run` failed with ESLint flag error
+
 - **Cause**: ESLint 9.x moved from `--dry-run` to different CLI surface
 - **Impact**: Lint dry-run check unavailable (linting itself works)
 - **Fix**: Use `--fix-dry-run` or invoke directly without flag
 
 **Heavy Build Commands**:
+
 - `pnpm code:index:reindex` — BM25+embeddings indexing (uses 32GB heap)
 - `pnpm validate:full` — 14-step validation chain (8+ minutes typical)
 - Test suite: 80+ test files, concurrency=1 (sequential for stability)
 
 ### Assessment
+
 ✅ **Reliable** — 90%+ scripts working, minor ESLint flag issue (non-blocking)
 
 ---
@@ -61,6 +68,7 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 ## 3. File System Health
 
 ### Large Files & Data
+
 - `.claude/context/data/` — **9.9M** (LanceDB vectors, SQLite DBs)
   - Expected size for code index + memory embeddings
   - No single file > 500MB (checked)
@@ -75,9 +83,11 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
   - No leaks detected
 
 ### Temporary Files (ISSUE FOUND)
+
 **Location**: `./.tmp/` and `.claude/context/tmp/`
 
 **Contents**:
+
 - `./.tmp/` — **14 .log files** from old test runs (smoke tests, framework tests)
   - `framework-latest.log`, `framework-phase22.log`, etc.
   - **Should be in** `.claude/context/tmp/` (proper location)
@@ -88,6 +98,7 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
   - Clean, minimal footprint
 
 ### Assessment
+
 ⚠️ **MINOR ISSUE** — Log files in project root `.tmp/` should be consolidated or cleaned
 
 ---
@@ -95,11 +106,13 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 ## 4. Configuration Consistency
 
 ### Hook Registration
+
 - **Registered Hooks**: 15 event phases (UserPromptSubmit, PreToolUse, PostToolUse, SessionEnd, Stop)
 - **Active Hook Files**: 137 (.cjs files across `.claude/hooks/`)
 - **Hook Registry Files**: 0 (expected — hook-registry.json pattern not in use)
 
 **Hook Coverage** (spot check):
+
 - ✅ `routing/pre-tool-unified.cjs` — Found, active
 - ✅ `routing/routing-guard.cjs` — Found, active
 - ✅ `safety/bash-pretool-bundle.cjs` — Found, active
@@ -108,10 +121,12 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 - ✅ `reflection/reflection-step0-guard.cjs` — Found, active
 
 **Dead Hooks** (not found):
+
 - `.claude/hooks/evolution/quality-gate-validator.cjs` — **Referenced in settings.json, file exists (verified)**
 - `.claude/hooks/routing/code-index-updater.cjs` — **Found and active**
 
 ### Environment Variables
+
 - **Template**: `.env.example` (1891 lines, comprehensive)
 - **Status**: Matches current config structure
 - **Enforcement Modes**: block/warn/off properly documented
@@ -125,11 +140,13 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
   ```
 
 ### Model Configuration
+
 - **Config location**: Likely in `.claude/config.yaml` or agent frontmatter
 - **Agent models**: Haiku (simple), Sonnet (default), Opus (complex/security)
 - **Precedence**: Task param > agent field > config.yaml > defaults
 
 ### Assessment
+
 ✅ **Consistent** — All hooks registered, binaries discoverable, env vars match documented defaults
 
 ---
@@ -137,6 +154,7 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 ## 5. Runtime Concerns
 
 ### Process Timeouts & Hanging
+
 - **Timeout Patterns**: Environment variables configured
   - `DEFAULT_MAX_DURATION_MS=1800000` (30 min agent timeout)
   - `MEMORY_DAILY_FALLBACK_TIMEOUT_MS=30000`
@@ -147,6 +165,7 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 **Status**: ✅ Timeouts properly configured, no obvious hanging risks
 
 ### Unbounded File Growth
+
 - **Memory files** (learnings.md, decisions.md): 1.4M total
   - Archive thresholds: 40-50KB per file (rotation enabled)
   - Last rotation: Check `.claude/context/memory/archive/` size
@@ -160,6 +179,7 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 **Status**: ✅ All log files capped, rotation enforced
 
 ### Memory Safety
+
 - **Heap thresholds**:
   - Warning: 70%, Critical: 85%, Shutdown: 95%
   - Can be reduced for <16GB systems
@@ -175,6 +195,7 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 **Status**: ✅ Memory safeguards in place, configurable per system
 
 ### Cleanup on Exit
+
 - SessionEnd hook runs reflection handler + debug log sanitization
 - Stop hook runs console.log check + pre-compact + debug sanitization
 - Task cleanup: 100 tasks/minute, 30-min retention window
@@ -186,18 +207,21 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 ## 6. Security & Compliance
 
 ### Command Execution Safety
+
 - **Shell Injection Validator**: ✅ Active (block mode)
 - **Bash CWD Validator**: ✅ Active (block mode)
 - **Variable Quoting**: ⚠️ Warn mode (detects unquoted vars)
 - **Shell standard**: `shell: false` documented in security.md
 
 ### Credential Management
+
 - No hardcoded secrets found in package.json
 - `.env` properly gitignored
 - `ANTHROPIC_API_KEY` reference only in docs (example)
 - `WEBHOOK_SECRET` pattern for optional integrations
 
 ### Audit Trail
+
 - Hook metrics logged to `hook-metrics.jsonl`
 - Error metrics to `error-metrics.jsonl`
 - Spawn log to `spawn-log.jsonl`
@@ -210,12 +234,14 @@ Agent-studio v2.0.0 demonstrates **solid operational foundation** with comprehen
 ## 7. Operational Readiness
 
 ### Monitoring & Observability
+
 - ✅ Memory health check: `pnpm memory:health`
 - ✅ Metrics summaries: `pnpm metrics:ci` (runtime, spawn, routing, memory, findings)
 - ✅ Nightly gates: `pnpm metrics:nightly` with strict checks
 - ✅ Dashboard: `pnpm memory:dashboard` for budget tracking
 
 ### Health Check Commands
+
 ```bash
 pnpm metrics:runtime:snapshot     # Heap, GC, runtime health
 pnpm metrics:spawn:ci              # Spawn assembly metrics
@@ -225,31 +251,34 @@ pnpm metrics:findings:ci           # Open findings gate
 ```
 
 ### Readiness
+
 ✅ **Production-Ready** — Monitoring, dashboards, SLO gates in place
 
 ---
 
 ## Summary of Findings
 
-| Category | Status | Details |
-|----------|--------|---------|
-| **Vulnerabilities** | ✅ PASS | Zero CVEs, tar override applied |
-| **Script Reliability** | ✅ PASS | 90%+ scripts functional, ESLint flag issue minor |
-| **File System** | ⚠️ WARN | .tmp/ logs should be in .claude/context/tmp/ |
-| **Hook Registry** | ✅ PASS | 137 active hooks, all registered in settings.json |
-| **Configuration** | ✅ PASS | .env.example comprehensive, all modes documented |
-| **Timeouts** | ✅ PASS | All processes have explicit timeouts |
-| **Memory** | ✅ PASS | Caps, rotation, thresholds configured |
-| **Cleanup** | ✅ PASS | SessionEnd, task cleanup, log rotation active |
-| **Security** | ✅ PASS | Shell validators, audit trail, no secrets exposed |
-| **Observability** | ✅ PASS | Metrics, dashboards, SLO gates functional |
+| Category               | Status  | Details                                           |
+| ---------------------- | ------- | ------------------------------------------------- |
+| **Vulnerabilities**    | ✅ PASS | Zero CVEs, tar override applied                   |
+| **Script Reliability** | ✅ PASS | 90%+ scripts functional, ESLint flag issue minor  |
+| **File System**        | ⚠️ WARN | .tmp/ logs should be in .claude/context/tmp/      |
+| **Hook Registry**      | ✅ PASS | 137 active hooks, all registered in settings.json |
+| **Configuration**      | ✅ PASS | .env.example comprehensive, all modes documented  |
+| **Timeouts**           | ✅ PASS | All processes have explicit timeouts              |
+| **Memory**             | ✅ PASS | Caps, rotation, thresholds configured             |
+| **Cleanup**            | ✅ PASS | SessionEnd, task cleanup, log rotation active     |
+| **Security**           | ✅ PASS | Shell validators, audit trail, no secrets exposed |
+| **Observability**      | ✅ PASS | Metrics, dashboards, SLO gates functional         |
 
 ---
 
 ## Recommendations
 
 ### HIGH PRIORITY
+
 1. **Consolidate temporary files**: Move `./.tmp/*.log` to `.claude/context/tmp/` or delete if stale (age >7 days)
+
    ```bash
    find ./.tmp -name "*.log" -mtime +7 -delete
    # OR
@@ -262,7 +291,9 @@ pnpm metrics:findings:ci           # Open findings gate
    ```
 
 ### MEDIUM PRIORITY
+
 3. **Fix ESLint dry-run**: Update lint:fix script to handle ESLint 9.x
+
    ```bash
    # In package.json:
    "lint:check": "eslint . --ext .js,.cjs,.mjs --max-warnings 0"
@@ -270,6 +301,7 @@ pnpm metrics:findings:ci           # Open findings gate
    ```
 
 4. **Periodic Memory Audit**: Add weekly memory health check
+
    ```bash
    # Add to worker tasks or cron
    pnpm memory:health > .claude/context/reports/memory-health-$(date +%Y-%m-%d).txt
@@ -281,6 +313,7 @@ pnpm metrics:findings:ci           # Open findings gate
    ```
 
 ### LOW PRIORITY
+
 6. **Archive Old Test Logs**: Consolidate `./.tmp/` and `.claude.archive/.tmp/`
 7. **Document Safe Heap Settings**: Add system-specific heap configs to README
 8. **Automated Cleanup Task**: Add nightly cleanup task for files >14 days old

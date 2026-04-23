@@ -27,16 +27,16 @@ This audit examined the full routing resolution chain (routing-table-core-map.cj
 
 ### Key Metrics
 
-| Category | Count |
-|----------|-------|
-| Total registered agents | 61 |
-| Core agents audited | 7 (developer, qa, planner, architect, code-reviewer, technical-writer, context-compressor) |
-| Specialized agents audited | 5 (code-simplifier, devops, security-architect, database-architect, devops-troubleshooter, incident-responder, researcher) |
-| Routing guard checks | 17 |
-| Critical misrouting gaps found | 6 |
-| Agent tool gaps found | 8 |
-| Agent skill gaps found | 7 |
-| Routing-guard coverage gaps found | 5 |
+| Category                          | Count                                                                                                                      |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Total registered agents           | 61                                                                                                                         |
+| Core agents audited               | 7 (developer, qa, planner, architect, code-reviewer, technical-writer, context-compressor)                                 |
+| Specialized agents audited        | 5 (code-simplifier, devops, security-architect, database-architect, devops-troubleshooter, incident-responder, researcher) |
+| Routing guard checks              | 17                                                                                                                         |
+| Critical misrouting gaps found    | 6                                                                                                                          |
+| Agent tool gaps found             | 8                                                                                                                          |
+| Agent skill gaps found            | 7                                                                                                                          |
+| Routing-guard coverage gaps found | 5                                                                                                                          |
 
 ### Severity Scale
 
@@ -85,14 +85,14 @@ This audit examined the full routing resolution chain (routing-table-core-map.cj
 
 **Missing entries that exist in SPECIALIST_KEYWORD_MAP but not in CLAUDE.md:**
 
-| Should Be In Table | Specialist Agent | Currently Missing |
-|-------------------|-----------------|-------------------|
-| "performance profiling/load test" | performance-engineer | YES |
-| "accessibility audit/wcag" | accessibility-tester | YES |
-| "chaos test/resilience test" | chaos-engineer | YES |
-| "incident/outage/postmortem" | incident-responder | YES |
-| "reverse engineer/disassembly" | reverse-engineer | YES |
-| "data pipeline/etl" | data-engineer | YES |
+| Should Be In Table                | Specialist Agent     | Currently Missing |
+| --------------------------------- | -------------------- | ----------------- |
+| "performance profiling/load test" | performance-engineer | YES               |
+| "accessibility audit/wcag"        | accessibility-tester | YES               |
+| "chaos test/resilience test"      | chaos-engineer       | YES               |
+| "incident/outage/postmortem"      | incident-responder   | YES               |
+| "reverse engineer/disassembly"    | reverse-engineer     | YES               |
+| "data pipeline/etl"               | data-engineer        | YES               |
 
 **Impact:** Router operators (human or AI) consulting the CLAUDE.md table will miss these specialist routes and default to developer.
 
@@ -348,6 +348,7 @@ This audit examined the full routing resolution chain (routing-table-core-map.cj
 ### OPT-03: Add missing tools to 4 agents [P1]
 
 **Actions:**
+
 - code-reviewer: add `Edit`
 - technical-writer: add `Bash`
 - devops: add `WebFetch`, `WebSearch`
@@ -358,6 +359,7 @@ This audit examined the full routing resolution chain (routing-table-core-map.cj
 ### OPT-04: Add 3 agents to SPECIALIST_KEYWORD_MAP [P1]
 
 **Actions:**
+
 - Add `performance-engineer` with profiling/load-test phrases
 - Add `accessibility-tester` with WCAG/a11y phrases
 - Add `chaos-engineer` with failure-injection/resilience phrases
@@ -410,12 +412,12 @@ Add these rows to CLAUDE.md Section 1 "Common Misrouting":
 
 ```markdown
 | "performance profiling/load test" | developer | **performance-engineer** |
-| "accessibility audit/WCAG"        | developer | **accessibility-tester** |
-| "chaos/resilience testing"        | developer | **chaos-engineer**       |
-| "incident/outage/postmortem"      | developer | **incident-responder**   |
-| "reverse engineer/disassembly"    | developer | **reverse-engineer**     |
-| "data pipeline/ETL"               | developer | **data-engineer**        |
-| "integrate repo/onboard"          | researcher| **artifact-integrator**  |
+| "accessibility audit/WCAG" | developer | **accessibility-tester** |
+| "chaos/resilience testing" | developer | **chaos-engineer** |
+| "incident/outage/postmortem" | developer | **incident-responder** |
+| "reverse engineer/disassembly" | developer | **reverse-engineer** |
+| "data pipeline/ETL" | developer | **data-engineer** |
+| "integrate repo/onboard" | researcher| **artifact-integrator** |
 ```
 
 ### Change 2: Fix Quick Routing table formatting
@@ -429,6 +431,7 @@ CLAUDE.md Section 8.5 lists `enterprise-skill-test-*` entries in the "High-impac
 ### Change 4: Add routing conflict documentation
 
 Add a "Known Routing Conflicts" subsection to CLAUDE.md Section 3 or to router-decision.md documenting:
+
 - `refactor`: architect vs code-simplifier vs developer (recommended: code-simplifier)
 - `deploy`: vercel_deploy intent name vs devops agent (recommended: rename intent)
 - `integration`: legacy intent maps to developer (recommended: artifact-integrator)
@@ -440,52 +443,52 @@ Add a "Known Routing Conflicts" subsection to CLAUDE.md Section 3 or to router-d
 
 ### Routing Pipeline
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `.claude/lib/routing/routing-table.cjs` | ~20 | Facade delegating to routing-table-data.cjs |
-| `.claude/lib/routing/routing-table-data.cjs` | ~30 | Aggregator importing 5 sub-modules |
-| `.claude/lib/routing/routing-table-core-map.cjs` | 283 | Primary keyword-to-intent mapping (~280 keywords) |
-| `.claude/lib/routing/routing-table-patterns.cjs` | 37 | Regex-based routing patterns (10 agent categories) |
-| `.claude/lib/routing/routing-table-intent-keywords.cjs` | 528 | Fuzzy intent matching keywords (50+ categories) |
-| `.claude/lib/routing/routing-table-intent-agents.cjs` | 149 | Intent-to-agent name mapping (70+ intents) |
-| `.claude/lib/routing/routing-table-disambiguation.cjs` | 241 | Disambiguation rules for ambiguous terms (13 rules) |
+| File                                                    | Lines | Purpose                                             |
+| ------------------------------------------------------- | ----- | --------------------------------------------------- |
+| `.claude/lib/routing/routing-table.cjs`                 | ~20   | Facade delegating to routing-table-data.cjs         |
+| `.claude/lib/routing/routing-table-data.cjs`            | ~30   | Aggregator importing 5 sub-modules                  |
+| `.claude/lib/routing/routing-table-core-map.cjs`        | 283   | Primary keyword-to-intent mapping (~280 keywords)   |
+| `.claude/lib/routing/routing-table-patterns.cjs`        | 37    | Regex-based routing patterns (10 agent categories)  |
+| `.claude/lib/routing/routing-table-intent-keywords.cjs` | 528   | Fuzzy intent matching keywords (50+ categories)     |
+| `.claude/lib/routing/routing-table-intent-agents.cjs`   | 149   | Intent-to-agent name mapping (70+ intents)          |
+| `.claude/lib/routing/routing-table-disambiguation.cjs`  | 241   | Disambiguation rules for ambiguous terms (13 rules) |
 
 ### Routing Guard
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `.claude/hooks/routing/routing-guard.cjs` | 31 | Entry point wrapper |
-| `.claude/hooks/routing/routing-guard-core.cjs` | 11 | Delegation to implementation |
-| `.claude/hooks/routing/routing-guard-core.impl.cjs` | 635 | 17 named checks executed sequentially |
-| `.claude/hooks/routing/routing-guard-core.policy.cjs` | 454 | SPECIALIST_KEYWORD_MAP (28 agents), HIGH_RISK list |
+| File                                                  | Lines | Purpose                                            |
+| ----------------------------------------------------- | ----- | -------------------------------------------------- |
+| `.claude/hooks/routing/routing-guard.cjs`             | 31    | Entry point wrapper                                |
+| `.claude/hooks/routing/routing-guard-core.cjs`        | 11    | Delegation to implementation                       |
+| `.claude/hooks/routing/routing-guard-core.impl.cjs`   | 635   | 17 named checks executed sequentially              |
+| `.claude/hooks/routing/routing-guard-core.policy.cjs` | 454   | SPECIALIST_KEYWORD_MAP (28 agents), HIGH_RISK list |
 
 ### Agent Definitions
 
-| Agent | File | Tools | Skills | Model |
-|-------|------|-------|--------|-------|
-| architect | `.claude/agents/core/architect.md` | 15 | 17 | opus |
-| developer | `.claude/agents/core/developer.md` | 15 | 24 | sonnet |
-| qa | `.claude/agents/core/qa.md` | 15 | 14 | opus |
-| planner | `.claude/agents/core/planner.md` | 15 | 23 | opus |
-| code-reviewer | `.claude/agents/specialized/code-reviewer.md` | 11 | 16 | (default) |
-| technical-writer | `.claude/agents/core/technical-writer.md` | 13 | 9 | (default) |
-| context-compressor | `.claude/agents/core/context-compressor.md` | 9 | 7 | haiku |
-| code-simplifier | `.claude/agents/specialized/code-simplifier.md` | 12 | 13 | opus |
-| devops | `.claude/agents/specialized/devops.md` | 12 | 31 | (default) |
-| security-architect | `.claude/agents/specialized/security-architect.md` | 13 | 20 | opus |
-| database-architect | `.claude/agents/specialized/database-architect.md` | 12 | 13 | opus |
-| incident-responder | `.claude/agents/specialized/incident-responder.md` | 11 | 16 | sonnet |
-| devops-troubleshooter | `.claude/agents/specialized/devops-troubleshooter.md` | 12 | 17 | sonnet |
-| researcher | `.claude/agents/specialized/researcher.md` | 11 | 10 | sonnet |
+| Agent                 | File                                                  | Tools | Skills | Model     |
+| --------------------- | ----------------------------------------------------- | ----- | ------ | --------- |
+| architect             | `.claude/agents/core/architect.md`                    | 15    | 17     | opus      |
+| developer             | `.claude/agents/core/developer.md`                    | 15    | 24     | sonnet    |
+| qa                    | `.claude/agents/core/qa.md`                           | 15    | 14     | opus      |
+| planner               | `.claude/agents/core/planner.md`                      | 15    | 23     | opus      |
+| code-reviewer         | `.claude/agents/specialized/code-reviewer.md`         | 11    | 16     | (default) |
+| technical-writer      | `.claude/agents/core/technical-writer.md`             | 13    | 9      | (default) |
+| context-compressor    | `.claude/agents/core/context-compressor.md`           | 9     | 7      | haiku     |
+| code-simplifier       | `.claude/agents/specialized/code-simplifier.md`       | 12    | 13     | opus      |
+| devops                | `.claude/agents/specialized/devops.md`                | 12    | 31     | (default) |
+| security-architect    | `.claude/agents/specialized/security-architect.md`    | 13    | 20     | opus      |
+| database-architect    | `.claude/agents/specialized/database-architect.md`    | 12    | 13     | opus      |
+| incident-responder    | `.claude/agents/specialized/incident-responder.md`    | 11    | 16     | sonnet    |
+| devops-troubleshooter | `.claude/agents/specialized/devops-troubleshooter.md` | 12    | 17     | sonnet    |
+| researcher            | `.claude/agents/specialized/researcher.md`            | 11    | 10     | sonnet    |
 
 ### CLAUDE.md and Rules
 
-| File | Purpose |
-|------|---------|
-| `.claude/CLAUDE.md` | Master routing document (Common Misrouting table, routing tables, enforcement references) |
-| `.claude/workflows/core/router-decision.md` | Authoritative routing decision workflow (1514 lines) |
-| `.claude/context/agent-registry.json` | Runtime agent registry (61 agents, 47K tokens) |
-| `.claude/rules/agents.md` | Agent quick reference with misrouting table |
+| File                                        | Purpose                                                                                   |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `.claude/CLAUDE.md`                         | Master routing document (Common Misrouting table, routing tables, enforcement references) |
+| `.claude/workflows/core/router-decision.md` | Authoritative routing decision workflow (1514 lines)                                      |
+| `.claude/context/agent-registry.json`       | Runtime agent registry (61 agents, 47K tokens)                                            |
+| `.claude/rules/agents.md`                   | Agent quick reference with misrouting table                                               |
 
 ---
 
@@ -525,25 +528,25 @@ Final Agent Selection
 
 ## Appendix B: Full Routing Guard Check Sequence
 
-| # | Check Name | Purpose | Mode |
-|---|-----------|---------|------|
-| 1 | tasklist-first-gate | Ensures TaskList() called before Task() | block |
-| 2 | task-payload-contract | Validates Task() payload structure | block |
-| 3 | router-bash-check | Blocks router from running Bash | block |
-| 4 | router-self-check | Blocks router from using banned tools | block |
-| 5 | router-read-governance | Limits router Read paths | block |
-| 6 | planner-first-guard | Requires planner for HIGH/EPIC | block |
-| 7 | task-create-guard | Restricts router TaskCreate | block |
-| 8 | security-review-guard | Requires security-architect for security work | block |
-| 9 | code-simplifier-architect-guard | Requires architect before code-simplifier | block |
-| 10 | high-risk-specialist-architect-guard | Requires architect before devops/chaos | block |
-| 11 | router-write-guard | Blocks router Write/Edit | block |
-| 12 | memory-pressure-check | Suggests compression at high token usage | warn |
-| 13 | specialist-override | Warns on developer when specialist matches | warn |
-| 14 | creator-intent-guard | Routes creation to creator skills | warn |
-| 15 | skill-agent-confusion | Detects skill invoked as agent | warn |
-| 16 | intent-agent-match | Validates intent-agent mapping | warn |
-| 17 | config-model-validator | Validates model selection | warn |
+| #   | Check Name                           | Purpose                                       | Mode  |
+| --- | ------------------------------------ | --------------------------------------------- | ----- |
+| 1   | tasklist-first-gate                  | Ensures TaskList() called before Task()       | block |
+| 2   | task-payload-contract                | Validates Task() payload structure            | block |
+| 3   | router-bash-check                    | Blocks router from running Bash               | block |
+| 4   | router-self-check                    | Blocks router from using banned tools         | block |
+| 5   | router-read-governance               | Limits router Read paths                      | block |
+| 6   | planner-first-guard                  | Requires planner for HIGH/EPIC                | block |
+| 7   | task-create-guard                    | Restricts router TaskCreate                   | block |
+| 8   | security-review-guard                | Requires security-architect for security work | block |
+| 9   | code-simplifier-architect-guard      | Requires architect before code-simplifier     | block |
+| 10  | high-risk-specialist-architect-guard | Requires architect before devops/chaos        | block |
+| 11  | router-write-guard                   | Blocks router Write/Edit                      | block |
+| 12  | memory-pressure-check                | Suggests compression at high token usage      | warn  |
+| 13  | specialist-override                  | Warns on developer when specialist matches    | warn  |
+| 14  | creator-intent-guard                 | Routes creation to creator skills             | warn  |
+| 15  | skill-agent-confusion                | Detects skill invoked as agent                | warn  |
+| 16  | intent-agent-match                   | Validates intent-agent mapping                | warn  |
+| 17  | config-model-validator               | Validates model selection                     | warn  |
 
 ---
 

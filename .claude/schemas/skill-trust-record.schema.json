@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skill-trust-record",
+  "title": "SkillTrustRecord",
+  "description": "Trust record produced by the Skill Trust Scoring Engine (v3.2.0 S4). Captures the computed 0-100 score, tier assignment, and the quality signals that contributed to the score.",
+  "type": "object",
+  "required": ["skillName", "source", "score", "tier", "signals", "breakdown", "computedAt"],
+  "additionalProperties": false,
+  "properties": {
+    "skillName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical skill name (kebab-case, matches directory name under .claude/skills/)."
+    },
+    "source": {
+      "type": "string",
+      "enum": ["builtin", "community", "external", "local"],
+      "description": "Provenance category of the skill. 'builtin' always resolves to tier=builtin and score=100."
+    },
+    "score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Computed 0-100 trust score. Builtin skills are always 100."
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["builtin", "verified", "community", "experimental"],
+      "description": "Trust tier derived from score. builtin=100, verified=80-99, community=50-79, experimental=0-49."
+    },
+    "signals": {
+      "type": "object",
+      "description": "Raw quality signals used as scorer inputs.",
+      "required": ["hasTests", "ageDays", "downloadCount", "reviewRating"],
+      "additionalProperties": false,
+      "properties": {
+        "hasTests": {
+          "type": "boolean",
+          "description": "True if at least one test file exists for this skill (tests/skills/<name>*.test.cjs)."
+        },
+        "testCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of test cases found. Informational only — not used in score computation."
+        },
+        "ageDays": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Age of the skill in days since first commit or install."
+        },
+        "downloadCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total download count from the marketplace registry. 0 for locally-sourced skills."
+        },
+        "reviewRating": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Community peer review rating (0.0–5.0). 0 means unrated."
+        },
+        "provenanceSha": {
+          "type": ["string", "null"],
+          "description": "HMAC-SHA256 provenance hash for bundle verification (v2.2.0+ requirement). Null if not signed."
+        }
+      }
+    },
+    "breakdown": {
+      "type": "object",
+      "description": "Per-component points that sum to the final score (before builtin override).",
+      "required": ["testCoverage", "ageStability", "downloadCount", "peerReviewRating"],
+      "additionalProperties": false,
+      "properties": {
+        "testCoverage": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30,
+          "description": "Points from test coverage (0 or 30)."
+        },
+        "ageStability": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Points from age stability (0 or 20)."
+        },
+        "downloadCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Points from download count (0 or 20)."
+        },
+        "peerReviewRating": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30,
+          "description": "Points from peer review rating (0–30, proportional)."
+        }
+      }
+    },
+    "computedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when this trust record was computed."
+    },
+    "tierThresholds": {
+      "type": "object",
+      "description": "Tier threshold configuration active at computation time (may be overridden via env vars).",
+      "additionalProperties": false,
+      "properties": {
+        "verified": {
+          "type": "integer",
+          "description": "Minimum score for verified tier (default 80, env: TRUST_TIER_VERIFIED_MIN)."
+        },
+        "community": {
+          "type": "integer",
+          "description": "Minimum score for community tier (default 50, env: TRUST_TIER_COMMUNITY_MIN)."
+        },
+        "experimental": {
+          "type": "integer",
+          "description": "Minimum score for experimental tier (always 0)."
+        }
+      }
+    }
+  }
+}

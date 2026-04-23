@@ -1,4 +1,5 @@
 <!-- Agent: architect | Task: #8 | Session: 2026-02-21 -->
+
 # Self-Healing Failure Detection Protocol -- Architecture Design
 
 ## Problem Statement
@@ -19,15 +20,15 @@ The router currently has no formal protocol for responding to in-session failure
 
 The framework already has significant self-healing infrastructure, but it is disconnected from the router's decision loop:
 
-| Component | File | What It Does | Gap |
-|-----------|------|-------------|-----|
-| **Recovery Queue** | `post-task-unified.cjs` / `post-task-unified-completion.helpers.cjs` | Writes `synthesizeRecoveryTaskUpdate()` entries to `taskupdate-recovery-queue.jsonl` when TaskOutput shows completion without matching TaskUpdate | Router never reads this queue |
-| **Loop State Manager** | `.claude/lib/self-healing/loop-state-manager.cjs` | Tracks spawn depth, detects infinite loops | Only tracks depth, not outcome quality |
-| **Rollback Manager** | `.claude/lib/self-healing/rollback-manager.cjs` | Can rollback failed changes | Not connected to router failure detection |
-| **Task Lifecycle State** | `.claude/lib/routing/task-lifecycle-state.cjs` | Persists per-task status to disk | Router does not compare expected vs actual deliverables |
-| **Pre-completion Validation** | `.claude/hooks/validation/pre-completion-validation.cjs` | Validates summary, filesModified, required outputs before completion | Only validates what the agent claims -- cannot detect underdelivery (e.g., "asked for 5 skills, got 1") |
-| **Post-completion Chain** | `.claude/hooks/workflow/post-completion-chain.cjs` | Advances enterprise workflow phases on task completion | Only advances phases; does not evaluate whether the phase produced adequate output |
-| **Reflection Spawn Queue** | `.claude/context/runtime/reflection-spawn-request.json` | Queues reflection requests for Step 0 processing | Only populated by post-creation-integration.cjs and task_completion triggers -- not by failure detection |
+| Component                     | File                                                                 | What It Does                                                                                                                                      | Gap                                                                                                      |
+| ----------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Recovery Queue**            | `post-task-unified.cjs` / `post-task-unified-completion.helpers.cjs` | Writes `synthesizeRecoveryTaskUpdate()` entries to `taskupdate-recovery-queue.jsonl` when TaskOutput shows completion without matching TaskUpdate | Router never reads this queue                                                                            |
+| **Loop State Manager**        | `.claude/lib/self-healing/loop-state-manager.cjs`                    | Tracks spawn depth, detects infinite loops                                                                                                        | Only tracks depth, not outcome quality                                                                   |
+| **Rollback Manager**          | `.claude/lib/self-healing/rollback-manager.cjs`                      | Can rollback failed changes                                                                                                                       | Not connected to router failure detection                                                                |
+| **Task Lifecycle State**      | `.claude/lib/routing/task-lifecycle-state.cjs`                       | Persists per-task status to disk                                                                                                                  | Router does not compare expected vs actual deliverables                                                  |
+| **Pre-completion Validation** | `.claude/hooks/validation/pre-completion-validation.cjs`             | Validates summary, filesModified, required outputs before completion                                                                              | Only validates what the agent claims -- cannot detect underdelivery (e.g., "asked for 5 skills, got 1")  |
+| **Post-completion Chain**     | `.claude/hooks/workflow/post-completion-chain.cjs`                   | Advances enterprise workflow phases on task completion                                                                                            | Only advances phases; does not evaluate whether the phase produced adequate output                       |
+| **Reflection Spawn Queue**    | `.claude/context/runtime/reflection-spawn-request.json`              | Queues reflection requests for Step 0 processing                                                                                                  | Only populated by post-creation-integration.cjs and task_completion triggers -- not by failure detection |
 
 ### What Is Missing (The Gap)
 
@@ -56,7 +57,7 @@ This is the minimal viable combination that actually closes the loop without ove
 
 - **(A) alone (CLAUDE.md only):** The router is an LLM. Protocol text is necessary but cannot reliably enforce behavior -- the same way the 70-line TaskUpdate warning box failed to ensure metadata in 15+ sessions. Protocol needs a hook backstop.
 - **(B) alone (router-decision.md only):** Same problem as (A) -- it is instruction text, not enforcement.
-- **(C) alone (New hook):** A new hook would fire on every TaskUpdate, but it cannot know what the router *expected* -- only what the agent *reported*. Expectation context lives in the router's task creation metadata.
+- **(C) alone (New hook):** A new hook would fire on every TaskUpdate, but it cannot know what the router _expected_ -- only what the agent _reported_. Expectation context lives in the router's task creation metadata.
 - **(D) alone (Extend post-completion-chain.cjs):** This hook already fires on TaskUpdate(completed) and has access to workflow state. It can detect the subset of failures where expected output counts are declared in workflow state. But it cannot detect ad-hoc underdelivery outside enterprise workflows.
 
 ### The Recommended Three-Part Design
@@ -139,25 +140,25 @@ The router would then check `failure-signals.jsonl` as part of its Step 0 sequen
 
 ## Failure Signals to Detect
 
-| # | Signal | How Detected | Where Detected | Response |
-|---|--------|-------------|----------------|----------|
-| F1 | Agent stall (no TaskUpdate(completed)) | TaskList shows task still `in_progress` after agent process ends | Router (Step 9.7) + recovery queue (existing) | Log + retry once |
-| F2 | Quantitative underdelivery | `requestedCount > deliveredCount` in completion metadata | post-completion-chain.cjs (new signal) + Router (Step 9.7) | Log + retry once |
-| F3 | Missing expected file | `outputArtifacts` path does not exist on disk | pre-completion-validation.cjs (existing TASK_OUTPUT_ENFORCEMENT) + Router (Step 9.7) | Log + queue reflection |
-| F4 | High tool-call count without output | Agent used >40 tool calls but `filesModified` is empty | post-task-unified.cjs (new check in Task completion handler) | Log + queue reflection |
-| F5 | Recurring failure pattern | Same failure type on same task type in 3+ consecutive sessions | Reflection agent (existing pattern detection) | Escalate to user + propose systemic fix |
+| #   | Signal                                 | How Detected                                                     | Where Detected                                                                       | Response                                |
+| --- | -------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------- |
+| F1  | Agent stall (no TaskUpdate(completed)) | TaskList shows task still `in_progress` after agent process ends | Router (Step 9.7) + recovery queue (existing)                                        | Log + retry once                        |
+| F2  | Quantitative underdelivery             | `requestedCount > deliveredCount` in completion metadata         | post-completion-chain.cjs (new signal) + Router (Step 9.7)                           | Log + retry once                        |
+| F3  | Missing expected file                  | `outputArtifacts` path does not exist on disk                    | pre-completion-validation.cjs (existing TASK_OUTPUT_ENFORCEMENT) + Router (Step 9.7) | Log + queue reflection                  |
+| F4  | High tool-call count without output    | Agent used >40 tool calls but `filesModified` is empty           | post-task-unified.cjs (new check in Task completion handler)                         | Log + queue reflection                  |
+| F5  | Recurring failure pattern              | Same failure type on same task type in 3+ consecutive sessions   | Reflection agent (existing pattern detection)                                        | Escalate to user + propose systemic fix |
 
 ## Self-Healing Response Design
 
 ### Response Matrix
 
-| Failure | Log to issues.md | Queue Reflection | Retry (max 1) | Escalate to User |
-|---------|-------------------|------------------|----------------|-------------------|
-| F1: Stall | YES | YES | YES (with timeout increase) | If retry also stalls |
-| F2: Underdelivery | YES | YES | YES (with explicit count requirement in prompt) | If retry also underdelivers |
-| F3: Missing file | YES | NO (pre-completion already blocks) | NO (agent should fix before completing) | Only if pre-completion in warn mode |
-| F4: High tool, no output | YES | YES | NO (likely systemic) | YES |
-| F5: Recurring pattern | Already logged | Already queued | NO | YES (mandatory) |
+| Failure                  | Log to issues.md | Queue Reflection                   | Retry (max 1)                                   | Escalate to User                    |
+| ------------------------ | ---------------- | ---------------------------------- | ----------------------------------------------- | ----------------------------------- |
+| F1: Stall                | YES              | YES                                | YES (with timeout increase)                     | If retry also stalls                |
+| F2: Underdelivery        | YES              | YES                                | YES (with explicit count requirement in prompt) | If retry also underdelivers         |
+| F3: Missing file         | YES              | NO (pre-completion already blocks) | NO (agent should fix before completing)         | Only if pre-completion in warn mode |
+| F4: High tool, no output | YES              | YES                                | NO (likely systemic)                            | YES                                 |
+| F5: Recurring pattern    | Already logged   | Already queued                     | NO                                              | YES (mandatory)                     |
 
 ### Retry Protocol
 
@@ -184,14 +185,14 @@ When the router decides to retry:
 
 ## Files to Change
 
-| File | Change Type | Description |
-|------|-------------|-------------|
-| `.claude/CLAUDE.md` | Add section | New Section 6.1: Post-Outcome Evaluation protocol |
-| `.claude/workflows/core/router-decision.md` | Add step | New Step 9.7: Post-Outcome Evaluation workflow step |
-| `.claude/hooks/workflow/post-completion-chain.cjs` | Extend | Add underdelivery signal emission (~15 lines) |
-| `.claude/hooks/routing/post-task-unified.cjs` | Extend | Add high-tool-count-no-output detection in Task completion handler (~20 lines) |
-| `.claude/context/memory/issues.md` | Append (at runtime) | Failure entries logged here by router |
-| `.claude/context/runtime/failure-signals.jsonl` | New file (at runtime) | Underdelivery signals emitted by hooks |
+| File                                               | Change Type           | Description                                                                    |
+| -------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------ |
+| `.claude/CLAUDE.md`                                | Add section           | New Section 6.1: Post-Outcome Evaluation protocol                              |
+| `.claude/workflows/core/router-decision.md`        | Add step              | New Step 9.7: Post-Outcome Evaluation workflow step                            |
+| `.claude/hooks/workflow/post-completion-chain.cjs` | Extend                | Add underdelivery signal emission (~15 lines)                                  |
+| `.claude/hooks/routing/post-task-unified.cjs`      | Extend                | Add high-tool-count-no-output detection in Task completion handler (~20 lines) |
+| `.claude/context/memory/issues.md`                 | Append (at runtime)   | Failure entries logged here by router                                          |
+| `.claude/context/runtime/failure-signals.jsonl`    | New file (at runtime) | Underdelivery signals emitted by hooks                                         |
 
 **Estimated total code change: ~80 lines across 2 hooks + ~40 lines of CLAUDE.md protocol + ~30 lines of router-decision.md.**
 
@@ -227,14 +228,14 @@ This is additive (no breaking changes), backward-compatible (tasks without these
 
 ## Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Retry storms (router retries endlessly) | MEDIUM | HIGH | Hard cap: 1 retry per task per session. `metadata.retryCount` tracked. |
-| False positive underdelivery (agent delivered correctly but metadata wrong) | LOW | MEDIUM | Retry prompt includes "see task #{original}" so retry agent can check existing work before duplicating. |
-| Memory file bloat from excessive failure logging | LOW | LOW | issues.md already has rotation at 20KB threshold. Failure entries are ~10 lines each. |
-| Hook extension increases latency | LOW | LOW | Signal emission is a single `appendFileSync` (~1ms). No network calls. Within 100ms hook budget. |
-| Router ignores protocol text (as has happened before) | HIGH | HIGH | This is why Part 3 (hook backstop) exists. Hooks fire regardless of whether the router follows protocol text. `failure-signals.jsonl` will accumulate evidence even if the router does not act on it, and reflection-agent will eventually detect the pattern. |
-| Context window pressure from retry prompts | MEDIUM | MEDIUM | Retry prompts reference original task ID rather than duplicating full context. Use Step 5.5 context-pressure check before retry spawn. |
+| Risk                                                                        | Likelihood | Impact | Mitigation                                                                                                                                                                                                                                                     |
+| --------------------------------------------------------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Retry storms (router retries endlessly)                                     | MEDIUM     | HIGH   | Hard cap: 1 retry per task per session. `metadata.retryCount` tracked.                                                                                                                                                                                         |
+| False positive underdelivery (agent delivered correctly but metadata wrong) | LOW        | MEDIUM | Retry prompt includes "see task #{original}" so retry agent can check existing work before duplicating.                                                                                                                                                        |
+| Memory file bloat from excessive failure logging                            | LOW        | LOW    | issues.md already has rotation at 20KB threshold. Failure entries are ~10 lines each.                                                                                                                                                                          |
+| Hook extension increases latency                                            | LOW        | LOW    | Signal emission is a single `appendFileSync` (~1ms). No network calls. Within 100ms hook budget.                                                                                                                                                               |
+| Router ignores protocol text (as has happened before)                       | HIGH       | HIGH   | This is why Part 3 (hook backstop) exists. Hooks fire regardless of whether the router follows protocol text. `failure-signals.jsonl` will accumulate evidence even if the router does not act on it, and reflection-agent will eventually detect the pattern. |
+| Context window pressure from retry prompts                                  | MEDIUM     | MEDIUM | Retry prompts reference original task ID rather than duplicating full context. Use Step 5.5 context-pressure check before retry spawn.                                                                                                                         |
 
 ## NOT Recommended
 

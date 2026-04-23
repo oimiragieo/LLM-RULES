@@ -36,25 +36,25 @@ The template-creator workflow operates as follows:
 
 ### 1.2 Trust Boundaries
 
-| Boundary | Description | Trust Level |
-|----------|-------------|-------------|
-| User -> Router | User requests template creation | Untrusted (external input) |
-| Router -> Creator Agent | Router spawns agent with template-creator skill | Semi-trusted (Router prompt) |
-| Creator Agent -> Filesystem | Agent writes template files | Guarded (unified-creator-guard.cjs) |
-| Template Content -> Spawn System | Templates consumed by spawn-prompt-assembler | Trusted (assumes valid templates) |
-| Template Content -> Other Agents | Templates used by other creator skills/agents | Trusted (assumes valid templates) |
-| Config Files -> Creator | presets.json, agent-registry.json consulted | Semi-trusted (modifiable by agents) |
+| Boundary                         | Description                                     | Trust Level                         |
+| -------------------------------- | ----------------------------------------------- | ----------------------------------- |
+| User -> Router                   | User requests template creation                 | Untrusted (external input)          |
+| Router -> Creator Agent          | Router spawns agent with template-creator skill | Semi-trusted (Router prompt)        |
+| Creator Agent -> Filesystem      | Agent writes template files                     | Guarded (unified-creator-guard.cjs) |
+| Template Content -> Spawn System | Templates consumed by spawn-prompt-assembler    | Trusted (assumes valid templates)   |
+| Template Content -> Other Agents | Templates used by other creator skills/agents   | Trusted (assumes valid templates)   |
+| Config Files -> Creator          | presets.json, agent-registry.json consulted     | Semi-trusted (modifiable by agents) |
 
 ### 1.3 STRIDE Analysis
 
-| Threat | Vector | Risk | Existing Controls | Gap |
-|--------|--------|------|-------------------|-----|
-| **S - Spoofing** | Malicious template impersonating a legitimate spawn template | MEDIUM | Creator-guard requires active creator state; template-updater delegation for existing templates | No signature/checksum on template files |
-| **T - Tampering** | Template content modified to inject malicious instructions into spawn prompts | HIGH | unified-creator-guard.cjs blocks direct writes; SEC-TMPL-004 fix sanitizes `{{` placeholders | Templates once written are not integrity-checked on read |
-| **R - Repudiation** | Template creation not fully audited; no provenance enforcement on template content | LOW | Workspace conventions require provenance headers; memory protocol tracks creation | Provenance headers are guidance, not enforced by code |
-| **I - Information Disclosure** | Template content could expose internal architecture, hook names, bypass conditions | LOW | Templates are internal to `.claude/` directory; not user-facing | Template catalog documents enforcement modes and override variables |
-| **D - Denial of Service** | Oversized template with massive placeholder expansion; recursive template inclusion | LOW | 500KB prompt limit in spawn-prompt-validator; no recursive template `#include` mechanism | No size limit on individual template files |
-| **E - Elevation of Privilege** | Template that grants Task tool (orchestrator capability) to non-orchestrator agents | HIGH | `enrichAllowedTools()` resolves tools from agent registry, not template content; ORCHESTRATOR_IDS check | Spawn templates contain `allowed_tools` arrays that are read by the Router |
+| Threat                         | Vector                                                                              | Risk   | Existing Controls                                                                                       | Gap                                                                        |
+| ------------------------------ | ----------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **S - Spoofing**               | Malicious template impersonating a legitimate spawn template                        | MEDIUM | Creator-guard requires active creator state; template-updater delegation for existing templates         | No signature/checksum on template files                                    |
+| **T - Tampering**              | Template content modified to inject malicious instructions into spawn prompts       | HIGH   | unified-creator-guard.cjs blocks direct writes; SEC-TMPL-004 fix sanitizes `{{` placeholders            | Templates once written are not integrity-checked on read                   |
+| **R - Repudiation**            | Template creation not fully audited; no provenance enforcement on template content  | LOW    | Workspace conventions require provenance headers; memory protocol tracks creation                       | Provenance headers are guidance, not enforced by code                      |
+| **I - Information Disclosure** | Template content could expose internal architecture, hook names, bypass conditions  | LOW    | Templates are internal to `.claude/` directory; not user-facing                                         | Template catalog documents enforcement modes and override variables        |
+| **D - Denial of Service**      | Oversized template with massive placeholder expansion; recursive template inclusion | LOW    | 500KB prompt limit in spawn-prompt-validator; no recursive template `#include` mechanism                | No size limit on individual template files                                 |
+| **E - Elevation of Privilege** | Template that grants Task tool (orchestrator capability) to non-orchestrator agents | HIGH   | `enrichAllowedTools()` resolves tools from agent registry, not template content; ORCHESTRATOR_IDS check | Spawn templates contain `allowed_tools` arrays that are read by the Router |
 
 ---
 
@@ -96,6 +96,7 @@ The SEC-TMPL-004 fix in `prompt-factory.cjs` sanitizes `{{` and `}}` in substitu
 **Severity:** HIGH
 
 **Required Mitigation:**
+
 1. The template-creator skill MUST include a security warning in the spawn template creation guidance that all placeholder values in spawn templates MUST be sanitized before substitution
 2. The skill SHOULD reference the `sanitizeSubstitutionValue()` function from `prompt-factory.cjs` as the canonical sanitization pattern
 3. Spawn templates created by this skill SHOULD NOT place `{{PLACEHOLDER}}` tokens inside the `prompt:` field of `Task()` calls where they would be directly substituted with user input
@@ -133,6 +134,7 @@ patterns: [/\.claude[/\\]templates[/\\](?:agents|skills|workflows|hooks|code|sch
 ```
 
 This regex DOES NOT match:
+
 - `.claude/templates/spawn/malicious-template.md` (spawn templates unprotected)
 - `.claude/templates/reports/malicious-report.md` (report templates unprotected)
 - `.claude/templates/code-styles/malicious-style.md` (code style templates unprotected)
@@ -147,6 +149,7 @@ Additionally, the template-creator skill says `hooks/`, `code/`, and `schemas/` 
 **Severity:** HIGH
 
 **Required Mitigation:**
+
 1. Update the `unified-creator-guard.cjs` regex pattern for `template-creator` to cover ALL template subdirectories including `spawn`, `reports`, `code-styles`, and root-level files
 2. Proposed fix:
    ```javascript
@@ -185,6 +188,7 @@ The skill does not instruct agents to validate or sanitize the template name bef
 **Severity:** MEDIUM
 
 **Required Mitigation:**
+
 1. The template-creator skill MUST instruct agents to validate that template names contain only `[a-z0-9-]` characters (lowercase kebab-case per workspace conventions)
 2. The skill SHOULD reject any template name containing `/`, `\`, `..`, or characters outside the allowed set
 3. Add a validation step before Step 6:
@@ -227,6 +231,7 @@ Additionally, the `location` field in the registry could be set to any path, pot
 **Severity:** MEDIUM
 
 **Required Mitigation:**
+
 1. The template-creator skill SHOULD instruct agents to always use `JSON.stringify()` (or equivalent) when constructing registry entries, never manual string concatenation
 2. The `location` field MUST be validated to start with `.claude/templates/` and contain no `..` segments
 3. The `type` field MUST be validated against the allowed enum: `agent|skill|workflow|hook|code|schema|spawn|report|code-style|document`
@@ -254,6 +259,7 @@ The 3-minute TTL reduces the window, but does not eliminate it. The `CREATOR_GUA
 **Severity:** MEDIUM (reduced from HIGH because: (a) TTL is short at 3 minutes, (b) writing to runtime directory requires explicit agent action, (c) the state file path is not a common target)
 
 **Required Mitigation:**
+
 1. The state file path `.claude/context/runtime/active-creators.json` SHOULD be documented as a security-sensitive file
 2. Consider adding a nonce or session ID to the state that must match the current agent's session
 3. The `clearCreatorActive()` function SHOULD be called automatically when the creator completes (not just on TTL expiry)
@@ -267,6 +273,7 @@ The 3-minute TTL reduces the window, but does not eliminate it. The `CREATOR_GUA
 **Description:**
 
 The template catalog documents:
+
 - All 28 active templates with their exact file paths
 - Agent and skill assignments (which agents use which templates)
 - Security compliance notes including enforcement override variables (`CREATOR_GUARD=warn|off`)
@@ -279,6 +286,7 @@ This information is already available to all spawned agents through the spawn pr
 **Severity:** LOW
 
 **Recommended Mitigation:**
+
 1. Remove specific enforcement override syntax from the catalog (reference `.claude/docs/@ENVIRONMENT_CONFIG.md` instead)
 2. This is a LOW priority recommendation and does not block approval
 
@@ -301,6 +309,7 @@ The template-creator's validation checklist (Step 5) focuses on structural corre
 ```
 
 There is no security-focused validation of template content:
+
 - No check for embedded JavaScript/shell commands in template body
 - No check for references to files outside `.claude/`
 - No check for prompt injection patterns (e.g., "IGNORE PREVIOUS INSTRUCTIONS")
@@ -314,6 +323,7 @@ The template catalog's SEC-TMPL-006 compliance section (lines 458-468) documents
 **Severity:** LOW
 
 **Recommended Mitigation:**
+
 1. Add security validation items to the Step 5 checklist:
    ```
    [ ] No secrets, credentials, or API keys in template content
@@ -327,16 +337,17 @@ The template catalog's SEC-TMPL-006 compliance section (lines 458-468) documents
 
 ## 3. Previously Identified Findings - Remediation Status
 
-| Finding | Original Severity | Status | Evidence |
-|---------|-------------------|--------|----------|
-| SEC-TMPL-001: Path traversal in getPresetRuleSnippet() | HIGH | FIXED | `prompt-assembler.cjs` now validates `normalizedSnippetPath.startsWith(normalizedProjectRoot + path.sep)` (per learnings.md) |
-| SEC-TMPL-002: Orchestrator spawn validation bypass | MEDIUM | FIXED | `spawn-prompt-validator.cjs` now matches ONLY on `subagent_type` field, not `description` (per learnings.md) |
-| SEC-TMPL-003: Fail-open error handling in spawn assembler | MEDIUM | UNRESOLVED | No evidence of fix in reviewed files; spawn-prompt-assembler still fails open |
-| SEC-TMPL-004: Placeholder injection in prompt-factory | MEDIUM | FIXED | `prompt-factory.cjs` now exports `sanitizeSubstitutionValue()` with loop-based `{{` / `}}` replacement (verified in code) |
+| Finding                                                   | Original Severity | Status     | Evidence                                                                                                                     |
+| --------------------------------------------------------- | ----------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| SEC-TMPL-001: Path traversal in getPresetRuleSnippet()    | HIGH              | FIXED      | `prompt-assembler.cjs` now validates `normalizedSnippetPath.startsWith(normalizedProjectRoot + path.sep)` (per learnings.md) |
+| SEC-TMPL-002: Orchestrator spawn validation bypass        | MEDIUM            | FIXED      | `spawn-prompt-validator.cjs` now matches ONLY on `subagent_type` field, not `description` (per learnings.md)                 |
+| SEC-TMPL-003: Fail-open error handling in spawn assembler | MEDIUM            | UNRESOLVED | No evidence of fix in reviewed files; spawn-prompt-assembler still fails open                                                |
+| SEC-TMPL-004: Placeholder injection in prompt-factory     | MEDIUM            | FIXED      | `prompt-factory.cjs` now exports `sanitizeSubstitutionValue()` with loop-based `{{` / `}}` replacement (verified in code)    |
 
 ### SEC-TMPL-004 Fix Quality Assessment
 
 The `sanitizeSubstitutionValue()` function in `prompt-factory.cjs` (lines 17-29) correctly:
+
 - Guards against null/non-string input
 - Uses a loop to handle overlapping patterns (e.g., `{{{{` becomes `{ { { {`)
 - Includes a safety break to prevent infinite loops (`if (result === prev) break`)
@@ -350,23 +361,23 @@ The fix is well-implemented and addresses the original finding. However, it only
 
 ### Controls from Security Controls Catalog
 
-| Control | Relevance to template-creator | Status |
-|---------|-------------------------------|--------|
-| SEC-001 (Token Whitelist) | Template-renderer enforces token whitelist; template-creator creates templates with tokens | DOCUMENTED ONLY - whitelist exists in template-renderer skill docs but is not enforced as executable code |
-| SEC-002 (Path Validation) | Template-creator writes files to `.claude/templates/` | PARTIALLY IMPLEMENTED - unified-creator-guard protects some subdirectories but not all (see SEC-TC-002) |
-| SEC-003 (Input Sanitization) | Template values sanitized before rendering | PARTIALLY IMPLEMENTED - SEC-TMPL-004 fix in prompt-factory.cjs; not in Router-level substitution |
-| SEC-004 (Transparency Markers) | Not directly relevant to template creation | N/A |
+| Control                        | Relevance to template-creator                                                              | Status                                                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| SEC-001 (Token Whitelist)      | Template-renderer enforces token whitelist; template-creator creates templates with tokens | DOCUMENTED ONLY - whitelist exists in template-renderer skill docs but is not enforced as executable code |
+| SEC-002 (Path Validation)      | Template-creator writes files to `.claude/templates/`                                      | PARTIALLY IMPLEMENTED - unified-creator-guard protects some subdirectories but not all (see SEC-TC-002)   |
+| SEC-003 (Input Sanitization)   | Template values sanitized before rendering                                                 | PARTIALLY IMPLEMENTED - SEC-TMPL-004 fix in prompt-factory.cjs; not in Router-level substitution          |
+| SEC-004 (Transparency Markers) | Not directly relevant to template creation                                                 | N/A                                                                                                       |
 
 ### Controls from unified-creator-guard.cjs
 
-| Control | Status | Effectiveness |
-|---------|--------|---------------|
-| Creator state tracking (TTL-bounded) | IMPLEMENTED | Effective but bypassable via state file manipulation (SEC-TC-005) |
-| Fail-closed on error (SEC-008) | IMPLEMENTED | Correct - hook exits with code 2 on error |
-| HOOK_FAIL_OPEN override | IMPLEMENTED | Debug escape hatch; logged via audit trail |
-| Watched tools (Edit/Write only) | IMPLEMENTED | Correct scope |
-| Enforcement modes (block/warn/off) | IMPLEMENTED | Default is `block` (appropriate) |
-| Template path pattern | PARTIALLY EFFECTIVE | Misses spawn/, reports/, code-styles/, and root-level templates (see SEC-TC-002) |
+| Control                              | Status              | Effectiveness                                                                    |
+| ------------------------------------ | ------------------- | -------------------------------------------------------------------------------- |
+| Creator state tracking (TTL-bounded) | IMPLEMENTED         | Effective but bypassable via state file manipulation (SEC-TC-005)                |
+| Fail-closed on error (SEC-008)       | IMPLEMENTED         | Correct - hook exits with code 2 on error                                        |
+| HOOK_FAIL_OPEN override              | IMPLEMENTED         | Debug escape hatch; logged via audit trail                                       |
+| Watched tools (Edit/Write only)      | IMPLEMENTED         | Correct scope                                                                    |
+| Enforcement modes (block/warn/off)   | IMPLEMENTED         | Default is `block` (appropriate)                                                 |
+| Template path pattern                | PARTIALLY EFFECTIVE | Misses spawn/, reports/, code-styles/, and root-level templates (see SEC-TC-002) |
 
 ---
 
@@ -431,18 +442,18 @@ The template-creator skill overhaul is approved for deployment provided the foll
 
 ## 7. Appendix: Files Reviewed
 
-| File | Path | Purpose |
-|------|------|---------|
-| Template-Creator Skill | `C:\dev\projects\agent-studio\.claude\skills\template-creator\SKILL.md` | Primary review target |
-| Unified Creator Guard | `C:\dev\projects\agent-studio\.claude\hooks\routing\unified-creator-guard.cjs` | Enforcement hook |
-| Template Catalog | `C:\dev\projects\agent-studio\.claude\context\artifacts\catalogs\template-catalog.md` | Template inventory |
-| Original Security Review | `C:\dev\projects\agent-studio\.claude\context\reports\security\template-system-security-review-2026-02-07.md` | Prior findings |
-| Prompt Factory | `C:\dev\projects\agent-studio\.claude\lib\spawn\prompt-factory.cjs` | SEC-TMPL-004 fix verification |
-| Universal Agent Spawn Template | `C:\dev\projects\agent-studio\.claude\templates\spawn\universal-agent-spawn.md` | Spawn template attack surface |
-| Security Controls Catalog | `C:\dev\projects\agent-studio\.claude\context\artifacts\security-reviews\security-controls-catalog.md` | Control reference |
-| Memory: learnings.md | `C:\dev\projects\agent-studio\.claude\context\memory\learnings.md` | Remediation evidence |
-| Memory: decisions.md | `C:\dev\projects\agent-studio\.claude\context\memory\decisions.md` | ADR-085 context |
-| Memory: issues.md | `C:\dev\projects\agent-studio\.claude\context\memory\issues.md` | Prior issue context |
+| File                           | Path                                                                                                          | Purpose                       |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Template-Creator Skill         | `C:\dev\projects\agent-studio\.claude\skills\template-creator\SKILL.md`                                       | Primary review target         |
+| Unified Creator Guard          | `C:\dev\projects\agent-studio\.claude\hooks\routing\unified-creator-guard.cjs`                                | Enforcement hook              |
+| Template Catalog               | `C:\dev\projects\agent-studio\.claude\context\artifacts\catalogs\template-catalog.md`                         | Template inventory            |
+| Original Security Review       | `C:\dev\projects\agent-studio\.claude\context\reports\security\template-system-security-review-2026-02-07.md` | Prior findings                |
+| Prompt Factory                 | `C:\dev\projects\agent-studio\.claude\lib\spawn\prompt-factory.cjs`                                           | SEC-TMPL-004 fix verification |
+| Universal Agent Spawn Template | `C:\dev\projects\agent-studio\.claude\templates\spawn\universal-agent-spawn.md`                               | Spawn template attack surface |
+| Security Controls Catalog      | `C:\dev\projects\agent-studio\.claude\context\artifacts\security-reviews\security-controls-catalog.md`        | Control reference             |
+| Memory: learnings.md           | `C:\dev\projects\agent-studio\.claude\context\memory\learnings.md`                                            | Remediation evidence          |
+| Memory: decisions.md           | `C:\dev\projects\agent-studio\.claude\context\memory\decisions.md`                                            | ADR-085 context               |
+| Memory: issues.md              | `C:\dev\projects\agent-studio\.claude\context\memory\issues.md`                                               | Prior issue context           |
 
 ---
 

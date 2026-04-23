@@ -23,13 +23,13 @@ This backlog prioritizes unblocking the core pipeline (Day 1-5) before secondary
 
 ## Priority Ordering Strategy
 
-| Tier | Focus | Effort | Blocked Reason |
-|------|-------|--------|---|
-| **P0 Wave 1** | Integration queue → test suite → memory circular dep | 5-8 hrs | Unblocks verification, artifact discovery, refactoring |
-| **P0 Wave 2** | Memory rotation field fixes → sanitization | 8-12 hrs | Unblocks memory-heavy workflows, async agents |
-| **P1 Wave 1** | Security hardening (injection, safeParseJSON) | 3-4 days | Unblocks compliance, OWASP audit, team confidence |
-| **P1 Wave 2** | Test coverage (5 critical modules) | 3 days | Unblocks security review sign-off |
-| **P1 Wave 3** | Concurrent write locking + config consolidation | 2+ weeks | Long-pole refactor, enables multi-agent workflows |
+| Tier          | Focus                                                | Effort   | Blocked Reason                                         |
+| ------------- | ---------------------------------------------------- | -------- | ------------------------------------------------------ |
+| **P0 Wave 1** | Integration queue → test suite → memory circular dep | 5-8 hrs  | Unblocks verification, artifact discovery, refactoring |
+| **P0 Wave 2** | Memory rotation field fixes → sanitization           | 8-12 hrs | Unblocks memory-heavy workflows, async agents          |
+| **P1 Wave 1** | Security hardening (injection, safeParseJSON)        | 3-4 days | Unblocks compliance, OWASP audit, team confidence      |
+| **P1 Wave 2** | Test coverage (5 critical modules)                   | 3 days   | Unblocks security review sign-off                      |
+| **P1 Wave 3** | Concurrent write locking + config consolidation      | 2+ weeks | Long-pole refactor, enables multi-agent workflows      |
 
 ---
 
@@ -54,6 +54,7 @@ This backlog prioritizes unblocking the core pipeline (Day 1-5) before secondary
 - [ ] **AC7:** Documentation: `.claude/context/artifacts/analysis/integration-queue-guide.md` explains queue lifecycle
 
 **TDD Approach:**
+
 ```
 RED:   No integration-queue-processor.cjs file → test fails
 GREEN: Create hook, wire to package.json, run → queue entries process
@@ -72,6 +73,7 @@ REFACTOR: Add dry-run, metrics, logging
 **Effort:** 3-5 hours
 
 **Definition of Done:**
+
 - Queue processor executes in <500ms per 100 entries
 - Dry-run output is human-readable
 - Integration health metric visible in CI dashboard
@@ -96,6 +98,7 @@ REFACTOR: Add dry-run, metrics, logging
 - [ ] **AC7:** CI gate enforces: no commit without passing tests
 
 **TDD Approach:**
+
 ```
 RED:   pnpm test → 2 failures, 2 incomplete
 GREEN: Write minimal assertions to complete incomplete tests, debug failures
@@ -103,6 +106,7 @@ REFACTOR: Add edge case coverage (malformed input, boundary conditions)
 ```
 
 **Investigation Checklist:**
+
 - [ ] Read both failing test files line-by-line
 - [ ] Identify assertion mismatch (expected vs actual)
 - [ ] Find root cause in implementation (metrics-schema.cjs, metrics-reader.cjs)
@@ -121,6 +125,7 @@ REFACTOR: Add edge case coverage (malformed input, boundary conditions)
 **Effort:** 6-8 hours
 
 **Definition of Done:**
+
 - `pnpm test` outputs: "X passed, 0 failed"
 - All 4 test files complete and passing
 - Coverage report shows no skipped tests
@@ -135,6 +140,7 @@ REFACTOR: Add edge case coverage (malformed input, boundary conditions)
 **So that** memory module refactoring doesn't break the dependency chain
 
 **Background:**
+
 ```
 contextual-memory.cjs → memory-query.cjs  (calls buildSemanticContext)
                     ↓
@@ -154,6 +160,7 @@ memory-query.cjs → contextual-memory.cjs  (calls readMemory)
 - [ ] **AC7:** Architecture doc updated: `.claude/context/artifacts/architecture/memory-module-dependencies.md`
 
 **TDD Approach:**
+
 ```
 RED:   Circular import detection fails
 GREEN: Extract buildSemanticContext to memory-utils, update both callers
@@ -165,6 +172,7 @@ REFACTOR: Add comprehensive unit tests for extracted function
 **Effort:** 4-6 hours
 
 **Definition of Done:**
+
 - Zero circular import warnings
 - `buildSemanticContext()` tested in isolation (unit tests)
 - Memory module tests pass (integration tests)
@@ -189,6 +197,7 @@ REFACTOR: Add comprehensive unit tests for extracted function
 - [ ] **AC7:** Manual test: rotate learnings.md (size 80KB → archive, create new)
 
 **TDD Approach:**
+
 ```
 RED:   pruneResult returns mixed field names, rotator fails silently
 GREEN: Standardize to { success, removed: [...], entries: [...] }, add assertions
@@ -196,6 +205,7 @@ REFACTOR: Add comprehensive error handling + logging
 ```
 
 **Field Audit:**
+
 - [ ] Search all files for `pruneResult.removed`, `pruneResult.entriesRemoved`, `pruneResult.entries`
 - [ ] Create single source of truth schema
 - [ ] Update all callers
@@ -212,6 +222,7 @@ REFACTOR: Add comprehensive error handling + logging
 **Effort:** 3-4 hours
 
 **Definition of Done:**
+
 - All pruneResult callers use consistent field names
 - Zero "undefined field" errors in tests
 - Memory rotation tested with 50KB, 100KB files
@@ -239,6 +250,7 @@ REFACTOR: Add comprehensive error handling + logging
 - [ ] **AC8:** Documentation: `.claude/context/artifacts/security/memory-poisoning-prevention.md`
 
 **TDD Approach:**
+
 ```
 RED:   Inject malicious code into decisions.md → readMemory returns raw content
 GREEN: Add sanitizeMemoryEntry() → readMemory sanitizes before returning
@@ -246,6 +258,7 @@ REFACTOR: Add comprehensive pattern detection + logging
 ```
 
 **Malicious Payload Test Cases:**
+
 ```javascript
 // Test cases:
 'Decision: eval("process.exit(1)")'
@@ -267,6 +280,7 @@ REFACTOR: Add comprehensive pattern detection + logging
 **Effort:** 4-6 hours
 
 **Definition of Done:**
+
 - sanitizeMemoryEntry() blocks all 10+ attack patterns
 - Zero false positives on legitimate patterns
 - Sanitization log shows all blocked entries
@@ -276,14 +290,14 @@ REFACTOR: Add comprehensive pattern detection + logging
 
 ## P0 Summary Table
 
-| ID | Story | Effort | Blocker Chain | Exit Criteria |
-|----|-------|--------|---|---|
-| P0-001 | Integration Queue Automation | 3-5h | None | Queue processor <500ms, orphan rate <10% |
-| P0-002 | Test Suite Completion | 6-8h | P0-001 | `pnpm test` → 0 failures, 100% pass |
-| P0-003 | Break Circular Dependency | 4-6h | P0-002 | Zero circular imports, memory tests pass |
-| P0-004 | Memory Rotation Fixes | 3-4h | P0-003 | Consistent field names, rotation tested |
-| P0-005 | Memory Sanitization | 4-6h | P0-004 | All 10+ patterns blocked, no false positives |
-| **TOTAL** | **5 P0 Issues** | **20-29h** | Sequential | **All P0s resolved, ready for P1** |
+| ID        | Story                        | Effort     | Blocker Chain | Exit Criteria                                |
+| --------- | ---------------------------- | ---------- | ------------- | -------------------------------------------- |
+| P0-001    | Integration Queue Automation | 3-5h       | None          | Queue processor <500ms, orphan rate <10%     |
+| P0-002    | Test Suite Completion        | 6-8h       | P0-001        | `pnpm test` → 0 failures, 100% pass          |
+| P0-003    | Break Circular Dependency    | 4-6h       | P0-002        | Zero circular imports, memory tests pass     |
+| P0-004    | Memory Rotation Fixes        | 3-4h       | P0-003        | Consistent field names, rotation tested      |
+| P0-005    | Memory Sanitization          | 4-6h       | P0-004        | All 10+ patterns blocked, no false positives |
+| **TOTAL** | **5 P0 Issues**              | **20-29h** | Sequential    | **All P0s resolved, ready for P1**           |
 
 **P0 Sprint: 3-5 days (assuming 6-8h/day)**
 
@@ -298,6 +312,7 @@ REFACTOR: Add comprehensive pattern detection + logging
 **So that** production-ready code is validated
 
 **Target Modules:**
+
 1. `loop-state-manager.cjs` (SECURITY CRITICAL: manages workflow loops)
 2. `metrics-reader.cjs` (generates CI metrics)
 3. `dashboard-renderer.cjs` (renders agent studio dashboard)
@@ -324,6 +339,7 @@ REFACTOR: Add comprehensive pattern detection + logging
 **Effort:** 12-16 hours
 
 **Definition of Done:**
+
 - Coverage report shows 80%+ for each module
 - All tests pass consistently
 - CI enforces coverage gate
@@ -347,6 +363,7 @@ REFACTOR: Add comprehensive pattern detection + logging
 - [ ] **AC7:** Documentation: `.claude/context/artifacts/security/prompt-injection-prevention.md`
 
 **Injection Patterns to Block:**
+
 ```
 "ignore previous instructions"
 "forget about your role"
@@ -360,6 +377,7 @@ REFACTOR: Add comprehensive pattern detection + logging
 ```
 
 **TDD Approach:**
+
 ```
 RED:   Inject attack prompt → passes through unchecked
 GREEN: Add detectPromptInjection() → attack prompt rejected
@@ -371,6 +389,7 @@ REFACTOR: Expand blocklist, add logging
 **Effort:** 2-3 days
 
 **Definition of Done:**
+
 - Zero false positives on 100 legitimate prompts
 - All 20+ attack patterns blocked
 - Security event log shows blocked attempts
@@ -393,6 +412,7 @@ REFACTOR: Expand blocklist, add logging
 - [ ] **AC6:** Test: inject prototype pollution attack → blocked by safeParseJSON
 
 **Malformed JSON Test Cases:**
+
 ```
 '{"unclosed": '
 '{"__proto__": {"isAdmin": true}}'
@@ -411,6 +431,7 @@ REFACTOR: Expand blocklist, add logging
 **Effort:** 1-2 days
 
 **Definition of Done:**
+
 - grep for `JSON\.parse\(` returns 0 results in production code
 - All hook JSON parsing uses safeParseJSON
 - Error handling comprehensive (no silent failures)
@@ -434,6 +455,7 @@ REFACTOR: Expand blocklist, add logging
 - [ ] **AC7:** Documentation: `.claude/context/artifacts/architecture/concurrent-write-locking.md`
 
 **Lock Protocol:**
+
 ```javascript
 // Before any file write:
 const lock = await lockfile.lock(filePath, { timeout: 5000 });
@@ -456,6 +478,7 @@ try {
 **Effort:** 2-3 days
 
 **Definition of Done:**
+
 - Concurrent write test passes (5 agents, same file)
 - Zero data loss in stress test (1000+ concurrent writes)
 - Lock timeout enforced
@@ -469,6 +492,7 @@ try {
 **So that** Windows process management is consistent
 
 **Files to Fix:**
+
 1. `.claude/lib/code-indexing/...` (1 file)
 2. `.claude/lib/memory/...` (1 file)
 3. `.claude/lib/routing/...` (1 file)
@@ -486,6 +510,7 @@ try {
 **Effort:** 1 hour
 
 **Definition of Done:**
+
 - All spawn calls have windowsHide: true
 - No shell: true found in spawn calls
 - Windows test verified child process hiding
@@ -518,6 +543,7 @@ try {
 **Effort:** 30 minutes
 
 **Definition of Done:**
+
 - learnings.md <20KB
 - Archive file created with >30-day entries
 - No data loss (verify entry count before/after)
@@ -531,6 +557,7 @@ try {
 **So that** configuration is centralized and maintainable
 
 **Current State:**
+
 ```
 .claude/settings.json          (hook registration)
 config.yaml                    (agent models)
@@ -541,6 +568,7 @@ workflow-state.json            (workflow metadata)
 ```
 
 **Target State:**
+
 ```
 config.yaml                    (agents, workflows, hooks, build scripts)
 .env                           (secrets)
@@ -568,6 +596,7 @@ config.yaml                    (agents, workflows, hooks, build scripts)
 **Effort:** 2 weeks
 
 **Definition of Done:**
+
 - Single config.yaml source of truth
 - .env only contains secrets
 - Zero duplicate config values
@@ -577,16 +606,16 @@ config.yaml                    (agents, workflows, hooks, build scripts)
 
 ## P1 Summary Table
 
-| ID | Story | Effort | Dependencies | Exit Criteria |
-|----|-------|--------|---|---|
-| P1-001 | Test Coverage (5 modules) | 12-16h | P0-002 | 80%+ coverage, all tests pass |
-| P1-002 | Prompt Injection Detection | 2-3d | P0-005 | Zero false positives, all patterns blocked |
-| P1-003 | safeParseJSON Adoption | 1-2d | P0-005 | grep shows 0 JSON.parse in production |
-| P1-004 | Concurrent Write Locking | 2-3d | P0-004 | Concurrent write test passes, no deadlock |
-| P1-005 | Shell Execution (windowsHide) | 1h | P1-003 | All spawn calls have windowsHide: true |
-| P1-006 | Memory Budget Rotation | 30m | P0-004 | learnings.md <20KB |
-| P1-007 | Configuration Consolidation | 2w | All P1 | Single config.yaml, 100% migration |
-| **TOTAL** | **7 P1 Issues** | **3-4w** | Sequential | **Production-ready, 95/100 security** |
+| ID        | Story                         | Effort   | Dependencies | Exit Criteria                              |
+| --------- | ----------------------------- | -------- | ------------ | ------------------------------------------ |
+| P1-001    | Test Coverage (5 modules)     | 12-16h   | P0-002       | 80%+ coverage, all tests pass              |
+| P1-002    | Prompt Injection Detection    | 2-3d     | P0-005       | Zero false positives, all patterns blocked |
+| P1-003    | safeParseJSON Adoption        | 1-2d     | P0-005       | grep shows 0 JSON.parse in production      |
+| P1-004    | Concurrent Write Locking      | 2-3d     | P0-004       | Concurrent write test passes, no deadlock  |
+| P1-005    | Shell Execution (windowsHide) | 1h       | P1-003       | All spawn calls have windowsHide: true     |
+| P1-006    | Memory Budget Rotation        | 30m      | P0-004       | learnings.md <20KB                         |
+| P1-007    | Configuration Consolidation   | 2w       | All P1       | Single config.yaml, 100% migration         |
+| **TOTAL** | **7 P1 Issues**               | **3-4w** | Sequential   | **Production-ready, 95/100 security**      |
 
 **P1 Timeline:** Week 2-3 (security) + Week 4-5 (coverage) + Week 6-7 (config refactor)
 
@@ -622,38 +651,38 @@ P1-007 (Config) ← All P1
 
 ### High-Risk Issues
 
-| Issue | Risk | Probability | Impact | Mitigation |
-|-------|------|-------------|--------|-----------|
-| Memory rotation field mismatches cause data loss | High | Medium | High | Backup before rotation, verify checksums |
-| Circular dependencies re-emerge during refactor | High | Medium | High | Add CI check for circular imports (pre-commit) |
-| Incomplete tests hide security bugs | High | Low | High | Red-green-refactor TDD for all tests |
-| Prompt injection detection bypassed | High | Low | High | Adversarial testing (try 50+ attack patterns) |
+| Issue                                            | Risk | Probability | Impact | Mitigation                                     |
+| ------------------------------------------------ | ---- | ----------- | ------ | ---------------------------------------------- |
+| Memory rotation field mismatches cause data loss | High | Medium      | High   | Backup before rotation, verify checksums       |
+| Circular dependencies re-emerge during refactor  | High | Medium      | High   | Add CI check for circular imports (pre-commit) |
+| Incomplete tests hide security bugs              | High | Low         | High   | Red-green-refactor TDD for all tests           |
+| Prompt injection detection bypassed              | High | Low         | High   | Adversarial testing (try 50+ attack patterns)  |
 
 ### Medium-Risk Issues
 
-| Issue | Risk | Probability | Impact | Mitigation |
-|------|------|-------------|--------|-----------|
-| Integration queue processor removes valid entries | Medium | Low | High | Dry-run mode, manual review gate |
-| Concurrent write locking causes deadlocks | Medium | Medium | Medium | Lock timeout + recovery mechanism |
-| Config consolidation breaks existing workflows | Medium | Medium | Medium | Dry-run, gradual migration, rollback plan |
+| Issue                                             | Risk   | Probability | Impact | Mitigation                                |
+| ------------------------------------------------- | ------ | ----------- | ------ | ----------------------------------------- |
+| Integration queue processor removes valid entries | Medium | Low         | High   | Dry-run mode, manual review gate          |
+| Concurrent write locking causes deadlocks         | Medium | Medium      | Medium | Lock timeout + recovery mechanism         |
+| Config consolidation breaks existing workflows    | Medium | Medium      | Medium | Dry-run, gradual migration, rollback plan |
 
 ---
 
 ## Success Metrics (1-Month Target)
 
-| Metric | Before | After | Target |
-|--------|--------|-------|--------|
-| Test pass rate | 99.94% (2 failures) | 100% | 100% |
-| Test failures | 2 | 0 | 0 |
-| Incomplete test files | 2 | 0 | 0 |
-| P0 issues | 5 | 0 | 0 |
-| P1 issues | 8 | 0-2 (partial) | <3 |
-| Security score | 87/100 | 95/100 | 95+/100 |
-| Architecture score | 7.8/10 | 9.0/10 | 9.0+/10 |
-| Orphan artifact rate | 70% | <10% | <5% |
-| Memory file sizes | 2.65x over budget | <20KB each | <20KB |
-| Circular dependencies | 1 (C-001) | 0 | 0 |
-| Concurrent write safety | Unsafe | Safe (locked) | Production-ready |
+| Metric                  | Before              | After         | Target           |
+| ----------------------- | ------------------- | ------------- | ---------------- |
+| Test pass rate          | 99.94% (2 failures) | 100%          | 100%             |
+| Test failures           | 2                   | 0             | 0                |
+| Incomplete test files   | 2                   | 0             | 0                |
+| P0 issues               | 5                   | 0             | 0                |
+| P1 issues               | 8                   | 0-2 (partial) | <3               |
+| Security score          | 87/100              | 95/100        | 95+/100          |
+| Architecture score      | 7.8/10              | 9.0/10        | 9.0+/10          |
+| Orphan artifact rate    | 70%                 | <10%          | <5%              |
+| Memory file sizes       | 2.65x over budget   | <20KB each    | <20KB            |
+| Circular dependencies   | 1 (C-001)           | 0             | 0                |
+| Concurrent write safety | Unsafe              | Safe (locked) | Production-ready |
 
 ---
 
@@ -662,6 +691,7 @@ P1-007 (Config) ← All P1
 ### Week 1 (Feb 13-17): P0 Wave 1-2
 
 **Daily Plan:**
+
 - **Day 1 (Wed):** P0-001 (Queue automation) + P0-002 (Tests: debug failures)
 - **Day 2 (Thu):** P0-002 (Tests: complete files) + P0-003 (Circular deps)
 - **Day 3 (Fri):** P0-004 (Memory rotation) + P0-005 (Sanitization)
@@ -673,6 +703,7 @@ P1-007 (Config) ← All P1
 ### Week 2-3 (Feb 18-Mar 3): P1 Wave 1 (Security)
 
 **Priority:**
+
 - P1-002 (Prompt injection) - 2-3 days
 - P1-003 (safeParseJSON) - 1-2 days
 - P1-001 (Coverage) - 12-16h
@@ -684,6 +715,7 @@ P1-007 (Config) ← All P1
 ### Week 4-7 (Mar 4-31): P1 Wave 2-3 (Coverage + Config)
 
 **Priority:**
+
 - P1-004 (Concurrent locking) - 2-3 days
 - P1-007 (Config consolidation) - 2 weeks
 
@@ -694,16 +726,19 @@ P1-007 (Config) ← All P1
 ## Stakeholder Communication Plan
 
 ### Daily Standup (Sprint P0)
+
 - **Status:** P0 story progress (tests/queue/memory)
 - **Blockers:** Any issues preventing story closure
 - **EOD Update:** Commit hashes, test results
 
 ### Weekly Sprint Review (Friday)
+
 - **Demo:** Working integration queue, passing tests
 - **Metrics:** Orphan rate, test coverage, security score
 - **Risks:** Any emerging blockers
 
 ### Monthly Board Update (Feb 28)
+
 - **Accomplishment:** 5 P0s resolved, 3 P1s in progress
 - **Security:** Score 87 → 95/100, orphan rate 70% → <10%
 - **Production Readiness:** Deployment checklist status
@@ -713,6 +748,7 @@ P1-007 (Config) ← All P1
 ## Definition of Done (Per Story)
 
 **Code:**
+
 - [ ] All acceptance criteria met and verified
 - [ ] TDD red-green-refactor cycle complete
 - [ ] Code follows style guide (`pnpm lint:fix`, `pnpm format` pass)
@@ -720,6 +756,7 @@ P1-007 (Config) ← All P1
 - [ ] Provenance header present
 
 **Tests:**
+
 - [ ] Unit tests for new/changed functions
 - [ ] Integration tests for multi-module changes
 - [ ] Edge case coverage included
@@ -727,6 +764,7 @@ P1-007 (Config) ← All P1
 - [ ] Coverage ≥80% for new code
 
 **Documentation:**
+
 - [ ] Inline code comments for complex logic
 - [ ] Public API documentation
 - [ ] Architecture diagrams updated if needed
@@ -734,11 +772,13 @@ P1-007 (Config) ← All P1
 - [ ] Memory files updated (learnings/decisions/issues)
 
 **Review:**
+
 - [ ] Code review approved (code-reviewer agent)
 - [ ] Security review approved (security-architect for P0/P1)
 - [ ] Architecture review approved (architect for refactors)
 
 **Deployment:**
+
 - [ ] CI/CD pipeline passes (linting, tests, build)
 - [ ] Manual verification on test environment
 - [ ] Rollback plan documented
@@ -749,16 +789,19 @@ P1-007 (Config) ← All P1
 ## Memory Updates Required
 
 **To `.claude/context/memory/learnings.md`:**
+
 - Pattern: Defensive programming trilogy (windowsHide + shell:false + file guards)
 - Pattern: Stale queue detection (cross-check before remediation)
 - Pattern: Memory rotation integration (field standardization key)
 
 **To `.claude/context/memory/decisions.md`:**
+
 - ADR-106: Break memory circular dependency via memory-utils.cjs neutral module
 - ADR-107: Consolidate 6 config files → config.yaml + .env (2-week refactor)
 - ADR-108: Add file-based locking for concurrent memory writes (proper-lockfile)
 
 **To `.claude/context/memory/issues.md`:**
+
 - Task #13 reflection context missing (audit trail gap for Wave 2)
 - Integration queue stale accumulation (P2 monitoring)
 - Memory field name standardization applied (C-002 resolved)
@@ -779,4 +822,3 @@ P1-007 (Config) ← All P1
 **Backlog Created By:** pm | **Date:** 2026-02-13
 **Sprint Ready:** YES — all stories have acceptance criteria, TDD approach, risk assessment
 **Next Action:** Spawn developer on P0-001 (Queue automation)
-

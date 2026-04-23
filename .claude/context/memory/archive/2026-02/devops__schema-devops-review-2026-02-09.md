@@ -30,6 +30,7 @@ C:\dev\projects\agent-studio\.claude\context\tmp\validate-schemas.cjs:40
 **Impact**: CI/CD pipeline will reject deployment. These are pre-commit hook failures.
 
 **Mitigation Path**:
+
 ```bash
 pnpm lint:fix  # Auto-fix check-refs.cjs
 # Manual fix: Extract validateSchema logic, reduce complexity <20
@@ -47,12 +48,12 @@ Progress disclosed: Test suite running with 70+ tests defined. At least 1 failur
 
 **Deployment Pipeline Status**: 🔴 BLOCKED
 
-| Stage | Status | Reason |
-|-------|--------|--------|
-| Lint  | ❌ Blocked | 2 errors (complexity, unused vars) |
-| Format| ⚠️ Unknown | Not yet verified |
-| Build | ⚠️ Unknown | Dependent on lint/format |
-| Test  | ⚠️ Partial  | 1+ test failures observed |
+| Stage  | Status     | Reason                             |
+| ------ | ---------- | ---------------------------------- |
+| Lint   | ❌ Blocked | 2 errors (complexity, unused vars) |
+| Format | ⚠️ Unknown | Not yet verified                   |
+| Build  | ⚠️ Unknown | Dependent on lint/format           |
+| Test   | ⚠️ Partial | 1+ test failures observed          |
 
 **Next Pipeline Stage**: All must pass lint before proceeding.
 
@@ -63,11 +64,13 @@ Progress disclosed: Test suite running with 70+ tests defined. At least 1 failur
 ### Schema Version Migration Strategy
 
 **Phase Structure**:
+
 - **Phase 1 (99a15ee9)**: Foundation - add `additionalProperties: false`, delete 12 stub schemas
 - **Phase 2 (72f64a9c)**: Standardization - Draft-07, domain/catalog additions
 - **Phase 3 (a6ce6b67)**: Structure B migration - all schemas to uniform structure
 
 **Compatibility**:
+
 - ✅ All phases maintain Draft-2020-12 compliance
 - ✅ `$id` uniqueness enforced across migrations
 - ✅ No breaking changes to consumer interfaces (agents, skills)
@@ -78,11 +81,13 @@ Progress disclosed: Test suite running with 70+ tests defined. At least 1 failur
 **Before Deploying Phase 3**:
 
 1. **Validate existing instances** against new schemas:
+
    ```bash
    pnpm validate:schemas --against-new-phase
    ```
 
 2. **Test schema version upgrades** with sample data:
+
    ```bash
    node tools/schema-migration-tester.mjs
    ```
@@ -99,6 +104,7 @@ Progress disclosed: Test suite running with 70+ tests defined. At least 1 failur
 ### Directory Structure (Consistent)
 
 ✅ **Well-Organized**:
+
 ```
 .claude/schemas/
 ├── agent-definition.schema.json         (core)
@@ -109,6 +115,7 @@ Progress disclosed: Test suite running with 70+ tests defined. At least 1 failur
 ```
 
 ✅ **Naming Convention Maintained**:
+
 - `{artifact-type}-definition.schema.json` for type definitions
 - `skill-{skill-name}-output.schema.json` for skill outputs
 - `{domain}.schema.json` for domain-specific schemas
@@ -117,6 +124,7 @@ Progress disclosed: Test suite running with 70+ tests defined. At least 1 failur
 ### Rules and Commands Organization
 
 ✅ **New Command Catalog** (96 entries):
+
 ```
 .claude/commands/
 ├── <skill-name>.md  (90+ files)
@@ -124,6 +132,7 @@ Progress disclosed: Test suite running with 70+ tests defined. At least 1 failur
 ```
 
 ✅ **New Rules Catalog** (453 entries):
+
 ```
 .claude/rules/
 ├── <domain>.md  (90+ files)
@@ -139,6 +148,7 @@ Progress disclosed: Test suite running with 70+ tests defined. At least 1 failur
 ### Schema Cross-References
 
 ✅ **Internal References Valid**:
+
 - `skill-definition.schema.json` → references valid `skill-*-output.schema.json` via `$ref`
 - `workflow-definition.schema.json` → properly references agent/skill schemas
 - No circular dependencies detected in schema graph
@@ -174,6 +184,7 @@ Progress disclosed: Test suite running with 70+ tests defined. At least 1 failur
 **Recommended Approach**: Staged rollout
 
 **Stage 1: Validation (1 hour)**
+
 ```bash
 # 1. Fix linting issues
 pnpm lint:fix  # Auto-fix
@@ -187,6 +198,7 @@ node tools/validate-all-schemas.mjs
 ```
 
 **Stage 2: Integration (2 hours)**
+
 ```bash
 # 1. Update CLAUDE.md with new command/rule routing
 # 2. Run integration queue processor
@@ -200,6 +212,7 @@ node .claude/tools/test-router-dispatch.mjs
 ```
 
 **Stage 3: Deployment (30 min)**
+
 ```bash
 # 1. Create release branch
 git switch -c release/schema-phase3
@@ -218,6 +231,7 @@ git switch main && git merge release/schema-phase3
 ### No Infrastructure Changes Required
 
 ✅ **Good News**: Schema migration is **non-infrastructure**:
+
 - No database migrations needed
 - No CI/CD pipeline modifications required
 - No deployment infrastructure changes
@@ -231,20 +245,22 @@ git switch main && git merge release/schema-phase3
 
 All new files follow established conventions:
 
-| Pattern | Examples | Compliance |
-|---------|----------|-----------|
-| Rules | `code-quality-expert.md`, `tdd.md` | ✅ lowercase kebab-case |
-| Commands | `advanced-elicitation.md` | ✅ matches skill names |
-| Schemas | `skill-tdd-output.schema.json` | ✅ consistent pattern |
-| Dates | `2026-02-09` format | ✅ ISO 8601 hyphens |
+| Pattern  | Examples                           | Compliance              |
+| -------- | ---------------------------------- | ----------------------- |
+| Rules    | `code-quality-expert.md`, `tdd.md` | ✅ lowercase kebab-case |
+| Commands | `advanced-elicitation.md`          | ✅ matches skill names  |
+| Schemas  | `skill-tdd-output.schema.json`     | ✅ consistent pattern   |
+| Dates    | `2026-02-09` format                | ✅ ISO 8601 hyphens     |
 
 ### Potential Naming Issues
 
 ⚠️ **Path Collision Warning**:
+
 ```
 .claude/rules/docker-compose.md          (Rule file)
 .claude/skills/docker-compose/SKILL.md   (Skill file)
 ```
+
 Both reference same capability—ensure proper routing distinction in CLAUDE.md.
 
 ---
@@ -282,6 +298,7 @@ Both reference same capability—ensure proper routing distinction in CLAUDE.md.
 ### Artifact Integration Status
 
 ⚠️ **Partial**:
+
 - Skill outputs properly registered in skill-catalog.md
 - Rules added to rules-catalog.md but NOT integrated into router
 - Commands created but routing keywords not in CLAUDE.md Section 3 table
@@ -293,6 +310,7 @@ Both reference same capability—ensure proper routing distinction in CLAUDE.md.
 ### IMMEDIATE (Blocking Deployment)
 
 1. **Fix Linting Errors** (20 min)
+
    ```bash
    # Auto-fix
    pnpm lint:fix
@@ -305,6 +323,7 @@ Both reference same capability—ensure proper routing distinction in CLAUDE.md.
    ```
 
 2. **Resolve Test Failures** (1-2 hours)
+
    ```bash
    # Run full test suite to identify all failures
    pnpm test 2>&1 | grep "not ok"
@@ -326,9 +345,11 @@ Both reference same capability—ensure proper routing distinction in CLAUDE.md.
    - Test router self-check gates 1-4 with new commands
 
 5. **Run Integration Queue** (1 hour)
+
    ```bash
    pnpm artifact-integrator:process
    ```
+
    - Validates all 60+ new skills have agent assignments
    - Confirms cross-references between skills/agents/workflows
 
@@ -353,14 +374,14 @@ Both reference same capability—ensure proper routing distinction in CLAUDE.md.
 
 ## Operational Health Score
 
-| Category | Score | Notes |
-|----------|-------|-------|
-| **Code Quality** | 2/5 | Linting failures block deployment |
-| **Test Coverage** | 3/5 | Tests exist but 1+ failing |
-| **Schema Design** | 5/5 | Well-structured, consistent naming |
-| **Backward Compat** | 4/5 | No breaking changes, but validation stricter |
-| **Documentation** | 3/5 | Phase learnings recorded, router integration pending |
-| **Deployment Ready** | 1/5 | BLOCKED on linting + tests |
+| Category             | Score | Notes                                                |
+| -------------------- | ----- | ---------------------------------------------------- |
+| **Code Quality**     | 2/5   | Linting failures block deployment                    |
+| **Test Coverage**    | 3/5   | Tests exist but 1+ failing                           |
+| **Schema Design**    | 5/5   | Well-structured, consistent naming                   |
+| **Backward Compat**  | 4/5   | No breaking changes, but validation stricter         |
+| **Documentation**    | 3/5   | Phase learnings recorded, router integration pending |
+| **Deployment Ready** | 1/5   | BLOCKED on linting + tests                           |
 
 **Overall**: 🔴 **NOT DEPLOYMENT READY** until blocking issues resolved.
 

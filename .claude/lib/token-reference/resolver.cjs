@@ -55,7 +55,9 @@ function resolveString(input, registry, warningsOut) {
     if (registrySection && Object.prototype.hasOwnProperty.call(registrySection, name)) {
       return registrySection[name];
     }
-    warningsOut.push(`Unresolvable token: {${prefix}.${name}} — "${name}" not found in ${regKey} registry`);
+    warningsOut.push(
+      `Unresolvable token: {${prefix}.${name}} — "${name}" not found in ${regKey} registry`
+    );
     return _match; // preserve literal
   });
 

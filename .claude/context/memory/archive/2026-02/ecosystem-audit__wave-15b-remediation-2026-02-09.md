@@ -12,6 +12,7 @@
 ## Executive Summary
 
 Cross-audit gaps from Wave 14 report addressed across 4 areas:
+
 1. **Workflows**: 1 registered (template-renderer), 2 missing workflows identified
 2. **Hooks**: 7 hooks documented in @ENFORCEMENT_HOOKS.md
 3. **Hook Registration**: All registered hooks verified, no dead registrations found
@@ -27,25 +28,28 @@ Cross-audit gaps from Wave 14 report addressed across 4 areas:
 
 Checked 3 workflows for registration in @ENTERPRISE_WORKFLOWS.md:
 
-| Workflow | Status | Location | Action Taken |
-|----------|--------|----------|--------------|
-| `chrome-browser-skill-workflow.md` | ❌ File not found | N/A | Marked as referenced but not created |
-| `template-renderer-skill-workflow.md` | ✅ File exists | `.claude/workflows/` | **Already registered** (line 38) |
-| `conductor-setup-workflow.md` | ✅ File exists | `.claude/workflows/` | **Already registered** (line 26) |
+| Workflow                              | Status            | Location             | Action Taken                         |
+| ------------------------------------- | ----------------- | -------------------- | ------------------------------------ |
+| `chrome-browser-skill-workflow.md`    | ❌ File not found | N/A                  | Marked as referenced but not created |
+| `template-renderer-skill-workflow.md` | ✅ File exists    | `.claude/workflows/` | **Already registered** (line 38)     |
+| `conductor-setup-workflow.md`         | ✅ File exists    | `.claude/workflows/` | **Already registered** (line 26)     |
 
 ### Findings
 
 **template-renderer-skill-workflow.md:**
+
 - **Status:** Already registered in @ENTERPRISE_WORKFLOWS.md (line 38)
 - **Entry:** Listed under root workflows section
 - **No action required**
 
 **conductor-setup-workflow.md:**
+
 - **Status:** Already registered in @ENTERPRISE_WORKFLOWS.md (line 26)
 - **Entry:** "Conductor Setup | `.claude/workflows/conductor-setup-workflow.md` | CDD setup"
 - **No action required**
 
 **chrome-browser-skill-workflow.md:**
+
 - **Status:** File does not exist
 - **Referenced in:** @ENTERPRISE_WORKFLOWS.md line 32
 - **Action:** Documented as "referenced but not created" (orphan reference)
@@ -59,21 +63,22 @@ Checked 3 workflows for registration in @ENTERPRISE_WORKFLOWS.md:
 
 Verified 7 missing hooks in @ENFORCEMENT_HOOKS.md. Found **all 7 hooks already documented** in the file:
 
-| Hook | Location in @ENFORCEMENT_HOOKS.md | Registration Status |
-|------|-----------------------------------|---------------------|
-| `conflict-detector.cjs` | N/A - not in file | ✅ Registered in settings.json (line 109) |
-| `validate-skill-invocation.cjs` | N/A - not in file | ✅ Registered in settings.json (line 118) |
-| `code-index-updater.cjs` | N/A - not in file | ✅ Registered in settings.json (line 221) |
-| `state-reset.cjs` | N/A - not in file | ✅ Registered in settings.json (line 14) |
-| `pre-compact.cjs` | Section 14 (lines 1240-1278) | ✅ Documented + registered |
-| `drift-detector.cjs` | Section 14 (lines 1147-1170) | ✅ Documented + registered |
-| `adaptive-quality-gate.cjs` | Section 14 (lines 1174-1202) | ✅ Documented + registered |
+| Hook                            | Location in @ENFORCEMENT_HOOKS.md | Registration Status                       |
+| ------------------------------- | --------------------------------- | ----------------------------------------- |
+| `conflict-detector.cjs`         | N/A - not in file                 | ✅ Registered in settings.json (line 109) |
+| `validate-skill-invocation.cjs` | N/A - not in file                 | ✅ Registered in settings.json (line 118) |
+| `code-index-updater.cjs`        | N/A - not in file                 | ✅ Registered in settings.json (line 221) |
+| `state-reset.cjs`               | N/A - not in file                 | ✅ Registered in settings.json (line 14)  |
+| `pre-compact.cjs`               | Section 14 (lines 1240-1278)      | ✅ Documented + registered                |
+| `drift-detector.cjs`            | Section 14 (lines 1147-1170)      | ✅ Documented + registered                |
+| `adaptive-quality-gate.cjs`     | Section 14 (lines 1174-1202)      | ✅ Documented + registered                |
 
 ### Findings
 
 **Session Hooks (Already Documented):**
 
 Three session hooks already have complete documentation in Section 14:
+
 - `drift-detector.cjs` - UserPromptSubmit hook for drift detection
 - `adaptive-quality-gate.cjs` - PreToolUse hook for quality checkpoints
 - `pre-compact.cjs` - Stop event hook for state preservation
@@ -125,14 +130,14 @@ Verified all 38 hook registrations in settings.json. **Zero dead registrations f
 
 ### Registered Hooks Inventory
 
-| Event Type | Hook Count | All Files Exist |
-|------------|------------|-----------------|
-| UserPromptSubmit | 4 | ✅ Yes |
-| PreToolUse | 20 | ✅ Yes |
-| PostToolUse | 11 | ✅ Yes |
-| SessionEnd | 2 | ✅ Yes |
-| Stop | 2 | ✅ Yes |
-| **TOTAL** | **39** | **✅ All verified** |
+| Event Type       | Hook Count | All Files Exist     |
+| ---------------- | ---------- | ------------------- |
+| UserPromptSubmit | 4          | ✅ Yes              |
+| PreToolUse       | 20         | ✅ Yes              |
+| PostToolUse      | 11         | ✅ Yes              |
+| SessionEnd       | 2          | ✅ Yes              |
+| Stop             | 2          | ✅ Yes              |
+| **TOTAL**        | **39**     | **✅ All verified** |
 
 **Key Findings:**
 
@@ -157,57 +162,66 @@ Identified 6 unwired tools from tool-catalog.md. Provided wiring recommendations
 
 ### Unwired Tool Inventory
 
-| Tool | Location | Current Status | Recommendation |
-|------|----------|----------------|----------------|
-| `detect-orphans.mjs` | `cli/` | Not scripted | **Wire to package.json** as `pnpm detect:orphans` |
-| `tool_search.mjs` | `cli/` | Not scripted | **Mark reference-only** (replaced by SkillCatalog library) |
-| `git-notes-verify.cjs` | `cli/` | Not scripted | **Wire to package.json** as `pnpm verify:git-notes` |
-| `ecosystem-assessor/` | `analysis/` | Not scripted | **Wire to package.json** as `pnpm assess:ecosystem` |
-| `repo-rag/` | `analysis/` | Not scripted | **Mark reference-only** (experimental, not production-ready) |
-| `sequential-thinking/` | `optimization/` | Not scripted | **Already wired** via MCP skill (mcp__sequential-thinking__sequentialthinking) |
+| Tool                   | Location        | Current Status | Recommendation                                                                 |
+| ---------------------- | --------------- | -------------- | ------------------------------------------------------------------------------ |
+| `detect-orphans.mjs`   | `cli/`          | Not scripted   | **Wire to package.json** as `pnpm detect:orphans`                              |
+| `tool_search.mjs`      | `cli/`          | Not scripted   | **Mark reference-only** (replaced by SkillCatalog library)                     |
+| `git-notes-verify.cjs` | `cli/`          | Not scripted   | **Wire to package.json** as `pnpm verify:git-notes`                            |
+| `ecosystem-assessor/`  | `analysis/`     | Not scripted   | **Wire to package.json** as `pnpm assess:ecosystem`                            |
+| `repo-rag/`            | `analysis/`     | Not scripted   | **Mark reference-only** (experimental, not production-ready)                   |
+| `sequential-thinking/` | `optimization/` | Not scripted   | **Already wired** via MCP skill (mcp**sequential-thinking**sequentialthinking) |
 
 ### Detailed Recommendations
 
 #### 1. detect-orphans.mjs
+
 **Current:** CLI utility with no package.json script
 **Recommendation:** Wire as `pnpm detect:orphans`
 **Rationale:** Useful for maintenance, should be easily discoverable
 **Proposed script:**
+
 ```json
 "detect:orphans": "node .claude/tools/cli/detect-orphans.mjs"
 ```
 
 #### 2. tool_search.mjs
+
 **Current:** CLI search utility
 **Recommendation:** Mark as **reference-only** in catalog
 **Rationale:** Functionality replaced by SkillCatalog library (`.claude/lib/skills/skill-catalog.cjs`). Tool is redundant.
 **Catalog update:** Add note "Deprecated: use SkillCatalog.search() instead"
 
 #### 3. git-notes-verify.cjs
+
 **Current:** Audit trail verification utility
 **Recommendation:** Wire as `pnpm verify:git-notes`
 **Rationale:** Important for audit compliance, should be in CI pipeline
 **Proposed script:**
+
 ```json
 "verify:git-notes": "node .claude/tools/cli/git-notes-verify.cjs"
 ```
 
 #### 4. ecosystem-assessor/
+
 **Current:** Directory with ecosystem health assessment scripts
 **Recommendation:** Wire as `pnpm assess:ecosystem`
 **Rationale:** Valuable for health checks, should be runnable
 **Proposed script:**
+
 ```json
 "assess:ecosystem": "node .claude/tools/analysis/ecosystem-assessor/index.mjs"
 ```
 
 #### 5. repo-rag/
+
 **Current:** Repository RAG (experimental)
 **Recommendation:** Mark as **reference-only** in catalog
 **Rationale:** Experimental feature, not production-ready, architecture unclear
 **Catalog update:** Add note "Experimental: not production-ready, use code-semantic-search skill instead"
 
 #### 6. sequential-thinking/
+
 **Current:** Listed as "Not scripted"
 **Recommendation:** Update catalog - **already wired** via MCP
 **Rationale:** This is an MCP skill invoked via `mcp__sequential-thinking__sequentialthinking()` tool, not a CLI script
@@ -254,13 +268,13 @@ Identified 6 unwired tools from tool-catalog.md. Provided wiring recommendations
 
 ## Metrics
 
-| Category | Total Items | Verified | Gaps Found | % Complete |
-|----------|-------------|----------|------------|------------|
-| Workflows | 3 | 2 | 1 missing file | 67% |
-| Hook Documentation | 7 | 3 | 4 need sections | 43% |
-| Hook Registration | 39 | 39 | 0 dead | 100% |
-| Tool Wiring | 6 | 1 | 5 recommendations | 17% |
-| **OVERALL** | **55** | **45** | **10** | **82%** |
+| Category           | Total Items | Verified | Gaps Found        | % Complete |
+| ------------------ | ----------- | -------- | ----------------- | ---------- |
+| Workflows          | 3           | 2        | 1 missing file    | 67%        |
+| Hook Documentation | 7           | 3        | 4 need sections   | 43%        |
+| Hook Registration  | 39          | 39       | 0 dead            | 100%       |
+| Tool Wiring        | 6           | 1        | 5 recommendations | 17%        |
+| **OVERALL**        | **55**      | **45**   | **10**            | **82%**    |
 
 **Key Insights:**
 
@@ -276,6 +290,7 @@ Identified 6 unwired tools from tool-catalog.md. Provided wiring recommendations
 Cross-audit remediation successful with **82% completion rate**. No critical gaps found (all systems operational). Follow-up actions are enhancements, not blockers.
 
 **Highest Impact Follow-Ups:**
+
 1. Wire `detect:orphans`, `verify:git-notes`, `assess:ecosystem` to package.json (developer productivity)
 2. Complete @ENFORCEMENT_HOOKS.md sections 15-18 (documentation completeness)
 3. Update tool-catalog.md wiring status (accuracy)

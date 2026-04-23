@@ -12,6 +12,7 @@
 **Overall Health**: GOOD with 7 critical architectural issues requiring attention
 
 **Quick Stats**:
+
 - 61 agent files (matches documented 59+)
 - 467 skills (high count - consolidation candidate)
 - 332 workflows (very high - governance needed)
@@ -33,6 +34,7 @@
 **Status**: Registry is healthy and synchronized
 
 **Evidence**:
+
 ```bash
 .claude/context/agent-registry.json:
 - 60 agents registered (60 healthy, 0 degraded)
@@ -43,6 +45,7 @@
 **Finding**: No duplicate router.md files found (previous issue resolved)
 
 **Verification**:
+
 ```bash
 # No duplicate agents in root
 ls .claude/agents/router.md → NOT FOUND (correct)
@@ -56,12 +59,14 @@ ls .claude/agents/core/router.md → FOUND (correct location)
 **Status**: All registered hooks exist on disk
 
 **Evidence**:
-- 81 active hooks (excluding _archive)
+
+- 81 active hooks (excluding \_archive)
 - settings.json references 40+ unique hook paths
 - No dead hook registrations found
 - Archive properly structured with README
 
 **Hook Distribution**:
+
 ```
 UserPromptSubmit: 5 hooks
 PreToolUse: 40+ hooks (multiple matchers)
@@ -80,6 +85,7 @@ Stop: 3 hooks
 **Status**: Catalogs exist but need freshness verification
 
 **Catalog Files**:
+
 ```
 ✅ command-catalog.md (24KB, updated 2026-02-15)
 ✅ skill-catalog.md (36KB, updated 2026-02-15)
@@ -102,12 +108,14 @@ Stop: 3 hooks
 **Issue**: 467 SKILL.md files is extremely high
 
 **Evidence**:
+
 ```bash
 find .claude/skills -name "SKILL.md" | wc -l
 → 467
 ```
 
 **Impact**:
+
 - Discovery complexity (too many options)
 - Maintenance burden (keeping 467 skills updated)
 - Catalog bloat (skill-catalog.md is 36KB)
@@ -116,6 +124,7 @@ find .claude/skills -name "SKILL.md" | wc -l
 **Root Cause**: Likely auto-generated skills without consolidation
 
 **Recommended Actions**:
+
 1. Audit skill catalog for duplicates
 2. Consolidate related skills (e.g., multiple auth skills → one auth-expert)
 3. Archive unused skills (skills with 0 agent assignments)
@@ -130,24 +139,28 @@ find .claude/skills -name "SKILL.md" | wc -l
 **Issue**: 332 workflow markdown files is unsustainable
 
 **Evidence**:
+
 ```bash
 find .claude/workflows -name "*.md" | wc -l
 → 332
 ```
 
 **Impact**:
+
 - Workflow discovery impossible
 - Conflicting workflow patterns
 - No clear "golden path" workflows
 - Agent confusion (which workflow to use?)
 
 **Comparison**:
+
 - 61 agents vs 332 workflows = 5.4 workflows per agent (too high)
 - Expected ratio: 1-2 workflows per agent
 
 **Root Cause**: Workflow generation without cleanup/consolidation
 
 **Recommended Actions**:
+
 1. Classify workflows: core (10-15), enterprise (20-30), archived (rest)
 2. Create workflow decision tree (which workflow when?)
 3. Archive obsolete workflows
@@ -162,12 +175,14 @@ find .claude/workflows -name "*.md" | wc -l
 **Issue**: Mixed ESM/CJS usage without clear rationale
 
 **Evidence**:
+
 ```bash
 .claude/lib: 265 .cjs files, 6 .mjs files
 .claude/tools: Mixed ESM/CJS without clear boundary
 ```
 
 **Pattern Violations Found**: NONE (good news)
+
 ```bash
 # No ESM imports in CJS files (checked)
 grep -r "import.*from" .claude/lib --include="*.cjs"
@@ -177,6 +192,7 @@ grep -r "import.*from" .claude/lib --include="*.cjs"
 **⚠️ Concern**: Inconsistent file extension strategy
 
 **Recommended Actions**:
+
 1. Document ESM vs CJS decision criteria
 2. Update architectural guidelines (when to use .mjs vs .cjs)
 3. Consider migrating to ESM-first for new modules
@@ -188,6 +204,7 @@ grep -r "import.*from" .claude/lib --include="*.cjs"
 **Issue**: Some modules use re-export pattern (indirection layer)
 
 **Evidence**:
+
 ```
 .claude/hooks/routing/spawn-prompt-assembler.helpers.cjs
 .claude/lib/code-indexing/hybrid-lazy-indexer.cjs
@@ -196,11 +213,13 @@ grep -r "import.*from" .claude/lib --include="*.cjs"
 ```
 
 **Pattern**:
+
 ```javascript
 // module.exports = require('./actual-impl.cjs');
 ```
 
 **Impact**:
+
 - Adds indirection (harder to debug)
 - Increases require() overhead
 - Obscures actual implementation location
@@ -216,6 +235,7 @@ grep -r "import.*from" .claude/lib --include="*.cjs"
 **Issue**: Some modules use `../../` relative requires (fragile)
 
 **Evidence**:
+
 ```javascript
 // From .claude/lib/memory/contextual-memory.cjs
 const init = require('../../tools/cli/init-memory-db.cjs');
@@ -225,6 +245,7 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 ```
 
 **Impact**:
+
 - Breaks if files are moved
 - Harder to refactor directory structure
 - Circular dependency risk
@@ -232,6 +253,7 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 **Count**: 10 instances found (manageable)
 
 **Recommended Actions**:
+
 1. Create central require resolver (absolute paths)
 2. Use NODE_PATH or package.json imports map
 3. Refactor to keep related modules in same directory
@@ -245,11 +267,13 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 **Status**: All hooks follow stdin/stdout JSON protocol
 
 **Evidence**:
+
 - Searched for hooks exporting functions (`module.exports = { preToolUse }`)
 - No violations found
 - All hooks in settings.json use `command` type with node execution
 
 **Pattern**:
+
 ```json
 {
   "type": "command",
@@ -266,8 +290,10 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 **Issue**: Cannot verify all 467 skills have proper structure without full scan
 
 **Expected Structure**:
+
 ```markdown
 # Skill Name
+
 <identity>...</identity>
 <capabilities>...</capabilities>
 <instructions>...</instructions>
@@ -275,6 +301,7 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 ```
 
 **Recommendation**: Run skill structure validator:
+
 ```bash
 pnpm tools:validate:skills
 ```
@@ -286,6 +313,7 @@ pnpm tools:validate:skills
 **Issue**: Cannot verify all 61 agents have required frontmatter fields
 
 **Expected Frontmatter**:
+
 ```yaml
 ---
 name: agent-name
@@ -298,6 +326,7 @@ version: 1.0.0
 **Evidence**: Registry shows all agents have health status, suggesting structure is validated
 
 **Recommendation**: Verify with agent validator:
+
 ```bash
 node .claude/lib/tools/agent-registry-generator.cjs --validate
 ```
@@ -311,12 +340,15 @@ node .claude/lib/tools/agent-registry-generator.cjs --validate
 **Risk**: Workflows may reference phases that no longer exist
 
 **Example Failure Pattern**:
+
 ```markdown
 ### Phase: Design
+
 [Broken reference to deleted phase]
 ```
 
 **Recommendation**: Run workflow validator:
+
 ```bash
 node .claude/lib/workflow/verify-workflows.mjs
 ```
@@ -330,6 +362,7 @@ node .claude/lib/workflow/verify-workflows.mjs
 **Status**: All major artifact types have catalog entries
 
 **Catalog Coverage**:
+
 ```
 ✅ Agents → agent-registry.json
 ✅ Skills → skill-catalog.md
@@ -350,11 +383,13 @@ node .claude/lib/workflow/verify-workflows.mjs
 **Issue**: High artifact counts suggest potential orphans
 
 **Suspects**:
+
 1. **467 skills** - Likely many unassigned to agents
 2. **332 workflows** - Likely many unreferenced
 3. **137 schemas** - Need to verify all have validators
 
 **Detection Method**:
+
 ```bash
 # Find skills not referenced in agent-registry.json
 jq -r '.agents[].capabilities[].skills[]' agent-registry.json | sort -u > assigned-skills.txt
@@ -363,6 +398,7 @@ comm -13 assigned-skills.txt all-skills.txt > orphaned-skills.txt
 ```
 
 **Recommendation**: Run orphan detector:
+
 ```bash
 pnpm tools:analyze:orphans
 ```
@@ -374,6 +410,7 @@ pnpm tools:analyze:orphans
 **Issue**: 137 schemas but unclear which are actively used
 
 **Evidence**:
+
 ```bash
 find .claude/schemas -name "*.json" -not -path "*/_archive/*" | wc -l
 → 137
@@ -385,6 +422,7 @@ grep -r "\$schema\|ajv\|validate" .claude/lib --include="*.cjs" | wc -l
 **Concern**: Schema-to-validator mapping not documented
 
 **Recommended Actions**:
+
 1. Create schema-usage-map.json (which schemas validate which files)
 2. Archive unused schemas
 3. Document schema validation strategy
@@ -396,6 +434,7 @@ grep -r "\$schema\|ajv\|validate" .claude/lib --include="*.cjs" | wc -l
 **Issue**: 377 active tools but wiring status unknown
 
 **Evidence**:
+
 ```bash
 find .claude/tools -name "*.cjs" -o -name "*.mjs" | grep -v _archive | wc -l
 → 377
@@ -414,6 +453,7 @@ find .claude/tools -name "*.cjs" -o -name "*.mjs" | grep -v _archive | wc -l
 **Issue**: Multiple agent registry files with unclear precedence
 
 **Files Found**:
+
 ```
 .claude/context/agent-registry.json (60 agents)
 .claude/context/agent-registry-core.json
@@ -424,11 +464,13 @@ find .claude/tools -name "*.cjs" -o -name "*.mjs" | grep -v _archive | wc -l
 ```
 
 **Impact**:
+
 - Unclear which file is source of truth
 - Potential inconsistencies between files
 - Maintenance burden (updating multiple files)
 
 **Recommended Actions**:
+
 1. Clarify registry architecture (is this intentional sharding?)
 2. Document registry precedence order
 3. Consider consolidating to single source of truth
@@ -440,6 +482,7 @@ find .claude/tools -name "*.cjs" -o -name "*.mjs" | grep -v _archive | wc -l
 **Issue**: 10+ configuration files in .claude/config with overlapping concerns
 
 **Files**:
+
 ```
 agent-config.json
 capability-routing.json
@@ -454,11 +497,13 @@ tool-manifest.json
 ```
 
 **Impact**:
+
 - Configuration scattered across files
 - Hard to understand full system configuration
 - Potential conflicts between files
 
 **Recommended Actions**:
+
 1. Create configuration architecture document
 2. Consider consolidating related configs
 3. Add configuration validation layer
@@ -470,6 +515,7 @@ tool-manifest.json
 **Finding**: Daily model-selection-drift reports in artifacts/reports/
 
 **Files**:
+
 ```
 model-selection-drift-2026-02-08.json
 model-selection-drift-2026-02-09.json
@@ -490,12 +536,14 @@ model-selection-drift-2026-02-15.json
 **Finding**: Very few deprecation markers found (3 total)
 
 **Evidence**:
+
 ```bash
 grep -r "DEPRECATED\|@deprecated\|FIXME\|TODO" .claude/lib --include="*.cjs" | wc -l
 → 3
 ```
 
 **Interpretation**: Either:
+
 1. Codebase is very clean (best case)
 2. Deprecations not being marked (risk)
 
@@ -508,6 +556,7 @@ grep -r "DEPRECATED\|@deprecated\|FIXME\|TODO" .claude/lib --include="*.cjs" | w
 **Status**: Archive is well-organized with README
 
 **Evidence**:
+
 ```
 .claude/hooks/_archive/README.md
 .claude/hooks/_archive/[category]/
@@ -525,6 +574,7 @@ grep -r "DEPRECATED\|@deprecated\|FIXME\|TODO" .claude/lib --include="*.cjs" | w
 **Issue**: Some tool matchers have 8+ hooks in chain
 
 **Evidence**:
+
 ```json
 // From settings.json
 "Edit|Write|NotebookEdit": 8 hooks in PreToolUse
@@ -533,6 +583,7 @@ grep -r "DEPRECATED\|@deprecated\|FIXME\|TODO" .claude/lib --include="*.cjs" | w
 ```
 
 **Impact**:
+
 - Each hook adds latency (<100ms target)
 - 8 hooks × 50ms = 400ms overhead
 - Compounds for high-frequency operations
@@ -548,6 +599,7 @@ grep -r "DEPRECATED\|@deprecated\|FIXME\|TODO" .claude/lib --include="*.cjs" | w
 **Finding**: agent-registry.json is manageable but large
 
 **Evidence**:
+
 ```bash
 cat agent-registry.json | wc -c
 → ~45KB (estimated from read failure)
@@ -566,6 +618,7 @@ cat agent-registry.json | wc -c
 **Finding**: Framework uses safeParseJSON utility (SEC-ICE-005 remediation)
 
 **Evidence**:
+
 ```javascript
 // From .claude/lib/creators/creator-commons.cjs
 // NOTE: safeParseJSON imported from ../utils/safe-json.cjs
@@ -580,12 +633,15 @@ cat agent-registry.json | wc -c
 **Finding**: bash-pretool-bundle.cjs in PreToolUse(Bash) chain
 
 **Evidence**:
+
 ```json
 {
   "matcher": "Bash",
-  "hooks": [{
-    "command": "node .claude/hooks/safety/bash-pretool-bundle.cjs"
-  }]
+  "hooks": [
+    {
+      "command": "node .claude/hooks/safety/bash-pretool-bundle.cjs"
+    }
+  ]
 }
 ```
 
@@ -661,20 +717,21 @@ cat agent-registry.json | wc -c
 
 ### Current State (2026-02-15)
 
-| Metric | Current | Target | Status |
-|--------|---------|--------|--------|
-| Total Agents | 61 | 60-80 | ✅ GOOD |
-| Total Skills | 467 | 50-100 | 🔴 CRITICAL |
-| Total Workflows | 332 | 50-80 | 🔴 CRITICAL |
-| Active Hooks | 81 | 70-90 | ✅ GOOD |
-| Active Tools | 377 | 300-400 | ✅ GOOD |
-| Schema Files | 137 | 100-150 | ✅ GOOD |
-| Dead Hooks | 0 | 0 | ✅ PERFECT |
-| Registry Age | Fresh | <7 days | ✅ GOOD |
+| Metric          | Current | Target  | Status      |
+| --------------- | ------- | ------- | ----------- |
+| Total Agents    | 61      | 60-80   | ✅ GOOD     |
+| Total Skills    | 467     | 50-100  | 🔴 CRITICAL |
+| Total Workflows | 332     | 50-80   | 🔴 CRITICAL |
+| Active Hooks    | 81      | 70-90   | ✅ GOOD     |
+| Active Tools    | 377     | 300-400 | ✅ GOOD     |
+| Schema Files    | 137     | 100-150 | ✅ GOOD     |
+| Dead Hooks      | 0       | 0       | ✅ PERFECT  |
+| Registry Age    | Fresh   | <7 days | ✅ GOOD     |
 
 ### Health Score: 6.5/10
 
 **Breakdown**:
+
 - Registry Health: 9/10 (excellent)
 - Hook System: 9/10 (excellent)
 - Catalog Currency: 7/10 (good)
@@ -687,23 +744,27 @@ cat agent-registry.json | wc -c
 ## 11. Action Plan
 
 ### Week 1: Critical Issues
+
 - [ ] Audit skill catalog (identify duplicates)
 - [ ] Consolidate top 20 duplicate skills
 - [ ] Classify workflows (core/enterprise/archive)
 - [ ] Run orphan detector
 
 ### Week 2: High Priority
+
 - [ ] Document registry architecture
 - [ ] Create schema-usage-map.json
 - [ ] Consolidate config files (design phase)
 
 ### Week 3: Medium Priority
+
 - [ ] Automate catalog regeneration in CI
 - [ ] Document ESM vs CJS strategy
 - [ ] Run workflow validator
 - [ ] Add hook timing metrics
 
 ### Week 4: Validation
+
 - [ ] Re-measure all metrics
 - [ ] Update health score
 - [ ] Document improvements
@@ -713,6 +774,7 @@ cat agent-registry.json | wc -c
 ## 12. Appendix: Detection Commands
 
 ### Find Orphaned Skills
+
 ```bash
 jq -r '.agents[].capabilities[].skills[]' .claude/context/agent-registry.json | sort -u > /tmp/assigned-skills.txt
 find .claude/skills -name "SKILL.md" -exec dirname {} \; | xargs -n1 basename | sort -u > /tmp/all-skills.txt
@@ -720,6 +782,7 @@ comm -13 /tmp/assigned-skills.txt /tmp/all-skills.txt
 ```
 
 ### Find Dead Hooks
+
 ```bash
 for hook in $(grep -oP '\.claude/hooks/[^"]+\.cjs' .claude/settings.json | sort -u); do
   [ -f "$hook" ] || echo "DEAD: $hook"
@@ -727,11 +790,13 @@ done
 ```
 
 ### Find Circular Dependencies
+
 ```bash
 node .claude/lib/utils/require-analyzer.cjs
 ```
 
 ### Validate Schemas
+
 ```bash
 find .claude/schemas -name "*.json" -exec node -e "try { require('{}'); console.log('✓ {}'); } catch(e) { console.error('✗ {}: ' + e.message); }" \;
 ```
@@ -743,12 +808,14 @@ find .claude/schemas -name "*.json" -exec node -e "try { require('{}'); console.
 The agent-studio codebase is **architecturally sound** with excellent hook system design and registry management. However, **artifact proliferation** (467 skills, 332 workflows) is a critical issue requiring immediate attention.
 
 **Key Strengths**:
+
 - Zero dead hooks (excellent maintenance)
 - Consistent hook protocol (good architecture)
 - Fresh registries (automated)
 - Security best practices (safeParseJSON, bash validation)
 
 **Key Weaknesses**:
+
 - Skill/workflow proliferation (discovery impossible)
 - Scattered configuration (10+ config files)
 - Unclear module patterns (ESM vs CJS)

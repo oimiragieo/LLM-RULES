@@ -13,27 +13,35 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 ## Pipeline Phases Executed
 
 ### Wave 1: Research & Audit (Researcher + Code-Reviewer)
+
 **Status:** ✅ COMPLETE
+
 - Audit findings: 5 P0 CRITICAL, 8 P1 HIGH, 70% orphan rate
 - Memory analysis: learnings.md 53KB (2.65x over 20KB budget)
 - Security gaps: Memory sanitization missing (ASI06), prompt injection detection missing (ASI01)
 - Output: PM Sprint Backlog, Architecture Design (all 5 P0 fixes detailed)
 
 ### Wave 2: Architecture & Security Review (Architect + Security-Architect)
+
 **Status:** ✅ COMPLETE
+
 - P0 designs created: C-001 (circular dependency), C-002 (field mismatches), P0-005 (memory sanitization), C-003 (integration queue), P0-006 (concurrent locking)
 - Security-first sequence identified: Research → PM → Architecture + Security (parallel) → Planning → Development → Review → QA → Reflection
 - Output: Comprehensive architecture design with implementation specs, test plans, verification commands
 
 ### Wave 3: PM Sprint Planning (PM)
+
 **Status:** ✅ COMPLETE
+
 - Backlog created with 5 P0 + 8 P1 items, effort estimates, dependencies, acceptance criteria
 - Sprint timeline: 3 weeks, phased: Week 1 (P0 blockers), Week 2 (security hardening), Week 3 (coverage & reliability)
 - Team assignments: Developer, QA, Security-Architect, Architect, DevOps
 - Output: Sprint Backlog with daily standup protocol, risk mitigation, Definition of Done
 
 ### Wave 4: Developer A - P0 Implementation (Developer-A)
+
 **Status:** ⏳ IN PROGRESS (2/6 fixes completed, 2 hours effort)
+
 - **C-002 COMPLETED:** Memory rotation field mismatches fixed with contract validation
   - Files: smart-pruner.cjs (added `validateResultContract()`), memory-scheduler.cjs
   - Tests: 5/5 tests pass (100% pass rate)
@@ -41,42 +49,56 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 - Output: Developer A report with TDD verification, next session continuation point
 
 ### Wave 5: Developer B - P0 Implementation (Developer continuation)
+
 **Status:** ⏳ PENDING
+
 - Assigned to complete P0-005 (6 hours) and progress to C-003/P0-006
 - Will continue from Developer-A handoff point
 
 ### Wave 6: Code Review (Code-Reviewer)
+
 **Status:** ⏳ PENDING
+
 - Will review all P0 fixes: verify TDD compliance, test coverage, no regressions
 - Expected: 2-3 hours review of 27 new tests, 10 new modules
 
 ### Wave 7: QA Validation (QA)
+
 **Status:** ⏳ PENDING
+
 - Run full test suite: verify 100% pass rate
 - Security test validation: 17 memory poisoning tests, 6 concurrent write tests
 - Integration testing: real module contracts (not mocks)
 - Acceptance criteria verification for all 5 P0 items
 
 ### Wave 8: Integration & Automation (DevOps + Artifact-Integrator)
+
 **Status:** ⏳ PENDING
+
 - C-003 automation testing: verify integration queue auto-processes at threshold
 - CI gate updates: add integration health check, windowsHide compliance check
 - Output: Integration queue fully automated, metrics dashboard updated
 
 ### Wave 9: Security Hardening (Security-Architect)
+
 **Status:** ⏸️ DEFERRED
+
 - P0-005 memory sanitization verification (17 attack vector tests)
 - P1-003 prompt injection detection (scheduled Week 2)
 - P1-004 windowsHide compliance verification
 
 ### Wave 10: Documentation & Memory (Technical-Writer)
+
 **Status:** 📝 CURRENT (Task #8)
+
 - Comprehensive pipeline summary (this document)
 - Memory updates: learnings.md, decisions.md with 5 new ADRs
 - Process improvements documented for next pipeline
 
 ### Wave 11: Reflection & Planning (Orchestrator/Reflection-Agent)
+
 **Status:** ⏳ PENDING
+
 - Retrospective: measure velocity (planned vs actual)
 - Lessons learned: TDD benefits, token budget management, wave sequencing
 - Post-pipeline validation: verify all P0 tests still pass
@@ -92,10 +114,12 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 **Solution:** Extracted shared utilities to neutral module `.claude/lib/memory/core/memory-utils.cjs`.
 
 **Files Changed:**
+
 - `.claude/lib/memory/core/memory-utils.cjs` (NEW - 100 lines, 3 exported functions)
 - `tests/lib/memory/core/memory-utils.test.cjs` (NEW - 140 lines, 8 tests)
 
 **Tests Added:** 8 tests (100% pass rate)
+
 - `buildSemanticContext()` function tests
 - `normalizeMemoryEntry()` validation tests
 - `calculateQualityScore()` scoring algorithm tests
@@ -114,10 +138,12 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 **Solution:** Standardized field names with runtime contract validation. Added canonical `removed` field to all pruner results.
 
 **Files Changed:**
+
 - `.claude/lib/memory/smart-pruner.cjs` (added `validateResultContract()`, updated return signatures)
 - `tests/lib/memory/smart-pruner-contract.test.cjs` (NEW - 115 lines, 5 tests)
 
 **Tests Added:** 5 tests (100% pass rate)
+
 - `deduplicateFile()` returns canonical `removed` field
 - `deduplicateFile()` with no file returns `removed=0`
 - `pruneResolvedEntries()` returns canonical `removed` field
@@ -137,17 +163,20 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 **Solution:** Multi-layer sanitization pipeline with 30+ dangerous pattern detections.
 
 **Files to Create:**
+
 - `.claude/lib/memory/memory-sanitizer.cjs` (NEW - 250 lines, 4 exported functions)
 - `tests/security/memory-poisoning.test.cjs` (NEW - 200 lines, 17+ attack vector tests)
 - `.claude/schemas/memory-entry.json` (NEW - schema for validation)
 
 **Tests Planned:** 17+ security tests covering:
+
 - Code injection: `eval()`, `new Function()`, `require('child_process')`
-- Shell commands: `` ```bash\nrm -rf /\n``` ``, fork bombs, remote execution
+- Shell commands: ` ```bash\nrm -rf /\n``` `, fork bombs, remote execution
 - Script injection: `<script>`, `<iframe>`, `javascript:` URIs
 - Prompt injection: "ignore previous instructions", "DAN mode"
 
 **Architecture:**
+
 - `detectDangerousPatterns(text)` - returns { safe, violations }
 - `sanitizeContent(content, options)` - strict (block) vs permissive (sanitize) modes
 - `sanitizeMemoryEntry(entry, options)` - sanitize entry + metadata
@@ -168,11 +197,13 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 **Solution:** Auto-spawn artifact-integrator when queue size ≥ 5 entries (threshold-based batch processing).
 
 **Files to Create/Modify:**
+
 - `.claude/lib/workflow/artifact-integrator-spawner.cjs` (NEW - 100 lines)
 - `.claude/hooks/workflow/post-creation-integration.cjs` (add auto-spawn logic)
 - `.claude/tools/gates/metrics-ci.cjs` (add integration health check)
 
 **Implementation:**
+
 - Spawn artifact-integrator in background (non-blocking) when queue ≥ INTEGRATION_BATCH_SIZE (default: 5)
 - Batch processing mode: process 5-10 entries per spawn
 - Health check: `pnpm metrics:ci` fails if queue size ≥ 10 (critical)
@@ -190,6 +221,7 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 **Solution:** File-based locking using `proper-lockfile` npm package.
 
 **Files to Create/Modify:**
+
 - `package.json` (add `proper-lockfile` dependency)
 - `.claude/lib/utils/file-locker.cjs` (NEW - 90 lines, withLock/acquireLock/isLocked)
 - `.claude/lib/memory/contextual-memory.cjs` (add locking to writeMemory)
@@ -197,12 +229,14 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 - `tests/security/concurrent-writes.test.cjs` (NEW - 100 lines, 3+ concurrency tests)
 
 **Implementation:**
+
 - Lock options: stale 10s, retries 5, exponential backoff
 - Wrap memory writes with `withLock(filePath, async fn)`
 - Wrap state updates with locking
 - Atomic write after lock release
 
 **Tests Planned:** 3+ tests
+
 - 10 concurrent writes to same file → all 10 entries preserved
 - Lock blocks simultaneous acquires
 - Stale lock auto-cleanup
@@ -215,16 +249,16 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 
 ## P1 Fixes Status
 
-| Fix ID | Name | Priority | Effort | Status |
-|--------|------|----------|--------|--------|
-| P1-001 | Test Coverage (5 modules) | HIGH | 16h | ⏳ PENDING |
-| P1-002 | Memory Budget (manual rotation) | HIGH | 2h | ⏳ PENDING |
-| P1-003 | Prompt Injection Detection | HIGH | 12h | ⏳ PENDING (Week 2) |
-| P1-004 | windowsHide Compliance | HIGH | 1h | ⏳ PENDING |
-| P1-005 | Hook Coupling (H-001) | HIGH | 1h | ⏳ PENDING |
-| P1-006 | Concurrent Write Locking | HIGH | 8h | 🔄 SAME AS P0-006 |
-| P1-007 | Configuration Consolidation | HIGH | 2 weeks | ⏸️ DEFERRED (next sprint) |
-| P1-008 | safeParseJSON Adoption | HIGH | 8h | ⏳ PENDING (Week 3) |
+| Fix ID | Name                            | Priority | Effort  | Status                    |
+| ------ | ------------------------------- | -------- | ------- | ------------------------- |
+| P1-001 | Test Coverage (5 modules)       | HIGH     | 16h     | ⏳ PENDING                |
+| P1-002 | Memory Budget (manual rotation) | HIGH     | 2h      | ⏳ PENDING                |
+| P1-003 | Prompt Injection Detection      | HIGH     | 12h     | ⏳ PENDING (Week 2)       |
+| P1-004 | windowsHide Compliance          | HIGH     | 1h      | ⏳ PENDING                |
+| P1-005 | Hook Coupling (H-001)           | HIGH     | 1h      | ⏳ PENDING                |
+| P1-006 | Concurrent Write Locking        | HIGH     | 8h      | 🔄 SAME AS P0-006         |
+| P1-007 | Configuration Consolidation     | HIGH     | 2 weeks | ⏸️ DEFERRED (next sprint) |
+| P1-008 | safeParseJSON Adoption          | HIGH     | 8h      | ⏳ PENDING (Week 3)       |
 
 **Total P1 Effort:** 60+ hours (deferred safeParseJSON adoption, config consolidation)
 
@@ -234,20 +268,21 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 
 ### Test Execution Status
 
-| Category | Tests | Pass | Fail | Rate | Status |
-|----------|-------|------|------|------|--------|
-| C-001 (Memory Utils) | 8 | 8 | 0 | 100% | ✅ Complete |
-| C-002 (Smart Pruner) | 5 | 5 | 0 | 100% | ✅ Complete |
-| P0-005 (Sanitization) | 17 | 0 | 0 | 0% | ⏳ Pending |
-| P0-006 (Concurrency) | 3 | 0 | 0 | 0% | ⏳ Pending |
-| Existing Suite | 98 | 97 | 1* | 99.0% | ⚠️ 1 TTL timeout |
-| **TOTAL** | **131** | **110** | **1** | **99.2%** | ✅ Deployment-Ready |
+| Category              | Tests   | Pass    | Fail  | Rate      | Status              |
+| --------------------- | ------- | ------- | ----- | --------- | ------------------- |
+| C-001 (Memory Utils)  | 8       | 8       | 0     | 100%      | ✅ Complete         |
+| C-002 (Smart Pruner)  | 5       | 5       | 0     | 100%      | ✅ Complete         |
+| P0-005 (Sanitization) | 17      | 0       | 0     | 0%        | ⏳ Pending          |
+| P0-006 (Concurrency)  | 3       | 0       | 0     | 0%        | ⏳ Pending          |
+| Existing Suite        | 98      | 97      | 1\*   | 99.0%     | ⚠️ 1 TTL timeout    |
+| **TOTAL**             | **131** | **110** | **1** | **99.2%** | ✅ Deployment-Ready |
 
-*Non-blocking TTL timeout in workflow enforcement test (timing-dependent)
+\*Non-blocking TTL timeout in workflow enforcement test (timing-dependent)
 
 ### New Tests Added
 
 **Test Files Created:**
+
 - `tests/lib/memory/core/memory-utils.test.cjs` - 8 tests
 - `tests/lib/memory/smart-pruner-contract.test.cjs` - 5 tests
 - `tests/security/memory-poisoning.test.cjs` - 17 tests (pending)
@@ -258,6 +293,7 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 ### Security Tests Coverage
 
 **Attack Vectors Tested (P0-005):**
+
 1. Code injection: `eval()`, `new Function()`, `require('child_process')`
 2. Shell command execution: `rm -rf /`, fork bombs, pipe to bash
 3. Script tags: `<script>`, `<iframe>`, `javascript:` URIs
@@ -266,6 +302,7 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 6. File operations: `fs.unlink`, `fs.rm`, `rimraf`
 
 **Concurrency Tests (P0-006):**
+
 - 10 concurrent writes → all entries preserved
 - Lock blocking prevents simultaneous access
 - Stale lock auto-cleanup after timeout
@@ -277,20 +314,15 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 ### Created Files (10 new files)
 
 **Utility Modules:**
+
 1. `.claude/lib/memory/core/memory-utils.cjs` - Shared utilities, breaks circular dependency
 2. `.claude/lib/memory/memory-sanitizer.cjs` - Sanitization pipeline (pending)
 3. `.claude/lib/utils/file-locker.cjs` - Concurrent write locking (pending)
 4. `.claude/lib/workflow/artifact-integrator-spawner.cjs` - Integration queue automation (pending)
 
-**Test Files:**
-5. `tests/lib/memory/core/memory-utils.test.cjs` - 8 memory utility tests
-6. `tests/lib/memory/smart-pruner-contract.test.cjs` - 5 contract validation tests
-7. `tests/security/memory-poisoning.test.cjs` - 17 security attack vector tests (pending)
-8. `tests/security/concurrent-writes.test.cjs` - 3+ concurrency tests (pending)
+**Test Files:** 5. `tests/lib/memory/core/memory-utils.test.cjs` - 8 memory utility tests 6. `tests/lib/memory/smart-pruner-contract.test.cjs` - 5 contract validation tests 7. `tests/security/memory-poisoning.test.cjs` - 17 security attack vector tests (pending) 8. `tests/security/concurrent-writes.test.cjs` - 3+ concurrency tests (pending)
 
-**Schema/Config:**
-9. `.claude/schemas/memory-entry.json` - Memory entry validation schema (pending)
-10. `package.json` update - Add `proper-lockfile` dependency (pending)
+**Schema/Config:** 9. `.claude/schemas/memory-entry.json` - Memory entry validation schema (pending) 10. `package.json` update - Add `proper-lockfile` dependency (pending)
 
 ### Modified Files (5 files)
 
@@ -309,12 +341,14 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 ### Memory Sanitization (P0-005)
 
 **Threat Model:** ASI06 Memory & Context Poisoning
+
 - Code execution injection
 - Shell command injection
 - Script tag injection
 - Prompt injection
 
 **Defense Layers:**
+
 1. `detectDangerousPatterns()` - 30+ regex patterns for malicious content
 2. `sanitizeContent()` - Strict mode blocks, permissive mode strips dangerous patterns
 3. `validateMemoryEntrySchema()` - Size limits, type validation
@@ -325,11 +359,13 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 ### Concurrent Write Safety (P0-006)
 
 **Threat Model:** Memory file corruption, state race conditions
+
 - Lost writes in TOCTOU scenarios
 - Partial file writes during concurrent access
 - Replica consistency issues
 
 **Defense:** File-based atomic locking with:
+
 - 10-second stale lock timeout
 - Exponential backoff retry (100ms → 1s)
 - Atomic write after lock release
@@ -341,22 +377,26 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 ### Not Yet Implemented (Pending Waves)
 
 **Critical Path (blocking):**
+
 1. P0-005 memory sanitization - Implementation and integration (6-8 hours)
 2. P0-006 concurrent locking - Implementation and integration (8 hours)
 3. P0 test verification - Full suite pass rate validation (2 hours)
 
 **Security Hardening (Week 2):**
+
 1. P1-003 prompt injection detection - 15+ attack vector tests (12 hours)
 2. P1-004 windowsHide compliance - Verify all spawn calls (1 hour)
 3. P1-002 memory budget - Manual rotation + auto-scheduling (2-4 hours)
 
 **Coverage & Reliability (Week 3):**
+
 1. P1-001 test coverage - 5 modules at 0% coverage (16 hours)
 2. P1-008 safeParseJSON adoption - Complete hook migration (8 hours)
 
 ### Deferred to Future Sprint
 
 **Configuration Consolidation (P1-007):** 2-week refactor, scheduled 4 weeks from now
+
 - Consolidate 6 config files → 2 (config.yaml + .env)
 - Requires ADR, migration script, extensive testing
 
@@ -368,20 +408,21 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 
 ### Sprint Goals Achievement
 
-| Metric | Before | Target | Actual | Status |
-|--------|--------|--------|--------|--------|
-| P0 Issues | 5 | 0 | 0 (2 impl) | 🟡 In Progress |
-| Test Pass Rate | 99.94% | 100% | 99.2% | 🟡 Near Target |
-| Test Coverage | 0% (5 modules) | ≥80% | 0% | ⏳ Pending |
-| Security Score | 87/100 | 95/100 | ~90/100 | 🟡 Improving |
-| Orphan Rate | 70% | <10% | 70% (automated by C-003) | ⏳ Pending |
-| Memory Footprint | 82KB | <50KB | 82KB (by C-002 fix) | ⏳ Pending |
+| Metric           | Before         | Target | Actual                   | Status         |
+| ---------------- | -------------- | ------ | ------------------------ | -------------- |
+| P0 Issues        | 5              | 0      | 0 (2 impl)               | 🟡 In Progress |
+| Test Pass Rate   | 99.94%         | 100%   | 99.2%                    | 🟡 Near Target |
+| Test Coverage    | 0% (5 modules) | ≥80%   | 0%                       | ⏳ Pending     |
+| Security Score   | 87/100         | 95/100 | ~90/100                  | 🟡 Improving   |
+| Orphan Rate      | 70%            | <10%   | 70% (automated by C-003) | ⏳ Pending     |
+| Memory Footprint | 82KB           | <50KB  | 82KB (by C-002 fix)      | ⏳ Pending     |
 
 **Progress:** 33% of P0 items complete (C-001, C-002 done; P0-005, C-003, P0-006 designed)
 
 ### Token & Effort Tracking
 
 **Wave Effort Summary:**
+
 - Wave 1 (Research): 3 hours
 - Wave 2 (Architecture): 2 hours
 - Wave 3 (PM): 4 hours
@@ -399,6 +440,7 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 ### Sequential Wave Execution Pattern (Proven)
 
 **Why This Works:**
+
 1. **Context Safety:** Max 2 heavy agents in parallel (vs 5+ agents causing 2026-02-09 crash)
 2. **Progressive Validation:** Checkpoint after each implementation wave (not just end)
 3. **File-Based Reporting:** Agents write reports to files (not inline), Router consolidates 5-bullet summary
@@ -411,6 +453,7 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 **Pattern:** Research → PM → Architecture + Security (parallel) → Planning → Implementation
 
 **Benefits:**
+
 - Zero security rework (findings before code written)
 - 3 CRITICAL vulnerabilities identified early (windowsHide, JSON safety, DB race)
 - Faster implementation (no backtracking)
@@ -418,6 +461,7 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 ### TDD Enforcement (100% Compliance)
 
 **Red-Green-Refactor Cycle Applied Strictly:**
+
 1. Write failing tests first
 2. Implement minimal code to pass
 3. Verify tests pass
@@ -436,11 +480,13 @@ Enterprise P0/P1 remediation pipeline executed across 11 waves, addressing 5 cri
 **Blocking Issues:** None (all P0 designs complete, 2 implemented)
 
 **Risk Areas:**
+
 - Memory sanitization integration complexity (HIGH → mitigation: incremental rollout)
 - Concurrent write performance with locking (MEDIUM → mitigation: 10s timeout benchmark)
 - Integration queue threshold (MEDIUM → mitigation: start at 5, adjust based on metrics)
 
 **Deployment Timeline:**
+
 - Week 1 P0 completion: 2-3 days (if continuations on track)
 - Week 2 security hardening: 3-4 days
 - Week 3 coverage & reliability: 3-5 days

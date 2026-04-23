@@ -20,14 +20,14 @@ Reflection analysis for tasks 38-43 (all completed on 2026-02-20) resulted in **
 
 ### Tasks Analyzed
 
-| Task ID | Completion Time        | Summary Provided                        | Data Quality | Score |
-| ------- | ---------------------- | --------------------------------------- | ------------ | ----- |
-| 38      | 2026-02-20T23:05:41Z   | Task 38 completed without summary metadata | Insufficient | —     |
-| 39      | 2026-02-20T23:05:42Z   | Task 39 completed without summary metadata | Insufficient | —     |
-| 40      | 2026-02-20T23:17:27Z   | Task 40 completed without summary metadata | Insufficient | —     |
-| 41      | 2026-02-20T23:28:31Z   | Task 41 completed without summary metadata | Insufficient | —     |
-| 42      | 2026-02-20T23:19:50Z   | Task 42 completed without summary metadata | Insufficient | —     |
-| 43      | 2026-02-20T23:28:31Z   | Task 43 completed without summary metadata | Insufficient | —     |
+| Task ID | Completion Time      | Summary Provided                           | Data Quality | Score |
+| ------- | -------------------- | ------------------------------------------ | ------------ | ----- |
+| 38      | 2026-02-20T23:05:41Z | Task 38 completed without summary metadata | Insufficient | —     |
+| 39      | 2026-02-20T23:05:42Z | Task 39 completed without summary metadata | Insufficient | —     |
+| 40      | 2026-02-20T23:17:27Z | Task 40 completed without summary metadata | Insufficient | —     |
+| 41      | 2026-02-20T23:28:31Z | Task 41 completed without summary metadata | Insufficient | —     |
+| 42      | 2026-02-20T23:19:50Z | Task 42 completed without summary metadata | Insufficient | —     |
+| 43      | 2026-02-20T23:28:31Z | Task 43 completed without summary metadata | Insufficient | —     |
 
 ### Data Sufficiency Assessment
 

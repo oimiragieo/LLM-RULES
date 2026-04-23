@@ -58,13 +58,13 @@ Pipeline #7 Tools System Overhaul completed with **EXCELLENT** quality (0.987 av
 
 #### Rubric Scores
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 1.0 | All 8 modules relocated, SEC-TOOL-001 fixed, all imports updated |
-| Accuracy | 1.0 | SafeExpressionParser correctly implements recursive descent, zero false positives |
-| Clarity | 0.95 | Security test structure clear, parser well-commented |
-| Consistency | 1.0 | Follows tools→lib boundary rule, git mv pattern, ESLint conventions |
-| Actionability | 1.0 | All imports updated, tests pass, vulnerability eliminated |
+| Dimension     | Score | Notes                                                                             |
+| ------------- | ----- | --------------------------------------------------------------------------------- |
+| Completeness  | 1.0   | All 8 modules relocated, SEC-TOOL-001 fixed, all imports updated                  |
+| Accuracy      | 1.0   | SafeExpressionParser correctly implements recursive descent, zero false positives |
+| Clarity       | 0.95  | Security test structure clear, parser well-commented                              |
+| Consistency   | 1.0   | Follows tools→lib boundary rule, git mv pattern, ESLint conventions               |
+| Actionability | 1.0   | All imports updated, tests pass, vulnerability eliminated                         |
 
 **Overall:** 0.99 / 1.0
 
@@ -115,13 +115,13 @@ None found - implementation excellent, security vulnerability eliminated
 
 #### Rubric Scores
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 1.0 | All 99 tools cataloged, all docs updated, ADR-089 accepted |
-| Accuracy | 1.0 | Provenance header correct, tool counts match filesystem |
-| Clarity | 1.0 | Clear catalog structure, summary stats, wiring status columns |
-| Consistency | 1.0 | Follows skill/template/command/schema catalog pattern |
-| Actionability | 1.0 | Catalog enables discovery, README enables onboarding |
+| Dimension     | Score | Notes                                                         |
+| ------------- | ----- | ------------------------------------------------------------- |
+| Completeness  | 1.0   | All 99 tools cataloged, all docs updated, ADR-089 accepted    |
+| Accuracy      | 1.0   | Provenance header correct, tool counts match filesystem       |
+| Clarity       | 1.0   | Clear catalog structure, summary stats, wiring status columns |
+| Consistency   | 1.0   | Follows skill/template/command/schema catalog pattern         |
+| Actionability | 1.0   | Catalog enables discovery, README enables onboarding          |
 
 **Overall:** 1.0 / 1.0
 
@@ -159,13 +159,13 @@ None found - documentation exemplary
 
 #### Rubric Scores
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.95 | All broken imports fixed, all doc inaccuracies corrected |
-| Accuracy | 1.0 | Import paths corrected, docs match reality |
-| Clarity | 0.9 | Commit message clear but lacks file-level detail |
-| Consistency | 1.0 | Follows post-QA fix pattern |
-| Actionability | 1.0 | All fixes applied, changes pushed |
+| Dimension     | Score | Notes                                                    |
+| ------------- | ----- | -------------------------------------------------------- |
+| Completeness  | 0.95  | All broken imports fixed, all doc inaccuracies corrected |
+| Accuracy      | 1.0   | Import paths corrected, docs match reality               |
+| Clarity       | 0.9   | Commit message clear but lacks file-level detail         |
+| Consistency   | 1.0   | Follows post-QA fix pattern                              |
+| Actionability | 1.0   | All fixes applied, changes pushed                        |
 
 **Overall:** 0.97 / 1.0
 
@@ -189,11 +189,11 @@ None found - documentation exemplary
 
 ### Overall Pipeline Score
 
-| Task | Completeness | Accuracy | Clarity | Consistency | Actionability | Overall |
-|------|--------------|----------|---------|-------------|---------------|---------|
-| #95  | 1.0 | 1.0 | 0.95 | 1.0 | 1.0 | **0.99** |
-| #96  | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | **1.0** |
-| #97  | 0.95 | 1.0 | 0.9 | 1.0 | 1.0 | **0.97** |
+| Task | Completeness | Accuracy | Clarity | Consistency | Actionability | Overall  |
+| ---- | ------------ | -------- | ------- | ----------- | ------------- | -------- |
+| #95  | 1.0          | 1.0      | 0.95    | 1.0         | 1.0           | **0.99** |
+| #96  | 1.0          | 1.0      | 1.0     | 1.0         | 1.0           | **1.0**  |
+| #97  | 0.95         | 1.0      | 0.9     | 1.0         | 1.0           | **0.97** |
 
 **Pipeline Average:** **0.987 / 1.0 (EXCELLENT)**
 
@@ -246,6 +246,7 @@ The parser rejects anything it doesn't explicitly support.
 **Applicability:** Any expression evaluation (config files, workflow DSLs, template engines, rule engines, policy languages)
 
 **Anti-Patterns:**
+
 - `new Function('return ' + userInput)()` - arbitrary code execution
 - `eval(sanitized)` - bypass via string escaping
 - Regex blacklist - incomplete, bypassable
@@ -259,6 +260,7 @@ The parser rejects anything it doesn't explicitly support.
 **Context:** Phase C relocations (Task #95)
 
 **Description:** Before relocating ANY file, grep the ENTIRE codebase for:
+
 1. The filename (e.g., `decision-handler`)
 2. The directory path (e.g., `tools/workflow/`)
 3. Any `require()` or `import()` references
@@ -268,6 +270,7 @@ Update ALL consumers before committing. Missing even one import breaks the build
 **Why Critical:** Relocated files with missed consumer updates cause MODULE_NOT_FOUND crashes. Example: `user-prompt-unified.cjs` still referenced old `router-state.cjs` path after relocation (Task #47).
 
 **Grep Patterns:**
+
 ```bash
 grep -r 'decision-handler' .
 grep -r 'tools/workflow/' .
@@ -276,6 +279,7 @@ grep -r "import.*decision-handler" .
 ```
 
 **Update Checklist:**
+
 - Update all `require()` paths to new location
 - Update all `import` paths to new location
 - Update depth calculations (`__dirname`, `../..`)
@@ -295,6 +299,7 @@ grep -r "import.*decision-handler" .
 **Context:** Phase D documentation (Task #96)
 
 **Description:** Create markdown catalog at `.claude/context/artifacts/catalogs/tool-catalog.md` with:
+
 - Summary statistics (active/archived/relocated counts)
 - Active tools organized by category
 - Wiring status per tool (package.json scripts, skill references, hook references)
@@ -308,6 +313,7 @@ grep -r "import.*decision-handler" .
 **Example:** Task #96 created catalog documenting 66 active + 25 archived + 8 relocated = 99 total tools
 
 **Benefits:**
+
 - Agents can search catalog for specific capabilities
 - Developers avoid duplicate tool creation
 - Archived tools can be restored with full git history
@@ -362,6 +368,7 @@ grep -r "import.*decision-handler" .
 **Example:** `decision-handler-security.test.cjs` has malicious expression strings like `'process.exit(1)'` and `'require("fs")'` for testing parser rejection.
 
 **Alternatives:**
+
 - Extend `security-lint.cjs` to auto-detect test files (path includes `tests/` or `*.test.*`)
 - Store malicious test data in separate .json file outside scan scope
 - Configure `security-lint.cjs` to allow eval/Function in test files only
@@ -471,6 +478,7 @@ grep -r "import.*decision-handler" .
 **EXCELLENT** - Pipeline #7 achieved **0.987 average score** across 3 tasks.
 
 **Achievements:**
+
 - Security vulnerability eliminated with comprehensive coverage
 - Tools/lib boundary enforced systematically
 - Complete catalog created (99 tools documented)
@@ -478,6 +486,7 @@ grep -r "import.*decision-handler" .
 - Zero critical issues
 
 **Improvement Opportunities:**
+
 - Minor post-QA fixes (Task #97) reveal opportunity for pre-commit import validation
 - Catalog automation would reduce manual maintenance
 - Depth calculation helper would eliminate relocation errors

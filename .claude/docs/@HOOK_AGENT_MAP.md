@@ -34,6 +34,8 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `a2a-shutdown.cjs`                  | x      |             |          |            |              |            |
 | `spawn-token-guard.cjs`             | x      | x           |          |            | x            |            |
 | `finish-only-guard.cjs`             | x      | x           |          |            | x            |            |
+| `aip-token-injector.cjs`            | x      | x           | x        | x          | x            | x          |
+| `aip-token-validator.cjs`           | x      | x           | x        | x          | x            | x          |
 | `session-end-memory-promotion.cjs`  | x      |             |          |            |              |            |
 | `worktree-auto-cleanup.cjs`         | x      |             |          |            |              |            |
 | `check-console-log.cjs`             | x      | x           | x        | x          | x            | x          |
@@ -134,7 +136,9 @@ This document provides a comprehensive mapping between enforcement hooks and age
 4. `spawn-prompt-validator.cjs`
 5. `spawn-token-guard.cjs` (matcher: Task — warns at 80K tokens, blocks at 120K)
 6. `finish-only-guard.cjs` (matcher: TaskCreate|Task — blocks when session is draining)
-7. `heartbeat-step05-check.cjs`
+7. `aip-token-injector.cjs` (matcher: Task — injects AIP capability token; fail-open advisory)
+8. `aip-token-validator.cjs` (matcher: Task — validates AIP capability token; fail-closed in production mode)
+9. `heartbeat-step05-check.cjs`
 
 ### PreToolUse (TaskUpdate)
 

@@ -101,11 +101,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "rules.primary",
-        "commands.primary",
-        "references.research"
-      ],
+      "missing": ["rules.primary", "commands.primary", "references.research"],
       "archived": false
     },
     {
@@ -2762,11 +2758,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "schemas.input",
-        "schemas.output",
-        "commands.primary"
-      ],
+      "missing": ["schemas.input", "schemas.output", "commands.primary"],
       "archived": false
     },
     {
@@ -3784,9 +3776,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "commands.primary"
-      ],
+      "missing": ["commands.primary"],
       "archived": false
     },
     {
@@ -4482,11 +4472,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "rules.primary",
-        "commands.primary",
-        "templates.implementation"
-      ],
+      "missing": ["rules.primary", "commands.primary", "templates.implementation"],
       "archived": false
     },
     {
@@ -8295,11 +8281,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "rules.primary",
-        "commands.primary",
-        "templates.implementation"
-      ],
+      "missing": ["rules.primary", "commands.primary", "templates.implementation"],
       "archived": false
     },
     {
@@ -8349,11 +8331,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "commands.primary",
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["commands.primary", "tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -9090,10 +9068,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "rules.primary",
-        "commands.primary"
-      ],
+      "missing": ["rules.primary", "commands.primary"],
       "archived": false
     },
     {
@@ -9304,10 +9279,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "rules.primary",
-        "commands.primary"
-      ],
+      "missing": ["rules.primary", "commands.primary"],
       "archived": false
     },
     {
@@ -9411,12 +9383,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "hooks.pre",
-        "hooks.post",
-        "rules.primary",
-        "commands.primary"
-      ],
+      "missing": ["hooks.pre", "hooks.post", "rules.primary", "commands.primary"],
       "archived": false
     },
     {
@@ -9734,11 +9701,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "commands.primary",
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["commands.primary", "tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -9881,9 +9844,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "commands.primary"
-      ],
+      "missing": ["commands.primary"],
       "archived": false
     },
     {

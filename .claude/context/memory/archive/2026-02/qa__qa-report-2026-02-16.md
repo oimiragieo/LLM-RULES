@@ -1,4 +1,5 @@
 <!-- Agent: qa | Task: #4 | Session: 2026-02-16 -->
+
 # QA & Test Coverage Analysis Report
 
 **Generated:** 2026-02-16
@@ -20,13 +21,13 @@
 
 **Key Metrics:**
 
-| Category | Count | Coverage Status |
-|----------|-------|----------------|
-| Total test files | 487 | Active |
-| Library modules (.claude/lib) | 296 | ~60% tested |
-| Hook modules (.claude/hooks) | 145 | ~86% tested |
-| Passing tests (counted) | 211 | 100% pass |
-| Failed to load | 1 | `reflection-step0-guard.test.cjs` |
+| Category                      | Count | Coverage Status                   |
+| ----------------------------- | ----- | --------------------------------- |
+| Total test files              | 487   | Active                            |
+| Library modules (.claude/lib) | 296   | ~60% tested                       |
+| Hook modules (.claude/hooks)  | 145   | ~86% tested                       |
+| Passing tests (counted)       | 211   | 100% pass                         |
+| Failed to load                | 1     | `reflection-step0-guard.test.cjs` |
 
 ---
 
@@ -62,18 +63,18 @@ tests/
 
 ### Test Scripts Available
 
-| Script | Purpose | Status |
-|--------|---------|--------|
-| `pnpm test` | Run all tests | ✅ Working |
-| `pnpm test:framework` | Framework-only tests | ✅ Working |
-| `pnpm test:framework:hooks` | Hook tests only | ✅ Working |
-| `pnpm test:framework:lib` | Lib tests only | ✅ Working |
-| `pnpm test:memory:ci` | Memory CI gate | ✅ Working |
-| `pnpm test:code-indexing` | Code indexing suite | ✅ Working |
-| `pnpm test:ci` | CI gate (spec reporter) | ✅ Working |
-| `pnpm test:coverage` | Coverage report | ⚠️ Experimental |
-| `pnpm test:hooks` | ARCHIVED | ❌ Redirects to archive |
-| `pnpm test:a2a` | Agent-to-agent | ❌ ARCHIVED |
+| Script                      | Purpose                 | Status                  |
+| --------------------------- | ----------------------- | ----------------------- |
+| `pnpm test`                 | Run all tests           | ✅ Working              |
+| `pnpm test:framework`       | Framework-only tests    | ✅ Working              |
+| `pnpm test:framework:hooks` | Hook tests only         | ✅ Working              |
+| `pnpm test:framework:lib`   | Lib tests only          | ✅ Working              |
+| `pnpm test:memory:ci`       | Memory CI gate          | ✅ Working              |
+| `pnpm test:code-indexing`   | Code indexing suite     | ✅ Working              |
+| `pnpm test:ci`              | CI gate (spec reporter) | ✅ Working              |
+| `pnpm test:coverage`        | Coverage report         | ⚠️ Experimental         |
+| `pnpm test:hooks`           | ARCHIVED                | ❌ Redirects to archive |
+| `pnpm test:a2a`             | Agent-to-agent          | ❌ ARCHIVED             |
 
 ---
 
@@ -86,12 +87,14 @@ tests/
 **Evidence:** 17 routing modules, only 11 tests — specialist override logic untested
 
 **Impact:**
+
 - Developer spawned instead of technical-writer for docs
 - Developer spawned instead of code-reviewer for reviews
 - Developer spawned instead of qa for tests
 - Violates IRON LAW: "Developer is the LAST RESORT"
 
 **Missing Test Scenarios:**
+
 ```javascript
 // CRITICAL: No tests exist for these scenarios
 - ❌ User says "update docs" → should block developer, require technical-writer
@@ -102,6 +105,7 @@ tests/
 ```
 
 **Known Failure Pattern (from memory):**
+
 > "Developer Agent TaskUpdate Compliance Requires Explicit Enforcement (Medium Risk)"
 > Evidence: Developer failed TaskUpdate(completed) 3 times; router had to manually update
 
@@ -116,6 +120,7 @@ tests/
 **Evidence:** 1 test file exists but only covers happy path
 
 **Missing State Transition Tests:**
+
 ```javascript
 // CRITICAL: No tests for these transitions
 - ❌ not_started → in_progress (TaskUpdate claim)
@@ -127,11 +132,13 @@ tests/
 ```
 
 **Impact:**
+
 - Tasks stuck "in_progress" forever (no completion tracking)
 - Duplicate work (multiple agents claim same task)
 - Workflow stalls (blocked tasks never unblock)
 
 **Known Failure (from CLAUDE.md):**
+
 > "Without TaskUpdate → tasks stuck forever, duplicate work, invisible progress, workflow stalls"
 
 **Required Tests:** 15 state machine tests covering all transitions + error cases
@@ -145,6 +152,7 @@ tests/
 **Evidence:** No tests for cycle detection in task dependencies
 
 **Missing Scenarios:**
+
 ```javascript
 // CRITICAL: No tests for these scenarios
 - ❌ Task A blocks Task B, Task B blocks Task A (circular dependency)
@@ -154,6 +162,7 @@ tests/
 ```
 
 **Impact:**
+
 - Enterprise workflow hangs indefinitely
 - CPU spin on circular dependency checks
 - Phase advancement failures
@@ -169,6 +178,7 @@ tests/
 **Evidence:** Missing test for spawn-template-resolver.cjs integration
 
 **Missing Tests:**
+
 ```javascript
 // Coverage gaps
 - ❌ Template placeholder substitution edge cases
@@ -178,6 +188,7 @@ tests/
 ```
 
 **Impact:**
+
 - Oversized prompts exceed token budget
 - Spawn fails silently with incomplete context
 
@@ -188,11 +199,13 @@ tests/
 ### 5. BM25 Code Indexing Regression — NO REGRESSION TESTS
 
 **Known Bug (from memory):**
+
 > "BM25 async pipeline OOMs at 600 files due to V8 heap fragmentation from Promise.race/inFlight patterns"
 
 **Evidence:** Memory learnings document Windows path issues, BM25 OOM, glob-to-regex bugs
 
 **Missing Regression Tests:**
+
 ```javascript
 // CRITICAL: No regression tests exist
 - ❌ Windows path normalization (path.relative() returns backslashes)
@@ -202,6 +215,7 @@ tests/
 ```
 
 **Impact:**
+
 - Regressions reintroduce fixed bugs
 - No TDD red-green cycle for known issues
 
@@ -214,6 +228,7 @@ tests/
 ### 1. Smoke Tests Disguised as Real Tests
 
 **Pattern Detected:**
+
 ```javascript
 // BAD: Test passes but doesn't assert behavior
 test('module exports function', () => {
@@ -237,17 +252,25 @@ test('someFunction returns expected result', () => {
 ### 2. Flaky Test Risk — Timing Dependencies
 
 **High-Risk Patterns:**
+
 ```javascript
 // RISKY: Timing-based assertions
-setTimeout(() => { assert(condition); }, 1000); // ❌ Race condition
+setTimeout(() => {
+  assert(condition);
+}, 1000); // ❌ Race condition
 
 // RISKY: Shared state between tests
 let sharedState = {};
-test('test 1', () => { sharedState.x = 1; }); // ❌ Pollutes test 2
-test('test 2', () => { assert(sharedState.x === undefined); }); // ❌ Fails if run after test 1
+test('test 1', () => {
+  sharedState.x = 1;
+}); // ❌ Pollutes test 2
+test('test 2', () => {
+  assert(sharedState.x === undefined);
+}); // ❌ Fails if run after test 1
 ```
 
 **Evidence:**
+
 - Memory tier tests use timeouts (`.test.cjs` files in `tests/lib/memory/`)
 - No use of `find-polluter` script for test pollution detection
 
@@ -260,6 +283,7 @@ test('test 2', () => { assert(sharedState.x === undefined); }); // ❌ Fails if 
 **Gap:** Most tests are unit tests. Integration tests are rare.
 
 **Critical Missing Integration Tests:**
+
 ```javascript
 // E2E scenarios not tested
 - ❌ Router → Spawn Planner → Planner creates tasks → Developer claims task → QA validates
@@ -277,6 +301,7 @@ test('test 2', () => { assert(sharedState.x === undefined); }); // ❌ Fails if 
 **From memory learnings and issues.md:**
 
 ### Windows Path Issues (FIXED — NO REGRESSION TEST)
+
 ```javascript
 // Bug: path.relative() returns backslashes on Windows
 // Fix: Normalize with .replace(/\\/g, '/')
@@ -284,6 +309,7 @@ test('test 2', () => { assert(sharedState.x === undefined); }); // ❌ Fails if 
 ```
 
 **Required Test:**
+
 ```javascript
 test('Windows path normalization in glob exclusions', () => {
   const path = 'node_modules\\foo\\bar';
@@ -296,6 +322,7 @@ test('Windows path normalization in glob exclusions', () => {
 ---
 
 ### Glob-to-Regex Root-Level Bug (FIXED — NO REGRESSION TEST)
+
 ```javascript
 // Bug: **/dir/** regex didn't match root-level directories
 // Fix: (.*/)?dir(/.*)?
@@ -303,6 +330,7 @@ test('Windows path normalization in glob exclusions', () => {
 ```
 
 **Required Test:**
+
 ```javascript
 test('Glob **/dir/** matches root-level directory', () => {
   const regex = globToRegex('**/node_modules/**');
@@ -314,6 +342,7 @@ test('Glob **/dir/** matches root-level directory', () => {
 ---
 
 ### BM25 OOM at 600 Files (FIXED — NO REGRESSION TEST)
+
 ```javascript
 // Bug: Async pipeline OOMs due to Promise.race/inFlight heap fragmentation
 // Fix: Sync fast-path for BM25-only mode
@@ -321,6 +350,7 @@ test('Glob **/dir/** matches root-level directory', () => {
 ```
 
 **Required Test:**
+
 ```javascript
 test('BM25 sync fast-path handles 1000+ files without OOM', async () => {
   process.env.LANCEDB_EMBEDDING_MODE = 'off';
@@ -352,11 +382,13 @@ test('BM25 sync fast-path handles 1000+ files without OOM', async () => {
 **Coverage:** `--experimental-test-coverage` (experimental, unstable)
 
 **Issues:**
+
 - No stable coverage reporting (experimental flag)
 - No coverage thresholds enforced
 - No CI gate for coverage regression
 
 **Recommendation:** Add coverage threshold to CI (`pnpm test:ci`):
+
 ```json
 {
   "scripts": {
@@ -373,9 +405,12 @@ test('BM25 sync fast-path handles 1000+ files without OOM', async () => {
 **Risk:** Tests pass but don't catch bugs
 
 **Example:**
+
 ```javascript
 // Code
-function add(a, b) { return a + b; }
+function add(a, b) {
+  return a + b;
+}
 
 // Weak test (passes even if code is wrong)
 test('add function exists', () => {
@@ -383,11 +418,14 @@ test('add function exists', () => {
 });
 
 // Mutation: Change + to - in code
-function add(a, b) { return a - b; } // Bug!
+function add(a, b) {
+  return a - b;
+} // Bug!
 // Weak test still passes! (mutation not killed)
 ```
 
 **Recommendation:** Run mutation testing on critical modules:
+
 ```bash
 pnpm add -D @stryker-mutator/core
 # Mutate routing-guard.cjs and verify tests catch mutations
@@ -465,15 +503,15 @@ pnpm add -D @stryker-mutator/core
 
 ## Summary Statistics
 
-| Category | Count | Details |
-|----------|-------|---------|
-| **Total test files** | 487 | Active (non-archived) |
-| **Passing tests (counted)** | 211 | 100% pass rate in counted suite |
-| **Failed to load** | 1 | `reflection-step0-guard.test.cjs` |
-| **Library modules** | 296 | ~60% have tests |
-| **Hook modules** | 145 | ~86% have tests |
-| **Critical untested modules** | 6 | routing-guard Check 7, task-lifecycle-state, workflow cycle detection, spawn validation, 2 regression gaps |
-| **Test infrastructure** | Node.js `--test` | Sequential execution, experimental coverage |
+| Category                      | Count            | Details                                                                                                    |
+| ----------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Total test files**          | 487              | Active (non-archived)                                                                                      |
+| **Passing tests (counted)**   | 211              | 100% pass rate in counted suite                                                                            |
+| **Failed to load**            | 1                | `reflection-step0-guard.test.cjs`                                                                          |
+| **Library modules**           | 296              | ~60% have tests                                                                                            |
+| **Hook modules**              | 145              | ~86% have tests                                                                                            |
+| **Critical untested modules** | 6                | routing-guard Check 7, task-lifecycle-state, workflow cycle detection, spawn validation, 2 regression gaps |
+| **Test infrastructure**       | Node.js `--test` | Sequential execution, experimental coverage                                                                |
 
 ---
 

@@ -31,6 +31,7 @@ The skill-centric universal expansion successfully achieves its stated goal of p
 Examples: `skill-tdd-output`, `skill-debugging-output`, `skill-ripgrep-output`, `skill-security-architect-output`, `skill-docker-compose-output`
 
 These schemas model actual skill outputs accurately:
+
 - Required fields match the skill's real output structure
 - Meaningful constraints (enums, minLength, minimum/maximum)
 - Domain-specific sub-schemas (e.g., STRIDE categories in security-architect, Red-Green-Refactor phases in TDD)
@@ -45,6 +46,7 @@ No schemas occupied this middle ground -- they are either Tier A or Tier C.
 Examples: `skill-swarm-coordination-output`, `skill-memory-forensics-output`, `skill-scientific-skills-output`, `skill-consensus-voting-output`, `skill-binary-analysis-patterns-output`, `skill-ai-ml-expert-output`
 
 These schemas contain only:
+
 ```json
 {
   "required": ["status", "output"],
@@ -59,14 +61,14 @@ This validates nothing meaningful -- any object with a status string passes.
 
 ### 1.3 Structural Inconsistencies
 
-| Property | Tier A Schemas | Tier C Stubs |
-|----------|---------------|--------------|
-| `$id` domain | `claude-code.anthropic.com` | `agent-studio.dev` |
-| Required top-level | `skillName, version, timestamp, output` | `status, output` |
-| `additionalProperties` | `false` (strict) | absent (permissive) |
-| Output `required` fields | Domain-specific | None |
-| `timestamp` field | Present | Absent |
-| `skillName` with `const` | Yes | No |
+| Property                 | Tier A Schemas                          | Tier C Stubs        |
+| ------------------------ | --------------------------------------- | ------------------- |
+| `$id` domain             | `claude-code.anthropic.com`             | `agent-studio.dev`  |
+| Required top-level       | `skillName, version, timestamp, output` | `status, output`    |
+| `additionalProperties`   | `false` (strict)                        | absent (permissive) |
+| Output `required` fields | Domain-specific                         | None                |
+| `timestamp` field        | Present                                 | Absent              |
+| `skillName` with `const` | Yes                                     | No                  |
 
 **Critical Finding:** There are two incompatible schema archetypes sharing the same naming convention. The Tier A schemas require `{skillName, version, timestamp, output}` while the Tier C stubs require `{status, output}`. These are structurally incompatible -- a valid Tier A instance would fail Tier C validation and vice versa.
 
@@ -118,6 +120,7 @@ The 90 skill output schemas have **zero runtime consumers**:
 Examples: `tdd.md` (126 lines), `testing.md`, `security.md`, `code-standards.md`
 
 Characteristics:
+
 - Iron Laws with enforcement mechanisms
 - Verification checklists with checkboxes
 - Common Rationalizations tables (anti-pattern prevention)
@@ -130,6 +133,7 @@ Characteristics:
 Examples: `go-expert.md` (62 lines), `docker-compose.md` (58 lines), `research-synthesis.md` (59 lines)
 
 Characteristics:
+
 - Core Principles section with actionable guidelines
 - Integration Points section (which agents/skills use this)
 - Anti-Patterns section
@@ -141,6 +145,7 @@ Characteristics:
 Examples: `memory-forensics.md` (18 lines), `scientific-skills.md` (18 lines)
 
 Characteristics:
+
 - One-sentence description
 - "When to Use" with a single generic sentence
 - Usage code block
@@ -149,31 +154,34 @@ Characteristics:
 
 ### 2.3 Structural Analysis
 
-| Metric | Framework Rules | Tier A Skill Rules | Tier B Skill Rules | Tier C Skill Rules |
-|--------|----------------|-------------------|-------------------|-------------------|
-| Avg. lines | 130 | 120 | 55 | 18 |
-| Has Iron Law | Sometimes | Yes | No | No |
-| Has Checklist | Sometimes | Yes | No | No |
-| Has Anti-Patterns | Sometimes | Yes | Yes | No |
-| Has Integration | Sometimes | Yes | Yes | No |
-| Has Memory Protocol | No | Sometimes | Yes | No |
-| Enforceable | Partially (hooks) | By convention | By convention | Not at all |
-| Value-add over SKILL.md | High | Medium | Low | Zero |
+| Metric                  | Framework Rules   | Tier A Skill Rules | Tier B Skill Rules | Tier C Skill Rules |
+| ----------------------- | ----------------- | ------------------ | ------------------ | ------------------ |
+| Avg. lines              | 130               | 120                | 55                 | 18                 |
+| Has Iron Law            | Sometimes         | Yes                | No                 | No                 |
+| Has Checklist           | Sometimes         | Yes                | No                 | No                 |
+| Has Anti-Patterns       | Sometimes         | Yes                | Yes                | No                 |
+| Has Integration         | Sometimes         | Yes                | Yes                | No                 |
+| Has Memory Protocol     | No                | Sometimes          | Yes                | No                 |
+| Enforceable             | Partially (hooks) | By convention      | By convention      | Not at all         |
+| Value-add over SKILL.md | High              | Medium             | Low                | Zero               |
 
 ### 2.4 Redundancy Analysis
 
 **Framework rules vs skill rules overlap:**
+
 - `testing.md` (framework) overlaps significantly with `tdd.md` (skill rule) -- both cover TDD, test organization, test execution
 - `security.md` (framework) overlaps with `security-architect.md` (skill rule) and `auth-security-expert.md` (skill rule)
 - `code-standards.md` (framework) overlaps with `code-quality-expert.md`, `code-style-validator.md`, `best-practices-guidelines.md`
 
 **Cross-skill rules overlap:**
+
 - `code-quality-expert.md`, `code-style-validator.md`, `best-practices-guidelines.md` all cover code quality from slightly different angles
 - `verification-before-completion.md` overlaps with `tdd.md` on completion verification
 
 ### 2.5 Enforceability Assessment
 
 Rules are only enforceable if:
+
 1. A hook checks them (very few do), or
 2. An agent reads them as context (most do via `.claude/rules/` auto-loading), or
 3. A human reads them (unlikely at 105 files)
@@ -214,12 +222,14 @@ This is byte-for-byte identical except for the skill name. Some pre-existing com
 ### 3.3 Assessment
 
 **Strengths of thin delegation:**
+
 - Zero code duplication
 - Consistent behavior
 - Easy to maintain
 - Clear separation of concerns (commands route, skills execute)
 
 **Weaknesses:**
+
 - No parameter passing -- commands cannot accept arguments
 - No validation -- commands cannot check preconditions before invoking the skill
 - No composition -- commands cannot chain multiple skills
@@ -229,6 +239,7 @@ This is byte-for-byte identical except for the skill name. Some pre-existing com
 ### 3.4 Naming Conflicts and Confusion
 
 Several commands have similar names that could confuse users:
+
 - `/debug` vs `/debugging` (both exist)
 - `/security-review` vs `/security-architect` (overlap)
 - `/analyze` vs `/code-analyzer` vs `/code-quality-expert` (three similar commands)
@@ -245,12 +256,12 @@ Commands are auto-discovered by Claude Code via the `/commands` directory. With 
 
 ### 4.1 Catalog System (4 catalogs)
 
-| Catalog | Entries | Accuracy | Value |
-|---------|---------|----------|-------|
-| Schema Catalog | 98 | 100% | Medium (88 schemas have no consumers) |
-| Command Catalog | 81+ | High | Medium (discovery via directory already works) |
-| Rules Catalog | 86 | 100% | High (new catalog, needed for organization) |
-| Skill Catalog | 100 | 100% | High (primary discovery mechanism) |
+| Catalog         | Entries | Accuracy | Value                                          |
+| --------------- | ------- | -------- | ---------------------------------------------- |
+| Schema Catalog  | 98      | 100%     | Medium (88 schemas have no consumers)          |
+| Command Catalog | 81+     | High     | Medium (discovery via directory already works) |
+| Rules Catalog   | 86      | 100%     | High (new catalog, needed for organization)    |
+| Skill Catalog   | 100     | 100%     | High (primary discovery mechanism)             |
 
 The catalog system successfully tracks all artifacts, but tracking artifacts that provide no value (hollow schemas, thin pointer rules) creates a false sense of completeness.
 
@@ -266,14 +277,14 @@ The catalog system successfully tracks all artifacts, but tracking artifacts tha
 
 The answer depends on skill tier:
 
-| Tier | Schema Value | Rules Value | Command Value |
-|------|-------------|-------------|---------------|
-| P0 Core (tdd, debugging, etc.) | High | High | High |
-| P1 Security (static-analysis, etc.) | High | Medium | Medium |
-| P2 Domain (go-expert, react-expert) | Medium | Medium | Low |
-| P3 Infra (terraform, k8s, docker) | Medium | Medium | Medium |
-| P4 Specialized (scientific, memory-forensics) | Zero (stubs) | Zero (pointers) | Low |
-| P5 Niche (binary-analysis, web3) | Zero (stubs) | Zero (pointers) | Low |
+| Tier                                          | Schema Value | Rules Value     | Command Value |
+| --------------------------------------------- | ------------ | --------------- | ------------- |
+| P0 Core (tdd, debugging, etc.)                | High         | High            | High          |
+| P1 Security (static-analysis, etc.)           | High         | Medium          | Medium        |
+| P2 Domain (go-expert, react-expert)           | Medium       | Medium          | Low           |
+| P3 Infra (terraform, k8s, docker)             | Medium       | Medium          | Medium        |
+| P4 Specialized (scientific, memory-forensics) | Zero (stubs) | Zero (pointers) | Low           |
+| P5 Niche (binary-analysis, web3)              | Zero (stubs) | Zero (pointers) | Low           |
 
 **Conclusion:** The triad is appropriate for Tiers P0-P3. For Tiers P4-P5, the expansion created hollow artifacts that add maintenance burden without value.
 
@@ -307,6 +318,7 @@ The answer depends on skill tier:
 ### 5.2 Over-Engineering
 
 **Schemas for skills that do not produce structured output:**
+
 - `scientific-skills` -- a meta-skill wrapping 139 sub-skills. Its "output" is whatever the sub-skill produces.
 - `memory-forensics` -- produces Volatility analysis reports, not structured JSON.
 - `binary-analysis-patterns` -- produces analysis documentation, not structured data.
@@ -337,6 +349,7 @@ At 299 files, manual governance will fail. Files will drift, become stale, and a
 ### 5.5 Context Budget Pressure
 
 The expansion significantly increases the context budget for every interaction:
+
 - 105 rules files auto-loaded into Claude Code context (~7,337 lines)
 - This competes with CLAUDE.md (~500 lines), agent files, skill files, and actual code
 - The performance rules document warns about attention degradation past 32K tokens
@@ -451,14 +464,14 @@ All new artifacts include provenance headers (`<!-- Agent: {type} | Task: #{id} 
 
 ## Scalability Assessment
 
-| Dimension | Current (90 skills) | At 150 Skills | At 200 Skills | Verdict |
-|-----------|-------------------|---------------|---------------|---------|
-| Schemas | Manageable (90 files) | Stretch | Unmanageable without automation | Needs base schema + generation |
-| Rules in `.claude/rules/` | CRITICAL (105 files, context overload) | BROKEN | BROKEN | Must restructure immediately |
-| Commands | Usable but unwieldy | Barely usable | Broken (command menu unusable) | Needs dynamic resolution |
-| Catalogs | Manageable | Tedious | Needs automation | Acceptable with tooling |
-| Agent wiring | 31% orphan rate | Will worsen | Will worsen | Needs policy + automation |
-| Governance | Manual, already failing | Unsustainable | Impossible | Needs full automation |
+| Dimension                 | Current (90 skills)                    | At 150 Skills | At 200 Skills                   | Verdict                        |
+| ------------------------- | -------------------------------------- | ------------- | ------------------------------- | ------------------------------ |
+| Schemas                   | Manageable (90 files)                  | Stretch       | Unmanageable without automation | Needs base schema + generation |
+| Rules in `.claude/rules/` | CRITICAL (105 files, context overload) | BROKEN        | BROKEN                          | Must restructure immediately   |
+| Commands                  | Usable but unwieldy                    | Barely usable | Broken (command menu unusable)  | Needs dynamic resolution       |
+| Catalogs                  | Manageable                             | Tedious       | Needs automation                | Acceptable with tooling        |
+| Agent wiring              | 31% orphan rate                        | Will worsen   | Will worsen                     | Needs policy + automation      |
+| Governance                | Manual, already failing                | Unsustainable | Impossible                      | Needs full automation          |
 
 **Bottom Line:** The current architecture works at 90 skills but will not scale to 200. The rules auto-loading mechanism is the most urgent bottleneck -- it is already degrading performance at 105 files. Schema and command patterns need restructuring before the next expansion.
 
@@ -466,16 +479,17 @@ All new artifacts include provenance headers (`<!-- Agent: {type} | Task: #{id} 
 
 ## Architecture Health Score: C+
 
-| Dimension | Score | Weight | Weighted |
-|-----------|-------|--------|----------|
-| Schema Architecture | C | 20% | 0.40 |
-| Rules Architecture | B- | 25% | 0.68 |
-| Command Architecture | B | 15% | 0.45 |
-| Integration | B | 20% | 0.60 |
-| Scalability | D | 20% | 0.26 |
-| **Overall** | | 100% | **2.39 / 4.0 = C+** |
+| Dimension            | Score | Weight | Weighted            |
+| -------------------- | ----- | ------ | ------------------- |
+| Schema Architecture  | C     | 20%    | 0.40                |
+| Rules Architecture   | B-    | 25%    | 0.68                |
+| Command Architecture | B     | 15%    | 0.45                |
+| Integration          | B     | 20%    | 0.60                |
+| Scalability          | D     | 20%    | 0.26                |
+| **Overall**          |       | 100%   | **2.39 / 4.0 = C+** |
 
 **Rationale:**
+
 - Schemas scored low due to 61% stubs, no base schema, no runtime consumers, and incompatible archetypes
 - Rules scored well for Tier A quality but lost points for context overload and thin pointer stubs
 - Commands scored well for consistent pattern but lost points for no categorization and naming conflicts
@@ -487,6 +501,7 @@ All new artifacts include provenance headers (`<!-- Agent: {type} | Task: #{id} 
 ## Appendix: Files Sampled
 
 ### Schemas (8 sampled of 90)
+
 - `skill-tdd-output.schema.json` (Tier A -- 102 lines, domain-specific)
 - `skill-debugging-output.schema.json` (Tier A -- 140 lines, domain-specific)
 - `skill-ripgrep-output.schema.json` (Tier A -- 110 lines, domain-specific)
@@ -501,6 +516,7 @@ All new artifacts include provenance headers (`<!-- Agent: {type} | Task: #{id} 
 - `skill-ai-ml-expert-output.schema.json` (Tier C -- 25 lines, hollow stub)
 
 ### Rules (7 sampled of 105)
+
 - `tdd.md` (Tier A -- 126 lines, excellent)
 - `go-expert.md` (Tier B -- 62 lines, structured)
 - `docker-compose.md` (Tier B -- 58 lines, structured)
@@ -510,6 +526,7 @@ All new artifacts include provenance headers (`<!-- Agent: {type} | Task: #{id} 
 - Framework rules: `security.md`, `testing.md`, `code-standards.md` (reference comparison)
 
 ### Commands (5 sampled of 97)
+
 - `tdd.md` (pre-existing, has description frontmatter)
 - `go-expert.md` (new, thin delegation)
 - `docker-compose.md` (new, thin delegation)
@@ -517,6 +534,7 @@ All new artifacts include provenance headers (`<!-- Agent: {type} | Task: #{id} 
 - `scientific-skills.md` (new, thin delegation)
 
 ### Integration Points Examined
+
 - `creator-commons.cjs` SCHEMA_MAP (validates definitions, not outputs)
 - `unified-creator-guard.cjs` SCHEMA_MAP (validates definitions, not outputs)
 - Schema catalog (98 entries, 87 DOCS ONLY)

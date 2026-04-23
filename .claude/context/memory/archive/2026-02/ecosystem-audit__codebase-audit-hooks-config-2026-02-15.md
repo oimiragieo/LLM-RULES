@@ -13,10 +13,12 @@
 **Overall Health**: ⚠️ MODERATE (7 issues found, 2 critical, 5 warnings)
 
 **Critical Issues**: 2
+
 - Hook path registration with command-line arguments parsed as filenames (settings.json)
 - routing-guard.cjs missing try/catch error handling (silent failure risk)
 
 **Warnings**: 5
+
 - Large runtime state file (spawn-assembly-cache.json: 62KB)
 - Large event bus log (event-bus.jsonl: 502KB)
 - Low test coverage (114 archived tests, 362 active tests for 271 library modules + 137 hooks)
@@ -52,11 +54,13 @@
 **Problem**: The hook system expects `command` to be a file path. Arguments like `--in-place` are NOT supported in the `command` field. This appears twice in settings.json (SessionEnd and Stop hooks).
 
 **Impact**:
+
 - Claude Code may attempt to execute `.claude/tools/cli/sanitize-debug-log.cjs --in-place` as a filename
 - Hook will fail silently or with unclear error
 - sanitize-debug-log.cjs exists at correct path, so this is a registration format issue
 
 **Remediation**:
+
 ```json
 // Option 1: Create wrapper script
 {
@@ -73,6 +77,7 @@
 ```
 
 **Files Affected**:
+
 - `.claude/settings.json` (lines 312, 331)
 
 ---
@@ -81,11 +86,11 @@
 
 **Sample Size**: 3 critical hooks examined
 
-| Hook | Try/Catch | Catch Block | process.exit() | Assessment |
-|------|-----------|-------------|----------------|------------|
-| routing-guard.cjs | ❌ No | ❌ No | ❌ No | ⚠️ **Missing error handling** |
-| unified-pre-write-hook.cjs | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Properly wrapped |
-| pre-completion-validation.cjs | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Properly wrapped |
+| Hook                          | Try/Catch | Catch Block | process.exit() | Assessment                    |
+| ----------------------------- | --------- | ----------- | -------------- | ----------------------------- |
+| routing-guard.cjs             | ❌ No     | ❌ No       | ❌ No          | ⚠️ **Missing error handling** |
+| unified-pre-write-hook.cjs    | ✅ Yes    | ✅ Yes      | ✅ Yes         | ✅ Properly wrapped           |
+| pre-completion-validation.cjs | ✅ Yes    | ✅ Yes      | ✅ Yes         | ✅ Properly wrapped           |
 
 #### ❌ CRITICAL: routing-guard.cjs Missing Error Handling
 
@@ -94,6 +99,7 @@
 **File**: `.claude/hooks/routing/routing-guard.cjs`
 
 **Current Code**:
+
 ```javascript
 const routingGuard = require('./routing-guard-core.cjs');
 
@@ -105,11 +111,13 @@ if (require.main === module) {
 **Problem**: If routing-guard-core.cjs throws an unhandled exception, the hook will crash without proper cleanup or error reporting.
 
 **Impact**:
+
 - Silent failures during agent routing
 - No audit trail for hook failures
 - May appear as "routing blocked for unknown reason"
 
 **Remediation**:
+
 ```javascript
 const routingGuard = require('./routing-guard-core.cjs');
 
@@ -117,13 +125,15 @@ if (require.main === module) {
   try {
     routingGuard.main();
   } catch (err) {
-    console.error(JSON.stringify({
-      timestamp: new Date().toISOString(),
-      level: 'error',
-      component: 'hook:routing-guard',
-      error: err.message,
-      stack: err.stack
-    }));
+    console.error(
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        level: 'error',
+        component: 'hook:routing-guard',
+        error: err.message,
+        stack: err.stack,
+      })
+    );
     process.exit(2); // Block on error (fail-closed)
   }
 }
@@ -136,6 +146,7 @@ if (require.main === module) {
 **Broad Matchers Found**: 8 instances of empty matcher `""` (catches ALL tools)
 
 **Known Overly-Broad Matchers**:
+
 - ✅ PreToolUse with `""` → pre-tool-unified.cjs (intentional, handles all tools)
 - ✅ PostToolUse with `""` → post-tool-metrics-unified.cjs (intentional, metrics for all tools)
 - ⚠️ `"Glob|Grep|WebSearch"` → routing-guard.cjs (appropriate for router restrictions)
@@ -150,7 +161,7 @@ if (require.main === module) {
 **Sample Review**: unified-pre-write-hook.cjs
 
 ```javascript
-process.exit(2);  // Block operation (fail-closed on error)
+process.exit(2); // Block operation (fail-closed on error)
 ```
 
 **Status**: ✅ Correct fail-closed behavior (exit 2 = block, exit 0 = allow)
@@ -181,6 +192,7 @@ process.exit(2);  // Block operation (fail-closed on error)
 **Note**: config.yaml file was not fully readable due to size (attempted read returned error). Model validation requires manual review of config.yaml.
 
 **Recommended Check**:
+
 ```bash
 grep -E "model:" config.yaml | grep -v "claude-(opus|sonnet|haiku)"
 ```
@@ -195,6 +207,7 @@ grep -E "model:" config.yaml | grep -v "claude-(opus|sonnet|haiku)"
 #### ⚠️ WARNING: Significant Documentation Gap
 
 **Sample Missing Variables** (from grep analysis):
+
 - AGENT_BASH_POLL_MAX_TRACKED_FILES
 - AGENT_BASH_POLL_REPEAT_THRESHOLD
 - AGENT_BASH_POLL_STALE_MS
@@ -208,7 +221,7 @@ grep -E "model:" config.yaml | grep -v "claude-(opus|sonnet|haiku)"
 - ARTIFACT_SCORE_CRITICAL_THRESHOLD
 - AST_GREP_BIN
 - AUTO_COMPANION_SPAWN
-- AUTO_COMPRESSION_PHASE_*
+- AUTO*COMPRESSION_PHASE*\*
 - CODE_INDEX_AUTO_UPDATE
 - CODE_INDEX_DEBOUNCE_MS
 - CODE_INDEX_EMBEDDINGS
@@ -216,11 +229,13 @@ grep -E "model:" config.yaml | grep -v "claude-(opus|sonnet|haiku)"
 - ...and 140+ more
 
 **Impact**:
+
 - Developers cannot discover available configuration options
 - Enforcement modes are undocumented (block/warn/off)
 - Hook behavior may change unexpectedly without documentation
 
 **Remediation**: Generate comprehensive .env.example from codebase scan:
+
 ```bash
 node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 ```
@@ -237,20 +252,22 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 
 #### ⚠️ WARNING: Large State Files
 
-| File | Size | Assessment |
-|------|------|------------|
-| spawn-assembly-cache.json | 62KB | ⚠️ Large cache file - may need rotation |
-| event-bus.jsonl | 502KB | ⚠️ Growing log file - needs rotation |
-| pre-compact-snapshot.json | 363 bytes | ✅ Normal |
-| router-state.json | 668 bytes | ✅ Normal |
-| agent-guardrails-state.json | 1.6KB | ✅ Normal |
+| File                        | Size      | Assessment                              |
+| --------------------------- | --------- | --------------------------------------- |
+| spawn-assembly-cache.json   | 62KB      | ⚠️ Large cache file - may need rotation |
+| event-bus.jsonl             | 502KB     | ⚠️ Growing log file - needs rotation    |
+| pre-compact-snapshot.json   | 363 bytes | ✅ Normal                               |
+| router-state.json           | 668 bytes | ✅ Normal                               |
+| agent-guardrails-state.json | 1.6KB     | ✅ Normal                               |
 
 **spawn-assembly-cache.json**:
+
 - **Purpose**: Caches assembled spawn prompts for faster agent spawning
 - **Issue**: 62KB cache may indicate many unique spawn patterns
 - **Recommendation**: Review cache eviction policy; consider LRU with max 50KB
 
 **event-bus.jsonl**:
+
 - **Purpose**: Append-only event log for system events
 - **Issue**: 502KB log file grows indefinitely
 - **Recommendation**: Implement log rotation (daily or at 1MB threshold)
@@ -288,6 +305,7 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 **Coverage Deficit**: 46 modules with no corresponding test file
 
 **Test Runner Issue**:
+
 - Mix of `.test.cjs` and `.test.cjs.archived` in same directory
 - Unclear which test runner is used (node --test vs vitest vs custom)
 - No clear test execution documentation
@@ -297,12 +315,14 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 ### 4.2 Critical Modules with No Tests
 
 **Sample Uncovered Modules** (requires detailed analysis):
+
 - `.claude/hooks/routing/routing-guard-core.cjs` (critical routing logic)
 - `.claude/hooks/reflection/reflection-step0-guard.cjs` (step 0 enforcement)
 - `.claude/lib/routing/fuzzy-intent-matcher.cjs` (semantic routing)
 - `.claude/lib/utils/hook-input.cjs` (hook infrastructure)
 
 **Recommendation**: Prioritize test coverage for:
+
 1. All routing hooks (routing-guard, pre-task-unified, etc.)
 2. All validation hooks (pre-completion, creator-compliance, etc.)
 3. Core library utilities (hook-input, project-root, safe-json)
@@ -312,6 +332,7 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 ### 4.3 Integration Test Gaps
 
 **End-to-End Scenarios Missing Tests**:
+
 - Full agent spawn → task execution → completion → reflection cycle
 - Hook failure recovery and fail-closed behavior
 - Multi-agent orchestration with task dependencies
@@ -375,6 +396,7 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 ## 7. Detailed Hook Catalog
 
 ### UserPromptSubmit Hooks (5)
+
 1. force-step0-execution.cjs
 2. state-reset.cjs
 3. drift-detector.cjs
@@ -382,6 +404,7 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 5. user-prompt-orchestrator.cjs
 
 ### PreToolUse Hooks (40+)
+
 - Universal: pre-tool-unified.cjs
 - Bash: bash-pretool-bundle.cjs
 - Grep: hybrid-search-enforcer.cjs
@@ -396,6 +419,7 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 - TaskUpdate: 4 completion validation hooks
 
 ### PostToolUse Hooks (10+)
+
 - Universal: post-tool-metrics-unified.cjs
 - Task|TaskList: post-task-unified.cjs
 - TaskUpdate: 3 completion workflow hooks
@@ -405,15 +429,18 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 - Task|TaskUpdate|Bash: unified-reflection-handler.cjs
 
 ### PostToolUseFailure Hooks (2)
+
 - Universal: post-tool-metrics-unified.cjs
 - Task|TaskUpdate|Bash: unified-reflection-handler.cjs
 
 ### SessionEnd Hooks (3)
+
 1. unified-reflection-handler.cjs
 2. reflection-queue-processor.cjs
 3. sanitize-debug-log.cjs --in-place ❌ (invalid format)
 
 ### Stop Hooks (3)
+
 1. check-console-log.cjs
 2. pre-compact.cjs
 3. sanitize-debug-log.cjs --in-place ❌ (invalid format)
@@ -423,16 +450,19 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 ## 8. Recommendations
 
 ### Short-Term (This Week)
+
 1. Fix settings.json hook registration format
 2. Add error handling to routing-guard.cjs
 3. Implement event-bus.jsonl rotation
 
 ### Medium-Term (This Month)
+
 4. Expand .env.example to include all variables
 5. Add test coverage for critical hooks
 6. Implement spawn-cache eviction policy
 
 ### Long-Term (This Quarter)
+
 7. Comprehensive integration test suite
 8. Hook performance profiling and optimization
 9. Automated hook health monitoring dashboard
@@ -442,28 +472,36 @@ node .claude/tools/cli/generate-env-example.cjs > .env.example.new
 ## Appendix A: Environment Variable Categories
 
 **Agent Configuration** (20+ vars):
-- AGENT_BASH_POLL_*, AGENT_EDIT_*, AGENT_GIT_*, AGENT_GUARDRAIL_*
+
+- AGENT*BASH_POLL*_, AGENT*EDIT*_, AGENT*GIT*_, AGENT*GUARDRAIL*_
 
 **Anomaly Detection** (10+ vars):
+
 - ANOMALY_DETECTION_ENABLED, ANOMALY_DURATION_MULTIPLIER, ANOMALY_TOKEN_MULTIPLIER
 
 **Code Indexing** (15+ vars):
+
 - CODE_INDEX_AUTO_UPDATE, CODE_INDEX_EMBEDDINGS, CODE_INDEX_DEBUG
 
 **Enforcement Modes** (30+ vars):
-- *_ENFORCEMENT (e.g., PLANNER_FIRST_ENFORCEMENT, CREATOR_GUARD, SECURITY_REVIEW_ENFORCEMENT)
+
+- \*\_ENFORCEMENT (e.g., PLANNER_FIRST_ENFORCEMENT, CREATOR_GUARD, SECURITY_REVIEW_ENFORCEMENT)
 
 **Memory System** (10+ vars):
-- MEMORY_MODE, OBSERVATIONAL_MEMORY_ENABLED, MEMORY_*_MAX_TOKENS
+
+- MEMORY*MODE, OBSERVATIONAL_MEMORY_ENABLED, MEMORY*\*\_MAX_TOKENS
 
 **Reflection System** (10+ vars):
-- REFLECTION_ENABLED, REFLECTION_STEP0_ENFORCEMENT, REFLECTION_*_THRESHOLD
+
+- REFLECTION*ENABLED, REFLECTION_STEP0_ENFORCEMENT, REFLECTION*\*\_THRESHOLD
 
 **Runtime Configuration** (20+ vars):
+
 - CLAUDE_AGENT_ID, CLAUDE_PROJECT_DIR, CLAUDE_RUNTIME_DIR
 
 **Search Tools** (10+ vars):
-- RG_BIN, AST_GREP_BIN, RGA_BIN, FZF_BIN, HYBRID_*
+
+- RG*BIN, AST_GREP_BIN, RGA_BIN, FZF_BIN, HYBRID*\*
 
 ---
 

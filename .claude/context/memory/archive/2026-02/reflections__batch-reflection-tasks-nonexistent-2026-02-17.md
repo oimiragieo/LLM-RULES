@@ -49,13 +49,13 @@
 
 ## Rubric Evaluation
 
-| Dimension | Score | Issue |
-|-----------|-------|-------|
-| **Completeness** | 0.0 | Task metadata unavailable; cannot assess what work was done |
-| **Accuracy** | 0.50 | Reflection queue accurately reports missing metadata |
-| **Clarity** | 0.30 | Evidence completely absent; cannot infer task scope or results |
-| **Consistency** | 0.40 | Pattern recurs 9+ times; consistent failure mode |
-| **Actionability** | 0.30 | Without task data, no specific improvement recommendations possible |
+| Dimension         | Score | Issue                                                               |
+| ----------------- | ----- | ------------------------------------------------------------------- |
+| **Completeness**  | 0.0   | Task metadata unavailable; cannot assess what work was done         |
+| **Accuracy**      | 0.50  | Reflection queue accurately reports missing metadata                |
+| **Clarity**       | 0.30  | Evidence completely absent; cannot infer task scope or results      |
+| **Consistency**   | 0.40  | Pattern recurs 9+ times; consistent failure mode                    |
+| **Actionability** | 0.30  | Without task data, no specific improvement recommendations possible |
 
 **Weighted Score**: (0.0×0.25 + 0.50×0.25 + 0.30×0.15 + 0.40×0.15 + 0.30×0.20) = **0.315 → 0.35 (rounded)** → **CRITICAL FAIL**
 

@@ -142,6 +142,7 @@ if (toolInput.metadata && toolInput.metadata.summary) {
 
 The queue entry contains ONLY: `taskId`, `trigger`, `timestamp`, `priority`, and
 `summary`. It does NOT include:
+
 - `filesModified` — the list of created/modified artifacts
 - `outputArtifacts` — paths to report files
 - `agent` — which agent produced the output
@@ -229,9 +230,10 @@ if (params.status === 'completed') {
   if (!params.metadata || !params.metadata.summary) {
     return {
       allow: false,
-      message: '[BLOCKED] TaskUpdate(completed) requires metadata.summary. ' +
-               'Add: metadata: { summary: "one-line description of what was done", ' +
-               'filesModified: [...] }'
+      message:
+        '[BLOCKED] TaskUpdate(completed) requires metadata.summary. ' +
+        'Add: metadata: { summary: "one-line description of what was done", ' +
+        'filesModified: [...] }',
     };
   }
 }
@@ -307,7 +309,7 @@ const entry = {
   artifactType: toolInput.metadata?.artifactType || null,
   filesModified: toolInput.metadata?.filesModified || [],
   outputArtifacts: toolInput.metadata?.outputArtifacts || [],
-  hasSummary: !!(toolInput.metadata?.summary),
+  hasSummary: !!toolInput.metadata?.summary,
 };
 ```
 
@@ -347,13 +349,13 @@ This enables monitoring: "what % of reflections run with insufficient data?"
 
 ## 5. Priority Matrix
 
-| Fix | Description | Priority | Effort | Impact |
-|-----|-------------|----------|--------|--------|
-| A | Blocking hook on TaskUpdate metadata | P0 | Low (1 hook edit) | Eliminates source of problem |
-| B | INSUFFICIENT_DATA gate in reflection agent | P1 | Low (agent prompt edit) | Prevents fabricated scores |
-| C | Independent artifact verification | P1 | Medium (new verification steps) | Catches integration failures independently |
-| D | Enrich reflection queue entries | P2 | Low (event handler edit) | Better data for reflection |
-| E | dataQuality field in reflection log | P2 | Low (schema change) | Enables monitoring |
+| Fix | Description                                | Priority | Effort                          | Impact                                     |
+| --- | ------------------------------------------ | -------- | ------------------------------- | ------------------------------------------ |
+| A   | Blocking hook on TaskUpdate metadata       | P0       | Low (1 hook edit)               | Eliminates source of problem               |
+| B   | INSUFFICIENT_DATA gate in reflection agent | P1       | Low (agent prompt edit)         | Prevents fabricated scores                 |
+| C   | Independent artifact verification          | P1       | Medium (new verification steps) | Catches integration failures independently |
+| D   | Enrich reflection queue entries            | P2       | Low (event handler edit)        | Better data for reflection                 |
+| E   | dataQuality field in reflection log        | P2       | Low (schema change)             | Enables monitoring                         |
 
 ---
 

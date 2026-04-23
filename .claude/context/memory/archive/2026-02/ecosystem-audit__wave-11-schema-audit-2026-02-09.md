@@ -24,15 +24,15 @@
 
 ### Standards Applied
 
-| Standard | Requirement |
-|----------|-------------|
-| Draft Version | Must use `2020-12` (not draft-07) |
-| $id Present | Must have unique URI in $id field |
-| title | Must have descriptive title |
-| description | Must have meaningful description |
-| type | Must be "object" at root level |
-| required | Must list mandatory fields |
-| additionalProperties | Must be `false` (strict validation) |
+| Standard              | Requirement                                     |
+| --------------------- | ----------------------------------------------- |
+| Draft Version         | Must use `2020-12` (not draft-07)               |
+| $id Present           | Must have unique URI in $id field               |
+| title                 | Must have descriptive title                     |
+| description           | Must have meaningful description                |
+| type                  | Must be "object" at root level                  |
+| required              | Must list mandatory fields                      |
+| additionalProperties  | Must be `false` (strict validation)             |
 | Property Descriptions | All properties must have `type` + `description` |
 
 **Scoring**: 1 point per standard met = 8 total
@@ -44,44 +44,44 @@
 
 ### PASS (18 schemas — 67%)
 
-| Schema | Draft | $id | title | desc | type | req | addlProps | propDesc | Score | Status |
-|--------|-------|-----|-------|------|------|-----|-----------|----------|-------|--------|
-| adr-template | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| phase-models | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| presets | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| plan | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| artifact-manifest | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| product-requirements | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| system-architecture | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| test-results | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| test-plan | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| ux-spec | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| project-brief | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| specification-template | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| agent-config | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| tool-manifest | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| agent-definition | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| artifact-graph | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| evolution-state | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
-| generic-skill-output-base | 2020-12 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 8/8 | PASS |
+| Schema                    | Draft   | $id | title | desc | type | req | addlProps | propDesc | Score | Status |
+| ------------------------- | ------- | --- | ----- | ---- | ---- | --- | --------- | -------- | ----- | ------ |
+| adr-template              | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| phase-models              | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| presets                   | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| plan                      | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| artifact-manifest         | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| product-requirements      | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| system-architecture       | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| test-results              | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| test-plan                 | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| ux-spec                   | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| project-brief             | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| specification-template    | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| agent-config              | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| tool-manifest             | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| agent-definition          | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| artifact-graph            | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| evolution-state           | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
+| generic-skill-output-base | 2020-12 | ✅  | ✅    | ✅   | ✅   | ✅  | ✅        | ✅       | 8/8   | PASS   |
 
 ### FIX (8 schemas — 30%)
 
-| Schema | Draft | Issue | Action | Score | Status |
-|--------|-------|-------|--------|-------|--------|
-| agent-identity | draft-07 | Uses Draft-07; no additionalProperties on root | Update to 2020-12, add additionalProperties: false | 6/8 | FIXED |
-| hook-definition | draft-07 | Uses Draft-07; missing some property descriptions | Update to 2020-12, add descriptions | 5/8 | FIXED |
-| implementation-plan | 2020-12 | Missing some property descriptions in nested objects | Add descriptions to all properties | 6/8 | FIXED |
-| project-analysis | 2020-12 | additionalProperties missing on some nested objects | Add additionalProperties: false throughout | 6/8 | FIXED |
-| track-metadata | 2020-12 | Missing descriptions on 3 properties | Add property descriptions | 5/8 | FIXED |
-| workflow-definition | 2020-12 | additionalProperties missing on root object | Add additionalProperties: false | 6/8 | FIXED |
-| agent-capability-card | 2020-12 | Minor: nested object missing additionalProperties | Add additionalProperties: false | 7/8 | FIXED |
-| skill-definition | 2020-12 | Missing descriptions on array items | Add descriptions to nested schemas | 6/8 | FIXED |
+| Schema                | Draft    | Issue                                                | Action                                             | Score | Status |
+| --------------------- | -------- | ---------------------------------------------------- | -------------------------------------------------- | ----- | ------ |
+| agent-identity        | draft-07 | Uses Draft-07; no additionalProperties on root       | Update to 2020-12, add additionalProperties: false | 6/8   | FIXED  |
+| hook-definition       | draft-07 | Uses Draft-07; missing some property descriptions    | Update to 2020-12, add descriptions                | 5/8   | FIXED  |
+| implementation-plan   | 2020-12  | Missing some property descriptions in nested objects | Add descriptions to all properties                 | 6/8   | FIXED  |
+| project-analysis      | 2020-12  | additionalProperties missing on some nested objects  | Add additionalProperties: false throughout         | 6/8   | FIXED  |
+| track-metadata        | 2020-12  | Missing descriptions on 3 properties                 | Add property descriptions                          | 5/8   | FIXED  |
+| workflow-definition   | 2020-12  | additionalProperties missing on root object          | Add additionalProperties: false                    | 6/8   | FIXED  |
+| agent-capability-card | 2020-12  | Minor: nested object missing additionalProperties    | Add additionalProperties: false                    | 7/8   | FIXED  |
+| skill-definition      | 2020-12  | Missing descriptions on array items                  | Add descriptions to nested schemas                 | 6/8   | FIXED  |
 
 ### FAIL (1 schema — 3%)
 
-| Schema | Draft | Critical Issues | Action | Status |
-|--------|-------|-----------------|--------|--------|
+| Schema                    | Draft   | Critical Issues    | Action    | Status               |
+| ------------------------- | ------- | ------------------ | --------- | -------------------- |
 | generic-skill-output-base | 2020-12 | NO — Actually PASS | Re-scored | RECLASSIFIED TO PASS |
 
 **Result**: All 27 active schemas now pass compliance after fixes.
@@ -90,7 +90,7 @@
 
 ## Skill Output Schemas (60+ total)
 
-All skill output schemas (skill-*-output.schema.json) follow **consistent patterns**:
+All skill output schemas (skill-\*-output.schema.json) follow **consistent patterns**:
 
 - **Draft**: 100% use Draft 2020-12 ✅
 - **$id**: All present and properly formatted ✅
@@ -105,7 +105,7 @@ All skill output schemas (skill-*-output.schema.json) follow **consistent patter
 
 ---
 
-## Archive Schemas (51 in _archive/ and _backup/)
+## Archive Schemas (51 in \_archive/ and \_backup/)
 
 **Finding**: Archive schemas are intentionally kept as-is for historical reference. No fixes applied.
 
@@ -120,6 +120,7 @@ All skill output schemas (skill-*-output.schema.json) follow **consistent patter
 ### 1. agent-identity.schema.json (FIXED)
 
 **Before**:
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -129,6 +130,7 @@ All skill output schemas (skill-*-output.schema.json) follow **consistent patter
 ```
 
 **After**:
+
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -142,11 +144,13 @@ All skill output schemas (skill-*-output.schema.json) follow **consistent patter
 ### 2. hook-definition.schema.json (FIXED)
 
 **Issues**:
+
 - Used draft-07
 - Missing descriptions on 4 properties
 - No additionalProperties on nested objects
 
 **Changes**:
+
 - Updated to 2020-12
 - Added descriptions to all properties
 - Added additionalProperties: false to nested objects
@@ -154,6 +158,7 @@ All skill output schemas (skill-*-output.schema.json) follow **consistent patter
 ### 3-8. Other Schemas (8 FIXED)
 
 All received targeted fixes:
+
 - Updated Draft version where needed
 - Added missing property descriptions
 - Added additionalProperties: false constraints
@@ -165,21 +170,21 @@ All received targeted fixes:
 
 ### Before Wave 11
 
-| Category | Count | Compliant | % |
-|----------|-------|-----------|---|
-| Active | 27 | ~16 | 59% |
-| Skill Output | 60+ | 60+ | 100% |
-| Archive | 51 | N/A | - |
-| **Total** | **138+** | **76+** | **55%** |
+| Category     | Count    | Compliant | %       |
+| ------------ | -------- | --------- | ------- |
+| Active       | 27       | ~16       | 59%     |
+| Skill Output | 60+      | 60+       | 100%    |
+| Archive      | 51       | N/A       | -       |
+| **Total**    | **138+** | **76+**   | **55%** |
 
 ### After Wave 11 (Final State)
 
-| Category | Count | Compliant | % |
-|----------|-------|-----------|---|
-| Active | 27 | 27 | 100% |
-| Skill Output | 60+ | 60+ | 100% |
-| Archive | 51 | N/A | - |
-| **Total** | **138+** | **87+** | **95%+** |
+| Category     | Count    | Compliant | %        |
+| ------------ | -------- | --------- | -------- |
+| Active       | 27       | 27        | 100%     |
+| Skill Output | 60+      | 60+       | 100%     |
+| Archive      | 51       | N/A       | -        |
+| **Total**    | **138+** | **87+**   | **95%+** |
 
 ---
 
@@ -236,6 +241,7 @@ All received targeted fixes:
 - **Impact**: Stricter validation, better data integrity, consistent API contracts
 
 **Next Steps**:
+
 1. Commit schema fixes to version control
 2. Update schema catalog with compliance status
 3. Implement automated compliance validation in CI
@@ -244,4 +250,3 @@ All received targeted fixes:
 ---
 
 **Audit Complete** ✅
-

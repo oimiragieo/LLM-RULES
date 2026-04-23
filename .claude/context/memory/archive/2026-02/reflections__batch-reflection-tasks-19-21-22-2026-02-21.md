@@ -12,11 +12,11 @@
 
 ## PHASE 0: Data Sufficiency Gate
 
-| Task | Summary Provided | Files Modified | Artifacts | Data Quality |
-|---|---|---|---|---|
-| 19 | YES — "Decisions/learnings recorded, lint+format+test verified, checkpoint commit created (silent completion, 19 tools, 122k tokens)" | Inferred (checkpoint) | Commit checkpoint | FULL |
-| 21 | YES — "Checkpoint commit fdaff9f1 — 16 files staged, pre-commit hooks passed" | 16 files (commit fdaff9f1) | Commit + hook validation | FULL |
-| 22 | YES — "CHANGELOG.md updated with [Unreleased] section covering 5 Added + 3 Fixed entries for commit fdaff9f1" | CHANGELOG.md | CHANGELOG.md | FULL |
+| Task | Summary Provided                                                                                                                      | Files Modified             | Artifacts                | Data Quality |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------ | ------------ |
+| 19   | YES — "Decisions/learnings recorded, lint+format+test verified, checkpoint commit created (silent completion, 19 tools, 122k tokens)" | Inferred (checkpoint)      | Commit checkpoint        | FULL         |
+| 21   | YES — "Checkpoint commit fdaff9f1 — 16 files staged, pre-commit hooks passed"                                                         | 16 files (commit fdaff9f1) | Commit + hook validation | FULL         |
+| 22   | YES — "CHANGELOG.md updated with [Unreleased] section covering 5 Added + 3 Fixed entries for commit fdaff9f1"                         | CHANGELOG.md               | CHANGELOG.md             | FULL         |
 
 **Decision**: Data quality FULL for all three tasks. Proceed with normal RECE analysis.
 
@@ -50,37 +50,37 @@
 
 ### Task 19
 
-| Dimension | Score | Rationale |
-|---|---|---|
-| Completeness | 0.80 | Decisions/learnings recorded, lint+format+test verified. The "silent completion" note and 19-tool usage implies broad work including coordination steps. The "checkpoint commit attempt" wording raises mild question on whether the commit succeeded vs. was deferred to Task 21. |
-| Accuracy | 0.85 | Lint/format/test verification is explicit in the summary — this is evidence-backed (not just asserted). 122k tokens indicates substantial work done with thorough checking. |
-| Clarity | 0.80 | Summary communicates what was done (learnings recorded, gates passed, commit attempted) but the "attempt" qualifier reduces clarity on final commit state. |
-| Consistency | 0.85 | Follows established memory protocol — decisions/learnings documented before checkpoint. Pattern-consistent with prior sessions. |
-| Actionability | 0.80 | Checkpoint commit state is ambiguous — is the checkpoint complete or did Task 21 need to finalize it? The relationship between Task 19 and Task 21 is not fully explicit from metadata alone. |
+| Dimension     | Score | Rationale                                                                                                                                                                                                                                                                          |
+| ------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.80  | Decisions/learnings recorded, lint+format+test verified. The "silent completion" note and 19-tool usage implies broad work including coordination steps. The "checkpoint commit attempt" wording raises mild question on whether the commit succeeded vs. was deferred to Task 21. |
+| Accuracy      | 0.85  | Lint/format/test verification is explicit in the summary — this is evidence-backed (not just asserted). 122k tokens indicates substantial work done with thorough checking.                                                                                                        |
+| Clarity       | 0.80  | Summary communicates what was done (learnings recorded, gates passed, commit attempted) but the "attempt" qualifier reduces clarity on final commit state.                                                                                                                         |
+| Consistency   | 0.85  | Follows established memory protocol — decisions/learnings documented before checkpoint. Pattern-consistent with prior sessions.                                                                                                                                                    |
+| Actionability | 0.80  | Checkpoint commit state is ambiguous — is the checkpoint complete or did Task 21 need to finalize it? The relationship between Task 19 and Task 21 is not fully explicit from metadata alone.                                                                                      |
 
 **Weighted Score (25/25/15/15/20)**: (0.25×0.80) + (0.25×0.85) + (0.15×0.80) + (0.15×0.85) + (0.20×0.80) = 0.20 + 0.2125 + 0.12 + 0.1275 + 0.16 = **0.82**
 
 ### Task 21
 
-| Dimension | Score | Rationale |
-|---|---|---|
-| Completeness | 0.90 | 16 files staged covering all major deliverables: smart-debug wiring fixes (Phase 1), validate-skill-agent-consistency.mjs (Phase 3), reflection-agent Step 4.7, agent-skill-matrix.json updates, lint fix. Pre-commit hooks passed (security lint, ESLint, registry/index regeneration). |
-| Accuracy | 0.92 | Pre-commit hooks include security lint, ESLint, registry/index regeneration — these are automated checks that verify correctness at commit time. Hook passage is strong evidence of accuracy. |
-| Clarity | 0.85 | Summary clearly enumerates the 16-file scope with category breakdowns. Commit hash fdaff9f1 provides permanent reference. |
-| Consistency | 0.88 | Follows the git checkpoint protocol documented in enterprise pipeline patterns. Pre-commit hooks include all required validation steps (lint, security, index regeneration). |
-| Actionability | 0.85 | Commit is the canonical save point — anyone can reproduce the state with `git checkout fdaff9f1`. Next steps are implied by CHANGELOG (Task 22) and enterprise-workflow update (Task 23). |
+| Dimension     | Score | Rationale                                                                                                                                                                                                                                                                                |
+| ------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.90  | 16 files staged covering all major deliverables: smart-debug wiring fixes (Phase 1), validate-skill-agent-consistency.mjs (Phase 3), reflection-agent Step 4.7, agent-skill-matrix.json updates, lint fix. Pre-commit hooks passed (security lint, ESLint, registry/index regeneration). |
+| Accuracy      | 0.92  | Pre-commit hooks include security lint, ESLint, registry/index regeneration — these are automated checks that verify correctness at commit time. Hook passage is strong evidence of accuracy.                                                                                            |
+| Clarity       | 0.85  | Summary clearly enumerates the 16-file scope with category breakdowns. Commit hash fdaff9f1 provides permanent reference.                                                                                                                                                                |
+| Consistency   | 0.88  | Follows the git checkpoint protocol documented in enterprise pipeline patterns. Pre-commit hooks include all required validation steps (lint, security, index regeneration).                                                                                                             |
+| Actionability | 0.85  | Commit is the canonical save point — anyone can reproduce the state with `git checkout fdaff9f1`. Next steps are implied by CHANGELOG (Task 22) and enterprise-workflow update (Task 23).                                                                                                |
 
 **Weighted Score**: (0.25×0.90) + (0.25×0.92) + (0.15×0.85) + (0.15×0.88) + (0.20×0.85) = 0.225 + 0.23 + 0.1275 + 0.132 + 0.17 = **0.88**
 
 ### Task 22
 
-| Dimension | Score | Rationale |
-|---|---|---|
-| Completeness | 0.88 | 5 Added + 3 Fixed entries cover the complete scope of commit fdaff9f1 per CHANGELOG.md lines 10-22. All major deliverables of the skill-wiring initiative are documented: CLI tool, Step 4.7, when-to-use tables, decision tree, developer.md fix, skill-index alignment, complexity reduction. |
-| Accuracy | 0.88 | CHANGELOG entries align with confirmed delivered artifacts in commit fdaff9f1. The Fixed section accurately separates skill-wiring-specific fixes from other pre-existing fixes. |
-| Clarity | 0.90 | Keep-a-Changelog format with `### Added` and `### Fixed` subsections under `## [Unreleased]` is clean and conventional. Commit hash fdaff9f1 cross-referenced for traceability. |
-| Consistency | 0.85 | Format follows existing CHANGELOG structure. Using `### Added — Skill-Wiring Improvement Initiative (2026-02-21, commit fdaff9f1)` and `### Fixed — ...` subsection pattern is consistent with future readability. |
-| Actionability | 0.80 | CHANGELOG updated for release notes but Note: the [Unreleased] section implies this is not yet in a formal release. Slightly lower because there is no associated version bump or release PR — though that may be expected for ongoing work. |
+| Dimension     | Score | Rationale                                                                                                                                                                                                                                                                                       |
+| ------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.88  | 5 Added + 3 Fixed entries cover the complete scope of commit fdaff9f1 per CHANGELOG.md lines 10-22. All major deliverables of the skill-wiring initiative are documented: CLI tool, Step 4.7, when-to-use tables, decision tree, developer.md fix, skill-index alignment, complexity reduction. |
+| Accuracy      | 0.88  | CHANGELOG entries align with confirmed delivered artifacts in commit fdaff9f1. The Fixed section accurately separates skill-wiring-specific fixes from other pre-existing fixes.                                                                                                                |
+| Clarity       | 0.90  | Keep-a-Changelog format with `### Added` and `### Fixed` subsections under `## [Unreleased]` is clean and conventional. Commit hash fdaff9f1 cross-referenced for traceability.                                                                                                                 |
+| Consistency   | 0.85  | Format follows existing CHANGELOG structure. Using `### Added — Skill-Wiring Improvement Initiative (2026-02-21, commit fdaff9f1)` and `### Fixed — ...` subsection pattern is consistent with future readability.                                                                              |
+| Actionability | 0.80  | CHANGELOG updated for release notes but Note: the [Unreleased] section implies this is not yet in a formal release. Slightly lower because there is no associated version bump or release PR — though that may be expected for ongoing work.                                                    |
 
 **Weighted Score**: (0.25×0.88) + (0.25×0.88) + (0.15×0.90) + (0.15×0.85) + (0.20×0.80) = 0.22 + 0.22 + 0.135 + 0.1275 + 0.16 = **0.86**
 
@@ -114,11 +114,11 @@
 
 ### Artifacts from This Batch
 
-| Artifact | Task | Integration Score (est.) | Notes |
-|---|---|---|---|
-| Checkpoint commit fdaff9f1 | 21 | N/A (git artifact, not framework artifact) | Commit hash provides permanent traceability; pre-commit hooks validate integration at commit time |
-| CHANGELOG.md [Unreleased] update | 22 | 90% | Follows Keep-a-Changelog format; cross-references commit hash; inside correct `[Unreleased]` section |
-| Decisions/learnings recorded | 19 | 80% | Memory files updated per protocol; exact files not enumerated in summary |
+| Artifact                         | Task | Integration Score (est.)                   | Notes                                                                                                |
+| -------------------------------- | ---- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Checkpoint commit fdaff9f1       | 21   | N/A (git artifact, not framework artifact) | Commit hash provides permanent traceability; pre-commit hooks validate integration at commit time    |
+| CHANGELOG.md [Unreleased] update | 22   | 90%                                        | Follows Keep-a-Changelog format; cross-references commit hash; inside correct `[Unreleased]` section |
+| Decisions/learnings recorded     | 19   | 80%                                        | Memory files updated per protocol; exact files not enumerated in summary                             |
 
 ### Integration Gaps
 
@@ -131,12 +131,12 @@
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|---|---|---|
-| Pre-commit multi-layer gate pattern (security lint + ESLint + index regen) | **Retain** | High reuse value — shows what an effective pre-commit hook chain looks like; specific to this project |
-| Double-completion on Task 22 | **Compress** | Already covered by `missing-taskupdate-metadata-recurring` and `parallel-completion-timestamp-diagnostic` gotchas; increment occurrence count only |
-| CHANGELOG mandatory update pattern | **Retain** | First confirmed use of the enterprise-workflow.md mandate from Task 23; validate that the pattern works in practice |
-| Task 19 "checkpoint attempt" ambiguity | **Archive** | One-time artifact; the learnable pattern (use commit hash or "deferred" in summary, never "attempt") is the signal |
+| Item                                                                       | Decision     | Rationale                                                                                                                                          |
+| -------------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pre-commit multi-layer gate pattern (security lint + ESLint + index regen) | **Retain**   | High reuse value — shows what an effective pre-commit hook chain looks like; specific to this project                                              |
+| Double-completion on Task 22                                               | **Compress** | Already covered by `missing-taskupdate-metadata-recurring` and `parallel-completion-timestamp-diagnostic` gotchas; increment occurrence count only |
+| CHANGELOG mandatory update pattern                                         | **Retain**   | First confirmed use of the enterprise-workflow.md mandate from Task 23; validate that the pattern works in practice                                |
+| Task 19 "checkpoint attempt" ambiguity                                     | **Archive**  | One-time artifact; the learnable pattern (use commit hash or "deferred" in summary, never "attempt") is the signal                                 |
 
 ---
 

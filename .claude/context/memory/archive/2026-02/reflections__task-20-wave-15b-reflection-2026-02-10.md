@@ -11,14 +11,14 @@
 
 ## Rubric Scores
 
-| Dimension      | Weight | Score | Weighted | Justification                                                          |
-| -------------- | ------ | ----- | -------- | ---------------------------------------------------------------------- |
-| Completeness   | 25%    | 0.82  | 0.205    | 45/55 items verified (82%), missing 10 items from full scope          |
-| Accuracy       | 25%    | 0.95  | 0.238    | 39/39 hook registrations valid, 3-state tool wiring model discovered  |
-| Clarity        | 15%    | 0.85  | 0.128    | Clear metrics reported, discoverable findings documented               |
-| Consistency    | 15%    | 0.80  | 0.120    | Workflows 2/3 registered, hooks 3/7 documented (partial consistency)   |
-| Actionability  | 20%    | 0.85  | 0.170    | 10 follow-up actions identified with clear next steps                 |
-| **TOTAL**      | 100%   |       | **0.85** |                                                                        |
+| Dimension     | Weight | Score | Weighted | Justification                                                        |
+| ------------- | ------ | ----- | -------- | -------------------------------------------------------------------- |
+| Completeness  | 25%    | 0.82  | 0.205    | 45/55 items verified (82%), missing 10 items from full scope         |
+| Accuracy      | 25%    | 0.95  | 0.238    | 39/39 hook registrations valid, 3-state tool wiring model discovered |
+| Clarity       | 15%    | 0.85  | 0.128    | Clear metrics reported, discoverable findings documented             |
+| Consistency   | 15%    | 0.80  | 0.120    | Workflows 2/3 registered, hooks 3/7 documented (partial consistency) |
+| Actionability | 20%    | 0.85  | 0.170    | 10 follow-up actions identified with clear next steps                |
+| **TOTAL**     | 100%   |       | **0.85** |                                                                      |
 
 **Threshold**: PASS (0.7+ required, 0.85 achieved)
 
@@ -55,6 +55,7 @@
 **Pattern**: Enterprise cross-audit verification threshold is 80-85% for multi-domain audits covering workflows, hooks, and integrations.
 
 **Rationale**:
+
 - 100% verification unrealistic for complex multi-domain audits
 - 80%+ provides high confidence while acknowledging practical verification limits
 - Unverified items (18%) should be documented as follow-up work, not audit failures
@@ -74,6 +75,7 @@
 **Context**: Wave 15B discovered a 3-state tool wiring model during cross-audit of tool usage patterns.
 
 **Pattern**: Tools exist in 3 wiring states:
+
 1. **Wired**: Tool exists, registered, assigned to agents, documented
 2. **Phantom**: Tool exists, registered, but no agent assignments or documentation
 3. **Dead**: Tool archived/deleted but still referenced in configs/catalogs
@@ -176,6 +178,7 @@
 **Status**: Integration health check not performed during Wave 15B audit
 
 **Recommendation**: Spawn artifact-integrator to analyze integration completeness for:
+
 - 2 registered workflows (check catalog entries, agent assignments)
 - 3 documented hooks (check @ENFORCEMENT_HOOKS.md, settings.json consistency)
 - 39 validated hook registrations (check for phantom wiring state)
@@ -183,6 +186,7 @@
 **Expected Integration Score**: 75-85% (based on 2/3 workflow registration, 3/7 hook documentation)
 
 **Gaps Likely to Be Found**:
+
 - Missing workflow catalog entries
 - Hook documentation not cross-referenced in hook files
 - Agent assignments missing for verified hooks
@@ -217,6 +221,7 @@
 ## Summary
 
 Wave 15B cross-audit achieved **PASS** status with 0.85/1.0 overall score:
+
 - **Strengths**: 82% verification rate, 100% hook registration validation, 3-state tool wiring model discovery
 - **Opportunities**: Close 57% hook documentation gap, register missing workflow, analyze 18% unverified items
 - **Critical Learnings**: 80-85% cross-audit threshold, 3-state tool wiring model, documentation-registration coupling pattern

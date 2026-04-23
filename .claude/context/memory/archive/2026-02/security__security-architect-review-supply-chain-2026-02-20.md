@@ -17,16 +17,16 @@ Four Priority-1 supply chain security gaps were addressed in this changeset. The
 
 ## Files Reviewed
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `.claude/hooks/safety/external-content-guard.cjs` | 669 | GAP-A/B/C: env var mode, quarantine writes, gh api enforcement |
-| `.claude/hooks/reflection/reflection-cleanup.cjs` | 94 | GAP-D: processedReflectionIds cleanup fix |
-| `.claude/hooks/reflection/reflection-step0-guard.cjs` | 434 | GAP-D: _MAX_REFLECTION_AGE_HOURS rename (staleness delegation) |
-| `.env.example` | 2017 | Documentation of EXTERNAL_CONTENT_GUARD_MODE |
-| `tests/hooks/external-content-guard.test.cjs` | 427 | 21 test scenarios for GAP-A/B/C |
-| `tests/hooks/reflection-cleanup.test.cjs` | 373 | 15 test scenarios for GAP-D |
-| `.claude/lib/utils/safe-json.cjs` | 425 | Dependency: prototype pollution-safe JSON parsing |
-| `.claude/lib/reflection/spawn-request-contract.cjs` | 211 | Dependency: atomic spawn request operations |
+| File                                                  | Lines | Purpose                                                         |
+| ----------------------------------------------------- | ----- | --------------------------------------------------------------- |
+| `.claude/hooks/safety/external-content-guard.cjs`     | 669   | GAP-A/B/C: env var mode, quarantine writes, gh api enforcement  |
+| `.claude/hooks/reflection/reflection-cleanup.cjs`     | 94    | GAP-D: processedReflectionIds cleanup fix                       |
+| `.claude/hooks/reflection/reflection-step0-guard.cjs` | 434   | GAP-D: \_MAX_REFLECTION_AGE_HOURS rename (staleness delegation) |
+| `.env.example`                                        | 2017  | Documentation of EXTERNAL_CONTENT_GUARD_MODE                    |
+| `tests/hooks/external-content-guard.test.cjs`         | 427   | 21 test scenarios for GAP-A/B/C                                 |
+| `tests/hooks/reflection-cleanup.test.cjs`             | 373   | 15 test scenarios for GAP-D                                     |
+| `.claude/lib/utils/safe-json.cjs`                     | 425   | Dependency: prototype pollution-safe JSON parsing               |
+| `.claude/lib/reflection/spawn-request-contract.cjs`   | 211   | Dependency: atomic spawn request operations                     |
 
 ---
 
@@ -34,58 +34,58 @@ Four Priority-1 supply chain security gaps were addressed in this changeset. The
 
 ### 1. Quarantine Logic (CRITICAL) -- PASS
 
-| Check | Status | Evidence |
-|-------|--------|----------|
-| Path traversal prevention | PASS | Lines 161-168: `path.resolve()` comparison with `resolvedDir + path.sep` prefix check. Both `startsWith` and exact-match guard present. |
-| Filename sanitization | PASS | Line 156: `domainRaw.replace(/[^a-z0-9.-]/gi, '-').slice(0, 50)` -- only alphanumeric, dots, hyphens allowed; length capped at 50 chars. Null bytes, path separators, and Windows reserved names are all stripped. |
-| Sensitive content exclusion | PASS | Lines 170-179: Only metadata fields written (timestamp, tool, url_or_command, domain, trust_level, action_taken). No request headers, cookies, auth tokens, or response bodies. |
-| Quarantine dir permissions | NOTE | `fs.mkdirSync({ recursive: true })` uses default OS permissions (typically 0o777 minus umask). Not a vulnerability in this context since the directory is within the project workspace, but explicit `0o750` would be defense-in-depth. See LOW-1. |
-| Fail-open guarantee | PASS | Lines 633-640 in main(): all unexpected errors caught, logged to stderr, and exit with code 0 (allow). Quarantine write failures in `writeQuarantineFile()` are also caught silently (best-effort). |
-| JSON injection in quarantine payload | PASS | `JSON.stringify()` with indent=2 handles all special characters safely. No template interpolation used. |
+| Check                                | Status | Evidence                                                                                                                                                                                                                                           |
+| ------------------------------------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Path traversal prevention            | PASS   | Lines 161-168: `path.resolve()` comparison with `resolvedDir + path.sep` prefix check. Both `startsWith` and exact-match guard present.                                                                                                            |
+| Filename sanitization                | PASS   | Line 156: `domainRaw.replace(/[^a-z0-9.-]/gi, '-').slice(0, 50)` -- only alphanumeric, dots, hyphens allowed; length capped at 50 chars. Null bytes, path separators, and Windows reserved names are all stripped.                                 |
+| Sensitive content exclusion          | PASS   | Lines 170-179: Only metadata fields written (timestamp, tool, url_or_command, domain, trust_level, action_taken). No request headers, cookies, auth tokens, or response bodies.                                                                    |
+| Quarantine dir permissions           | NOTE   | `fs.mkdirSync({ recursive: true })` uses default OS permissions (typically 0o777 minus umask). Not a vulnerability in this context since the directory is within the project workspace, but explicit `0o750` would be defense-in-depth. See LOW-1. |
+| Fail-open guarantee                  | PASS   | Lines 633-640 in main(): all unexpected errors caught, logged to stderr, and exit with code 0 (allow). Quarantine write failures in `writeQuarantineFile()` are also caught silently (best-effort).                                                |
+| JSON injection in quarantine payload | PASS   | `JSON.stringify()` with indent=2 handles all special characters safely. No template interpolation used.                                                                                                                                            |
 
 ### 2. Env Var Mode Switch -- GAP-A (HIGH) -- PASS
 
-| Check | Status | Evidence |
-|-------|--------|----------|
-| Block exit code correctness | PASS | Line 624: `process.exit(2)` is reached only when `result.action === 'block'`. No code path can bypass this. |
-| Default-to-warn correctness | PASS | Line 67: `if (!raw) return 'warn'` -- unset env var defaults to warn. Line 69: unrecognized values also default to warn. Backward-compatible. |
-| Off-mode early exit | PASS | Line 595: `getEnforcementMode() === 'off'` checked before `parseHookInputAsync()`. No stdin parsing or tool processing occurs in off mode. |
-| Env var injection resistance | PASS | Line 68: `raw.toLowerCase().trim()` applied before string comparison against a strict allowlist ('block', 'warn', 'off'). No eval, no template expansion. |
-| Case/whitespace handling | PASS | `toLowerCase().trim()` on line 68 handles `BLOCK`, ` warn `, `OFF`, etc. |
-| Mode consistency across handlers | PASS | Both `handleWebFetch` (lines 291, 337) and `handleBash` (lines 440, 537) call `getEnforcementMode()` at decision points. The function reads `process.env` each time (not cached), so mid-process changes are respected. |
+| Check                            | Status | Evidence                                                                                                                                                                                                                |
+| -------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Block exit code correctness      | PASS   | Line 624: `process.exit(2)` is reached only when `result.action === 'block'`. No code path can bypass this.                                                                                                             |
+| Default-to-warn correctness      | PASS   | Line 67: `if (!raw) return 'warn'` -- unset env var defaults to warn. Line 69: unrecognized values also default to warn. Backward-compatible.                                                                           |
+| Off-mode early exit              | PASS   | Line 595: `getEnforcementMode() === 'off'` checked before `parseHookInputAsync()`. No stdin parsing or tool processing occurs in off mode.                                                                              |
+| Env var injection resistance     | PASS   | Line 68: `raw.toLowerCase().trim()` applied before string comparison against a strict allowlist ('block', 'warn', 'off'). No eval, no template expansion.                                                               |
+| Case/whitespace handling         | PASS   | `toLowerCase().trim()` on line 68 handles `BLOCK`, `warn`, `OFF`, etc.                                                                                                                                                  |
+| Mode consistency across handlers | PASS   | Both `handleWebFetch` (lines 291, 337) and `handleBash` (lines 440, 537) call `getEnforcementMode()` at decision points. The function reads `process.env` each time (not cached), so mid-process changes are respected. |
 
 ### 3. gh api Enforcement -- GAP-C (HIGH) -- PASS
 
-| Check | Status | Evidence |
-|-------|--------|----------|
-| Org extraction regex | PASS | Line 393: `/gh\s+api\s+\/?(?:repos|orgs|users)\/([^/\s"']+)/i` handles `repos/ORG`, `orgs/ORG`, `users/ORG` with optional leading slash. Capture group `[^/\s"']+` prevents multi-segment captures. |
-| Trusted org comparison | PASS | Lines 437-438: Both sides lowercased before comparison via `.map(o => o.toLowerCase())` and `.toLowerCase()`. Case-insensitive match. |
-| False positive check (trusted orgs) | PASS | Test GAP-C-4 explicitly verifies trusted org `VoltAgent` is allowed in block mode. Line 438 uses `Array.includes()` for exact match (no partial/prefix matching). |
-| Null org handling | PASS | Line 436: `if (org && config)` -- null org from unmatched regex skips the untrusted check entirely. |
-| Multiple gh api calls | NOTE | Only the first `gh api` match is extracted (single regex exec). A command with two `gh api` calls would only check the first org. See INFO-1. |
-| Enforcement parity with WebFetch | PASS | Test GAP-C-6 verifies both WebFetch and gh api block consistently in block mode. Both use `getEnforcementMode()` identically. |
+| Check                               | Status | Evidence                                                                                                                                                          |
+| ----------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Org extraction regex                | PASS   | Line 393: `/gh\s+api\s+\/?(?:repos                                                                                                                                | orgs | users)\/([^/\s"']+)/i`handles`repos/ORG`, `orgs/ORG`, `users/ORG`with optional leading slash. Capture group`[^/\s"']+` prevents multi-segment captures. |
+| Trusted org comparison              | PASS   | Lines 437-438: Both sides lowercased before comparison via `.map(o => o.toLowerCase())` and `.toLowerCase()`. Case-insensitive match.                             |
+| False positive check (trusted orgs) | PASS   | Test GAP-C-4 explicitly verifies trusted org `VoltAgent` is allowed in block mode. Line 438 uses `Array.includes()` for exact match (no partial/prefix matching). |
+| Null org handling                   | PASS   | Line 436: `if (org && config)` -- null org from unmatched regex skips the untrusted check entirely.                                                               |
+| Multiple gh api calls               | NOTE   | Only the first `gh api` match is extracted (single regex exec). A command with two `gh api` calls would only check the first org. See INFO-1.                     |
+| Enforcement parity with WebFetch    | PASS   | Test GAP-C-6 verifies both WebFetch and gh api block consistently in block mode. Both use `getEnforcementMode()` identically.                                     |
 
 ### 4. Reflection Cleanup -- GAP-D (MEDIUM) -- PASS
 
-| Check | Status | Evidence |
-|-------|--------|----------|
-| processedReflectionIds validation | PASS | Line 52: `Array.isArray(processedIds) && processedIds.length > 0` -- guards against non-array and empty array. |
-| Delegation to contract module | PASS | Line 53: `removeRequests(SPAWN_REQUEST_PATH, processedIds)` uses atomic write via `atomicWriteJSONSync` in spawn-request-contract.cjs. |
-| Cross-session race condition | PASS | Lines 55-62: Processed IDs are also appended to `reflection-log.jsonl` so that `reflection-step0-guard.cjs` can filter them via `pruneAlreadyProcessedRequests()` even if spawn-request.json was not cleared before the next session. |
-| Legacy fallback | PASS | Lines 63-72: Task IDs with `task_completion:` or `session_end:` prefixes handled via the same `removeRequests` path. |
-| Fail-open on errors | PASS | Lines 87-89: All errors caught, hook exits with code 0. No blocking on cleanup failure. |
-| _MAX_REFLECTION_AGE_HOURS status | PASS | Declared at line 59 of step0-guard.cjs but staleness logic properly delegated to `spawn-request-contract.cjs` via `removeStaleRequests`. The underscore prefix correctly signals "private/unused in this scope." |
-| Reminder file cleanup | PASS | Lines 76-84: Reminder file only removed when remaining requests count is 0. Race-safe because `readSpawnRequestsFile` is a fresh read. |
+| Check                             | Status | Evidence                                                                                                                                                                                                                              |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| processedReflectionIds validation | PASS   | Line 52: `Array.isArray(processedIds) && processedIds.length > 0` -- guards against non-array and empty array.                                                                                                                        |
+| Delegation to contract module     | PASS   | Line 53: `removeRequests(SPAWN_REQUEST_PATH, processedIds)` uses atomic write via `atomicWriteJSONSync` in spawn-request-contract.cjs.                                                                                                |
+| Cross-session race condition      | PASS   | Lines 55-62: Processed IDs are also appended to `reflection-log.jsonl` so that `reflection-step0-guard.cjs` can filter them via `pruneAlreadyProcessedRequests()` even if spawn-request.json was not cleared before the next session. |
+| Legacy fallback                   | PASS   | Lines 63-72: Task IDs with `task_completion:` or `session_end:` prefixes handled via the same `removeRequests` path.                                                                                                                  |
+| Fail-open on errors               | PASS   | Lines 87-89: All errors caught, hook exits with code 0. No blocking on cleanup failure.                                                                                                                                               |
+| \_MAX_REFLECTION_AGE_HOURS status | PASS   | Declared at line 59 of step0-guard.cjs but staleness logic properly delegated to `spawn-request-contract.cjs` via `removeStaleRequests`. The underscore prefix correctly signals "private/unused in this scope."                      |
+| Reminder file cleanup             | PASS   | Lines 76-84: Reminder file only removed when remaining requests count is 0. Race-safe because `readSpawnRequestsFile` is a fresh read.                                                                                                |
 
 ### 5. Test Security -- PASS
 
-| Check | Status | Evidence |
-|-------|--------|----------|
-| No real network calls | PASS | All tests call exported handler functions directly (not main()). No HTTP requests made. One integration test in reflection-cleanup uses `spawnSync` on the local hook file only. |
-| Temp dir isolation | PASS | reflection-cleanup tests use `os.tmpdir()` + `fs.mkdtempSync`. external-content-guard tests use the real quarantine dir but clean up via `cleanupQuarantineFiles()` in afterEach. |
-| Env var restore | PASS | Both test files save/restore `process.env` state in beforeEach/afterEach hooks. |
-| No state leakage | PASS | `guard._resetCache()` called in beforeEach/afterEach in external-content-guard tests to prevent config cache bleed. |
-| Test coverage breadth | PASS | 21 tests cover GAP-A (5), GAP-B (7), GAP-C (6), regression (3). 15 tests cover reflection cleanup across 4 describe blocks. Both positive and negative cases present. |
+| Check                 | Status | Evidence                                                                                                                                                                          |
+| --------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No real network calls | PASS   | All tests call exported handler functions directly (not main()). No HTTP requests made. One integration test in reflection-cleanup uses `spawnSync` on the local hook file only.  |
+| Temp dir isolation    | PASS   | reflection-cleanup tests use `os.tmpdir()` + `fs.mkdtempSync`. external-content-guard tests use the real quarantine dir but clean up via `cleanupQuarantineFiles()` in afterEach. |
+| Env var restore       | PASS   | Both test files save/restore `process.env` state in beforeEach/afterEach hooks.                                                                                                   |
+| No state leakage      | PASS   | `guard._resetCache()` called in beforeEach/afterEach in external-content-guard tests to prevent config cache bleed.                                                               |
+| Test coverage breadth | PASS   | 21 tests cover GAP-A (5), GAP-B (7), GAP-C (6), regression (3). 15 tests cover reflection cleanup across 4 describe blocks. Both positive and negative cases present.             |
 
 ---
 
@@ -155,27 +155,27 @@ Four Priority-1 supply chain security gaps were addressed in this changeset. The
 
 ## OWASP Mapping
 
-| OWASP Category | Applicability | Status |
-|----------------|---------------|--------|
-| A01: Broken Access Control | Quarantine path traversal | MITIGATED (path.resolve check) |
-| A03: Injection | Env var injection, filename injection | MITIGATED (strict allowlist, sanitization) |
-| A05: Security Misconfiguration | Default enforcement mode | ACCEPTABLE (defaults to warn, not off) |
-| A09: Security Logging Failures | Audit trail for untrusted access | ADDRESSED (quarantine files + audit log) |
-| ASI01: Agent Goal Hijacking | External content influencing agent | ADDRESSED (block/warn/quarantine pipeline) |
-| ASI02: Tool Misuse | gh api to untrusted orgs | ADDRESSED (org trust verification) |
+| OWASP Category                 | Applicability                         | Status                                     |
+| ------------------------------ | ------------------------------------- | ------------------------------------------ |
+| A01: Broken Access Control     | Quarantine path traversal             | MITIGATED (path.resolve check)             |
+| A03: Injection                 | Env var injection, filename injection | MITIGATED (strict allowlist, sanitization) |
+| A05: Security Misconfiguration | Default enforcement mode              | ACCEPTABLE (defaults to warn, not off)     |
+| A09: Security Logging Failures | Audit trail for untrusted access      | ADDRESSED (quarantine files + audit log)   |
+| ASI01: Agent Goal Hijacking    | External content influencing agent    | ADDRESSED (block/warn/quarantine pipeline) |
+| ASI02: Tool Misuse             | gh api to untrusted orgs              | ADDRESSED (org trust verification)         |
 
 ---
 
 ## STRIDE Analysis (New Attack Surface)
 
-| Threat | Component | Assessment |
-|--------|-----------|------------|
-| **Spoofing** | Domain trust matching | MITIGATED -- exact match or `.` prefix subdomain matching prevents `evil-github.com` from matching `github.com` |
-| **Tampering** | Quarantine files | LOW RISK -- files are append-only metadata; no code execution based on quarantine content |
-| **Repudiation** | Enforcement actions | MITIGATED -- audit log and quarantine files provide dual evidence trail |
-| **Information Disclosure** | Quarantine file content | SAFE -- only metadata stored (no headers, tokens, cookies, or response bodies) |
-| **Denial of Service** | Quarantine dir fills disk | LOW RISK -- best-effort writes; failure does not block operations; no automatic growth loop |
-| **Elevation of Privilege** | Env var override to bypass | ACCEPTABLE -- `off` mode requires explicit operator action; default is `warn` |
+| Threat                     | Component                  | Assessment                                                                                                      |
+| -------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Spoofing**               | Domain trust matching      | MITIGATED -- exact match or `.` prefix subdomain matching prevents `evil-github.com` from matching `github.com` |
+| **Tampering**              | Quarantine files           | LOW RISK -- files are append-only metadata; no code execution based on quarantine content                       |
+| **Repudiation**            | Enforcement actions        | MITIGATED -- audit log and quarantine files provide dual evidence trail                                         |
+| **Information Disclosure** | Quarantine file content    | SAFE -- only metadata stored (no headers, tokens, cookies, or response bodies)                                  |
+| **Denial of Service**      | Quarantine dir fills disk  | LOW RISK -- best-effort writes; failure does not block operations; no automatic growth loop                     |
+| **Elevation of Privilege** | Env var override to bypass | ACCEPTABLE -- `off` mode requires explicit operator action; default is `warn`                                   |
 
 ---
 
@@ -201,11 +201,11 @@ The three LOW findings and two INFORMATIONAL items are non-blocking and suitable
 
 ## Checklist Summary
 
-| Category | Severity | Items | Pass | Fail | Notes |
-|----------|----------|-------|------|------|-------|
-| Quarantine Logic | CRITICAL | 6 | 6 | 0 | DIR permissions noted (LOW-1) |
-| Env Var Mode Switch | HIGH | 6 | 6 | 0 | Clean implementation |
-| gh api Enforcement | HIGH | 6 | 6 | 0 | Single-match noted (INFO-1) |
-| Reflection Cleanup | MEDIUM | 7 | 7 | 0 | Unused var noted (INFO-2) |
-| Test Security | STANDARD | 5 | 5 | 0 | Good isolation |
-| **Total** | | **30** | **30** | **0** | |
+| Category            | Severity | Items  | Pass   | Fail  | Notes                         |
+| ------------------- | -------- | ------ | ------ | ----- | ----------------------------- |
+| Quarantine Logic    | CRITICAL | 6      | 6      | 0     | DIR permissions noted (LOW-1) |
+| Env Var Mode Switch | HIGH     | 6      | 6      | 0     | Clean implementation          |
+| gh api Enforcement  | HIGH     | 6      | 6      | 0     | Single-match noted (INFO-1)   |
+| Reflection Cleanup  | MEDIUM   | 7      | 7      | 0     | Unused var noted (INFO-2)     |
+| Test Security       | STANDARD | 5      | 5      | 0     | Good isolation                |
+| **Total**           |          | **30** | **30** | **0** |                               |

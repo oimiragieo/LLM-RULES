@@ -9,37 +9,37 @@
 
 ## Reducer Stats
 
-| Metric | Count |
-|--------|-------|
-| Input lines | 9,755 |
-| Kept (issue-like) | 292 |
-| After noise removal | 140 |
-| After deduplication | 140 |
-| Reduction ratio | 98.6% |
+| Metric              | Count |
+| ------------------- | ----- |
+| Input lines         | 9,755 |
+| Kept (issue-like)   | 292   |
+| After noise removal | 140   |
+| After deduplication | 140   |
+| Reduction ratio     | 98.6% |
 
 ---
 
 ## Error Category Summary
 
-| # | Category | Occurrences | Severity |
-|---|----------|-------------|----------|
-| A | Hook PreToolUse:Write errors | 26 | CRITICAL |
-| B | File does not exist (Read errors) | 19 | HIGH |
-| C | Hook PreToolUse:TaskUpdate errors | 16 | HIGH |
-| D | Streaming stall events | 12 | HIGH |
-| E | Hook PreToolUse:Task errors | 8 | MEDIUM |
-| F | Bash tool errors | 8 | MEDIUM |
-| G | Hook PreToolUse:TaskList errors | 6 | MEDIUM |
-| H | File size / token limit exceeded | 4 | HIGH |
-| I | Streaming content block errors | 3 | MEDIUM |
-| J | Hook UserPromptSubmit errors | 3 | MEDIUM |
-| K | Write without prior Read | 2 | MEDIUM |
-| L | YAML frontmatter parse error | 2 | LOW |
-| M | WebFetch 404 errors | 2 | LOW |
-| N | Grep tool input error | 1 | LOW |
-| O | Hook PreToolUse:TaskCreate error | 1 | LOW |
-| P | Execution timeout (10s) | 1 | LOW |
-| Q | MCP auth failures (external noise) | 2 | IGNORE |
+| #   | Category                           | Occurrences | Severity |
+| --- | ---------------------------------- | ----------- | -------- |
+| A   | Hook PreToolUse:Write errors       | 26          | CRITICAL |
+| B   | File does not exist (Read errors)  | 19          | HIGH     |
+| C   | Hook PreToolUse:TaskUpdate errors  | 16          | HIGH     |
+| D   | Streaming stall events             | 12          | HIGH     |
+| E   | Hook PreToolUse:Task errors        | 8           | MEDIUM   |
+| F   | Bash tool errors                   | 8           | MEDIUM   |
+| G   | Hook PreToolUse:TaskList errors    | 6           | MEDIUM   |
+| H   | File size / token limit exceeded   | 4           | HIGH     |
+| I   | Streaming content block errors     | 3           | MEDIUM   |
+| J   | Hook UserPromptSubmit errors       | 3           | MEDIUM   |
+| K   | Write without prior Read           | 2           | MEDIUM   |
+| L   | YAML frontmatter parse error       | 2           | LOW      |
+| M   | WebFetch 404 errors                | 2           | LOW      |
+| N   | Grep tool input error              | 1           | LOW      |
+| O   | Hook PreToolUse:TaskCreate error   | 1           | LOW      |
+| P   | Execution timeout (10s)            | 1           | LOW      |
+| Q   | MCP auth failures (external noise) | 2           | IGNORE   |
 
 ---
 
@@ -48,6 +48,7 @@
 ### 1. Hook PreToolUse:Write Retry Loop (26 occurrences) — CRITICAL
 
 Highest-frequency error class. Two dense clusters:
+
 - 07:00-07:05: 14 errors from parallel agents
 - 07:07-07:12: 8 errors
 
@@ -56,11 +57,11 @@ Agents cannot see WHY they are blocked so they retry. The 07:00:02 and 07:00:03 
 confirms immediate retry without corrective action.
 
 Observable sequence:
-  07:00:02.837 Hook PreToolUse:Write error:
-  07:00:03.536 Hook PreToolUse:Write error:       <- 700ms retry
-  07:00:27.250 Write tool validation: File has not been read yet
-  07:01:19.469 Hook PreToolUse:Write error:       <- read attempted, still blocked
-  (continues 13 minutes)
+07:00:02.837 Hook PreToolUse:Write error:
+07:00:03.536 Hook PreToolUse:Write error: <- 700ms retry
+07:00:27.250 Write tool validation: File has not been read yet
+07:01:19.469 Hook PreToolUse:Write error: <- read attempted, still blocked
+(continues 13 minutes)
 
 Impact: ~13 minutes of blocked execution contributing to 12 streaming stalls.
 
@@ -71,17 +72,17 @@ Impact: ~13 minutes of blocked execution contributing to 12 streaming stalls.
 TaskUpdate calls blocked, preventing task lifecycle transitions.
 
 6-error burst at 06:57:04-06:57:12:
-  06:57:04.008 Hook PreToolUse:TaskUpdate error:
-  06:57:04.035 Hook PreToolUse:TaskUpdate error:  <- 27ms gap (parallel agents)
-  06:57:08.479 Hook PreToolUse:TaskUpdate error:
-  06:57:08.513 Hook PreToolUse:TaskUpdate error:  <- 34ms gap (parallel agents)
-  06:57:12.582 Hook PreToolUse:TaskUpdate error:
+06:57:04.008 Hook PreToolUse:TaskUpdate error:
+06:57:04.035 Hook PreToolUse:TaskUpdate error: <- 27ms gap (parallel agents)
+06:57:08.479 Hook PreToolUse:TaskUpdate error:
+06:57:08.513 Hook PreToolUse:TaskUpdate error: <- 34ms gap (parallel agents)
+06:57:12.582 Hook PreToolUse:TaskUpdate error:
 
 Three near-simultaneous pairs = two parallel agents attempting TaskUpdate on same task.
 pre-completion-validation.cjs blocking both due to missing evidence metadata.
 
 4-error burst at 07:12:04-07:12:05:
-  Four errors within 465ms = single agent retrying completed status four times.
+Four errors within 465ms = single agent retrying completed status four times.
 
 ---
 
@@ -92,8 +93,8 @@ Cumulative stall time: ~1,133 seconds (~19 minutes of 48-minute session).
 Stall durations: 63.7s, 260.2s, 88.3s, 178.9s, 102.0s, 119.0s, 88.3s, 32.5s, 43.7s, 44.0s, 43.5s, 69.1s
 
 The 260-second stall (most severe) immediately followed by blocked dangerous command:
-  06:39:42.761 Streaming stall detected: 260.2s gap
-  06:39:45.338 Hook PreToolUse:Bash error: BLOCKED Dangerous Command Detected
+06:39:42.761 Streaming stall detected: 260.2s gap
+06:39:45.338 Hook PreToolUse:Bash error: BLOCKED Dangerous Command Detected
 
 Pattern: every major stall is followed by a hook block. Model computes for minutes, produced action is rejected.
 
@@ -104,11 +105,11 @@ Pattern: every major stall is followed by a hook block. Model computes for minut
 19 failed Read attempts at 5-6ms each (immediate, no I/O — path wrong before filesystem consulted).
 
 Dense cluster at 07:04:46-07:05:20 (14 errors in 34 seconds, 7 simultaneous pairs):
-  07:04:46.784 Read error: File does not exist.
-  07:04:46.785 Read error: File does not exist.   <- simultaneous (two parallel agents)
-  07:04:47.161 Read error: File does not exist.
-  07:04:47.161 Read error: File does not exist.   <- simultaneous
-  (5 more pairs...)
+07:04:46.784 Read error: File does not exist.
+07:04:46.785 Read error: File does not exist. <- simultaneous (two parallel agents)
+07:04:47.161 Read error: File does not exist.
+07:04:47.161 Read error: File does not exist. <- simultaneous
+(5 more pairs...)
 
 Root cause: Windows path separator issues (backslash vs forward slash) + agents constructing
 relative paths instead of absolute paths.
@@ -119,10 +120,10 @@ relative paths instead of absolute paths.
 
 Agents reading large files without checking token budget first via pnpm search:tokens.
 
-  06:32:45.997 MaxFileReadTokenExceededError: File content (26836 tokens) exceeds 25000
-  07:17:21.917 FileTooLargeError: File content (437.6KB) exceeds 256KB
-  07:19:28.517 FileTooLargeError: File content (331.3KB) exceeds 256KB
-  07:19:29.123 MaxFileReadTokenExceededError: File content (30729 tokens) exceeds 25000
+06:32:45.997 MaxFileReadTokenExceededError: File content (26836 tokens) exceeds 25000
+07:17:21.917 FileTooLargeError: File content (437.6KB) exceeds 256KB
+07:19:28.517 FileTooLargeError: File content (331.3KB) exceeds 256KB
+07:19:29.123 MaxFileReadTokenExceededError: File content (30729 tokens) exceeds 25000
 
 The 437.6KB and 331.3KB reads at 07:19 (1 second apart) are two parallel agents loading large
 files in a context-exhaustion survival pattern near session end.
@@ -135,22 +136,26 @@ Windows OS argument length limit.
 ## Additional Findings
 
 ### YAML Frontmatter Corruption
-  07:10:57.421 WARN: Failed to parse YAML frontmatter in
-               C:/dev/projects/agent-studio/.claude/skills/sharp-edges/SKILL.md
-               YAML Parse error: Unexpected token
+
+07:10:57.421 WARN: Failed to parse YAML frontmatter in
+C:/dev/projects/agent-studio/.claude/skills/sharp-edges/SKILL.md
+YAML Parse error: Unexpected token
 Fires every time skill catalog is scanned. P0 fix required.
 
 ### Hook PreToolUse:TaskList Errors (6 occurrences)
+
 Consistent with reflection-step0-guard.cjs enforcement blocking TaskList when pending
 reflections exist. Expected behavior but represents time lost waiting for reflection
 processing before pipeline can continue.
 
 ### MCP Authentication Failure (ignorable startup noise)
-  06:31:18.665 MCP server claude.ai Stripe: authentication_error
+
+06:31:18.665 MCP server claude.ai Stripe: authentication_error
 Stripe MCP not configured with OAuth. External noise, not a framework error.
 
 ### Streaming Content Block Error (3 occurrences)
-  06:33:51.035 Error streaming, falling back to non-streaming mode: Content block input is not a string
+
+06:33:51.035 Error streaming, falling back to non-streaming mode: Content block input is not a string
 SDK-level error. Falls back to non-streaming automatically but adds latency.
 
 ---
@@ -162,6 +167,7 @@ SDK-level error. Falls back to non-streaming automatically but adds latency.
 ASSESSMENT: NO — insufficient. A dedicated debug-log-analysis skill is needed.
 
 ### What IS captured (sufficient):
+
 - Error type and timestamp
 - Hook name that fired
 - Tool name in use when errors occur
@@ -196,6 +202,7 @@ which tasks completed vs which were abandoned.
 ## Recommendation: Build debug-log-analysis Skill
 
 A dedicated skill with companion Node.js script that:
+
 1. Ingests raw Claude Code debug logs
 2. Extracts hook stderr content from surrounding context (not just error markers)
 3. Cross-references spawn-log.jsonl to map errors to agent instances and task IDs
@@ -211,16 +218,16 @@ that contains the primary diagnostic evidence. A context-preserving mode is need
 
 ## Action Items
 
-| Priority | Action | Owner |
-|----------|--------|-------|
-| P0 | Repair sharp-edges SKILL.md YAML frontmatter syntax error | developer |
-| P0 | Fix hook error logging to capture rejection message body in debug log | developer |
-| P1 | Add task ID and agent spawn ID to all hook error log lines | developer |
-| P1 | Include attempted file path in Read file-does-not-exist error lines | developer |
-| P1 | Build debug-log-analysis skill with structured JSON output | skill-creator |
-| P2 | Enforce pnpm search:tokens check before large file reads in agent prompts | technical-writer |
-| P2 | Add Windows ENAMETOOLONG guard in Bash tool pre-hook | developer |
-| P3 | Configure Stripe MCP OAuth or remove from settings.json | devops |
+| Priority | Action                                                                    | Owner            |
+| -------- | ------------------------------------------------------------------------- | ---------------- |
+| P0       | Repair sharp-edges SKILL.md YAML frontmatter syntax error                 | developer        |
+| P0       | Fix hook error logging to capture rejection message body in debug log     | developer        |
+| P1       | Add task ID and agent spawn ID to all hook error log lines                | developer        |
+| P1       | Include attempted file path in Read file-does-not-exist error lines       | developer        |
+| P1       | Build debug-log-analysis skill with structured JSON output                | skill-creator    |
+| P2       | Enforce pnpm search:tokens check before large file reads in agent prompts | technical-writer |
+| P2       | Add Windows ENAMETOOLONG guard in Bash tool pre-hook                      | developer        |
+| P3       | Configure Stripe MCP OAuth or remove from settings.json                   | devops           |
 
 ---
 

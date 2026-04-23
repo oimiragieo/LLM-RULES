@@ -17,12 +17,12 @@ The existing creator infrastructure is well-structured but has **moderate duplic
 
 ### Key Findings
 
-| Category | Rating | Priority |
-|----------|--------|----------|
-| **Code Duplication** | 🟡 Medium (15-20%) | P1 |
-| **Unnecessary Complexity** | 🟡 Medium | P2 |
-| **Dead Code Risk** | 🟢 Low | P3 |
-| **Readiness for Extension** | 🟡 Medium | P1 |
+| Category                    | Rating             | Priority |
+| --------------------------- | ------------------ | -------- |
+| **Code Duplication**        | 🟡 Medium (15-20%) | P1       |
+| **Unnecessary Complexity**  | 🟡 Medium          | P2       |
+| **Dead Code Risk**          | 🟢 Low             | P3       |
+| **Readiness for Extension** | 🟡 Medium          | P1       |
 
 ### Recommendations
 
@@ -39,10 +39,12 @@ The existing creator infrastructure is well-structured but has **moderate duplic
 
 **Instances Found:** 2 (100% identical)
 **Files:**
+
 - `.claude/lib/creators/creator-commons.cjs` (lines 43-61)
 - `.claude/lib/creators/ecosystem-impact-analyzer.cjs` (lines 36-53)
 
 **Duplication:**
+
 ```javascript
 // DUPLICATE 1: creator-commons.cjs
 function safeParseJSON(str) {
@@ -69,6 +71,7 @@ function safeParseJSON(str) {
 **Duplication:** This EXACT function appears in both files.
 
 **Impact:**
+
 - **LOC duplicated:** 19 lines × 2 = 38 lines
 - **Risk:** Bug fixes must be applied twice
 - **Maintenance:** Double the testing burden
@@ -109,6 +112,7 @@ module.exports = { safeParseJSON };
 ```
 
 **Import pattern:**
+
 ```javascript
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 ```
@@ -121,16 +125,19 @@ const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 **Instances Found:** 3 (pattern variations)
 **Files:**
+
 - `.claude/hooks/routing/unified-creator-guard.cjs` (line 198)
 - `.claude/lib/creators/ecosystem-impact-analyzer.cjs` (line 163-170)
 - `.claude/hooks/workflow/post-creation-integration.cjs` (various)
 
 **Pattern 1: Simple normalization (unified-creator-guard.cjs:198)**
+
 ```javascript
 const normalizedPath = filePath.replace(/\\/g, '/');
 ```
 
 **Pattern 2: Basename extraction (ecosystem-impact-analyzer.cjs:163-170)**
+
 ```javascript
 const artifactName = path
   .basename(artifactPath, path.extname(artifactPath))
@@ -142,6 +149,7 @@ const parentDir = path.basename(path.dirname(artifactPath)).toLowerCase();
 ```
 
 **Pattern 3: Queue paths (post-creation-integration.cjs)**
+
 ```javascript
 const QUEUE_PATH = path.join(
   PROJECT_ROOT,
@@ -153,6 +161,7 @@ const QUEUE_PATH = path.join(
 ```
 
 **Impact:**
+
 - **Consistency risk:** 3 different approaches to path handling
 - **Windows path bugs:** Learned from memory (backslash vs forward slash issues)
 - **Maintenance:** Each file implements path logic differently
@@ -213,9 +222,11 @@ module.exports = {
 
 **Instances Found:** 1 (but exported from creator-commons.cjs)
 **Files:**
+
 - `.claude/lib/creators/creator-commons.cjs` (line 36, exported line 359)
 
 **Current state:**
+
 ```javascript
 const PROVENANCE_REGEX = /^<!--\s*Agent:\s*\S+\s*\|\s*Task:\s*#?\S+\s*\|\s*Session:\s*\S+\s*-->/;
 ```
@@ -236,7 +247,8 @@ All 4 creators (`agent-creator`, `skill-creator`, `hook-creator`, `workflow-crea
 3. **Artifact-updater delegation code** (same pattern)
 
 **Pattern (from agent-creator:66-93):**
-```markdown
+
+````markdown
 ### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
 
 **BEFORE creating any agent file, check if it already exists:**
@@ -245,6 +257,7 @@ All 4 creators (`agent-creator`, `skill-creator`, `hook-creator`, `workflow-crea
    ```bash
    test -f .claude/agents/<category>/<agent-name>.md && echo "EXISTS" || echo "NEW"
    ```
+````
 
 2. **If agent EXISTS:**
    - **DO NOT proceed with creation**
@@ -257,7 +270,8 @@ All 4 creators (`agent-creator`, `skill-creator`, `hook-creator`, `workflow-crea
      ```
    - **Return updater result to user**
    - **STOP HERE** - Do not continue with creation steps
-```
+
+````
 
 **Impact:**
 - **Prose duplication:** ~30 lines × 4 = 120 lines of nearly identical text
@@ -277,7 +291,7 @@ Create shared template file:
 1. **Check if {ARTIFACT_TYPE} already exists:**
    ```bash
    test -f {ARTIFACT_PATH_PATTERN} && echo "EXISTS" || echo "NEW"
-   ```
+````
 
 2. **If {ARTIFACT_TYPE} EXISTS:**
    - **DO NOT proceed with creation**
@@ -293,12 +307,13 @@ Create shared template file:
 
 3. **If {ARTIFACT_TYPE} is NEW:**
    - Continue to Step 1 below (verification and creation steps)
-```
+
+````
 
 **Inclusion pattern (in each creator SKILL.md):**
 ```markdown
 {INCLUDE:.claude/templates/creator-common-sections.md#step-0}
-```
+````
 
 **Why this matters for companion matrix:** Companion matrix will add new creators (command-creator, rule-creator, tool-creator). Without template extraction, Step 0 pattern duplicates 7 times instead of 4.
 
@@ -324,6 +339,7 @@ This reduces 120 lines of duplication to 3 lines per creator.
 **Location:** `checkSingleItem` function (lines 197-217)
 
 **Current complexity:**
+
 ```javascript
 function checkSingleItem(item, artifactPath, artifactName, parentDir) {
   // For items with a target file, check if the artifact is referenced in it
@@ -349,11 +365,13 @@ function checkSingleItem(item, artifactPath, artifactName, parentDir) {
 ```
 
 **Issues:**
+
 1. **Nested if statements** (2 levels)
 2. **Guard clause pattern** could simplify early returns
 3. **Magic conditional:** `parentDir || artifactName` - why prioritize parentDir?
 
 **Simplified version:**
+
 ```javascript
 function checkSingleItem(item, artifactPath, artifactName, parentDir) {
   // Early return for items without target
@@ -378,6 +396,7 @@ function checkSingleItem(item, artifactPath, artifactName, parentDir) {
 ```
 
 **Changes:**
+
 1. **Guard clause:** Early return for no-target case (reduces nesting)
 2. **Combined toLowerCase():** Apply to content once, not in searchName logic
 3. **Inline comment:** Explain why `parentDir || artifactName` (skill-specific logic)
@@ -393,11 +412,13 @@ function checkSingleItem(item, artifactPath, artifactName, parentDir) {
 **Location:** `validateSchema` function (lines 198-302)
 
 **Complexity metrics:**
+
 - **Lines:** 105 lines
 - **Cyclomatic complexity:** ~12 (multiple nested conditionals)
 - **Responsibility:** 4 distinct operations (load schema, check required, validate types, validate patterns)
 
 **Current structure:**
+
 ```javascript
 function validateSchema(artifactType, content) {
   const errors = [];
@@ -531,7 +552,11 @@ function validateFieldTypes(content, schema) {
     }
 
     // MinLength for strings
-    if (fieldSchema.minLength && typeof value === 'string' && value.length < fieldSchema.minLength) {
+    if (
+      fieldSchema.minLength &&
+      typeof value === 'string' &&
+      value.length < fieldSchema.minLength
+    ) {
       errors.push(`Field '${field}' is too short (min ${fieldSchema.minLength} chars)`);
     }
   }
@@ -541,6 +566,7 @@ function validateFieldTypes(content, schema) {
 ```
 
 **Benefits:**
+
 1. **Single Responsibility:** Each function does one thing
 2. **Testability:** Can unit test `validateRequiredFields` in isolation
 3. **Readability:** Main function reads like a checklist
@@ -558,11 +584,13 @@ function validateFieldTypes(content, schema) {
 **Location:** `isCreatorCompletion` function (lines 47-84)
 
 **Complexity:**
+
 - Two detection methods (metadata vs pattern matching)
 - 7 regex patterns for creator detection
 - Nested loop through patterns
 
 **Current:**
+
 ```javascript
 function isCreatorCompletion(hookData) {
   const toolInput = hookData?.toolUse?.input || {};
@@ -602,6 +630,7 @@ function isCreatorCompletion(hookData) {
 2. **Metadata-first:** Metadata is the authoritative source (pattern matching is fallback)
 
 **Simplified:**
+
 ```javascript
 // Module-level constant (defined once, not per-call)
 const CREATOR_TYPE_PATTERNS = [
@@ -611,7 +640,11 @@ const CREATOR_TYPE_PATTERNS = [
   { pattern: /creat(e|ed|ing)\s+(new\s+)?workflow/i, type: 'workflow' },
   { pattern: /creat(e|ed|ing)\s+(new\s+)?template/i, type: 'template' },
   { pattern: /creat(e|ed|ing)\s+(new\s+)?schema/i, type: 'schema' },
-  { pattern: /skill-creator|agent-creator|hook-creator|workflow-creator|template-creator|schema-creator/i, type: 'unknown' },
+  {
+    pattern:
+      /skill-creator|agent-creator|hook-creator|workflow-creator|template-creator|schema-creator/i,
+    type: 'unknown',
+  },
 ];
 
 function isCreatorCompletion(hookData) {
@@ -631,13 +664,12 @@ function isCreatorCompletion(hookData) {
   const text = `${toolInput.metadata?.summary || ''} ${toolInput.metadata?.subject || ''}`;
   const matchedPattern = CREATOR_TYPE_PATTERNS.find(({ pattern }) => pattern.test(text));
 
-  return matchedPattern
-    ? { match: true, creatorType: matchedPattern.type }
-    : { match: false };
+  return matchedPattern ? { match: true, creatorType: matchedPattern.type } : { match: false };
 }
 ```
 
 **Benefits:**
+
 1. **Performance:** Patterns defined once (not recreated on every call)
 2. **Readability:** `find()` is more concise than `for...of` loop
 3. **Maintainability:** Adding new creator type = 1 line in constant
@@ -651,17 +683,18 @@ function isCreatorCompletion(hookData) {
 ### 3.1 creator-commons.cjs: All Functions Used ✅
 
 **Exports (lines 351-361):**
+
 ```javascript
 module.exports = {
-  validatePostCreation,      // ✅ Used by runIntegrationChecklist (line 318)
-  updateCatalog,             // ✅ Used by creator skills
-  queueCrossCreatorReview,   // ✅ Used by creator skills + post-creation hook
-  validateSchema,            // ✅ Used by runIntegrationChecklist (line 328)
-  runIntegrationChecklist,   // ✅ Used by creator skills
+  validatePostCreation, // ✅ Used by runIntegrationChecklist (line 318)
+  updateCatalog, // ✅ Used by creator skills
+  queueCrossCreatorReview, // ✅ Used by creator skills + post-creation hook
+  validateSchema, // ✅ Used by runIntegrationChecklist (line 328)
+  runIntegrationChecklist, // ✅ Used by creator skills
   // Internal exports for testing
-  SCHEMA_MAP,                // ✅ Used by tests
-  PROVENANCE_REGEX,          // ✅ Used by tests
-  safeParseJSON,             // ✅ Used internally + tests
+  SCHEMA_MAP, // ✅ Used by tests
+  PROVENANCE_REGEX, // ✅ Used by tests
+  safeParseJSON, // ✅ Used internally + tests
 };
 ```
 
@@ -672,14 +705,15 @@ module.exports = {
 ### 3.2 ecosystem-impact-analyzer.cjs: All Functions Used ✅
 
 **Exports (lines 219-226):**
+
 ```javascript
 module.exports = {
-  analyzeImpact,              // ✅ Used by artifact-integrator skill
-  checkMustHaveCompletion,    // ✅ Used by artifact-integrator skill
+  analyzeImpact, // ✅ Used by artifact-integrator skill
+  checkMustHaveCompletion, // ✅ Used by artifact-integrator skill
   // Internal exports for testing
-  loadImpactGraph,            // ✅ Used by tests
-  safeParseJSON,              // ✅ Used internally
-  IMPACT_GRAPH_PATH,          // ✅ Used by tests
+  loadImpactGraph, // ✅ Used by tests
+  safeParseJSON, // ✅ Used internally
+  IMPACT_GRAPH_PATH, // ✅ Used by tests
 };
 ```
 
@@ -693,10 +727,12 @@ module.exports = {
 **Function:** `checkSingleItem` (lines 197-217)
 
 **Current state:**
+
 - Internal function (not exported)
 - Only called by `checkMustHaveCompletion` (line 173)
 
 **Risk assessment:**
+
 - ✅ **Currently used** (called from `checkMustHaveCompletion`)
 - ⚠️ **No direct tests** (only tested via `checkMustHaveCompletion`)
 
@@ -709,11 +745,13 @@ module.exports = {
 ### 4.1 Current Architecture: Extensible ✅
 
 **Strengths:**
+
 1. **Centralized config:** `ecosystem-impact-graph.json` is single source of truth
 2. **Type-driven:** Easy to add new artifact types (just add to graph JSON)
 3. **Modular:** Creator-commons is independent of specific creators
 
 **Gaps:**
+
 1. **Path utilities:** No centralized path normalization (see Section 1.2)
 2. **JSON utilities:** `safeParseJSON` duplicated (see Section 1.1)
 3. **Creator prose:** Step 0 duplicated across 4 creators (see Section 1.4)
@@ -733,14 +771,14 @@ module.exports = {
 
 **Impact on existing code:**
 
-| Component | Change Required | Complexity |
-|-----------|-----------------|------------|
-| `creator-commons.cjs` | ✅ None (extends naturally) | Low |
-| `ecosystem-impact-analyzer.cjs` | ✅ None (graph-driven) | Low |
-| `ecosystem-impact-graph.json` | ✅ Add companion edges | Low |
-| Creator skills | ⚠️ Add companion checks | Medium |
-| `unified-creator-guard.cjs` | ✅ Already supports command/rule/tool | Low |
-| `post-creation-integration.cjs` | ⚠️ Add companion validation | Medium |
+| Component                       | Change Required                       | Complexity |
+| ------------------------------- | ------------------------------------- | ---------- |
+| `creator-commons.cjs`           | ✅ None (extends naturally)           | Low        |
+| `ecosystem-impact-analyzer.cjs` | ✅ None (graph-driven)                | Low        |
+| `ecosystem-impact-graph.json`   | ✅ Add companion edges                | Low        |
+| Creator skills                  | ⚠️ Add companion checks               | Medium     |
+| `unified-creator-guard.cjs`     | ✅ Already supports command/rule/tool | Low        |
+| `post-creation-integration.cjs` | ⚠️ Add companion validation           | Medium     |
 
 **Conclusion:** Current architecture is extensible but will benefit from simplification BEFORE adding companion features.
 
@@ -751,18 +789,21 @@ module.exports = {
 ### P1 (BEFORE Companion Matrix Implementation)
 
 **1. Extract `safeParseJSON` to shared utility**
+
 - **Impact:** Prevents 3rd duplication in companion matrix code
 - **Effort:** 15 minutes
 - **Files:** Create `.claude/lib/utils/safe-json.cjs`, update 2 importers
 - **Risk:** Low (simple extraction)
 
 **2. Extract path utilities to shared module**
+
 - **Impact:** Prevents Windows path bugs in companion matrix
 - **Effort:** 30 minutes
 - **Files:** Create `.claude/lib/utils/path-helpers.cjs`, update 3 importers
 - **Risk:** Low (pure functions, easy to test)
 
 **3. Templatize Step 0 in creator skills**
+
 - **Impact:** Prevents 7th duplication when adding command/rule/tool creators
 - **Effort:** 45 minutes
 - **Files:** Update 4 existing creator SKILL.md files
@@ -773,12 +814,14 @@ module.exports = {
 ### P2 (DURING Companion Matrix Implementation)
 
 **4. Simplify `checkSingleItem` in ecosystem-impact-analyzer.cjs**
+
 - **Impact:** Makes companion checks easier to understand
 - **Effort:** 15 minutes
 - **Files:** `.claude/lib/creators/ecosystem-impact-analyzer.cjs`
 - **Risk:** Low (covered by existing tests)
 
 **5. Extract validation sub-functions from `validateSchema`**
+
 - **Impact:** Makes companion schema validation easier to extend
 - **Effort:** 60 minutes
 - **Files:** `.claude/lib/creators/creator-commons.cjs`
@@ -786,6 +829,7 @@ module.exports = {
 - **Decision:** Only apply if companion matrix adds 3+ new schema validation rules
 
 **6. Move creator patterns to module-level constant**
+
 - **Impact:** Makes adding companion creators easier
 - **Effort:** 5 minutes
 - **Files:** `.claude/hooks/workflow/post-creation-integration.cjs`
@@ -796,12 +840,14 @@ module.exports = {
 ### P3 (POST Companion Matrix Implementation)
 
 **7. Add usage metrics to detect dead code**
+
 - **Impact:** Prevents accumulation of unused functions
 - **Effort:** 120 minutes
 - **Files:** Add telemetry to creator-commons and ecosystem-impact-analyzer
 - **Risk:** Low (opt-in feature)
 
 **8. Add test coverage for `checkSingleItem`**
+
 - **Impact:** Prevents regression in companion checks
 - **Effort:** 30 minutes
 - **Files:** Create new test file or extend existing
@@ -813,24 +859,24 @@ module.exports = {
 
 ### Before Simplification
 
-| File | LOC | Functions | Cyclomatic Complexity | Duplication |
-|------|-----|-----------|----------------------|-------------|
-| `creator-commons.cjs` | 362 | 6 | ~8 avg | 19 lines (safeParseJSON) |
-| `ecosystem-impact-analyzer.cjs` | 227 | 5 | ~6 avg | 19 lines (safeParseJSON) |
-| Creator skills (4 total) | ~800 | - | - | 120 lines (Step 0 prose) |
-| `unified-creator-guard.cjs` | 400+ | 10+ | ~10 avg | 0 |
-| `post-creation-integration.cjs` | 350+ | 8 | ~7 avg | 0 |
+| File                            | LOC  | Functions | Cyclomatic Complexity | Duplication              |
+| ------------------------------- | ---- | --------- | --------------------- | ------------------------ |
+| `creator-commons.cjs`           | 362  | 6         | ~8 avg                | 19 lines (safeParseJSON) |
+| `ecosystem-impact-analyzer.cjs` | 227  | 5         | ~6 avg                | 19 lines (safeParseJSON) |
+| Creator skills (4 total)        | ~800 | -         | -                     | 120 lines (Step 0 prose) |
+| `unified-creator-guard.cjs`     | 400+ | 10+       | ~10 avg               | 0                        |
+| `post-creation-integration.cjs` | 350+ | 8         | ~7 avg                | 0                        |
 
 **Total duplication:** ~158 lines across 7 files
 
 ### After P1 Simplification (Recommended)
 
-| Component | LOC Saved | Maintenance Burden Reduced |
-|-----------|-----------|---------------------------|
-| Extract `safeParseJSON` | -38 lines | 50% (2 copies → 1) |
-| Extract path utilities | -20 lines | 67% (3 patterns → 1) |
-| Templatize Step 0 | -100 lines | 75% (4 duplicates → 1 template) |
-| **Total** | **-158 lines** | **~64% reduction** |
+| Component               | LOC Saved      | Maintenance Burden Reduced      |
+| ----------------------- | -------------- | ------------------------------- |
+| Extract `safeParseJSON` | -38 lines      | 50% (2 copies → 1)              |
+| Extract path utilities  | -20 lines      | 67% (3 patterns → 1)            |
+| Templatize Step 0       | -100 lines     | 75% (4 duplicates → 1 template) |
+| **Total**               | **-158 lines** | **~64% reduction**              |
 
 ---
 
@@ -862,17 +908,17 @@ This prevents duplication from 158 lines → 316+ lines and reduces Windows path
 
 ## 8. Appendix: Files Analyzed
 
-| File | Lines Read | Purpose |
-|------|-----------|---------|
-| `.claude/lib/creators/creator-commons.cjs` | 362 (full) | Shared creator functions |
-| `.claude/lib/creators/ecosystem-impact-analyzer.cjs` | 227 (full) | Impact analysis |
-| `.claude/context/data/ecosystem-impact-graph.json` | 327 (full) | Dependency graph |
-| `.claude/skills/artifact-integrator/SKILL.md` | 267 (full) | Integration skill |
-| `.claude/skills/agent-creator/SKILL.md` | 200 (partial) | Agent creator |
-| `.claude/skills/skill-creator/SKILL.md` | 200 (partial) | Skill creator |
-| `.claude/skills/hook-creator/SKILL.md` | 200 (partial) | Hook creator |
-| `.claude/hooks/routing/unified-creator-guard.cjs` | 200 (partial) | Creator enforcement |
-| `.claude/hooks/workflow/post-creation-integration.cjs` | 200 (partial) | Post-creation hook |
+| File                                                   | Lines Read    | Purpose                  |
+| ------------------------------------------------------ | ------------- | ------------------------ |
+| `.claude/lib/creators/creator-commons.cjs`             | 362 (full)    | Shared creator functions |
+| `.claude/lib/creators/ecosystem-impact-analyzer.cjs`   | 227 (full)    | Impact analysis          |
+| `.claude/context/data/ecosystem-impact-graph.json`     | 327 (full)    | Dependency graph         |
+| `.claude/skills/artifact-integrator/SKILL.md`          | 267 (full)    | Integration skill        |
+| `.claude/skills/agent-creator/SKILL.md`                | 200 (partial) | Agent creator            |
+| `.claude/skills/skill-creator/SKILL.md`                | 200 (partial) | Skill creator            |
+| `.claude/skills/hook-creator/SKILL.md`                 | 200 (partial) | Hook creator             |
+| `.claude/hooks/routing/unified-creator-guard.cjs`      | 200 (partial) | Creator enforcement      |
+| `.claude/hooks/workflow/post-creation-integration.cjs` | 200 (partial) | Post-creation hook       |
 
 **Total:** ~2,183 lines analyzed across 9 files
 

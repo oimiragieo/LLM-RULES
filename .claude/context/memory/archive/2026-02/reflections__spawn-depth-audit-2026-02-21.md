@@ -25,6 +25,7 @@ Lines 224 and 272 of `ecosystem-creation-workflow.md` state:
 > **Enforcement**: `routing-guard.cjs` reads `spawnDepth` from parent task metadata (via TaskGet) before allowing Task() calls. If depth >= 5, blocks spawn with error.
 
 The protocol describes (lines 218–222):
+
 1. Root orchestrator sets `spawnDepth: 0` and `traceId: <uuid>` in TaskUpdate metadata
 2. Each spawned agent reads parent task's metadata via TaskGet to extract `spawnDepth` and `traceId`
 3. Each spawned agent increments `spawnDepth` by 1 before spawning its children
@@ -34,11 +35,13 @@ The protocol describes (lines 218–222):
 ### What routing-guard.cjs Actually Does
 
 **File chain:**
+
 - `routing-guard.cjs` → `routing-guard-core.cjs` → `routing-guard-core.impl.cjs`
 
-Search results for `spawnDepth`, `TaskGet`, `depth`, `recursion` in all routing-guard-*.cjs files: **ZERO matches**.
+Search results for `spawnDepth`, `TaskGet`, `depth`, `recursion` in all routing-guard-\*.cjs files: **ZERO matches**.
 
 `routing-guard-core.impl.cjs` exports these checks:
+
 - `checkTaskPayloadContract` — validates task_id in prompt
 - `checkPlannerFirst` — planner-first gate
 - `checkTaskCreate` — task create restrictions
@@ -71,6 +74,7 @@ if (loopState.spawnDepth >= depthLimit) {
 ```
 
 **Implementation details:**
+
 - Mechanism: File-based shared state in `.claude/context/self-healing/loop-state.json`
 - Manager: `.claude/lib/self-healing/loop-state-manager.cjs`
 - Default depth limit: `5` (via `DEFAULT_DEPTH_LIMIT` constant in `pre-task-unified-helpers.cjs`)
@@ -85,6 +89,7 @@ if (loopState.spawnDepth >= depthLimit) {
 ### Companion-check.cjs SEC-ICE-002 Implementation
 
 `@ENFORCEMENT_HOOKS.md` (Section 13) documents SEC-ICE-002 in `companion-check.cjs`:
+
 - Depth limit: 2 (not 5)
 - Per-event cap: 5 spawns
 - Cycle detection via DAG tracking
@@ -96,12 +101,12 @@ This covers **companion auto-spawn amplification** specifically, which is a diff
 
 ## Gap Analysis
 
-| Control Layer | Documented | Implemented | Mechanism |
-|---|---|---|---|
-| routing-guard.cjs TaskGet depth check | YES (ecosystem-creation-workflow.md) | **NO** | Not present |
-| pre-task-unified depth check | Not mentioned in SEC-ICE-002 doc | **YES** | loop-state.json, default limit 5 |
-| companion-check.cjs depth limit | YES (@ENFORCEMENT_HOOKS.md) | YES | In-memory, limit 2 |
-| Spawn trace log per traceId | YES (ecosystem-creation-workflow.md) | **NO** | No spawn-trace-*.jsonl files written |
+| Control Layer                         | Documented                           | Implemented | Mechanism                             |
+| ------------------------------------- | ------------------------------------ | ----------- | ------------------------------------- |
+| routing-guard.cjs TaskGet depth check | YES (ecosystem-creation-workflow.md) | **NO**      | Not present                           |
+| pre-task-unified depth check          | Not mentioned in SEC-ICE-002 doc     | **YES**     | loop-state.json, default limit 5      |
+| companion-check.cjs depth limit       | YES (@ENFORCEMENT_HOOKS.md)          | YES         | In-memory, limit 2                    |
+| Spawn trace log per traceId           | YES (ecosystem-creation-workflow.md) | **NO**      | No spawn-trace-\*.jsonl files written |
 
 ---
 
@@ -112,6 +117,7 @@ This covers **companion auto-spawn amplification** specifically, which is a diff
 The file-based loop-state mechanism in `pre-task-unified-core.cjs` DOES provide depth enforcement (limit 5, same number as documented). This means the core protection against unbounded recursive spawning exists.
 
 However:
+
 1. The `routing-guard.cjs`-specific check documented in SEC-ICE-002 is absent — the documentation is inaccurate
 2. The distributed trace context (TaskGet + task metadata propagation) is not implemented — agents are not actually reading parent task spawnDepth from metadata
 3. Spawn trace logs (`.claude/context/runtime/spawn-trace-{traceId}.jsonl`) are not being written
@@ -122,30 +128,33 @@ However:
 ## Recommendations
 
 ### Immediate (no code change required)
+
 1. Update `ecosystem-creation-workflow.md` SEC-ICE-002 to accurately reflect the actual enforcement mechanism (pre-task-unified via loop-state-manager) — this is a documentation fix
 2. Remove the false claim that `routing-guard.cjs` uses TaskGet for this check
 
 ### Enhancement (optional, medium priority)
+
 3. If the distributed TaskGet-based mechanism is desired (true distributed depth tracking per trace), implement it in a separate check function (e.g., `checkSpawnDepth` in routing-guard-core.checks-task.cjs) that reads parent task metadata
 4. Add spawn trace log writing to `pre-task-unified-core.cjs` for observability
 
 ### Verification (for issue closure)
+
 5. The existing depth enforcement in `pre-task-unified-core.cjs` should be tested: verify that `loopState.spawnDepth >= 5` triggers a block when `LOOP_DEPTH_LIMIT=5`
 
 ---
 
 ## Files Examined
 
-| File | spawnDepth Logic |
-|---|---|
-| `.claude/hooks/routing/routing-guard.cjs` | Thin wrapper only |
-| `.claude/hooks/routing/routing-guard-core.cjs` | Thin wrapper only |
-| `.claude/hooks/routing/routing-guard-core.impl.cjs` | No spawnDepth — confirmed |
-| `.claude/hooks/routing/pre-task-unified-core.cjs` | YES — spawnDepth check at lines 301-306 |
-| `.claude/hooks/routing/pre-task-unified-helpers.cjs` | `getDepthLimit()` — default 5, env override via LOOP_DEPTH_LIMIT |
-| `.claude/lib/self-healing/loop-state-manager.cjs` | State management for spawnDepth counter |
-| `.claude/workflows/core/ecosystem-creation-workflow.md` | SEC-ICE-002 documentation (inaccurate re: routing-guard) |
-| `.claude/docs/@ENFORCEMENT_HOOKS.md` | Section 13: SEC-ICE-002 (companion-check scope) |
+| File                                                    | spawnDepth Logic                                                 |
+| ------------------------------------------------------- | ---------------------------------------------------------------- |
+| `.claude/hooks/routing/routing-guard.cjs`               | Thin wrapper only                                                |
+| `.claude/hooks/routing/routing-guard-core.cjs`          | Thin wrapper only                                                |
+| `.claude/hooks/routing/routing-guard-core.impl.cjs`     | No spawnDepth — confirmed                                        |
+| `.claude/hooks/routing/pre-task-unified-core.cjs`       | YES — spawnDepth check at lines 301-306                          |
+| `.claude/hooks/routing/pre-task-unified-helpers.cjs`    | `getDepthLimit()` — default 5, env override via LOOP_DEPTH_LIMIT |
+| `.claude/lib/self-healing/loop-state-manager.cjs`       | State management for spawnDepth counter                          |
+| `.claude/workflows/core/ecosystem-creation-workflow.md` | SEC-ICE-002 documentation (inaccurate re: routing-guard)         |
+| `.claude/docs/@ENFORCEMENT_HOOKS.md`                    | Section 13: SEC-ICE-002 (companion-check scope)                  |
 
 ---
 

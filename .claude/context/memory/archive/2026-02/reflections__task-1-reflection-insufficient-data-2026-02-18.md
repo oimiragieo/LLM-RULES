@@ -50,12 +50,12 @@ The reflection trigger indicates task completion, but the task system cannot fin
 
 ## Findings
 
-| Issue | Evidence | Severity |
-| --- | --- | --- |
-| No task found in system | TaskGet(1) returned "Task not found" | Critical |
+| Issue                     | Evidence                                             | Severity |
+| ------------------------- | ---------------------------------------------------- | -------- |
+| No task found in system   | TaskGet(1) returned "Task not found"                 | Critical |
 | Fallback summary detected | Summary: "Task 1 completed without summary metadata" | Critical |
-| No artifact paths | No filesModified or outputArtifacts in metadata | Critical |
-| Missing execution context | No tool logs or evidence of work | High |
+| No artifact paths         | No filesModified or outputArtifacts in metadata      | Critical |
+| Missing execution context | No tool logs or evidence of work                     | High     |
 
 ## Recommendations
 
@@ -89,6 +89,7 @@ The reflection trigger indicates task completion, but the task system cannot fin
 **File: `.claude/context/memory/issues.md`**
 
 Add entry:
+
 ```
 ### Task metadata contract enforcement gap (2026-02-18)
 - Reflection triggered for task 1 with insufficient metadata
@@ -101,6 +102,7 @@ Add entry:
 **File: `.claude/context/memory/decisions.md`**
 
 Add entry:
+
 ```
 ### ADR: Reflection data sufficiency gates (2026-02-18)
 - DECISION: Withheld reflection score for task 1 due to insufficient data

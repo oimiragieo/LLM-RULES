@@ -62,17 +62,17 @@ This design introduces:
 
 ### Existing Infrastructure
 
-| Component | Location | Purpose | Status |
-|-----------|----------|---------|--------|
-| ecosystem-impact-graph.json | `.claude/context/data/` | Maps artifact types to integration targets | Active, 9 types |
-| creator-commons.cjs | `.claude/lib/creators/` | 5 shared functions for post-creation validation | Active |
-| ecosystem-impact-analyzer.cjs | `.claude/lib/creators/` | analyzeImpact + checkMustHaveCompletion | Active |
-| artifact-integrator SKILL.md | `.claude/skills/artifact-integrator/` | Post-creation gap analysis, queue processing | Active |
-| research-synthesis SKILL.md | `.claude/skills/research-synthesis/` | Pre-creation research with Exa+WebSearch | Active |
-| 9 creator skills | `.claude/skills/*/SKILL.md` | Individual artifact creators | Active |
-| unified-creator-guard.cjs | `.claude/hooks/safety/` | Blocks direct writes to creator paths | Active |
-| post-creation-integration.cjs | `.claude/hooks/workflow/` | Queues integration analysis on completion | Active |
-| integration-queue.jsonl | `.claude/context/runtime/` | Queue of artifacts needing integration | Active |
+| Component                     | Location                              | Purpose                                         | Status          |
+| ----------------------------- | ------------------------------------- | ----------------------------------------------- | --------------- |
+| ecosystem-impact-graph.json   | `.claude/context/data/`               | Maps artifact types to integration targets      | Active, 9 types |
+| creator-commons.cjs           | `.claude/lib/creators/`               | 5 shared functions for post-creation validation | Active          |
+| ecosystem-impact-analyzer.cjs | `.claude/lib/creators/`               | analyzeImpact + checkMustHaveCompletion         | Active          |
+| artifact-integrator SKILL.md  | `.claude/skills/artifact-integrator/` | Post-creation gap analysis, queue processing    | Active          |
+| research-synthesis SKILL.md   | `.claude/skills/research-synthesis/`  | Pre-creation research with Exa+WebSearch        | Active          |
+| 9 creator skills              | `.claude/skills/*/SKILL.md`           | Individual artifact creators                    | Active          |
+| unified-creator-guard.cjs     | `.claude/hooks/safety/`               | Blocks direct writes to creator paths           | Active          |
+| post-creation-integration.cjs | `.claude/hooks/workflow/`             | Queues integration analysis on completion       | Active          |
+| integration-queue.jsonl       | `.claude/context/runtime/`            | Queue of artifacts needing integration          | Active          |
 
 ### Key Observations
 
@@ -156,24 +156,24 @@ Add `companionMatrix` as a new top-level key in `.claude/context/data/ecosystem-
 
 ### Field Definitions
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `companionType` | string | The type of companion artifact (agent, skill, hook, etc.) |
-| `relationship` | string | Human-readable description of the relationship |
-| `checkStrategy` | string | How to verify if the companion exists (see Strategies below) |
-| `checkTarget` | string | Path pattern or file to check (supports `{name}` interpolation) |
-| `autoCreate` | boolean | Whether artifact-integrator should auto-spawn the creator |
-| `creatorSkill` | string | Which creator skill to invoke for missing companions |
+| Field           | Type    | Description                                                     |
+| --------------- | ------- | --------------------------------------------------------------- |
+| `companionType` | string  | The type of companion artifact (agent, skill, hook, etc.)       |
+| `relationship`  | string  | Human-readable description of the relationship                  |
+| `checkStrategy` | string  | How to verify if the companion exists (see Strategies below)    |
+| `checkTarget`   | string  | Path pattern or file to check (supports `{name}` interpolation) |
+| `autoCreate`    | boolean | Whether artifact-integrator should auto-spawn the creator       |
+| `creatorSkill`  | string  | Which creator skill to invoke for missing companions            |
 
 ### Check Strategies
 
-| Strategy | Description | Example |
-|----------|-------------|---------|
-| `file-exists` | Check if a specific file exists | `tests/agents/{name}.test.cjs` |
-| `grep-in-file` | Check if artifact name appears in a file | `{name}` in `skill-catalog.md` |
-| `json-key-exists` | Check if a key exists in a JSON file | `agents.{name}` in `agent-registry.json` |
-| `glob-match` | Check if any file matches a glob pattern | `.claude/commands/{name}.md` |
-| `settings-registered` | Check if hook is registered in settings.json | `{name}` in hooks array |
+| Strategy              | Description                                  | Example                                  |
+| --------------------- | -------------------------------------------- | ---------------------------------------- |
+| `file-exists`         | Check if a specific file exists              | `tests/agents/{name}.test.cjs`           |
+| `grep-in-file`        | Check if artifact name appears in a file     | `{name}` in `skill-catalog.md`           |
+| `json-key-exists`     | Check if a key exists in a JSON file         | `agents.{name}` in `agent-registry.json` |
+| `glob-match`          | Check if any file matches a glob pattern     | `.claude/commands/{name}.md`             |
+| `settings-registered` | Check if hook is registered in settings.json | `{name}` in hooks array                  |
 
 ### Full Companion Matrix
 
@@ -500,12 +500,12 @@ Add `companionMatrix` as a new top-level key in `.claude/context/data/ecosystem-
 
 The existing `artifactTypes` section in `ecosystem-impact-graph.json` focuses on **integration actions** (update-routing-table, update-catalog, etc.) with target file paths. The new `companionMatrix` focuses on **companion existence checks** -- verifying that related artifacts exist (or proposing their creation). They are complementary:
 
-| Aspect | `artifactTypes` (existing) | `companionMatrix` (new) |
-|--------|---------------------------|------------------------|
-| When used | Post-creation (artifact-integrator) | Pre-creation (companion-check) AND post-creation |
-| Purpose | Track integration actions | Check companion existence |
-| Granularity | Action-level ("update X file") | Artifact-level ("does Y exist?") |
-| Consumer | ecosystem-impact-analyzer.cjs | companion-check.cjs AND artifact-integrator |
+| Aspect      | `artifactTypes` (existing)          | `companionMatrix` (new)                          |
+| ----------- | ----------------------------------- | ------------------------------------------------ |
+| When used   | Post-creation (artifact-integrator) | Pre-creation (companion-check) AND post-creation |
+| Purpose     | Track integration actions           | Check companion existence                        |
+| Granularity | Action-level ("update X file")      | Artifact-level ("does Y exist?")                 |
+| Consumer    | ecosystem-impact-analyzer.cjs       | companion-check.cjs AND artifact-integrator      |
 
 ---
 
@@ -597,7 +597,7 @@ Each check strategy is a pure function that returns `boolean`:
 
 ```javascript
 const CHECK_STRATEGIES = {
-  'file-exists': (resolvedTarget) => {
+  'file-exists': resolvedTarget => {
     return fs.existsSync(path.join(PROJECT_ROOT, resolvedTarget));
   },
 
@@ -616,7 +616,7 @@ const CHECK_STRATEGIES = {
     return json && artifactName in json;
   },
 
-  'glob-match': (resolvedTarget) => {
+  'glob-match': resolvedTarget => {
     // Use simple fs.readdirSync + minimatch or manual check
     // Avoid heavy dependencies
     return globHasMatch(resolvedTarget);
@@ -645,7 +645,10 @@ function interpolateTarget(template, artifactName) {
 ### Example Usage
 
 ```javascript
-const { checkCompanions, formatCompanionChecklist } = require('.claude/lib/creators/companion-check.cjs');
+const {
+  checkCompanions,
+  formatCompanionChecklist,
+} = require('.claude/lib/creators/companion-check.cjs');
 
 // Before creating an agent named "python-pro"
 const result = checkCompanions('agent', 'python-pro');
@@ -732,11 +735,11 @@ After generating the standard integration plan (Step 3), also check companions:
 2. For each artifact processed:
    a. Run `checkCompanions(artifactType, artifactName)`
    b. For REQUIRED missing companions:
-      - If `autoCreate: true` and `creatorSkill` is set: TaskCreate to invoke creator
-      - If `autoCreate: false`: TaskCreate with "Verify/create {companionType} for {name}"
-   c. For RECOMMENDED missing companions:
-      - Create advisory tasks (lower priority)
-   d. Include companion checklist in the integration report
+   - If `autoCreate: true` and `creatorSkill` is set: TaskCreate to invoke creator
+   - If `autoCreate: false`: TaskCreate with "Verify/create {companionType} for {name}"
+     c. For RECOMMENDED missing companions:
+   - Create advisory tasks (lower priority)
+     d. Include companion checklist in the integration report
 ```
 
 ### Deduplication
@@ -764,9 +767,9 @@ Add explicit tool priority section:
 
 Use tools in this priority order:
 
-1. **mcp__Exa__web_search_exa** - Preferred for web research (better quality, structured results)
-2. **mcp__Exa__get_code_context_exa** - Preferred for code examples and context
-3. **mcp__Ref__ref_search_documentation** - Preferred for official documentation lookup
+1. **mcp**Exa**web_search_exa** - Preferred for web research (better quality, structured results)
+2. **mcp**Exa**get_code_context_exa** - Preferred for code examples and context
+3. **mcp**Ref**ref_search_documentation** - Preferred for official documentation lookup
 4. **WebSearch** - Fallback when MCP tools are unavailable
 5. **WebFetch** - Fallback for fetching specific URLs
 
@@ -793,7 +796,7 @@ Research using MCP tools (preferred) or WebSearch (fallback):
 
 Add to all 9 creator skills (before Step 1):
 
-```markdown
+````markdown
 ### Research-First Protocol (MANDATORY)
 
 Before starting creation, invoke research-synthesis:
@@ -801,10 +804,12 @@ Before starting creation, invoke research-synthesis:
 ```javascript
 Skill({ skill: 'research-synthesis' });
 ```
+````
 
 This ensures all design decisions are backed by current best practices.
 The research-synthesis skill prefers MCP tools (Exa, Ref) over WebSearch.
-```
+
+````
 
 ---
 
@@ -898,18 +903,19 @@ sequenceDiagram
     AI-->>R: Integration report
 
     Note over R,AI: Follow-up creators run<br/>for missing companions
-```
+````
 
 ## Integration Points
 
-| Integration Point | Where | How |
-|-------------------|-------|-----|
-| Router Gate 4 | CLAUDE.md Section 1.2 | Detects creation requests |
-| Router Step 0.5 | router-decision.md | Processes integration queue |
-| Creator Step 0.5 | Each creator SKILL.md | Runs companion check |
-| Post-creation hook | post-creation-integration.cjs | Queues integration analysis |
-| artifact-integrator | artifact-integrator SKILL.md | Processes queue + companions |
-```
+| Integration Point   | Where                         | How                          |
+| ------------------- | ----------------------------- | ---------------------------- |
+| Router Gate 4       | CLAUDE.md Section 1.2         | Detects creation requests    |
+| Router Step 0.5     | router-decision.md            | Processes integration queue  |
+| Creator Step 0.5    | Each creator SKILL.md         | Runs companion check         |
+| Post-creation hook  | post-creation-integration.cjs | Queues integration analysis  |
+| artifact-integrator | artifact-integrator SKILL.md  | Processes queue + companions |
+
+````
 
 ---
 
@@ -1012,7 +1018,7 @@ graph TB
     AI -.->|follow-up tasks| AC
     AI -.->|follow-up tasks| SC
     AI -.->|follow-up tasks| HC
-```
+````
 
 ### Data Flow
 
@@ -1059,11 +1065,13 @@ flowchart LR
 **Decision:** Implement `companion-check.cjs` as a library module, not a hook.
 
 **Pro:**
+
 - Libraries are called explicitly by creator skills, giving them control over timing
 - Hooks would fire on every Write/Edit, causing false positives on non-creator writes
 - Library pattern matches existing `creator-commons.cjs` and `ecosystem-impact-analyzer.cjs`
 
 **Con:**
+
 - Each creator skill must explicitly add Step 0.5 (9 files to update)
 - No automatic enforcement -- a creator could skip the check
 
@@ -1074,11 +1082,13 @@ flowchart LR
 **Decision:** Add `companionMatrix` to existing `ecosystem-impact-graph.json`.
 
 **Pro:**
+
 - Single source of truth for artifact relationships
 - Avoids another JSON file that needs lifecycle management
 - Companion matrix and integration targets are conceptually related
 
 **Con:**
+
 - File grows larger (currently ~325 lines, will grow to ~600)
 - Two different consumers read different sections of the same file
 
@@ -1089,11 +1099,13 @@ flowchart LR
 **Decision:** Only `test` companions have `autoCreate: true`. Other companions require explicit tasks.
 
 **Pro:**
+
 - Prevents infinite creation loops (agent creates skill creates agent creates...)
 - Tests are safe to auto-generate (no cascading side effects)
 - Other companions need human/agent judgment
 
 **Con:**
+
 - Missing companions still require manual follow-up
 
 **Mitigation:** artifact-integrator creates follow-up tasks (not TaskCreate from the creator itself), which the Router then assigns to appropriate agents.
@@ -1103,6 +1115,7 @@ flowchart LR
 **Scenario:** Agent requires skill assignment. Skill requires agent assignment. Creating one triggers creation of the other in a loop.
 
 **Mitigation:**
+
 - The companion matrix uses `autoCreate: false` for cross-type companions
 - artifact-integrator deduplicates against existing queue entries
 - Follow-up tasks are P2 priority (not immediate), allowing human review
@@ -1112,6 +1125,7 @@ flowchart LR
 **Scenario:** The companion matrix falls out of sync with the actual ecosystem structure.
 
 **Mitigation:**
+
 - The matrix is versioned in Git alongside the code
 - Schema validation can be added (schema-creator)
 - artifact-integrator's health-check mode can audit the matrix
@@ -1121,6 +1135,7 @@ flowchart LR
 **Scenario:** With 49 agents, 50+ skills, and many hooks, the companion check reads multiple files.
 
 **Mitigation:**
+
 - File reads are cached per-session (companion-check runs once per creation)
 - Only the relevant artifact type's companions are checked (not all types)
 - Worst case: ~10 file reads per companion check (sub-second on local filesystem)
@@ -1130,52 +1145,60 @@ flowchart LR
 ## 13. Implementation Sequence
 
 ### Phase 1: Data Structure (1 task)
+
 1. Add `companionMatrix` to `ecosystem-impact-graph.json`
 
 ### Phase 2: Library Module (1 task)
+
 2. Create `companion-check.cjs` with `checkCompanions`, `formatCompanionChecklist`, `loadCompanionMatrix`
 3. Create tests for `companion-check.cjs`
 
 ### Phase 3: Creator Skill Updates (1 task, batch)
+
 4. Add Step 0.5 to all 9 creator skills
 5. Update agent-creator Step 2 with MCP tool references
 6. Add tool priority section to research-synthesis SKILL.md
 
 ### Phase 4: artifact-integrator Enhancement (1 task)
+
 7. Add Step 3.1 (companion matrix analysis) to artifact-integrator SKILL.md
 
 ### Phase 5: Workflow Documentation (1 task)
+
 8. Create `ecosystem-creation-workflow.md`
 9. Update `router-decision.md` Gate 4 references
 
 ### Phase 6: Quality Gates (1 task)
+
 10. Run all tests (`pnpm test`)
 11. Run lint (`pnpm lint:fix`) and format (`pnpm format`)
 12. Verify no regressions
 
 ### Estimated Effort
 
-| Phase | Files | Complexity | Estimated Duration |
-|-------|-------|------------|-------------------|
-| 1: Data Structure | 1 modify | LOW | 15 min |
-| 2: Library Module | 2 create | MEDIUM | 45 min |
-| 3: Creator Updates | 10 modify | LOW (repetitive) | 30 min |
-| 4: Integrator Enhancement | 1 modify | MEDIUM | 20 min |
-| 5: Workflow Docs | 2 create/modify | LOW | 20 min |
-| 6: Quality Gates | 0 (testing) | LOW | 15 min |
-| **Total** | **16 files** | **MEDIUM** | **~2.5 hours** |
+| Phase                     | Files           | Complexity       | Estimated Duration |
+| ------------------------- | --------------- | ---------------- | ------------------ |
+| 1: Data Structure         | 1 modify        | LOW              | 15 min             |
+| 2: Library Module         | 2 create        | MEDIUM           | 45 min             |
+| 3: Creator Updates        | 10 modify       | LOW (repetitive) | 30 min             |
+| 4: Integrator Enhancement | 1 modify        | MEDIUM           | 20 min             |
+| 5: Workflow Docs          | 2 create/modify | LOW              | 20 min             |
+| 6: Quality Gates          | 0 (testing)     | LOW              | 15 min             |
+| **Total**                 | **16 files**    | **MEDIUM**       | **~2.5 hours**     |
 
 ---
 
 ## Appendix A: ADR Reference
 
 This design extends **ADR-100** (Cross-Artifact Integration System) with:
+
 - A new companion matrix data structure (backward-compatible addition to impact graph)
 - A pre-creation companion check (new library)
 - Enhanced post-creation companion analysis (extension to artifact-integrator)
 - Unified creation workflow documentation (new workflow)
 
 It does NOT change:
+
 - The existing integration action model (`artifactTypes` in impact graph)
 - The existing creator-commons validation functions
 - The existing hook enforcement (unified-creator-guard, post-creation-integration)

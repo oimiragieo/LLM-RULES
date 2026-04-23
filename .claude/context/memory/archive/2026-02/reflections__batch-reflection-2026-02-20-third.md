@@ -8,11 +8,11 @@ This is the third reflection pass for the same three reflection IDs. The prior t
 
 ## PHASE 0: Data Sufficiency Gate
 
-| Reflection | TaskId | Summary Provided | dataQuality | Score Decision |
-|-----------|--------|-----------------|-------------|----------------|
-| 1 | 1 | Detailed multi-tier audit results | full | Score computed |
-| 2 | 2 | Fallback string only | insufficient | Score WITHHELD |
-| 3 | 3 | Substantive update description | full | Score computed |
+| Reflection | TaskId | Summary Provided                  | dataQuality  | Score Decision |
+| ---------- | ------ | --------------------------------- | ------------ | -------------- |
+| 1          | 1      | Detailed multi-tier audit results | full         | Score computed |
+| 2          | 2      | Fallback string only              | insufficient | Score WITHHELD |
+| 3          | 3      | Substantive update description    | full         | Score computed |
 
 **REFLECTION RESULT FOR TASK 2: INSUFFICIENT_DATA — No summary metadata provided. Score withheld. This is the 15th+ occurrence. ADR-139 BLOCK mode not yet effective.**
 
@@ -24,28 +24,31 @@ This is the third reflection pass for the same three reflection IDs. The prior t
 
 ### Scores
 
-| Dimension | Score | Weight | Notes |
-|-----------|-------|--------|-------|
-| Completeness | 0.85 | 25% | Multi-tier audit: SKILL.md, catalog, index, agent files, test coverage — all checked |
-| Accuracy | 0.90 | 25% | Gap precisely identified: agentPrimary=['developer'] vs correct ['router','master-orchestrator','planner'] |
-| Clarity | 0.87 | 15% | Clear tier-by-tier findings with specific field values |
-| Consistency | 0.85 | 15% | Follows integration health rubric; consistent gap severity classification |
-| Actionability | 0.82 | 20% | Specific: run `node .claude/tools/cli/generate-skill-index.cjs`, check agent-skill-matrix.json |
+| Dimension     | Score | Weight | Notes                                                                                                      |
+| ------------- | ----- | ------ | ---------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.85  | 25%    | Multi-tier audit: SKILL.md, catalog, index, agent files, test coverage — all checked                       |
+| Accuracy      | 0.90  | 25%    | Gap precisely identified: agentPrimary=['developer'] vs correct ['router','master-orchestrator','planner'] |
+| Clarity       | 0.87  | 15%    | Clear tier-by-tier findings with specific field values                                                     |
+| Consistency   | 0.85  | 15%    | Follows integration health rubric; consistent gap severity classification                                  |
+| Actionability | 0.82  | 20%    | Specific: run `node .claude/tools/cli/generate-skill-index.cjs`, check agent-skill-matrix.json             |
 
 **Overall Score: 0.868 / 1.0 — PASS**
 
 ### RBT Diagnosis
 
 **Roses:**
+
 - Comprehensive multi-tier audit (SKILL.md + catalog + skill-index + agent files + tests)
 - Precise gap specification with exact wrong/right field values
 - Correctly identified root cause: skill-index.json sources agentPrimary from lookup tables, not frontmatter
 
 **Buds:**
+
 - SKILL.md frontmatter `agents:` field not explicitly in audit scope (already confirmed correct in this case)
 - Low-severity schema gap (no `.claude/schemas/` entry for wave-executor) not remediated by audit task — appropriate for auditor-only role
 
 **Thorns:**
+
 - None. Gap correctly identified, prior batch already triggered fix tasks.
 
 ### Integration Health (ADR-100)
@@ -74,30 +77,33 @@ This is the canonical fallback string. Score withheld per Iron Law: "Never produ
 
 ### Scores
 
-| Dimension | Score | Weight | Notes |
-|-----------|-------|--------|-------|
-| Completeness | 0.75 | 25% | Both skill-creator and skill-updater updated; summary confirms outputs but lacks filesModified |
-| Accuracy | 0.88 | 25% | Gap D registration check step is technically sound; agentPrimary guidance targets correct fix |
-| Clarity | 0.85 | 15% | Summary clear and specific: "Updated skill-creator with agentPrimary/frontmatter/rules-companion guidance" |
-| Consistency | 0.83 | 15% | Follows skill-updater workflow conventions; Gap D naming consistent with existing gap labeling |
-| Actionability | 0.70 | 20% | Wave-executor stale index entry still unresolved; fix is in tools (generate-skill-index), not in workflow docs |
+| Dimension     | Score | Weight | Notes                                                                                                          |
+| ------------- | ----- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.75  | 25%    | Both skill-creator and skill-updater updated; summary confirms outputs but lacks filesModified                 |
+| Accuracy      | 0.88  | 25%    | Gap D registration check step is technically sound; agentPrimary guidance targets correct fix                  |
+| Clarity       | 0.85  | 15%    | Summary clear and specific: "Updated skill-creator with agentPrimary/frontmatter/rules-companion guidance"     |
+| Consistency   | 0.83  | 15%    | Follows skill-updater workflow conventions; Gap D naming consistent with existing gap labeling                 |
+| Actionability | 0.70  | 20%    | Wave-executor stale index entry still unresolved; fix is in tools (generate-skill-index), not in workflow docs |
 
 **Overall Score: 0.802 / 1.0 — PASS**
 
 ### RBT Diagnosis
 
 **Roses:**
+
 - Directly closed root-cause gap: skill-creator now guides authors to set `agents:` frontmatter
 - Skill-updater Gap D registration check step prevents silent skill-index.json stale regression
 - Fast remediation: Tasks 1 → 2 → 3 all within ~1.75 hours (audit → fix → root-cause fix)
 - Rules-companion guidance added to skill-creator formalizing `.claude/rules/{skill-name}.md` as required artifact
 
 **Buds:**
+
 - Task 3 summary is missing `filesModified` list — exact file paths modified by the update unclear
 - wave-executor skill-index.json stale entry still outstanding (Gap D fixes the workflow; it does not auto-run on existing skills)
 - No test coverage for the Gap D check step itself (relies on manual execution)
 
 **Thorns:**
+
 - Task 2 missing metadata (15th+ occurrence) demonstrates that workflow-level fixes alone are insufficient without runtime enforcement
 
 ### Integration Health (ADR-100)
@@ -128,12 +134,12 @@ This is the canonical fallback string. Score withheld per Iron Law: "Never produ
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale | Score |
-|------|----------|-----------|-------|
-| skill-index-silent-stale-regression pattern | RETAIN | High reuse value — any skill update can trigger this; already partially documented in issues.md, now needs patterns.json entry | 0.85 |
-| fast-remediation-loop-pattern | RETAIN (reinforce) | Proven pattern; reinforcing with second evidence instance increases confidence | 0.80 |
-| reflection-spawn-dedupe-gap gotcha | RETAIN | New finding; not previously documented; high operational impact | 0.82 |
-| reflection log entries for prior two batches | COMPRESS | Already in log; this pass adds net-new gotcha only | 0.60 |
+| Item                                         | Decision           | Rationale                                                                                                                      | Score |
+| -------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ----- |
+| skill-index-silent-stale-regression pattern  | RETAIN             | High reuse value — any skill update can trigger this; already partially documented in issues.md, now needs patterns.json entry | 0.85  |
+| fast-remediation-loop-pattern                | RETAIN (reinforce) | Proven pattern; reinforcing with second evidence instance increases confidence                                                 | 0.80  |
+| reflection-spawn-dedupe-gap gotcha           | RETAIN             | New finding; not previously documented; high operational impact                                                                | 0.82  |
+| reflection log entries for prior two batches | COMPRESS           | Already in log; this pass adds net-new gotcha only                                                                             | 0.60  |
 
 ---
 

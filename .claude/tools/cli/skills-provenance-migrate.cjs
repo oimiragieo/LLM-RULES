@@ -149,9 +149,8 @@ function migrateFile(content, filePath, dryRun, verbose) {
   }
 
   // Preserve existing frontmatter order; append new fields at the end of the frontmatter block
-  const baseFm = appendBlock.length > 0
-    ? patchedFrontmatter + '\n' + appendBlock.trimEnd()
-    : patchedFrontmatter;
+  const baseFm =
+    appendBlock.length > 0 ? patchedFrontmatter + '\n' + appendBlock.trimEnd() : patchedFrontmatter;
   const newContent = `---\n${baseFm}\n---\n${parsed.bodyText}`;
 
   if (!dryRun) {

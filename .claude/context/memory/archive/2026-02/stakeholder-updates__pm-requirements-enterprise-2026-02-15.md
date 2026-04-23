@@ -26,11 +26,13 @@ The framework demonstrates excellent metrics (100% test pass, 0 lint errors, str
 ### User Impact
 
 **For Framework Operators:**
+
 - **Misrouting**: Developer spawned instead of specialist → inferior results, user frustration
 - **Task Corruption**: Tasks stuck in progress, duplicate work, workflow stalls
 - **System Hangs**: Workflow loops never exit → session crashes, resource exhaustion
 
 **For Framework Contributors:**
+
 - **Hidden Regressions**: Code changes break untested paths, discovered only in production
 - **Technical Debt**: Growing complexity without safety nets
 - **False Security**: Green CI gives false confidence
@@ -49,15 +51,17 @@ The framework demonstrates excellent metrics (100% test pass, 0 lint errors, str
 ### Audit Findings (QA Report 2026-02-15)
 
 **Critical Gaps:**
+
 - **routing-guard.cjs** (2599 LOC → modular): No tests for Check 7 (specialist override), Check 5 (architect-first), Check 1 (planner-first)
 - **task-lifecycle-state.cjs**: No state transition tests (not_started → in_progress → completed/blocked)
 - **workflow/cycle-detector.cjs**: No infinite loop detection tests
 - **user-prompt-unified.cjs** (2155 LOC): No batch creation detection tests
-- **spawn-prompt-assembler.*.cjs**: Constitution tests exist, but no memory mode validation tests
+- **spawn-prompt-assembler.\*.cjs**: Constitution tests exist, but no memory mode validation tests
 
 ### Business Impact Metrics
 
 From QA Report:
+
 - **Regression Risk**: HIGH for untested routing logic
 - **Impact**: User-facing (specialist misrouting), Quality (poor architecture), Edge cases (catastrophic hangs)
 - **Test Coverage**: 47% routing, 40% spawn/orchestration (vs 85% code indexing, 100% planning/QA)
@@ -65,6 +69,7 @@ From QA Report:
 ### Memory Learnings Evidence
 
 From `learnings.md`:
+
 > "99.3% test pass rate can mask critical coverage gaps (routing logic, loop detection untested)"
 
 > "Pattern: Test Coverage Can Mask Critical Gaps - 100% pass rate (213/213 tests) + 0 lint errors = looks healthy, but critical paths untested"
@@ -76,6 +81,7 @@ From `learnings.md`:
 **We believe that adding 95 integration tests for critical untested paths will reduce production regression risk from HIGH to LOW.**
 
 **We'll know we're right when:**
+
 1. **Specialist misrouting rate** drops to <1% (currently unmeasured)
 2. **Task state corruption incidents** drop to 0 (currently unmeasured, user reports exist)
 3. **Workflow loop incidents** drop to 0 (rare but catastrophic)
@@ -95,15 +101,15 @@ From `learnings.md`:
 
 ## Success Metrics
 
-| Metric | Baseline | Target | How Measured |
-|--------|----------|--------|--------------|
-| **Critical path test coverage** | 0% (routing, task lifecycle, loop detection) | 100% | Test count per critical module |
-| **Total test count** | 213 tests | 308+ tests (+95 tests minimum) | `pnpm test` output |
-| **Specialist misrouting rate** | Unknown (no metrics) | <1% | New routing quality metric in CI |
-| **Task state corruption incidents** | Unknown (user reports) | 0 incidents/month | Task lifecycle metrics |
-| **Workflow loop incidents** | 0 reported (rare) | 0 incidents | Cycle detector metrics |
-| **CI execution time** | ~4 min | <7 min (+3 min acceptable) | GitHub Actions duration |
-| **Regression detection rate** | ~60% (estimated) | 95%+ | Calculated: caught/(caught+escaped) |
+| Metric                              | Baseline                                     | Target                         | How Measured                        |
+| ----------------------------------- | -------------------------------------------- | ------------------------------ | ----------------------------------- |
+| **Critical path test coverage**     | 0% (routing, task lifecycle, loop detection) | 100%                           | Test count per critical module      |
+| **Total test count**                | 213 tests                                    | 308+ tests (+95 tests minimum) | `pnpm test` output                  |
+| **Specialist misrouting rate**      | Unknown (no metrics)                         | <1%                            | New routing quality metric in CI    |
+| **Task state corruption incidents** | Unknown (user reports)                       | 0 incidents/month              | Task lifecycle metrics              |
+| **Workflow loop incidents**         | 0 reported (rare)                            | 0 incidents                    | Cycle detector metrics              |
+| **CI execution time**               | ~4 min                                       | <7 min (+3 min acceptable)     | GitHub Actions duration             |
+| **Regression detection rate**       | ~60% (estimated)                             | 95%+                           | Calculated: caught/(caught+escaped) |
 
 ---
 
@@ -111,38 +117,38 @@ From `learnings.md`:
 
 ### MUST (MVP Blockers)
 
-| Priority | Capability | Rationale |
-|----------|-----------|-----------|
-| Must | **Routing-guard integration tests** (20 tests) | Prevents specialist misrouting, planner-first bypass, security gate failures |
-| Must | **Task lifecycle state tests** (15 tests) | Prevents task corruption, duplicate work, workflow stalls |
-| Must | **Workflow cycle detection tests** (10 tests) | Prevents infinite loops, system hangs, catastrophic failures |
-| Must | **Test execution in CI** | Tests must run automatically on every PR |
+| Priority | Capability                                     | Rationale                                                                    |
+| -------- | ---------------------------------------------- | ---------------------------------------------------------------------------- |
+| Must     | **Routing-guard integration tests** (20 tests) | Prevents specialist misrouting, planner-first bypass, security gate failures |
+| Must     | **Task lifecycle state tests** (15 tests)      | Prevents task corruption, duplicate work, workflow stalls                    |
+| Must     | **Workflow cycle detection tests** (10 tests)  | Prevents infinite loops, system hangs, catastrophic failures                 |
+| Must     | **Test execution in CI**                       | Tests must run automatically on every PR                                     |
 
 ### SHOULD (High Value)
 
-| Priority | Capability | Rationale |
-|----------|-----------|-----------|
-| Should | **Batch creation detection tests** (12 tests) | Prevents invisible artifacts, catalog/routing failures |
-| Should | **Spawn-prompt memory injection tests** (18 tests) | Prevents agents missing critical context, inconsistent behavior |
-| Should | **Routing-table disambiguation tests** (10 tests) | Prevents ambiguous intent misrouting |
-| Should | **Routing quality metrics** | Enables continuous monitoring of routing behavior |
+| Priority | Capability                                         | Rationale                                                       |
+| -------- | -------------------------------------------------- | --------------------------------------------------------------- |
+| Should   | **Batch creation detection tests** (12 tests)      | Prevents invisible artifacts, catalog/routing failures          |
+| Should   | **Spawn-prompt memory injection tests** (18 tests) | Prevents agents missing critical context, inconsistent behavior |
+| Should   | **Routing-table disambiguation tests** (10 tests)  | Prevents ambiguous intent misrouting                            |
+| Should   | **Routing quality metrics**                        | Enables continuous monitoring of routing behavior               |
 
 ### COULD (Nice to Have)
 
-| Priority | Capability | Rationale |
-|----------|-----------|-----------|
-| Could | **Integration boundary tests** (20+ tests) | End-to-end pipeline validation |
-| Could | **TDD enforcement hook** | Pre-commit test requirement |
-| Could | **Property-based routing tests** | Advanced invariant testing with fast-check |
+| Priority | Capability                                 | Rationale                                  |
+| -------- | ------------------------------------------ | ------------------------------------------ |
+| Could    | **Integration boundary tests** (20+ tests) | End-to-end pipeline validation             |
+| Could    | **TDD enforcement hook**                   | Pre-commit test requirement                |
+| Could    | **Property-based routing tests**           | Advanced invariant testing with fast-check |
 
 ### WON'T (Explicitly Excluded)
 
-| Priority | Capability | Rationale |
-|----------|-----------|-----------|
-| Won't | **Legacy code refactor** | Focus on test coverage first, refactor later |
-| Won't | **Test framework migration** | Node.js native runner works well, no migration needed |
-| Won't | **100% code coverage** | Diminishing returns, focus on critical paths |
-| Won't | **Performance optimization** | Tests may slow CI, acceptable trade-off for safety |
+| Priority | Capability                   | Rationale                                             |
+| -------- | ---------------------------- | ----------------------------------------------------- |
+| Won't    | **Legacy code refactor**     | Focus on test coverage first, refactor later          |
+| Won't    | **Test framework migration** | Node.js native runner works well, no migration needed |
+| Won't    | **100% code coverage**       | Diminishing returns, focus on critical paths          |
+| Won't    | **Performance optimization** | Tests may slow CI, acceptable trade-off for safety    |
 
 ---
 
@@ -151,12 +157,15 @@ From `learnings.md`:
 ### Primary User: Framework Developer
 
 **Current Behavior:**
+
 - Developer makes code changes → CI passes (green) → Deploys → Production bug discovered → User impact → Hotfix cycle
 
 **Trigger:**
+
 - Code change in routing logic, task lifecycle, or workflow orchestration
 
 **Success State:**
+
 - Developer makes code changes → CI catches regression (tests fail) → Fix before merge → No production impact
 
 **Job to Be Done:**
@@ -165,9 +174,11 @@ From `learnings.md`:
 ### Secondary User: QA Engineer
 
 **Current Behavior:**
+
 - QA runs audit → Finds gaps → Reports findings → Waits for developer to add tests
 
 **Success State:**
+
 - QA runs audit → Test coverage report shows 95%+ for critical paths → Audit focuses on edge cases, not missing coverage
 
 **Job to Be Done:**
@@ -176,9 +187,11 @@ From `learnings.md`:
 ### Tertiary User: Framework Operator (End User)
 
 **Current Behavior:**
+
 - User requests feature → Router misroutes to developer → Inferior result → User frustrated → Reports issue
 
 **Success State:**
+
 - User requests feature → Router correctly routes to specialist → High-quality result → User satisfied
 
 **Job to Be Done:**
@@ -191,24 +204,28 @@ From `learnings.md`:
 ### MVP Scope
 
 **Phase 1: Critical Foundation (P0)**
+
 - Add routing-guard integration tests (20 tests)
 - Add task lifecycle state tests (15 tests)
 - Add workflow cycle detection tests (10 tests)
 - **Total: 45 tests, 3.5 days**
 
 **Phase 2: High Priority (P1)**
+
 - Add batch creation detection tests (12 tests)
 - Add spawn-prompt memory injection tests (18 tests)
 - Add routing-table disambiguation tests (10 tests)
 - **Total: 40 tests, 4 days**
 
 **Phase 3: Metrics & Monitoring (P1)**
+
 - Add routing quality metrics to CI
 - Add task lifecycle metrics
 - Add workflow loop detection metrics
 - **Total: 3 metrics, 2 days**
 
 **Phase 4: Nice to Have (P2 - Optional)**
+
 - Add integration boundary tests (20+ tests)
 - Add TDD enforcement pre-commit hook
 - Add property-based routing tests
@@ -216,31 +233,34 @@ From `learnings.md`:
 
 ### Test Coverage Target
 
-| Module | Current Tests | Target Tests | Gap | Priority |
-|--------|---------------|--------------|-----|----------|
-| routing-guard.cjs | 0 | 20 | +20 | P0 |
-| task-lifecycle-state.cjs | 0 | 15 | +15 | P0 |
-| workflow/cycle-detector.cjs | 0 | 10 | +10 | P0 |
-| user-prompt-unified.cjs | 0 | 12 | +12 | P1 |
-| spawn-prompt-assembler.*.cjs | 4 (partial) | 18 | +14 | P1 |
-| routing-table-*.cjs | 0 | 10 | +10 | P1 |
-| **TOTAL** | **4** | **85** | **+81** | **P0-P1** |
+| Module                        | Current Tests | Target Tests | Gap     | Priority  |
+| ----------------------------- | ------------- | ------------ | ------- | --------- |
+| routing-guard.cjs             | 0             | 20           | +20     | P0        |
+| task-lifecycle-state.cjs      | 0             | 15           | +15     | P0        |
+| workflow/cycle-detector.cjs   | 0             | 10           | +10     | P0        |
+| user-prompt-unified.cjs       | 0             | 12           | +12     | P1        |
+| spawn-prompt-assembler.\*.cjs | 4 (partial)   | 18           | +14     | P1        |
+| routing-table-\*.cjs          | 0             | 10           | +10     | P1        |
+| **TOTAL**                     | **4**         | **85**       | **+81** | **P0-P1** |
 
 ### Edge Cases & Scenarios
 
 **Routing-Guard Tests:**
+
 - ✅ Specialist override enforced (Check 7): "update docs" → technical-writer (NOT developer)
 - ✅ Planner-first enforced (Check 1): HIGH complexity → planner spawned first
 - ✅ Security review enforced (Check 2): auth changes → security-architect included
 - ✅ Architect-first for high-risk specialists (Check 5): code-simplifier → architect spawned first
 
 **Task Lifecycle Tests:**
+
 - ✅ Valid state transitions: not_started → in_progress → completed
 - ✅ Invalid transitions rejected: completed → in_progress (should fail)
 - ✅ Concurrent claim prevention: Two agents claim same task (second fails)
 - ✅ Ownership transfer validation: Only owner can update task
 
 **Workflow Cycle Tests:**
+
 - ✅ Intentional cycle detection: Phase A → Phase B → Phase A (should detect)
 - ✅ Max phase depth guard: 20 phases max (should reject deeper)
 - ✅ Linear workflow passes: Phase 1 → Phase 2 → Phase 3 (no cycle)
@@ -252,17 +272,20 @@ From `learnings.md`:
 ### Feasibility: HIGH
 
 **Dependencies:**
+
 - Node.js native test runner (already in use)
 - Existing test infrastructure (`tests/` directory structure)
 - No new testing frameworks required
 
 **Integration Points:**
+
 - `tests/lib/routing/` - Routing-guard tests
 - `tests/lib/task-management/` - Task lifecycle tests
 - `tests/lib/workflow/` - Cycle detection tests
 - `.github/workflows/` - CI integration (already configured)
 
 **Test Pattern (TDD Cycle):**
+
 1. **RED**: Write failing test for expected behavior
 2. **GREEN**: Implement minimal code to pass test
 3. **REFACTOR**: Clean up implementation
@@ -271,17 +294,20 @@ From `learnings.md`:
 ### Architecture Notes
 
 **Test Organization:**
+
 - Mirror production structure: `tests/` mirrors `.claude/lib/`
 - Use descriptive test names: `test('should reject invalid state transition')`
 - Isolate tests: No shared state, no execution order dependencies
 - Use real data structures: Actual task objects, agent definitions, routing intents
 
 **Mock Strategy:**
+
 - **Minimal mocking**: Use real modules where possible
 - **Mock external I/O**: File system, network calls, spawn processes
 - **Mock time-sensitive**: Use fake timers for retry logic, timeouts
 
 **Assertion Strategy:**
+
 - Use `assert.strictEqual()` for exact matches
 - Use `assert.ok()` for boolean checks
 - Use `assert.throws()` for error validation
@@ -291,17 +317,18 @@ From `learnings.md`:
 
 ## Implementation Phases
 
-| # | Phase | Description | Status | Parallel | Depends | Plan Link |
-|---|-------|-------------|--------|----------|---------|-----------|
-| 1 | **P0 Foundation** | Add critical path tests (routing, task lifecycle, cycle detection) | pending | No | - | - |
-| 2 | **P1 High Priority** | Add batch creation, memory injection, disambiguation tests | pending | No | 1 | - |
-| 3 | **P1 Metrics** | Add routing quality, task lifecycle, workflow loop metrics to CI | pending | Yes | 1,2 | - |
-| 4 | **P2 Optional** | Add integration boundary tests, TDD enforcement, property-based tests | pending | Yes | 1,2,3 | - |
-| 5 | **Validation** | Verify all tests pass, CI green, metrics functional | pending | No | 1,2,3,4 | - |
+| #   | Phase                | Description                                                           | Status  | Parallel | Depends | Plan Link |
+| --- | -------------------- | --------------------------------------------------------------------- | ------- | -------- | ------- | --------- |
+| 1   | **P0 Foundation**    | Add critical path tests (routing, task lifecycle, cycle detection)    | pending | No       | -       | -         |
+| 2   | **P1 High Priority** | Add batch creation, memory injection, disambiguation tests            | pending | No       | 1       | -         |
+| 3   | **P1 Metrics**       | Add routing quality, task lifecycle, workflow loop metrics to CI      | pending | Yes      | 1,2     | -         |
+| 4   | **P2 Optional**      | Add integration boundary tests, TDD enforcement, property-based tests | pending | Yes      | 1,2,3   | -         |
+| 5   | **Validation**       | Verify all tests pass, CI green, metrics functional                   | pending | No       | 1,2,3,4 | -         |
 
 ### Phase 1: P0 Foundation (Week 1)
 
 **Deliverables:**
+
 - 20 routing-guard integration tests
 - 15 task lifecycle state tests
 - 10 workflow cycle detection tests
@@ -310,6 +337,7 @@ From `learnings.md`:
 **Estimated Effort:** 3.5 days (2 days routing, 1 day task, 0.5 day cycle)
 
 **Success Criteria:**
+
 - [ ] All 45 tests pass (100% pass rate)
 - [ ] No lint errors introduced
 - [ ] CI execution time <6 minutes (+2 min from baseline)
@@ -318,6 +346,7 @@ From `learnings.md`:
 ### Phase 2: P1 High Priority (Week 2)
 
 **Deliverables:**
+
 - 12 batch creation detection tests
 - 18 spawn-prompt memory injection tests
 - 10 routing-table disambiguation tests
@@ -326,6 +355,7 @@ From `learnings.md`:
 **Estimated Effort:** 4 days (1 day batch, 1.5 days memory, 0.5 day disambiguation, 1 day buffer)
 
 **Success Criteria:**
+
 - [ ] All 40 tests pass (100% pass rate)
 - [ ] Total tests: 298 (213 baseline + 45 P0 + 40 P1)
 - [ ] CI execution time <7 minutes
@@ -334,6 +364,7 @@ From `learnings.md`:
 ### Phase 3: P1 Metrics (Week 2-3)
 
 **Deliverables:**
+
 - Routing quality metrics (specialist override rate, planner spawn rate)
 - Task lifecycle metrics (state corruption rate, claim conflicts)
 - Workflow loop detection metrics (cycle detection rate)
@@ -341,6 +372,7 @@ From `learnings.md`:
 **Estimated Effort:** 2 days
 
 **Success Criteria:**
+
 - [ ] Metrics tracked in CI (pnpm metrics:ci includes new metrics)
 - [ ] Baseline data collected (1 week of data)
 - [ ] Metrics dashboard updated
@@ -349,6 +381,7 @@ From `learnings.md`:
 ### Phase 4: P2 Optional (Week 3+)
 
 **Deliverables:**
+
 - 20+ integration boundary tests (optional)
 - TDD enforcement pre-commit hook (optional)
 - Property-based routing tests (optional)
@@ -356,6 +389,7 @@ From `learnings.md`:
 **Estimated Effort:** 4 days
 
 **Success Criteria:**
+
 - [ ] Integration tests validate end-to-end pipelines
 - [ ] Pre-commit hook enforces TDD discipline
 - [ ] Property-based tests discover edge cases
@@ -364,16 +398,16 @@ From `learnings.md`:
 
 ## Decisions Log
 
-| Decision | Choice | Alternatives | Rationale |
-|----------|--------|--------------|-----------|
-| **Test framework** | Node.js native test runner | Jest, Mocha, Vitest | Already in use, fast, no dependencies, works well |
-| **Test organization** | Mirror lib structure (`tests/` mirrors `.claude/lib/`) | Colocated tests, single test directory | Existing pattern, clear organization, easy navigation |
-| **Mock strategy** | Minimal mocking (real modules where possible) | Heavy mocking, full isolation | Prefer integration tests, real modules catch more bugs |
-| **Test execution** | Sequential (`--test-concurrency=1`) | Parallel execution | Prevents race conditions, current approach works |
-| **CI integration** | Add to existing workflows | New dedicated test workflow | Leverage existing GitHub Actions, no new workflows needed |
-| **Metrics location** | CI gate (`pnpm metrics:ci`) | Separate monitoring system | Existing metrics infrastructure, automatic enforcement |
-| **Phase priority** | P0 (routing, task, cycle) first | Breadth-first (all modules) | Highest risk first, immediate regression protection |
-| **Test count target** | 95 tests minimum (P0+P1) | 100% code coverage | Focus on critical paths, diminishing returns on full coverage |
+| Decision              | Choice                                                 | Alternatives                           | Rationale                                                     |
+| --------------------- | ------------------------------------------------------ | -------------------------------------- | ------------------------------------------------------------- |
+| **Test framework**    | Node.js native test runner                             | Jest, Mocha, Vitest                    | Already in use, fast, no dependencies, works well             |
+| **Test organization** | Mirror lib structure (`tests/` mirrors `.claude/lib/`) | Colocated tests, single test directory | Existing pattern, clear organization, easy navigation         |
+| **Mock strategy**     | Minimal mocking (real modules where possible)          | Heavy mocking, full isolation          | Prefer integration tests, real modules catch more bugs        |
+| **Test execution**    | Sequential (`--test-concurrency=1`)                    | Parallel execution                     | Prevents race conditions, current approach works              |
+| **CI integration**    | Add to existing workflows                              | New dedicated test workflow            | Leverage existing GitHub Actions, no new workflows needed     |
+| **Metrics location**  | CI gate (`pnpm metrics:ci`)                            | Separate monitoring system             | Existing metrics infrastructure, automatic enforcement        |
+| **Phase priority**    | P0 (routing, task, cycle) first                        | Breadth-first (all modules)            | Highest risk first, immediate regression protection           |
+| **Test count target** | 95 tests minimum (P0+P1)                               | 100% code coverage                     | Focus on critical paths, diminishing returns on full coverage |
 
 ---
 
@@ -382,11 +416,13 @@ From `learnings.md`:
 ### Market Context
 
 **Industry Standards:**
+
 - **Kent Beck (TDD)**: "Test the behavior, not the implementation"
 - **Martin Fowler**: "Tests should give confidence, not create busy work"
 - **Google Testing Blog**: "Focus on integration boundaries, not internals"
 
 **Test Coverage Benchmarks:**
+
 - **Critical systems**: 95%+ coverage on critical paths (financial, healthcare)
 - **Framework code**: 80%+ coverage typical, but critical paths need 100%
 - **CI execution time**: <10 minutes acceptable for comprehensive suites
@@ -394,6 +430,7 @@ From `learnings.md`:
 ### Technical Context
 
 **Existing Test Infrastructure:**
+
 - Node.js native test runner (`node --test`)
 - 213 tests passing (100% pass rate)
 - 131 test files across 13 categories
@@ -401,12 +438,14 @@ From `learnings.md`:
 - Test organization: Mirrors lib structure
 
 **Test Quality Patterns:**
+
 - Clear test descriptions using `describe()` and `it()` blocks
 - Good assertions and edge case coverage
 - Isolated tests (no shared state)
 - Real data structures (not heavy mocking)
 
 **Feasibility Assessment:** HIGH
+
 - No new tools needed (Node.js native runner)
 - Clear test patterns established
 - CI infrastructure ready
@@ -416,14 +455,14 @@ From `learnings.md`:
 
 ## Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| **CI execution time exceeds 10 min** | Medium | Low | Parallelize tests, optimize slow tests, acceptable trade-off |
-| **False positives in new tests** | Low | Medium | Review tests thoroughly, use real scenarios, iterate on feedback |
-| **Test maintenance burden** | Medium | Medium | Follow DRY, use test helpers, keep tests simple |
-| **Developer resistance to TDD** | Low | Low | TDD optional in Phase 4, focus on test value first |
-| **Tests don't catch real regressions** | Low | High | Use integration tests, test real scenarios, validate with production cases |
-| **Phase 1 timeline slip** | Medium | Medium | Buffer time included, prioritize ruthlessly, P2 is optional |
+| Risk                                   | Likelihood | Impact | Mitigation                                                                 |
+| -------------------------------------- | ---------- | ------ | -------------------------------------------------------------------------- |
+| **CI execution time exceeds 10 min**   | Medium     | Low    | Parallelize tests, optimize slow tests, acceptable trade-off               |
+| **False positives in new tests**       | Low        | Medium | Review tests thoroughly, use real scenarios, iterate on feedback           |
+| **Test maintenance burden**            | Medium     | Medium | Follow DRY, use test helpers, keep tests simple                            |
+| **Developer resistance to TDD**        | Low        | Low    | TDD optional in Phase 4, focus on test value first                         |
+| **Tests don't catch real regressions** | Low        | High   | Use integration tests, test real scenarios, validate with production cases |
+| **Phase 1 timeline slip**              | Medium     | Medium | Buffer time included, prioritize ruthlessly, P2 is optional                |
 
 ---
 
@@ -446,6 +485,7 @@ From `learnings.md`:
 **So that** specialist misrouting and planner-first bypass are caught before production
 
 **Acceptance Criteria:**
+
 - [ ] 20 tests added for routing-guard.cjs checks
 - [ ] Check 1 (planner-first) tested: HIGH complexity → planner spawned first
 - [ ] Check 2 (security review) tested: auth changes → security-architect included
@@ -456,6 +496,7 @@ From `learnings.md`:
 - [ ] Test execution time: <1.5 minutes
 
 **Definition of Done:**
+
 - [ ] Tests written following TDD cycle (RED → GREEN → REFACTOR)
 - [ ] All tests pass locally (`pnpm test`)
 - [ ] All tests pass in CI (GitHub Actions)
@@ -477,6 +518,7 @@ From `learnings.md`:
 **So that** task state corruption and duplicate claims are caught before production
 
 **Acceptance Criteria:**
+
 - [ ] 15 tests added for task-lifecycle-state.cjs
 - [ ] Valid state transitions tested: not_started → in_progress → completed
 - [ ] Invalid transitions rejected: completed → in_progress (should throw error)
@@ -486,6 +528,7 @@ From `learnings.md`:
 - [ ] Test execution time: <1 minute
 
 **Definition of Done:**
+
 - [ ] Tests written following TDD cycle (RED → GREEN → REFACTOR)
 - [ ] All tests pass locally and in CI
 - [ ] Lint and format pass
@@ -505,6 +548,7 @@ From `learnings.md`:
 **So that** infinite workflow loops are caught before causing system hangs
 
 **Acceptance Criteria:**
+
 - [ ] 10 tests added for workflow/cycle-detector.cjs
 - [ ] Intentional cycle detection tested: Phase A → Phase B → Phase A (should detect)
 - [ ] Max phase depth guard tested: 20 phases max (should reject deeper)
@@ -513,6 +557,7 @@ From `learnings.md`:
 - [ ] Test execution time: <30 seconds
 
 **Definition of Done:**
+
 - [ ] Tests written following TDD cycle (RED → GREEN → REFACTOR)
 - [ ] All tests pass locally and in CI
 - [ ] Lint and format pass
@@ -532,6 +577,7 @@ From `learnings.md`:
 **So that** batch creation requests route to orchestrators (not direct developers)
 
 **Acceptance Criteria:**
+
 - [ ] 12 tests added for batch creation detection
 - [ ] "create 10 agents" → orchestrator spawned (NOT 10 developers)
 - [ ] "create N skills" → orchestrator spawned
@@ -540,6 +586,7 @@ From `learnings.md`:
 - [ ] Test execution time: <1 minute
 
 **Definition of Done:**
+
 - [ ] Tests written following TDD cycle (RED → GREEN → REFACTOR)
 - [ ] All tests pass locally and in CI
 - [ ] Lint and format pass
@@ -559,6 +606,7 @@ From `learnings.md`:
 **So that** agents receive critical context (constitution, behaviour, learnings)
 
 **Acceptance Criteria:**
+
 - [ ] 18 tests added for spawn-prompt-assembler memory injection
 - [ ] Constitution loading tested: Spawn prompt includes constitution content
 - [ ] Behaviour loading tested: Spawn prompt includes behaviour content
@@ -568,6 +616,7 @@ From `learnings.md`:
 - [ ] Test execution time: <1.5 minutes
 
 **Definition of Done:**
+
 - [ ] Tests written following TDD cycle (RED → GREEN → REFACTOR)
 - [ ] All tests pass locally and in CI
 - [ ] Lint and format pass
@@ -587,6 +636,7 @@ From `learnings.md`:
 **So that** ambiguous intents route to correct specialists (not developer)
 
 **Acceptance Criteria:**
+
 - [ ] 10 tests added for routing-table disambiguation
 - [ ] "review code" → code-reviewer (NOT developer)
 - [ ] "update docs" → technical-writer (NOT developer)
@@ -596,6 +646,7 @@ From `learnings.md`:
 - [ ] Test execution time: <30 seconds
 
 **Definition of Done:**
+
 - [ ] Tests written following TDD cycle (RED → GREEN → REFACTOR)
 - [ ] All tests pass locally and in CI
 - [ ] Lint and format pass
@@ -615,6 +666,7 @@ From `learnings.md`:
 **So that** I can detect routing regressions before user impact
 
 **Acceptance Criteria:**
+
 - [ ] Specialist override rate metric added (should be <1%)
 - [ ] Planner spawn rate metric added (should be 100% for HIGH/EPIC)
 - [ ] Security-architect inclusion rate metric added (should be 100% for auth changes)
@@ -623,6 +675,7 @@ From `learnings.md`:
 - [ ] Alert thresholds defined and enforced
 
 **Definition of Done:**
+
 - [ ] Metrics collection code added to CI
 - [ ] Baseline data collected (1 week of data)
 - [ ] Metrics dashboard shows new metrics
@@ -642,6 +695,7 @@ From `learnings.md`:
 **So that** I can detect task state corruption before workflow stalls
 
 **Acceptance Criteria:**
+
 - [ ] Task state corruption rate metric added (should be 0%)
 - [ ] Claim conflict rate metric added (should be 0%)
 - [ ] Task completion rate metric added (should be >95%)
@@ -650,6 +704,7 @@ From `learnings.md`:
 - [ ] Alert thresholds defined and enforced
 
 **Definition of Done:**
+
 - [ ] Metrics collection code added to CI
 - [ ] Baseline data collected (1 week of data)
 - [ ] Metrics dashboard shows new metrics
@@ -669,6 +724,7 @@ From `learnings.md`:
 **So that** I can detect infinite loops before system hangs
 
 **Acceptance Criteria:**
+
 - [ ] Cycle detection rate metric added (should be 0% for production workflows)
 - [ ] Max phase depth violations metric added (should be 0%)
 - [ ] Workflow completion rate metric added (should be >95%)
@@ -677,6 +733,7 @@ From `learnings.md`:
 - [ ] Alert thresholds defined and enforced
 
 **Definition of Done:**
+
 - [ ] Metrics collection code added to CI
 - [ ] Baseline data collected (1 week of data)
 - [ ] Metrics dashboard shows new metrics
@@ -700,12 +757,14 @@ From `learnings.md`:
 ### Status Reporting
 
 **Weekly Updates:**
+
 - Test count progress (current/target)
 - CI execution time tracking
 - Blocker status (if any)
 - Risk mitigation updates
 
 **Completion Criteria:**
+
 - [ ] All P0 tests complete (45 tests)
 - [ ] All P1 tests complete (40 tests)
 - [ ] All P1 metrics complete (3 metrics)

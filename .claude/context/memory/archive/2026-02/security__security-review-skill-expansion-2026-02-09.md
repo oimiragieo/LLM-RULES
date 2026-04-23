@@ -21,13 +21,13 @@ The skill expansion created approximately 299 new artifacts across four categori
 
 ### 1.1 Trail of Bits Skills (5 skills reviewed)
 
-| Skill | Prompt Injection Risk | Permission Scoping | Verdict |
-|-------|----------------------|-------------------|---------|
-| `static-analysis` | LOW | ADEQUATE | PASS |
-| `variant-analysis` | LOW | ADEQUATE | PASS |
-| `insecure-defaults` | LOW | ADEQUATE | PASS |
-| `differential-review` | LOW | ADEQUATE | PASS |
-| `semgrep-rule-creator` | LOW | ADEQUATE | PASS |
+| Skill                  | Prompt Injection Risk | Permission Scoping | Verdict |
+| ---------------------- | --------------------- | ------------------ | ------- |
+| `static-analysis`      | LOW                   | ADEQUATE           | PASS    |
+| `variant-analysis`     | LOW                   | ADEQUATE           | PASS    |
+| `insecure-defaults`    | LOW                   | ADEQUATE           | PASS    |
+| `differential-review`  | LOW                   | ADEQUATE           | PASS    |
+| `semgrep-rule-creator` | LOW                   | ADEQUATE           | PASS    |
 
 **Positive Findings:**
 
@@ -43,13 +43,13 @@ The skill expansion created approximately 299 new artifacts across four categori
 
 ### 1.2 Other Skills (5 additional skills sampled)
 
-| Skill | Prompt Injection Risk | Permission Scoping | Verdict |
-|-------|----------------------|-------------------|---------|
-| `memory-forensics` | LOW | ADEQUATE | PASS |
-| `binary-analysis-patterns` | LOW | ADEQUATE | PASS |
-| `protocol-reverse-engineering` | LOW | ADEQUATE | PASS |
-| `web3-expert` | LOW | MINIMAL | WARN |
-| `doc-generator` | NONE | ADEQUATE | PASS |
+| Skill                          | Prompt Injection Risk | Permission Scoping | Verdict |
+| ------------------------------ | --------------------- | ------------------ | ------- |
+| `memory-forensics`             | LOW                   | ADEQUATE           | PASS    |
+| `binary-analysis-patterns`     | LOW                   | ADEQUATE           | PASS    |
+| `protocol-reverse-engineering` | LOW                   | ADEQUATE           | PASS    |
+| `web3-expert`                  | LOW                   | MINIMAL            | WARN    |
+| `doc-generator`                | NONE                  | ADEQUATE           | PASS    |
 
 **Observations:**
 
@@ -61,6 +61,7 @@ The skill expansion created approximately 299 new artifacts across four categori
 **Finding SEC-SKILL-001 (MEDIUM)**: Skills that accept user-provided code for review or analysis (e.g., `static-analysis`, `variant-analysis`) could potentially be used to smuggle instructions embedded within code comments. However, the `<identity>` and `<instructions>` tags provide reasonable structural separation between system instructions and user input.
 
 **Mitigation**: The existing architecture already mitigates this through:
+
 - Skills are invoked by agents, not directly by users
 - Agents operate within the hook enforcement framework
 - Tool access is declared in frontmatter and enforceable
@@ -71,13 +72,13 @@ The skill expansion created approximately 299 new artifacts across four categori
 
 ### 2.1 Security-Specific Rules (5 rules reviewed)
 
-| Rule File | Security Boundaries | Circumvention Risk | Verdict |
-|-----------|-------------------|-------------------|---------|
-| `security-architect.md` | STRONG | LOW | PASS |
-| `auth-security-expert.md` | STRONG | LOW | PASS |
-| `static-analysis.md` | ADEQUATE | LOW | PASS |
-| `insecure-defaults.md` | STRONG | LOW | PASS |
-| `variant-analysis.md` | ADEQUATE | LOW | PASS |
+| Rule File                 | Security Boundaries | Circumvention Risk | Verdict |
+| ------------------------- | ------------------- | ------------------ | ------- |
+| `security-architect.md`   | STRONG              | LOW                | PASS    |
+| `auth-security-expert.md` | STRONG              | LOW                | PASS    |
+| `static-analysis.md`      | ADEQUATE            | LOW                | PASS    |
+| `insecure-defaults.md`    | STRONG              | LOW                | PASS    |
+| `variant-analysis.md`     | ADEQUATE            | LOW                | PASS    |
 
 **Positive Findings:**
 
@@ -107,12 +108,12 @@ The skill expansion created approximately 299 new artifacts across four categori
 
 **Breakdown by pattern:**
 
-| Schema Pattern | Count | `additionalProperties: false` | Risk |
-|---------------|-------|------------------------------|------|
-| Detailed schemas (Trail of Bits + Tier 1) | 19 | YES (all nested objects) | LOW |
-| Detailed schemas (security/auth) | 2 | NO (root or nested) | HIGH |
-| Minimal stub schemas (`{status, output}`) | ~45 | NO | MEDIUM |
-| Medium-detail schemas (domain experts) | ~23 | NO | HIGH |
+| Schema Pattern                            | Count | `additionalProperties: false` | Risk   |
+| ----------------------------------------- | ----- | ----------------------------- | ------ |
+| Detailed schemas (Trail of Bits + Tier 1) | 19    | YES (all nested objects)      | LOW    |
+| Detailed schemas (security/auth)          | 2     | NO (root or nested)           | HIGH   |
+| Minimal stub schemas (`{status, output}`) | ~45   | NO                            | MEDIUM |
+| Medium-detail schemas (domain experts)    | ~23   | NO                            | HIGH   |
 
 **High-Risk Schemas (missing `additionalProperties: false`):**
 
@@ -138,6 +139,7 @@ The skill expansion created approximately 299 new artifacts across four categori
 ```
 
 These schemas provide no meaningful validation of the `output` object. Any data structure passes. While they serve as placeholder schemas, they offer no protection against:
+
 - Property injection
 - Data exfiltration via output fields
 - Unexpected data structures from compromised skills
@@ -186,12 +188,12 @@ Invoke the {skill-name} skill and follow it exactly as presented to you
 
 **Finding SEC-CMD-001 (INFORMATIONAL)**: The following commands delegate to skills that could interact with sensitive systems:
 
-| Command | Skill | Sensitivity | Risk |
-|---------|-------|------------|------|
-| `/memory-forensics` | memory-forensics | HIGH (memory dumps) | LOW (skill has auth notice) |
-| `/binary-analysis-patterns` | binary-analysis-patterns | HIGH (binary analysis) | LOW (skill has auth notice) |
-| `/protocol-reverse-engineering` | protocol-reverse-engineering | HIGH (network capture) | LOW (skill has auth notice) |
-| `/insecure-defaults` | insecure-defaults | MEDIUM (credential scanning) | LOW (defensive tool) |
+| Command                         | Skill                        | Sensitivity                  | Risk                        |
+| ------------------------------- | ---------------------------- | ---------------------------- | --------------------------- |
+| `/memory-forensics`             | memory-forensics             | HIGH (memory dumps)          | LOW (skill has auth notice) |
+| `/binary-analysis-patterns`     | binary-analysis-patterns     | HIGH (binary analysis)       | LOW (skill has auth notice) |
+| `/protocol-reverse-engineering` | protocol-reverse-engineering | HIGH (network capture)       | LOW (skill has auth notice) |
+| `/insecure-defaults`            | insecure-defaults            | MEDIUM (credential scanning) | LOW (defensive tool)        |
 
 All sensitive commands delegate to skills that include explicit "AUTHORIZED USE ONLY" security notices. The commands themselves introduce no additional risk.
 
@@ -201,13 +203,13 @@ All sensitive commands delegate to skills that include explicit "AUTHORIZED USE 
 
 ### 5.1 Attribution Verification
 
-| Skill | CC-BY-SA-4.0 | Source Attribution | Source URL | Verdict |
-|-------|-------------|-------------------|-----------|---------|
-| `static-analysis` | YES (frontmatter + comment) | `trailofbits/skills` | YES | COMPLIANT |
-| `variant-analysis` | YES (frontmatter + comment) | `trailofbits/skills` | YES | COMPLIANT |
-| `insecure-defaults` | YES (frontmatter + comment) | `trailofbits/skills` | YES | COMPLIANT |
-| `differential-review` | YES (frontmatter + comment) | `trailofbits/skills` | YES | COMPLIANT |
-| `semgrep-rule-creator` | YES (frontmatter + comment) | `trailofbits/skills` | YES | COMPLIANT |
+| Skill                  | CC-BY-SA-4.0                | Source Attribution   | Source URL | Verdict   |
+| ---------------------- | --------------------------- | -------------------- | ---------- | --------- |
+| `static-analysis`      | YES (frontmatter + comment) | `trailofbits/skills` | YES        | COMPLIANT |
+| `variant-analysis`     | YES (frontmatter + comment) | `trailofbits/skills` | YES        | COMPLIANT |
+| `insecure-defaults`    | YES (frontmatter + comment) | `trailofbits/skills` | YES        | COMPLIANT |
+| `differential-review`  | YES (frontmatter + comment) | `trailofbits/skills` | YES        | COMPLIANT |
+| `semgrep-rule-creator` | YES (frontmatter + comment) | `trailofbits/skills` | YES        | COMPLIANT |
 
 **All Trail of Bits skills are fully license-compliant.** Each includes:
 
@@ -218,6 +220,7 @@ All sensitive commands delegate to skills that include explicit "AUTHORIZED USE 
 ### 5.2 Content Originality
 
 The Trail of Bits skills contain original content adapted for the agent-studio framework. They include:
+
 - Agent-studio-specific sections (Memory Protocol, Agent Integration, Related Skills)
 - Framework-specific patterns (provenance headers, tool declarations)
 - No proprietary content mixed in
@@ -230,37 +233,37 @@ The Trail of Bits skills contain original content adapted for the agent-studio f
 
 ### ASI01: Agent Goal Hijacking
 
-| Control | Status | Evidence |
-|---------|--------|----------|
-| Skills define clear identity boundaries | PASS | All `<identity>` tags scope agent expertise |
-| Skills resist redirection attempts | PASS | No "follow user instructions blindly" patterns |
-| Security notices limit authorized use | PASS | 8/10 sampled skills include security notices |
-| Tool access declared in frontmatter | PASS | All skills declare `tools:` in YAML |
-| Commands use `disable-model-invocation` | PASS | All commands prevent direct model prompting |
+| Control                                 | Status | Evidence                                       |
+| --------------------------------------- | ------ | ---------------------------------------------- |
+| Skills define clear identity boundaries | PASS   | All `<identity>` tags scope agent expertise    |
+| Skills resist redirection attempts      | PASS   | No "follow user instructions blindly" patterns |
+| Security notices limit authorized use   | PASS   | 8/10 sampled skills include security notices   |
+| Tool access declared in frontmatter     | PASS   | All skills declare `tools:` in YAML            |
+| Commands use `disable-model-invocation` | PASS   | All commands prevent direct model prompting    |
 
 **ASI01 Verdict: COMPLIANT** -- Skills resist goal hijacking through structural identity definitions and frontmatter-enforced tool restrictions.
 
 ### ASI02: Tool Misuse
 
-| Control | Status | Evidence |
-|---------|--------|----------|
-| Tool access scoped per skill | PASS | Frontmatter `tools:` field declares allowed tools |
-| No skill grants unbounded tool access | PASS | All skills use specific tool lists |
-| Enforcement hooks validate tool usage | PASS | routing-guard.cjs, unified-pre-write-hook.cjs active |
-| Router blacklist prevents unauthorized tools | PASS | Section 1.1 tool restrictions enforced |
-| Bash commands in skills are scoped | PARTIAL | Skills contain Bash examples but scope is context-dependent |
+| Control                                      | Status  | Evidence                                                    |
+| -------------------------------------------- | ------- | ----------------------------------------------------------- |
+| Tool access scoped per skill                 | PASS    | Frontmatter `tools:` field declares allowed tools           |
+| No skill grants unbounded tool access        | PASS    | All skills use specific tool lists                          |
+| Enforcement hooks validate tool usage        | PASS    | routing-guard.cjs, unified-pre-write-hook.cjs active        |
+| Router blacklist prevents unauthorized tools | PASS    | Section 1.1 tool restrictions enforced                      |
+| Bash commands in skills are scoped           | PARTIAL | Skills contain Bash examples but scope is context-dependent |
 
 **ASI02 Verdict: MOSTLY COMPLIANT** -- Tool access is properly scoped through frontmatter declarations and enforcement hooks. One gap: skills that list `Bash` in their tools can execute any Bash command within the agent's sandbox, though the shell-injection-validator hook provides defense-in-depth.
 
 ### ASI06: Memory/Context Poisoning
 
-| Control | Status | Evidence |
-|---------|--------|----------|
-| Skills include Memory Protocol | PASS | All 10 sampled skills include mandatory protocol |
-| Memory writes are append-only | PASS | Protocol specifies append, not overwrite |
-| No skill instructs writing arbitrary data | PASS | Memory writes scoped to learnings/issues/decisions |
-| Memory entries include context | PARTIAL | No provenance markers on individual memory entries |
-| Memory sanitization on write | FAIL | No sanitization utility exists (known issue) |
+| Control                                   | Status  | Evidence                                           |
+| ----------------------------------------- | ------- | -------------------------------------------------- |
+| Skills include Memory Protocol            | PASS    | All 10 sampled skills include mandatory protocol   |
+| Memory writes are append-only             | PASS    | Protocol specifies append, not overwrite           |
+| No skill instructs writing arbitrary data | PASS    | Memory writes scoped to learnings/issues/decisions |
+| Memory entries include context            | PARTIAL | No provenance markers on individual memory entries |
+| Memory sanitization on write              | FAIL    | No sanitization utility exists (known issue)       |
 
 **ASI06 Verdict: PARTIALLY COMPLIANT** -- Skills follow the memory protocol but the underlying infrastructure lacks memory entry sanitization. This is a known systemic issue (SEC-MEM-002 from the auth security audit) not introduced by this expansion.
 
@@ -274,29 +277,29 @@ None. No critical security vulnerabilities introduced by the skill expansion.
 
 ### High-Risk Findings (1)
 
-| ID | Finding | Impact | Remediation |
-|----|---------|--------|-------------|
+| ID             | Finding                                                       | Impact                                           | Remediation                                                                 |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------- |
 | SEC-SCHEMA-001 | 70/89 skill output schemas lack `additionalProperties: false` | Property injection through schema-validated data | Add `additionalProperties: false` to root and nested objects in all schemas |
 
 ### Medium-Risk Findings (2)
 
-| ID | Finding | Impact | Remediation |
-|----|---------|--------|-------------|
-| SEC-SCHEMA-002 | ~45 schemas use minimal stub pattern with no output validation | No meaningful validation of skill output structure | Expand stub schemas with proper output field definitions |
-| SEC-SKILL-001 | Code-reviewing skills could process user input containing embedded instructions | Low probability prompt injection via code comments | Monitor for anomalous behavior; existing agent framework provides mitigations |
+| ID             | Finding                                                                         | Impact                                             | Remediation                                                                   |
+| -------------- | ------------------------------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------- |
+| SEC-SCHEMA-002 | ~45 schemas use minimal stub pattern with no output validation                  | No meaningful validation of skill output structure | Expand stub schemas with proper output field definitions                      |
+| SEC-SKILL-001  | Code-reviewing skills could process user input containing embedded instructions | Low probability prompt injection via code comments | Monitor for anomalous behavior; existing agent framework provides mitigations |
 
 ### Low-Risk Findings (3)
 
-| ID | Finding | Impact | Remediation |
-|----|---------|--------|-------------|
-| SEC-RULE-001 | Rules are advisory, not programmatically enforced | Rules can be ignored by agents | By design; enforcement is handled by hooks |
-| SEC-RULE-002 | `web3-expert` skill lacks security notice section | Missing authorized-use boundaries for financial-impact domain | Add security notice to web3-expert SKILL.md |
-| SEC-LICENSE-001 | CC-BY-SA-4.0 derivative works need explicit documentation | License compliance tracking | Document Trail of Bits skill license in project LICENSE or NOTICE file |
+| ID              | Finding                                                   | Impact                                                        | Remediation                                                            |
+| --------------- | --------------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| SEC-RULE-001    | Rules are advisory, not programmatically enforced         | Rules can be ignored by agents                                | By design; enforcement is handled by hooks                             |
+| SEC-RULE-002    | `web3-expert` skill lacks security notice section         | Missing authorized-use boundaries for financial-impact domain | Add security notice to web3-expert SKILL.md                            |
+| SEC-LICENSE-001 | CC-BY-SA-4.0 derivative works need explicit documentation | License compliance tracking                                   | Document Trail of Bits skill license in project LICENSE or NOTICE file |
 
 ### Informational Findings (1)
 
-| ID | Finding | Impact | Remediation |
-|----|---------|--------|-------------|
+| ID          | Finding                                               | Impact                                | Remediation                                 |
+| ----------- | ----------------------------------------------------- | ------------------------------------- | ------------------------------------------- |
 | SEC-CMD-001 | Sensitive commands (forensics, binary analysis) exist | No additional risk beyond skill scope | Commands properly delegate to scoped skills |
 
 ---
@@ -338,12 +341,12 @@ None. No critical security vulnerabilities introduced by the skill expansion.
 
 ### SOC2 Trust Service Criteria
 
-| Criteria | Status | Notes |
-|----------|--------|-------|
-| CC6.1 (Logical Access) | PASS | Tool access controlled via frontmatter + hooks |
-| CC6.3 (System Boundaries) | PASS | Skills define clear identity and capability boundaries |
-| CC7.2 (Monitoring) | PARTIAL | Skills log to memory but no centralized security event monitoring |
-| CC8.1 (Change Management) | PASS | All artifacts include provenance headers |
+| Criteria                  | Status  | Notes                                                             |
+| ------------------------- | ------- | ----------------------------------------------------------------- |
+| CC6.1 (Logical Access)    | PASS    | Tool access controlled via frontmatter + hooks                    |
+| CC6.3 (System Boundaries) | PASS    | Skills define clear identity and capability boundaries            |
+| CC7.2 (Monitoring)        | PARTIAL | Skills log to memory but no centralized security event monitoring |
+| CC8.1 (Change Management) | PASS    | All artifacts include provenance headers                          |
 
 ### GDPR Considerations
 

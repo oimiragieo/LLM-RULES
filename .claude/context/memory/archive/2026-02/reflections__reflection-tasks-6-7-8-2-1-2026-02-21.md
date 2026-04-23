@@ -28,18 +28,18 @@ Score withheld for tasks 2 and 1. Score provided at PARTIAL confidence for tasks
 **Agent:** developer/skill-creator (inferred)
 **Data Quality:** partial
 
-| Dimension | Score |
-|-----------|-------|
-| Completeness | 0.70 |
-| Accuracy | 0.90 |
-| Clarity | 0.85 |
-| Consistency | 0.75 |
-| Actionability | 0.65 |
-| **Overall** | **0.77** |
+| Dimension     | Score    |
+| ------------- | -------- |
+| Completeness  | 0.70     |
+| Accuracy      | 0.90     |
+| Clarity       | 0.85     |
+| Consistency   | 0.75     |
+| Actionability | 0.65     |
+| **Overall**   | **0.77** |
 
 **Threshold:** PASS (0.77 >= 0.70)
 
-*Note: Score carries partial confidence due to absent TaskUpdate metadata. Integration gaps lower Actionability and Consistency dimensions.*
+_Note: Score carries partial confidence due to absent TaskUpdate metadata. Integration gaps lower Actionability and Consistency dimensions._
 
 ---
 
@@ -89,12 +89,12 @@ Score withheld — insufficient metadata.
 
 **Integration Score: 15% — CRITICAL**
 
-| Integration Check | Status |
-|---|---|
-| Catalog entry (skill-catalog.md) | MISSING for all 3 skills |
-| Skill-index entry (skill-index.json) | MISSING for all 3 skills |
-| Agent assignment | UNKNOWN (no index entry to verify) |
-| SKILL.md file | PRESENT for all 3 skills |
+| Integration Check                    | Status                             |
+| ------------------------------------ | ---------------------------------- |
+| Catalog entry (skill-catalog.md)     | MISSING for all 3 skills           |
+| Skill-index entry (skill-index.json) | MISSING for all 3 skills           |
+| Agent assignment                     | UNKNOWN (no index entry to verify) |
+| SKILL.md file                        | PRESENT for all 3 skills           |
 
 Classification: **Critical gaps** — artifacts exist on disk but are invisible to the ecosystem routing layer.
 
@@ -108,11 +108,11 @@ Classification: **Critical gaps** — artifacts exist on disk but are invisible 
 
 **Artifacts checked:** shadcn-ui, web-perf, next-cache-components
 
-| Skill | Catalog presence | Index presence | Agent assignment | Orphan status |
-|---|---|---|---|---|
-| shadcn-ui | MISSING | MISSING | MISSING | ORPHANED |
-| web-perf | MISSING | MISSING | MISSING | ORPHANED |
-| next-cache-components | MISSING | MISSING | MISSING | ORPHANED |
+| Skill                 | Catalog presence | Index presence | Agent assignment | Orphan status |
+| --------------------- | ---------------- | -------------- | ---------------- | ------------- |
+| shadcn-ui             | MISSING          | MISSING        | MISSING          | ORPHANED      |
+| web-perf              | MISSING          | MISSING        | MISSING          | ORPHANED      |
+| next-cache-components | MISSING          | MISSING        | MISSING          | ORPHANED      |
 
 **Finding severity:** CATALOG_MISSING + INDEX_MISSING + AGENT_MISSING for all three skills.
 
@@ -134,12 +134,12 @@ Classification: **Critical gaps** — artifacts exist on disk but are invisible 
 
 ## Memory Curation Decisions
 
-| Item | Action | Rationale |
-|---|---|---|
-| Batch skill import integration gap (recurring) | **Retain** | Second occurrence in 24 hours — systemic pattern requiring evolution recommendation |
-| shadcn/ui + web-perf + next-cache SKILL.md content | **Archive** (already in files) | Content is in skill files; no need to duplicate in memory |
-| `verified: false` for imported skills convention | **Retain** | Positive pattern worth reinforcing in patterns.json |
-| TaskUpdate metadata absence (5 more instances) | **Retain** | Escalation evidence for pre-completion-validation.cjs enforcement |
+| Item                                               | Action                         | Rationale                                                                           |
+| -------------------------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------- |
+| Batch skill import integration gap (recurring)     | **Retain**                     | Second occurrence in 24 hours — systemic pattern requiring evolution recommendation |
+| shadcn/ui + web-perf + next-cache SKILL.md content | **Archive** (already in files) | Content is in skill files; no need to duplicate in memory                           |
+| `verified: false` for imported skills convention   | **Retain**                     | Positive pattern worth reinforcing in patterns.json                                 |
+| TaskUpdate metadata absence (5 more instances)     | **Retain**                     | Escalation evidence for pre-completion-validation.cjs enforcement                   |
 
 ---
 

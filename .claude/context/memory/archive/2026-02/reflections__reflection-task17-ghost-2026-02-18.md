@@ -14,11 +14,13 @@ Reflection ID: task_completion:2026-02-18T06:55:07.529Z:17
 **Result: INSUFFICIENT_DATA — Score withheld.**
 
 Findings:
+
 - TaskGet({ taskId: "17" }) returned "Task not found"
 - Summary is the fallback string: "Task 17 completed without summary metadata"
 - No filesModified, outputArtifacts, or agent type provided in trigger
 
 **Memory fallback search results:**
+
 - reflection-log.jsonl entry #6 (2026-02-18T06:50:00.000Z) references taskId "17" — this is a prior reflection batch ID, not the actual task
 - Archive decisions.md references historical Task #17 from 2026-02-08 (Ecosystem Creation Protocol Sequencing Decision — a planner task, a different session entirely)
 - Archive learnings.md references Task #17 from 2026-02-08 (zero-rework plan dependency DAGs, planner work)
@@ -31,12 +33,14 @@ Findings:
 This is the **N-th confirmed ghost task** occurrence (pattern ID: `ghost-task-reflection-echo` in gotchas.json).
 
 **Prior occurrences documented in reflection-log.jsonl:**
+
 - 2026-02-17T22:14 batch: ghost tasks task-1, 1, 2 (none found in task system)
 - 2026-02-17T22:23 batch: ghost task 2 (echo of prior batch)
 - 2026-02-18T06:50 batch: taskId "17" used as batch identifier in reflection entry, now being re-triggered
 
 **Pattern diagnosis:**
 The reflection queue ID format `task_completion:2026-02-18T06:55:07.529Z:17` shows taskId=17. This could be:
+
 1. A legitimate task that completed without TaskUpdate (standard ghost task scenario)
 2. A reflection system using sequential batch numbers (the "17" may be an internal counter)
 3. An artifact from the 06:50 batch reflection that processed tasks 15 and 16 (that batch used taskId "17" as its log entry ID)
@@ -72,16 +76,20 @@ Integration score: N/A
 ## Memory Curation Decisions
 
 ### Retain
+
 - Ghost-task-reflection-echo gotcha (already in gotchas.json — high reuse, recurring pattern)
 - Missing-taskupdate-metadata-recurring gotcha (already in gotchas.json — critical systemic issue)
 
 ### Compress
+
 - No new evidence to compress
 
 ### Archive
+
 - No content to archive from this reflection
 
 ### Rationale
+
 This ghost task reflection produced no new high-signal patterns beyond what is already documented. The primary value of this reflection run is confirming the INSUFFICIENT_DATA gate functions correctly and appending the atomic handshake record.
 
 ## Learnings Extracted
@@ -93,13 +101,16 @@ This ghost task reflection produced no new high-signal patterns beyond what is a
 ## Recommendations
 
 ### P0 (Critical)
+
 - Implement ghost-task deduplication in reflection-queue-processor.cjs: before spawning, check if taskId appears in reflection-log.jsonl processedReflectionIds — if already documented as ghost or processed, suppress the spawn.
 
 ### P1 (High)
+
 - Change reflection-log.jsonl batch entry taskId format: use "batch-{timestamp}" instead of numeric taskId to prevent collision with actual task IDs.
 - Add TaskGet validation at queue processing time — reject if task not found in system before spawning reflection-agent.
 
 ### P2 (Medium)
+
 - Implement REFLECTION_TASK_VALIDATION=warn|block enforcement mode in queue processor.
 - Add deduplication key to spawn-request.json entries (check against last N processedReflectionIds before spawning).
 

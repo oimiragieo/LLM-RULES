@@ -18,6 +18,7 @@
 ### ✅ FIXED (1)
 
 **MEDIUM: TOCTOU race in sync-memory-index.cjs (lines 189-195)**
+
 - **Status**: FIXED
 - **Location**: `.claude/hooks/memory/sync-memory-index.cjs:189-197`
 - **Fix Applied**: Now uses non-blocking spawn with `detached: true` and `child.unref()`
@@ -26,6 +27,7 @@
 ### ❌ STILL PRESENT (1)
 
 **MEDIUM: user-prompt-unified.cjs at 1701 lines**
+
 - **Status**: STILL PRESENT (now 1700 lines)
 - **Location**: `.claude/hooks/routing/user-prompt-unified.cjs`
 - **Line Count**: 1700 lines (verified 2026-02-10)
@@ -35,6 +37,7 @@
 ### 🗑️ NO LONGER PRESENT (6)
 
 The following issues were not found in current codebase (code removed or refactored):
+
 1. C-02: Event bus async contract violation
 2. C-03: Race condition in TaskUpdate counter
 3. MEDIUM: parseHookInputAsync silently returns null
@@ -49,21 +52,25 @@ The following issues were not found in current codebase (code removed or refacto
 ### MEDIUM Priority (4 issues)
 
 **M-01: routing-guard.cjs exceeds maintainability threshold**
+
 - File: `.claude/hooks/routing/routing-guard.cjs`
 - Lines: 2205 (largest file in codebase)
 - Remediation: Extract to modular structure
 
 **M-02: memory-manager.cjs exceeds maintainability threshold**
+
 - File: `.claude/lib/memory/memory-manager.cjs`
 - Lines: 1504
 - Remediation: Extract tier/rotation/stats logic
 
 **M-03: unified-reflection-handler.cjs exceeds maintainability threshold**
+
 - File: `.claude/hooks/reflection/unified-reflection-handler.cjs`
 - Lines: 1228
 - Remediation: Extract queue/priority/execution logic
 
 **M-04: user-prompt-unified.cjs still at 1700 lines**
+
 - File: `.claude/hooks/routing/user-prompt-unified.cjs`
 - Lines: 1700 (unchanged)
 - Remediation: Same as previous audit
@@ -71,6 +78,7 @@ The following issues were not found in current codebase (code removed or refacto
 ### LOW Priority (3 issues)
 
 **L-01 to L-03: Empty catch blocks**
+
 - Files: index-manager.cjs (2x), code-index-updater.cjs (2x), contextual-memory.cjs (1x)
 - Pattern: `.catch(() => {})`
 - Remediation: Add minimal logging
@@ -80,11 +88,13 @@ The following issues were not found in current codebase (code removed or refacto
 ## Summary Statistics
 
 **Previous Audit Issues**:
+
 - ✅ Fixed: 1
 - 🗑️ No longer present: 6
 - ❌ Still present: 1
 
 **New Issues Found**:
+
 - CRITICAL: 0
 - HIGH: 0
 - MEDIUM: 4

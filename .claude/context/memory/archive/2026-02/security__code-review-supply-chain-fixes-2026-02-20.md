@@ -32,6 +32,7 @@
 ### Strengths
 
 **external-content-guard.cjs**:
+
 - `safeParseJSON` used correctly (line 100) instead of raw `JSON.parse` for trusted-sources.json loading. The null-prototype safe object is handled correctly by the `typeof parsed !== 'object'` check.
 - Path traversal protection in `writeQuarantineFile()` (lines 162-168) uses `path.resolve` comparison with `path.sep` suffix — robust against directory traversal.
 - `shell: false` is not applicable here (no child_process.spawn usage).
@@ -41,18 +42,21 @@
 - Cache reset exported as `_resetCache()` for test isolation — good design.
 
 **reflection-cleanup.cjs**:
+
 - No `child_process.spawn` usage — shell injection not applicable.
 - No raw `JSON.parse` — all parsing delegated to `safeParseJSON` via `spawn-request-contract.cjs`.
 - Error handling wraps the entire `main()` body (lines 87-88): `catch (_err) { process.exit(0); }` — correct fail-open for a PostToolUse hook.
 - Staleness check uses `req?.source?.timestamp` field consistently with how `sanitizeSpawnRequest()` normalizes it.
 
 **spawn-request-contract.cjs** (GAP-D backing library):
+
 - `removeStaleRequests()` uses `atomicWriteJSONSync` for safe concurrent writes — correct.
 - Cutoff comparison `ts >= cutoff` is correct direction (retain fresh, remove stale).
 - Filter preserves entries with unparseable timestamps (`return true` on NaN) — conservative, avoids inadvertent data loss.
 - Return value of `removedCount` is correct and tested.
 
 **Tests (external-content-guard.test.cjs)**:
+
 - 21 scenarios covering GAP-A, GAP-B, GAP-C, and regression cases.
 - `beforeEach`/`afterEach` save and restore `process.env.EXTERNAL_CONTENT_GUARD_MODE` — deterministic.
 - `cleanupQuarantineFiles()` called in `afterEach` — no leftover state.
@@ -60,6 +64,7 @@
 - No external network calls.
 
 **Tests (reflection-cleanup.test.cjs)**:
+
 - 15 scenarios across 4 suites covering `removeStaleRequests`, `readSpawnRequestsFile` with `maxAge`, `removeRequests`, and cross-session stale cleanup.
 - Uses `tmpDir` with `fs.mkdtempSync` and `fs.rmSync` cleanup — no leftover files, fully isolated.
 - `spawnSync` test (line 286) exercises the hook process boundary with no metadata — correct integration test approach.
@@ -147,6 +152,7 @@
 ## Stage 3: Integration Verification
 
 **Hook registration** (`.claude/settings.json`):
+
 - `external-content-guard.cjs` registered under `PreToolUse` — confirmed present.
 - `reflection-cleanup.cjs` registered under `PostToolUse(TaskUpdate)` — confirmed present.
 - Both registrations verified via grep.
@@ -171,13 +177,13 @@
 
 ## File Verdicts
 
-| File | Verdict | Notes |
-|------|---------|-------|
-| `.claude/hooks/safety/external-content-guard.cjs` | PASS | Well-implemented. Minor path traversal and schema issues. |
-| `tests/hooks/external-content-guard.test.cjs` | PASS | Good coverage. Minor cleanup isolation concern. |
-| `.claude/hooks/reflection/reflection-cleanup.cjs` | PASS | Clean implementation, correct fail-open, proper delegation to contract. |
-| `tests/hooks/reflection-cleanup.test.cjs` | PASS | Thorough. Missing one integration-level spawnSync happy-path test. |
-| `.env.example` | FAIL | `EXTERNAL_CONTENT_GUARD_MODE` not documented. BLOCKING. |
+| File                                              | Verdict | Notes                                                                   |
+| ------------------------------------------------- | ------- | ----------------------------------------------------------------------- |
+| `.claude/hooks/safety/external-content-guard.cjs` | PASS    | Well-implemented. Minor path traversal and schema issues.               |
+| `tests/hooks/external-content-guard.test.cjs`     | PASS    | Good coverage. Minor cleanup isolation concern.                         |
+| `.claude/hooks/reflection/reflection-cleanup.cjs` | PASS    | Clean implementation, correct fail-open, proper delegation to contract. |
+| `tests/hooks/reflection-cleanup.test.cjs`         | PASS    | Thorough. Missing one integration-level spawnSync happy-path test.      |
+| `.env.example`                                    | FAIL    | `EXTERNAL_CONTENT_GUARD_MODE` not documented. BLOCKING.                 |
 
 ---
 

@@ -12,6 +12,7 @@
 Designed 5 remediation fixes with exact before/after code, TDD test specifications, Windows compatibility verification, and risk mitigation. All fixes include security controls from the security-controls-catalog.md and map to OWASP categories for compliance reporting.
 
 **Priority Summary**:
+
 - **P0 (This Week - Security Critical)**: Fixes 1, 2, 3 (shell injection, JSON.parse protection, DB race condition)
 - **P1 (This Month)**: Fix 4 (event bus null checks)
 - **P2 (Next Quarter)**: Fix 5 (audit additional shell injection vectors)
@@ -23,7 +24,9 @@ Designed 5 remediation fixes with exact before/after code, TDD test specificatio
 ## Fix 1: Remove shell:true from 4 Skill Scripts
 
 ### Classification: **CRITICAL** (OWASP A03: Injection)
+
 ### Effort: 4 hours
+
 ### Security Control: SEC-003 (Input Sanitization)
 
 ### Problem Statement
@@ -40,29 +43,33 @@ All 4 skill scripts use `shell: true` in `spawn()` calls, creating command injec
 **Line**: 72
 
 **Before (Vulnerable)**:
+
 ```javascript
 const child = spawn('python', [executorPath, ...args.filter(a => a !== '--help')], {
   stdio: 'inherit',
   cwd: path.dirname(executorPath),
-  shell: true,  // ← VULNERABILITY: Command injection risk
+  shell: true, // ← VULNERABILITY: Command injection risk
 });
 ```
 
 **After (Safe)**:
+
 ```javascript
 const child = spawn('python', [executorPath, ...args.filter(a => a !== '--help')], {
   stdio: 'inherit',
   cwd: path.dirname(executorPath),
-  shell: false,  // ← FIX: No shell, direct execution only
+  shell: false, // ← FIX: No shell, direct execution only
 });
 ```
 
 **Verification**:
+
 - ✅ Command works without shell: `python` resolves from PATH on Windows/Unix
 - ✅ No pipes, redirects, or globs needed in arguments
 - ✅ Array-based args prevent injection (already implemented)
 
 **Windows Compatibility**:
+
 - `python` command resolves on Windows if Python installed via Microsoft Store, installer, or PATH
 - No `.cmd` wrapper needed (direct executable)
 - If PATH not set: fails gracefully with error (not a shell injection vector)
@@ -75,6 +82,7 @@ const child = spawn('python', [executorPath, ...args.filter(a => a !== '--help')
 **Line**: 66
 
 **Before (Vulnerable)**:
+
 ```javascript
 const child = spawn(
   'git',
@@ -82,12 +90,13 @@ const child = spawn(
   {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: true,  // ← VULNERABILITY: Command injection risk
+    shell: true, // ← VULNERABILITY: Command injection risk
   }
 );
 ```
 
 **After (Safe)**:
+
 ```javascript
 const child = spawn(
   'git',
@@ -95,17 +104,19 @@ const child = spawn(
   {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: false,  // ← FIX: No shell, direct execution only
+    shell: false, // ← FIX: No shell, direct execution only
   }
 );
 ```
 
 **Verification**:
+
 - ✅ Command works without shell: `git` resolves from PATH on Windows/Unix
 - ✅ No shell-specific features used (no wildcards, pipes, redirects)
 - ✅ Array-based args already implemented
 
 **Windows Compatibility**:
+
 - Git for Windows includes `git.exe` in PATH (direct executable, not .cmd)
 - No shell needed for resolution
 - Fails gracefully if Git not installed (not a security issue)
@@ -118,29 +129,33 @@ const child = spawn(
 **Line**: 64
 
 **Before (Vulnerable)**:
+
 ```javascript
 const child = spawn('docker', ['compose', ...composeArgs], {
   stdio: 'inherit',
   cwd: PROJECT_ROOT,
-  shell: true,  // ← VULNERABILITY: Command injection risk
+  shell: true, // ← VULNERABILITY: Command injection risk
 });
 ```
 
 **After (Safe)**:
+
 ```javascript
 const child = spawn('docker', ['compose', ...composeArgs], {
   stdio: 'inherit',
   cwd: PROJECT_ROOT,
-  shell: false,  // ← FIX: No shell, direct execution only
+  shell: false, // ← FIX: No shell, direct execution only
 });
 ```
 
 **Verification**:
+
 - ✅ Command works without shell: `docker` resolves from PATH
 - ✅ Subcommand `compose` passed as array argument (safe)
 - ✅ No shell metacharacters needed
 
 **Windows Compatibility**:
+
 - Docker Desktop for Windows includes `docker.exe` in PATH (direct executable)
 - `compose` is a Docker CLI plugin (not separate command)
 - No shell wrapper needed
@@ -153,6 +168,7 @@ const child = spawn('docker', ['compose', ...composeArgs], {
 **Line**: 66
 
 **Before (Vulnerable)**:
+
 ```javascript
 const child = spawn(
   'terraform',
@@ -160,12 +176,13 @@ const child = spawn(
   {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: true,  // ← VULNERABILITY: Command injection risk
+    shell: true, // ← VULNERABILITY: Command injection risk
   }
 );
 ```
 
 **After (Safe)**:
+
 ```javascript
 const child = spawn(
   'terraform',
@@ -173,17 +190,19 @@ const child = spawn(
   {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: false,  // ← FIX: No shell, direct execution only
+    shell: false, // ← FIX: No shell, direct execution only
   }
 );
 ```
 
 **Verification**:
+
 - ✅ Command works without shell: `terraform` resolves from PATH
 - ✅ No shell-specific features used
 - ✅ Array-based args already safe
 
 **Windows Compatibility**:
+
 - Terraform for Windows is a single `terraform.exe` in PATH
 - No shell wrapper needed
 - Fails gracefully if not installed
@@ -197,6 +216,7 @@ const child = spawn(
 **Test File**: `tests/skills/shell-injection-prevention.test.cjs`
 
 **Test 1: Verify shell:false prevents injection**
+
 ```javascript
 // Test name: Shell metacharacters do not execute with shell:false
 // File: tests/skills/shell-injection-prevention.test.cjs
@@ -213,20 +233,27 @@ test('sequential-thinking skill with malicious args does not execute shell metac
   });
 
   let stderr = '';
-  child.stderr.on('data', (data) => { stderr += data.toString(); });
+  child.stderr.on('data', data => {
+    stderr += data.toString();
+  });
 
-  const exitCode = await new Promise((resolve) => {
-    child.on('close', (code) => resolve(code));
+  const exitCode = await new Promise(resolve => {
+    child.on('close', code => resolve(code));
   });
 
   // Expect: Python treats '; rm -rf /' as literal argument → fails (unrecognized option)
   // NOT: Shell executes 'rm -rf /' → would succeed with shell:true
   assert.notStrictEqual(exitCode, 0, 'Malicious args should fail, not execute');
-  assert.match(stderr, /unrecognized|invalid|error/i, 'Error indicates argument parsing failure, not shell execution');
+  assert.match(
+    stderr,
+    /unrecognized|invalid|error/i,
+    'Error indicates argument parsing failure, not shell execution'
+  );
 });
 ```
 
 **Test 2: Verify commands still work normally**
+
 ```javascript
 // Test name: Normal skill invocation still works with shell:false
 // Assert: spawn with shell:false executes legitimate commands successfully
@@ -240,10 +267,12 @@ test('git-expert skill normal invocation works with shell:false', async () => {
   });
 
   let stdout = '';
-  child.stdout.on('data', (data) => { stdout += data.toString(); });
+  child.stdout.on('data', data => {
+    stdout += data.toString();
+  });
 
-  const exitCode = await new Promise((resolve) => {
-    child.on('close', (code) => resolve(code));
+  const exitCode = await new Promise(resolve => {
+    child.on('close', code => resolve(code));
   });
 
   // Expect: Git executes normally
@@ -253,6 +282,7 @@ test('git-expert skill normal invocation works with shell:false', async () => {
 ```
 
 **TDD Cycle**:
+
 1. **RED**: Write test → Verify it fails with `shell: true` (injection executes or command fails differently)
 2. **GREEN**: Change `shell: true` → `shell: false` → Verify test passes
 3. **REFACTOR**: None needed (simple boolean change)
@@ -262,7 +292,9 @@ test('git-expert skill normal invocation works with shell:false', async () => {
 ## Fix 2: Adopt safeParseJSON in Reflection Hooks
 
 ### Classification: **HIGH** (OWASP A04: Insecure Design - Error Handling)
+
 ### Effort: 2 hours
+
 ### Security Control: SEC-003 (Input Sanitization)
 
 ### Problem Statement
@@ -279,6 +311,7 @@ test('git-expert skill normal invocation works with shell:false', async () => {
 **Line**: 185
 
 **Before (Best Practice Violation)**:
+
 ```javascript
 function readExistingSpawnRequests(spawnRequestFile) {
   try {
@@ -287,7 +320,7 @@ function readExistingSpawnRequests(spawnRequestFile) {
     }
     const content = fs.readFileSync(spawnRequestFile, 'utf8');
     if (!content.trim()) return [];
-    const parsed = JSON.parse(content);  // ← UNPROTECTED (outer try-catch returns [] on error)
+    const parsed = JSON.parse(content); // ← UNPROTECTED (outer try-catch returns [] on error)
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     debugLog('reflection-queue-processor', 'Error reading existing spawn requests', err);
@@ -297,6 +330,7 @@ function readExistingSpawnRequests(spawnRequestFile) {
 ```
 
 **After (Safe + Best Practice)**:
+
 ```javascript
 const { safeParseJSON } = require('../../../.claude/lib/utils/safe-json.cjs');
 
@@ -309,7 +343,7 @@ function readExistingSpawnRequests(spawnRequestFile) {
     if (!content.trim()) return [];
 
     // Use safeParseJSON - returns Object.create(null) on error (no prototype pollution)
-    const parsed = safeParseJSON(content, null);  // ← FIX: Safe JSON parse
+    const parsed = safeParseJSON(content, null); // ← FIX: Safe JSON parse
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     debugLog('reflection-queue-processor', 'Error reading existing spawn requests', err);
@@ -319,6 +353,7 @@ function readExistingSpawnRequests(spawnRequestFile) {
 ```
 
 **Why This Fix**:
+
 - `safeParseJSON` uses `Object.create(null)` → prevents prototype pollution
 - Strips dangerous keys (`__proto__`, `constructor`, `prototype`)
 - Returns safe empty object on error (not `{}`)
@@ -332,13 +367,14 @@ function readExistingSpawnRequests(spawnRequestFile) {
 **Line**: 68
 
 **Before (Best Practice Violation)**:
+
 ```javascript
 function readSpawnRequests(filePath) {
   try {
     if (!fs.existsSync(filePath)) return [];
     const content = fs.readFileSync(filePath, 'utf8');
     if (!content.trim()) return [];
-    const parsed = JSON.parse(content);  // ← UNPROTECTED (outer try-catch returns [] on error)
+    const parsed = JSON.parse(content); // ← UNPROTECTED (outer try-catch returns [] on error)
     return Array.isArray(parsed) ? parsed : [];
   } catch (_err) {
     return [];
@@ -347,6 +383,7 @@ function readSpawnRequests(filePath) {
 ```
 
 **After (Safe + Best Practice)**:
+
 ```javascript
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
@@ -357,7 +394,7 @@ function readSpawnRequests(filePath) {
     if (!content.trim()) return [];
 
     // Use safeParseJSON - returns Object.create(null) on error
-    const parsed = safeParseJSON(content, null);  // ← FIX: Safe JSON parse
+    const parsed = safeParseJSON(content, null); // ← FIX: Safe JSON parse
     return Array.isArray(parsed) ? parsed : [];
   } catch (_err) {
     return [];
@@ -373,13 +410,14 @@ function readSpawnRequests(filePath) {
 **Line**: 49
 
 **Before (Best Practice Violation)**:
+
 ```javascript
 function readSpawnRequests(filePath) {
   try {
     if (!fs.existsSync(filePath)) return [];
     const content = fs.readFileSync(filePath, 'utf8');
     if (!content.trim()) return [];
-    const parsed = JSON.parse(content);  // ← UNPROTECTED (outer try-catch logs error)
+    const parsed = JSON.parse(content); // ← UNPROTECTED (outer try-catch logs error)
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     stderrLog('warn', 'Failed to read spawn requests', { error: err.message });
@@ -389,6 +427,7 @@ function readSpawnRequests(filePath) {
 ```
 
 **After (Safe + Best Practice)**:
+
 ```javascript
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
@@ -399,7 +438,7 @@ function readSpawnRequests(filePath) {
     if (!content.trim()) return [];
 
     // Use safeParseJSON - returns Object.create(null) on error
-    const parsed = safeParseJSON(content, null);  // ← FIX: Safe JSON parse
+    const parsed = safeParseJSON(content, null); // ← FIX: Safe JSON parse
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     stderrLog('warn', 'Failed to read spawn requests', { error: err.message });
@@ -415,6 +454,7 @@ function readSpawnRequests(filePath) {
 **Test File**: `tests/hooks/safe-json-parse.test.cjs`
 
 **Test 1: Verify prototype pollution prevention**
+
 ```javascript
 // Test name: safeParseJSON prevents prototype pollution
 // Assert: Parsing malicious JSON does not pollute Object.prototype
@@ -426,12 +466,21 @@ test('safeParseJSON prevents prototype pollution', () => {
   const parsed = safeParseJSON(maliciousJSON, null);
 
   // Verify pollution did not happen
-  assert.strictEqual(Object.prototype.polluted, undefined, 'Object.prototype should not be polluted');
-  assert.strictEqual(parsed.__proto__, undefined, 'Parsed object should not have __proto__ property');
+  assert.strictEqual(
+    Object.prototype.polluted,
+    undefined,
+    'Object.prototype should not be polluted'
+  );
+  assert.strictEqual(
+    parsed.__proto__,
+    undefined,
+    'Parsed object should not have __proto__ property'
+  );
 });
 ```
 
 **Test 2: Verify safe fallback on malformed JSON**
+
 ```javascript
 // Test name: safeParseJSON returns safe empty object on error
 // Assert: Malformed JSON returns Object.create(null) (no prototype)
@@ -443,12 +492,17 @@ test('safeParseJSON returns safe empty object on malformed JSON', () => {
   const parsed = safeParseJSON(malformedJSON, null);
 
   // Verify safe empty object returned
-  assert.strictEqual(Object.getPrototypeOf(parsed), null, 'Returned object should have no prototype');
+  assert.strictEqual(
+    Object.getPrototypeOf(parsed),
+    null,
+    'Returned object should have no prototype'
+  );
   assert.deepStrictEqual(Object.keys(parsed), [], 'Returned object should be empty');
 });
 ```
 
 **TDD Cycle**:
+
 1. **RED**: Write test → Verify it fails with raw `JSON.parse` (prototype pollution or unsafe error handling)
 2. **GREEN**: Replace `JSON.parse` with `safeParseJSON` → Verify test passes
 3. **REFACTOR**: None needed (direct replacement)
@@ -458,7 +512,9 @@ test('safeParseJSON returns safe empty object on malformed JSON', () => {
 ## Fix 3: DB Init Race Condition Fix
 
 ### Classification: **MEDIUM** (OWASP A04: Insecure Design - Race Condition)
+
 ### Effort: 3 hours
+
 ### Security Control: SEC-007 (File-Based Locking)
 
 ### Problem Statement
@@ -475,17 +531,18 @@ test('safeParseJSON returns safe empty object on malformed JSON', () => {
 **Lines**: 56-81
 
 **Before (Race Condition)**:
+
 ```javascript
 function ensureEntityDbInitialized(dbPath) {
   try {
     const dbDir = path.dirname(dbPath);
     if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true });  // ← RACE: concurrent mkdir
+      fs.mkdirSync(dbDir, { recursive: true }); // ← RACE: concurrent mkdir
     }
 
     // Lazily initialize schema if missing (idempotent).
     const { DatabaseSync } = require('node:sqlite');
-    const db = new DatabaseSync(dbPath);  // ← RACE: concurrent schema init
+    const db = new DatabaseSync(dbPath); // ← RACE: concurrent schema init
     try {
       const row = db
         .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'")
@@ -493,7 +550,7 @@ function ensureEntityDbInitialized(dbPath) {
       if (row) return;
 
       const init = require('../../tools/cli/init-memory-db.cjs');
-      init.initializeDatabase(db);  // ← RACE: concurrent schema creation
+      init.initializeDatabase(db); // ← RACE: concurrent schema creation
     } finally {
       db.close();
     }
@@ -504,10 +561,11 @@ function ensureEntityDbInitialized(dbPath) {
 ```
 
 **After (Safe with File Lock)**:
+
 ```javascript
 function ensureEntityDbInitialized(dbPath) {
   const lockFile = dbPath + '.init.lock';
-  let lockFd = null;  // File descriptor for lock
+  let lockFd = null; // File descriptor for lock
 
   try {
     const dbDir = path.dirname(dbPath);
@@ -517,7 +575,7 @@ function ensureEntityDbInitialized(dbPath) {
 
     // Atomic lock acquisition using exclusive write flag
     try {
-      lockFd = fs.openSync(lockFile, 'wx');  // ← FIX: Atomic lock (fails if exists)
+      lockFd = fs.openSync(lockFile, 'wx'); // ← FIX: Atomic lock (fails if exists)
     } catch (err) {
       if (err.code === 'EEXIST') {
         // Another process is initializing - wait briefly or skip
@@ -526,7 +584,7 @@ function ensureEntityDbInitialized(dbPath) {
         // Optional: Wait for lock release (max 2 seconds)
         const maxWaitMs = 2000;
         const startWait = Date.now();
-        while (fs.existsSync(lockFile) && (Date.now() - startWait) < maxWaitMs) {
+        while (fs.existsSync(lockFile) && Date.now() - startWait < maxWaitMs) {
           // Busy-wait (acceptable for short duration in hook)
           // Alternative: use Atomics.wait with SharedArrayBuffer
         }
@@ -535,15 +593,15 @@ function ensureEntityDbInitialized(dbPath) {
         if (fs.existsSync(lockFile)) {
           debugLog('sync-memory-index', 'Lock timeout - assuming stale lock');
           try {
-            fs.unlinkSync(lockFile);  // Remove stale lock
+            fs.unlinkSync(lockFile); // Remove stale lock
           } catch (_cleanupErr) {
             // Best effort cleanup
           }
         } else {
-          return;  // Lock released, another process initialized successfully
+          return; // Lock released, another process initialized successfully
         }
       } else {
-        throw err;  // Unexpected error
+        throw err; // Unexpected error
       }
     }
 
@@ -557,7 +615,7 @@ function ensureEntityDbInitialized(dbPath) {
       if (row) return;
 
       const init = require('../../tools/cli/init-memory-db.cjs');
-      init.initializeDatabase(db);  // ← SAFE: Only one process can reach here
+      init.initializeDatabase(db); // ← SAFE: Only one process can reach here
     } finally {
       db.close();
     }
@@ -567,8 +625,8 @@ function ensureEntityDbInitialized(dbPath) {
     // Always release lock
     if (lockFd !== null) {
       try {
-        fs.closeSync(lockFd);  // Close file descriptor
-        fs.unlinkSync(lockFile);  // Delete lock file
+        fs.closeSync(lockFd); // Close file descriptor
+        fs.unlinkSync(lockFile); // Delete lock file
       } catch (_cleanupErr) {
         // Best effort cleanup
       }
@@ -578,6 +636,7 @@ function ensureEntityDbInitialized(dbPath) {
 ```
 
 **Why This Fix**:
+
 - `fs.openSync(lockFile, 'wx')` → **Atomic** lock acquisition (fails if file exists)
 - POSIX-compliant: Works on Windows/Linux/macOS
 - Lock timeout: Prevents deadlock from crashed processes (stale locks)
@@ -592,17 +651,20 @@ If a process crashes while holding lock → lock file persists → future proces
 ### Alternative: SQLite WAL Mode (Research-Recommended)
 
 **Research Finding** (from remediation-best-practices-research-2026-02-13.md):
+
 - WAL (Write-Ahead Logging) mode allows concurrent readers + single writer
 - Better long-term solution than file locks
 - Requires schema change (not immediate fix)
 
 **Future Enhancement** (P2):
+
 ```javascript
 // Enable WAL mode during schema init
 db.exec('PRAGMA journal_mode=WAL;');
 ```
 
 **Why Not Now**:
+
 - Requires testing with existing schema
 - Migration plan needed for production databases
 - File lock is faster to implement (3h vs 8h)
@@ -614,6 +676,7 @@ db.exec('PRAGMA journal_mode=WAL;');
 **Test File**: `tests/hooks/db-init-race-condition.test.cjs`
 
 **Test 1: Verify concurrent init does not fail**
+
 ```javascript
 // Test name: Concurrent schema init with file lock succeeds
 // Assert: 10 parallel processes all initialize successfully (no SQLITE_BUSY errors)
@@ -626,25 +689,37 @@ test('concurrent schema init with file lock succeeds', async () => {
   const testDbPath = path.join(__dirname, 'test-db-race.sqlite');
 
   // Delete test DB and lock file
-  try { fs.unlinkSync(testDbPath); } catch {}
-  try { fs.unlinkSync(testDbPath + '.init.lock'); } catch {}
+  try {
+    fs.unlinkSync(testDbPath);
+  } catch {}
+  try {
+    fs.unlinkSync(testDbPath + '.init.lock');
+  } catch {}
 
   // Spawn 10 parallel processes that call ensureEntityDbInitialized
   const processes = [];
   for (let i = 0; i < 10; i++) {
-    const child = spawn('node', [
-      '-e',
-      `
+    const child = spawn(
+      'node',
+      [
+        '-e',
+        `
       const sync = require('./hooks/memory/sync-memory-index.cjs');
       sync.ensureEntityDbInitialized('${testDbPath}');
-      `
-    ], { stdio: 'pipe' });
+      `,
+      ],
+      { stdio: 'pipe' }
+    );
 
-    processes.push(new Promise((resolve) => {
-      let stderr = '';
-      child.stderr.on('data', (data) => { stderr += data.toString(); });
-      child.on('close', (code) => resolve({ code, stderr }));
-    }));
+    processes.push(
+      new Promise(resolve => {
+        let stderr = '';
+        child.stderr.on('data', data => {
+          stderr += data.toString();
+        });
+        child.on('close', code => resolve({ code, stderr }));
+      })
+    );
   }
 
   const results = await Promise.all(processes);
@@ -652,7 +727,11 @@ test('concurrent schema init with file lock succeeds', async () => {
   // Verify: All processes exit successfully (no SQLITE_BUSY or schema errors)
   results.forEach((result, idx) => {
     assert.strictEqual(result.code, 0, `Process ${idx} should exit successfully`);
-    assert.doesNotMatch(result.stderr, /SQLITE_BUSY|schema_version/i, `Process ${idx} should not error`);
+    assert.doesNotMatch(
+      result.stderr,
+      /SQLITE_BUSY|schema_version/i,
+      `Process ${idx} should not error`
+    );
   });
 
   // Verify: Schema initialized exactly once (no duplicate tables)
@@ -661,7 +740,10 @@ test('concurrent schema init with file lock succeeds', async () => {
   const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
   db.close();
 
-  assert.ok(tables.some(t => t.name === 'schema_version'), 'schema_version table should exist');
+  assert.ok(
+    tables.some(t => t.name === 'schema_version'),
+    'schema_version table should exist'
+  );
 
   // Cleanup
   fs.unlinkSync(testDbPath);
@@ -669,6 +751,7 @@ test('concurrent schema init with file lock succeeds', async () => {
 ```
 
 **Test 2: Verify stale lock cleanup**
+
 ```javascript
 // Test name: Stale lock file is removed after timeout
 // Assert: If lock file exists for >2s, it is removed and init proceeds
@@ -681,7 +764,9 @@ test('stale lock file is removed after timeout', async () => {
   const lockFile = testDbPath + '.init.lock';
 
   // Delete test DB
-  try { fs.unlinkSync(testDbPath); } catch {}
+  try {
+    fs.unlinkSync(testDbPath);
+  } catch {}
 
   // Create stale lock file (simulate crashed process)
   fs.writeFileSync(lockFile, String(process.pid - 1000), 'utf8');
@@ -705,6 +790,7 @@ test('stale lock file is removed after timeout', async () => {
 ```
 
 **TDD Cycle**:
+
 1. **RED**: Write test → Verify it fails without lock (concurrent init errors)
 2. **GREEN**: Add file lock → Verify test passes
 3. **REFACTOR**: Extract lock acquisition to separate function (optional)
@@ -714,7 +800,9 @@ test('stale lock file is removed after timeout', async () => {
 ## Fix 4: Event Bus Null Checks
 
 ### Classification: **LOW** (Defensive Programming)
+
 ### Effort: 3 hours
+
 ### Security Control: SEC-008 (Defensive Coding)
 
 ### Problem Statement
@@ -728,12 +816,14 @@ Search for all files that import `event-bus.cjs` without null checks. Event bus 
 ### Fix 4.1: Search for Event Bus Imports
 
 **Search Command**:
+
 ```bash
 # Find all imports of event-bus.cjs
 rg -F "require.*event-bus.cjs" -g "*.cjs" -g "*.js" -g "*.ts"
 ```
 
 **Expected Findings** (from previous code reviews):
+
 - `.claude/hooks/routing/pre-task-unified.cjs`
 - `.claude/hooks/routing/pre-tool-unified.cjs`
 - `.claude/hooks/memory/sync-memory-index.cjs`
@@ -746,14 +836,16 @@ rg -F "require.*event-bus.cjs" -g "*.cjs" -g "*.js" -g "*.ts"
 **Pattern**: All event bus imports should use this safe pattern:
 
 **Before (Unsafe)**:
+
 ```javascript
 const eventBus = require('../../lib/events/event-bus.cjs');
 
 // Later in code
-eventBus.emit('some-event', data);  // ← CRASH if eventBus is null
+eventBus.emit('some-event', data); // ← CRASH if eventBus is null
 ```
 
 **After (Safe)**:
+
 ```javascript
 const eventBus = require('../../lib/events/event-bus.cjs');
 
@@ -772,10 +864,11 @@ function safeEmit(eventName, data) {
 }
 
 // Later in code
-safeEmit('some-event', data);  // ← SAFE: No crash if eventBus is null
+safeEmit('some-event', data); // ← SAFE: No crash if eventBus is null
 ```
 
 **Alternative: Module-Level Guard**:
+
 ```javascript
 const eventBus = require('../../lib/events/event-bus.cjs');
 const EVENT_BUS_AVAILABLE = eventBus && typeof eventBus.emit === 'function';
@@ -793,17 +886,19 @@ if (EVENT_BUS_AVAILABLE) {
 **File**: `.claude/hooks/routing/pre-task-unified.cjs` (example)
 
 **Before (Unsafe)**:
+
 ```javascript
 const eventBus = require('../../lib/events/event-bus.cjs');
 
 function preToolUse(toolName, args) {
   // ... hook logic ...
 
-  eventBus.emit('tool-use', { toolName, args });  // ← CRASH if eventBus is null
+  eventBus.emit('tool-use', { toolName, args }); // ← CRASH if eventBus is null
 }
 ```
 
 **After (Safe)**:
+
 ```javascript
 const eventBus = require('../../lib/events/event-bus.cjs');
 
@@ -823,7 +918,7 @@ function safeEmit(eventName, data) {
 function preToolUse(toolName, args) {
   // ... hook logic ...
 
-  safeEmit('tool-use', { toolName, args });  // ← SAFE: No crash if eventBus is null
+  safeEmit('tool-use', { toolName, args }); // ← SAFE: No crash if eventBus is null
 }
 ```
 
@@ -834,6 +929,7 @@ function preToolUse(toolName, args) {
 **Test File**: `tests/lib/events/event-bus-safe-import.test.cjs`
 
 **Test 1: Verify safe emit handles null event bus**
+
 ```javascript
 // Test name: safeEmit does not crash when eventBus is null
 // Assert: Calling safeEmit with null eventBus does not throw
@@ -860,6 +956,7 @@ test('safeEmit does not crash when eventBus is null', () => {
 ```
 
 **Test 2: Verify safe emit works normally when eventBus exists**
+
 ```javascript
 // Test name: safeEmit emits event when eventBus is available
 // Assert: Calling safeEmit with valid eventBus emits event successfully
@@ -879,7 +976,7 @@ test('safeEmit emits event when eventBus is available', () => {
   }
 
   let emitted = false;
-  eventBus.on('test-event', (data) => {
+  eventBus.on('test-event', data => {
     emitted = true;
     assert.deepStrictEqual(data, { foo: 'bar' }, 'Event data should match');
   });
@@ -891,6 +988,7 @@ test('safeEmit emits event when eventBus is available', () => {
 ```
 
 **TDD Cycle**:
+
 1. **RED**: Write test → Verify it fails without safe wrapper (crash on null eventBus)
 2. **GREEN**: Add safe wrapper → Verify test passes
 3. **REFACTOR**: Extract helper to shared utility (optional)
@@ -900,7 +998,9 @@ test('safeEmit emits event when eventBus is available', () => {
 ## Fix 5: Audit for Additional Shell Injection Vectors
 
 ### Classification: **INFORMATIONAL** (Comprehensive Audit)
+
 ### Effort: 2 hours
+
 ### Security Control: SEC-003 (Input Sanitization)
 
 ### Problem Statement
@@ -927,6 +1027,7 @@ rg -P "spawnSync.*shell:\s*true" -g "*.cjs" -g "*.js" -g "*.ts" --no-heading --l
 ```
 
 **Expected Findings**:
+
 1. `.claude/skills/sequential-thinking/scripts/main.cjs:72` (already known)
 2. `.claude/skills/git-expert/scripts/main.cjs:66` (already known)
 3. `.claude/skills/docker-compose/scripts/main.cjs:64` (already known)
@@ -939,7 +1040,7 @@ rg -P "spawnSync.*shell:\s*true" -g "*.cjs" -g "*.js" -g "*.ts" --no-heading --l
 
 **Create audit report** at `.claude/context/reports/shell-injection-audit-2026-02-13.md`:
 
-```markdown
+````markdown
 # Shell Injection Audit Report
 
 **Date**: 2026-02-13
@@ -960,8 +1061,8 @@ rg -P "spawnSync.*shell:\s*true" -g "*.cjs" -g "*.js" -g "*.ts" --no-heading --l
 ### Additional Instances (To Be Reviewed)
 
 | File | Line | Pattern | Risk Assessment | Remediation |
-|------|------|---------|-----------------|-------------|
-| ... | ... | ... | ... | ... |
+| ---- | ---- | ------- | --------------- | ----------- |
+| ...  | ...  | ...     | ...             | ...         |
 
 ---
 
@@ -980,6 +1081,7 @@ rg -P "spawnSync.*shell:\s*true" -g "*.cjs" -g "*.js" -g "*.ts" --no-heading --l
 **Pattern**: Warn on any `spawn`, `exec`, `spawnSync` with `shell: true`
 
 **Implementation**:
+
 ```javascript
 // .eslintrc.cjs custom rules
 module.exports = {
@@ -1003,8 +1105,10 @@ module.exports = {
   },
 };
 ```
+````
 
 **Enforcement**: Pre-commit hook (`pnpm lint:fix` gate)
+
 ```
 
 ---
@@ -1087,3 +1191,4 @@ All fixes map to security controls from `.claude/context/artifacts/security-cont
 **Agent**: security-architect
 **Task**: task-phase2-security
 **Evidence-Based**: All fixes include exact before/after code, TDD tests, Windows compatibility verification
+```

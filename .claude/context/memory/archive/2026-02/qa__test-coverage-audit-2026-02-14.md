@@ -14,12 +14,14 @@
 **Overall Status**: GOOD with TARGETED GAPS
 
 **Key Findings**:
+
 - ✅ **Strong coverage** for code-indexing (23 tests), memory subsystem (32 tests), hooks (75 tests)
 - ⚠️ **Critical gaps** in routing logic, workflow cycle detection, and hook enforcement paths
 - ❌ **Test quality issues**: Some tests don't run assertions, others have hardcoded paths
 - ✅ **Test organization**: Generally mirrors source structure well
 
 **Priority Recommendations**:
+
 1. Add tests for routing-guard.cjs enforcement logic (P0 - routing critical)
 2. Add tests for cycle-detector.cjs to prevent infinite loops (P0 - safety critical)
 3. Fix flaky tests in Progressive Disclosure (timing-dependent)
@@ -36,17 +38,20 @@
 **Test Coverage**: LIMITED (3 test files found, but gaps remain)
 
 **Missing Coverage**:
+
 - `getPreferredAgent()` function (lines 1031-1033) - NO DIRECT TESTS
 - DISAMBIGUATION_RULES application logic - PARTIALLY TESTED
 - Edge cases: ambiguous intent resolution, fallback behavior
 - Error handling for invalid/malformed routing table entries
 
 **Impact**: Routing is the CORE of the multi-agent framework. Bugs here cause:
+
 - Wrong agents spawned for requests → poor results
 - Disambiguation failures → fallback to developer (defeats specialist routing)
 - Production incidents due to misrouting
 
 **Recommendation**:
+
 ```javascript
 // MISSING: tests/lib/routing/routing-table-direct.test.cjs
 test('getPreferredAgent resolves keyword to agent', () => {
@@ -71,17 +76,20 @@ test('DISAMBIGUATION_RULES prefers correct agent for ambiguous terms', () => {
 **Test Coverage**: NONE FOUND (no test file discovered)
 
 **Missing Coverage**:
+
 - Planner-first enforcement (complexity gate)
 - Security review enforcement (auth/credentials gate)
 - Specialist routing enforcement (developer override check)
 - Edge cases: malformed task data, missing metadata
 
 **Impact**:
+
 - This hook enforces IRON LAW routing rules (Section 1.2 of CLAUDE.md)
 - Without tests, violations can go undetected
 - Router could spawn wrong agents, violating framework contracts
 
 **Recommendation**:
+
 ```javascript
 // MISSING: tests/hooks/routing-guard.test.cjs
 test('blocks TaskCreate for HIGH complexity without planner', () => {
@@ -106,17 +114,20 @@ test('enforces specialist routing over developer', () => {
 **Test Coverage**: NONE FOUND
 
 **Missing Coverage**:
+
 - Cycle detection algorithm correctness
 - Handling of complex dependency graphs
 - Edge cases: self-loops, disconnected components
 - Performance on large workflow graphs
 
 **Impact**:
+
 - Infinite loops in workflow execution
 - Task dependency deadlocks (A blocks B, B blocks A)
 - Framework hangs requiring manual intervention
 
 **Recommendation**:
+
 ```javascript
 // MISSING: tests/lib/workflow/cycle-detector.test.cjs
 test('detects simple cycle: A -> B -> A', () => {
@@ -146,17 +157,20 @@ test('handles self-loops', () => {
 **Test Coverage**: PARTIAL (1 test file: `contextual-memory.search-filters.test.cjs`)
 
 **Missing Coverage**:
+
 - Date range filtering edge cases (start date > end date, invalid dates)
 - Tag filtering with empty/null tags
 - Combined filters (date + tag + keyword)
 - Filter performance on large memory files (100+ entries)
 
 **Impact**:
+
 - Memory search returns irrelevant results
 - Performance degradation on large memory files
 - Query errors crash memory subsystem
 
 **Recommendation**:
+
 ```javascript
 // EXTEND: tests/lib/memory/contextual-memory.search-filters.test.cjs
 test('rejects invalid date ranges', () => {
@@ -199,6 +213,7 @@ test('Commit checkpoint pattern documented', () => {
 **Impact**: These tests give false confidence - they pass even if requirement is missing.
 
 **Files Affected**:
+
 - `tests/agents/core/planner.test.cjs` (multiple tests)
 
 **Recommendation**: Add explicit assertions to all "validation" tests.
@@ -217,6 +232,7 @@ const testPath = path.join(process.cwd(), '.claude', 'agents', 'core', 'planner.
 ```
 
 **Files Affected**:
+
 - `tests/agents/core/planner.test.cjs`
 - Various hook tests
 
@@ -236,6 +252,7 @@ test('[Adaptive] Should detect optimal stopping point (readiness)', () => {
 **Impact**: Intermittent CI failures, developer frustration, false negatives.
 
 **Recommendation**:
+
 - Mock time-dependent logic
 - Use condition-based waiting instead of sleep
 - Add retry logic for truly async tests
@@ -243,6 +260,7 @@ test('[Adaptive] Should detect optimal stopping point (readiness)', () => {
 ### 2.4 Missing Edge Case Coverage
 
 **Common Gaps**:
+
 - Null/undefined input handling
 - Empty string inputs
 - Malformed JSON in hook inputs
@@ -250,6 +268,7 @@ test('[Adaptive] Should detect optimal stopping point (readiness)', () => {
 - Race conditions in concurrent operations
 
 **Example Missing Test**:
+
 ```javascript
 // MISSING: tests for null safety
 test('routing-table handles null intent gracefully', () => {
@@ -269,6 +288,7 @@ test('routing-table handles null intent gracefully', () => {
 ✅ Grouped by category: hooks/, lib/, integration/, tools/
 
 **Minor Issues**:
+
 - Some legacy tests in wrong locations (e.g., `tests/routing-table.test.cjs` should be in `tests/lib/routing/`)
 - Inconsistent use of `.test.cjs` vs `.test.mjs` extensions
 
@@ -279,15 +299,18 @@ test('routing-table handles null intent gracefully', () => {
 ## 4. Broken/Failing Tests
 
 **Current Status** (from `pnpm test 2>&1 | head -200`):
+
 - **Pass Rate**: 99.3% (87/88 tests in initial batch)
 - **Failed Tests**: 1 test failure (exact test not shown in truncated output)
 
 **Need Full Run**: The test output was truncated at 200 lines. Full test suite analysis requires:
+
 ```bash
 pnpm test 2>&1 | tee test-full-output.log
 ```
 
 **Common Failure Patterns** (from learnings.md):
+
 - Tests written but not run until late (Wave 4b → Wave 6b discovery pattern)
 - Edge case tests fail on first run (non-blocking workflow enforcement, TTL timing)
 
@@ -300,12 +323,14 @@ pnpm test 2>&1 | tee test-full-output.log
 **Active Hooks** (42 non-archived): Many lack comprehensive tests for all enforcement modes (block/warn/off).
 
 **Example Gap**: `unified-creator-guard.cjs` (Gate 4 enforcement)
+
 - **Covered**: Basic blocking behavior
 - **NOT Covered**: Warn mode behavior, override environment variable handling, edge cases (archived artifact restoration)
 
 ### 5.2 Complex Functions in lib/
 
 **High Complexity, Low Coverage**:
+
 - `.claude/lib/workflow/task-router.cjs` - No test file found
 - `.claude/lib/workflow/workflow-engine.cjs` - Basic tests only
 - `.claude/lib/memory/memory-extractor.cjs` - No direct tests found
@@ -320,11 +345,13 @@ pnpm test 2>&1 | tee test-full-output.log
 ### 6.1 Concurrent Operations
 
 **Gaps**:
+
 - Multiple agents writing to same file simultaneously
 - Race conditions in memory index updates
 - Parallel hook execution conflicts
 
 **Test Needed**:
+
 ```javascript
 test('handles concurrent memory writes without corruption', async () => {
   // Spawn 10 parallel writes to learnings.md
@@ -335,12 +362,14 @@ test('handles concurrent memory writes without corruption', async () => {
 ### 6.2 Error Recovery
 
 **Gaps**:
+
 - Hook failure recovery (what happens if hook throws?)
 - Malformed spawn prompt handling
 - Invalid agent type in Task() call
 - Missing skill file when Skill() invoked
 
 **Test Needed**:
+
 ```javascript
 test('routing-guard returns error for invalid task structure', () => {
   const invalidTask = { subagent_type: 'nonexistent' };
@@ -353,6 +382,7 @@ test('routing-guard returns error for invalid task structure', () => {
 ### 6.3 Boundary Conditions
 
 **Gaps**:
+
 - Extremely long user prompts (>100K tokens)
 - Empty task lists (TaskList() returns [])
 - Zero-byte memory files
@@ -362,14 +392,14 @@ test('routing-guard returns error for invalid task structure', () => {
 
 ## 7. Coverage Metrics (Estimated)
 
-| Area                | Source Files | Test Files | Est. Coverage | Priority |
-| ------------------- | ------------ | ---------- | ------------- | -------- |
-| Code Indexing       | 17           | 23         | **85%**       | LOW      |
-| Memory Subsystem    | 39           | 32         | **80%**       | MEDIUM   |
-| Routing Logic       | 8            | 7          | **60%**       | HIGH     |
-| Hooks (active)      | 42           | 75         | **70%**       | MEDIUM   |
-| Workflow Engine     | 15           | 12         | **65%**       | HIGH     |
-| Utils               | 30           | 8          | **40%**       | MEDIUM   |
+| Area                 | Source Files | Test Files | Est. Coverage | Priority |
+| -------------------- | ------------ | ---------- | ------------- | -------- |
+| Code Indexing        | 17           | 23         | **85%**       | LOW      |
+| Memory Subsystem     | 39           | 32         | **80%**       | MEDIUM   |
+| Routing Logic        | 8            | 7          | **60%**       | HIGH     |
+| Hooks (active)       | 42           | 75         | **70%**       | MEDIUM   |
+| Workflow Engine      | 15           | 12         | **65%**       | HIGH     |
+| Utils                | 30           | 8          | **40%**       | MEDIUM   |
 | **Overall Estimate** | **151**      | **157**    | **68%**       | -        |
 
 **Note**: Coverage is estimated from file counts and test thoroughness review. Actual line/branch coverage requires instrumentation tools (e.g., `c8` or `nyc`).
@@ -433,18 +463,21 @@ test('routing-guard returns error for invalid task structure', () => {
 ## 9. Test Quality Gates (Proposed)
 
 ### Pre-Commit Gate
+
 - ✅ All tests pass (100%)
 - ✅ No skipped/ignored tests
 - ✅ `pnpm lint:fix` passes (0 errors)
 - ✅ `pnpm format` produces no changes
 
 ### Pre-PR Gate
+
 - ✅ New code has accompanying tests (80%+ coverage)
 - ✅ All edge cases documented and tested
 - ✅ No hardcoded paths in tests
 - ✅ No tests without assertions
 
 ### CI Gate
+
 - ✅ Test pass rate ≥ 99%
 - ✅ No flaky tests (3+ runs without failure)
 - ✅ Performance tests complete in <5min
@@ -457,17 +490,20 @@ test('routing-guard returns error for invalid task structure', () => {
 ### Recommended Additions
 
 1. **Coverage Tool**: Add `c8` for line/branch coverage metrics
+
    ```bash
    pnpm add -D c8
    # Run: c8 --reporter=html --reporter=text node --test "tests/**/*.test.{cjs,mjs}"
    ```
 
 2. **Test Watch Mode**: For TDD workflow
+
    ```bash
    node --test --watch "tests/**/*.test.cjs"
    ```
 
 3. **Parallel Test Execution**: Speed up CI
+
    ```bash
    # Current: --test-concurrency=1 (sequential)
    # Consider: --test-concurrency=4 for CI (faster, risk of race conditions)
@@ -484,18 +520,21 @@ test('routing-guard returns error for invalid task structure', () => {
 ## 11. Codebase Health Indicators
 
 ### Positive Signals ✅
+
 - 99.3% test pass rate (high reliability)
 - Tests mirror source structure (easy discovery)
 - Active test maintenance (75 hook tests)
 - Good memory/code-indexing coverage (80%+)
 
 ### Warning Signals ⚠️
+
 - Critical gaps in routing/cycle detection (framework core)
 - Tests without assertions (false confidence)
 - Hardcoded paths (platform brittleness)
 - Low utils coverage (40% - hidden bugs)
 
 ### Red Flags 🚨
+
 - No tests for routing-guard.cjs (IRON LAW enforcement)
 - No tests for cycle-detector.cjs (infinite loop risk)
 - Flaky tests (CI instability)
@@ -504,8 +543,8 @@ test('routing-guard returns error for invalid task structure', () => {
 
 ## 12. Comparison to Industry Standards
 
-| Metric                  | agent-studio | Industry Target | Status |
-| ----------------------- | ------------ | --------------- | ------ |
+| Metric                  | agent-studio | Industry Target | Status  |
+| ----------------------- | ------------ | --------------- | ------- |
 | Test Pass Rate          | 99.3%        | ≥ 99%           | ✅ GOOD |
 | Estimated Coverage      | 68%          | ≥ 80%           | ⚠️ LOW  |
 | Critical Path Coverage  | 60%          | 100%            | ❌ BAD  |
@@ -519,16 +558,19 @@ test('routing-guard returns error for invalid task structure', () => {
 ## 13. Next Steps
 
 ### Immediate (This Week)
+
 1. Create `tests/hooks/routing-guard.test.cjs` with 10+ test cases
 2. Create `tests/lib/workflow/cycle-detector.test.cjs` with 8+ test cases
 3. Fix assertions in `tests/agents/core/planner.test.cjs`
 
 ### Short-Term (This Month)
+
 4. Add routing-table edge case tests
 5. Fix hardcoded paths across all tests
 6. Install and run `c8` for baseline coverage metrics
 
 ### Long-Term (This Quarter)
+
 7. Achieve 80%+ line coverage across all modules
 8. Add mutation testing to validate test quality
 9. Document testing standards in `testing.md`
@@ -542,6 +584,7 @@ The agent-studio codebase has **strong test coverage in core subsystems** (code-
 **Key Takeaway**: Prioritize P0 tasks (routing-guard + cycle-detector tests) before adding new features. These are safety-critical paths that protect the entire multi-agent orchestration system.
 
 **Estimated Effort**:
+
 - P0 fixes: 4-6 hours
 - P1 improvements: 8-10 hours
 - P2 enhancements: 6-8 hours

@@ -16,6 +16,7 @@
 **Task 36** (metadata gate): Task completed without summary metadata — Phase 0 data sufficiency gate withholds score (per policy). Reinforces mandatory metadata contract for future reflections.
 
 **Router Gaps**: Three observations logged in session-gap-log.jsonl. Analysis reveals:
+
 - Gap 1 (reflection-agent TaskUpdate blocker): Confirmed P1 blocker from background spawn limitation
 - Gap 2 (developer misrouting for git): Confirmed systemic pattern, precedent for routing enforcement
 - Gap 3 (researcher placeholder output): FALSE POSITIVE — file contains complete 200+ line research report
@@ -51,18 +52,21 @@
 ### RBT Diagnosis (Roses/Buds/Thorns)
 
 **Roses (Strengths)**:
+
 - ✅ Comprehensive check matrix covering hooks (syntax), security patterns (SE-02, SE-01), skill catalog
 - ✅ Security validation built into audit from start
 - ✅ Clear Router wiring (Step 0.7 location documented in CLAUDE.md 1.2 Gate 6)
 - ✅ Systematic approach generalizable to other creation workflows
 
 **Buds (Growth Opportunities)**:
+
 - 🌱 Verified flag (verifiedAt: timestamp) should be added to framework artifact frontmatter for audit tracking
 - 🌱 Quick-reference guide for framework changes (which artifacts trigger Step 0.7) would reduce friction
 - 🌱 Agent frontmatter drift (model:, tools:, skills:) not yet in audit scope
 - 🌱 Skill-index consistency checks (ADR-2026-02-21-003) should be integrated
 
 **Thorns (Issues)**:
+
 - 🔴 Three systemic gaps identified by router (see Gap Analysis below) — external to this artifact but visible in session-gap-log
 
 ---
@@ -72,6 +76,7 @@
 **Context**: Task 36 completed but spawn request shows "Summary: Task 36 completed without summary metadata"
 
 **Phase 0 Data Sufficiency Check**:
+
 - ❌ summary metadata: Fallback string only ("Task 36 completed without summary metadata")
 - ❌ filesModified: Not provided in metadata
 - ❌ outputArtifacts: Not provided in metadata
@@ -80,6 +85,7 @@
 **Assessment**: Phase 0 gate working as designed. No fabricated score issued. Root cause: Task 36 did not provide metadata contract at completion (no TaskUpdate with summary/filesModified).
 
 **Learning**: Reinforces MANDATORY metadata contract from CLAUDE.md Section 5.5-5.6. Agents must include:
+
 ```javascript
 TaskUpdate({
   taskId: 'X',
@@ -104,6 +110,7 @@ Three gaps logged by Router with observation timestamps 2026-02-22T01:30-02:15.
 ### Gap 1: Reflection-Agent Background Spawn Tool Whitelist (P1 BLOCKER)
 
 **Router Observation**:
+
 ```
 type: missing_metadata
 description: Background-spawned reflection-agent (run_in_background:true) reported TaskUpdate unavailable — atomic handshake blocked.
@@ -111,11 +118,13 @@ context: Root cause: run_in_background spawns may not receive full tool whitelis
 ```
 
 **Reflection Validation**: ✅ CONFIRMED
+
 - Evidence in `.claude/context/memory/issues.md`: "Reflection-Agent Cannot Complete Atomic Handshake (2026-02-22 BLOCKER)"
 - Impact: Reflection-spawn-request.json entries cannot be marked processed, reflection-cleanup.cjs cannot remove processed reflections
 - Systemic pattern: Applies to any agent spawned with run_in_background:true that needs atomic completion
 
 **Mitigation Status**: DOCUMENTED
+
 - CLAUDE.md Step 0 must enforce reflection-agent ALWAYS foreground
 - Related issue: May affect other background spawn patterns globally
 
@@ -126,6 +135,7 @@ context: Root cause: run_in_background spawns may not receive full tool whitelis
 ### Gap 2: Developer Misrouted for Git Push/Deploy (P2 ROUTING)
 
 **Router Observation**:
+
 ```
 type: integration_gap
 description: ROUTING ERROR: developer used for git commit+push instead of devops. CLAUDE.md routing table maps deploy/CI/git operations to devops specialist.
@@ -133,11 +143,13 @@ context: devops agent path: .claude/agents/specialized/devops.md. This is a recu
 ```
 
 **Reflection Validation**: ✅ CONFIRMED
+
 - CLAUDE.md Section 1 Common Misrouting table clearly documents: "git push / commit / deploy" → **devops**
 - Specialist-first routing law (IRON LAW) requires checking Step 6.5 before defaulting to developer
 - Router's routing-guard.cjs Check 7 enforces this, but missed in this session
 
 **Pattern Type**: PRECEDENT — recurring misrouting risk
+
 - Observed in: task-26 (git commit+push by developer instead of devops)
 - Related keywords: git push, deploy, CI/CD, infrastructure, Docker, Kubernetes
 - Current routing keywords for devops may be insufficient
@@ -151,6 +163,7 @@ context: devops agent path: .claude/agents/specialized/devops.md. This is a recu
 ### Gap 3: Researcher Produced Placeholder Report (ANALYSIS: FALSE POSITIVE)
 
 **Router Observation**:
+
 ```
 type: placeholder_output
 description: researcher produced TEST_STUB instead of actual research report for webmcp/Claude features
@@ -158,6 +171,7 @@ context: .claude/context/artifacts/research-reports/claude-features-webmcp-resea
 ```
 
 **Reflection Validation**: ❌ FALSE POSITIVE
+
 - File `.claude/context/artifacts/research-reports/claude-features-webmcp-research-2026-02-22.md` contains **complete 200+ line research report**
 - Content includes:
   - Executive summary (4 Claude features: WebMCP, Memory Tool, Worktrees, Healthcare)
@@ -169,6 +183,7 @@ context: .claude/context/artifacts/research-reports/claude-features-webmcp-resea
 **Root Cause of False Positive**: Router likely checked file metadata (size, modification time, file name pattern) rather than content verification
 
 **Learning**: Placeholder detection mechanism is unreliable for file-based content checks. Recommendation:
+
 - Reflection-agent should **read file content** when evaluating placeholder_output gaps before accepting classification
 - Router gap mechanism should not rely on file naming conventions (if file is named "-research-" it should contain research, not verify via content scan)
 
@@ -181,6 +196,7 @@ context: .claude/context/artifacts/research-reports/claude-features-webmcp-resea
 ### Learnings (patterns/solutions)
 
 Added to `.claude/context/memory/learnings.md`:
+
 - **Systemic Learning: Router Gap Observation Validation (2026-02-22)**
   - Placeholder_output gaps have HIGH false positive rate without content validation
   - Integration gaps and missing_metadata gaps are more reliable (LOW false positive rate)
@@ -189,6 +205,7 @@ Added to `.claude/context/memory/learnings.md`:
 ### Issues (blockers/workarounds)
 
 Updated in `.claude/context/memory/issues.md`:
+
 - **ISSUE: Reflection-Agent Cannot Complete Atomic Handshake** (P1 BLOCKER)
   - Never spawn reflection-agent with run_in_background:true
 - **ISSUE: Router Gap Observation False Positive** (P2)
@@ -249,6 +266,7 @@ Updated in `.claude/context/memory/issues.md`:
 **Status**: Reflection work COMPLETE but cannot mark processed via TaskUpdate metadata.
 
 **Workaround**: Reflection report written to `.claude/context/reports/reflections/reflection-task-32-36-2026-02-22.md`. Router or future reflection batch must:
+
 1. Verify this report exists
 2. Manually call: `TaskUpdate({ taskId: 'reflection-task-X', metadata: { processedReflectionIds: ['task_completion:2026-02-22T02:30:52.930Z:32', 'task_completion:2026-02-22T02:44:17.833Z:36'] } })`
 3. Reflection-cleanup.cjs will then remove processed entries from reflection-spawn-request.json

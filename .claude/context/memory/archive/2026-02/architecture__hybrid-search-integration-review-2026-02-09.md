@@ -28,6 +28,7 @@ The search infrastructure consists of two independent subsystems that serve diff
 **Commands:** `pnpm search:code`, `pnpm search:structure`, `pnpm search:file`
 
 **Architecture:**
+
 ```
 User Query
     |
@@ -45,6 +46,7 @@ Ranked Output
 ```
 
 **Key characteristics:**
+
 - Zero startup time (no batch indexing required)
 - ripgrep via `@vscode/ripgrep` npm package (cross-platform)
 - Optional semantic search via `@xenova/transformers` (MiniLM-L6-v2 model)
@@ -61,6 +63,7 @@ Ranked Output
 **Components:** QueryAnalyzer + AstGrepSearch + ResultRanker
 
 **Architecture:**
+
 ```
 User Query
     |
@@ -81,6 +84,7 @@ Ranked Output with timing
 ```
 
 **Key characteristics:**
+
 - Depends on IndexManager (requires pre-built index via `pnpm code:index:reindex`)
 - Three-stage pipeline: semantic -> structural -> combination
 - QueryAnalyzer: natural language -> AST pattern conversion (6 languages)
@@ -90,28 +94,28 @@ Ranked Output with timing
 
 ### 1.2 Supporting Components
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| BM25Indexer | `bm25-indexer.cjs` (291 lines) | Okapi BM25 sparse lexical search with lazy IDF |
-| IndexManager | `index-manager.cjs` (780+ lines) | Full index lifecycle: build, incremental update, search |
-| CodeParser | `code-parser.cjs` | Tree-sitter AST parsing (JS, TS, Python, Go, Rust) |
-| SemanticChunker | `semantic-chunker.cjs` | Intelligent code chunking by AST boundaries |
-| EmbeddingGenerator | `embedding-generator.cjs` | Dense vector generation (transformers/fastembed) |
-| VectorStore | `vector-store.cjs` | LanceDB wrapper with BM25-only mode guard |
-| MerkleTree | `merkle-tree.cjs` | O(log n) change detection for incremental updates |
-| QueryAnalyzer | `query-analyzer.cjs` | NL -> AST pattern with synonym expansion |
-| ResultRanker | `result-ranker.cjs` | Score combination, dedup, confidence filtering |
-| AstGrepSearch | `ast-grep-wrapper.cjs` | Structural search via `@ast-grep/cli` |
+| Component          | File                             | Purpose                                                 |
+| ------------------ | -------------------------------- | ------------------------------------------------------- |
+| BM25Indexer        | `bm25-indexer.cjs` (291 lines)   | Okapi BM25 sparse lexical search with lazy IDF          |
+| IndexManager       | `index-manager.cjs` (780+ lines) | Full index lifecycle: build, incremental update, search |
+| CodeParser         | `code-parser.cjs`                | Tree-sitter AST parsing (JS, TS, Python, Go, Rust)      |
+| SemanticChunker    | `semantic-chunker.cjs`           | Intelligent code chunking by AST boundaries             |
+| EmbeddingGenerator | `embedding-generator.cjs`        | Dense vector generation (transformers/fastembed)        |
+| VectorStore        | `vector-store.cjs`               | LanceDB wrapper with BM25-only mode guard               |
+| MerkleTree         | `merkle-tree.cjs`                | O(log n) change detection for incremental updates       |
+| QueryAnalyzer      | `query-analyzer.cjs`             | NL -> AST pattern with synonym expansion                |
+| ResultRanker       | `result-ranker.cjs`              | Score combination, dedup, confidence filtering          |
+| AstGrepSearch      | `ast-grep-wrapper.cjs`           | Structural search via `@ast-grep/cli`                   |
 
 ### 1.3 Index Persistence
 
-| Index | Path | Size | Last Updated |
-|-------|------|------|-------------|
-| BM25 sparse index | `.claude/context/data/lancedb/bm25-index.json` | 2.0 MB | 2026-02-06 |
-| LanceDB vectors | `.claude/context/data/lancedb/code_index.lance/` | ~5.1 MB (36 fragments) | 2026-02-06 |
-| Merkle tree | `.claude/context/code-index/merkle-tree.json` | 2.8 MB | 2026-02-06 |
-| Index metadata | `.claude/context/code-index/metadata.json` | 190 KB | 2026-02-06 |
-| Checkpoint | `.claude/context/code-index/checkpoint.json` | 99 B | 2026-02-06 |
+| Index             | Path                                             | Size                   | Last Updated |
+| ----------------- | ------------------------------------------------ | ---------------------- | ------------ |
+| BM25 sparse index | `.claude/context/data/lancedb/bm25-index.json`   | 2.0 MB                 | 2026-02-06   |
+| LanceDB vectors   | `.claude/context/data/lancedb/code_index.lance/` | ~5.1 MB (36 fragments) | 2026-02-06   |
+| Merkle tree       | `.claude/context/code-index/merkle-tree.json`    | 2.8 MB                 | 2026-02-06   |
+| Index metadata    | `.claude/context/code-index/metadata.json`       | 190 KB                 | 2026-02-06   |
+| Checkpoint        | `.claude/context/code-index/checkpoint.json`     | 99 B                   | 2026-02-06   |
 
 **Observation:** All indices were last updated on 2026-02-06, which is 3 days stale. The Merkle tree and checkpoint suggest the batch indexer ran once but has not been re-run since.
 
@@ -120,6 +124,7 @@ Ranked Output with timing
 **Hook:** `.claude/hooks/routing/code-index-updater.cjs`
 **Event:** PostToolUse(Edit|Write)
 **Behavior:**
+
 - Fires after any code file is written or edited
 - Debounces rapid changes (5-second window)
 - Uses Merkle tree for O(log n) incremental change detection
@@ -135,11 +140,11 @@ Ranked Output with timing
 
 ### 2.1 Skill Inventory
 
-| Skill | Type | Speed | Accuracy | Backend |
-|-------|------|-------|----------|---------|
-| `ripgrep` | Text search | <10ms | ~70% | `@vscode/ripgrep` binary |
-| `code-semantic-search` | Hybrid | <150ms | ~95% | HybridSearch (IndexManager + ast-grep) |
-| `code-structural-search` | AST patterns | <50ms | 100% | `@ast-grep/cli` via ast-grep-wrapper |
+| Skill                    | Type         | Speed  | Accuracy | Backend                                |
+| ------------------------ | ------------ | ------ | -------- | -------------------------------------- |
+| `ripgrep`                | Text search  | <10ms  | ~70%     | `@vscode/ripgrep` binary               |
+| `code-semantic-search`   | Hybrid       | <150ms | ~95%     | HybridSearch (IndexManager + ast-grep) |
+| `code-structural-search` | AST patterns | <50ms  | 100%     | `@ast-grep/cli` via ast-grep-wrapper   |
 
 ### 2.2 Skill-to-Backend Mapping
 
@@ -153,6 +158,7 @@ Skill: code-structural-search --> @ast-grep/cli binary (direct)
 ```
 
 **CLI Commands (separate path):**
+
 ```
 pnpm search:code "query"     --> HybridLazyIndexer (hybrid-lazy-indexer.cjs)
                               --> ripgrep (text) + LanceDB (semantic) + RRF fusion
@@ -172,45 +178,45 @@ pnpm search:file path 1 50   --> HybridLazyIndexer.getFileContent()
 
 ### 3.1 Agents WITH Search Skills
 
-| Agent | `ripgrep` | `code-semantic-search` | `code-structural-search` | `pnpm search:code` docs |
-|-------|-----------|------------------------|--------------------------|------------------------|
-| developer | YES | YES | YES | YES |
-| architect | YES | YES | YES | YES |
-| qa | YES | YES | YES | NO |
-| code-reviewer | YES | YES | YES | YES |
-| code-simplifier | YES | YES | YES | NO |
-| security-architect | YES | YES | YES | NO |
-| researcher | YES | YES | YES | NO |
-| reverse-engineer | YES | YES | YES | NO |
-| c4-code | YES | NO | YES | NO |
+| Agent              | `ripgrep` | `code-semantic-search` | `code-structural-search` | `pnpm search:code` docs |
+| ------------------ | --------- | ---------------------- | ------------------------ | ----------------------- |
+| developer          | YES       | YES                    | YES                      | YES                     |
+| architect          | YES       | YES                    | YES                      | YES                     |
+| qa                 | YES       | YES                    | YES                      | NO                      |
+| code-reviewer      | YES       | YES                    | YES                      | YES                     |
+| code-simplifier    | YES       | YES                    | YES                      | NO                      |
+| security-architect | YES       | YES                    | YES                      | NO                      |
+| researcher         | YES       | YES                    | YES                      | NO                      |
+| reverse-engineer   | YES       | YES                    | YES                      | NO                      |
+| c4-code            | YES       | NO                     | YES                      | NO                      |
 
 **Total: 9 agents (of 49) have at least one search skill.**
 
 ### 3.2 Agents WITHOUT Search Skills (Should Have)
 
-| Agent | Why It Needs Search | Missing Skills |
-|-------|-------------------|----------------|
-| planner | Needs to understand existing codebase before planning | ripgrep, code-semantic-search |
-| technical-writer | Needs to find code references for documentation | ripgrep, code-semantic-search |
-| devops | Needs to find configuration patterns, Dockerfiles | ripgrep |
-| devops-troubleshooter | Needs to trace error patterns through codebase | ripgrep, code-semantic-search |
-| database-architect | Needs to find existing schema/query patterns | ripgrep, code-structural-search |
-| typescript-pro | Needs codebase-wide type analysis | ripgrep, code-semantic-search, code-structural-search |
-| python-pro | Needs to find Python patterns and imports | ripgrep, code-semantic-search, code-structural-search |
-| frontend-pro | Needs to find component patterns | ripgrep, code-semantic-search, code-structural-search |
-| nodejs-pro | Needs to find API patterns, middleware | ripgrep, code-semantic-search, code-structural-search |
-| incident-responder | Needs rapid log/error pattern tracing | ripgrep |
-| All other domain agents (13) | Needs codebase exploration for domain-specific tasks | ripgrep (minimum) |
+| Agent                        | Why It Needs Search                                   | Missing Skills                                        |
+| ---------------------------- | ----------------------------------------------------- | ----------------------------------------------------- |
+| planner                      | Needs to understand existing codebase before planning | ripgrep, code-semantic-search                         |
+| technical-writer             | Needs to find code references for documentation       | ripgrep, code-semantic-search                         |
+| devops                       | Needs to find configuration patterns, Dockerfiles     | ripgrep                                               |
+| devops-troubleshooter        | Needs to trace error patterns through codebase        | ripgrep, code-semantic-search                         |
+| database-architect           | Needs to find existing schema/query patterns          | ripgrep, code-structural-search                       |
+| typescript-pro               | Needs codebase-wide type analysis                     | ripgrep, code-semantic-search, code-structural-search |
+| python-pro                   | Needs to find Python patterns and imports             | ripgrep, code-semantic-search, code-structural-search |
+| frontend-pro                 | Needs to find component patterns                      | ripgrep, code-semantic-search, code-structural-search |
+| nodejs-pro                   | Needs to find API patterns, middleware                | ripgrep, code-semantic-search, code-structural-search |
+| incident-responder           | Needs rapid log/error pattern tracing                 | ripgrep                                               |
+| All other domain agents (13) | Needs codebase exploration for domain-specific tasks  | ripgrep (minimum)                                     |
 
 ### 3.3 Skill Catalog Gaps
 
 The skill catalog (`skill-catalog.md`) lists search skills but assigns them to only 2-3 agents:
 
-| Skill | Catalog Assignment | Actual Assignment |
-|-------|-------------------|-------------------|
-| `ripgrep` | developer, code-reviewer | 9 agents |
-| `code-semantic-search` | developer, architect | 8 agents |
-| `code-structural-search` | developer, code-reviewer | 8 agents |
+| Skill                    | Catalog Assignment       | Actual Assignment |
+| ------------------------ | ------------------------ | ----------------- |
+| `ripgrep`                | developer, code-reviewer | 9 agents          |
+| `code-semantic-search`   | developer, architect     | 8 agents          |
+| `code-structural-search` | developer, code-reviewer | 8 agents          |
 
 **Gap:** The catalog is outdated -- it shows 2-3 assignments while the actual agent files show 8-9. But even the actual assignment leaves 40 agents without any search capabilities.
 
@@ -293,6 +299,7 @@ graph TB
 **Impact:** 40 of 49 agents cannot efficiently search the codebase. They fall back to basic Grep/Glob which is slower, less accurate, and cannot perform semantic search.
 
 **Affected categories:**
+
 - ALL 22 domain agents (0% search coverage)
 - 5 specialized agents (devops, devops-troubleshooter, database-architect, incident-responder, conductor-validator)
 - 2 core agents (planner, technical-writer)
@@ -305,14 +312,14 @@ graph TB
 
 **Differences:**
 
-| Aspect | HybridLazyIndexer (CLI) | HybridSearch (Programmatic) |
-|--------|------------------------|----------------------------|
-| Scoring | RRF (Reciprocal Rank Fusion) | Weighted average |
-| Text search | ripgrep (real-time) | BM25 (pre-indexed) |
-| Semantic | @xenova/transformers (lazy) | IndexManager vectors |
-| Structural | None | ast-grep refinement |
-| Startup | 0 seconds | Requires pre-built index |
-| Weights | text: 0.4, semantic: 0.6 | semantic: 0.7, structural: 0.3 |
+| Aspect      | HybridLazyIndexer (CLI)      | HybridSearch (Programmatic)    |
+| ----------- | ---------------------------- | ------------------------------ |
+| Scoring     | RRF (Reciprocal Rank Fusion) | Weighted average               |
+| Text search | ripgrep (real-time)          | BM25 (pre-indexed)             |
+| Semantic    | @xenova/transformers (lazy)  | IndexManager vectors           |
+| Structural  | None                         | ast-grep refinement            |
+| Startup     | 0 seconds                    | Requires pre-built index       |
+| Weights     | text: 0.4, semantic: 0.6     | semantic: 0.7, structural: 0.3 |
 
 **Recommendation:** Document the distinction clearly. The CLI system (`pnpm search:code`) is the recommended entry point for ad-hoc search. The programmatic system (`HybridSearch`) is for agents that need AST-aware structural refinement.
 
@@ -321,6 +328,7 @@ graph TB
 **Impact:** The BM25 index, LanceDB vectors, and Merkle tree were all last updated on 2026-02-06. While the `code-index-updater` hook should trigger incremental updates, the data shows no updates in 3 days despite active development.
 
 **Possible causes:**
+
 1. Hook may not be firing (check settings.json registration)
 2. Incremental updates may be silently failing (fail-open design)
 3. The full index (`pnpm code:index:reindex`) may need manual re-run
@@ -363,14 +371,14 @@ graph TB
 
 ## 7. Recommendations Summary
 
-| Priority | Issue | Recommendation | Effort |
-|----------|-------|----------------|--------|
-| P1 | 80% agents lack search | Add `ripgrep` to all agents with Bash; add semantic+structural to all domain-pro agents | Medium (22+ agent files) |
-| P2 | Stale indices | Add index freshness check; document re-index procedure | Low |
-| P2 | Skill catalog outdated | Regenerate via `pnpm skills:index` | Low |
-| P3 | Dual systems not documented | Add architecture docs explaining when to use CLI vs programmatic search | Low |
-| P3 | No search-first protocol | Add search step to developer workflow | Low |
-| P3 | BM25-only mode | Document `LANCEDB_EMBEDDING_MODE=hybrid` for high-memory environments | Low |
+| Priority | Issue                       | Recommendation                                                                          | Effort                   |
+| -------- | --------------------------- | --------------------------------------------------------------------------------------- | ------------------------ |
+| P1       | 80% agents lack search      | Add `ripgrep` to all agents with Bash; add semantic+structural to all domain-pro agents | Medium (22+ agent files) |
+| P2       | Stale indices               | Add index freshness check; document re-index procedure                                  | Low                      |
+| P2       | Skill catalog outdated      | Regenerate via `pnpm skills:index`                                                      | Low                      |
+| P3       | Dual systems not documented | Add architecture docs explaining when to use CLI vs programmatic search                 | Low                      |
+| P3       | No search-first protocol    | Add search step to developer workflow                                                   | Low                      |
+| P3       | BM25-only mode              | Document `LANCEDB_EMBEDDING_MODE=hybrid` for high-memory environments                   | Low                      |
 
 ---
 

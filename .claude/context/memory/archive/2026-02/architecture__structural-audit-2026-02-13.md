@@ -12,6 +12,7 @@
 The agent-studio framework has grown to 59 agents, 155 skills, 133 schemas, 105 hooks, 61 tools, and 31 workflows. While the core orchestration works, structural debt has accumulated across every subsystem. The most critical issues are: 83% of schemas are unreferenced, 89% of environment variables are undocumented, memory files exceed budgets by 3-4x, 10 active hooks are unregistered, and CLAUDE.md contains 6 stale file references. None of these are show-stoppers individually, but collectively they erode discoverability, increase onboarding friction, and create silent failures.
 
 **Severity Distribution:**
+
 - CRITICAL (P0): 2 findings (memory budget overflow, env var documentation gap)
 - HIGH (P1): 3 findings (unused schemas, unregistered hooks, stale CLAUDE.md references)
 - MEDIUM (P2): 3 findings (tool inventory drift, skill catalog staleness, workflow registry gaps)
@@ -27,6 +28,7 @@ The agent-studio framework has grown to 59 agents, 155 skills, 133 schemas, 105 
 Only ~20 schemas are actually loaded or validated against in runtime code. The remaining 111 exist as documentation-only artifacts with no enforcement mechanism. This means the vast majority of schemas provide a false sense of structural validation.
 
 **Actively referenced schemas** (sample):
+
 - `agent-frontmatter.schema.json` — used by agent validation
 - `skill-frontmatter.schema.json` — used by skill validation
 - `hook-registration.schema.json` — used by settings validation
@@ -34,6 +36,7 @@ Only ~20 schemas are actually loaded or validated against in runtime code. The r
 - `spawn-log-entry.schema.json` — used by spawn logger
 
 **Never-referenced schemas** (111 total, sample):
+
 - Most `*-workflow.schema.json` files
 - Most `*-report.schema.json` files
 - Most `*-catalog.schema.json` files
@@ -61,18 +64,18 @@ The skill catalog lists skills but cross-referencing with agent assignments reve
 
 **Finding:** 105 hook files exist on disk. Only 30 are registered in `.claude/settings.json`. After excluding `_archive/` contents, **10 active hooks are unregistered:**
 
-| Hook File | Location | Purpose |
-|-----------|----------|---------|
-| `bash-command-validator.cjs` | `safety/` | Blocks dangerous shell commands |
-| `shell-injection-validator.cjs` | `safety/` | Blocks shell injection patterns |
-| `windows-null-sanitizer.cjs` | `safety/` | Prevents Windows reserved name issues |
-| `user-prompt-unified.cjs` | `routing/` | User prompt preprocessing |
-| `error-tracker.cjs` | `monitoring/` | Error tracking |
-| `metrics-collector.cjs` | `monitoring/` | Metrics collection |
-| `error-summary-extractor.cjs` | `reflection/` | Error summary extraction |
-| `force-step0-execution.cjs` | `reflection/` | Forces step 0 reflection |
-| `drift-detector.cjs` | `session/` | Session drift detection |
-| `state-reset.cjs` | `session/` | Session state reset |
+| Hook File                       | Location      | Purpose                               |
+| ------------------------------- | ------------- | ------------------------------------- |
+| `bash-command-validator.cjs`    | `safety/`     | Blocks dangerous shell commands       |
+| `shell-injection-validator.cjs` | `safety/`     | Blocks shell injection patterns       |
+| `windows-null-sanitizer.cjs`    | `safety/`     | Prevents Windows reserved name issues |
+| `user-prompt-unified.cjs`       | `routing/`    | User prompt preprocessing             |
+| `error-tracker.cjs`             | `monitoring/` | Error tracking                        |
+| `metrics-collector.cjs`         | `monitoring/` | Metrics collection                    |
+| `error-summary-extractor.cjs`   | `reflection/` | Error summary extraction              |
+| `force-step0-execution.cjs`     | `reflection/` | Forces step 0 reflection              |
+| `drift-detector.cjs`            | `session/`    | Session drift detection               |
+| `state-reset.cjs`               | `session/`    | Session state reset                   |
 
 **Note:** Some of these (bash-command-validator, shell-injection-validator, windows-null-sanitizer) are referenced in the CLAUDE.md enforcement hooks table, suggesting they ARE expected to be active. Their absence from settings.json may mean they are wired through a different mechanism (e.g., hardcoded in the Claude Code client) or they were accidentally dropped during the 2026-02-08 hook consolidation.
 
@@ -93,6 +96,7 @@ All 59 agents in the registry have corresponding agent definition files. No file
 **Finding:** 282 unique environment variables are referenced across the codebase. Only 32 are documented in `.env.example`. That is **11% documentation coverage** — 262 env vars are completely undocumented.
 
 **Categories of undocumented variables:**
+
 - Enforcement mode toggles (e.g., `PLANNER_FIRST_ENFORCEMENT`, `CREATOR_GUARD`, `SPECIALIST_ROUTING_ENFORCEMENT`)
 - Memory system controls (e.g., `MEMORY_MODE`, `OBSERVATIONAL_MEMORY_ENABLED`, `MEMORY_SUMMARY_BLOCK_MAX_TOKENS`)
 - Feature flags (e.g., `LANCEDB_EMBEDDING_MODE`, `AUTO_COMPRESSION_PHASE_3`)
@@ -115,14 +119,14 @@ The `config.yaml` defines agent models for only 4 agents (planner, developer, qa
 
 **Finding:** 6 file paths referenced in CLAUDE.md point to non-existent files:
 
-| Referenced Path | Context | Issue |
-|-----------------|---------|-------|
-| `.claude/agents/domain/python-expert.md` | Example in violation section | File does not exist (actual: `python-pro.md`) |
-| `.claude/context/runtime/integration-queue.json` | Step 0.5 check | Wrong extension (actual: `.jsonl`) |
-| `.claude/context/runtime/reflection-spawn-request.json` | Step 0 check | File does not exist on disk |
-| `.claude/context/runtime/workflow-state.json` | Enterprise workflow | File does not exist on disk |
-| `.claude/hooks/safety/api-rate-limiter.cjs` | Gate 4 example | File never created (example only) |
-| `.claude/workflows/enterprise/security-audit.md` | Gate 4 example | File never created (example only) |
+| Referenced Path                                         | Context                      | Issue                                         |
+| ------------------------------------------------------- | ---------------------------- | --------------------------------------------- |
+| `.claude/agents/domain/python-expert.md`                | Example in violation section | File does not exist (actual: `python-pro.md`) |
+| `.claude/context/runtime/integration-queue.json`        | Step 0.5 check               | Wrong extension (actual: `.jsonl`)            |
+| `.claude/context/runtime/reflection-spawn-request.json` | Step 0 check                 | File does not exist on disk                   |
+| `.claude/context/runtime/workflow-state.json`           | Enterprise workflow          | File does not exist on disk                   |
+| `.claude/hooks/safety/api-rate-limiter.cjs`             | Gate 4 example               | File never created (example only)             |
+| `.claude/workflows/enterprise/security-audit.md`        | Gate 4 example               | File never created (example only)             |
 
 **Impact:** The last two are used as "wrong" examples in violation documentation, so their non-existence is arguably intentional. However, the first four are functional references that could cause runtime failures or confuse agents trying to read them.
 
@@ -138,24 +142,24 @@ Multiple `@` reference files in `.claude/docs/` cross-reference each other. Spot
 
 ### 5.1 Registration Summary
 
-| Category | Count |
-|----------|-------|
-| Total hook files on disk | 105 |
-| Archived (`_archive/`) | ~65 |
-| Active (non-archive) | ~40 |
-| Registered in settings.json | 30 |
-| Active but unregistered | 10 |
+| Category                    | Count |
+| --------------------------- | ----- |
+| Total hook files on disk    | 105   |
+| Archived (`_archive/`)      | ~65   |
+| Active (non-archive)        | ~40   |
+| Registered in settings.json | 30    |
+| Active but unregistered     | 10    |
 
 ### 5.2 Event Distribution (Registered Hooks)
 
-| Event | Hooks | Purpose |
-|-------|-------|---------|
-| `PreToolUse` | 14 | Tool validation, routing, safety |
-| `PostToolUse` | 5 | Metrics, indexing, integration |
-| `PostToolUseFailure` | 1 | Failure metrics |
-| `UserPromptSubmit` | 5 | Prompt preprocessing |
-| `Stop` | 3 | Session cleanup |
-| `SessionEnd` | 2 | Session teardown |
+| Event                | Hooks | Purpose                          |
+| -------------------- | ----- | -------------------------------- |
+| `PreToolUse`         | 14    | Tool validation, routing, safety |
+| `PostToolUse`        | 5     | Metrics, indexing, integration   |
+| `PostToolUseFailure` | 1     | Failure metrics                  |
+| `UserPromptSubmit`   | 5     | Prompt preprocessing             |
+| `Stop`               | 3     | Session cleanup                  |
+| `SessionEnd`         | 2     | Session teardown                 |
 
 ### 5.3 Consolidation Status
 
@@ -171,13 +175,13 @@ No hooks currently have performance monitoring beyond `post-tool-metrics-unified
 
 ### 6.1 Coverage Analysis
 
-| Metric | Value |
-|--------|-------|
-| Total schemas | 133 |
-| Referenced in code | ~22 |
-| Used in validation hooks | ~8 |
-| Documentation-only | ~111 |
-| Schema coverage rate | 17% |
+| Metric                   | Value |
+| ------------------------ | ----- |
+| Total schemas            | 133   |
+| Referenced in code       | ~22   |
+| Used in validation hooks | ~8    |
+| Documentation-only       | ~111  |
+| Schema coverage rate     | 17%   |
 
 ### 6.2 Notable Gaps
 
@@ -199,11 +203,11 @@ Prioritize wiring validation for the 8-10 schemas that govern critical paths (ag
 
 ### 7.1 Current State
 
-| Category | Count |
-|----------|-------|
-| Active tools | 61 |
-| Archived tools | 25 |
-| npm scripts | 131 |
+| Category       | Count |
+| -------------- | ----- |
+| Active tools   | 61    |
+| Archived tools | 25    |
+| npm scripts    | 131   |
 
 ### 7.2 Script Sprawl
 
@@ -217,11 +221,11 @@ Prioritize wiring validation for the 8-10 schemas that govern critical paths (ag
 
 ### 8.1 Budget Violations (CRITICAL)
 
-| File | Size | Budget | Overage |
-|------|------|--------|---------|
-| `decisions.md` | 75,820 bytes (74 KB) | 20 KB | **3.8x over** |
-| `issues.md` | 63,418 bytes (62 KB) | 20 KB | **3.2x over** |
-| `learnings.md` | 14,056 bytes (14 KB) | 20 KB | Within budget |
+| File           | Size                 | Budget | Overage       |
+| -------------- | -------------------- | ------ | ------------- |
+| `decisions.md` | 75,820 bytes (74 KB) | 20 KB  | **3.8x over** |
+| `issues.md`    | 63,418 bytes (62 KB) | 20 KB  | **3.2x over** |
+| `learnings.md` | 14,056 bytes (14 KB) | 20 KB  | Within budget |
 
 **Impact:** Oversized memory files are injected into every agent spawn prompt. At 74KB + 62KB = 136KB just for decisions + issues, this consumes a massive portion of the 200K context window before the agent even starts working. Given the research finding that model performance degrades past 32K tokens, these files alone may be causing quality degradation.
 
@@ -260,15 +264,15 @@ The named memory system (`.claude/context/memory/named/`) is available but usage
 
 ## Appendix: Artifact Inventory
 
-| Artifact Type | Count | Registry/Catalog |
-|---------------|-------|------------------|
-| Agents | 59 | agent-registry.json (59) |
-| Skills (directories) | 155 | skill-catalog.md |
-| Skills (with SKILL.md) | 152 | — |
-| Schemas | 133 | schema-catalog.md |
-| Hooks (total files) | 105 | settings.json (30 registered) |
-| Hooks (active, non-archive) | ~40 | — |
-| Tools | 61 | tool-catalog.md |
-| Workflows | 31 | workflow registry |
-| npm scripts | 131 | package.json |
-| Environment variables (in code) | 282 | .env.example (32 documented) |
+| Artifact Type                   | Count | Registry/Catalog              |
+| ------------------------------- | ----- | ----------------------------- |
+| Agents                          | 59    | agent-registry.json (59)      |
+| Skills (directories)            | 155   | skill-catalog.md              |
+| Skills (with SKILL.md)          | 152   | —                             |
+| Schemas                         | 133   | schema-catalog.md             |
+| Hooks (total files)             | 105   | settings.json (30 registered) |
+| Hooks (active, non-archive)     | ~40   | —                             |
+| Tools                           | 61    | tool-catalog.md               |
+| Workflows                       | 31    | workflow registry             |
+| npm scripts                     | 131   | package.json                  |
+| Environment variables (in code) | 282   | .env.example (32 documented)  |

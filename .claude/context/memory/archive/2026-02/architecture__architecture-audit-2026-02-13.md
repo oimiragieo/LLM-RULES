@@ -33,12 +33,14 @@ The agent-studio codebase shows **mature architecture with significant technical
 **Impact**: 14 hooks without proper `module.exports` patterns could fail to load correctly
 
 **Evidence**:
+
 - 105 total hook files
 - 0 hooks using functional exports (`module.exports = function`)
 - All hooks registered in settings.json use stdin-based protocol (JSON in/out)
 - 14 orphaned hooks in `_archive/` subdirectories still contain old export patterns
 
 **Affected Files**:
+
 ```
 .claude/hooks/monitoring/_archive/error-tracker-hook.cjs
 .claude/hooks/monitoring/_archive/execution-limit-monitor-hook.cjs
@@ -52,6 +54,7 @@ The agent-studio codebase shows **mature architecture with significant technical
 ```
 
 **Recommended Action**:
+
 1. **Delete archived hooks** if no longer needed (448KB of orphaned code)
 2. OR **restore to active** if still required (requires settings.json registration)
 3. Document decision in `.claude/context/memory/decisions.md`
@@ -66,12 +69,14 @@ The agent-studio codebase shows **mature architecture with significant technical
 **Impact**: 26 archived tools (192KB) with unclear restoration path
 
 **Evidence**:
+
 - `.claude/tools/_archive/` contains 26 deprecated tools
 - No clear archival policy documented
 - Some tools reference in-memory caching, monitoring dashboards, ESLint fixes
-- Tool catalog marks 25 tools as deprecated (overlaps with _archive count)
+- Tool catalog marks 25 tools as deprecated (overlaps with \_archive count)
 
 **Sample Archived Tools**:
+
 ```
 archive-issues.py
 compact-lancedb.cjs
@@ -85,11 +90,13 @@ migrate-agent-config.cjs
 ```
 
 **Questions to Answer**:
+
 1. Should these be **permanently deleted** (free up 192KB)?
 2. Should any be **restored** (e.g., `detect-orphans.mjs` for architecture analysis)?
 3. Is there a **retention policy** for archived tools?
 
 **Recommended Action**:
+
 1. **Audit archived tools** for restoration candidates (1-2 hours)
 2. **Delete permanently** if no restoration plan exists
 3. **Document archival policy** in `FILE_PLACEMENT_RULES.md`
@@ -102,16 +109,19 @@ migrate-agent-config.cjs
 **Impact**: 404 active tests vs 114 archived tests — unclear archival rationale
 
 **Evidence**:
+
 - `tests/` directory contains 404 active test files
 - Archive exists but size/scope unclear (grep failed to enumerate)
 - No documented policy for test archival vs deletion
 - Archived tests may contain valuable regression patterns
 
 **Affected Areas**:
+
 - Hook tests: `post-creation-integration-edge-cases.test.cjs`, `post-creation-integration.test.cjs` (appear active, not archived)
 - Unknown archived test scope
 
 **Recommended Action**:
+
 1. **Inventory archived tests** (run `find tests/_archive -name "*.test.*"`)
 2. **Classify by restoration value**:
    - **Delete**: Obsolete tests for removed features
@@ -131,6 +141,7 @@ migrate-agent-config.cjs
 **Impact**: 8 hooks contain overlapping guard/validation logic, risking inconsistency
 
 **Evidence**:
+
 - `routing-guard.cjs` (79KB, 38 functions) — central validation hub
 - `unified-creator-guard.cjs` (23KB) — creator path validation
 - `pre-task-unified.cjs` (38KB) — task validation
@@ -139,6 +150,7 @@ migrate-agent-config.cjs
 - `unified-pre-write-hook.cjs` (46KB) — file safety validation
 
 **Overlap Examples**:
+
 1. **Routing validation** appears in:
    - `routing-guard.cjs` (primary)
    - `pre-task-unified.cjs` (task-specific)
@@ -150,15 +162,21 @@ migrate-agent-config.cjs
    - `unified-pre-write-hook.cjs` (file path safety)
 
 **Risk**:
+
 - Inconsistent validation logic across hooks
 - Difficult to maintain (change requires 3+ file edits)
 - High cognitive load (79KB routing-guard with 38 functions)
 
 **Recommended Action**:
+
 1. **Extract shared validation to library module**: `.claude/lib/validation/common-guards.cjs`
 2. **Refactor hooks to use shared module**:
    ```javascript
-   const { validateRouting, validateSecurity, validateFilePath } = require('../../lib/validation/common-guards.cjs');
+   const {
+     validateRouting,
+     validateSecurity,
+     validateFilePath,
+   } = require('../../lib/validation/common-guards.cjs');
    ```
 3. **Split routing-guard.cjs** into smaller modules:
    - `routing-guard-core.cjs` (10KB) — core routing logic
@@ -176,6 +194,7 @@ migrate-agent-config.cjs
 **Impact**: 10+ modules use lazy loading to break circular dependencies
 
 **Evidence**:
+
 ```
 .claude/lib/memory/core/memory-utils.cjs
 .claude/lib/routing/routing-table.cjs
@@ -189,6 +208,7 @@ migrate-agent-config.cjs
 ```
 
 **Pattern**:
+
 ```javascript
 // routing-guard.cjs line 3-5
 // Memory Monitor integration (lazy-loaded to avoid circular dependencies)
@@ -197,20 +217,24 @@ migrate-agent-config.cjs
 ```
 
 **Root Cause**:
+
 - `routing-guard.cjs` depends on `memory-monitor`
 - `memory-monitor` depends on `routing-guard` (for event tracking)
 - Workaround: lazy-load `memory-monitor` inside functions
 
 **Recommended Action**:
+
 1. **Introduce dependency inversion**:
    - Create `validation-events.cjs` interface
    - Both `routing-guard` and `memory-monitor` depend on interface (not each other)
    - Use event bus for loose coupling
 
 2. **Run madge analysis**:
+
    ```bash
    npx madge --circular .claude/lib
    ```
+
    (Already run: "Processed 226 files (23 warnings)" — suggests 23 circular refs)
 
 3. **Refactor top 5 circular dependency chains**:
@@ -244,11 +268,13 @@ migrate-agent-config.cjs
 **3.1.1: skill-creator/scripts/create.cjs (107KB, 3,677 lines)**
 
 **Violations**:
+
 - **Single Responsibility Principle**: Handles research, template rendering, file I/O, validation, CLAUDE.md updates, catalog updates
 - **God Object**: 107KB script doing 6+ distinct responsibilities
 - **Testability**: Impossible to unit test individual functions (all private/inline)
 
 **Recommended Split**:
+
 ```
 skill-creator/
   lib/
@@ -269,11 +295,13 @@ skill-creator/
 **3.1.2: routing-guard.cjs (79KB, 2,700+ lines, 38 functions)**
 
 **Violations**:
+
 - **Cyclomatic Complexity**: 38 functions suggest complex branching logic
 - **God Object**: Central validation hub with 7+ enforcement modes
 - **Mixed Concerns**: Routing + security + complexity + planner-first + specialist routing
 
 **Recommended Split** (already outlined in Finding 2.1):
+
 ```
 routing/
   guards/
@@ -298,28 +326,33 @@ routing/
 **Impact**: 646 instances of direct console usage bypassing structured logging
 
 **Evidence**:
+
 ```bash
 grep -r "console\.log\|console\.error" .claude/hooks .claude/lib --include="*.cjs" | grep -v "logger\|Logger\|// console" | wc -l
 # Result: 646
 ```
 
 **Problem**:
+
 - Logger infrastructure exists (`.claude/lib/utils/logger.cjs`)
 - 646 instances bypass logger (no structured logs, no log levels, no timestamps)
 - Violates `check-console-log.cjs` hook (runs on Stop event)
 
 **Sample Violations**:
+
 - Hooks: Direct `console.error` in error handlers (no context)
 - Library modules: `console.log` for debugging (should use logger.debug)
 - Tools: `console.log` in CLI tools (acceptable for user output, but inconsistent)
 
 **Recommended Action**:
+
 1. **Classify console usage**:
    - **CLI tools** (user-facing): Keep `console.log` (acceptable)
    - **Hooks/lib** (internal): Replace with logger
    - **Debug statements**: Replace with `logger.debug`
 
 2. **Batch refactor script** (similar to archived `eslint-batch-fix.cjs`):
+
    ```javascript
    // Replace in hooks/lib only
    console.log(...) → logger.info(...)
@@ -339,18 +372,21 @@ grep -r "console\.log\|console\.error" .claude/hooks .claude/lib --include="*.cj
 **Impact**: 226 modules split between CJS (majority) and ESM (.mjs tools)
 
 **Evidence**:
+
 - Hooks: 100% CommonJS (`.cjs`)
 - Library: 100% CommonJS (`.cjs`)
 - Tools: Mixed (`.mjs` for newer tools, `.cjs` for legacy)
 - Total: 226 modules (85% `.cjs`, 15% `.mjs`)
 
 **Current State**:
+
 - Hooks use CommonJS (required by Claude Code's stdin-based protocol)
 - Tools use ESM for modern Node.js features (top-level await, ESM imports)
 
 **Assessment**: **NOT A PROBLEM** — intentional split based on execution context
 
 **Recommendation**: Document in `code-standards.md`:
+
 ```markdown
 ## Module Format Guidelines
 
@@ -368,6 +404,7 @@ grep -r "console\.log\|console\.error" .claude/hooks .claude/lib --include="*.cj
 **Impact**: 5 instances of hardcoded values (minimal)
 
 **Evidence**:
+
 ```bash
 grep -r "hardcoded\|magic.*number\|0x[0-9a-f]" .claude/hooks .claude/lib --include="*.cjs" -i | grep -v "comment\|//" | wc -l
 # Result: 5
@@ -387,12 +424,14 @@ grep -r "hardcoded\|magic.*number\|0x[0-9a-f]" .claude/hooks .claude/lib --inclu
 **Impact**: 17 instances of technical debt markers
 
 **Evidence**:
+
 ```bash
 grep -r "TODO\|FIXME\|HACK" .claude/hooks .claude/lib .claude/tools --include="*.cjs" --include="*.mjs" | wc -l
 # Result: 17
 ```
 
 **Recommended Action**:
+
 1. **Audit 17 instances** (2 hours)
 2. **Create GitHub issues** for legitimate TODOs
 3. **Remove obsolete markers** (already completed work)
@@ -405,12 +444,14 @@ grep -r "TODO\|FIXME\|HACK" .claude/hooks .claude/lib .claude/tools --include="*
 **Impact**: 27 instances of `@deprecated` markers
 
 **Evidence**:
+
 ```bash
 grep -r "deprecated\|@deprecated" .claude --include="*.cjs" --include="*.mjs" | wc -l
 # Result: 27
 ```
 
 **Recommended Action**:
+
 1. **Audit deprecated code** (determine if still in use)
 2. **Remove if unused** (or move to `_archive/`)
 3. **Update call sites** if replacement exists
@@ -423,6 +464,7 @@ grep -r "deprecated\|@deprecated" .claude --include="*.cjs" --include="*.mjs" | 
 **Impact**: 6 instances of `shell: true` in child process spawns
 
 **Evidence**:
+
 ```bash
 grep -r "shell:\s*true" .claude --include="*.cjs" --include="*.mjs" | wc -l
 # Result: 6
@@ -431,6 +473,7 @@ grep -r "shell:\s*true" .claude --include="*.cjs" --include="*.mjs" | wc -l
 **Risk**: Potential command injection vectors (low if inputs are controlled)
 
 **Recommended Action**:
+
 1. **Audit 6 instances** for input validation
 2. **Refactor to `shell: false` with array arguments** (security best practice)
 3. **Document exceptions** (if shell features required)
@@ -447,6 +490,7 @@ grep -r "shell:\s*true" .claude --include="*.cjs" --include="*.mjs" | wc -l
 **Impact**: 7 config files across project, unclear precedence
 
 **Evidence**:
+
 ```
 .claude/config.staging.yaml       — staging environment config
 .claude/config.yaml               — primary config (agents, models)
@@ -458,21 +502,25 @@ grep -r "shell:\s*true" .claude --include="*.cjs" --include="*.mjs" | wc -l
 ```
 
 **Problems**:
+
 1. **No documented precedence**: Which config wins if conflicts?
 2. **Scattered configs**: Tool-specific configs not in central location
 3. **No schema validation**: Missing JSON schema for config.yaml
 
 **Recommended Action**:
+
 1. **Consolidate tool configs** to `.claude/config.yaml`:
+
    ```yaml
    tools:
      github:
-       apiUrl: "https://api.github.com"
+       apiUrl: 'https://api.github.com'
      kubernetes-flux:
-       namespace: "flux-system"
+       namespace: 'flux-system'
    ```
 
 2. **Document precedence** in `@ENVIRONMENT_CONFIG.md`:
+
    ```
    1. CLI args (highest)
    2. Environment variables
@@ -493,6 +541,7 @@ grep -r "shell:\s*true" .claude --include="*.cjs" --include="*.mjs" | wc -l
 **Impact**: Unclear script usage, potential redundancy
 
 **Evidence**:
+
 ```bash
 cat package.json | jq '.scripts | keys | length'
 # Result: 168
@@ -501,6 +550,7 @@ cat package.json | jq '.scripts | keys | length'
 **Problem**: 168 scripts with no usage documentation or deprecation markers
 
 **Sample Scripts** (from package.json audit):
+
 - `search:*` — 15+ search-related scripts
 - `metrics:*` — 20+ metrics scripts
 - `test:*` — 30+ test scripts
@@ -508,6 +558,7 @@ cat package.json | jq '.scripts | keys | length'
 - Numerous one-off scripts with unclear purpose
 
 **Recommended Action**:
+
 1. **Audit script usage** (analyze git history + README references)
 2. **Classify scripts**:
    - **Core** (frequently used, document in README)
@@ -535,6 +586,7 @@ cat package.json | jq '.scripts | keys | length'
 **Impact**: Cluttered codebase, unclear restoration path
 
 **Evidence**:
+
 ```bash
 find .claude -type d -name "_archive" | wc -l
 # Result: 16
@@ -546,6 +598,7 @@ du -sh .claude/hooks/_archive/ .claude/tools/_archive/
 ```
 
 **Additional Archives** (not measured):
+
 - `.claude/agents/_archive/`
 - `.claude/skills/_archive/`
 - `.claude/workflows/_archive/`
@@ -555,28 +608,37 @@ du -sh .claude/hooks/_archive/ .claude/tools/_archive/
 - (10+ more archive directories)
 
 **Problem**: No archival policy documented, unclear if archives are:
+
 - **Temporary** (restore candidates)
 - **Historical** (keep for reference)
 - **Obsolete** (delete permanently)
 
 **Recommended Action**:
+
 1. **Create archival policy** in `FILE_PLACEMENT_RULES.md`:
-   ```markdown
+
+   ````markdown
    ## Archive Policy
 
    Archives exist for 3 purposes:
+
    1. **Restoration Candidates** (tag: `RESTORE_CANDIDATE`)
    2. **Historical Reference** (tag: `HISTORICAL`)
    3. **Pending Deletion** (tag: `DELETE_AFTER_2026-XX-XX`)
 
    Tag format: Add YAML frontmatter to archived files:
+
    ```yaml
    ---
    archived: 2026-02-13
-   archiveReason: "Replaced by unified-pre-write-hook.cjs"
+   archiveReason: 'Replaced by unified-pre-write-hook.cjs'
    archiveType: RESTORE_CANDIDATE | HISTORICAL | DELETE_AFTER_2026-XX-XX
    ---
    ```
+   ````
+
+   ```
+
    ```
 
 2. **Audit archives by size** (prioritize largest):
@@ -599,6 +661,7 @@ du -sh .claude/hooks/_archive/ .claude/tools/_archive/
 **Impact**: High cognitive load when searching docs
 
 **Evidence**:
+
 ```bash
 find .claude -name "*.md" -path "*/_archive/*" | wc -l
 # Result: 405
@@ -607,6 +670,7 @@ find .claude -name "*.md" -path "*/_archive/*" | wc -l
 **Problem**: Searching documentation returns 405 archived files as noise
 
 **Recommended Action**:
+
 1. **Move archived docs** to single location: `.claude/_archive/docs/YYYY-MM/`
 2. **Update `.gitignore`**: Exclude `_archive/` from ripgrep searches
 3. **Add ripgreprc rule**: `--glob=!**/_archive/**`
@@ -617,22 +681,22 @@ find .claude -name "*.md" -path "*/_archive/*" | wc -l
 
 ## Codebase Metrics Summary
 
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| **Total Hooks** | 105 | Healthy count |
-| **Hook Avg Size** | 356 lines | Moderate (largest: 2,700 lines) |
-| **Total Library Modules** | 226 | Large but organized |
-| **Library Total Lines** | 63,933 | High complexity |
-| **Oversized Modules** | 6 (>50KB) | **CRITICAL** |
-| **Circular Dependencies** | 23 warnings | **HIGH** (needs refactoring) |
-| **Console Usage** | 646 instances | **HIGH** (bypasses logger) |
-| **Archive Size** | 640KB | **MEDIUM** (cleanup needed) |
-| **NPM Scripts** | 168 | **MEDIUM** (documentation needed) |
-| **Active Tests** | 404 | Healthy coverage |
-| **Archived Tests** | 114 | **MEDIUM** (restore or delete) |
-| **Shell Injection Risks** | 6 instances | **MEDIUM** (audit needed) |
-| **TODO/FIXME Markers** | 17 | Low technical debt |
-| **Deprecated Code** | 27 instances | Low (normal churn) |
+| Metric                    | Value         | Assessment                        |
+| ------------------------- | ------------- | --------------------------------- |
+| **Total Hooks**           | 105           | Healthy count                     |
+| **Hook Avg Size**         | 356 lines     | Moderate (largest: 2,700 lines)   |
+| **Total Library Modules** | 226           | Large but organized               |
+| **Library Total Lines**   | 63,933        | High complexity                   |
+| **Oversized Modules**     | 6 (>50KB)     | **CRITICAL**                      |
+| **Circular Dependencies** | 23 warnings   | **HIGH** (needs refactoring)      |
+| **Console Usage**         | 646 instances | **HIGH** (bypasses logger)        |
+| **Archive Size**          | 640KB         | **MEDIUM** (cleanup needed)       |
+| **NPM Scripts**           | 168           | **MEDIUM** (documentation needed) |
+| **Active Tests**          | 404           | Healthy coverage                  |
+| **Archived Tests**        | 114           | **MEDIUM** (restore or delete)    |
+| **Shell Injection Risks** | 6 instances   | **MEDIUM** (audit needed)         |
+| **TODO/FIXME Markers**    | 17            | Low technical debt                |
+| **Deprecated Code**       | 27 instances  | Low (normal churn)                |
 
 ---
 
@@ -699,16 +763,16 @@ find .claude -name "*.md" -path "*/_archive/*" | wc -l
 
 ## Architecture Quality Scores
 
-| Category | Score | Rationale |
-|----------|-------|-----------|
-| **Modularity** | B+ | Good separation of concerns, but oversized modules drag down score |
-| **Coupling** | C+ | Circular dependencies and lazy-loading workarounds indicate tight coupling |
-| **Cohesion** | B | Well-organized directory structure, but god objects reduce cohesion |
-| **Testability** | B- | 404 active tests is strong, but oversized modules hard to unit test |
-| **Maintainability** | C+ | High cognitive load (79KB routing-guard, 646 console usages) |
-| **Scalability** | B | Event-driven architecture supports scaling, but circular deps are fragile |
-| **Security** | B- | 6 shell injection risks, but minimal hardcoded secrets |
-| **Documentation** | B | Good docs, but 405 archived docs create noise |
+| Category            | Score | Rationale                                                                  |
+| ------------------- | ----- | -------------------------------------------------------------------------- |
+| **Modularity**      | B+    | Good separation of concerns, but oversized modules drag down score         |
+| **Coupling**        | C+    | Circular dependencies and lazy-loading workarounds indicate tight coupling |
+| **Cohesion**        | B     | Well-organized directory structure, but god objects reduce cohesion        |
+| **Testability**     | B-    | 404 active tests is strong, but oversized modules hard to unit test        |
+| **Maintainability** | C+    | High cognitive load (79KB routing-guard, 646 console usages)               |
+| **Scalability**     | B     | Event-driven architecture supports scaling, but circular deps are fragile  |
+| **Security**        | B-    | 6 shell injection risks, but minimal hardcoded secrets                     |
+| **Documentation**   | B     | Good docs, but 405 archived docs create noise                              |
 
 **Overall Grade**: **B-** (Functional but needs refactoring)
 
@@ -719,11 +783,13 @@ find .claude -name "*.md" -path "*/_archive/*" | wc -l
 ### Introduce Architecture Decision Records (ADRs)
 
 **Problem**: No documented rationale for:
+
 - Why routing-guard is 79KB (deliberate or tech debt?)
 - Why lazy-loading circular dependencies (workaround or design?)
 - Why 168 npm scripts (organic growth or intentional?)
 
 **Recommendation**: Adopt ADR pattern (already exists in `.claude/context/memory/decisions.md`):
+
 ```markdown
 ## ADR-XXX: Split routing-guard.cjs into 6 modules
 
@@ -737,6 +803,7 @@ find .claude -name "*.md" -path "*/_archive/*" | wc -l
 ### Establish Module Size Budget
 
 **Recommendation**: Enforce module size limits via ESLint plugin:
+
 ```javascript
 // .eslintrc.cjs
 rules: {
@@ -752,6 +819,7 @@ rules: {
 **Problem**: Circular dependencies solved via lazy loading (fragile workaround)
 
 **Recommendation**: Introduce DI container (e.g., `awilix`, `tsyringe`) or manual DI:
+
 ```javascript
 // routing-guard.cjs (before)
 const memoryMonitor = require('../../lib/memory/memory-monitor.cjs'); // Circular!
@@ -770,11 +838,13 @@ module.exports = { createRoutingGuard };
 ### Appendix A: Module Dependency Graph
 
 **Recommendation**: Generate visual dependency graph:
+
 ```bash
 npx madge --image graph.png --extensions cjs,mjs .claude/lib
 ```
 
 Expected output:
+
 - Circular dependency chains (23 warnings)
 - God object hubs (routing-guard, memory-manager)
 - Dependency depth analysis
@@ -782,6 +852,7 @@ Expected output:
 ### Appendix B: Archive Inventory
 
 **Full archive directory list**:
+
 ```
 .claude/agents/_archive/
 .claude/hooks/_archive/
@@ -806,6 +877,7 @@ docs/_archive/ (405 files)
 ### Appendix C: Dependency Frequency Analysis
 
 **Top 20 most frequently imported modules**:
+
 ```
 558 times: const path = require('path');
 527 times: const fs = require('fs');
@@ -821,6 +893,7 @@ docs/_archive/ (405 files)
 ```
 
 **Insights**:
+
 - **path/fs**: Standard Node.js modules (expected)
 - **PROJECT_ROOT**: 88 imports (49 + 39) — suggests centralized project root handling
 - **eventBus**: 22 imports — good event-driven architecture
@@ -833,25 +906,21 @@ docs/_archive/ (405 files)
 The agent-studio codebase demonstrates **mature architecture with accumulating technical debt**. The system is **functional and well-organized**, but **oversized modules and circular dependencies** create maintainability risks.
 
 **Immediate Actions**:
+
 1. Refactor `skill-creator/create.cjs` (107KB → 7 modules)
 2. Split `routing-guard.cjs` (79KB → 6 modules)
 3. Resolve 23 circular dependency warnings
 
-**Medium-Term Actions**:
-4. Batch refactor 646 console usages to logger
-5. Archive triage and cleanup (640KB)
-6. Audit shell injection risks (6 instances)
+**Medium-Term Actions**: 4. Batch refactor 646 console usages to logger 5. Archive triage and cleanup (640KB) 6. Audit shell injection risks (6 instances)
 
-**Long-Term Actions**:
-7. Introduce ADRs for architecture decisions
-8. Establish module size budgets (ESLint enforcement)
-9. Adopt dependency injection to eliminate circular deps
+**Long-Term Actions**: 7. Introduce ADRs for architecture decisions 8. Establish module size budgets (ESLint enforcement) 9. Adopt dependency injection to eliminate circular deps
 
 **Estimated Total Effort**: 80-100 hours (P0-P2 recommendations)
 
 ---
 
 **Next Steps**:
+
 1. Review findings with team
 2. Prioritize recommendations based on business impact
 3. Create GitHub issues for P0/P1 recommendations

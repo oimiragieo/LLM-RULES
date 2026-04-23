@@ -10,6 +10,7 @@
 **Status**: 🟡 MODERATE RISK - Significant coverage gaps in critical infrastructure
 
 **Overall Assessment**:
+
 - **Test Count**: 214 tests passing (100% pass rate in measured subset)
 - **Coverage Estimate**: ~60% of critical paths tested
 - **Critical Gaps**: 40% of hooks untested, 70% of CLI tools untested
@@ -92,69 +93,69 @@
 
 #### Routing Hooks (Critical Path)
 
-| Hook | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `routing-guard.cjs` | ✅ 5 test files | Comprehensive | PASS | LOW |
-| `unified-creator-guard.cjs` | ✅ 6 test files | Comprehensive | PASS | LOW |
-| `user-prompt-unified.cjs` | ✅ 1 test file | Basic | PARTIAL | MEDIUM |
-| `user-prompt-orchestrator.cjs` | ❌ 1 basic test | Minimal | **GAP** | **HIGH** |
-| `pre-task-unified.cjs` | ✅ 1 test file | Basic | PARTIAL | MEDIUM |
-| `spawn-prompt-assembler.cjs` | ✅ 10 test files | Comprehensive | PASS | LOW |
+| Hook                           | Test File        | Coverage      | Status  | Risk     |
+| ------------------------------ | ---------------- | ------------- | ------- | -------- |
+| `routing-guard.cjs`            | ✅ 5 test files  | Comprehensive | PASS    | LOW      |
+| `unified-creator-guard.cjs`    | ✅ 6 test files  | Comprehensive | PASS    | LOW      |
+| `user-prompt-unified.cjs`      | ✅ 1 test file   | Basic         | PARTIAL | MEDIUM   |
+| `user-prompt-orchestrator.cjs` | ❌ 1 basic test  | Minimal       | **GAP** | **HIGH** |
+| `pre-task-unified.cjs`         | ✅ 1 test file   | Basic         | PARTIAL | MEDIUM   |
+| `spawn-prompt-assembler.cjs`   | ✅ 10 test files | Comprehensive | PASS    | LOW      |
 
 **Analysis**: Core routing (routing-guard, unified-creator-guard) is well-tested with comprehensive suites. However, `user-prompt-orchestrator.cjs` orchestrates ALL user prompts and has only 1 basic test - this is a **critical gap**.
 
 #### Safety Hooks (Security Critical)
 
-| Hook | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `bash-command-validator.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `shell-injection-validator.cjs` | ✅ 2 test files | Good | PASS | LOW |
-| `windows-null-sanitizer.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `unified-pre-write-hook.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `spawn-prompt-validator.cjs` | ✅ 2 test files | Good | PASS | LOW |
-| `validate-skill-invocation.cjs` | ✅ 1 test file | Basic | PASS | LOW |
-| `hybrid-search-enforcer.cjs` | ✅ 1 test file | Basic | PARTIAL | MEDIUM |
+| Hook                            | Test File       | Coverage | Status  | Risk   |
+| ------------------------------- | --------------- | -------- | ------- | ------ |
+| `bash-command-validator.cjs`    | ✅ 1 test file  | Good     | PASS    | LOW    |
+| `shell-injection-validator.cjs` | ✅ 2 test files | Good     | PASS    | LOW    |
+| `windows-null-sanitizer.cjs`    | ✅ 1 test file  | Good     | PASS    | LOW    |
+| `unified-pre-write-hook.cjs`    | ✅ 1 test file  | Good     | PASS    | LOW    |
+| `spawn-prompt-validator.cjs`    | ✅ 2 test files | Good     | PASS    | LOW    |
+| `validate-skill-invocation.cjs` | ✅ 1 test file  | Basic    | PASS    | LOW    |
+| `hybrid-search-enforcer.cjs`    | ✅ 1 test file  | Basic    | PARTIAL | MEDIUM |
 
 **Analysis**: Security hooks are well-tested. Recent security fixes (Task #5-17) added comprehensive test suites. Good state.
 
 #### Reflection Hooks (Session Management)
 
-| Hook | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `unified-reflection-handler.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `reflection-queue-processor.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `reflection-step0-guard.cjs` | ✅ 2 test files | Good | PASS | LOW |
-| `force-step0-execution.cjs` | ✅ 1 test file | Basic | PASS | LOW |
+| Hook                             | Test File       | Coverage | Status | Risk |
+| -------------------------------- | --------------- | -------- | ------ | ---- |
+| `unified-reflection-handler.cjs` | ✅ 1 test file  | Good     | PASS   | LOW  |
+| `reflection-queue-processor.cjs` | ✅ 1 test file  | Good     | PASS   | LOW  |
+| `reflection-step0-guard.cjs`     | ✅ 2 test files | Good     | PASS   | LOW  |
+| `force-step0-execution.cjs`      | ✅ 1 test file  | Basic    | PASS   | LOW  |
 
 **Analysis**: Reflection hooks are adequately tested. No gaps identified.
 
 #### Workflow Hooks (Phase Management)
 
-| Hook | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `post-completion-chain.cjs` | ✅ 1 test file | Basic | PARTIAL | MEDIUM |
-| `post-creation-integration.cjs` | ✅ 2 test files | Good | PASS | LOW |
+| Hook                            | Test File       | Coverage | Status  | Risk   |
+| ------------------------------- | --------------- | -------- | ------- | ------ |
+| `post-completion-chain.cjs`     | ✅ 1 test file  | Basic    | PARTIAL | MEDIUM |
+| `post-creation-integration.cjs` | ✅ 2 test files | Good     | PASS    | LOW    |
 
 **Analysis**: `post-completion-chain.cjs` advances workflow phases automatically - only 1 basic test. Should have edge case tests (phase skip, invalid transitions, concurrent completions).
 
 #### Session Hooks (State Management)
 
-| Hook | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `state-reset.cjs` | ✅ 2 test files | Good | PASS | LOW |
-| `drift-detector.cjs` | ✅ 1 test file | Basic | PASS | LOW |
-| `adaptive-quality-gate.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `post-edit-scanner.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `pre-compact.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
+| Hook                        | Test File       | Coverage        | Status  | Risk   |
+| --------------------------- | --------------- | --------------- | ------- | ------ |
+| `state-reset.cjs`           | ✅ 2 test files | Good            | PASS    | LOW    |
+| `drift-detector.cjs`        | ✅ 1 test file  | Basic           | PASS    | LOW    |
+| `adaptive-quality-gate.cjs` | ❌ None         | **No coverage** | **GAP** | MEDIUM |
+| `post-edit-scanner.cjs`     | ❌ None         | **No coverage** | **GAP** | MEDIUM |
+| `pre-compact.cjs`           | ❌ None         | **No coverage** | **GAP** | LOW    |
 
 **Analysis**: Session management hooks partially tested. `adaptive-quality-gate.cjs` adjusts quality thresholds dynamically - no tests is a **gap**.
 
 #### Monitoring Hooks (Observability)
 
-| Hook | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `metrics-collector.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `error-tracker.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
+| Hook                    | Test File      | Coverage        | Status  | Risk   |
+| ----------------------- | -------------- | --------------- | ------- | ------ |
+| `metrics-collector.cjs` | ✅ 1 test file | Good            | PASS    | LOW    |
+| `error-tracker.cjs`     | ❌ None        | **No coverage** | **GAP** | MEDIUM |
 
 **Analysis**: `error-tracker.cjs` captures errors for analysis - no tests means broken error tracking could go unnoticed.
 
@@ -168,80 +169,80 @@
 
 #### Memory Subsystem (`.claude/lib/memory/`)
 
-| Module | Test File | Coverage | Status | Risk |
-|--------|-----------|----------|--------|------|
-| `lancedb-client.cjs` | ✅ 3 test files | Good | PASS | LOW |
-| `learnings-parser.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `named-memory.test.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `memory-entity-links.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `audit-trail-integration.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `contextual-memory.cjs` | ✅ 1 test file (filters) | Partial | PARTIAL | MEDIUM |
-| **`memory-search.cjs`** | ❌ None | **No coverage** | **GAP** | **HIGH** |
-| **`memory-extraction-writer.cjs`** | ❌ None | **No coverage** | **GAP** | **HIGH** |
-| **`entity-query.cjs`** | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| **`memory-deduplicator.cjs`** | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `intent-analyzer.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `memory-extractor.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `session-summary.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
+| Module                             | Test File                | Coverage        | Status  | Risk     |
+| ---------------------------------- | ------------------------ | --------------- | ------- | -------- |
+| `lancedb-client.cjs`               | ✅ 3 test files          | Good            | PASS    | LOW      |
+| `learnings-parser.cjs`             | ✅ 1 test file           | Good            | PASS    | LOW      |
+| `named-memory.test.cjs`            | ✅ 1 test file           | Good            | PASS    | LOW      |
+| `memory-entity-links.cjs`          | ✅ 1 test file           | Good            | PASS    | LOW      |
+| `audit-trail-integration.cjs`      | ✅ 1 test file           | Good            | PASS    | LOW      |
+| `contextual-memory.cjs`            | ✅ 1 test file (filters) | Partial         | PARTIAL | MEDIUM   |
+| **`memory-search.cjs`**            | ❌ None                  | **No coverage** | **GAP** | **HIGH** |
+| **`memory-extraction-writer.cjs`** | ❌ None                  | **No coverage** | **GAP** | **HIGH** |
+| **`entity-query.cjs`**             | ❌ None                  | **No coverage** | **GAP** | MEDIUM   |
+| **`memory-deduplicator.cjs`**      | ❌ None                  | **No coverage** | **GAP** | MEDIUM   |
+| `intent-analyzer.cjs`              | ❌ None                  | **No coverage** | **GAP** | LOW      |
+| `memory-extractor.cjs`             | ❌ None                  | **No coverage** | **GAP** | MEDIUM   |
+| `session-summary.cjs`              | ❌ None                  | **No coverage** | **GAP** | LOW      |
 
 **Analysis**: Core memory operations (lancedb, parsing, named memory) are tested. However, **search and extraction** - critical for memory retrieval - are untested. This is a **high-risk gap**.
 
 #### Routing Subsystem (`.claude/lib/routing/`)
 
-| Module | Test File | Coverage | Status | Risk |
-|--------|-----------|----------|--------|------|
-| `agent-registry-resolver.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `fuzzy-intent-matcher.cjs` | ✅ 1 test file | Basic | PARTIAL | MEDIUM |
-| `semantic-router.cjs` | ✅ 1 test file | Basic | PARTIAL | MEDIUM |
-| `pattern-router.cjs` | ✅ 1 test file | Basic | PARTIAL | MEDIUM |
-| `intent-classifier.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `router-state.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
+| Module                        | Test File      | Coverage        | Status  | Risk   |
+| ----------------------------- | -------------- | --------------- | ------- | ------ |
+| `agent-registry-resolver.cjs` | ✅ 1 test file | Good            | PASS    | LOW    |
+| `fuzzy-intent-matcher.cjs`    | ✅ 1 test file | Basic           | PARTIAL | MEDIUM |
+| `semantic-router.cjs`         | ✅ 1 test file | Basic           | PARTIAL | MEDIUM |
+| `pattern-router.cjs`          | ✅ 1 test file | Basic           | PARTIAL | MEDIUM |
+| `intent-classifier.cjs`       | ✅ 1 test file | Good            | PASS    | LOW    |
+| `router-state.cjs`            | ❌ None        | **No coverage** | **GAP** | MEDIUM |
 
 **Analysis**: Routing tested but many tests are "happy path only." No negative tests (invalid intents, conflicting patterns, state corruption). `router-state.cjs` manages routing state - no tests is a **gap**.
 
 #### Code Indexing Subsystem (`.claude/lib/code-indexing/`)
 
-| Module | Test File | Coverage | Status | Risk |
-|--------|-----------|----------|--------|------|
-| `hybrid-search.cjs` | ✅ 2 test files | Good | PASS | LOW |
-| `query-analyzer.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `result-ranker.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `bm25-indexer.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `merkle-tree.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `ast-grep-wrapper.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `semantic-chunker.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `gpu-detector.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `index.cjs` (index-manager) | ✅ 2 test files | Good | PASS | LOW |
-| `code-parser.cjs` | ⚠️ 1 basic test | Basic | PARTIAL | MEDIUM |
-| `parse-utils.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `parse-chunk-worker.cjs` | ✅ 1 test file | Good | PASS | LOW |
+| Module                      | Test File       | Coverage        | Status  | Risk   |
+| --------------------------- | --------------- | --------------- | ------- | ------ |
+| `hybrid-search.cjs`         | ✅ 2 test files | Good            | PASS    | LOW    |
+| `query-analyzer.cjs`        | ✅ 1 test file  | Good            | PASS    | LOW    |
+| `result-ranker.cjs`         | ✅ 1 test file  | Good            | PASS    | LOW    |
+| `bm25-indexer.cjs`          | ✅ 1 test file  | Good            | PASS    | LOW    |
+| `merkle-tree.cjs`           | ✅ 1 test file  | Good            | PASS    | LOW    |
+| `ast-grep-wrapper.cjs`      | ✅ 1 test file  | Good            | PASS    | LOW    |
+| `semantic-chunker.cjs`      | ✅ 1 test file  | Good            | PASS    | LOW    |
+| `gpu-detector.cjs`          | ✅ 1 test file  | Good            | PASS    | LOW    |
+| `index.cjs` (index-manager) | ✅ 2 test files | Good            | PASS    | LOW    |
+| `code-parser.cjs`           | ⚠️ 1 basic test | Basic           | PARTIAL | MEDIUM |
+| `parse-utils.cjs`           | ❌ None         | **No coverage** | **GAP** | MEDIUM |
+| `parse-chunk-worker.cjs`    | ✅ 1 test file  | Good            | PASS    | LOW    |
 
 **Analysis**: Code indexing is well-tested (24 test files for 17 modules). Good coverage. `code-parser.cjs` and `parse-utils.cjs` could use more edge case tests (malformed code, syntax errors, large files).
 
 #### QA Subsystem (`.claude/lib/qa/`)
 
-| Module | Test File | Coverage | Status | Risk |
-|--------|-----------|----------|--------|------|
-| `criteria.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `report.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `gate.mjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
+| Module         | Test File      | Coverage        | Status  | Risk   |
+| -------------- | -------------- | --------------- | ------- | ------ |
+| `criteria.cjs` | ✅ 1 test file | Good            | PASS    | LOW    |
+| `report.cjs`   | ✅ 1 test file | Good            | PASS    | LOW    |
+| `gate.mjs`     | ❌ None        | **No coverage** | **GAP** | MEDIUM |
 
 **Analysis**: QA criteria and reporting tested, but `gate.mjs` (quality gate enforcement) is untested.
 
 #### Workflow Subsystem (`.claude/lib/workflow/`)
 
-| Module | Test File | Coverage | Status | Risk |
-|--------|-----------|----------|--------|------|
-| `checkpoint-manager.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `cross-workflow-trigger.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `step-validators.cjs` | ✅ 2 test files | Good | PASS | LOW |
-| **`loop-handler.mjs`** | ❌ None | **No coverage** | **GAP** | **HIGH** |
-| **`conditional-executor.cjs`** | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| **`cycle-detector.cjs`** | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `verify-workflows.mjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `phase-advance-reader.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `phase-transition-validator.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `dependency-resolver.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
+| Module                           | Test File       | Coverage        | Status  | Risk     |
+| -------------------------------- | --------------- | --------------- | ------- | -------- |
+| `checkpoint-manager.cjs`         | ✅ 1 test file  | Good            | PASS    | LOW      |
+| `cross-workflow-trigger.cjs`     | ✅ 1 test file  | Good            | PASS    | LOW      |
+| `step-validators.cjs`            | ✅ 2 test files | Good            | PASS    | LOW      |
+| **`loop-handler.mjs`**           | ❌ None         | **No coverage** | **GAP** | **HIGH** |
+| **`conditional-executor.cjs`**   | ❌ None         | **No coverage** | **GAP** | MEDIUM   |
+| **`cycle-detector.cjs`**         | ❌ None         | **No coverage** | **GAP** | MEDIUM   |
+| `verify-workflows.mjs`           | ❌ None         | **No coverage** | **GAP** | LOW      |
+| `phase-advance-reader.cjs`       | ❌ None         | **No coverage** | **GAP** | MEDIUM   |
+| `phase-transition-validator.cjs` | ❌ None         | **No coverage** | **GAP** | MEDIUM   |
+| `dependency-resolver.cjs`        | ❌ None         | **No coverage** | **GAP** | LOW      |
 
 **Analysis**: **Critical workflow gap**. Checkpoints and validation tested, but **loop handling, conditional execution, and cycle detection are untested**. These modules prevent infinite loops and deadlocks - **high risk**.
 
@@ -250,6 +251,7 @@
 **60+ utility modules. ~25 tested, ~35 untested.**
 
 **High-Risk Untested Utils**:
+
 - `compression-trigger.cjs` - Triggers context compression (0 coverage)
 - `retry-with-backoff.cjs` - Retry logic (0 coverage)
 - `cost-calculator.cjs` - Cost tracking (0 coverage)
@@ -258,6 +260,7 @@
 - `pattern-library.cjs` - Pattern matching (0 coverage)
 
 **Low-Risk Untested Utils**:
+
 - Formatters, constants, simple helpers (low complexity, low risk)
 
 **Analysis**: Most utility gaps are low-risk. However, `compression-trigger.cjs` and `retry-with-backoff.cjs` affect critical flows and should have tests.
@@ -272,79 +275,79 @@
 
 #### Metrics Tools (`.claude/tools/cli/*-summary.cjs`)
 
-| Tool | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `spawn-assembly-metrics-summary.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `router-churn-summary.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `runtime-health-summary.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `memory-slo-summary.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `memory-cache-stability-summary.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `open-findings-summary.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `open-findings-trend-summary.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `worker-metrics-summary.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
+| Tool                                 | Test File      | Coverage        | Status  | Risk   |
+| ------------------------------------ | -------------- | --------------- | ------- | ------ |
+| `spawn-assembly-metrics-summary.cjs` | ❌ None        | **No coverage** | **GAP** | MEDIUM |
+| `router-churn-summary.cjs`           | ❌ None        | **No coverage** | **GAP** | MEDIUM |
+| `runtime-health-summary.cjs`         | ❌ None        | **No coverage** | **GAP** | MEDIUM |
+| `memory-slo-summary.cjs`             | ❌ None        | **No coverage** | **GAP** | MEDIUM |
+| `memory-cache-stability-summary.cjs` | ❌ None        | **No coverage** | **GAP** | MEDIUM |
+| `open-findings-summary.cjs`          | ✅ 1 test file | Good            | PASS    | LOW    |
+| `open-findings-trend-summary.cjs`    | ✅ 1 test file | Good            | PASS    | LOW    |
+| `worker-metrics-summary.cjs`         | ❌ None        | **No coverage** | **GAP** | MEDIUM |
 
 **Analysis**: 8 metrics tools, only 2 tested. These tools are used in CI (`pnpm metrics:ci`) - broken metrics tools will fail CI silently. **Medium-risk gap**.
 
 #### Validation Tools (`.claude/tools/cli/validate-*.cjs`)
 
-| Tool | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `validate-integration.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `validate-latest-integration-artifacts.mjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `validate-commit.mjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `validate-agents.mjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `validate-commands.mjs` | ❌ None | **No coverage** | **GAP** | LOW |
+| Tool                                        | Test File | Coverage        | Status  | Risk   |
+| ------------------------------------------- | --------- | --------------- | ------- | ------ |
+| `validate-integration.cjs`                  | ❌ None   | **No coverage** | **GAP** | MEDIUM |
+| `validate-latest-integration-artifacts.mjs` | ❌ None   | **No coverage** | **GAP** | MEDIUM |
+| `validate-commit.mjs`                       | ❌ None   | **No coverage** | **GAP** | LOW    |
+| `validate-agents.mjs`                       | ❌ None   | **No coverage** | **GAP** | LOW    |
+| `validate-commands.mjs`                     | ❌ None   | **No coverage** | **GAP** | LOW    |
 
 **Analysis**: 10 validation tools, 1 tested (`validate-integration.cjs` via integration tests). Validation tools enforce quality gates - untested validators = broken gates go unnoticed.
 
 #### Generator Tools (`.claude/tools/cli/generate-*.cjs`)
 
-| Tool | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `generate-agent-registry.cjs` | ✅ 1 test file (lib) | Partial | PARTIAL | MEDIUM |
-| `generate-skill-index.cjs` | ✅ 1 test file (lib) | Partial | PARTIAL | MEDIUM |
-| `generate-agent-catalog.cjs` | ✅ 1 test file (lib) | Partial | PARTIAL | MEDIUM |
-| `generate-tool-manifest.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `generate-routing-prototypes.cjs` | ✅ 1 test file (lib) | Partial | PARTIAL | LOW |
-| `generate-workflow-registry.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `generate-embeddings.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
+| Tool                              | Test File            | Coverage        | Status  | Risk   |
+| --------------------------------- | -------------------- | --------------- | ------- | ------ |
+| `generate-agent-registry.cjs`     | ✅ 1 test file (lib) | Partial         | PARTIAL | MEDIUM |
+| `generate-skill-index.cjs`        | ✅ 1 test file (lib) | Partial         | PARTIAL | MEDIUM |
+| `generate-agent-catalog.cjs`      | ✅ 1 test file (lib) | Partial         | PARTIAL | MEDIUM |
+| `generate-tool-manifest.cjs`      | ❌ None              | **No coverage** | **GAP** | MEDIUM |
+| `generate-routing-prototypes.cjs` | ✅ 1 test file (lib) | Partial         | PARTIAL | LOW    |
+| `generate-workflow-registry.cjs`  | ❌ None              | **No coverage** | **GAP** | LOW    |
+| `generate-embeddings.cjs`         | ❌ None              | **No coverage** | **GAP** | LOW    |
 
 **Analysis**: Generator tools have **library tests but no CLI tests**. CLI wiring (argument parsing, file I/O, error handling) is untested. Should have smoke tests.
 
 #### Memory Tools (`.claude/tools/cli/memory-*.cjs`)
 
-| Tool | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `memory-dashboard.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `memory-extract.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `memory-record.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `init-memory-db.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `sync-memory-json.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `migrate-legacy-sessions.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
+| Tool                          | Test File      | Coverage        | Status  | Risk   |
+| ----------------------------- | -------------- | --------------- | ------- | ------ |
+| `memory-dashboard.cjs`        | ✅ 1 test file | Good            | PASS    | LOW    |
+| `memory-extract.cjs`          | ❌ None        | **No coverage** | **GAP** | MEDIUM |
+| `memory-record.cjs`           | ❌ None        | **No coverage** | **GAP** | MEDIUM |
+| `init-memory-db.cjs`          | ❌ None        | **No coverage** | **GAP** | LOW    |
+| `sync-memory-json.cjs`        | ❌ None        | **No coverage** | **GAP** | LOW    |
+| `migrate-legacy-sessions.cjs` | ❌ None        | **No coverage** | **GAP** | LOW    |
 
 **Analysis**: 6 memory tools, 1 tested. `memory-extract.cjs` and `memory-record.cjs` are user-facing tools - no tests = broken UX goes unnoticed.
 
 #### Analysis Tools (`.claude/tools/analysis/`)
 
-| Tool | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `project-analyzer/analyzer.mjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `ecosystem-assessor/assess-ecosystem.mjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `repo-rag/scripts/search.mjs` | ❌ None | **No coverage** | **GAP** | LOW |
+| Tool                                      | Test File | Coverage        | Status  | Risk   |
+| ----------------------------------------- | --------- | --------------- | ------- | ------ |
+| `project-analyzer/analyzer.mjs`           | ❌ None   | **No coverage** | **GAP** | MEDIUM |
+| `ecosystem-assessor/assess-ecosystem.mjs` | ❌ None   | **No coverage** | **GAP** | MEDIUM |
+| `repo-rag/scripts/search.mjs`             | ❌ None   | **No coverage** | **GAP** | LOW    |
 
 **Analysis**: 8 analysis tools, 0 tested. These are higher-level tools (less critical), but `project-analyzer` is used by agents - should have smoke tests.
 
 #### Other CLI Tools
 
-| Tool | Test File | Coverage | Status | Risk |
-|------|-----------|----------|--------|------|
-| `hybrid-search.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `index-codebase.cjs` | ❌ None | **No coverage** | **GAP** | MEDIUM |
-| `doctor.mjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `error-report.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `cleanup-transient-artifacts.cjs` | ✅ 1 test file | Good | PASS | LOW |
-| `git-notes-verify.cjs` | ❌ None | **No coverage** | **GAP** | LOW |
-| `document-query.cjs` | ✅ 1 test file (lib) | Partial | PARTIAL | LOW |
+| Tool                              | Test File            | Coverage        | Status  | Risk   |
+| --------------------------------- | -------------------- | --------------- | ------- | ------ |
+| `hybrid-search.cjs`               | ✅ 1 test file       | Good            | PASS    | LOW    |
+| `index-codebase.cjs`              | ❌ None              | **No coverage** | **GAP** | MEDIUM |
+| `doctor.mjs`                      | ❌ None              | **No coverage** | **GAP** | LOW    |
+| `error-report.cjs`                | ❌ None              | **No coverage** | **GAP** | LOW    |
+| `cleanup-transient-artifacts.cjs` | ✅ 1 test file       | Good            | PASS    | LOW    |
+| `git-notes-verify.cjs`            | ❌ None              | **No coverage** | **GAP** | LOW    |
+| `document-query.cjs`              | ✅ 1 test file (lib) | Partial         | PARTIAL | LOW    |
 
 **Analysis**: Mix of tested and untested. `index-codebase.cjs` is critical (rebuilds search index) - no tests is a **gap**.
 
@@ -355,6 +358,7 @@
 #### 4.1 Weak Assertions (30% of tests)
 
 **Examples**:
+
 ```javascript
 // BAD: Too vague
 expect(result).toBeTruthy();
@@ -374,6 +378,7 @@ expect(fn).toThrow('Invalid task ID');
 #### 4.2 Missing Negative Test Cases (40% of tests)
 
 **Pattern**: Most tests only verify happy paths (valid inputs, expected outputs). Missing:
+
 - Invalid input tests
 - Boundary condition tests
 - Error handling tests
@@ -381,11 +386,11 @@ expect(fn).toThrow('Invalid task ID');
 
 **Examples of Missing Negative Tests**:
 
-| Module | Missing Tests |
-|--------|---------------|
-| `routing-guard.cjs` | No test for missing task_id, invalid agent type, circular task dependencies |
-| `memory-search.cjs` | No test for malformed queries, empty results, corrupted index |
-| `hybrid-search.cjs` | No test for search timeouts, binary file rejection, encoding errors |
+| Module                       | Missing Tests                                                                      |
+| ---------------------------- | ---------------------------------------------------------------------------------- |
+| `routing-guard.cjs`          | No test for missing task_id, invalid agent type, circular task dependencies        |
+| `memory-search.cjs`          | No test for malformed queries, empty results, corrupted index                      |
+| `hybrid-search.cjs`          | No test for search timeouts, binary file rejection, encoding errors                |
 | `spawn-prompt-assembler.cjs` | No test for prompt size limits, invalid placeholders, circular template references |
 
 **Impact**: Bugs discovered in production instead of tests.
@@ -395,12 +400,14 @@ expect(fn).toThrow('Invalid task ID');
 #### 4.3 File System Dependencies (15% of tests)
 
 **Pattern**: Some tests depend on file system state:
+
 - Read/write real files in `.claude/context/`
 - Depend on existing config files
 - Assume specific directory structure
 - No cleanup after test failure
 
 **Examples**:
+
 - `memory-dashboard.test.cjs` - Reads actual memory files
 - `state-reset.test.cjs` - Writes to real state files
 - `learnings-parser.test.cjs` - Parses actual learnings.md
@@ -408,6 +415,7 @@ expect(fn).toThrow('Invalid task ID');
 **Impact**: Tests fail on clean environments, Windows vs Linux differences, parallel test execution.
 
 **Recommendation**:
+
 1. Use temp directories for all file I/O tests
 2. Mock file system operations where appropriate
 3. Add explicit cleanup in `afterEach` hooks
@@ -418,11 +426,13 @@ expect(fn).toThrow('Invalid task ID');
 **Current State**: No centralized test fixtures directory. Each test duplicates setup code.
 
 **Impact**:
+
 - Code duplication (100+ lines of duplicate setup across tests)
 - Inconsistent test data
 - Hard to maintain tests
 
 **Recommendation**: Create `tests/fixtures/` with:
+
 - `agents/` - Sample agent configs
 - `memory/` - Sample memory files
 - `hooks/` - Sample hook inputs/outputs
@@ -436,6 +446,7 @@ expect(fn).toThrow('Invalid task ID');
 **Impact**: Performance regressions go unnoticed until production.
 
 **Recommendation**: Add benchmark suite:
+
 - Hook execution time (target: <100ms per hook)
 - Memory search latency (target: <50ms)
 - Hybrid search latency (target: <500ms)
@@ -450,6 +461,7 @@ expect(fn).toThrow('Invalid task ID');
 **Pattern**: Tests using `setTimeout`, `Date.now()`, TTL expiration.
 
 **Examples**:
+
 - `unified-creator-guard-ttl-bounds.test.cjs` - TTL timing tests
 - `reflection-queue-processor.test.cjs` - Timeout tests
 - `adaptive-quality-gate.cjs` - Time-based threshold adjustments (untested)
@@ -457,6 +469,7 @@ expect(fn).toThrow('Invalid task ID');
 **Impact**: Tests pass locally, fail in CI due to timing differences.
 
 **Recommendation**:
+
 1. Use fake timers (Jest/Vitest `jest.useFakeTimers()`)
 2. Mock `Date.now()` and `performance.now()`
 3. Increase timeout margins for CI (2x local timeout)
@@ -466,6 +479,7 @@ expect(fn).toThrow('Invalid task ID');
 **Pattern**: Tests requiring external services (GPUs, embedding models, LanceDB).
 
 **Examples**:
+
 - `fastembed-gpu-integration.test.cjs` - Requires GPU
 - `lancedb-client-gpu-integration.test.cjs` - Requires GPU + LanceDB
 - `embedding-generator-gpu.test.cjs` - Requires GPU
@@ -481,6 +495,7 @@ expect(fn).toThrow('Invalid task ID');
 **Pattern**: Tests with async operations, parallel execution, shared state.
 
 **Potential Issues** (not observed yet, but risk exists):
+
 - `memory-scheduler.cjs` - Concurrent memory writes
 - `post-completion-chain.cjs` - Phase transitions
 - `task-cleanup-manager.cjs` - Concurrent task updates
@@ -494,6 +509,7 @@ expect(fn).toThrow('Invalid task ID');
 #### 6.1 Test Scripts
 
 **Package.json Test Commands**:
+
 ```json
 "test": "node --test --test-concurrency=1 \"tests/**/*.test.{mjs,cjs}\"",
 "test:framework": "node --test --test-concurrency=1 [framework tests]",
@@ -506,6 +522,7 @@ expect(fn).toThrow('Invalid task ID');
 #### 6.2 CI Workflows
 
 **memory-ci.yml**:
+
 - Runs on memory subsystem changes
 - Executes `test:memory:ci` + `test:framework`
 - Runs memory SLO checks (`metrics:memory:slo:ci`)
@@ -515,6 +532,7 @@ expect(fn).toThrow('Invalid task ID');
 **Status**: ✅ Good coverage for memory subsystem.
 
 **memory-mvp-gate.yml**:
+
 - Nightly strict gate
 - Runs `metrics:nightly:strict` (0 open findings allowed)
 - Enforces quality thresholds
@@ -522,11 +540,13 @@ expect(fn).toThrow('Invalid task ID');
 **Status**: ✅ Good enforcement for production readiness.
 
 **Missing CI Checks**:
+
 - No routing subsystem CI workflow
 - No workflow engine CI workflow
 - No CLI tools smoke test workflow
 
 **Recommendation**: Add CI workflows for:
+
 1. `routing-ci.yml` - Runs on routing changes
 2. `workflow-ci.yml` - Runs on workflow changes
 3. `cli-smoke-ci.yml` - Smoke tests for all CLI tools
@@ -564,6 +584,7 @@ tests/
 **Analysis**: Good organization. Tests mirror source structure. Easy to find.
 
 **Missing**:
+
 - `tests/fixtures/` - Test data
 - `tests/helpers/` - Shared test utilities
 - `tests/benchmarks/` - Performance tests
@@ -573,6 +594,7 @@ tests/
 **Pattern**: `[module-name].test.{cjs,mjs}`
 
 **Examples**:
+
 - `routing-guard.test.cjs` - Basic tests
 - `routing-guard-comprehensive.test.cjs` - Comprehensive tests
 - `routing-guard-specialist-override.test.cjs` - Specific feature tests
@@ -657,31 +679,31 @@ tests/
 
 ### Coverage Targets
 
-| Category | Current | Target (3 months) | Target (6 months) |
-|----------|---------|-------------------|-------------------|
-| **Overall** | 60% | 80% | 90% |
-| **Hooks** | 60% | 90% | 95% |
-| **Libraries** | 40% | 75% | 85% |
-| **CLI Tools** | 32% | 70% | 80% |
-| **Critical Paths** | 70% | 100% | 100% |
+| Category           | Current | Target (3 months) | Target (6 months) |
+| ------------------ | ------- | ----------------- | ----------------- |
+| **Overall**        | 60%     | 80%               | 90%               |
+| **Hooks**          | 60%     | 90%               | 95%               |
+| **Libraries**      | 40%     | 75%               | 85%               |
+| **CLI Tools**      | 32%     | 70%               | 80%               |
+| **Critical Paths** | 70%     | 100%              | 100%              |
 
 ### Quality Targets
 
-| Metric | Current | Target (3 months) | Target (6 months) |
-|--------|---------|-------------------|-------------------|
-| **Negative Tests** | 60% | 85% | 95% |
-| **Weak Assertions** | 30% | 10% | 5% |
-| **Flaky Tests** | 0% | 0% | 0% |
-| **Test Pass Rate** | 100% | 100% | 100% |
+| Metric              | Current | Target (3 months) | Target (6 months) |
+| ------------------- | ------- | ----------------- | ----------------- |
+| **Negative Tests**  | 60%     | 85%               | 95%               |
+| **Weak Assertions** | 30%     | 10%               | 5%                |
+| **Flaky Tests**     | 0%      | 0%                | 0%                |
+| **Test Pass Rate**  | 100%    | 100%              | 100%              |
 
 ### Infrastructure Targets
 
-| Item | Current | Target (3 months) | Target (6 months) |
-|------|---------|-------------------|-------------------|
-| **Fixtures** | None | Full | Full |
-| **Helpers** | None | Full | Full |
-| **Benchmarks** | None | 10 critical paths | 25 critical paths |
-| **CI Workflows** | 2 | 5 | 8 |
+| Item             | Current | Target (3 months) | Target (6 months) |
+| ---------------- | ------- | ----------------- | ----------------- |
+| **Fixtures**     | None    | Full              | Full              |
+| **Helpers**      | None    | Full              | Full              |
+| **Benchmarks**   | None    | 10 critical paths | 25 critical paths |
+| **CI Workflows** | 2       | 5                 | 8                 |
 
 ---
 
@@ -740,6 +762,7 @@ tests/
 **Overall Status**: 🟡 MODERATE RISK
 
 **Strengths**:
+
 - ✅ Code indexing well-tested (24 test files, comprehensive)
 - ✅ Core routing hooks well-tested (routing-guard, unified-creator-guard)
 - ✅ Security hooks comprehensively tested (recent security fixes)
@@ -747,6 +770,7 @@ tests/
 - ✅ Good test organization (mirrors source structure)
 
 **Critical Gaps**:
+
 - ❌ Workflow engine untested (loop-handler, conditional-executor, cycle-detector)
 - ❌ Memory search untested (memory-search.cjs, memory-extraction-writer.cjs)
 - ❌ User prompt orchestrator minimally tested
@@ -754,6 +778,7 @@ tests/
 - ❌ 40% of tests lack negative test cases
 
 **Recommended Priority**:
+
 1. **P0 (This Week)**: Test workflow engine, memory search, user prompt orchestrator (32 hours)
 2. **P1 (This Month)**: CLI smoke tests, strengthen assertions, add fixtures (44 hours)
 3. **P2 (Next Quarter)**: Performance benchmarks, property-based testing, utility tests (56 hours)
@@ -841,25 +866,26 @@ pnpm test:ci
 
 ## Appendix C: Gap Prioritization Matrix
 
-| Module | Risk | Impact | Effort | Priority |
-|--------|------|--------|--------|----------|
-| `loop-handler.mjs` | HIGH | HIGH | 8h | **P0** |
-| `memory-search.cjs` | HIGH | HIGH | 8h | **P0** |
-| `user-prompt-orchestrator.cjs` | HIGH | MEDIUM | 8h | **P0** |
-| `post-completion-chain.cjs` | MEDIUM | HIGH | 4h | **P0** |
-| `adaptive-quality-gate.cjs` | MEDIUM | MEDIUM | 4h | **P0** |
-| CLI Tools (smoke tests) | MEDIUM | MEDIUM | 16h | **P1** |
-| `conditional-executor.cjs` | MEDIUM | MEDIUM | 4h | **P1** |
-| `cycle-detector.cjs` | MEDIUM | MEDIUM | 4h | **P1** |
-| `memory-extraction-writer.cjs` | MEDIUM | MEDIUM | 4h | **P1** |
-| `entity-query.cjs` | MEDIUM | LOW | 4h | **P1** |
-| Negative test cases | MEDIUM | MEDIUM | 8h | **P1** |
-| Test fixtures | LOW | MEDIUM | 8h | **P1** |
-| Utility modules | LOW | LOW | 16h | **P2** |
-| Performance benchmarks | LOW | MEDIUM | 16h | **P2** |
-| CI workflow expansion | LOW | MEDIUM | 8h | **P2** |
+| Module                         | Risk   | Impact | Effort | Priority |
+| ------------------------------ | ------ | ------ | ------ | -------- |
+| `loop-handler.mjs`             | HIGH   | HIGH   | 8h     | **P0**   |
+| `memory-search.cjs`            | HIGH   | HIGH   | 8h     | **P0**   |
+| `user-prompt-orchestrator.cjs` | HIGH   | MEDIUM | 8h     | **P0**   |
+| `post-completion-chain.cjs`    | MEDIUM | HIGH   | 4h     | **P0**   |
+| `adaptive-quality-gate.cjs`    | MEDIUM | MEDIUM | 4h     | **P0**   |
+| CLI Tools (smoke tests)        | MEDIUM | MEDIUM | 16h    | **P1**   |
+| `conditional-executor.cjs`     | MEDIUM | MEDIUM | 4h     | **P1**   |
+| `cycle-detector.cjs`           | MEDIUM | MEDIUM | 4h     | **P1**   |
+| `memory-extraction-writer.cjs` | MEDIUM | MEDIUM | 4h     | **P1**   |
+| `entity-query.cjs`             | MEDIUM | LOW    | 4h     | **P1**   |
+| Negative test cases            | MEDIUM | MEDIUM | 8h     | **P1**   |
+| Test fixtures                  | LOW    | MEDIUM | 8h     | **P1**   |
+| Utility modules                | LOW    | LOW    | 16h    | **P2**   |
+| Performance benchmarks         | LOW    | MEDIUM | 16h    | **P2**   |
+| CI workflow expansion          | LOW    | MEDIUM | 8h     | **P2**   |
 
 **Priority Legend**:
+
 - **P0**: Critical - Address this week
 - **P1**: Important - Address this month
 - **P2**: Nice-to-have - Address next quarter

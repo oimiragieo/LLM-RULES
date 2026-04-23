@@ -43,6 +43,7 @@ pnpm test execution:
    - **Priority: HIGH** - Affects code-structural-search skill
 
 **Recommended Actions:**
+
 - Investigate ast-grep binary availability and configuration
 - Verify ast-grep pattern syntax compatibility
 - Add fallback handling for ast-grep unavailability
@@ -56,6 +57,7 @@ pnpm test execution:
 **Excellent coverage:** 77 test files for 49 active hook files
 
 **Covered Hooks:**
+
 - ✅ routing-guard.cjs (6 test files - comprehensive, specialist override, enforcement)
 - ✅ spawn-prompt-assembler.cjs (10 test files - constitution, context mode, intent, memory mode, etc.)
 - ✅ unified-creator-guard.cjs (6 test files - comprehensive, new types, protected paths, schema validation, templates, ttl bounds)
@@ -97,6 +99,7 @@ pnpm test execution:
 **Well-Covered Areas:**
 
 ✅ **code-indexing/** - Excellent coverage
+
 - hybrid-search.cjs ✅
 - bm25-indexer.cjs ✅
 - embedding-generator.cjs ✅
@@ -105,6 +108,7 @@ pnpm test execution:
 - merkle-tree.cjs ✅
 
 ✅ **memory/** - Good coverage
+
 - contextual-memory.cjs ✅ (2 test files)
 - lancedb-client.cjs ✅ (4 test files including GPU)
 - audit-trail-integration.cjs ✅
@@ -115,6 +119,7 @@ pnpm test execution:
 - memory-entity-links.cjs ✅
 
 ✅ **creators/** - Complete coverage
+
 - companion-check.cjs ✅
 - creator-commons.cjs ✅
 - ecosystem-impact-analyzer.cjs ✅
@@ -123,64 +128,64 @@ pnpm test execution:
 
 ⚠️ **routing/** - Moderate gaps (9 source files, limited tests)
 
-| Source File | Test Status | Priority |
-|-------------|-------------|----------|
-| **fuzzy-intent-matcher.cjs** | ❌ No test | **HIGH** - Core routing logic |
-| **intent-classifier.cjs** | ❌ No test | **HIGH** - Routing decisions |
-| **pattern-router.cjs** | ❌ No test | **MEDIUM** - Pattern matching |
-| **semantic-router.cjs** | ❌ No test | **MEDIUM** - Semantic routing |
-| **routing-table.cjs** | ❌ No test | **MEDIUM** - Agent routing table |
-| **router-state.cjs** | ✅ Partial (used in other tests) | LOW |
-| agent-registry-loader.cjs | ✅ Tested | OK |
-| agent-registry-resolver.cjs | ✅ Tested | OK |
+| Source File                  | Test Status                      | Priority                         |
+| ---------------------------- | -------------------------------- | -------------------------------- |
+| **fuzzy-intent-matcher.cjs** | ❌ No test                       | **HIGH** - Core routing logic    |
+| **intent-classifier.cjs**    | ❌ No test                       | **HIGH** - Routing decisions     |
+| **pattern-router.cjs**       | ❌ No test                       | **MEDIUM** - Pattern matching    |
+| **semantic-router.cjs**      | ❌ No test                       | **MEDIUM** - Semantic routing    |
+| **routing-table.cjs**        | ❌ No test                       | **MEDIUM** - Agent routing table |
+| **router-state.cjs**         | ✅ Partial (used in other tests) | LOW                              |
+| agent-registry-loader.cjs    | ✅ Tested                        | OK                               |
+| agent-registry-resolver.cjs  | ✅ Tested                        | OK                               |
 
 **Critical:** `fuzzy-intent-matcher.cjs` and `intent-classifier.cjs` are core routing logic with NO dedicated tests. Routing bugs could cause agent misrouting.
 
 ⚠️ **monitoring/** - Light coverage (7 source files, 1 test)
 
-| Source File | Test Status | Priority |
-|-------------|-------------|----------|
-| metrics-reader.cjs | ❌ No test | **MEDIUM** |
-| dashboard-renderer.cjs | ❌ No test | **MEDIUM** |
-| spawn-log.cjs | ❌ No test | **MEDIUM** |
-| violation-tracker.cjs | ❌ No test | **MEDIUM** |
-| production-alerts.cjs | ❌ No test | LOW |
-| router-churn-log.cjs | ❌ No test | LOW |
-| runtime-health-log.cjs | ❌ No test | LOW |
+| Source File            | Test Status | Priority   |
+| ---------------------- | ----------- | ---------- |
+| metrics-reader.cjs     | ❌ No test  | **MEDIUM** |
+| dashboard-renderer.cjs | ❌ No test  | **MEDIUM** |
+| spawn-log.cjs          | ❌ No test  | **MEDIUM** |
+| violation-tracker.cjs  | ❌ No test  | **MEDIUM** |
+| production-alerts.cjs  | ❌ No test  | LOW        |
+| router-churn-log.cjs   | ❌ No test  | LOW        |
+| runtime-health-log.cjs | ❌ No test  | LOW        |
 
 **Impact:** Monitoring and metrics may fail silently; production issues undetected.
 
 ⚠️ **self-healing/** - No coverage (3 source files, 0 tests)
 
-| Source File | Test Status | Priority |
-|-------------|-------------|----------|
-| **loop-state-manager.cjs** | ❌ No test | **HIGH** - Loop detection |
-| **rollback-manager.cjs** | ❌ No test | **MEDIUM** - Rollback logic |
-| **validator.cjs** | ❌ No test | **MEDIUM** - Validation logic |
+| Source File                | Test Status | Priority                      |
+| -------------------------- | ----------- | ----------------------------- |
+| **loop-state-manager.cjs** | ❌ No test  | **HIGH** - Loop detection     |
+| **rollback-manager.cjs**   | ❌ No test  | **MEDIUM** - Rollback logic   |
+| **validator.cjs**          | ❌ No test  | **MEDIUM** - Validation logic |
 
 **Critical:** `loop-state-manager.cjs` prevents infinite loops but has NO tests. Loop detection bugs could cause hangs.
 
 ⚠️ **memory/core/** - Limited coverage (5 source files, 1 test)
 
-| Source File | Test Status | Priority |
-|-------------|-------------|----------|
-| **memory-extraction.cjs** | ❌ No test | **MEDIUM** |
-| **memory-lifecycle.cjs** | ❌ No test | **MEDIUM** |
-| **memory-query.cjs** | ❌ No test | **MEDIUM** |
-| **memory-storage.cjs** | ❌ No test | **MEDIUM** |
-| memory-utils.cjs | ✅ Tested | OK |
+| Source File               | Test Status | Priority   |
+| ------------------------- | ----------- | ---------- |
+| **memory-extraction.cjs** | ❌ No test  | **MEDIUM** |
+| **memory-lifecycle.cjs**  | ❌ No test  | **MEDIUM** |
+| **memory-query.cjs**      | ❌ No test  | **MEDIUM** |
+| **memory-storage.cjs**    | ❌ No test  | **MEDIUM** |
+| memory-utils.cjs          | ✅ Tested   | OK         |
 
 **Impact:** Core memory operations untested; data corruption/loss risk.
 
 ⚠️ **memory/prompts/** - No coverage (5 prompt modules, 0 tests)
 
-| Source File | Test Status | Priority |
-|-------------|-------------|----------|
-| consolidation.cjs | ❌ No test | LOW |
-| dedup-decision.cjs | ❌ No test | LOW |
-| intent-analysis.cjs | ❌ No test | LOW |
-| memory-extraction.cjs | ❌ No test | LOW |
-| session-structured-summary.cjs | ❌ No test | LOW |
+| Source File                    | Test Status | Priority |
+| ------------------------------ | ----------- | -------- |
+| consolidation.cjs              | ❌ No test  | LOW      |
+| dedup-decision.cjs             | ❌ No test  | LOW      |
+| intent-analysis.cjs            | ❌ No test  | LOW      |
+| memory-extraction.cjs          | ❌ No test  | LOW      |
+| session-structured-summary.cjs | ❌ No test  | LOW      |
 
 **Note:** Prompt modules are LLM prompts (not logic), so test priority is lower.
 
@@ -379,21 +384,22 @@ pnpm test execution:
 
 **Large Files (>500 lines):**
 
-| File | Lines | Priority |
-|------|-------|----------|
-| skill-creator/scripts/create.cjs | 2778 | **Refactor needed** |
-| user-prompt-unified.cjs | 1658 | **Refactor needed** |
-| routing-guard.cjs | 1685 | **Refactor needed** |
-| spawn-prompt-assembler.cjs | 1386 | **Refactor needed** |
-| pre-tool-unified.cjs | 1248 | **Refactor needed** |
-| memory-manager.cjs | 1249 | **Refactor needed** |
-| routing-table.cjs | 869 | Consider refactor |
-| unified-reflection-handler.cjs | 868 | Consider refactor |
-| prompt-assembler.cjs | 851 | Consider refactor |
-| spawn-prompt-validator.cjs | 831 | Consider refactor |
-| hybrid-lazy-indexer.cjs | 823 | Consider refactor |
+| File                             | Lines | Priority            |
+| -------------------------------- | ----- | ------------------- |
+| skill-creator/scripts/create.cjs | 2778  | **Refactor needed** |
+| user-prompt-unified.cjs          | 1658  | **Refactor needed** |
+| routing-guard.cjs                | 1685  | **Refactor needed** |
+| spawn-prompt-assembler.cjs       | 1386  | **Refactor needed** |
+| pre-tool-unified.cjs             | 1248  | **Refactor needed** |
+| memory-manager.cjs               | 1249  | **Refactor needed** |
+| routing-table.cjs                | 869   | Consider refactor   |
+| unified-reflection-handler.cjs   | 868   | Consider refactor   |
+| prompt-assembler.cjs             | 851   | Consider refactor   |
+| spawn-prompt-validator.cjs       | 831   | Consider refactor   |
+| hybrid-lazy-indexer.cjs          | 823   | Consider refactor   |
 
 **Recommendation:** These files are too large for effective testing and maintenance. Consider:
+
 - Extract helper functions to separate modules
 - Split into smaller, focused files
 - Apply Single Responsibility Principle
@@ -405,21 +411,25 @@ pnpm test execution:
 ## Test Execution Commands
 
 **Run all tests:**
+
 ```bash
 pnpm test
 ```
 
 **Run specific test file:**
+
 ```bash
 node --test tests/hooks/routing-guard.test.cjs
 ```
 
 **Run tests with coverage (if enabled):**
+
 ```bash
 pnpm test:coverage
 ```
 
 **Lint and format (MANDATORY before completion):**
+
 ```bash
 pnpm lint:fix  # Must pass with 0 errors
 pnpm format    # Must produce no changes
@@ -429,16 +439,16 @@ pnpm format    # Must produce no changes
 
 ## Coverage Metrics (Estimated)
 
-| Category | Files | Tests | Coverage % |
-|----------|-------|-------|------------|
-| **Hooks** | 49 | 77 | ~90% ✅ |
-| **Lib/code-indexing** | 17 | 23 | ~80% ✅ |
-| **Lib/memory** | 30 | 32 | ~60% ⚠️ |
-| **Lib/routing** | 9 | 3 | ~30% ❌ |
-| **Lib/monitoring** | 7 | 1 | ~15% ❌ |
-| **Lib/self-healing** | 3 | 0 | ~0% ❌ |
-| **Lib/creators** | 3 | 3 | ~100% ✅ |
-| **Overall** | ~118 | ~139 | **~65%** ⚠️ |
+| Category              | Files | Tests | Coverage %  |
+| --------------------- | ----- | ----- | ----------- |
+| **Hooks**             | 49    | 77    | ~90% ✅     |
+| **Lib/code-indexing** | 17    | 23    | ~80% ✅     |
+| **Lib/memory**        | 30    | 32    | ~60% ⚠️     |
+| **Lib/routing**       | 9     | 3     | ~30% ❌     |
+| **Lib/monitoring**    | 7     | 1     | ~15% ❌     |
+| **Lib/self-healing**  | 3     | 0     | ~0% ❌      |
+| **Lib/creators**      | 3     | 3     | ~100% ✅    |
+| **Overall**           | ~118  | ~139  | **~65%** ⚠️ |
 
 **Note:** Coverage % is estimated based on file-to-test ratio, not line coverage.
 
@@ -448,26 +458,28 @@ pnpm format    # Must produce no changes
 
 **Overall: 7.5/10** ⚠️ (Good, with room for improvement)
 
-| Criterion | Score | Notes |
-|-----------|-------|-------|
-| **Meaningful Assertions** | 9/10 ✅ | Tests check real behavior |
-| **Edge Case Coverage** | 8/10 ✅ | Good edge case coverage |
-| **Integration Testing** | 8/10 ✅ | Many E2E tests |
-| **TDD Evidence** | 7/10 ⚠️ | Some TDD, not consistent |
-| **Test Isolation** | 9/10 ✅ | Clean setup/teardown |
-| **Flaky Tests** | 10/10 ✅ | No flaky patterns detected |
-| **Regression Tests** | 5/10 ❌ | Cannot verify |
-| **Mock Usage** | 6/10 ⚠️ | Too many mocks in some tests |
-| **Coverage Completeness** | 6/10 ⚠️ | Critical gaps in routing/self-healing |
-| **Test Maintainability** | 8/10 ✅ | Clear, readable tests |
+| Criterion                 | Score    | Notes                                 |
+| ------------------------- | -------- | ------------------------------------- |
+| **Meaningful Assertions** | 9/10 ✅  | Tests check real behavior             |
+| **Edge Case Coverage**    | 8/10 ✅  | Good edge case coverage               |
+| **Integration Testing**   | 8/10 ✅  | Many E2E tests                        |
+| **TDD Evidence**          | 7/10 ⚠️  | Some TDD, not consistent              |
+| **Test Isolation**        | 9/10 ✅  | Clean setup/teardown                  |
+| **Flaky Tests**           | 10/10 ✅ | No flaky patterns detected            |
+| **Regression Tests**      | 5/10 ❌  | Cannot verify                         |
+| **Mock Usage**            | 6/10 ⚠️  | Too many mocks in some tests          |
+| **Coverage Completeness** | 6/10 ⚠️  | Critical gaps in routing/self-healing |
+| **Test Maintainability**  | 8/10 ✅  | Clear, readable tests                 |
 
 **Strengths:**
+
 - Excellent hook coverage
 - Good test structure and isolation
 - No flaky test patterns
 - Real behavior testing (mostly)
 
 **Weaknesses:**
+
 - Critical routing/loop-detection logic untested
 - Some over-mocking (integration bugs missed)
 - Inconsistent TDD practices
@@ -480,11 +492,13 @@ pnpm format    # Must produce no changes
 The test suite is **in good shape overall** with excellent coverage of hooks and code-indexing, but has **critical gaps** in routing logic, loop detection, and self-healing modules.
 
 **Key Risks:**
+
 1. **Routing misrouting** (fuzzy-intent-matcher untested)
 2. **Infinite loops** (loop-state-manager untested)
 3. **AST-grep broken** (tests failing NOW)
 
 **Recommended Next Steps:**
+
 1. Fix ast-grep test failures (P0)
 2. Add routing logic tests (P0)
 3. Add loop detection tests (P0)

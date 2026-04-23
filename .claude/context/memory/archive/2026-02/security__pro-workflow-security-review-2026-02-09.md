@@ -32,8 +32,8 @@ function sanitizeQuery(query: string): string {
     .replace(/\s+/g, ' ')
     .trim()
     .split(' ')
-    .filter((word) => word.length > 0)
-    .map((word) => {
+    .filter(word => word.length > 0)
+    .map(word => {
       if (word.startsWith('"') && word.endsWith('"')) return word;
       if (!word.includes('*')) return `${word}*`;
       return word;
@@ -46,12 +46,12 @@ function sanitizeQuery(query: string): string {
 
 ### Comparison to Ours
 
-| Area | pro-workflow | agent-studio |
-|------|-------------|--------------|
-| FTS5 query sanitization | Yes, basic `sanitizeQuery()` | Our BM25 indexer handles this at the indexer level |
-| Hook stdin JSON parsing | try/catch with passthrough | Same pattern, plus structured `hook-input.cjs` utility |
-| Path input validation | None | `unified-pre-write-hook.cjs` validates all file paths |
-| Tool input validation | None | `tool-scope-validator.cjs` enforces allowed tool sets |
+| Area                    | pro-workflow                 | agent-studio                                           |
+| ----------------------- | ---------------------------- | ------------------------------------------------------ |
+| FTS5 query sanitization | Yes, basic `sanitizeQuery()` | Our BM25 indexer handles this at the indexer level     |
+| Hook stdin JSON parsing | try/catch with passthrough   | Same pattern, plus structured `hook-input.cjs` utility |
+| Path input validation   | None                         | `unified-pre-write-hook.cjs` validates all file paths  |
+| Tool input validation   | None                         | `tool-scope-validator.cjs` enforces allowed tool sets  |
 
 **Verdict:** Their FTS5 sanitization is a good pattern (we do not currently have FTS5). Everything else is weaker than ours.
 
@@ -82,12 +82,12 @@ Critical examples:
 
 ### Comparison to Ours
 
-| Area | pro-workflow | agent-studio |
-|------|-------------|--------------|
-| Temp file paths | No validation | `windows-null-sanitizer.cjs` + `unified-pre-write-hook.cjs` |
-| Session ID sanitization | None | We normalize all IDs |
-| File path validation | None | Multi-layer: Write hook, path validation, Windows reserved name check |
-| Path traversal regex | None | `.replace(/\\/g, '/')` + pattern matching for `..` |
+| Area                    | pro-workflow  | agent-studio                                                          |
+| ----------------------- | ------------- | --------------------------------------------------------------------- |
+| Temp file paths         | No validation | `windows-null-sanitizer.cjs` + `unified-pre-write-hook.cjs`           |
+| Session ID sanitization | None          | We normalize all IDs                                                  |
+| File path validation    | None          | Multi-layer: Write hook, path validation, Windows reserved name check |
+| Path traversal regex    | None          | `.replace(/\\/g, '/')` + pattern matching for `..`                    |
 
 **Verdict:** Significantly weaker than ours. Their code trusts environment variables and stdin inputs for path construction without sanitization.
 
@@ -114,12 +114,12 @@ Critical examples:
 
 ### Comparison to Ours
 
-| Area | pro-workflow | agent-studio |
-|------|-------------|--------------|
-| Shell command validation | None (hardcoded commands only) | `bash-command-validator.cjs` blocks dangerous patterns |
-| Shell injection prevention | None | `shell-injection-validator.cjs` detects injection patterns |
-| execSync usage | `shell: true` (default) | We use `spawnSync` with `shell: false` where possible |
-| Agent prompt SQL | Suggests raw shell sqlite3 | Our DB access is through parameterized `better-sqlite3` |
+| Area                       | pro-workflow                   | agent-studio                                               |
+| -------------------------- | ------------------------------ | ---------------------------------------------------------- |
+| Shell command validation   | None (hardcoded commands only) | `bash-command-validator.cjs` blocks dangerous patterns     |
+| Shell injection prevention | None                           | `shell-injection-validator.cjs` detects injection patterns |
+| execSync usage             | `shell: true` (default)        | We use `spawnSync` with `shell: false` where possible      |
+| Agent prompt SQL           | Suggests raw shell sqlite3     | Our DB access is through parameterized `better-sqlite3`    |
 
 **Verdict:** Their shell usage is minimal and mostly safe due to hardcoded commands. However, the scout agent's suggestion to run raw sqlite3 queries with user keywords via shell is a SQL injection + command injection risk. Our approach is strictly superior.
 
@@ -141,6 +141,7 @@ Critical examples:
 **Hook registration:** Via `hooks.json` with the standard Claude Code hooks schema. Uses `${CLAUDE_PLUGIN_ROOT}` variable for script paths.
 
 **Hook matchers:**
+
 - PreToolUse on Edit/Write: quality gate tracking (non-blocking)
 - PreToolUse on Bash matching `git commit`: reminder only
 - PreToolUse on Bash matching `git push`: reminder only
@@ -154,13 +155,13 @@ Critical examples:
 
 ### Comparison to Ours
 
-| Area | pro-workflow | agent-studio |
-|------|-------------|--------------|
-| Hook enforcement model | Advisory (exit 0 always) | Blocking (exit 2 for violations) |
-| Hook bypass protection | None | Multi-layer (routing-guard, creator-guard, pre-write) |
-| Hook protocol compliance | Non-standard (no allow/block JSON) | Standard stdin/stdout JSON protocol |
-| Hook categories | 1 file, all hooks | Organized by concern (routing, safety, validation) |
-| Security hooks | None | bash-command-validator, shell-injection-validator, etc. |
+| Area                     | pro-workflow                       | agent-studio                                            |
+| ------------------------ | ---------------------------------- | ------------------------------------------------------- |
+| Hook enforcement model   | Advisory (exit 0 always)           | Blocking (exit 2 for violations)                        |
+| Hook bypass protection   | None                               | Multi-layer (routing-guard, creator-guard, pre-write)   |
+| Hook protocol compliance | Non-standard (no allow/block JSON) | Standard stdin/stdout JSON protocol                     |
+| Hook categories          | 1 file, all hooks                  | Organized by concern (routing, safety, validation)      |
+| Security hooks           | None                               | bash-command-validator, shell-injection-validator, etc. |
 
 **Verdict:** Their hooks serve a completely different purpose (reminders/tracking, not enforcement). Our hook system is fundamentally more secure. Their hooks would not contribute to our security posture.
 
@@ -177,11 +178,13 @@ Critical examples:
 ### Their Approach
 
 **Hardcoded secret detection in post-edit-check.js (line 55):**
+
 ```javascript
 if (/(['"])?(api[_-]?key|secret|password|token)(['"])?[\s]*[:=][\s]*(['"])[^'"]{8,}/i.test(line)) {
   issues.push(`${lineNum}: Possible hardcoded secret`);
 }
 ```
+
 This is a post-edit advisory check. It detects common secret patterns but does not block commits or edits.
 
 **Database path:** Uses `~/.pro-workflow/data.db` in user home directory. No encryption, no access controls beyond filesystem permissions. The database stores learning data, not secrets.
@@ -190,11 +193,11 @@ This is a post-edit advisory check. It detects common secret patterns but does n
 
 ### Comparison to Ours
 
-| Area | pro-workflow | agent-studio |
-|------|-------------|--------------|
-| Secret detection | Basic regex in post-edit hook | Multiple layers (pre-write hooks, git hooks) |
-| Detection scope | Post-edit advisory only | Pre-commit blocking |
-| Credential storage | N/A (no credentials) | Environment variables, never in code |
+| Area                | pro-workflow                     | agent-studio                                   |
+| ------------------- | -------------------------------- | ---------------------------------------------- |
+| Secret detection    | Basic regex in post-edit hook    | Multiple layers (pre-write hooks, git hooks)   |
+| Detection scope     | Post-edit advisory only          | Pre-commit blocking                            |
+| Credential storage  | N/A (no credentials)             | Environment variables, never in code           |
 | Database encryption | None (not needed for their data) | N/A (our SQLite stores non-sensitive data too) |
 
 **Verdict:** Their secret detection regex is simpler than ours but catches the basics. Not a security enhancement for us.
@@ -213,6 +216,7 @@ This is a post-edit advisory check. It detects common secret patterns but does n
 **Dev:** `@types/better-sqlite3` ^7.6.12, `@types/node` ^20.17.14, `typescript` ^5.7.3
 
 **Analysis:**
+
 - **Total dependency count:** 1 runtime dependency. This is excellent for security -- minimal supply chain attack surface.
 - **`better-sqlite3`:** Widely used, actively maintained, uses N-API for native bindings. The native compilation step requires build tools (node-gyp, Python, C++ compiler) which adds build-time complexity but no runtime risk.
 - **No known CVEs** for `better-sqlite3` ^12.6.2 at time of review.
@@ -220,12 +224,12 @@ This is a post-edit advisory check. It detects common secret patterns but does n
 
 ### Comparison to Ours
 
-| Area | pro-workflow | agent-studio |
-|------|-------------|--------------|
-| Runtime dependencies | 1 (better-sqlite3) | Several (better-sqlite3, others) |
-| Supply chain risk | Very low | Low-medium (more deps) |
-| Shared dependency | better-sqlite3 | better-sqlite3 (already present) |
-| Lock file | package-lock.json present | pnpm-lock.yaml |
+| Area                 | pro-workflow              | agent-studio                     |
+| -------------------- | ------------------------- | -------------------------------- |
+| Runtime dependencies | 1 (better-sqlite3)        | Several (better-sqlite3, others) |
+| Supply chain risk    | Very low                  | Low-medium (more deps)           |
+| Shared dependency    | better-sqlite3            | better-sqlite3 (already present) |
+| Lock file            | package-lock.json present | pnpm-lock.yaml                   |
 
 **Verdict:** Their dependency posture is exemplary (1 runtime dep). No dependency risk from adoption since we already use `better-sqlite3`.
 
@@ -272,14 +276,14 @@ Git commands use `execSync` wrapped in try/catch. The error messages are swallow
 
 ## Risk Matrix for Adoption
 
-| Finding | Severity | Risk if Adopted | Mitigation Required |
-|---------|----------|----------------|---------------------|
-| No path traversal protection | MEDIUM | LOW (our hooks catch it) | Add sessionId sanitization to any adopted scripts |
-| Advisory-only hooks | LOW | NONE (we would not replace our blocking hooks) | N/A -- adopt concepts, not code |
-| Scout agent raw SQL shell | MEDIUM | MEDIUM (if adopted as-is) | Rewrite to use parameterized queries |
-| Temp file race conditions | LOW | LOW | Use our atomic-write utility |
-| Session ID in filenames | LOW | LOW on Linux, MEDIUM on Windows | Sanitize before use in filenames |
-| No input length limits | LOW | NONE (Claude Code controls inputs) | N/A |
+| Finding                      | Severity | Risk if Adopted                                | Mitigation Required                               |
+| ---------------------------- | -------- | ---------------------------------------------- | ------------------------------------------------- |
+| No path traversal protection | MEDIUM   | LOW (our hooks catch it)                       | Add sessionId sanitization to any adopted scripts |
+| Advisory-only hooks          | LOW      | NONE (we would not replace our blocking hooks) | N/A -- adopt concepts, not code                   |
+| Scout agent raw SQL shell    | MEDIUM   | MEDIUM (if adopted as-is)                      | Rewrite to use parameterized queries              |
+| Temp file race conditions    | LOW      | LOW                                            | Use our atomic-write utility                      |
+| Session ID in filenames      | LOW      | LOW on Linux, MEDIUM on Windows                | Sanitize before use in filenames                  |
+| No input length limits       | LOW      | NONE (Claude Code controls inputs)             | N/A                                               |
 
 ---
 

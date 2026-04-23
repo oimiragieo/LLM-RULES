@@ -26,6 +26,7 @@
 #### Pattern 1: God Object Emergence in Hot Paths
 
 **Evidence:**
+
 - routing-guard.cjs: 2577 lines, 7+ responsibilities (planner-first, security review, specialist routing, TaskCreate validation, tool blacklist, enforcement modes)
 - user-prompt-unified.cjs: 2155 lines (preset system, memory injection, compression reminder, reflection metadata, batch detection)
 - spawn-prompt-assembler.cjs: 1827 lines (template loading, model resolution, memory sections, skill injection)
@@ -41,6 +42,7 @@
 #### Pattern 2: Index Synchronization Drift
 
 **Evidence:**
+
 - 458 SKILL.md files vs 383 indexed → 75 orphaned (16% orphan rate)
 - 60 agent definitions vs 59 registered → 1 orphan (2% drift)
 - skill-index.json staleness: 24 hours old (generatedAt: 2026-02-14T18:12:57.972Z)
@@ -56,6 +58,7 @@
 #### Pattern 3: Archive Clutter Without Cleanup Policy
 
 **Evidence:**
+
 - 50 archived hooks in `.claude/hooks/_archive/`
 - 16 archive directories across `.claude/`
 - Memory files in temp directory (56 files, no TTL enforcement)
@@ -72,6 +75,7 @@
 #### Pattern 4: Configuration Sprawl Without Usage Audit
 
 **Evidence:**
+
 - 159 schemas (all active? unknown)
 - 326 workflows (all referenced? unknown)
 - Learnings note: "Schema sprawl (111/133 unreferenced)" from previous audit
@@ -91,11 +95,13 @@
 #### Category 1: Code Quality (Score: 6.5/10)
 
 **Strengths:**
+
 - ✅ 0 circular dependencies in hooks (grep validation passed)
 - ✅ 0 parent directory imports (well-defined module boundaries)
 - ✅ Clean module separation (.claude/lib vs .claude/tools vs .claude/hooks)
 
 **Weaknesses:**
+
 - ❌ 3 hooks breach 500-line budget by 4-5x (routing-guard: 2577, user-prompt: 2155, spawn-prompt: 1827)
 - ❌ 95 TODO/FIXME comments (technical debt indicator)
 - ⚠️ JSON.parse called in 232 files (potential security/performance risk per memory notes)
@@ -107,10 +113,12 @@
 #### Category 2: Synchronization & Discovery (Score: 4.0/10)
 
 **Strengths:**
+
 - ✅ Agent registry 100% healthy (lastHealthCheck: 2026-02-14T08:11:36.891Z)
 - ✅ Memory HOT tier within budget (learnings: 17KB, decisions: 8.6KB)
 
 **Weaknesses:**
+
 - ❌ 75 orphaned skills (16% orphan rate, target: <5%)
 - ❌ skill-index.json 24h stale (target: <1h)
 - ❌ Agent-file drift (60 files vs 59 registered)
@@ -125,10 +133,12 @@
 #### Category 3: Performance & Efficiency (Score: 5.0/10)
 
 **Strengths:**
+
 - ✅ 6 wildcard hooks consolidated to 2 (60% overhead reduction per memory notes)
 - ✅ Registry-driven agent discovery (cached lookups)
 
 **Weaknesses:**
+
 - ❌ 3 hooks breach performance budget (target: <100ms, risk: >500ms)
 - ⚠️ Synchronous fs.readFileSync in PreToolUse hot paths
 - ⚠️ No hook performance instrumentation (can't measure actual times)
@@ -143,10 +153,12 @@
 #### Category 4: Maintenance & Hygiene (Score: 3.0/10)
 
 **Strengths:**
+
 - ✅ Clean modular separation (lib vs tools vs hooks)
 - ✅ No circular dependencies detected
 
 **Weaknesses:**
+
 - ❌ 50 archived hooks in tree (target: 0)
 - ❌ 16 archive directories (target: 1)
 - ❌ 56 temp files (target: <10)
@@ -162,11 +174,13 @@
 #### Category 5: Documentation & Discoverability (Score: 7.0/10)
 
 **Strengths:**
+
 - ✅ Comprehensive catalogs (agent, skill, command, workflow)
 - ✅ Strong ADR system (ADR-100 to ADR-122 documented)
 - ✅ Memory system with explicit budgets (HOT/WARM/COLD tiers)
 
 **Weaknesses:**
+
 - ⚠️ 262/282 environment variables undocumented (per learnings)
 - ⚠️ No workflow usage catalog (326 workflows, unclear if all active)
 - ⚠️ No schema usage metadata (159 schemas, 70% unreferenced per previous audit)
@@ -178,6 +192,7 @@
 #### Overall Weighted Score: **5.3/10**
 
 **Category Weights:**
+
 - Code Quality: 20% × 6.5 = 1.30
 - Synchronization: 30% × 4.0 = 1.20
 - Performance: 20% × 5.0 = 1.00
@@ -194,11 +209,11 @@
 
 #### Priority 1: CRITICAL (P0) — Blocking Issues
 
-| Issue | Severity | Effort | Impact | Timeline |
-|-------|----------|--------|--------|----------|
-| **P0.1: Hook Complexity Explosion** | 10/10 | HIGH (3-5 days) | **Performance degradation** (200-400ms per tool call) | 7 days |
-| **P0.2: Skill Indexing Drift** | 9/10 | LOW (1 hour) | **Discoverability failure** (75 skills invisible) | 24 hours |
-| **P0.3: Agent Registry Drift** | 8/10 | LOW (2 hours) | **Routing failures** (1 agent unspawnable) | 24 hours |
+| Issue                               | Severity | Effort          | Impact                                                | Timeline |
+| ----------------------------------- | -------- | --------------- | ----------------------------------------------------- | -------- |
+| **P0.1: Hook Complexity Explosion** | 10/10    | HIGH (3-5 days) | **Performance degradation** (200-400ms per tool call) | 7 days   |
+| **P0.2: Skill Indexing Drift**      | 9/10     | LOW (1 hour)    | **Discoverability failure** (75 skills invisible)     | 24 hours |
+| **P0.3: Agent Registry Drift**      | 8/10     | LOW (2 hours)   | **Routing failures** (1 agent unspawnable)            | 24 hours |
 
 **Remediation Plan P0.1 (Hook Complexity):**
 
@@ -247,6 +262,7 @@
 **Benefit:** 100% routing reliability
 
 **Dependency Graph:**
+
 ```
 P0.1 (Hook Extraction) → BLOCKS P2.3 (Hook Order Optimization)
 P0.2 (Skill Reindex) → ENABLES P1.3 (Schema/Workflow Audit)
@@ -255,12 +271,12 @@ P0.3 (Agent Registry) → BLOCKS all agent spawning
 
 #### Priority 2: HIGH (P1) — Urgent But Not Blocking
 
-| Issue | Severity | Effort | Impact | Timeline |
-|-------|----------|--------|--------|----------|
-| **P1.1: Archive Clutter** | 7/10 | LOW (2 hours) | **Visual noise** (50 false positives) | 7 days |
-| **P1.2: Temp File Accumulation** | 7/10 | MEDIUM (4 hours) | **Disk waste + stale data** | 7 days |
-| **P1.3: Configuration Sprawl** | 6/10 | HIGH (2-3 days) | **Navigation difficulty** | 30 days |
-| **P1.4: Memory Budget Violations** | 6/10 | LOW (1 hour) | **Memory bloat** | 7 days |
+| Issue                              | Severity | Effort           | Impact                                | Timeline |
+| ---------------------------------- | -------- | ---------------- | ------------------------------------- | -------- |
+| **P1.1: Archive Clutter**          | 7/10     | LOW (2 hours)    | **Visual noise** (50 false positives) | 7 days   |
+| **P1.2: Temp File Accumulation**   | 7/10     | MEDIUM (4 hours) | **Disk waste + stale data**           | 7 days   |
+| **P1.3: Configuration Sprawl**     | 6/10     | HIGH (2-3 days)  | **Navigation difficulty**             | 30 days  |
+| **P1.4: Memory Budget Violations** | 6/10     | LOW (1 hour)     | **Memory bloat**                      | 7 days   |
 
 **Remediation Plan P1.1 (Archive Clutter):**
 
@@ -295,7 +311,7 @@ P0.3 (Agent Registry) → BLOCKS all agent spawning
      grep -r "$basename" .claude --include="*.cjs" --include="*.mjs" --include="*.md" -c || echo "Unused: $basename"
    done > schema-usage-audit.txt
    ```
-2. **Audit workflow usage:** Same pattern for .claude/workflows/*.md
+2. **Audit workflow usage:** Same pattern for .claude/workflows/\*.md
 3. **Create usage metadata:** Add `referencedBy: []` to schema-catalog.md and workflow-catalog.md
 4. **Archive unused:** Move schemas/workflows with 0 references to `.claude_archive/`
 5. **Document active set:** Create `.claude/docs/ACTIVE_ARTIFACTS.md`
@@ -317,14 +333,15 @@ P0.3 (Agent Registry) → BLOCKS all agent spawning
 
 #### Priority 3: MEDIUM (P2) — Cleanup & Refactoring
 
-| Issue | Severity | Effort | Impact | Timeline |
-|-------|----------|--------|--------|----------|
-| **P2.1: Duplicate Agent Definitions** | 5/10 | LOW (30 min) | **Configuration drift risk** | 14 days |
-| **P2.2: TODO/FIXME Debt** | 5/10 | MEDIUM (1-2 days) | **Code quality debt** | 30 days |
-| **P2.3: Hook Execution Order** | 5/10 | MEDIUM (1 day) | **Performance overhead** | 30 days |
-| **P2.4: Library Organization** | 4/10 | LOW (2 hours) | **Navigation inconsistency** | 30 days |
+| Issue                                 | Severity | Effort            | Impact                       | Timeline |
+| ------------------------------------- | -------- | ----------------- | ---------------------------- | -------- |
+| **P2.1: Duplicate Agent Definitions** | 5/10     | LOW (30 min)      | **Configuration drift risk** | 14 days  |
+| **P2.2: TODO/FIXME Debt**             | 5/10     | MEDIUM (1-2 days) | **Code quality debt**        | 30 days  |
+| **P2.3: Hook Execution Order**        | 5/10     | MEDIUM (1 day)    | **Performance overhead**     | 30 days  |
+| **P2.4: Library Organization**        | 4/10     | LOW (2 hours)     | **Navigation inconsistency** | 30 days  |
 
 **Remediation Summary:**
+
 - P2.1: Delete `.claude/agents/router.md` duplicate
 - P2.2: Triage 95 TODOs into P0/P1/P2/P3, create tasks for high-priority
 - P2.3: Add hook performance instrumentation, document execution order
@@ -334,10 +351,10 @@ P0.3 (Agent Registry) → BLOCKS all agent spawning
 
 #### Priority 4: LOW (P3) — Nice to Have
 
-| Issue | Severity | Effort | Impact | Timeline |
-|-------|----------|--------|--------|----------|
-| **P3.1: Database Size Monitoring** | 3/10 | LOW (1 hour) | **Future disk waste risk** | 90 days |
-| **P3.2: Workflow Usage Catalog** | 3/10 | MEDIUM (1 day) | **Navigation difficulty** | 90 days |
+| Issue                              | Severity | Effort         | Impact                     | Timeline |
+| ---------------------------------- | -------- | -------------- | -------------------------- | -------- |
+| **P3.1: Database Size Monitoring** | 3/10     | LOW (1 hour)   | **Future disk waste risk** | 90 days  |
+| **P3.2: Workflow Usage Catalog**   | 3/10     | MEDIUM (1 day) | **Navigation difficulty**  | 90 days  |
 
 **Defer Rationale:** P3 issues are preventive, not remedial. Address after P0-P2 resolved.
 
@@ -551,6 +568,7 @@ P1.1 (Archive Clutter) + P2.1 (Duplicate Agent) + P2.4 (Library Org) → Batchab
 **Why It Happens:** Queue processing adds `processed: true` flag but doesn't delete entry. Result: queue file grows unbounded. No scheduled cleanup job.
 
 **Solution:** Add staleness validation as Step 0 in queue processors:
+
 1. Read queue
 2. Filter `processed: false` AND `timestamp > 24h ago` (ignore old entries)
 3. Cross-check against catalogs/registries (validate artifact still needs integration)
@@ -566,6 +584,7 @@ P1.1 (Archive Clutter) + P2.1 (Duplicate Agent) + P2.4 (Library Org) → Batchab
 **Pattern:** Rapid feature development creates artifacts faster than integration/cleanup systems can process. Technical debt accumulates in low-visibility areas (archives, temp files, orphaned artifacts).
 
 **Evidence:**
+
 - 50 archived hooks (no cleanup policy)
 - 56 temp files (no TTL enforcement)
 - 75 orphaned skills (16% orphan rate)
@@ -574,6 +593,7 @@ P1.1 (Archive Clutter) + P2.1 (Duplicate Agent) + P2.4 (Library Org) → Batchab
 **Why It Happens:** Urgency bias favors feature delivery over maintenance. "Archive now, clean up later" pattern. Deferred cleanup never happens because it's never urgent.
 
 **Solution:** Integrate hygiene into delivery pipeline:
+
 - **Definition of Done includes cleanup:** Task not complete until temp files cleaned, archives moved, indexes updated
 - **Automated enforcement:** CI fails if temp file count >10, orphan rate >5%, archive count >0
 - **Scheduled maintenance windows:** Last Friday of month = cleanup day (rotate memory, purge archives, audit usage)
@@ -591,6 +611,7 @@ P1.1 (Archive Clutter) + P2.1 (Duplicate Agent) + P2.4 (Library Org) → Batchab
 **Why It Happens:** Performance is invisible without metrics. Developers don't know they're crossing budget until it's 5x over.
 
 **Solution:** Continuous performance monitoring:
+
 1. **Instrument hot paths:** Add timing to post-tool-metrics-unified.cjs
 2. **Set budgets:** 100ms per hook, 500ms cumulative
 3. **Enforce budgets:** CI fails if any hook exceeds budget
@@ -606,6 +627,7 @@ P1.1 (Archive Clutter) + P2.1 (Duplicate Agent) + P2.4 (Library Org) → Batchab
 **Pattern:** Cleanup tasks span multiple subsystems (temp files, archives, memory rotation, index synchronization). Without centralized orchestration, they're forgotten.
 
 **Evidence:**
+
 - Temp files: Manual cleanup only (per workspace-conventions.md)
 - Archives: No documented TTL or cleanup script
 - Memory rotation: Policy documented (ADR-102) but not automated
@@ -614,6 +636,7 @@ P1.1 (Archive Clutter) + P2.1 (Duplicate Agent) + P2.4 (Library Org) → Batchab
 **Why It Happens:** Ownership unclear. Is temp file cleanup a "session" responsibility? "Memory" responsibility? "General" responsibility? Result: nobody does it.
 
 **Solution:** Centralized maintenance orchestrator:
+
 - **SessionEnd hook:** Orchestrates all end-of-session cleanup (temp files, context compaction, metric collection)
 - **Daily cron:** Orchestrates all daily maintenance (queue purging, index refresh, archive aging)
 - **Monthly cron:** Orchestrates all monthly maintenance (memory rotation, artifact audit, usage report)
@@ -631,6 +654,7 @@ P1.1 (Archive Clutter) + P2.1 (Duplicate Agent) + P2.4 (Library Org) → Batchab
 **Integration Status:** ✅ **EXCELLENT** (95%+)
 
 **Wiring Check:**
+
 - ✅ Report location correct (`.claude/context/reports/`)
 - ✅ Provenance header present (`<!-- Agent: architect | Task: #2 | Session: 2026-02-14 -->`)
 - ✅ Date suffix format correct (`architecture-review-2026-02-14.md`)
@@ -702,12 +726,14 @@ The agent-studio framework demonstrates **strong architectural foundations** (cl
 **Priority:** Focus on **P0 issues first** (hook extraction, skill reindex, agent registry) to prevent compounding. These are **force multipliers** — fixing them unlocks downstream improvements.
 
 **Effort Distribution:**
+
 - **Quick Wins (P0.2, P0.3, P1.4, P2.1, P2.4):** 6 hours, 5 tasks, immediate visibility
 - **Critical Path (P0.1):** 3-5 days, 1 task, BLOCKS performance optimization
 - **Hygiene Automation (P1.1, P1.2):** 6 hours, 2 tasks, prevents future accumulation
 - **Audit & Triage (P1.3, P2.2):** 3-4 days, 2 tasks, clears aspirational debt
 
 **Success Metrics:**
+
 - Orphan rate: 16% → <5% (P0.2)
 - Hook complexity: 2577 lines → <500 lines per hook (P0.1)
 - Temp files: 56 → <10 (P1.2)
@@ -719,6 +745,7 @@ The agent-studio framework demonstrates **strong architectural foundations** (cl
 ---
 
 **Next Steps:**
+
 1. Create tasks for P0.1, P0.2, P0.3 (critical path)
 2. Assign quick wins (P0.2, P0.3, P1.4) to immediate execution
 3. Schedule P0.1 (hook extraction) for next sprint

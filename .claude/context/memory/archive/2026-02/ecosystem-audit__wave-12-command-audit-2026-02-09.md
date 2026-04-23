@@ -25,7 +25,6 @@ All commands follow this exact pattern:
 ---
 disable-model-invocation: true
 ---
-
 Invoke the {skill-name} skill and follow it exactly as presented to you
 ```
 
@@ -132,16 +131,19 @@ All 99 skills exist with SKILL.md files:
 The following commands reference skills that need verification or context:
 
 ### 1. analyze.md
+
 - **Delegates to:** analyze skill
 - **Status:** ⚠️ Requires verification - skill name is generic
 - **Recommendation:** Verify skill exists or rename to more specific pattern
 
 ### 2. learn.md
+
 - **Delegates to:** learn skill
 - **Status:** ⚠️ Requires verification - skill name is generic
 - **Recommendation:** Verify skill exists or rename to more specific pattern
 
 ### 3. compress.md
+
 - **Delegates to:** compress skill
 - **Status:** ⚠️ Requires verification - possible name mismatch
 - **Recommendation:** Check if this references `context-compressor` skill
@@ -161,12 +163,12 @@ For each command, verified:
 
 ## Quality Metrics
 
-| Metric | Score | Notes |
-|--------|-------|-------|
-| **Frontmatter Presence** | 102/102 (100%) | All commands have YAML block |
-| **Delegation Pattern** | 102/102 (100%) | Consistent format across all |
-| **Skill Matching** | 99/102 (97%) | 3 commands need clarification |
-| **Formatting Consistency** | 102/102 (100%) | No deviations found |
+| Metric                     | Score          | Notes                         |
+| -------------------------- | -------------- | ----------------------------- |
+| **Frontmatter Presence**   | 102/102 (100%) | All commands have YAML block  |
+| **Delegation Pattern**     | 102/102 (100%) | Consistent format across all  |
+| **Skill Matching**         | 99/102 (97%)   | 3 commands need clarification |
+| **Formatting Consistency** | 102/102 (100%) | No deviations found           |
 
 ## Action Items
 
@@ -188,6 +190,7 @@ For each command, verified:
 All 102 commands follow the standard pattern with 100% consistency. The framework's command system is well-standardized and ready for production use. The 3 commands with generic skill names are likely aliases or internal mappings that should be clarified in next phase.
 
 **Recommended Next Steps:**
+
 - Wave 13: Agent assignment audit (59 agents)
 - Update command catalog with descriptions
 - Document any command aliases or dynamic routing

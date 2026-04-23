@@ -13,12 +13,14 @@
 **Severity Breakdown**: 0 CRITICAL | 2 HIGH | 1 MEDIUM | 2 LOW
 
 **Key Changes Since Previous Audit**:
+
 - H-01 (Command injection in logical-unit-tracker.cjs): **FIXED** - File no longer exists
 - H-02 (103 log injection instances): **PARTIALLY FIXED** - Reduced to 26 instances (75% reduction)
 - H-03 (193 JSON.parse without try/catch): **PARTIALLY FIXED** - Now 63 instances in hooks, 13 in production (60% reduction)
 - C-01 (Shell injection validator gaps): **NOT FOUND** - Validator file could not be located for verification
 
 **Critical Observations**:
+
 1. Previous command injection vulnerability (H-01) appears remediated through file removal/refactoring
 2. Significant progress on log injection cleanup (75% reduction)
 3. JSON.parse error handling still needs improvement, especially in hooks
@@ -36,12 +38,14 @@
 **Evidence**: File `.claude/lib/routing/logical-unit-tracker.cjs` does not exist
 
 **Analysis**:
+
 - Searched for the file at expected path - not found
 - File may have been deleted, refactored, or moved
 - Unable to verify if vulnerability was fixed or code was removed
 - Recommend: Check git history to confirm intentional remediation
 
 **Recommendation**:
+
 - ✅ Mark as FIXED if file removal was intentional
 - ⚠️ Verify no similar patterns exist in replacement code
 
@@ -52,6 +56,7 @@
 **Previous Status**: HIGH - 103 instances
 **Current Status**: **HIGH** - 26 instances remaining (75% reduction)
 **Evidence**:
+
 ```bash
 cd "C:\dev\projects\agent-studio" && \
   rg "console\.log.*\$\{|console\.log.*\+|console\.error.*\$\{|console\.error.*\+" \
@@ -60,30 +65,34 @@ cd "C:\dev\projects\agent-studio" && \
 ```
 
 **Analysis**:
+
 - Significant progress: 77 instances (75%) have been fixed
 - 26 instances remain vulnerable to log injection
 - Pattern: String concatenation or template literals in console.log/console.error
 - Risk: Attacker-controlled input could inject newlines, ANSI codes, or misleading log entries
 
 **Affected Areas**:
+
 - Hooks directory (estimated 15-20 instances)
 - Scripts directory (estimated 5-10 instances)
 
 **Example Vulnerable Pattern**:
+
 ```javascript
 // VULNERABLE - allows log injection
-console.log("Processing file: " + userInput);
+console.log('Processing file: ' + userInput);
 console.error(`Error in ${filename}: ${error.message}`);
 ```
 
 **Recommended Fix**:
+
 ```javascript
 // SAFE - use structured logging
 logger.info({ operation: 'processing', file: userInput });
 logger.error({ operation: 'error', file: filename, error: error.message });
 
 // OR sanitize before logging
-console.log("Processing file:", sanitizeForLog(userInput));
+console.log('Processing file:', sanitizeForLog(userInput));
 ```
 
 **Remediation Priority**: HIGH
@@ -96,6 +105,7 @@ console.log("Processing file:", sanitizeForLog(userInput));
 **Previous Status**: HIGH - 193 instances
 **Current Status**: **HIGH** - 76 instances remaining (60% reduction)
 **Evidence**:
+
 ```bash
 # Hooks directory:
 cd "C:\dev\projects\agent-studio\.claude\hooks" && \
@@ -110,12 +120,14 @@ cd "C:\dev\projects\agent-studio" && \
 ```
 
 **Analysis**:
+
 - 117 instances (60%) have been fixed
 - 76 instances remain: 63 in hooks + 13 in production code
 - **NONE** of the remaining instances use try/catch protection (0% protected)
 - Critical: Hooks are security-critical; unhandled JSON.parse crashes hook execution
 
 **High-Risk Files** (from unified-creator-guard.cjs analysis):
+
 ```javascript
 // Line 233 - reads active-creators.json
 const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
@@ -131,17 +143,20 @@ schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 ```
 
 **Attack Vector**:
+
 1. Attacker corrupts `.claude/context/runtime/active-creators.json` with invalid JSON
 2. Hook attempts to read state with `JSON.parse(fs.readFileSync(...))`
 3. Hook crashes, bypassing creator guard enforcement
 4. Attacker can now write artifacts without creator workflow
 
 **Impact**:
+
 - Hook crashes expose system to bypass attacks
 - DoS via malformed JSON in state files
 - Loss of security enforcement when hooks fail
 
 **Recommended Fix** (example for unified-creator-guard.cjs):
+
 ```javascript
 // BEFORE (lines 233, 279, 314, 423)
 const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
@@ -171,17 +186,20 @@ try {
 **Evidence**: Unable to locate shell injection validator file
 
 **Analysis**:
+
 - Previous report mentioned gaps in shell injection validator
 - No file path provided in previous findings
 - Search for validator patterns yielded no results
 - May have been refactored or integrated into consolidated hooks
 
 **Files Checked**:
+
 - `.claude/hooks/safety/` - no shell-injection-validator.cjs found
 - `.claude/hooks/routing/` - routing-guard.cjs found, but different purpose
 - `.claude/hooks/validation/` - no shell validator found
 
 **Recommendation**:
+
 - **BLOCKER**: Need original file path from previous audit to verify fix
 - Search for: `shell`, `injection`, `validator` in hooks directory
 - If validator was deleted: verify replacement validation exists
@@ -197,24 +215,28 @@ try {
 **Pattern**: String concatenation in path.join with regex replacement
 
 **Vulnerable Code**:
+
 ```javascript
 const absolutePath = path.join(LIB_DIR, modulePath.replace(/^(\.\.\/)+lib\//, ''));
 ```
 
 **Analysis**:
+
 - Uses regex to strip leading `../lib/` patterns
 - Regex can be bypassed with: `..\\lib\\`, `..../lib/`, etc.
 - path.join doesn't prevent traversal if cleaned path still contains `..`
 
 **Attack Vector**:
+
 ```javascript
 // Example bypass
-const malicious = "../../../etc/passwd";
+const malicious = '../../../etc/passwd';
 const cleaned = malicious.replace(/^(\.\.\/)+lib\//, ''); // No match, returns original
 const result = path.join(LIB_DIR, cleaned); // Traverses outside LIB_DIR
 ```
 
 **Recommended Fix**:
+
 ```javascript
 // Use path.resolve + path.relative to enforce boundaries
 const absolutePath = path.resolve(LIB_DIR, modulePath.replace(/^(\.\.\/)+lib\//, ''));
@@ -233,10 +255,12 @@ if (relative.startsWith('..')) {
 
 **Severity**: LOW
 **Files**:
+
 - `scripts/testing/test-version-validation.mjs:28`
 - `tests/integration/routing-cli-test.cjs:484`
 
 **Vulnerable Code**:
+
 ```javascript
 // scripts/testing/test-version-validation.mjs:28
 shell: true,
@@ -246,12 +270,14 @@ shell: true, // Required for Windows PATH resolution
 ```
 
 **Analysis**:
+
 - Both instances are in test/script files (not production)
 - Comment indicates Windows PATH resolution need
 - Low risk: test code not exposed to untrusted input
 - Best practice violation: avoid shell:true when possible
 
 **Recommended Fix**:
+
 ```javascript
 // Option 1: Use execa with preferLocal (resolves PATH without shell)
 const { execa } = require('execa');
@@ -333,14 +359,16 @@ const result = spawnSync(fullPath, args, { shell: false });
 ## Testing Recommendations
 
 1. **Log Injection Tests**:
+
    ```javascript
    test('log injection - newline', () => {
-     const malicious = "innocent\n[CRITICAL] Fake error";
+     const malicious = 'innocent\n[CRITICAL] Fake error';
      // Should not create misleading log entry
    });
    ```
 
 2. **JSON.parse Resilience Tests**:
+
    ```javascript
    test('hook survives corrupt state file', () => {
      fs.writeFileSync(STATE_FILE, '{invalid json}');
@@ -353,7 +381,7 @@ const result = spawnSync(fullPath, args, { shell: false });
 3. **Path Traversal Tests**:
    ```javascript
    test('path traversal blocked', () => {
-     const malicious = "../../../etc/passwd";
+     const malicious = '../../../etc/passwd';
      expect(() => resolvePath(malicious)).toThrow('Path traversal detected');
    });
    ```
@@ -363,12 +391,14 @@ const result = spawnSync(fullPath, args, { shell: false });
 ## Compliance Notes
 
 **OWASP Top 10 Coverage**:
+
 - **A03 (Injection)**: H-02 (log injection), C-01 (shell injection)
 - **A04 (Insecure Design)**: H-03 (missing error handling)
 - **A05 (Security Misconfiguration)**: NEW-02 (shell:true in tests)
 - **A09 (Logging Failures)**: H-02 (log injection allows log spoofing)
 
 **CWE Coverage**:
+
 - **CWE-78 (OS Command Injection)**: C-01 (if validator has gaps)
 - **CWE-117 (Log Injection)**: H-02
 - **CWE-755 (Improper Error Handling)**: H-03
@@ -379,11 +409,13 @@ const result = spawnSync(fullPath, args, { shell: false });
 ## Appendix: Methodology
 
 **Tools Used**:
+
 - ripgrep (rg) for pattern matching
 - find for file discovery
 - wc for counting
 
 **Search Patterns**:
+
 ```bash
 # Command injection
 rg "execSync|exec\(|spawn\(" -g "*.cjs" -g "!node_modules/**" -g "!tests/**"
@@ -407,11 +439,13 @@ rg "SECRET|PASSWORD|TOKEN|API_KEY" -g "*.cjs" -g "*.js" -g "*.mjs" \
 ```
 
 **Files Examined**:
+
 - Total hooks: 103 .cjs files in `.claude/hooks/`
 - Production code: ~50 .cjs files in `.claude/lib/`, `.claude/tools/`
 - Test exclusions: All files in `tests/` directory excluded from production findings
 
 **Limitations**:
+
 - Static analysis only (no dynamic testing)
 - Unable to verify C-01 (shell injection validator) due to missing file path
 - Path traversal finding (NEW-01) requires manual code review for full impact assessment
@@ -424,6 +458,7 @@ rg "SECRET|PASSWORD|TOKEN|API_KEY" -g "*.cjs" -g "*.js" -g "*.mjs" \
 **Overall Risk Level**: MEDIUM
 
 **Positive Trends**:
+
 - H-01 (command injection) appears fixed through code removal
 - 75% reduction in log injection instances (H-02: 103 → 26)
 - 60% reduction in unsafe JSON.parse (H-03: 193 → 76)
@@ -431,6 +466,7 @@ rg "SECRET|PASSWORD|TOKEN|API_KEY" -g "*.cjs" -g "*.js" -g "*.mjs" \
 - Strong hook enforcement framework (creator guard, fail-closed patterns)
 
 **Remaining Concerns**:
+
 - 76 JSON.parse calls without try/catch (HIGH) - especially in security-critical hooks
 - 26 log injection instances (HIGH) - allows log spoofing/manipulation
 - 1 path traversal risk (MEDIUM) - regex-based path sanitization can be bypassed

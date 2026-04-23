@@ -1,4 +1,5 @@
 <!-- Agent: router | Task: batch-sweep-a | Session: 2026-02-11 -->
+
 # Runtime Agent-Skill Sweep — Batch A
 
 **Date:** 2026-02-11
@@ -8,17 +9,17 @@
 
 ## Per-Agent Results
 
-| # | Agent              | Skill Invoked          | Status | Duration (ms) |
-|---|--------------------|------------------------|--------|---------------|
-| 1 | architect          | architecture-review    | PASS   | 6279          |
-| 2 | context-compressor | context-compressor     | PASS   | 5156          |
-| 3 | developer          | tdd                    | PASS   | 6548          |
-| 4 | planner            | complexity-assessment  | PASS   | 6627          |
-| 5 | pm                 | prd-generator          | PASS   | 6155          |
-| 6 | qa                 | test-generator         | PASS   | 6881          |
-| 7 | reflection-agent   | insight-extraction     | PASS   | 4761          |
-| 8 | router             | sequential-thinking    | PASS   | 7602          |
-| 9 | technical-writer   | doc-generator          | PASS   | 5598          |
+| #   | Agent              | Skill Invoked         | Status | Duration (ms) |
+| --- | ------------------ | --------------------- | ------ | ------------- |
+| 1   | architect          | architecture-review   | PASS   | 6279          |
+| 2   | context-compressor | context-compressor    | PASS   | 5156          |
+| 3   | developer          | tdd                   | PASS   | 6548          |
+| 4   | planner            | complexity-assessment | PASS   | 6627          |
+| 5   | pm                 | prd-generator         | PASS   | 6155          |
+| 6   | qa                 | test-generator        | PASS   | 6881          |
+| 7   | reflection-agent   | insight-extraction    | PASS   | 4761          |
+| 8   | router             | sequential-thinking   | PASS   | 7602          |
+| 9   | technical-writer   | doc-generator         | PASS   | 5598          |
 
 ## Totals
 

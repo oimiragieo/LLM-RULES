@@ -37,6 +37,7 @@ while (inFlight.size >= concurrency) {
 ```
 
 **Why it leaks:**
+
 1. `Promise.race()` creates a new Promise that holds references to ALL promises in the array
 2. Each `Array.from(inFlight)` creates a new array snapshot
 3. The `.then()` callback on line 592-637 captures `filePath`, `result`, `chunkBuffer`, `flushPromise` in closure scope
@@ -44,6 +45,7 @@ while (inFlight.size >= concurrency) {
 5. V8 cannot garbage-collect the closure-captured variables until ALL promises in that race batch are settled
 
 **Evidence from learnings.md:**
+
 > "Async pipeline still OOMs due to V8 heap fragmentation from Promise.race/inFlight patterns"
 > "BM25-only mode: 1330 files in 19.5s, 120MB peak RSS, 7182 chunks (vs OOM at 600 files with async pipeline)"
 
@@ -79,11 +81,12 @@ this.documents = []; // Array of { id, text, tokens, length, termFreqs }
 this.documents.push({
   id: doc.id,
   length: tokens.length,
-  termFreqs,  // Object with EVERY unique term -> count
+  termFreqs, // Object with EVERY unique term -> count
 });
 ```
 
 **Why it leaks:**
+
 - For 7000+ chunks (measured in production), each document stores a `termFreqs` object with potentially hundreds of unique terms
 - The `_calculateIDF()` method (lines 134-152) creates a SECOND copy of all terms in the `this.idf` object
 - `toJSON()` serializes the entire `documents` array + `idf` object into a massive JSON string
@@ -91,7 +94,7 @@ this.documents.push({
 
 ### Impact
 
-- Memory usage scales as O(D * T) where D = documents and T = average unique terms per document
+- Memory usage scales as O(D \* T) where D = documents and T = average unique terms per document
 - For 7000 chunks with ~100 unique terms each: ~2.8M term entries in memory
 - `JSON.stringify` during save doubles peak memory momentarily
 - The `idf` object (line 146) grows with corpus vocabulary (every unique term across ALL documents)
@@ -126,6 +129,7 @@ addToCache(text, embedding) {
 ```
 
 **Why it leaks:**
+
 - Each embedding is a `number[]` of 384 floats = ~3KB per entry
 - 7000 chunks = ~21MB of cached embeddings in memory
 - The cache has NO eviction policy, NO max size
@@ -171,6 +175,7 @@ this.ripgrepCache.set(cacheKey, { results, time: Date.now() });
 ```
 
 **Why it leaks:**
+
 - Old entries are checked for staleness on READ, but stale entries are never proactively removed
 - A unique query generates a new cache key: `rg:${query}:${options.limit}`
 - Each cache entry stores the full ripgrep results array (file paths, match objects)
@@ -209,6 +214,7 @@ this.subscriptions.push(subscription);
 ```
 
 **Why it leaks:**
+
 - The EventBus is a **singleton** (line 142: `const bus = new EventBus()`)
 - Every `on()` call adds to `this.subscriptions` but there is no automatic cleanup
 - The `once()` method (lines 102-108) does remove after first fire, but persistent subscriptions accumulate
@@ -256,6 +262,7 @@ static getSharedStore(config = {}) {
 ```
 
 **Why it leaks:**
+
 - Shared stores are never removed from the static Map
 - Each store holds LanceDB connections, embedder model references, and table handles
 - The `close()` method (lines 760-767) refuses to close shared stores: `if (this._shared) return;`
@@ -293,14 +300,14 @@ The sync fast-path (index-manager.cjs lines 447-518) that runs when `embeddingMo
 
 ## Summary Table
 
-| # | Severity | Component | File | Root Cause | Memory Impact |
-|---|----------|-----------|------|------------|---------------|
-| 1 | CRITICAL | Async Index Pipeline | index-manager.cjs:526-640 | Promise.race + closure capture retains file contents, ASTs, chunks | OOM at 600+ files |
-| 2 | HIGH | BM25 Indexer | bm25-indexer.cjs:91,170 | Unbounded documents array with termFreqs objects | O(D*T) growth, ~2.8M entries |
-| 3 | HIGH | Embedding Cache | embedding-generator.cjs:50,331 | Unbounded Map cache, no eviction, full JSON load | ~21MB for 7000 chunks |
-| 4 | MEDIUM | Ripgrep Cache | hybrid-lazy-indexer.cjs:50,242 | No size limit on search result cache | Grows with unique queries |
-| 5 | MEDIUM | EventBus Subscriptions | event-bus.cjs:31,92 | Singleton array accumulates subscriptions | Grows over session lifetime |
-| 6 | LOW | Shared Vector Stores | lancedb-client.cjs:137,150 | Static Map never clears, close() blocked on shared | ~50MB per transformer model |
+| #   | Severity | Component              | File                           | Root Cause                                                         | Memory Impact                 |
+| --- | -------- | ---------------------- | ------------------------------ | ------------------------------------------------------------------ | ----------------------------- |
+| 1   | CRITICAL | Async Index Pipeline   | index-manager.cjs:526-640      | Promise.race + closure capture retains file contents, ASTs, chunks | OOM at 600+ files             |
+| 2   | HIGH     | BM25 Indexer           | bm25-indexer.cjs:91,170        | Unbounded documents array with termFreqs objects                   | O(D\*T) growth, ~2.8M entries |
+| 3   | HIGH     | Embedding Cache        | embedding-generator.cjs:50,331 | Unbounded Map cache, no eviction, full JSON load                   | ~21MB for 7000 chunks         |
+| 4   | MEDIUM   | Ripgrep Cache          | hybrid-lazy-indexer.cjs:50,242 | No size limit on search result cache                               | Grows with unique queries     |
+| 5   | MEDIUM   | EventBus Subscriptions | event-bus.cjs:31,92            | Singleton array accumulates subscriptions                          | Grows over session lifetime   |
+| 6   | LOW      | Shared Vector Stores   | lancedb-client.cjs:137,150     | Static Map never clears, close() blocked on shared                 | ~50MB per transformer model   |
 
 ---
 

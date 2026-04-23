@@ -23,11 +23,13 @@ Analyzed 5 memory sources and extracted 47 documentation-relevant citations. Fou
 ## Priority Recommendations
 
 ### P0 (Critical - Immediate)
+
 - **REC-009**: Memory sanitization (OWASP ASI06, sensitive data in archives)
 - **REC-010**: Memory rotation (136KB over budget)
 - **REC-013**: Test coverage audit (0% in critical modules)
 
 ### P1 (High - This Sprint)
+
 - **REC-001**: Pre-commit hook for artifact naming
 - **REC-004**: Update CLAUDE.md memory targets
 - **REC-006**: QA checkpoint enforcement
@@ -36,6 +38,7 @@ Analyzed 5 memory sources and extracted 47 documentation-relevant citations. Fou
 - **REC-014**: Research report naming consistency
 
 ### P2 (Medium - Next Sprint)
+
 - **REC-002**: Consolidate lint/format docs
 - **REC-003**: Document session file naming
 - **REC-005**: Document test archival pattern
@@ -46,15 +49,17 @@ Analyzed 5 memory sources and extracted 47 documentation-relevant citations. Fou
 ## Citations by Category (47 total)
 
 ### File Naming & Placement (15)
+
 - Research reports: `{topic}-research-{YYYY-MM-DD}.md`
 - Operational reports: `.claude/context/reports/`
 - Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
 - Tests: `tests/` mirror structure
 - Temp: `.claude/context/tmp/` only
-- Data: `.claude/context/data/` for *.db, *.json, *.lance
+- Data: `.claude/context/data/` for _.db, _.json, \*.lance
 - Naming: lowercase kebab-case, ISO 8601 dates
 
 ### Memory System (8)
+
 - learnings.md is legacy archive (not active)
 - Thresholds: 40KB learnings, 80KB decisions
 - Session files use timestamps
@@ -63,6 +68,7 @@ Analyzed 5 memory sources and extracted 47 documentation-relevant citations. Fou
 - Tiers: STM/MTM/LTM
 
 ### Code Quality & Testing (10)
+
 - Lint/format BLOCKING before completion
 - TDD planning: parallel reads → search → plan
 - Quality gates: Tests → Lint → Format
@@ -71,6 +77,7 @@ Analyzed 5 memory sources and extracted 47 documentation-relevant citations. Fou
 - Test archival with implementation
 
 ### Git Workflow (6)
+
 - Conventional commits
 - AI attribution required
 - Frequent commits as save points
@@ -79,6 +86,7 @@ Analyzed 5 memory sources and extracted 47 documentation-relevant citations. Fou
 - TDD: RED → GREEN → REFACTOR → COMMIT
 
 ### Security & Enforcement (8)
+
 - windowsHide (18+ calls, no automation)
 - safeParseJSON (ADR-115)
 - shell: false (ADR-114)

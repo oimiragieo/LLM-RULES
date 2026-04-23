@@ -18,40 +18,40 @@
 
 ### A Rules (3 audited)
 
-| Rule | Score | Status | Notes |
-|------|-------|--------|-------|
-| advanced-elicitation | 8/10 | PASS | Strong: methods table, cost control, security controls, related skills |
-| agents | 7/10 | PASS | Quick reference format excellent; specialist routing law clear |
-| ai-ml-expert | 3/10 | ENHANCED | Stub file - needs substantive content |
+| Rule                 | Score | Status   | Notes                                                                  |
+| -------------------- | ----- | -------- | ---------------------------------------------------------------------- |
+| advanced-elicitation | 8/10  | PASS     | Strong: methods table, cost control, security controls, related skills |
+| agents               | 7/10  | PASS     | Quick reference format excellent; specialist routing law clear         |
+| ai-ml-expert         | 3/10  | ENHANCED | Stub file - needs substantive content                                  |
 
 ### B Rules (2 audited)
 
-| Rule | Score | Status | Notes |
-|------|--------|--------|-------|
-| best-practices-guidelines | 9/10 | PASS | Comprehensive: RESTful, responsive, validation, deps, security, performance, testing, framework-specific guidance |
-| binary-analysis-patterns | 3/10 | ENHANCED | Stub file - needs skill specification content |
+| Rule                      | Score | Status   | Notes                                                                                                             |
+| ------------------------- | ----- | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| best-practices-guidelines | 9/10  | PASS     | Comprehensive: RESTful, responsive, validation, deps, security, performance, testing, framework-specific guidance |
+| binary-analysis-patterns  | 3/10  | ENHANCED | Stub file - needs skill specification content                                                                     |
 
 ### C Rules (17 audited)
 
-| Rule | Score | Status | Notes |
-|------|-------|--------|-------|
-| checklist-generator | 8/10 | PASS | IEEE 1028 foundation, LLM contextual additions (10-20%), anti-patterns |
-| code-analyzer | 9/10 | PASS | Metrics detailed (cyclomatic, LOC, maintainability), ESLint config, workflow clear |
-| code-quality-expert | 10/10 | PASS | **EXEMPLARY** - Covers constants, names, comments, SRP, DRY, structure, encapsulation, testing, VCS |
-| code-semantic-search | 8/10 | PASS | Search modes (hybrid/semantic/structural), integration points, anti-patterns documented |
-| code-standards | 9/10 | PASS | File organization, naming, patterns, error handling, AI-generated review layers, lint/format gates |
-| code-structural-search | 9/10 | PASS | Pattern syntax, language support, common patterns by language, security patterns, vs other tools comparison |
-| code-style-validator | 9/10 | PASS | AST-based validation, naming/formatting/structure checks, integration examples, output format |
-| complexity-assessment | 10/10 | PASS | **EXEMPLARY** - Workflow types, tiers, anti-patterns, integration, validation depth guidelines, iron law |
-| consensus-voting | 9/10 | PASS | Voting protocols, weighted voting, quorum, conflict resolution, Byzantine FT, decision format |
-| container-expert | 8/10 | PASS | Docker/K8s/Helm/Istio/Knative standards, anti-patterns, integration points |
-| context-driven-development | 8/10 | PASS | Context artifacts, lifecycle, standards, anti-patterns, integration points |
-| architecture-review | 10/10 | PASS | **EXEMPLARY** - NFR compliance, anti-patterns, risk analysis, trade-offs, review checklist, iron law |
-| artifact-integration | 8/10 | PASS | Must-have/should-have/nice-to-have tiers, dependency graphs, post-creation protocol |
-| artifact-integrator | 8/10 | PASS | Integration tiers, post-creation protocol, anti-patterns, integration points |
-| auth-security-expert | 10/10 | PASS | **EXEMPLARY** - OAuth 2.1, JWT RFC 8725, token standards, anti-patterns, review checklist, iron laws |
-| api-development-expert | 9/10 | PASS | REST design, OpenAPI, versioning, auth, error handling, rate limiting, integration points |
-| android-expert | 9/10 | PASS | Jetpack Compose standards, performance, testing, architecture, integration points, memory protocol |
+| Rule                       | Score | Status | Notes                                                                                                       |
+| -------------------------- | ----- | ------ | ----------------------------------------------------------------------------------------------------------- |
+| checklist-generator        | 8/10  | PASS   | IEEE 1028 foundation, LLM contextual additions (10-20%), anti-patterns                                      |
+| code-analyzer              | 9/10  | PASS   | Metrics detailed (cyclomatic, LOC, maintainability), ESLint config, workflow clear                          |
+| code-quality-expert        | 10/10 | PASS   | **EXEMPLARY** - Covers constants, names, comments, SRP, DRY, structure, encapsulation, testing, VCS         |
+| code-semantic-search       | 8/10  | PASS   | Search modes (hybrid/semantic/structural), integration points, anti-patterns documented                     |
+| code-standards             | 9/10  | PASS   | File organization, naming, patterns, error handling, AI-generated review layers, lint/format gates          |
+| code-structural-search     | 9/10  | PASS   | Pattern syntax, language support, common patterns by language, security patterns, vs other tools comparison |
+| code-style-validator       | 9/10  | PASS   | AST-based validation, naming/formatting/structure checks, integration examples, output format               |
+| complexity-assessment      | 10/10 | PASS   | **EXEMPLARY** - Workflow types, tiers, anti-patterns, integration, validation depth guidelines, iron law    |
+| consensus-voting           | 9/10  | PASS   | Voting protocols, weighted voting, quorum, conflict resolution, Byzantine FT, decision format               |
+| container-expert           | 8/10  | PASS   | Docker/K8s/Helm/Istio/Knative standards, anti-patterns, integration points                                  |
+| context-driven-development | 8/10  | PASS   | Context artifacts, lifecycle, standards, anti-patterns, integration points                                  |
+| architecture-review        | 10/10 | PASS   | **EXEMPLARY** - NFR compliance, anti-patterns, risk analysis, trade-offs, review checklist, iron law        |
+| artifact-integration       | 8/10  | PASS   | Must-have/should-have/nice-to-have tiers, dependency graphs, post-creation protocol                         |
+| artifact-integrator        | 8/10  | PASS   | Integration tiers, post-creation protocol, anti-patterns, integration points                                |
+| auth-security-expert       | 10/10 | PASS   | **EXEMPLARY** - OAuth 2.1, JWT RFC 8725, token standards, anti-patterns, review checklist, iron laws        |
+| api-development-expert     | 9/10  | PASS   | REST design, OpenAPI, versioning, auth, error handling, rate limiting, integration points                   |
+| android-expert             | 9/10  | PASS   | Jetpack Compose standards, performance, testing, architecture, integration points, memory protocol          |
 
 ## Enhanced Rules (Content Added)
 
@@ -60,6 +60,7 @@
 **Issue**: Stub file with only "When to Use" section and usage example; missing all substance.
 
 **Enhanced with**:
+
 - Core Principles (PyTorch, LangChain, LLM integration focus)
 - Input Requirements (data formats, model selection, optimization goals)
 - Output Standards (model evaluation metrics, performance benchmarks)
@@ -77,6 +78,7 @@
 **Issue**: Stub file with only "When to Use" section; no technical guidance.
 
 **Enhanced with**:
+
 - Core Principles (disassembly, decompilation, control flow analysis, pattern recognition)
 - Input Requirements (executable types, analysis objectives, resource constraints)
 - Output Standards (control flow graphs, vulnerability reports, pattern findings)

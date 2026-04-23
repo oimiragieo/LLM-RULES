@@ -19,14 +19,14 @@ Tasks #10 and #11 represent a textbook example of the enterprise pipeline's valu
 
 ## Overall Scores
 
-| Dimension | Weight | Score | Notes |
-|-----------|--------|-------|-------|
-| **Completeness** | 25% | 0.75 | Implementation plan delivered. searchArchives() deferred (acceptable). Core modules done. |
-| **Accuracy** | 25% | 0.85 | 41 tests pass. 2 critical wiring bugs (C1, C2) found and documented. No false positives. |
-| **Clarity** | 15% | 0.90 | Well-structured modules. Test coverage excellent. Documentation clear. |
-| **Consistency** | 15% | 0.88 | All modules follow TDD pattern. Security controls applied uniformly. Config structure clean. |
-| **Actionability** | 20% | 0.78 | Clear fix recommendations with line numbers. C1+C2 are 2-line fixes. 6 follow-up tasks documented. |
-| **OVERALL SCORE** | **100%** | **0.83** | **PASS** (0.7-0.9 threshold) |
+| Dimension         | Weight   | Score    | Notes                                                                                              |
+| ----------------- | -------- | -------- | -------------------------------------------------------------------------------------------------- |
+| **Completeness**  | 25%      | 0.75     | Implementation plan delivered. searchArchives() deferred (acceptable). Core modules done.          |
+| **Accuracy**      | 25%      | 0.85     | 41 tests pass. 2 critical wiring bugs (C1, C2) found and documented. No false positives.           |
+| **Clarity**       | 15%      | 0.90     | Well-structured modules. Test coverage excellent. Documentation clear.                             |
+| **Consistency**   | 15%      | 0.88     | All modules follow TDD pattern. Security controls applied uniformly. Config structure clean.       |
+| **Actionability** | 20%      | 0.78     | Clear fix recommendations with line numbers. C1+C2 are 2-line fixes. 6 follow-up tasks documented. |
+| **OVERALL SCORE** | **100%** | **0.83** | **PASS** (0.7-0.9 threshold)                                                                       |
 
 **Threshold Assessment:** 0.83 = **PASS** (passes 0.7 minimum, approaches 0.9 excellence)
 
@@ -94,11 +94,11 @@ Tasks #10 and #11 represent a textbook example of the enterprise pipeline's valu
 
 The enterprise pipeline caught bugs that single-phase review would miss:
 
-| Phase | Agent | Finding | Severity | Detection Method |
-|-------|-------|---------|----------|------------------|
-| Phase 1 (Spec) | developer | Modules created, tests pass | — | Implementation |
-| Phase 4 (Code Review) | code-reviewer | C1 (property mismatch), C2 (option name) | CRITICAL | Static code inspection |
-| Phase 5 (QA) | qa | Same C1 + C2 bugs discovered independently | CRITICAL | Test coverage analysis |
+| Phase                 | Agent         | Finding                                    | Severity | Detection Method       |
+| --------------------- | ------------- | ------------------------------------------ | -------- | ---------------------- |
+| Phase 1 (Spec)        | developer     | Modules created, tests pass                | —        | Implementation         |
+| Phase 4 (Code Review) | code-reviewer | C1 (property mismatch), C2 (option name)   | CRITICAL | Static code inspection |
+| Phase 5 (QA)          | qa            | Same C1 + C2 bugs discovered independently | CRITICAL | Test coverage analysis |
 
 **Key Insight:** Code review found bugs via interface inspection (expected return value vs actual). QA found bugs via test analysis (option names not reaching function). Both reached the same conclusion independently, validating the finding.
 
@@ -118,13 +118,14 @@ The enterprise pipeline caught bugs that single-phase review would miss:
 
 All 3 security mitigations (MF-001, MF-002, MF-003) from the security review are correctly implemented:
 
-| Mitigation | Implementation | Verification | Status |
-|-----------|-----------------|--------------|--------|
-| MF-001: safeParseJSON | Used in all 4 modules | Grep: 0 raw JSON.parse calls | **PASS** |
-| MF-002: atomicWriteSync | Used for all file writes | Grep: 0 raw writeFileSync calls | **PASS** |
+| Mitigation                    | Implementation                 | Verification                        | Status   |
+| ----------------------------- | ------------------------------ | ----------------------------------- | -------- |
+| MF-001: safeParseJSON         | Used in all 4 modules          | Grep: 0 raw JSON.parse calls        | **PASS** |
+| MF-002: atomicWriteSync       | Used for all file writes       | Grep: 0 raw writeFileSync calls     | **PASS** |
 | MF-003: scrubSensitiveContent | Called before cold JSONL write | Integration test verifies redaction | **PASS** |
 
 **Outstanding Issues:**
+
 - Path validation missing in cold-storage.cjs (I2) - should be added
 - Prototype pollution risk remains in 38 other memory subsystem files (not in scope for this task)
 
@@ -137,6 +138,7 @@ The memory management system is part of the cross-artifact integration framework
 **Integration Score: 75%** (GAPS category - improvements needed)
 
 **Integrated Components:**
+
 - ✅ memory-scheduler.cjs wired into main memory stack
 - ✅ sync-memory-index.cjs hook triggers rotation on memory writes
 - ✅ config.yaml memory section added
@@ -144,6 +146,7 @@ The memory management system is part of the cross-artifact integration framework
 - ✅ artifact-graph.json tracks as critical infrastructure module
 
 **Integration Gaps:**
+
 - ⚠️ learnings.md not in CORE_MEMORY_MARKDOWN_FILES (missing largest file from hook trigger)
 - ⚠️ searchArchives() and searchCold() functions stubbed (incomplete)
 - ⚠️ Warm archive deletion not implemented (storage tier not fully functional)
@@ -162,6 +165,7 @@ The memory management system is part of the cross-artifact integration framework
 **Pattern:** When code is well-designed and tests pass (41/41), but code review + QA find bugs in different detection methods, those bugs are in the wiring layer (integration interfaces) not in core logic. This validates the pipeline design.
 
 **Applicable To:** Any multi-phase review where Unit Tests are insufficient to catch integration issues. Wiring bugs manifest as:
+
 - Option name mismatches (caller expects X, function parameter is Y)
 - Property name mismatches (returned object has Y, caller accesses X)
 - Type mismatches (caller expects string, function returns number)
@@ -177,6 +181,7 @@ The memory management system is part of the cross-artifact integration framework
 **Pattern:** When rebuilding archived modules, identify ALL trigger points BEFORE implementation. The original archived modules (rotator, pruner, cold-storage) had solid internal designs but were orphaned because trigger points weren't wired. The new rebuild correctly wires most triggers, but missed learnings.md in the hook.
 
 **Checklist for Module Restoration:**
+
 1. Identify all trigger points (hooks, schedulers, CLI, explicit API calls)
 2. List all files that should activate the module (CORE_MEMORY_MARKDOWN_FILES)
 3. Add trigger code DURING implementation, not after
@@ -193,6 +198,7 @@ The memory management system is part of the cross-artifact integration framework
 **Pattern:** Configuration-driven systems are prone to silent failures when config keys don't match function parameters. The config.yaml specifies one key name (similarity_threshold), scheduler translates to different name (similarityThreshold), function expects another (threshold). Each translation layer is a risk point.
 
 **Prevention:**
+
 - Keep config keys aligned with function parameter names
 - Document the translation mapping clearly
 - Add validation that config keys are actually used by target functions
@@ -269,13 +275,13 @@ The memory management system is part of the cross-artifact integration framework
 
 ## Quality Gate Assessment
 
-| Gate | Status | Evidence |
-|------|--------|----------|
-| **Tests Pass** | ✅ PASS | 41/41 tests pass, no regressions |
-| **Security Controls** | ✅ PASS | MF-001, MF-002, MF-003 verified |
-| **Code Quality** | ✅ PASS | Module size, DRY, error handling all good |
-| **Spec Compliance** | ⚠️ PARTIAL | 2 critical wiring bugs, 6 follow-ups, 1 deferred feature |
-| **Integration Wiring** | ⚠️ PARTIAL | learnings.md missing from hook, searchArchives deferred |
+| Gate                   | Status     | Evidence                                                 |
+| ---------------------- | ---------- | -------------------------------------------------------- |
+| **Tests Pass**         | ✅ PASS    | 41/41 tests pass, no regressions                         |
+| **Security Controls**  | ✅ PASS    | MF-001, MF-002, MF-003 verified                          |
+| **Code Quality**       | ✅ PASS    | Module size, DRY, error handling all good                |
+| **Spec Compliance**    | ⚠️ PARTIAL | 2 critical wiring bugs, 6 follow-ups, 1 deferred feature |
+| **Integration Wiring** | ⚠️ PARTIAL | learnings.md missing from hook, searchArchives deferred  |
 
 **Overall:** PASS with critical fixes required (C1+C2)
 

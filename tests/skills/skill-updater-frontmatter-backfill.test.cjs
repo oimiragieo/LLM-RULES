@@ -21,9 +21,7 @@ const {
   parseFrontmatter,
   hasFrontmatterBlock,
   tokenizeDescription,
-} = require(
-  path.join(PROJECT_ROOT, '.claude', 'skills', 'skill-updater', 'scripts', 'main.cjs')
-);
+} = require(path.join(PROJECT_ROOT, '.claude', 'skills', 'skill-updater', 'scripts', 'main.cjs'));
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -45,7 +43,11 @@ function withTempSkill(skillName, content, fn) {
   }
 }
 
-function makeSkillContent({ name = 'test-skill', description = '', withFrontmatterBlock = false } = {}) {
+function makeSkillContent({
+  name = 'test-skill',
+  description = '',
+  withFrontmatterBlock = false,
+} = {}) {
   const attrs = ['---', `name: ${name}`, `description: '${description}'`, 'version: 1.0.0'];
   if (withFrontmatterBlock) {
     attrs.push('frontmatter:');
@@ -67,13 +69,18 @@ function makeSkillContent({ name = 'test-skill', description = '', withFrontmatt
 // ---------------------------------------------------------------------------
 
 test('backfillFrontmatter proposes defaults for skill missing frontmatter block', () => {
-  const desc = 'Research-backed skill refresh workflow for updating existing skills with TDD checkpoints.';
+  const desc =
+    'Research-backed skill refresh workflow for updating existing skills with TDD checkpoints.';
   const skillName = `tmp-bf-no-block-${Date.now()}`;
 
-  withTempSkill(skillName, makeSkillContent({ name: skillName, description: desc }), (relPath) => {
+  withTempSkill(skillName, makeSkillContent({ name: skillName, description: desc }), relPath => {
     const result = backfillFrontmatter(relPath);
 
-    assert.equal(result.action, 'proposed', `Expected "proposed" but got "${result.action}": ${result.message}`);
+    assert.equal(
+      result.action,
+      'proposed',
+      `Expected "proposed" but got "${result.action}": ${result.message}`
+    );
     assert.ok(result.proposed, 'proposed object should be present');
 
     // triggers derived from description keywords
@@ -89,7 +96,11 @@ test('backfillFrontmatter proposes defaults for skill missing frontmatter block'
 
     // requires_skills defaults to []
     assert.ok(Array.isArray(result.proposed.requires_skills), 'requires_skills must be an array');
-    assert.equal(result.proposed.requires_skills.length, 0, 'default requires_skills must be empty');
+    assert.equal(
+      result.proposed.requires_skills.length,
+      0,
+      'default requires_skills must be empty'
+    );
 
     assert.match(result.message, /proposed/i);
   });
@@ -97,13 +108,20 @@ test('backfillFrontmatter proposes defaults for skill missing frontmatter block'
 
 test('backfillFrontmatter respects token_budget override', () => {
   const skillName = `tmp-bf-override-${Date.now()}`;
-  withTempSkill(skillName, makeSkillContent({ name: skillName, description: 'some skill description' }), (relPath) => {
-    const result = backfillFrontmatter(relPath, { token_budget: 20000, requires_skills: ['tdd'] });
+  withTempSkill(
+    skillName,
+    makeSkillContent({ name: skillName, description: 'some skill description' }),
+    relPath => {
+      const result = backfillFrontmatter(relPath, {
+        token_budget: 20000,
+        requires_skills: ['tdd'],
+      });
 
-    assert.equal(result.action, 'proposed');
-    assert.equal(result.proposed.token_budget, 20000, 'overridden token_budget must be 20000');
-    assert.deepEqual(result.proposed.requires_skills, ['tdd']);
-  });
+      assert.equal(result.action, 'proposed');
+      assert.equal(result.proposed.token_budget, 20000, 'overridden token_budget must be 20000');
+      assert.deepEqual(result.proposed.requires_skills, ['tdd']);
+    }
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -115,7 +133,11 @@ test('backfillFrontmatter returns already_present for skill that already has fro
 
   withTempSkill(
     skillName,
-    makeSkillContent({ name: skillName, description: 'existing skill', withFrontmatterBlock: true }),
+    makeSkillContent({
+      name: skillName,
+      description: 'existing skill',
+      withFrontmatterBlock: true,
+    }),
     (relPath, absolutePath) => {
       const originalContent = fs.readFileSync(absolutePath, 'utf8');
       const result = backfillFrontmatter(relPath);
@@ -129,7 +151,11 @@ test('backfillFrontmatter returns already_present for skill that already has fro
 
       // File must be unchanged
       const afterContent = fs.readFileSync(absolutePath, 'utf8');
-      assert.equal(afterContent, originalContent, 'File must not be modified when frontmatter block already present');
+      assert.equal(
+        afterContent,
+        originalContent,
+        'File must not be modified when frontmatter block already present'
+      );
     }
   );
 });
@@ -153,7 +179,11 @@ test('applyFrontmatterBackfill refuses to overwrite existing frontmatter block',
 
       // File must be unchanged
       const afterContent = fs.readFileSync(absolutePath, 'utf8');
-      assert.equal(afterContent, originalContent, 'File must not be modified when block already present');
+      assert.equal(
+        afterContent,
+        originalContent,
+        'File must not be modified when block already present'
+      );
     }
   );
 });
@@ -166,68 +196,91 @@ test('applyFrontmatterBackfill writes a schema-valid frontmatter block', () => {
   const skillName = `tmp-bf-apply-${Date.now()}`;
   const desc = 'Hybrid semantic BM25 search over the codebase for discovery and navigation.';
 
-  withTempSkill(skillName, makeSkillContent({ name: skillName, description: desc }), (relPath, absolutePath) => {
-    // Step 1: propose
-    const proposal = backfillFrontmatter(relPath);
-    assert.equal(proposal.action, 'proposed');
+  withTempSkill(
+    skillName,
+    makeSkillContent({ name: skillName, description: desc }),
+    (relPath, absolutePath) => {
+      // Step 1: propose
+      const proposal = backfillFrontmatter(relPath);
+      assert.equal(proposal.action, 'proposed');
 
-    // Step 2: apply (simulates agent confirming)
-    const applyResult = applyFrontmatterBackfill(relPath, proposal.proposed);
-    assert.equal(applyResult.ok, true, `apply failed: ${applyResult.message}`);
+      // Step 2: apply (simulates agent confirming)
+      const applyResult = applyFrontmatterBackfill(relPath, proposal.proposed);
+      assert.equal(applyResult.ok, true, `apply failed: ${applyResult.message}`);
 
-    // Step 3: read back and validate structure
-    const updatedContent = fs.readFileSync(absolutePath, 'utf8');
-    const parsed = parseFrontmatter(updatedContent);
-    assert.ok(parsed, 'Updated file must have parseable frontmatter');
-    assert.ok(hasFrontmatterBlock(parsed.attributes), 'Updated frontmatter must contain frontmatter block');
+      // Step 3: read back and validate structure
+      const updatedContent = fs.readFileSync(absolutePath, 'utf8');
+      const parsed = parseFrontmatter(updatedContent);
+      assert.ok(parsed, 'Updated file must have parseable frontmatter');
+      assert.ok(
+        hasFrontmatterBlock(parsed.attributes),
+        'Updated frontmatter must contain frontmatter block'
+      );
 
-    const fm = parsed.attributes.frontmatter;
+      const fm = parsed.attributes.frontmatter;
 
-    // triggers must be non-empty string array
-    assert.ok(Array.isArray(fm.triggers), 'triggers must be array');
-    assert.ok(fm.triggers.length > 0, 'triggers must not be empty');
-    for (const t of fm.triggers) {
-      assert.equal(typeof t, 'string', `trigger "${t}" must be string`);
+      // triggers must be non-empty string array
+      assert.ok(Array.isArray(fm.triggers), 'triggers must be array');
+      assert.ok(fm.triggers.length > 0, 'triggers must not be empty');
+      for (const t of fm.triggers) {
+        assert.equal(typeof t, 'string', `trigger "${t}" must be string`);
+      }
+
+      // token_budget must be integer >= 1000
+      assert.equal(typeof fm.token_budget, 'number', 'token_budget must be number');
+      assert.ok(fm.token_budget >= 1000, `token_budget ${fm.token_budget} must be >= 1000`);
+
+      // requires_skills must be array
+      assert.ok(Array.isArray(fm.requires_skills), 'requires_skills must be array');
+
+      // only allowed keys per schema (additionalProperties: false)
+      const allowedKeys = new Set([
+        'triggers',
+        'output_schema_ref',
+        'token_budget',
+        'requires_skills',
+      ]);
+      for (const key of Object.keys(fm)) {
+        assert.ok(
+          allowedKeys.has(key),
+          `unknown frontmatter key "${key}" violates additionalProperties:false`
+        );
+      }
+
+      // body must be preserved intact
+      assert.match(
+        updatedContent,
+        /# .+\n\nBody text here\./s,
+        'Markdown body must be preserved after backfill'
+      );
     }
-
-    // token_budget must be integer >= 1000
-    assert.equal(typeof fm.token_budget, 'number', 'token_budget must be number');
-    assert.ok(fm.token_budget >= 1000, `token_budget ${fm.token_budget} must be >= 1000`);
-
-    // requires_skills must be array
-    assert.ok(Array.isArray(fm.requires_skills), 'requires_skills must be array');
-
-    // only allowed keys per schema (additionalProperties: false)
-    const allowedKeys = new Set(['triggers', 'output_schema_ref', 'token_budget', 'requires_skills']);
-    for (const key of Object.keys(fm)) {
-      assert.ok(allowedKeys.has(key), `unknown frontmatter key "${key}" violates additionalProperties:false`);
-    }
-
-    // body must be preserved intact
-    assert.match(updatedContent, /# .+\n\nBody text here\./s, 'Markdown body must be preserved after backfill');
-  });
+  );
 });
 
 test('applyFrontmatterBackfill is idempotent — second call returns ok:false without file change', () => {
   const skillName = `tmp-bf-idem-${Date.now()}`;
 
-  withTempSkill(skillName, makeSkillContent({ name: skillName, description: 'idempotency check skill' }), (relPath, absolutePath) => {
-    const proposal = backfillFrontmatter(relPath);
-    assert.equal(proposal.action, 'proposed');
+  withTempSkill(
+    skillName,
+    makeSkillContent({ name: skillName, description: 'idempotency check skill' }),
+    (relPath, absolutePath) => {
+      const proposal = backfillFrontmatter(relPath);
+      assert.equal(proposal.action, 'proposed');
 
-    // First apply
-    const first = applyFrontmatterBackfill(relPath, proposal.proposed);
-    assert.equal(first.ok, true);
+      // First apply
+      const first = applyFrontmatterBackfill(relPath, proposal.proposed);
+      assert.equal(first.ok, true);
 
-    const afterFirst = fs.readFileSync(absolutePath, 'utf8');
+      const afterFirst = fs.readFileSync(absolutePath, 'utf8');
 
-    // Second apply must fail (already present)
-    const second = applyFrontmatterBackfill(relPath, proposal.proposed);
-    assert.equal(second.ok, false, 'second apply must fail when block already written');
+      // Second apply must fail (already present)
+      const second = applyFrontmatterBackfill(relPath, proposal.proposed);
+      assert.equal(second.ok, false, 'second apply must fail when block already written');
 
-    const afterSecond = fs.readFileSync(absolutePath, 'utf8');
-    assert.equal(afterSecond, afterFirst, 'file must not change on second apply attempt');
-  });
+      const afterSecond = fs.readFileSync(absolutePath, 'utf8');
+      assert.equal(afterSecond, afterFirst, 'file must not change on second apply attempt');
+    }
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -253,7 +306,11 @@ test('tokenizeDescription returns skill name as fallback for empty description',
   const tokens = tokenizeDescription('');
   assert.ok(Array.isArray(tokens));
   // empty description → empty array (caller provides name as fallback)
-  assert.equal(tokens.length, 0, 'empty description yields empty array (caller adds name fallback)');
+  assert.equal(
+    tokens.length,
+    0,
+    'empty description yields empty array (caller adds name fallback)'
+  );
 });
 
 test('backfillFrontmatter uses skill name as trigger when description is empty', () => {
@@ -262,10 +319,13 @@ test('backfillFrontmatter uses skill name as trigger when description is empty',
   withTempSkill(
     skillName,
     ['---', `name: ${skillName}`, "description: ''", '---', '', '# Body'].join('\n'),
-    (relPath) => {
+    relPath => {
       const result = backfillFrontmatter(relPath);
       assert.equal(result.action, 'proposed');
-      assert.ok(result.proposed.triggers.length > 0, 'must have at least one trigger even with empty description');
+      assert.ok(
+        result.proposed.triggers.length > 0,
+        'must have at least one trigger even with empty description'
+      );
       assert.ok(
         result.proposed.triggers.includes(skillName),
         `skill name "${skillName}" must be used as fallback trigger`

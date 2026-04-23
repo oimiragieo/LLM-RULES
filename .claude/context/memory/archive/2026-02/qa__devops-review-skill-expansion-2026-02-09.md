@@ -17,6 +17,7 @@
 **Rollback Complexity**: SIMPLE (single `git reset --hard`)
 
 **Key Findings**:
+
 - 273 untracked files, all under `.claude/` directory (safe)
 - Zero Windows reserved names
 - Zero path length violations
@@ -32,15 +33,15 @@
 
 ### Breakdown by Type
 
-| Type                  | Count | Location                    | Size Est.  |
-| --------------------- | ----- | --------------------------- | ---------- |
-| Command files (.md)   | 95    | `.claude/commands/`         | ~12.5 KB   |
-| Rules files (.md)     | 100   | `.claude/rules/`            | ~500 KB    |
-| Schemas (.json)       | 89    | `.claude/schemas/`          | ~890 KB    |
-| Skill directories     | 97    | `.claude/skills/`           | ~1.2 MB    |
-| Catalog updates (.md) | 1     | `.claude/context/artifacts/`| ~50 KB     |
-| Test fixtures         | 1     | `tests/fixtures/`           | <1 KB      |
-| **TOTAL**             | **273**| -                           | **~2.5 MB**|
+| Type                  | Count   | Location                     | Size Est.   |
+| --------------------- | ------- | ---------------------------- | ----------- |
+| Command files (.md)   | 95      | `.claude/commands/`          | ~12.5 KB    |
+| Rules files (.md)     | 100     | `.claude/rules/`             | ~500 KB     |
+| Schemas (.json)       | 89      | `.claude/schemas/`           | ~890 KB     |
+| Skill directories     | 97      | `.claude/skills/`            | ~1.2 MB     |
+| Catalog updates (.md) | 1       | `.claude/context/artifacts/` | ~50 KB      |
+| Test fixtures         | 1       | `tests/fixtures/`            | <1 KB       |
+| **TOTAL**             | **273** | -                            | **~2.5 MB** |
 
 ### Git Status
 
@@ -69,6 +70,7 @@ Untracked: 273 files
 ### Schema Files (89 total)
 
 **Sample Analysis**:
+
 - All follow pattern: `skill-{name}-output.schema.json`
 - Typical size: 5-15 KB per schema
 - Total estimated: ~890 KB
@@ -78,6 +80,7 @@ Untracked: 273 files
 ### Rules Files (100 total)
 
 **Sample Analysis**:
+
 - Average size: ~5 KB per file
 - Largest category: security rules (~8-10 KB due to examples)
 - Total estimated: ~500 KB
@@ -87,6 +90,7 @@ Untracked: 273 files
 ### Command Files (95 total)
 
 **Sample Analysis**:
+
 - Average size: ~130 bytes per file (thin delegators)
 - Total: ~12.5 KB
 
@@ -106,6 +110,7 @@ Untracked: 273 files
 ✅ **PASS**: All skill directories use kebab-case
 
 **Sample Filenames**:
+
 ```
 ✓ advanced-elicitation.md
 ✓ api-development-expert.md
@@ -130,6 +135,7 @@ Untracked: 273 files
 ✅ **PASS**: Zero paths exceeding 260 characters
 
 **Longest Path Sample**:
+
 - `.claude/schemas/skill-interactive-requirements-gathering-output.schema.json` (78 chars)
 - Well under Windows limit
 
@@ -142,6 +148,7 @@ Untracked: 273 files
 **Patterns Checked**: `AKIA`, `ghp_`, `sk-`, `Bearer `, `token:`, `password:`, `secret:`
 
 **Flagged Files (5)**:
+
 1. `.claude/rules/complexity-assessment.md` - FALSE POSITIVE (mentions "task-breakdown")
 2. `.claude/rules/insecure-defaults.md` - FALSE POSITIVE (security rule documentation)
 3. `.claude/rules/plan-generator.md` - FALSE POSITIVE (documentation)
@@ -149,6 +156,7 @@ Untracked: 273 files
 5. `.claude/rules/security-architect.md` - FALSE POSITIVE (security documentation)
 
 **Analysis**:
+
 - All matches are **documentation examples** showing how to detect secrets
 - Example: "Scan for AWS access keys (`AKIA` prefix), GitHub tokens (`ghp_`)"
 - Zero actual hardcoded credentials found
@@ -162,6 +170,7 @@ Untracked: 273 files
 ### Staging Area
 
 **Status**: CLEAN ✓
+
 - Zero staged files awaiting commit
 - No conflicts detected
 - No merge conflicts
@@ -189,20 +198,24 @@ All modified files are **metadata updates** (expected):
 ### Affected Pipelines
 
 **Test Suite**: ✅ NO IMPACT
+
 - New files are documentation (.md) and schemas (.json)
 - Zero test files modified
 - Zero source code (.ts, .js, .mjs) modified
 
 **Lint Pipeline**: ⚠️ MINOR IMPACT
+
 - 195 new .md files to lint
 - Estimated lint time: +15 seconds
 - **Recommendation**: Pre-commit hook will catch issues
 
 **Build Pipeline**: ✅ NO IMPACT
+
 - No build artifacts affected
 - No compiled code
 
 **Deployment**: ✅ NO IMPACT
+
 - Framework expansion (not application code)
 - No runtime dependencies changed
 
@@ -211,6 +224,7 @@ All modified files are **metadata updates** (expected):
 **Unexpected File**: `tests/fixtures/code-indexing/hook-test/.claude/context/code-index/.indexing.lock`
 
 **Analysis**:
+
 - Lock file from code indexing test
 - Size: <1 KB
 - **Recommendation**: Should be in .gitignore (not critical)
@@ -232,6 +246,7 @@ All modified files are **metadata updates** (expected):
 ### Case Sensitivity
 
 ⚠️ **CAUTION**: Framework assumes case-sensitive filesystem
+
 - Example: `CODE-analyzer.md` vs `code-analyzer.md` would conflict on Windows
 - **Current State**: All lowercase (SAFE)
 
@@ -241,14 +256,14 @@ All modified files are **metadata updates** (expected):
 
 ### Total Disk Usage
 
-| Category      | Size     | Percentage |
-| ------------- | -------- | ---------- |
-| Schemas       | ~890 KB  | 35%        |
-| Rules         | ~500 KB  | 20%        |
-| Skills        | ~1.2 MB  | 48%        |
-| Commands      | ~12.5 KB | <1%        |
-| Catalogs      | ~50 KB   | 2%         |
-| **TOTAL**     | **~2.5 MB** | **100%** |
+| Category  | Size        | Percentage |
+| --------- | ----------- | ---------- |
+| Schemas   | ~890 KB     | 35%        |
+| Rules     | ~500 KB     | 20%        |
+| Skills    | ~1.2 MB     | 48%        |
+| Commands  | ~12.5 KB    | <1%        |
+| Catalogs  | ~50 KB      | 2%         |
+| **TOTAL** | **~2.5 MB** | **100%**   |
 
 **Context**: Project size BEFORE expansion = ~150 MB
 **Impact**: +1.7% increase (NEGLIGIBLE)
@@ -305,6 +320,7 @@ git clean -f .claude/  # Execute
 ### Memory Poisoning Risk
 
 ⚠️ **LOW RISK**: New rules/commands are documentation, not executable code
+
 - Rules files loaded by agents as reference material
 - No dynamic code generation from rules content
 
@@ -366,17 +382,17 @@ The skill expansion introduces 273 new files (~2.5 MB) with **ZERO critical issu
 
 ### Summary Metrics
 
-| Metric                | Result   | Status |
-| --------------------- | -------- | ------ |
-| File count            | 273      | ✓      |
-| Disk usage            | ~2.5 MB  | ✓      |
-| Oversized files       | 0        | ✓      |
-| Windows violations    | 0        | ✓      |
-| Path length issues    | 0        | ✓      |
-| Secrets detected      | 0        | ✓      |
-| Unexpected file types | 1 (.lock)| ⚠️     |
-| Rollback complexity   | TRIVIAL  | ✓      |
-| CI/CD impact          | MINOR    | ✓      |
+| Metric                | Result    | Status |
+| --------------------- | --------- | ------ |
+| File count            | 273       | ✓      |
+| Disk usage            | ~2.5 MB   | ✓      |
+| Oversized files       | 0         | ✓      |
+| Windows violations    | 0         | ✓      |
+| Path length issues    | 0         | ✓      |
+| Secrets detected      | 0         | ✓      |
+| Unexpected file types | 1 (.lock) | ⚠️     |
+| Rollback complexity   | TRIVIAL   | ✓      |
+| CI/CD impact          | MINOR     | ✓      |
 
 ### Next Steps
 

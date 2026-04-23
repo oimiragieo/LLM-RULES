@@ -70,7 +70,7 @@ verification-before-completion/rules.md    (was .claude/rules/verification-befor
 
 **Impact**: These rules are now **only available when skills are explicitly invoked via Skill({ skill: "name" })**. Agents do NOT get them by default.
 
-### Moved to .claude/rules/_archive/ (79 files)
+### Moved to .claude/rules/\_archive/ (79 files)
 
 These rules are **archived and completely unavailable**:
 
@@ -174,12 +174,12 @@ workflow-creator.md, workflow-patterns.md, writing-skills.md
 
 These rules had **universal applicability** and are now invisible unless explicitly invoked:
 
-| Rule                                   | Affected Agents | Universal Concern |
-| -------------------------------------- | --------------- | ----------------- |
+| Rule                                    | Affected Agents | Universal Concern |
+| --------------------------------------- | --------------- | ----------------- |
 | verification-before-completion/rules.md | ALL agents      | Quality gates     |
-| debugging/rules.md                     | developer, qa   | Debugging process |
-| tdd/rules.md                           | developer, qa   | TDD methodology   |
-| task-management-protocol/rules.md      | ALL agents      | Task coordination |
+| debugging/rules.md                      | developer, qa   | Debugging process |
+| tdd/rules.md                            | developer, qa   | TDD methodology   |
+| task-management-protocol/rules.md       | ALL agents      | Task coordination |
 
 **Example Impact**: `verification-before-completion` is a **pre-completion gate** used by ALL agents. Moving it to skills means agents must explicitly invoke `Skill({ skill: "verification-before-completion" })` instead of having it auto-loaded.
 
@@ -250,6 +250,7 @@ If rules remain in `.claude/skills/{name}/rules.md`, add explicit skill invocati
 
 ```markdown
 **Mandatory Skills:**
+
 - Invoke `Skill({ skill: "tdd" })` before implementing features
 - Invoke `Skill({ skill: "debugging" })` when debugging issues
 - Invoke `Skill({ skill: "verification-before-completion" })` before marking tasks complete
@@ -324,7 +325,7 @@ These are skill-specific but have **cross-cutting concerns**:
 - database-architect.md (used by database-architect for reviews)
 - checklist-generator.md (used by qa, code-reviewer for validation)
 
-### Archive Candidates (Keep in .claude/rules/_archive/)
+### Archive Candidates (Keep in .claude/rules/\_archive/)
 
 These are truly skill-specific and only used when explicitly invoked:
 

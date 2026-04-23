@@ -51,14 +51,14 @@ This review assessed the security posture of two proposed features and the recen
 
 ### 1.2 STRIDE Analysis
 
-| Threat Category | Feature 1 (CI Checker) | Feature 2 (Blacklist Monitor) | Risk Level |
-|---|---|---|---|
-| **S**poofing | A malicious hook could impersonate a clean module | A compromised hook could inject fake "allow" events | LOW |
-| **T**ampering | Malicious require() in hook could execute arbitrary code during verification | Violation logs could be tampered to hide attacks | MEDIUM |
-| **R**epudiation | CI output could be spoofed to show clean results | Violation events could be deleted from JSONL | MEDIUM |
-| **I**nformation Disclosure | Error messages could leak file paths, env vars, secrets | Violation logs could capture sensitive prompt content | HIGH |
-| **D**enial of Service | Malformed hooks could hang or crash the verifier | Excessive logging could fill disk | LOW |
-| **E**levation of Privilege | Dynamic require() of hook could execute code as CI user | N/A -- monitoring is read-only | CRITICAL |
+| Threat Category            | Feature 1 (CI Checker)                                                       | Feature 2 (Blacklist Monitor)                         | Risk Level |
+| -------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------- | ---------- |
+| **S**poofing               | A malicious hook could impersonate a clean module                            | A compromised hook could inject fake "allow" events   | LOW        |
+| **T**ampering              | Malicious require() in hook could execute arbitrary code during verification | Violation logs could be tampered to hide attacks      | MEDIUM     |
+| **R**epudiation            | CI output could be spoofed to show clean results                             | Violation events could be deleted from JSONL          | MEDIUM     |
+| **I**nformation Disclosure | Error messages could leak file paths, env vars, secrets                      | Violation logs could capture sensitive prompt content | HIGH       |
+| **D**enial of Service      | Malformed hooks could hang or crash the verifier                             | Excessive logging could fill disk                     | LOW        |
+| **E**levation of Privilege | Dynamic require() of hook could execute code as CI user                      | N/A -- monitoring is read-only                        | CRITICAL   |
 
 ---
 
@@ -86,6 +86,7 @@ The proposed script will scan `.claude/hooks/` (excluding `_archive/`) for `.cjs
 **Recommendation:** MUST-FIX before implementation.
 
 **Required Mitigation:**
+
 - Use **static analysis only** (regex-based `require()` extraction + `path.resolve()` for path checking)
 - NEVER call `require()` or `require.resolve()` on hook files
 - The implementation must use a pattern like:
@@ -130,6 +131,7 @@ function resolveRequirePath(requirePath, fromFile) {
 ### 2.3 Finding SEC-CI-002 [HIGH]: Path Traversal in Hook File Discovery
 
 **Threat:** The hook file discovery process (scanning `.claude/hooks/`) could be exploited if:
+
 - Symlinks within the hooks directory point outside the project
 - A hook file contains a `require('../../../../../../etc/passwd')` path that the resolver follows
 
@@ -138,6 +140,7 @@ function resolveRequirePath(requirePath, fromFile) {
 **Likelihood:** LOW -- Requires symlinks or crafted require paths.
 
 **Required Mitigation:**
+
 - Use `fs.realpathSync()` on discovered hook files to resolve symlinks before processing
 - Validate that all discovered files are within the project root using `validatePathWithinProject()` from `project-root.cjs`
 - For require path resolution, ensure resolved paths stay within the project root
@@ -146,6 +149,7 @@ function resolveRequirePath(requirePath, fromFile) {
 ### 2.4 Finding SEC-CI-003 [MEDIUM]: Secrets Exposure in Error Messages
 
 **Threat:** If a `require()` fails, the error message from Node.js may include:
+
 - Full file system paths revealing CI directory structure
 - Module search paths that include paths with embedded secrets
 - Environment variables if the error handler logs `process.env`
@@ -155,6 +159,7 @@ function resolveRequirePath(requirePath, fromFile) {
 **Likelihood:** MEDIUM -- Error messages are routinely printed by CI scripts.
 
 **Required Mitigation:**
+
 - Sanitize all error output before printing
 - Strip absolute paths to relative-to-project-root paths
 - Never log `process.env` or `process.argv` in error messages
@@ -164,6 +169,7 @@ function resolveRequirePath(requirePath, fromFile) {
 ### 2.5 Finding SEC-CI-004 [MEDIUM]: Result Spoofing
 
 **Threat:** A compromised hook module could:
+
 - Modify `process.exitCode` to force a clean exit
 - Write to stdout to inject fake "all checks passed" messages
 - Create race conditions with the verifier's output
@@ -173,6 +179,7 @@ function resolveRequirePath(requirePath, fromFile) {
 **Likelihood:** LOW -- Requires hook to be already compromised, which is the scenario the checker is designed to detect.
 
 **Required Mitigation:**
+
 - Use static analysis only (eliminates this entire class, since no hook code executes)
 - Output a checksum/signature of results for verification
 - Use structured JSON output (not free-text) for machine-parseable results
@@ -189,6 +196,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 ### 3.2 Finding SEC-MON-001 [HIGH]: Log Injection via Tool Names
 
 **Threat:** Tool names and context data written to JSONL could contain special characters that:
+
 - Break JSON parsing (unescaped quotes, newlines)
 - Inject fake log entries (JSONL newline injection)
 - Create misleading log entries for forensic analysis
@@ -200,6 +208,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 **Likelihood:** LOW -- Tool names are controlled by Claude Code's internal protocol, not user input. However, the `context` field could contain user-supplied data (e.g., prompt content).
 
 **Required Mitigation:**
+
 - Validate tool names against a whitelist of known tools before logging (already partially done via `ALL_WATCHED_TOOLS`)
 - Sanitize context/prompt fields before logging: strip or truncate to prevent prompt content leakage
 - Use `JSON.stringify()` for all field values (already in place via `appendJsonl`)
@@ -209,6 +218,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 ### 3.3 Finding SEC-MON-002 [HIGH]: Sensitive Prompt Content in Violation Logs
 
 **Threat:** If the violation monitor logs "context" about what the router was doing when the violation occurred, this context could include:
+
 - User prompt content containing passwords, API keys, or PII
 - Agent spawn prompts containing task descriptions with sensitive details
 - File paths being written that reveal confidential code structure
@@ -218,6 +228,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 **Likelihood:** MEDIUM -- The routing-guard already logs some context via `auditLog()` and the `result.message` field includes tool names and commands.
 
 **Required Mitigation:**
+
 - NEVER log raw prompt content in violation entries
 - Log only: tool name, timestamp, enforcement mode, violation type, router state (mode/taskSpawned)
 - If command context is needed (e.g., for Bash violations), truncate to first 50 characters and strip any patterns matching:
@@ -236,6 +247,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 **Likelihood:** LOW -- Rate limiting already exists in both restored modules (5000/hour for error-tracker, 10000/hour for metrics-collector).
 
 **Required Mitigation:**
+
 - Apply `maxLines` rotation to the violation JSONL file (2000 lines recommended, matching existing patterns)
 - Apply rate limiting (5000/hour recommended, matching error-tracker pattern)
 - Both mitigations are already implemented in the existing monitoring modules and should be followed as the pattern
@@ -243,6 +255,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 ### 3.5 Finding SEC-MON-004 [LOW]: Threshold Alerting Without Authentication
 
 **Threat:** If threshold alerts are emitted via the event bus or written to a file, they could be:
+
 - Spoofed by a malicious hook writing fake alert events
 - Suppressed by modifying the threshold configuration
 
@@ -251,6 +264,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 **Likelihood:** LOW -- Requires access to event bus or config files.
 
 **Recommended Mitigation:**
+
 - Use the existing event bus (`EventTypes.TOOL_BLOCKED`) for alerts (already authenticated within process)
 - Store threshold configuration in an environment variable (not a file that could be tampered)
 - Log alert emissions to the audit trail
@@ -265,6 +279,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 **Status:** REVIEWED -- No vulnerabilities found.
 
 **Security Controls Present:**
+
 - Rate limiting: 5000 errors/hour maximum (line 27-28)
 - Maximum log file size: 2000 lines via `maxLines` parameter (line 24)
 - Error message truncation: Stack traces limited to first 3 lines (line 149)
@@ -272,6 +287,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 - Fail-safe: Catch block prevents monitoring from crashing tool pipeline (line 156)
 
 **Security Concerns:**
+
 - [LOW] `params` keys are logged (line 151: `Object.keys(params || {})`) -- this is safe since it only logs key names, not values
 - [LOW] `source` extraction via regex on stack trace (line 136) is defensive and only extracts filename
 - The `message` field (line 144) logs the raw error message. This could theoretically contain user data if an error message includes prompt content, but this is standard error handling practice and the risk is acceptable
@@ -284,6 +300,7 @@ The proposed enhancement to `routing-guard.cjs` would log router blacklist viola
 **Status:** REVIEWED -- One finding.
 
 **Security Controls Present:**
+
 - Rate limiting: 10000 metrics/hour (line 57)
 - Maximum log file size: 2000 lines (line 54)
 - Metric validation: Schema validation before logging (lines 98-120)
@@ -308,6 +325,7 @@ If `params` or `result` contain circular references or very large objects, `JSON
 **Likelihood:** LOW -- Claude Code tool params/results are typically small JSON objects.
 
 **Required Mitigation:**
+
 - Wrap the `JSON.stringify()` calls in a try/catch with a max-length guard
 - Or use a safe size estimator that does not require full serialization
 - Example: `JSON.stringify(params || {}).slice(0, 10000).length` (cap at 10KB)
@@ -321,6 +339,7 @@ If `params` or `result` contain circular references or very large objects, `JSON
 **Status:** REVIEWED -- No vulnerabilities found.
 
 Both wrappers:
+
 - Use `parseHookInputSync` / `parseHookInputAsync` from the sanitized `hook-input.cjs` utility
 - Wrap all logic in try/catch with `process.exit(0)` in `finally` (fail-open for monitoring)
 - The `error-tracker-hook.cjs` correctly uses `coerceError()` to safely extract error information from tool output
@@ -333,18 +352,20 @@ Both wrappers:
 **Concern:** Did the restoration from `_archive/monitoring/` bypass any security checks?
 
 **Analysis:**
+
 - The restoration was documented in ADR-082 (`.claude/context/memory/decisions.md`)
 - The files were restored as exact copies (per ADR-082 rationale)
 - The `unified-creator-guard.cjs` hook blocks writes to `.claude/hooks/**/*.cjs`, but restoration was performed by a developer agent which would have had `CREATOR_GUARD=warn` or the write was to a monitoring path (not a creator path)
 - The restored modules have the same `require()` dependencies as the original active hooks, and all dependencies resolve correctly
 
-**Finding SEC-RESTORE-002 [LOW]: Archived Modules Restored Without Integrity Verification
+\*\*Finding SEC-RESTORE-002 [LOW]: Archived Modules Restored Without Integrity Verification
 
 **Threat:** The archived modules could have been modified after archiving but before restoration. No checksum or hash verification was performed.
 
 **Impact:** LOW -- The archive is within the git repository and git tracks file integrity.
 
 **Recommended Mitigation:**
+
 - For future archive restoration operations, verify files via `git log --diff-filter=M -- <file>` to confirm no modifications occurred in the archive
 - Consider adding a manifest file (`_archive/MANIFEST.sha256`) for integrity checking
 
@@ -356,18 +377,19 @@ Both wrappers:
 
 The following safety hooks provide defense-in-depth for the proposed features:
 
-| Hook | Purpose | Relevant to Features |
-|---|---|---|
-| `bash-command-validator.cjs` | Blocks dangerous Bash commands | Feature 1 (CI script): Ensures CI script cannot be tricked into executing dangerous commands |
-| `shell-injection-validator.cjs` | Blocks shell injection patterns | Feature 1: Additional protection layer |
-| `windows-null-sanitizer.cjs` | Prevents Windows reserved name issues | Feature 1: File discovery safety on Windows |
-| `spawn-prompt-validator.cjs` | Validates agent spawn prompts | Feature 2: Ensures violation context does not include injection attempts |
+| Hook                            | Purpose                               | Relevant to Features                                                                         |
+| ------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `bash-command-validator.cjs`    | Blocks dangerous Bash commands        | Feature 1 (CI script): Ensures CI script cannot be tricked into executing dangerous commands |
+| `shell-injection-validator.cjs` | Blocks shell injection patterns       | Feature 1: Additional protection layer                                                       |
+| `windows-null-sanitizer.cjs`    | Prevents Windows reserved name issues | Feature 1: File discovery safety on Windows                                                  |
+| `spawn-prompt-validator.cjs`    | Validates agent spawn prompts         | Feature 2: Ensures violation context does not include injection attempts                     |
 
 **Conflict Assessment:** No conflicts detected between proposed features and existing safety hooks.
 
 ### 5.2 Hook Input Sanitization (`hook-input.cjs`)
 
 The shared hook input utility provides:
+
 - **SEC-007**: Prototype pollution prevention via `sanitizeObject()` (stripping `__proto__`, `constructor`, `prototype`)
 - **Key filtering**: Top-level keys filtered by `ALLOWED_HOOK_INPUT_KEYS`
 - **Audit logging**: Standardized JSON logging via `auditLog()` and `securityAuditLog()`
@@ -378,17 +400,19 @@ This infrastructure is well-designed and should be reused by both proposed featu
 ### 5.3 JSONL Utilities (`jsonl-utils.cjs`)
 
 The JSONL utility provides:
+
 - **Best-effort writes**: Never throws (critical for monitoring hooks)
 - **Line rotation**: `trimJsonlFile()` prevents unbounded growth
 - **Directory creation**: `ensureDirForFile()` handles missing directories
 
-**Finding SEC-JSONL-001 [LOW]: Non-Atomic Write Operation
+\*\*Finding SEC-JSONL-001 [LOW]: Non-Atomic Write Operation
 
 The `appendJsonl()` function uses `fs.appendFileSync()` which is not atomic. On crash, a partial JSON line could be written, corrupting the file for readers that do not handle partial lines.
 
 **Impact:** LOW -- Log corruption, not a security vulnerability. Readers should skip malformed lines.
 
 **Recommended Mitigation:**
+
 - Document that JSONL readers must skip lines that fail `JSON.parse()`
 - This is already standard JSONL practice and is not a blocking concern
 
@@ -398,24 +422,24 @@ The `appendJsonl()` function uses `fs.appendFileSync()` which is not atomic. On 
 
 ### 6.1 Required Mitigations (MUST-FIX Before Implementation)
 
-| ID | Finding | Severity | Feature | Mitigation |
-|---|---|---|---|---|
-| SEC-CI-001 | Code injection via dynamic require() | CRITICAL | CI Checker | Use static analysis only; NEVER call require() on hook files |
-| SEC-CI-002 | Path traversal in hook discovery | HIGH | CI Checker | Validate paths with `validatePathWithinProject()`; reject symlinks outside project |
-| SEC-MON-001 | Log injection via tool names | HIGH | Blacklist Monitor | Whitelist tool names; truncate/sanitize context fields; max 500 chars per field |
-| SEC-MON-002 | Sensitive prompt content in logs | HIGH | Blacklist Monitor | Never log raw prompts; strip secret patterns; log only structural metadata |
+| ID          | Finding                              | Severity | Feature           | Mitigation                                                                         |
+| ----------- | ------------------------------------ | -------- | ----------------- | ---------------------------------------------------------------------------------- |
+| SEC-CI-001  | Code injection via dynamic require() | CRITICAL | CI Checker        | Use static analysis only; NEVER call require() on hook files                       |
+| SEC-CI-002  | Path traversal in hook discovery     | HIGH     | CI Checker        | Validate paths with `validatePathWithinProject()`; reject symlinks outside project |
+| SEC-MON-001 | Log injection via tool names         | HIGH     | Blacklist Monitor | Whitelist tool names; truncate/sanitize context fields; max 500 chars per field    |
+| SEC-MON-002 | Sensitive prompt content in logs     | HIGH     | Blacklist Monitor | Never log raw prompts; strip secret patterns; log only structural metadata         |
 
 ### 6.2 Recommended Mitigations (SHOULD-FIX)
 
-| ID | Finding | Severity | Feature | Mitigation |
-|---|---|---|---|---|
-| SEC-CI-003 | Secrets in error messages | MEDIUM | CI Checker | Sanitize error output; use relative paths only |
-| SEC-CI-004 | Result spoofing | MEDIUM | CI Checker | Use structured JSON output with summary counts |
-| SEC-RESTORE-001 | Unbounded serialization | MEDIUM | Restored metrics-collector | Cap JSON.stringify at 10KB; wrap in try/catch |
-| SEC-MON-003 | Disk exhaustion | MEDIUM | Blacklist Monitor | Apply maxLines (2000) and rate limiting (5000/hr) |
-| SEC-MON-004 | Threshold alerting integrity | LOW | Blacklist Monitor | Use event bus; store thresholds in env vars |
-| SEC-RESTORE-002 | No integrity verification on restore | LOW | Restored modules | Use git history verification; consider MANIFEST |
-| SEC-JSONL-001 | Non-atomic JSONL writes | LOW | All monitoring | Document partial-line handling requirement |
+| ID              | Finding                              | Severity | Feature                    | Mitigation                                        |
+| --------------- | ------------------------------------ | -------- | -------------------------- | ------------------------------------------------- |
+| SEC-CI-003      | Secrets in error messages            | MEDIUM   | CI Checker                 | Sanitize error output; use relative paths only    |
+| SEC-CI-004      | Result spoofing                      | MEDIUM   | CI Checker                 | Use structured JSON output with summary counts    |
+| SEC-RESTORE-001 | Unbounded serialization              | MEDIUM   | Restored metrics-collector | Cap JSON.stringify at 10KB; wrap in try/catch     |
+| SEC-MON-003     | Disk exhaustion                      | MEDIUM   | Blacklist Monitor          | Apply maxLines (2000) and rate limiting (5000/hr) |
+| SEC-MON-004     | Threshold alerting integrity         | LOW      | Blacklist Monitor          | Use event bus; store thresholds in env vars       |
+| SEC-RESTORE-002 | No integrity verification on restore | LOW      | Restored modules           | Use git history verification; consider MANIFEST   |
+| SEC-JSONL-001   | Non-atomic JSONL writes              | LOW      | All monitoring             | Document partial-line handling requirement        |
 
 ---
 
@@ -441,29 +465,29 @@ The `appendJsonl()` function uses `fs.appendFileSync()` which is not atomic. On 
 
 The following controls from the security controls catalog apply:
 
-| Control ID | Name | Applicability |
-|---|---|---|
-| SEC-001 | Token Whitelist | Feature 2: Validate tool names against known-tool whitelist |
-| SEC-002 | Path Validation | Feature 1: Validate hook file paths and require paths within project |
-| SEC-003 | Input Sanitization | Both: Sanitize all logged values for secrets and injection |
-| SEC-004 | Transparency Markers | Feature 2: Mark all violation log entries with source hook name |
+| Control ID | Name                 | Applicability                                                        |
+| ---------- | -------------------- | -------------------------------------------------------------------- |
+| SEC-001    | Token Whitelist      | Feature 2: Validate tool names against known-tool whitelist          |
+| SEC-002    | Path Validation      | Feature 1: Validate hook file paths and require paths within project |
+| SEC-003    | Input Sanitization   | Both: Sanitize all logged values for secrets and injection           |
+| SEC-004    | Transparency Markers | Feature 2: Mark all violation log entries with source hook name      |
 
 ---
 
 ## 8. OWASP Top 10 Mapping
 
-| OWASP Category | Risk | Addressed By |
-|---|---|---|
-| A01: Broken Access Control | LOW | Hooks run in same process; no elevation risk |
-| A02: Cryptographic Failures | N/A | No crypto operations in these features |
-| A03: Injection | HIGH | SEC-CI-001 (code injection), SEC-MON-001 (log injection) |
-| A04: Insecure Design | MEDIUM | Static analysis approach mitigates by design |
-| A05: Security Misconfiguration | LOW | Enforcement mode defaults to `block` |
-| A06: Vulnerable Components | LOW | No new external dependencies |
-| A07: Authentication Failures | N/A | No authentication in these features |
-| A08: Software/Data Integrity | MEDIUM | SEC-CI-004 (result spoofing), SEC-RESTORE-002 (archive integrity) |
-| A09: Logging Failures | MEDIUM | SEC-MON-002 (secrets in logs), SEC-MON-003 (log rotation) |
-| A10: SSRF | N/A | No outbound network requests |
+| OWASP Category                 | Risk   | Addressed By                                                      |
+| ------------------------------ | ------ | ----------------------------------------------------------------- |
+| A01: Broken Access Control     | LOW    | Hooks run in same process; no elevation risk                      |
+| A02: Cryptographic Failures    | N/A    | No crypto operations in these features                            |
+| A03: Injection                 | HIGH   | SEC-CI-001 (code injection), SEC-MON-001 (log injection)          |
+| A04: Insecure Design           | MEDIUM | Static analysis approach mitigates by design                      |
+| A05: Security Misconfiguration | LOW    | Enforcement mode defaults to `block`                              |
+| A06: Vulnerable Components     | LOW    | No new external dependencies                                      |
+| A07: Authentication Failures   | N/A    | No authentication in these features                               |
+| A08: Software/Data Integrity   | MEDIUM | SEC-CI-004 (result spoofing), SEC-RESTORE-002 (archive integrity) |
+| A09: Logging Failures          | MEDIUM | SEC-MON-002 (secrets in logs), SEC-MON-003 (log rotation)         |
+| A10: SSRF                      | N/A    | No outbound network requests                                      |
 
 ---
 
@@ -493,20 +517,20 @@ The proposed features are architecturally sound and fill genuine capability gaps
 
 ## Appendix A: Files Reviewed
 
-| File | Path | Status |
-|---|---|---|
-| error-tracker.cjs | `.claude/hooks/monitoring/error-tracker.cjs` | SAFE |
-| metrics-collector.cjs | `.claude/hooks/monitoring/metrics-collector.cjs` | SAFE (with SEC-RESTORE-001 mitigation) |
-| error-tracker-hook.cjs | `.claude/hooks/monitoring/error-tracker-hook.cjs` | SAFE |
-| metrics-collector-hook.cjs | `.claude/hooks/monitoring/metrics-collector-hook.cjs` | SAFE |
-| execution-limit-monitor-hook.cjs | `.claude/hooks/monitoring/execution-limit-monitor-hook.cjs` | SAFE |
-| routing-guard.cjs | `.claude/hooks/routing/routing-guard.cjs` | SAFE (context for Feature 2) |
-| hook-input.cjs | `.claude/lib/utils/hook-input.cjs` | SAFE |
-| jsonl-utils.cjs | `.claude/lib/utils/jsonl-utils.cjs` | SAFE (with SEC-JSONL-001 note) |
-| project-root.cjs | `.claude/lib/utils/project-root.cjs` | SAFE |
-| logger.cjs | `.claude/lib/utils/logger.cjs` | SAFE |
-| bash-command-validator.cjs | `.claude/hooks/safety/bash-command-validator.cjs` | SAFE |
-| shell-injection-validator.cjs | `.claude/hooks/safety/shell-injection-validator.cjs` | SAFE |
+| File                             | Path                                                        | Status                                 |
+| -------------------------------- | ----------------------------------------------------------- | -------------------------------------- |
+| error-tracker.cjs                | `.claude/hooks/monitoring/error-tracker.cjs`                | SAFE                                   |
+| metrics-collector.cjs            | `.claude/hooks/monitoring/metrics-collector.cjs`            | SAFE (with SEC-RESTORE-001 mitigation) |
+| error-tracker-hook.cjs           | `.claude/hooks/monitoring/error-tracker-hook.cjs`           | SAFE                                   |
+| metrics-collector-hook.cjs       | `.claude/hooks/monitoring/metrics-collector-hook.cjs`       | SAFE                                   |
+| execution-limit-monitor-hook.cjs | `.claude/hooks/monitoring/execution-limit-monitor-hook.cjs` | SAFE                                   |
+| routing-guard.cjs                | `.claude/hooks/routing/routing-guard.cjs`                   | SAFE (context for Feature 2)           |
+| hook-input.cjs                   | `.claude/lib/utils/hook-input.cjs`                          | SAFE                                   |
+| jsonl-utils.cjs                  | `.claude/lib/utils/jsonl-utils.cjs`                         | SAFE (with SEC-JSONL-001 note)         |
+| project-root.cjs                 | `.claude/lib/utils/project-root.cjs`                        | SAFE                                   |
+| logger.cjs                       | `.claude/lib/utils/logger.cjs`                              | SAFE                                   |
+| bash-command-validator.cjs       | `.claude/hooks/safety/bash-command-validator.cjs`           | SAFE                                   |
+| shell-injection-validator.cjs    | `.claude/hooks/safety/shell-injection-validator.cjs`        | SAFE                                   |
 
 ## Appendix B: Security Checklist (IEEE 1028 + Contextual)
 

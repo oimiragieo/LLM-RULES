@@ -811,7 +811,9 @@ function main() {
   if (refAuditWarnings.length > 0) {
     console.log('\nRef-audit: unresolvable {skill.*} references in agent manifests:');
     refAuditWarnings.forEach(w => console.log(`  [WARN] ${w}`));
-    console.log(`\n${refAuditWarnings.length} unresolvable ref(s) found (warnings only — index generation succeeded).`);
+    console.log(
+      `\n${refAuditWarnings.length} unresolvable ref(s) found (warnings only — index generation succeeded).`
+    );
   }
 }
 

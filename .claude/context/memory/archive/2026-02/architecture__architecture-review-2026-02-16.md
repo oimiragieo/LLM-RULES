@@ -9,6 +9,7 @@ Comprehensive architecture review of the agent-studio framework reveals a mature
 **Overall Assessment: GOOD with HIGH refactoring opportunity**
 
 **Key Metrics:**
+
 - **61 agent definitions** (potential 30% reduction)
 - **~13,000 lines** in routing hooks alone
 - **~1,900 environment variables** defined
@@ -26,12 +27,14 @@ Comprehensive architecture review of the agent-studio framework reveals a mature
 **Issue**: Excessive hook chain depth creates performance bottlenecks and maintenance burden.
 
 **Evidence**:
+
 - routing-guard.cjs appears in 5 different tool matchers
 - pre-tool-unified.cjs consolidates 11 checks but still 6KB entry point
 - spawn-prompt-assembler has 6 submodules totaling ~100KB combined
 - Edit/Write/NotebookEdit trigger 8 sequential hooks
 
 **Measured Impact**:
+
 ```
 Edit/Write/NotebookEdit chain:
 1. pre-tool-unified.cjs
@@ -49,6 +52,7 @@ Edit/Write/NotebookEdit chain:
 **Current State**: Unknown - needs instrumentation
 
 **Recommendation**:
+
 - Consolidate routing-guard calls (appears 5x in different matchers)
 - Merge semantically related hooks (evolution-state-guard + research-enforcement)
 - Add hook execution timing metrics
@@ -63,6 +67,7 @@ Edit/Write/NotebookEdit chain:
 **Issue**: spawn-prompt-assembler.cjs is a thin shim delegating to 6 submodules with 100KB+ combined size.
 
 **Files**:
+
 ```
 spawn-prompt-assembler.cjs              612 bytes  (shim)
 spawn-prompt-assembler.helpers.cjs       81 bytes  (loader)
@@ -78,6 +83,7 @@ Total: ~66KB of submodules + entry files
 **Complexity Signal**: 6-layer abstraction for what should be 2-3 focused modules.
 
 **Recommendation**:
+
 - Consolidate `.runtime.cjs` + `.runtime-support.cjs` (conceptually same)
 - Consider merging `.memory.cjs` into `.core.cjs` (both spawn-time context)
 - Keep `.task-tools.cjs` separate (clear boundary)
@@ -92,17 +98,20 @@ Total: ~66KB of submodules + entry files
 **Issue**: settings.json references hooks that may no longer exist or serve overlapping purposes.
 
 **Examples**:
+
 - `code-index-updater.cjs` (10KB) - overlaps with memory sync?
 - `agent-registry-auto-refresh.cjs` (3.8KB) - when is auto-refresh needed vs manual?
 - `artifact-scoring-ledger-hook.cjs` - is scoring ledger actively used?
 
 **Verification Needed**:
+
 ```bash
 # Check if hooks have any test coverage
 grep -r "code-index-updater\|agent-registry-auto-refresh" tests/
 ```
 
 **Recommendation**:
+
 - Audit all hooks for:
   - Last modified date
   - Test coverage
@@ -121,6 +130,7 @@ grep -r "code-index-updater\|agent-registry-auto-refresh" tests/
 **Assessment**: 15 subsystems with clear separation of concerns.
 
 **Subsystems** (`.claude/lib/`):
+
 ```
 ✓ agents/          - Agent utilities
 ✓ code-indexing/   - Code search + embeddings
@@ -141,15 +151,18 @@ grep -r "code-index-updater\|agent-registry-auto-refresh" tests/
 ```
 
 **Strengths**:
+
 - Clear domain boundaries
 - Minimal cross-subsystem imports (need to verify)
 - `_archive/` directories for deprecated code
 
 **Concerns**:
+
 - `utils/` is catch-all (needs audit for god-module pattern)
 - Some overlap between `quality/` and `qa/`
 
 **Recommendation**:
+
 - Audit `utils/` for over-broad responsibilities
 - Consider merging `quality/` and `qa/` (or document clear distinction)
 - Add subsystem dependency graph documentation
@@ -163,17 +176,20 @@ grep -r "code-index-updater\|agent-registry-auto-refresh" tests/
 **Issue**: No dependency graph documented; risk of circular imports between subsystems.
 
 **High-Risk Pairs**:
+
 - `routing/` ↔ `spawn/` (routing needs spawning, spawning needs routing context)
 - `memory/` ↔ `reflection/` (reflection writes memory, memory feeds reflection)
 - `monitoring/` ↔ `events/` (monitoring listens to events, events report metrics)
 
 **Verification Command**:
+
 ```bash
 # Use madge or similar to detect cycles
 npx madge --circular .claude/lib
 ```
 
 **Recommendation**:
+
 - Run circular dependency detection
 - Document allowed dependency directions
 - Add pre-commit hook to prevent new cycles
@@ -189,18 +205,21 @@ npx madge --circular .claude/lib
 **Issue**: 61 agent definitions with significant overlap and unclear distinctions.
 
 **Evidence**:
+
 ```bash
 $ find .claude/agents -name "*.md" | wc -l
 61
 ```
 
 **Overlap Examples** (need verification):
+
 - `developer` vs `coder` - same role?
 - `code-reviewer` vs `code-auditor` - review vs audit distinction?
 - `devops` vs `devops-troubleshooter` vs `incident-responder` - all ops-focused
 - 10+ language-specific agents (`python-pro`, `typescript-pro`, etc.) - could generic developer handle with context?
 
 **Utilization Audit Needed**:
+
 ```javascript
 // Check actual agent usage from spawn logs
 const spawnLog = require('./.claude/context/runtime/spawn-log.jsonl');
@@ -213,6 +232,7 @@ const agentUsage = spawnLog
 ```
 
 **Recommendation**:
+
 - Audit spawn-log.jsonl for actual usage (80/20 rule likely applies)
 - Archive agents with <5% usage
 - Consolidate overlapping agents (e.g., devops + troubleshooter + incident)
@@ -227,25 +247,30 @@ const agentUsage = spawnLog
 **Issue**: 10+ language-specific agents when generic developer + skills might suffice.
 
 **Current Agents**:
+
 - `python-pro`, `typescript-pro`, `javascript-expert`, `rust-pro`, etc.
 
 **Trade-off Analysis**:
 
 **Current Approach (Pros)**:
+
 - Language-specific prompts and patterns
 - Specialized error handling
 
 **Current Approach (Cons)**:
+
 - Maintenance burden (61 agent definitions to update)
 - Prompt duplication across language agents
 - New language = new agent definition
 
 **Alternative (Skills-Based)**:
+
 - Generic `developer` agent
 - Language-specific skills (python-patterns, typescript-patterns)
 - Load skill based on file extension / project context
 
 **Recommendation**:
+
 - Pilot consolidation: merge 3 least-used language agents into developer + skills
 - Measure: spawn time, output quality, maintenance effort
 - If successful, expand to all language agents
@@ -261,6 +286,7 @@ const agentUsage = spawnLog
 **Issue**: ~1,900 lines in .env.example with 200+ environment variables.
 
 **Categories**:
+
 ```
 Memory system:      ~60 vars
 Hooks/enforcement:  ~40 vars
@@ -271,12 +297,14 @@ Debug flags:        ~30 vars
 ```
 
 **Problems**:
+
 - Overwhelming for new users
 - High cognitive load (which vars actually matter?)
 - Likely many unused/deprecated vars
 - No clear "recommended defaults"
 
 **Examples of Questionable Vars**:
+
 ```bash
 # Do we need this level of granularity?
 MEMORY_MAX_CONTEXT_CHARS_PATTERNS=3000
@@ -291,6 +319,7 @@ HEAP_SHUTDOWN_THRESHOLD=95
 ```
 
 **Recommendation**:
+
 - Audit vars for usage (grep codebase for each var)
 - Create `.env.minimal` with only essential 20 vars
 - Group related vars into structured config sections
@@ -303,12 +332,14 @@ HEAP_SHUTDOWN_THRESHOLD=95
 #### IMPROVEMENT_OPPORTUNITY / HIGH: Config Consolidation
 
 **Current State**: Multiple config mechanisms:
+
 - `.env` (environment variables)
 - `config.yaml` (agent models)
 - `settings.json` (hooks)
 - Various runtime state files (workflow-state.json, etc.)
 
 **Recommendation**:
+
 - Consolidate into layered config:
   ```
   1. Defaults (in code)
@@ -330,11 +361,13 @@ HEAP_SHUTDOWN_THRESHOLD=95
 **Issue**: Complex tier architecture (STM/MTM/LTM) but unclear if it's actively used.
 
 **Questions**:
+
 - Are all 3 tiers populated?
 - Do agents actually read from LTM?
 - Is tier promotion working?
 
 **Verification Needed**:
+
 ```bash
 # Check if LTM is populated
 ls -lh .claude/context/memory/ltm/
@@ -344,6 +377,7 @@ grep -r "STM\|MTM\|LTM" .claude/lib/memory/
 ```
 
 **Recommendation**:
+
 - Audit memory tier usage
 - If LTM is empty/unused, simplify to 2 tiers (active + archive)
 - Document tier lifecycle with concrete examples
@@ -357,6 +391,7 @@ grep -r "STM\|MTM\|LTM" .claude/lib/memory/
 **Issue**: Complex rotation logic with multiple thresholds.
 
 **Current**:
+
 ```bash
 MEMORY_LEARNINGS_ARCHIVE_THRESHOLD_KB=50
 MEMORY_LEARNINGS_KEEP_LINES=100
@@ -365,6 +400,7 @@ MEMORY_DECISIONS_WARN_THRESHOLD_KB=40
 ```
 
 **Recommendation**:
+
 - Simplify to single threshold per file type
 - Use consistent policy (size-based XOR line-based, not both)
 
@@ -379,11 +415,13 @@ MEMORY_DECISIONS_WARN_THRESHOLD_KB=40
 **Issue**: No performance testing for hooks despite <100ms requirement.
 
 **Critical Hooks to Test**:
+
 - routing-guard.cjs (called 5x per request)
 - spawn-prompt-assembler.cjs (called on every agent spawn)
 - pre-tool-unified.cjs (called on every tool use)
 
 **Recommendation**:
+
 - Add `tests/hooks/benchmarks/hook-performance.test.cjs`
 - Measure: min/max/p95 execution time
 - Set red line at 100ms, yellow at 50ms
@@ -398,11 +436,13 @@ MEMORY_DECISIONS_WARN_THRESHOLD_KB=40
 **Issue**: Hooks tested in isolation but not as chains.
 
 **Missing Coverage**:
+
 - Full Edit/Write hook chain (9 hooks)
 - Task spawn hook chain (4 hooks)
 - Edge cases: hook failures mid-chain
 
 **Recommendation**:
+
 - Add `tests/integration/hook-chains.test.cjs`
 - Test full pipeline for each tool type
 - Verify graceful degradation on hook failure
@@ -420,6 +460,7 @@ MEMORY_DECISIONS_WARN_THRESHOLD_KB=40
 **Evidence**: settings.json has 50+ hook registrations but no timing metrics.
 
 **Recommendation**:
+
 - Add timing instrumentation to hook runner
 - Export metrics to .claude/context/runtime/hook-metrics.jsonl
 - Create dashboard: `pnpm metrics:hooks`
@@ -433,11 +474,13 @@ MEMORY_DECISIONS_WARN_THRESHOLD_KB=40
 **Issue**: spawn-prompt-validator.cjs warns at 50KB but many spawn prompts likely exceed this.
 
 **Evidence**:
+
 - spawn-prompt-assembler loads memory context (~12KB module)
 - Runtime context injection (~11KB module)
 - Task tools context (~18KB module)
 
 **Recommendation**:
+
 - Audit actual spawn prompt sizes from spawn-log.jsonl
 - Implement progressive disclosure for memory context
 - Add spawn prompt size to dashboard
@@ -449,6 +492,7 @@ MEMORY_DECISIONS_WARN_THRESHOLD_KB=40
 ## SUMMARY BY CATEGORY
 
 ### STRUCTURAL Issues: 7 findings
+
 - CRITICAL: Hook chain bloat (9 hooks for Write)
 - HIGH: spawn-prompt-assembler submodule proliferation
 - HIGH: Dead hook registrations in settings.json
@@ -458,6 +502,7 @@ MEMORY_DECISIONS_WARN_THRESHOLD_KB=40
 - HIGH: Hook execution time not measured
 
 ### TECH_DEBT: 5 findings
+
 - HIGH: Dead hooks still registered
 - MEDIUM: Complex memory rotation thresholds
 - HIGH: Hook performance tests missing
@@ -465,12 +510,14 @@ MEMORY_DECISIONS_WARN_THRESHOLD_KB=40
 - LOW: Memory file rotation thresholds overly complex
 
 ### OVER_ENGINEERING: 4 findings
+
 - HIGH: 61 agents (30% reduction opportunity)
 - MEDIUM: Language-specific agents vs skills
 - CRITICAL: 200+ environment variables
 - HIGH: Multiple config mechanisms
 
 ### IMPROVEMENT_OPPORTUNITY: 3 findings
+
 - HIGH: Config consolidation (4 mechanisms → 1-2)
 - MEDIUM: Spawn prompt size optimization
 - HIGH: Hook timing dashboard
@@ -535,13 +582,15 @@ MEMORY_DECISIONS_WARN_THRESHOLD_KB=40
 **Overall: 7.5/10 (GOOD)**
 
 **Strengths (+)**:
+
 - ✅ Clear separation of concerns (.claude/lib/)
 - ✅ Well-documented hook system
 - ✅ Comprehensive enforcement gates
-- ✅ Active maintenance (_archive/ usage)
+- ✅ Active maintenance (\_archive/ usage)
 - ✅ Good naming conventions
 
 **Weaknesses (-)**:
+
 - ❌ Hook chain depth (9 hooks/call)
 - ❌ Configuration complexity (200+ vars)
 - ❌ Agent sprawl (61 agents)
@@ -594,6 +643,7 @@ node .claude/tools/analysis/spawn-log-analyzer.cjs --top 20
 ### D. Environment Variable Categories
 
 **Essential (20 vars)**:
+
 - AGENT_STUDIO_ENV, PROJECT_ROOT, ANTHROPIC_API_KEY
 - PLANNER_FIRST_ENFORCEMENT, CREATOR_GUARD, SPAWN_PROMPT_VALIDATOR
 - HYBRID_EMBEDDINGS, HYBRID_SEARCH_DAEMON
@@ -601,9 +651,11 @@ node .claude/tools/analysis/spawn-log-analyzer.cjs --top 20
 - (10 more TBD after audit)
 
 **Optional (50 vars)**:
+
 - Feature flags, debug toggles, threshold tuning
 
 **Deprecated (~130 vars)**:
+
 - To be archived after usage audit
 
 ---
@@ -622,6 +674,7 @@ node .claude/tools/analysis/spawn-log-analyzer.cjs --top 20
 **Agent**: architect
 **Task**: #2 (Architecture review)
 **Files Analyzed**:
+
 - settings.json (354 lines, 50+ hooks)
 - .env.example (1,952 lines, 200+ vars)
 - .claude/agents/ (61 agent files)

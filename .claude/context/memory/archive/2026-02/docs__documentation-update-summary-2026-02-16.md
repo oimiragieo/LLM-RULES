@@ -64,6 +64,7 @@ All documentation changes align with security and architectural findings from th
 **Status**: Already accurate
 
 **Evidence**:
+
 - Line 38 documents hook consolidation (2026-02-08): "config-model-validator.cjs and intent-agent-match.cjs were consolidated into routing-guard.cjs"
 - Archived hooks referenced with deprecation notices
 - No new hooks (env-guard-audit.cjs) found in architecture/security reports
@@ -75,6 +76,7 @@ All documentation changes align with security and architectural findings from th
 **File**: `.claude/rules/security.md` (updated in-place)
 
 **Changes**:
+
 - Memory Poisoning Prevention section already exists (lines 147-158)
 - Section already documents:
   - Validation of memory writes
@@ -83,12 +85,14 @@ All documentation changes align with security and architectural findings from th
 - **No additional updates needed** - existing documentation aligns with ADR-135
 
 **Evidence from existing security.md**:
+
 ```markdown
 ## Memory Poisoning Prevention
 
 **Risk**: Stored memory influences agent decisions maliciously.
 
 **Mitigations:**
+
 - Validate memory writes match expected schemas
 - Sanitize code snippets before storing
 - Never execute bash commands from memory without approval
@@ -153,6 +157,7 @@ The architecture report identified tool assignment issues (P1):
 **Status**: **NOT included in this documentation update**
 
 **Rationale**:
+
 - Requires changes to `.claude/context/agent-registry.json` (not documentation)
 - Requires validation of agent frontmatter `allowed_tools` fields
 - Should be handled by separate task (devops or agent-creator)
@@ -177,6 +182,7 @@ grep -n "consolidated" .claude/docs/@ENFORCEMENT_HOOKS.md
 ```
 
 **Results**:
+
 - ✅ decisions.md: 3 new ADRs added (134-136)
 - ✅ security.md: Memory poisoning section exists and is accurate
 - ✅ @ENFORCEMENT_HOOKS.md: Consolidation documented, no dead hook references
@@ -185,12 +191,12 @@ grep -n "consolidated" .claude/docs/@ENFORCEMENT_HOOKS.md
 
 ## Files Modified
 
-| File | Changes | Validation |
-|------|---------|------------|
-| `.claude/context/memory/decisions.md` | +220 lines (3 ADRs) | ✅ Valid markdown, ADR numbering sequential |
-| `.claude/rules/security.md` | No changes (already accurate) | ✅ Memory poisoning section exists |
-| `.claude/docs/@ENFORCEMENT_HOOKS.md` | No changes (already accurate) | ✅ Consolidation documented |
-| `.claude/context/reports/documentation-update-summary-2026-02-16.md` | Created (this file) | ✅ Summary complete |
+| File                                                                 | Changes                       | Validation                                  |
+| -------------------------------------------------------------------- | ----------------------------- | ------------------------------------------- |
+| `.claude/context/memory/decisions.md`                                | +220 lines (3 ADRs)           | ✅ Valid markdown, ADR numbering sequential |
+| `.claude/rules/security.md`                                          | No changes (already accurate) | ✅ Memory poisoning section exists          |
+| `.claude/docs/@ENFORCEMENT_HOOKS.md`                                 | No changes (already accurate) | ✅ Consolidation documented                 |
+| `.claude/context/reports/documentation-update-summary-2026-02-16.md` | Created (this file)           | ✅ Summary complete                         |
 
 ---
 
@@ -222,15 +228,18 @@ grep -n "consolidated" .claude/docs/@ENFORCEMENT_HOOKS.md
 ## References
 
 **Source Reports:**
+
 - Architecture Report: `.claude/context/reports/architecture-report-2026-02-16.md`
 - Security Report: `.claude/context/reports/security-report-2026-02-16.md`
 
 **Updated Files:**
+
 - Decisions: `.claude/context/memory/decisions.md`
 - Security Rules: `.claude/rules/security.md`
 - Hook Reference: `.claude/docs/@ENFORCEMENT_HOOKS.md`
 
 **Related ADRs:**
+
 - ADR-132: Sequential Remediation for Convergent Audit Findings
 - ADR-133: Integration Tests Before Feature Work
 - ADR-134: Dead Hook Cleanup and Settings.json Sync (NEW)

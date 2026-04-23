@@ -48,8 +48,13 @@ class HookRunner {
 
   /**
    * Run hook in a separate process (classic mode)
+   * @param {string} scriptPath
+   * @param {string[]} hookArgs
+   * @param {object} [options]
+   * @param {boolean} [options.captureStderr=false] - If true, return { code, stderr } instead of code
+   * @returns {Promise<number|{code:number,stderr:string}>}
    */
-  async runProcess(scriptPath, hookArgs) {
+  async runProcess(scriptPath, hookArgs, options = {}) {
     const ext = path.extname(scriptPath);
     let cmd, cmdArgs;
 
@@ -61,15 +66,33 @@ class HookRunner {
       cmdArgs = [scriptPath, ...hookArgs];
     }
 
+    const captureStderr = Boolean(options.captureStderr);
+
     return new Promise(resolve => {
+      const stderrChunks = [];
+      const stdio = captureStderr ? ['inherit', 'inherit', 'pipe'] : 'inherit';
+
       const child = spawn(cmd, cmdArgs, {
-        stdio: 'inherit',
+        stdio,
         env: this.baseEnv,
         windowsHide: true,
       });
 
+      if (captureStderr && child.stderr) {
+        child.stderr.on('data', chunk => {
+          stderrChunks.push(chunk);
+          // Forward to parent stderr so the output is still visible
+          process.stderr.write(chunk);
+        });
+      }
+
       child.on('close', code => {
-        resolve(code || 0);
+        const exitCode = code || 0;
+        if (captureStderr) {
+          resolve({ code: exitCode, stderr: Buffer.concat(stderrChunks).toString('utf8') });
+        } else {
+          resolve(exitCode);
+        }
       });
     });
   }

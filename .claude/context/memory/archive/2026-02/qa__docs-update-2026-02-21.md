@@ -21,6 +21,7 @@ Updated CHANGELOG.md, README.md, `@DIRECTORY_STRUCTURE.md`, and `@SKILL_CATALOG_
 **Change**: Prepended a new `### Added` block at the top of the existing `## [Unreleased]` section.
 
 **Content added**:
+
 - 6 new skills from VoltAgent awesome-agent-skills (enhance-prompt, next-upgrade, vercel-deploy, shadcn-ui, web-perf, next-cache-components)
 - Gap-capture mechanism: CLAUDE.md §0.1 protocol, router-decision.md Step 9.5, reflection-queue-processor.cjs, post-completion-chain.cjs, reflection-agent.md Step 1.5, session-gap-log-entry.schema.json, 15 integration tests
 - Skill wiring: 7 agent frontmatter files updated, new "Vercel & Web Performance" catalog category, ADR-2026-02-21-012
@@ -37,6 +38,7 @@ Updated CHANGELOG.md, README.md, `@DIRECTORY_STRUCTURE.md`, and `@SKILL_CATALOG_
 **Change**: Added `session-gap-log.jsonl` to the `runtime/` directory listing with a description.
 
 **Line added**:
+
 ```
 │   └── session-gap-log.jsonl   # Router gap observations: retries, stalls, integration gaps, missing metadata
 ```
@@ -46,6 +48,7 @@ Updated CHANGELOG.md, README.md, `@DIRECTORY_STRUCTURE.md`, and `@SKILL_CATALOG_
 **Change**: Added 6 new rows to the skill reference table for the skills added in this session.
 
 **Rows added**:
+
 - `enhance-prompt` — transform vague UI/feature requests into structured specs
 - `next-upgrade` — 9-step Next.js version migration workflow
 - `vercel-deploy` — zero-auth Vercel deployment for 20+ frameworks

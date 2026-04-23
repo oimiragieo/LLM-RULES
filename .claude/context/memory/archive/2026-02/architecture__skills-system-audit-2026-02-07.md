@@ -23,46 +23,46 @@ The skills system is **functional but needs significant cleanup**. While core sk
 
 ### Overall Counts
 
-| Metric | Count | Notes |
-|--------|-------|-------|
-| **On-Disk Skills** | 302 | Total skill directories (excludes scientific sub-skills) |
-| **Catalog Skills** | 435 | Listed in skill-catalog.md (INFLATED) |
-| **Invoked Skills** | 105 | Referenced by agents/workflows (ACTIVE) |
-| **Dead Skills** | 214 | 70.9% never invoked (candidates for archival) |
-| **Orphans** | 8 | On disk, missing from catalog |
-| **Phantoms** | 141 | In catalog, missing from disk (mostly scientific) |
-| **Commands** | 17 | User-facing slash commands |
-| **Agents** | 49 | Registered agents |
-| **Workflows** | 27 | Active workflows |
+| Metric             | Count | Notes                                                    |
+| ------------------ | ----- | -------------------------------------------------------- |
+| **On-Disk Skills** | 302   | Total skill directories (excludes scientific sub-skills) |
+| **Catalog Skills** | 435   | Listed in skill-catalog.md (INFLATED)                    |
+| **Invoked Skills** | 105   | Referenced by agents/workflows (ACTIVE)                  |
+| **Dead Skills**    | 214   | 70.9% never invoked (candidates for archival)            |
+| **Orphans**        | 8     | On disk, missing from catalog                            |
+| **Phantoms**       | 141   | In catalog, missing from disk (mostly scientific)        |
+| **Commands**       | 17    | User-facing slash commands                               |
+| **Agents**         | 49    | Registered agents                                        |
+| **Workflows**      | 27    | Active workflows                                         |
 
 ### Breakdown by Category
 
-| Category | Count (Catalog) | Active Skills | Dead Skills | Health |
-|----------|-----------------|---------------|-------------|--------|
-| Core Development | 10 | 8 | 2 | ✅ 80% |
-| Planning & Architecture | 6 | 6 | 0 | ✅ 100% |
-| Security | 6 | 4 | 2 | ⚠️ 67% |
-| DevOps & Infrastructure | 19 | 6 | 13 | ❌ 32% |
-| Languages | 16 | 5 | 11 | ⚠️ 31% |
-| Frameworks | 26 | 8 | 18 | ⚠️ 31% |
-| Mobile | 9 | 3 | 6 | ⚠️ 33% |
-| Data & Database | 12 | 4 | 8 | ⚠️ 33% |
-| Documentation | 10 | 6 | 4 | ⚠️ 60% |
-| Git & Version Control | 10 | 4 | 6 | ⚠️ 40% |
-| Code Style & Linting | 18 | 3 | 15 | ❌ 17% |
-| Creator Tools | 11 | 10 | 1 | ✅ 91% |
-| Memory & Context | 9 | 7 | 2 | ✅ 78% |
-| Validation & Quality | 8 | 6 | 2 | ✅ 75% |
-| Specialized Patterns | 27 | 18 | 9 | ⚠️ 67% |
-| Scientific Research | 142 | 1 (parent) | 141 (sub-skills) | ⚠️ Special case |
-| Framework Configuration | 26 | 0 | 26 | ❌ 0% |
-| Styling & Design | 15 | 2 | 13 | ❌ 13% |
-| Build Tools | 9 | 2 | 7 | ❌ 22% |
-| External Integrations | 11 | 5 | 6 | ⚠️ 45% |
-| Project Structure | 8 | 1 | 7 | ❌ 13% |
-| Java Spring Boot | 6 | 0 | 6 | ❌ 0% |
-| Agent Behavior | 12 | 1 | 11 | ❌ 8% |
-| Other Specialized | 22 | 1 | 21 | ❌ 5% |
+| Category                | Count (Catalog) | Active Skills | Dead Skills      | Health          |
+| ----------------------- | --------------- | ------------- | ---------------- | --------------- |
+| Core Development        | 10              | 8             | 2                | ✅ 80%          |
+| Planning & Architecture | 6               | 6             | 0                | ✅ 100%         |
+| Security                | 6               | 4             | 2                | ⚠️ 67%          |
+| DevOps & Infrastructure | 19              | 6             | 13               | ❌ 32%          |
+| Languages               | 16              | 5             | 11               | ⚠️ 31%          |
+| Frameworks              | 26              | 8             | 18               | ⚠️ 31%          |
+| Mobile                  | 9               | 3             | 6                | ⚠️ 33%          |
+| Data & Database         | 12              | 4             | 8                | ⚠️ 33%          |
+| Documentation           | 10              | 6             | 4                | ⚠️ 60%          |
+| Git & Version Control   | 10              | 4             | 6                | ⚠️ 40%          |
+| Code Style & Linting    | 18              | 3             | 15               | ❌ 17%          |
+| Creator Tools           | 11              | 10            | 1                | ✅ 91%          |
+| Memory & Context        | 9               | 7             | 2                | ✅ 78%          |
+| Validation & Quality    | 8               | 6             | 2                | ✅ 75%          |
+| Specialized Patterns    | 27              | 18            | 9                | ⚠️ 67%          |
+| Scientific Research     | 142             | 1 (parent)    | 141 (sub-skills) | ⚠️ Special case |
+| Framework Configuration | 26              | 0             | 26               | ❌ 0%           |
+| Styling & Design        | 15              | 2             | 13               | ❌ 13%          |
+| Build Tools             | 9               | 2             | 7                | ❌ 22%          |
+| External Integrations   | 11              | 5             | 6                | ⚠️ 45%          |
+| Project Structure       | 8               | 1             | 7                | ❌ 13%          |
+| Java Spring Boot        | 6               | 0             | 6                | ❌ 0%           |
+| Agent Behavior          | 12              | 1             | 11               | ❌ 8%           |
+| Other Specialized       | 22              | 1             | 21               | ❌ 5%           |
 
 ---
 
@@ -121,6 +121,7 @@ Remove these 3 entries from catalog OR restore from archive if needed.
 8. `test-skill-e2e-1769915216355` (test artifact)
 
 **Status:**
+
 - `code-semantic-search`, `code-structural-search` — **ACTIVELY USED** (105 invocations across agents/workflows)
 - `scientific-skills` — **PARENT SKILL** for 139 sub-skills
 - `test-skill-e2e-1769915216355` — **TEST ARTIFACT** (should be deleted)
@@ -204,6 +205,7 @@ Archive dead skills to `.claude/skills/_archive/dead/` with README.md explaining
 **Agent Skill Assignments (Frontmatter):**
 
 **Example: code-reviewer.md** (28 skills assigned):
+
 - `task-management-protocol`
 - `checklist-generator`
 - `code-analyzer`
@@ -223,6 +225,7 @@ Archive dead skills to `.claude/skills/_archive/dead/` with README.md explaining
 - ... (12 more)
 
 **Observation:**
+
 - Core agents (developer, planner, qa, code-reviewer, architect) have **rich skill assignments** (10-28 skills each)
 - Domain agents (python-pro, nodejs-pro) have **fewer assignments** (2-8 skills each)
 - Orchestrators (master-orchestrator) have **minimal assignments** (1-3 skills) — rely on delegation
@@ -242,17 +245,20 @@ Archive dead skills to `.claude/skills/_archive/dead/` with README.md explaining
 Skills with executable scripts in `scripts/` directory (expected for programmatic skills).
 
 **Skills with Structured Identity Tags:**
+
 - `<identity>` tag: ~60% (diagram-generator, progressive-disclosure missing)
 - `<capabilities>` tag: ~60%
 - `## Overview` section: ~40%
 
 **Well-Structured Skills:**
+
 - `api-development-expert` — Has `<identity>`, `<capabilities>`, `<instructions>`
 - `architecture-review` — Has `<identity>`, `<capabilities>`, `<instructions>`
 - `database-architect` — Has `<identity>`, `<capabilities>`, `<instructions>`
 - `security-architect` — Has `<identity>`, `<capabilities>`, `<instructions>`
 
 **Poorly-Structured Skills:**
+
 - `diagram-generator` — Missing `<identity>` tags, uses `## Overview`
 - `progressive-disclosure` — Missing `<identity>` tags
 - `brainstorming` — Uses `## Overview` instead of `<identity>`
@@ -271,25 +277,25 @@ Standardize all skills to use `<identity>`, `<capabilities>`, `<instructions>` s
 
 All 17 commands delegate to valid skills:
 
-| Command | Skill | Status |
-|---------|-------|--------|
-| `/brainstorm` | `brainstorming` | ✅ Exists |
-| `/write-plan` | `writing-plans` | ✅ Exists |
-| `/execute-plan` | `executing-plans` | ✅ Exists |
-| `/tdd` | `tdd` | ✅ Exists |
-| `/debug` | `debugging` | ✅ Exists |
-| `/build-fix` | `debugging` | ✅ Exists |
-| `/code-review` | `requesting-code-review` | ✅ Exists |
-| `/verify` | `verification-before-completion` | ✅ Exists |
-| `/test-coverage` | `tdd` | ✅ Exists |
-| `/e2e` | `qa-workflow` | ✅ Exists |
-| `/eval` | `qa-workflow` | ✅ Exists |
-| `/refactor-clean` | `code-quality-expert` | ✅ Exists |
-| `/security-review` | `security-architect` | ✅ Exists |
-| `/compress` | `context-compressor` | ✅ Exists |
-| `/learn` | `context-compressor` + memory | ✅ Enriched (valid) |
-| `/analyze` | `project-analyzer` | ✅ Exists |
-| `/setup-pm` | standalone script | ✅ Standalone (valid) |
+| Command            | Skill                            | Status                |
+| ------------------ | -------------------------------- | --------------------- |
+| `/brainstorm`      | `brainstorming`                  | ✅ Exists             |
+| `/write-plan`      | `writing-plans`                  | ✅ Exists             |
+| `/execute-plan`    | `executing-plans`                | ✅ Exists             |
+| `/tdd`             | `tdd`                            | ✅ Exists             |
+| `/debug`           | `debugging`                      | ✅ Exists             |
+| `/build-fix`       | `debugging`                      | ✅ Exists             |
+| `/code-review`     | `requesting-code-review`         | ✅ Exists             |
+| `/verify`          | `verification-before-completion` | ✅ Exists             |
+| `/test-coverage`   | `tdd`                            | ✅ Exists             |
+| `/e2e`             | `qa-workflow`                    | ✅ Exists             |
+| `/eval`            | `qa-workflow`                    | ✅ Exists             |
+| `/refactor-clean`  | `code-quality-expert`            | ✅ Exists             |
+| `/security-review` | `security-architect`             | ✅ Exists             |
+| `/compress`        | `context-compressor`             | ✅ Exists             |
+| `/learn`           | `context-compressor` + memory    | ✅ Enriched (valid)   |
+| `/analyze`         | `project-analyzer`               | ✅ Exists             |
+| `/setup-pm`        | standalone script                | ✅ Standalone (valid) |
 
 **Health:** No missing skill references. All commands work.
 
@@ -458,11 +464,13 @@ Core skills (tdd, debugging, ripgrep, verification-before-completion) are **crit
 The skills system is **functional for core workflows** (TDD, debugging, code review, planning) but suffers from **severe catalog drift** (32% phantom entries) and **massive dead code** (70.9% unused skills). Immediate catalog fixes and dead skill archival are required to restore trust in the skill discovery process.
 
 **After P1 fixes:**
+
 - **Expected Health Score:** 85/100 (catalog fixed, dead skills archived)
 - **Active Skills:** 88 (well-maintained)
 - **Catalog Accuracy:** 100% (phantoms/orphans resolved)
 
 **Actionable Next Steps:**
+
 1. Update skill catalog (remove 141 phantoms, add 5 orphans)
 2. Archive 214 dead skills to `_archive/dead/`
 3. Delete test artifact `test-skill-e2e-1769915216355`

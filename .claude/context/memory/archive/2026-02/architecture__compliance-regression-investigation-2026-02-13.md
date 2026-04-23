@@ -36,11 +36,13 @@ All enforcement hooks registered correctly in settings.json. No dead hooks detec
 ## Environment Variable Enforcement Levels: ⚠️ CRITICAL
 
 From .env:
+
 - PLANNER_FIRST_ENFORCEMENT=block ✅
 - CREATOR_GUARD=block ✅
 - ROUTER_WRITE_GUARD=block ✅
 
 But routing-guard.cjs internal defaults:
+
 - ROUTER_BASH_GUARD=warn ⚠️
 - SPECIALIST_ROUTING_ENFORCEMENT=warn ⚠️
 - TASKLIST_FIRST_ENFORCEMENT=warn ⚠️
@@ -57,6 +59,7 @@ But routing-guard.cjs internal defaults:
 - Estimated Tokens: ~8,327 ⚠️
 
 Context Window Reality:
+
 - 4K-8K tokens: 85-95% instruction compliance
 - CLAUDE.md is at degradation boundary
 
@@ -65,9 +68,11 @@ Context Window Reality:
 ## Root Cause Hypothesis
 
 ### Primary: Enforcement Mode Weakening
+
 Router violates rules → Hook detects → Logs warning → Allows operation → Router learns violations permitted
 
 ### Secondary: CLAUDE.md Token Bloat
+
 8.3K tokens at compliance degradation boundary (85-95% zone)
 
 ---

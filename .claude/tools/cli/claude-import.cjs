@@ -35,8 +35,7 @@ const { convertManagedAgent } = require('../../lib/import/managed-agent-adapter.
 // ---------------------------------------------------------------------------
 
 const DEFAULT_API_URL =
-  process.env.ANTHROPIC_MANAGED_AGENTS_API_URL ||
-  'https://api.anthropic.com/v1/agents';
+  process.env.ANTHROPIC_MANAGED_AGENTS_API_URL || 'https://api.anthropic.com/v1/agents';
 
 // ---------------------------------------------------------------------------
 // Argument parsing (no external deps)
@@ -98,7 +97,9 @@ function fetchJson(url, headers) {
       },
       res => {
         let data = '';
-        res.on('data', chunk => { data += chunk; });
+        res.on('data', chunk => {
+          data += chunk;
+        });
         res.on('end', () => {
           if (res.statusCode && res.statusCode >= 400) {
             reject(new Error(`HTTP ${res.statusCode}: ${data.slice(0, 200)}`));
@@ -132,9 +133,9 @@ function checkCredentials(apiKey) {
   if (!apiKey) {
     process.stderr.write(
       '[claude-import] Error: ANTHROPIC_API_KEY environment variable is not set.\n' +
-      'Set it before running:\n' +
-      '  export ANTHROPIC_API_KEY=sk-ant-...\n' +
-      'Or add it to your .env file.\n'
+        'Set it before running:\n' +
+        '  export ANTHROPIC_API_KEY=sk-ant-...\n' +
+        'Or add it to your .env file.\n'
     );
     process.exit(1);
   }
@@ -215,14 +216,14 @@ async function main() {
   if (args.help) {
     process.stdout.write(
       'Usage: node claude-import.cjs [options] <managed-agent-id>\n\n' +
-      'Options:\n' +
-      '  --dry-run              Print the would-be agent file without writing\n' +
-      '  --fixture <file>       Use a local JSON fixture instead of the API\n' +
-      '  --output-dir <path>    Custom output directory (default: .claude/agents/imported/)\n' +
-      '  -h, --help             Show this help\n\n' +
-      'Environment variables:\n' +
-      '  ANTHROPIC_API_KEY                  Required for live API calls\n' +
-      '  ANTHROPIC_MANAGED_AGENTS_API_URL   Override API base URL\n'
+        'Options:\n' +
+        '  --dry-run              Print the would-be agent file without writing\n' +
+        '  --fixture <file>       Use a local JSON fixture instead of the API\n' +
+        '  --output-dir <path>    Custom output directory (default: .claude/agents/imported/)\n' +
+        '  -h, --help             Show this help\n\n' +
+        'Environment variables:\n' +
+        '  ANTHROPIC_API_KEY                  Required for live API calls\n' +
+        '  ANTHROPIC_MANAGED_AGENTS_API_URL   Override API base URL\n'
     );
     process.exit(0);
   }
@@ -251,7 +252,7 @@ async function main() {
       if (!process.env.ANTHROPIC_API_KEY) {
         process.stderr.write(
           '[claude-import] Hint: ANTHROPIC_API_KEY is not set.\n' +
-          '  Set it with: export ANTHROPIC_API_KEY=sk-ant-...\n'
+            '  Set it with: export ANTHROPIC_API_KEY=sk-ant-...\n'
         );
       }
       process.exit(1);
@@ -259,13 +260,14 @@ async function main() {
   } else {
     process.stderr.write(
       '[claude-import] Error: provide a managed-agent-id or --fixture <file>\n' +
-      'Run with --help for usage.\n'
+        'Run with --help for usage.\n'
     );
     process.exit(1);
   }
 
   // Convert
-  const { agentFrontmatter, manifest, agentMd, importReport } = convertManagedAgent(managedAgentJson);
+  const { agentFrontmatter, manifest, agentMd, importReport } =
+    convertManagedAgent(managedAgentJson);
   const agentId = agentFrontmatter.name;
 
   // Report warnings
@@ -284,14 +286,12 @@ async function main() {
   if (!args.dryRun) {
     process.stdout.write(
       `\n[claude-import] Import complete.\n` +
-      `  Agent ID : ${agentId}\n` +
-      `  Tools    : ${importReport.mappedTools.length} mapped, ${importReport.skippedTools.length} skipped\n` +
-      `  Warnings : ${importReport.warnings.length}\n`
+        `  Agent ID : ${agentId}\n` +
+        `  Tools    : ${importReport.mappedTools.length} mapped, ${importReport.skippedTools.length} skipped\n` +
+        `  Warnings : ${importReport.warnings.length}\n`
     );
     if (importReport.skippedTools.length > 0) {
-      process.stdout.write(
-        `  Skipped  : ${importReport.skippedTools.join(', ')}\n`
-      );
+      process.stdout.write(`  Skipped  : ${importReport.skippedTools.join(', ')}\n`);
     }
   }
 }

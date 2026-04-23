@@ -56,29 +56,37 @@ Their corresponding **wrapper hooks** ARE registered:
 These appear to be complete hooks but are NOT registered:
 
 **Audit:**
+
 - `audit/git-notes-audit.cjs`
 
 **Cost Tracking:**
+
 - `cost-tracking/llm-usage-tracker.cjs`
 
 **Evolution:**
+
 - `evolution/evolution-audit.cjs`
 - `evolution/unified-evolution-guard.cjs` (has shebang, appears complete)
 
 **Git:**
+
 - `git/regenerate-registries.cjs`
 
 **Memory:**
+
 - `memory/format-memory.cjs`
 - `memory/planning-progress-tracker.cjs`
 
 **Post-tool-use:**
+
 - `post-tool-use/incremental-indexer.cjs`
 
 **Reflection:**
+
 - `reflection/error-summary-extractor.cjs`
 
 **Routing (16 unregistered):**
+
 - `routing/agent-context-tracker.cjs`
 - `routing/agent-health-hook.cjs`
 - `routing/context-mode-tool-guard.cjs`
@@ -94,6 +102,7 @@ These appear to be complete hooks but are NOT registered:
 - `routing/tool-availability-validator.cjs`
 
 **Safety (14 unregistered):**
+
 - `safety/bash-cwd-validator.cjs`
 - `safety/command-allowlist-validator.cjs`
 - `safety/enforce-claude-md-update.cjs`
@@ -107,23 +116,28 @@ These appear to be complete hooks but are NOT registered:
 - `safety/validators/` subdirectory (7 library files - not meant to be registered)
 
 **Self-healing:**
+
 - `self-healing/auto-rerouter.cjs`
 
 **Session:**
+
 - `session/post-creation-reminder.cjs`
 
 **Skills (4 unregistered):**
+
 - `skills/duplicate-detector.cjs`
 - `skills/metadata-validator.cjs`
 - `skills/rule-structure-validator.cjs`
 - `skills/rule-validator.cjs`
 
 **Validation:**
+
 - `validation/agent-tools-validator.cjs`
 - `validation/plan-evolution-guard.cjs`
 - `validation/track-analytics-validator.cjs`
 
 **Hooks root:**
+
 - `statusline.cjs`
 
 ### 4. Naming Conventions ✅ CLEAN
@@ -161,6 +175,7 @@ These appear to be complete hooks but are NOT registered:
 ### 8. Protocol Compliance ✅ SPOT-CHECKED
 
 **Sample hooks tested**:
+
 - `routing/routing-guard.cjs` ✅ follows protocol (JSON stdin/stdout)
 - `safety/bash-command-validator.cjs` ✅ follows protocol
 
@@ -175,6 +190,7 @@ These appear to be complete hooks but are NOT registered:
 - `metrics-collector.cjs` + `metrics-collector-hook.cjs`
 
 **This is intentional design**:
+
 - Library file exports reusable functions
 - Hook wrapper implements stdin/stdout protocol
 - No action needed (not true duplicates)
@@ -250,6 +266,7 @@ Example:
 **Critical Issue**: Empty `__tests__/` directory (fixed)
 
 **Follow-up**: Review 53 unregistered hooks to determine if they should be:
+
 1. Registered in `.claude/settings.json`
 2. Documented as library files
 3. Deleted as obsolete

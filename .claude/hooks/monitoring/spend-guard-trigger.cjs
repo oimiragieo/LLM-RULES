@@ -63,12 +63,12 @@ async function main() {
     const result = checkSpendCeiling(sessionId);
 
     if (result.downgrade) {
-      const costStr = typeof result.sessionCostUsd === 'number'
-        ? `$${result.sessionCostUsd.toFixed(2)}`
-        : '(unknown)';
-      const ceilingStr = typeof result.ceilingUsd === 'number'
-        ? `$${result.ceilingUsd.toFixed(2)}`
-        : '(unknown)';
+      const costStr =
+        typeof result.sessionCostUsd === 'number'
+          ? `$${result.sessionCostUsd.toFixed(2)}`
+          : '(unknown)';
+      const ceilingStr =
+        typeof result.ceilingUsd === 'number' ? `$${result.ceilingUsd.toFixed(2)}` : '(unknown)';
 
       const advisory =
         `[spend-guard] Session cost ${costStr} exceeds ceiling ${ceilingStr}. ` +
@@ -77,9 +77,7 @@ async function main() {
 
       process.stderr.write(`[spend-guard] ADVISORY: ${advisory}\n`);
 
-      process.stdout.write(
-        JSON.stringify({ allow: true, additionalContext: advisory }) + '\n'
-      );
+      process.stdout.write(JSON.stringify({ allow: true, additionalContext: advisory }) + '\n');
       process.exit(0);
     }
   } catch (_err) {

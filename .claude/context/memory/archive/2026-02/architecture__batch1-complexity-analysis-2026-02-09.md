@@ -22,12 +22,12 @@ Foundation layer analysis reveals **moderate complexity with high duplication** 
 
 ### Complexity Metrics
 
-| Category | Files | Total Lines | Duplication | Dead Code % | Avg Complexity |
-|----------|-------|-------------|-------------|-------------|----------------|
-| Schemas | 27 active + 25 archived | ~7,500 | 20-30% | 59% inactive | Medium |
-| Config | 1 (config.yaml) | 136 lines | 0% | ~10% unused | Low |
-| Rules | 11 files | ~16KB | 25-40% | 0% | Medium-High |
-| Memory | 3 main (learnings, decisions, issues) | ~102KB | 15-20% | 0% | Medium |
+| Category | Files                                 | Total Lines | Duplication | Dead Code %  | Avg Complexity |
+| -------- | ------------------------------------- | ----------- | ----------- | ------------ | -------------- |
+| Schemas  | 27 active + 25 archived               | ~7,500      | 20-30%      | 59% inactive | Medium         |
+| Config   | 1 (config.yaml)                       | 136 lines   | 0%          | ~10% unused  | Low            |
+| Rules    | 11 files                              | ~16KB       | 25-40%      | 0%           | Medium-High    |
+| Memory   | 3 main (learnings, decisions, issues) | ~102KB      | 15-20%      | 0%           | Medium         |
 
 ---
 
@@ -41,12 +41,12 @@ Foundation layer analysis reveals **moderate complexity with high duplication** 
 
 ### 1.2 Wiring Status Breakdown
 
-| Status | Count | % of Active | Description |
-|--------|-------|-------------|-------------|
-| **WIRED (Ajv)** | 8 | 30% | Actively validated at runtime |
-| **SOFT-WIRED** | 3 | 11% | Path referenced, validation optional |
-| **DOCS ONLY** | 16 | **59%** | Reference documentation only |
-| **Total** | 27 | 100% | — |
+| Status          | Count | % of Active | Description                          |
+| --------------- | ----- | ----------- | ------------------------------------ |
+| **WIRED (Ajv)** | 8     | 30%         | Actively validated at runtime        |
+| **SOFT-WIRED**  | 3     | 11%         | Path referenced, validation optional |
+| **DOCS ONLY**   | 16    | **59%**     | Reference documentation only         |
+| **Total**       | 27    | 100%        | —                                    |
 
 **Key Issue:** 59% of "active" schemas are not actually used for validation. This creates confusion about which schemas are normative.
 
@@ -55,16 +55,19 @@ Foundation layer analysis reveals **moderate complexity with high duplication** 
 Three schemas define agent structure with significant overlap:
 
 #### agent-definition.schema.json (117 lines)
+
 - Defines: `frontmatter` (name, description, tools, model, priority, skills, hooks) + `content`
 - Used by: `agent-parser.cjs` for markdown parsing
 - Validation: Advisory via `validateDefinition()`
 
 #### agent-identity.schema.json (149 lines)
+
 - Defines: `role`, `goal`, `backstory`, `personality` (traits, communication_style, risk_tolerance), `motto`
 - Used by: `agent-parser.cjs` for identity frontmatter parsing
 - Validation: Ajv validated (pre-existing)
 
 #### agent-capability-card.schema.json (291 lines)
+
 - Defines: `id`, `capabilities` (array with domain, triggerPhrases, skills), `health`, `metadata`
 - Used by: `generate-agent-registry.cjs` for capability card structure
 - Validation: Advisory
@@ -76,6 +79,7 @@ Three schemas define agent structure with significant overlap:
 - **agent-capability-card** defines OUTPUT format (derived from frontmatter)
 
 **Duplication:**
+
 - `name`/`id` concept appears in all 3
 - `description` appears in definition and capability-card
 - `skills` appears in definition and capability-card
@@ -105,20 +109,28 @@ Create single `agent-unified.schema.json`:
     }
   },
   "$defs": {
-    "AgentFrontmatter": { /* agent-definition fields */ },
-    "AgentIdentity": { /* agent-identity fields */ },
-    "AgentCapability": { /* agent-capability-card fields */ }
+    "AgentFrontmatter": {
+      /* agent-definition fields */
+    },
+    "AgentIdentity": {
+      /* agent-identity fields */
+    },
+    "AgentCapability": {
+      /* agent-capability-card fields */
+    }
   }
 }
 ```
 
 **Benefits:**
+
 - Single source of truth for agent structure
 - Reuse definitions via `$ref` (DRY)
 - Easier validation (one schema to update)
 - Clear semantic relationships
 
 **Risks:**
+
 - Breaking change for existing consumers (agent-parser.cjs, generate-agent-registry.cjs)
 - Requires migration of 3 validator call sites
 
@@ -144,11 +156,13 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 ```
 
 **Benefits:**
+
 - No breaking changes
 - Incremental improvement
 - Maintains backward compatibility
 
 **Risks:**
+
 - Partial fix (still 3 separate files)
 - Requires relative `$ref` path support
 
@@ -160,30 +174,31 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 
 16 schemas marked DOCS ONLY are not validated at runtime:
 
-| Schema | Lines (est) | Purpose | Action Recommended |
-|--------|-------------|---------|-------------------|
-| `agent-spawn-params.json` | ~80 | Spawn parameter reference | Archive (duplicates CLAUDE.md Section 2) |
-| `adr-template.schema.json` | ~120 | ADR format reference | **Keep** (normative for decisions.md) |
-| `artifact_manifest.schema.json` | ~150 | Artifact metadata | Archive (no consumer found) |
-| `evolution-state.schema.json` | ~180 | Evolution workflow state | **Wire** (evolution-orchestrator uses this) |
-| `hook-definition.schema.json` | ~200 | Hook structure | **Keep** (normative for hook-creator) |
-| `implementation-plan.schema.json` | ~250 | Plan structure | **Keep** (normative for planner) |
-| `phase-models.schema.json` | ~100 | Phase definitions | **Wire** (workflow state manager uses this) |
-| `plan.schema.json` | ~300 | Plan validation | **Wire** (planner output) |
-| `presets.schema.json` | ~150 | Preset definitions | Archive (unused since preset system removed) |
-| `product_requirements.schema.json` | ~220 | PRD structure | **Keep** (normative for PRD template) |
-| `project-analysis.schema.json` | ~180 | Analysis output | Archive (no consumer) |
-| `project_brief.schema.json` | ~150 | Project brief format | Archive (no consumer) |
-| `specification-template.schema.json` | ~200 | Spec structure | **Keep** (normative for specs/) |
-| `system_architecture.schema.json` | ~250 | Architecture docs | Archive (no consumer) |
-| `test-results.schema.json` | ~120 | Test output format | **Wire** (qa agent uses this) |
-| `test_plan.schema.json` | ~180 | Test plan structure | **Wire** (qa agent uses this) |
-| `tool-manifest.schema.json` | ~100 | Tool metadata | Archive (tools use different format) |
-| `track-metadata.schema.json` | ~80 | Track metadata | Archive (no consumer) |
-| `ux_spec.schema.json` | ~150 | UX spec format | Archive (no consumer) |
-| `workflow-definition.schema.json` | ~180 | Workflow structure | **Wire** (workflow-creator uses this) |
+| Schema                               | Lines (est) | Purpose                   | Action Recommended                           |
+| ------------------------------------ | ----------- | ------------------------- | -------------------------------------------- |
+| `agent-spawn-params.json`            | ~80         | Spawn parameter reference | Archive (duplicates CLAUDE.md Section 2)     |
+| `adr-template.schema.json`           | ~120        | ADR format reference      | **Keep** (normative for decisions.md)        |
+| `artifact_manifest.schema.json`      | ~150        | Artifact metadata         | Archive (no consumer found)                  |
+| `evolution-state.schema.json`        | ~180        | Evolution workflow state  | **Wire** (evolution-orchestrator uses this)  |
+| `hook-definition.schema.json`        | ~200        | Hook structure            | **Keep** (normative for hook-creator)        |
+| `implementation-plan.schema.json`    | ~250        | Plan structure            | **Keep** (normative for planner)             |
+| `phase-models.schema.json`           | ~100        | Phase definitions         | **Wire** (workflow state manager uses this)  |
+| `plan.schema.json`                   | ~300        | Plan validation           | **Wire** (planner output)                    |
+| `presets.schema.json`                | ~150        | Preset definitions        | Archive (unused since preset system removed) |
+| `product_requirements.schema.json`   | ~220        | PRD structure             | **Keep** (normative for PRD template)        |
+| `project-analysis.schema.json`       | ~180        | Analysis output           | Archive (no consumer)                        |
+| `project_brief.schema.json`          | ~150        | Project brief format      | Archive (no consumer)                        |
+| `specification-template.schema.json` | ~200        | Spec structure            | **Keep** (normative for specs/)              |
+| `system_architecture.schema.json`    | ~250        | Architecture docs         | Archive (no consumer)                        |
+| `test-results.schema.json`           | ~120        | Test output format        | **Wire** (qa agent uses this)                |
+| `test_plan.schema.json`              | ~180        | Test plan structure       | **Wire** (qa agent uses this)                |
+| `tool-manifest.schema.json`          | ~100        | Tool metadata             | Archive (tools use different format)         |
+| `track-metadata.schema.json`         | ~80         | Track metadata            | Archive (no consumer)                        |
+| `ux_spec.schema.json`                | ~150        | UX spec format            | Archive (no consumer)                        |
+| `workflow-definition.schema.json`    | ~180        | Workflow structure        | **Wire** (workflow-creator uses this)        |
 
 **Action Summary:**
+
 - **Wire 6 schemas** (evolution-state, phase-models, plan, test-results, test_plan, workflow-definition) → move from DOCS ONLY to WIRED
 - **Keep 4 as reference** (adr-template, hook-definition, implementation-plan, product_requirements, specification-template)
 - **Archive 10 schemas** (no consumers, duplicative, or obsolete)
@@ -196,14 +211,14 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 
 **$ref Usage Analysis:**
 
-| Schema | $ref Count | Complexity Rating | Notes |
-|--------|------------|-------------------|-------|
-| `event-schema.json` (archived) | 40 | Very High | Excessive internal references |
-| `agent-capability-card.schema.json` | 4 | Medium | Well-structured definitions |
-| `evolution-state.schema.json` | 5 | Medium | Clean composition |
-| `workflow-patterns.schema.json` (archived) | 4 | Medium | — |
-| `agent-tools.json` (archived) | 6 | Medium-High | — |
-| `skillcatalog-response.schema.json` (archived) | 5 | Medium | — |
+| Schema                                         | $ref Count | Complexity Rating | Notes                         |
+| ---------------------------------------------- | ---------- | ----------------- | ----------------------------- |
+| `event-schema.json` (archived)                 | 40         | Very High         | Excessive internal references |
+| `agent-capability-card.schema.json`            | 4          | Medium            | Well-structured definitions   |
+| `evolution-state.schema.json`                  | 5          | Medium            | Clean composition             |
+| `workflow-patterns.schema.json` (archived)     | 4          | Medium            | —                             |
+| `agent-tools.json` (archived)                  | 6          | Medium-High       | —                             |
+| `skillcatalog-response.schema.json` (archived) | 5          | Medium            | —                             |
 
 **Key Findings:**
 
@@ -219,12 +234,13 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 
 **Issue:** Inconsistent `.schema.json` suffix usage
 
-| Pattern | Count | Example |
-|---------|-------|---------|
-| `*.schema.json` | 24 | `agent-definition.schema.json` (preferred) |
-| `*.json` (no suffix) | 3 | `agent-spawn-params.json` |
+| Pattern              | Count | Example                                    |
+| -------------------- | ----- | ------------------------------------------ |
+| `*.schema.json`      | 24    | `agent-definition.schema.json` (preferred) |
+| `*.json` (no suffix) | 3     | `agent-spawn-params.json`                  |
 
 **Missing `.schema` suffix:**
+
 1. `agent-spawn-params.json` (DOCS ONLY)
 2. `agent-tools.json` (archived)
 3. `artifact-graph.schema.json` (has suffix but recently added)
@@ -254,14 +270,14 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 
 **Potentially Unused Config:**
 
-| Section | Field | Evidence | Action |
-|---------|-------|----------|--------|
-| `integrations.superpowers` | `tdd_enforcement` | No grep matches in codebase | Verify usage or remove |
-| `integrations.superpowers` | `plan_execution: batch` | No grep matches | Verify usage or remove |
-| `integrations.claude_flow` | `swarm_topology` | No grep matches | Verify usage or remove |
-| `integrations.claude_flow` | `consensus: byzantine` | No grep matches | Verify usage or remove |
-| `monitoring.thresholds.hookExecutionTimeMs` | Value but no enforcer | Metric collected but no alert? | Wire or document |
-| `monitoring.thresholds.errorRatePerHour` | Value but no enforcer | Metric collected but no alert? | Wire or document |
+| Section                                     | Field                   | Evidence                       | Action                 |
+| ------------------------------------------- | ----------------------- | ------------------------------ | ---------------------- |
+| `integrations.superpowers`                  | `tdd_enforcement`       | No grep matches in codebase    | Verify usage or remove |
+| `integrations.superpowers`                  | `plan_execution: batch` | No grep matches                | Verify usage or remove |
+| `integrations.claude_flow`                  | `swarm_topology`        | No grep matches                | Verify usage or remove |
+| `integrations.claude_flow`                  | `consensus: byzantine`  | No grep matches                | Verify usage or remove |
+| `monitoring.thresholds.hookExecutionTimeMs` | Value but no enforcer   | Metric collected but no alert? | Wire or document       |
+| `monitoring.thresholds.errorRatePerHour`    | Value but no enforcer   | Metric collected but no alert? | Wire or document       |
 
 **Estimated Dead Config:** ~10% (4-6 fields out of ~40 total)
 
@@ -302,19 +318,19 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 **Total Size:** ~16KB
 **Average File Size:** ~1.5KB
 
-| File | Size | Lines (est) | Primary Topic |
-|------|------|-------------|---------------|
-| `agents.md` | 2.3KB | ~110 | Agent routing quick reference |
-| `artifact-integration.md` | 1.6KB | ~75 | Integration tiers and protocols |
-| `code-standards.md` | 1.7KB | ~85 | Code organization and style |
-| `git-workflow.md` | 1.2KB | ~60 | Commit guidelines and branching |
-| `hooks.md` | 1.2KB | ~60 | Hook protocol and organization |
-| `memory-protocol.md` | 561B | ~28 | Memory persistence rules |
-| `performance.md` | 1.1KB | ~55 | Optimization and resource management |
-| `security.md` | 1.2KB | ~60 | Security standards and OWASP |
-| `task-tracking.md` | 422B | ~21 | TaskUpdate protocol |
-| `testing.md` | 1.4KB | ~70 | TDD and test execution |
-| `workspace-conventions.md` | 2.4KB | ~120 | File placement and naming |
+| File                       | Size  | Lines (est) | Primary Topic                        |
+| -------------------------- | ----- | ----------- | ------------------------------------ |
+| `agents.md`                | 2.3KB | ~110        | Agent routing quick reference        |
+| `artifact-integration.md`  | 1.6KB | ~75         | Integration tiers and protocols      |
+| `code-standards.md`        | 1.7KB | ~85         | Code organization and style          |
+| `git-workflow.md`          | 1.2KB | ~60         | Commit guidelines and branching      |
+| `hooks.md`                 | 1.2KB | ~60         | Hook protocol and organization       |
+| `memory-protocol.md`       | 561B  | ~28         | Memory persistence rules             |
+| `performance.md`           | 1.1KB | ~55         | Optimization and resource management |
+| `security.md`              | 1.2KB | ~60         | Security standards and OWASP         |
+| `task-tracking.md`         | 422B  | ~21         | TaskUpdate protocol                  |
+| `testing.md`               | 1.4KB | ~70         | TDD and test execution               |
+| `workspace-conventions.md` | 2.4KB | ~120        | File placement and naming            |
 
 **Total Lines:** ~744 lines
 
@@ -327,6 +343,7 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 **1. testing.md ↔ code-standards.md (40% overlap)**
 
 **Shared Content:**
+
 - "Run lint: `pnpm lint:fix`" (appears in both)
 - "Run format: `pnpm format`" (appears in both)
 - Pre-commit requirements section (identical content in both)
@@ -339,6 +356,7 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 **2. security.md ↔ code-standards.md (25% overlap)**
 
 **Shared Content:**
+
 - "Validate all inputs and handle errors explicitly" (both)
 - "Use parameterized queries" (security.md detailed, code-standards.md brief)
 - Error handling guidance (overlapping but different focus)
@@ -350,6 +368,7 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 **3. git-workflow.md ↔ testing.md (30% overlap)**
 
 **Shared Content:**
+
 - Pre-commit requirements (lint, format, tests) appear in BOTH
 - "Run tests before committing: `pnpm test`" (identical)
 - Quality gates as blocking (both emphasize)
@@ -370,16 +389,16 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 
 #### Duplication Metrics
 
-| Rule File | Duplicate Content % | Primary Duplication Source |
-|-----------|---------------------|----------------------------|
-| `testing.md` | 40% | code-standards.md, git-workflow.md |
-| `code-standards.md` | 35% | testing.md, security.md |
-| `git-workflow.md` | 30% | testing.md |
-| `security.md` | 25% | code-standards.md |
-| `hooks.md` | 60% | @ENFORCEMENT_HOOKS.md |
-| `task-tracking.md` | 15% | @TASK_TRACKING_GUIDE.md |
-| `memory-protocol.md` | 10% | CLAUDE.md Section 8 |
-| Others | <10% | — |
+| Rule File            | Duplicate Content % | Primary Duplication Source         |
+| -------------------- | ------------------- | ---------------------------------- |
+| `testing.md`         | 40%                 | code-standards.md, git-workflow.md |
+| `code-standards.md`  | 35%                 | testing.md, security.md            |
+| `git-workflow.md`    | 30%                 | testing.md                         |
+| `security.md`        | 25%                 | code-standards.md                  |
+| `hooks.md`           | 60%                 | @ENFORCEMENT_HOOKS.md              |
+| `task-tracking.md`   | 15%                 | @TASK_TRACKING_GUIDE.md            |
+| `memory-protocol.md` | 10%                 | CLAUDE.md Section 8                |
+| Others               | <10%                | —                                  |
 
 **Weighted Average Duplication:** ~25-30% across all rules
 
@@ -390,6 +409,7 @@ Keep 3 schemas, add `$ref` links to eliminate field duplication:
 #### Option A: Merge High-Overlap Rules (Aggressive)
 
 **Before (11 files, 16KB):**
+
 ```
 agents.md
 artifact-integration.md
@@ -405,6 +425,7 @@ workspace-conventions.md
 ```
 
 **After (8 files, ~12KB):**
+
 - `agents.md` (unchanged)
 - `artifact-integration.md` (unchanged)
 - `quality-standards.md` (new: merges code-standards + testing + git-workflow pre-commit)
@@ -426,6 +447,7 @@ workspace-conventions.md
 Keep all 11 files, add cross-references to eliminate duplicate sections:
 
 **Example (testing.md):**
+
 ```markdown
 ## Pre-Commit Requirements
 
@@ -456,11 +478,11 @@ See [git-workflow.md](./git-workflow.md#pre-commit-requirements) for lint, forma
 
 **Issue:** Some rules duplicate enforcement hook logic
 
-| Rule | Enforcement Hook | Overlap % | Recommendation |
-|------|------------------|-----------|----------------|
-| `git-workflow.md` pre-commit | `pre-commit` Git hooks | 80% | Rule documents WHAT to do, hook enforces HOW. Keep both. |
-| `task-tracking.md` TaskUpdate rules | `task-auto-route.cjs`, `task-update-tracker.cjs` | 60% | Rule explains protocol, hooks enforce. Keep both. |
-| `artifact-integration.md` creator rules | `unified-creator-guard.cjs`, `post-creation-integration.cjs` | 70% | Rule explains tiers, hooks enforce. Keep both. |
+| Rule                                    | Enforcement Hook                                             | Overlap % | Recommendation                                           |
+| --------------------------------------- | ------------------------------------------------------------ | --------- | -------------------------------------------------------- |
+| `git-workflow.md` pre-commit            | `pre-commit` Git hooks                                       | 80%       | Rule documents WHAT to do, hook enforces HOW. Keep both. |
+| `task-tracking.md` TaskUpdate rules     | `task-auto-route.cjs`, `task-update-tracker.cjs`             | 60%       | Rule explains protocol, hooks enforce. Keep both.        |
+| `artifact-integration.md` creator rules | `unified-creator-guard.cjs`, `post-creation-integration.cjs` | 70%       | Rule explains tiers, hooks enforce. Keep both.           |
 
 **Pattern:** Rules provide **guidance** (what/why), hooks provide **enforcement** (how/when). No redundancy — complementary layers.
 
@@ -474,17 +496,18 @@ See [git-workflow.md](./git-workflow.md#pre-commit-requirements) for lint, forma
 
 **Primary Memory Files:**
 
-| File | Size | Lines (est) | Purpose |
-|------|------|-------------|---------|
-| `learnings.md` | 39KB | ~807 | Patterns, solutions, workflows discovered |
-| `decisions.md` | 43KB | ~943 | Architecture Decision Records (ADRs) |
-| `issues.md` | 20KB | ~500 | Known blockers, workarounds, open issues |
-| `gotchas.json` | 30KB | — | Structured error pattern database |
-| `patterns.json` | 69KB | — | Pattern recognition database |
+| File            | Size | Lines (est) | Purpose                                   |
+| --------------- | ---- | ----------- | ----------------------------------------- |
+| `learnings.md`  | 39KB | ~807        | Patterns, solutions, workflows discovered |
+| `decisions.md`  | 43KB | ~943        | Architecture Decision Records (ADRs)      |
+| `issues.md`     | 20KB | ~500        | Known blockers, workarounds, open issues  |
+| `gotchas.json`  | 30KB | —           | Structured error pattern database         |
+| `patterns.json` | 69KB | —           | Pattern recognition database              |
 
 **Total Primary Memory:** ~201KB (human-readable + structured)
 
 **Supporting Files:**
+
 - `codebase_map.json` (357B) - File discovery cache
 - `behaviour.md` (529B) - Agent behavioral guidelines
 - `constitution.md` (505B) - Core framework principles
@@ -501,20 +524,27 @@ See [git-workflow.md](./git-workflow.md#pre-commit-requirements) for lint, forma
 **Examples:**
 
 **learnings.md:**
+
 ```markdown
 ## ADR-107: Pro-Workflow Adoption Strategy (decisions.md)
+
 **Pattern:** Adopt CONCEPTS not CODE when integrating reference implementations
 ```
+
 ↑ This IS an ADR reference, correctly placed in learnings.md
 
 **decisions.md:**
+
 ```markdown
 ## ADR-090: ACCS Integration Strategy
+
 **Context:** Comparison of VoltAgent/awesome-claude-code-subagents...
 ```
+
 ↑ This IS an ADR, correctly placed in decisions.md
 
 **Actual Overlap:**
+
 - **Hook consolidation pattern** appears in both learnings.md and decisions.md (ADR-XXX for hook consolidation)
 - **TDD for documentation** appears in learnings.md but no corresponding ADR
 - **Test archival strategy** appears in issues.md but also referenced in decisions.md
@@ -530,16 +560,19 @@ See [git-workflow.md](./git-workflow.md#pre-commit-requirements) for lint, forma
 **Example:**
 
 **issues.md:**
+
 ```markdown
 ## 2026-02-08: 277 Pre-Existing Test Failures
+
 **Status:** Open (documented)
 ```
 
 **learnings.md:**
+
 ```markdown
 ## 2026-02-09: Pro-Workflow Adoption Best Practices
-**Key Learnings:**
-4. Batch test failures ≠ real regressions (investigation required)
+
+**Key Learnings:** 4. Batch test failures ≠ real regressions (investigation required)
 ```
 
 **Issue:** Same topic (test failures) documented in both files with different framing.
@@ -564,11 +597,11 @@ See [git-workflow.md](./git-workflow.md#pre-commit-requirements) for lint, forma
 
 **Memory File Growth (2026-02-07 → 2026-02-09):**
 
-| File | 2026-02-08 Backup | Current (2026-02-09) | Growth | Growth Rate |
-|------|-------------------|----------------------|--------|-------------|
-| `learnings.md` | 61KB | 39KB | -22KB | -36% (rotation) |
-| `decisions.md` | 46KB | 43KB | -3KB | -7% (rotation) |
-| `issues.md` | 74KB | 20KB | -54KB | -73% (rotation) |
+| File           | 2026-02-08 Backup | Current (2026-02-09) | Growth | Growth Rate     |
+| -------------- | ----------------- | -------------------- | ------ | --------------- |
+| `learnings.md` | 61KB              | 39KB                 | -22KB  | -36% (rotation) |
+| `decisions.md` | 46KB              | 43KB                 | -3KB   | -7% (rotation)  |
+| `issues.md`    | 74KB              | 20KB                 | -54KB  | -73% (rotation) |
 
 **Observation:** Memory files DECREASED in size due to recent rotation/archival to `memory/archive/`. Current sizes are healthy.
 
@@ -584,6 +617,7 @@ See [git-workflow.md](./git-workflow.md#pre-commit-requirements) for lint, forma
 
 ```markdown
 ## 2026-02-08: .env.example Missing Enforcement Variables
+
 **Status:** Open (pending Task #35 or dedicated docs update task)
 ```
 
@@ -596,11 +630,13 @@ See [git-workflow.md](./git-workflow.md#pre-commit-requirements) for lint, forma
 ### 4.5 JSON Memory Files (gotchas.json, patterns.json)
 
 **gotchas.json (30KB):**
+
 - Structured error pattern database
 - Used by error-pattern-detector (archived)
 - **Status:** Actively maintained, no duplication detected
 
 **patterns.json (69KB):**
+
 - Pattern recognition database
 - Used by pattern analyzer (usage unclear)
 - **Status:** Actively maintained, but large size suggests periodic review
@@ -614,6 +650,7 @@ See [git-workflow.md](./git-workflow.md#pre-commit-requirements) for lint, forma
 **Check:** Are any files in wrong locations per workspace-conventions.md?
 
 **Expected:**
+
 - Reports → `.claude/context/reports/`
 - Plans → `.claude/context/plans/`
 - Memory → `.claude/context/memory/`
@@ -628,13 +665,13 @@ All memory files correctly placed in `.claude/context/memory/`.
 
 ### Priority 1: High Impact, Low Effort (Quick Wins)
 
-| # | Recommendation | Impact | Effort | Savings |
-|---|----------------|--------|--------|---------|
-| **1** | **Consolidate 3 agent schemas** via $ref composition | High | 3-4h | 207 lines (37% reduction) |
-| **2** | **Wire 6 DOCS ONLY schemas** (evolution-state, phase-models, plan, test-results, test_plan, workflow-definition) | Medium | 2-3h | Clarifies 22% of schemas |
-| **3** | **Archive 10 unused schemas** (agent-spawn-params, artifact_manifest, presets, project-analysis, project_brief, system_architecture, tool-manifest, track-metadata, ux_spec, project-analysis) | Medium | 1-2h | Reduces noise, 37% reduction |
-| **4** | **Cross-reference rules** (testing.md ↔ git-workflow.md, hooks.md → @ENFORCEMENT_HOOKS.md) | Low-Medium | 1h | 15% size reduction, eliminates duplication |
-| **5** | **Remove dead config fields** (integrations.superpowers, integrations.claude_flow) | Low | 30min | 10% config reduction |
+| #     | Recommendation                                                                                                                                                                                 | Impact     | Effort | Savings                                    |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------ | ------------------------------------------ |
+| **1** | **Consolidate 3 agent schemas** via $ref composition                                                                                                                                           | High       | 3-4h   | 207 lines (37% reduction)                  |
+| **2** | **Wire 6 DOCS ONLY schemas** (evolution-state, phase-models, plan, test-results, test_plan, workflow-definition)                                                                               | Medium     | 2-3h   | Clarifies 22% of schemas                   |
+| **3** | **Archive 10 unused schemas** (agent-spawn-params, artifact_manifest, presets, project-analysis, project_brief, system_architecture, tool-manifest, track-metadata, ux_spec, project-analysis) | Medium     | 1-2h   | Reduces noise, 37% reduction               |
+| **4** | **Cross-reference rules** (testing.md ↔ git-workflow.md, hooks.md → @ENFORCEMENT_HOOKS.md)                                                                                                     | Low-Medium | 1h     | 15% size reduction, eliminates duplication |
+| **5** | **Remove dead config fields** (integrations.superpowers, integrations.claude_flow)                                                                                                             | Low        | 30min  | 10% config reduction                       |
 
 **Total Quick Win Effort:** 7-11 hours
 **Total Quick Win Impact:** ~400 lines removed, 25% duplication eliminated, 22% schema clarity improvement
@@ -643,12 +680,12 @@ All memory files correctly placed in `.claude/context/memory/`.
 
 ### Priority 2: Medium Impact, Medium Effort
 
-| # | Recommendation | Impact | Effort | Savings |
-|---|----------------|--------|--------|---------|
-| **6** | **Deduplicate learnings.md ↔ decisions.md** (move ADR summaries to decisions.md only) | Medium | 2-3h | 12-15KB duplicate content |
-| **7** | **Consolidate token thresholds in config.yaml** (single source of truth for budgets) | Medium | 2h | Eliminates config confusion |
-| **8** | **Validate patterns.json schema** (create schema for structured memory) | Medium | 3-4h | Prevents memory corruption |
-| **9** | **Rename schema files** (agent-spawn-params.json → agent-spawn-params.schema.json) | Low | 15min | Naming consistency |
+| #     | Recommendation                                                                        | Impact | Effort | Savings                     |
+| ----- | ------------------------------------------------------------------------------------- | ------ | ------ | --------------------------- |
+| **6** | **Deduplicate learnings.md ↔ decisions.md** (move ADR summaries to decisions.md only) | Medium | 2-3h   | 12-15KB duplicate content   |
+| **7** | **Consolidate token thresholds in config.yaml** (single source of truth for budgets)  | Medium | 2h     | Eliminates config confusion |
+| **8** | **Validate patterns.json schema** (create schema for structured memory)               | Medium | 3-4h   | Prevents memory corruption  |
+| **9** | **Rename schema files** (agent-spawn-params.json → agent-spawn-params.schema.json)    | Low    | 15min  | Naming consistency          |
 
 **Total P2 Effort:** 7-10 hours
 **Total P2 Impact:** Structural integrity, consistency, 15% memory duplication removed
@@ -657,11 +694,11 @@ All memory files correctly placed in `.claude/context/memory/`.
 
 ### Priority 3: Low Impact, High Effort (Future Work)
 
-| # | Recommendation | Impact | Effort | Reason Deferred |
-|---|----------------|--------|--------|-----------------|
-| **10** | **Merge testing.md + code-standards.md** (aggressive consolidation) | Medium | 4-5h | Structural change, risk of confusion |
-| **11** | **Create unified memory schema** (single schema for learnings/decisions/issues structure) | Medium-High | 6-8h | Large refactor, unclear value |
-| **12** | **Automated memory rotation** (prune entries >30 days) | Low | 4-6h | Manual rotation working, low urgency |
+| #      | Recommendation                                                                            | Impact      | Effort | Reason Deferred                      |
+| ------ | ----------------------------------------------------------------------------------------- | ----------- | ------ | ------------------------------------ |
+| **10** | **Merge testing.md + code-standards.md** (aggressive consolidation)                       | Medium      | 4-5h   | Structural change, risk of confusion |
+| **11** | **Create unified memory schema** (single schema for learnings/decisions/issues structure) | Medium-High | 6-8h   | Large refactor, unclear value        |
+| **12** | **Automated memory rotation** (prune entries >30 days)                                    | Low         | 4-6h   | Manual rotation working, low urgency |
 
 ---
 
@@ -729,7 +766,10 @@ All memory files correctly placed in `.claude/context/memory/`.
           "type": "object",
           "properties": {
             "traits": { "type": "array", "items": { "type": "string" }, "maxItems": 5 },
-            "communication_style": { "type": "string", "enum": ["direct", "diplomatic", "technical"] },
+            "communication_style": {
+              "type": "string",
+              "enum": ["direct", "diplomatic", "technical"]
+            },
             "risk_tolerance": { "type": "string", "enum": ["low", "medium", "high"] }
           }
         },
@@ -820,6 +860,7 @@ if (frontmatter.identity) {
 See [git-workflow.md § Pre-Commit Requirements](./git-workflow.md#pre-commit-requirements) for comprehensive lint, format, and commit validation steps.
 
 **Summary for testing context:**
+
 - All tests MUST pass before committing
 - Lint and format are enforced (see git-workflow.md)
 - No partial commits with failing tests
@@ -835,19 +876,19 @@ Quality gates are enforced at commit time. See git-workflow.md for full protocol
 
 ## 7. Complexity Ratings by File
 
-| File | Cyclomatic Complexity | Cognitive Load | Duplication | Overall Rating |
-|------|----------------------|----------------|-------------|----------------|
-| `config.yaml` | Low (linear structure) | Low (well-commented) | None | ⭐⭐⭐⭐⭐ Excellent |
-| `agent-definition.schema.json` | Medium (nested props) | Medium (JSON schema) | High (with 2 others) | ⭐⭐⭐ Good (post-consolidation: ⭐⭐⭐⭐) |
-| `agent-identity.schema.json` | Medium | Medium | High | ⭐⭐⭐ Good |
-| `agent-capability-card.schema.json` | Medium-High (4 $refs) | Medium | High | ⭐⭐⭐ Good |
-| `testing.md` | Low | Low | High (40%) | ⭐⭐⭐ Good (post-xref: ⭐⭐⭐⭐) |
-| `code-standards.md` | Low | Medium | High (35%) | ⭐⭐⭐ Good |
-| `git-workflow.md` | Low | Low | Medium (30%) | ⭐⭐⭐⭐ Very Good |
-| `hooks.md` | Low | Low | Very High (60%) | ⭐⭐ Fair (post-reduction: ⭐⭐⭐⭐) |
-| `learnings.md` | Low (list structure) | Medium (39KB) | Medium (15%) | ⭐⭐⭐⭐ Very Good |
-| `decisions.md` | Low (ADR format) | Medium (43KB) | Medium (15%) | ⭐⭐⭐⭐ Very Good |
-| `issues.md` | Low | Low (20KB after rotation) | Low (10%) | ⭐⭐⭐⭐⭐ Excellent |
+| File                                | Cyclomatic Complexity  | Cognitive Load            | Duplication          | Overall Rating                             |
+| ----------------------------------- | ---------------------- | ------------------------- | -------------------- | ------------------------------------------ |
+| `config.yaml`                       | Low (linear structure) | Low (well-commented)      | None                 | ⭐⭐⭐⭐⭐ Excellent                       |
+| `agent-definition.schema.json`      | Medium (nested props)  | Medium (JSON schema)      | High (with 2 others) | ⭐⭐⭐ Good (post-consolidation: ⭐⭐⭐⭐) |
+| `agent-identity.schema.json`        | Medium                 | Medium                    | High                 | ⭐⭐⭐ Good                                |
+| `agent-capability-card.schema.json` | Medium-High (4 $refs)  | Medium                    | High                 | ⭐⭐⭐ Good                                |
+| `testing.md`                        | Low                    | Low                       | High (40%)           | ⭐⭐⭐ Good (post-xref: ⭐⭐⭐⭐)          |
+| `code-standards.md`                 | Low                    | Medium                    | High (35%)           | ⭐⭐⭐ Good                                |
+| `git-workflow.md`                   | Low                    | Low                       | Medium (30%)         | ⭐⭐⭐⭐ Very Good                         |
+| `hooks.md`                          | Low                    | Low                       | Very High (60%)      | ⭐⭐ Fair (post-reduction: ⭐⭐⭐⭐)       |
+| `learnings.md`                      | Low (list structure)   | Medium (39KB)             | Medium (15%)         | ⭐⭐⭐⭐ Very Good                         |
+| `decisions.md`                      | Low (ADR format)       | Medium (43KB)             | Medium (15%)         | ⭐⭐⭐⭐ Very Good                         |
+| `issues.md`                         | Low                    | Low (20KB after rotation) | Low (10%)            | ⭐⭐⭐⭐⭐ Excellent                       |
 
 **Average Rating:** ⭐⭐⭐⭐ (3.6/5) — Good foundation with room for optimization
 
@@ -857,13 +898,13 @@ Quality gates are enforced at commit time. See git-workflow.md for full protocol
 
 ### Quick Wins (Priority 1)
 
-| Task | Effort | Savings | ROI |
-|------|--------|---------|-----|
-| Consolidate 3 agent schemas | 3-4h | 207 lines, clearer structure | ⭐⭐⭐⭐⭐ Very High |
-| Wire 6 DOCS ONLY schemas | 2-3h | 22% clarity improvement | ⭐⭐⭐⭐ High |
-| Archive 10 unused schemas | 1-2h | 37% schema count reduction | ⭐⭐⭐⭐⭐ Very High |
-| Cross-reference rules | 1h | 15% size reduction | ⭐⭐⭐⭐ High |
-| Remove dead config | 30min | 10% config reduction | ⭐⭐⭐ Medium |
+| Task                        | Effort | Savings                      | ROI                  |
+| --------------------------- | ------ | ---------------------------- | -------------------- |
+| Consolidate 3 agent schemas | 3-4h   | 207 lines, clearer structure | ⭐⭐⭐⭐⭐ Very High |
+| Wire 6 DOCS ONLY schemas    | 2-3h   | 22% clarity improvement      | ⭐⭐⭐⭐ High        |
+| Archive 10 unused schemas   | 1-2h   | 37% schema count reduction   | ⭐⭐⭐⭐⭐ Very High |
+| Cross-reference rules       | 1h     | 15% size reduction           | ⭐⭐⭐⭐ High        |
+| Remove dead config          | 30min  | 10% config reduction         | ⭐⭐⭐ Medium        |
 
 **Total Quick Win Effort:** 7.5-11 hours
 **Total Quick Win ROI:** ⭐⭐⭐⭐⭐ Excellent (high impact, low risk)
@@ -872,12 +913,12 @@ Quality gates are enforced at commit time. See git-workflow.md for full protocol
 
 ### Medium-Term (Priority 2)
 
-| Task | Effort | Savings | ROI |
-|------|--------|---------|-----|
-| Deduplicate learnings ↔ decisions | 2-3h | 12-15KB duplicate content | ⭐⭐⭐ Medium |
-| Consolidate token thresholds | 2h | Config clarity | ⭐⭐⭐⭐ High |
-| Validate patterns.json schema | 3-4h | Memory integrity | ⭐⭐⭐ Medium |
-| Rename schema files | 15min | Naming consistency | ⭐⭐ Low |
+| Task                              | Effort | Savings                   | ROI           |
+| --------------------------------- | ------ | ------------------------- | ------------- |
+| Deduplicate learnings ↔ decisions | 2-3h   | 12-15KB duplicate content | ⭐⭐⭐ Medium |
+| Consolidate token thresholds      | 2h     | Config clarity            | ⭐⭐⭐⭐ High |
+| Validate patterns.json schema     | 3-4h   | Memory integrity          | ⭐⭐⭐ Medium |
+| Rename schema files               | 15min  | Naming consistency        | ⭐⭐ Low      |
 
 **Total P2 Effort:** 7-10 hours
 **Total P2 ROI:** ⭐⭐⭐ Medium (structural improvements)

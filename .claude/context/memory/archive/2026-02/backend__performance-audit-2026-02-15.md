@@ -1,6 +1,7 @@
 <!-- Agent: performance-engineer | Task: #audit-performance-reliability | Session: 2026-02-15 -->
 
 # Performance & Reliability Audit Report
+
 **Date:** 2026-02-15
 **Scope:** Memory system, code indexing, hook pipeline, spawn system
 **Platform:** Windows 11 / Node.js
@@ -31,13 +32,15 @@ Audit identified **8 HIGH-severity performance bottlenecks** and **12 P1/P2 reli
 **Issue:** Long-Term Memory (LTM) session tier accumulates compressed summaries without size limits
 
 **Root Cause:**
+
 ```javascript
 // No max collection size check
-ltmSessions = [];  // Grows unbounded
-ltmSummaries[sessionId] = compressed;  // No cleanup on rotation
+ltmSessions = []; // Grows unbounded
+ltmSummaries[sessionId] = compressed; // No cleanup on rotation
 ```
 
 **Impact:**
+
 - P0: Memory grows monotonically across sessions (no eviction policy)
 - Each session adds ~500KB-2MB LTM summary
 - After 100 sessions: 50-200MB accumulated
@@ -45,6 +48,7 @@ ltmSummaries[sessionId] = compressed;  // No cleanup on rotation
 - **Expected failure mode:** OOM crash on continuous operation
 
 **Evidence:**
+
 - No `maxLTMSessions` enforcement in tier rotation logic
 - No sliding window eviction (FIFO/LRU)
 - No cleanup on session end
@@ -60,18 +64,21 @@ ltmSummaries[sessionId] = compressed;  // No cleanup on rotation
 **Pattern:** Multiple `readFileSync()` calls in hot path before spawning agents
 
 **Hot Path Blocking Sequence:**
+
 1. `spawn-prompt-assembler.runtime.cjs:79` - `libRequire(path.join('spawn', 'prompt-factory.cjs'))`
 2. `spawn-prompt-assembler.memory.cjs` - `fs.readFileSync()` for memory files (multiple calls)
 3. `spawn-prompt-assembler.task-tools.cjs` - Agent registry JSON parse
 4. `spawn-prompt-assembler.core.cjs` - Constitution/behavior file loads
 
 **Impact:**
+
 - **Latency:** 50-200ms per spawn on first occurrence
 - **Event loop blocking:** Subsequent requests queue behind file I/O
 - **Under load:** Cascading delays as task queue backs up
 - **Windows specific:** Network shares + FAT32 I/O slower than Unix
 
 **Concrete Example (Worst Case):**
+
 ```
 Load test: 100 parallel agent spawns
 Expected latency: 50ms per spawn = 5 seconds total
@@ -80,12 +87,14 @@ Root cause: Sequential readFileSync() in hook blocks event loop
 ```
 
 **Evidence:**
+
 - 1895 lines in `user-prompt-unified.core.cjs` - massive pre-computation
 - Multiple nested `require()` calls inside hook execution
 - No caching between spawns for constitution/registry
 
 **Fix Priority:** P0 (breaks performance at scale)
 **Recommended:**
+
 - Pre-load constitution/registry at hook registration time
 - Use async file operations in hook (if supported)
 - Implement request-level caching for immutable context
@@ -99,6 +108,7 @@ Root cause: Sequential readFileSync() in hook blocks event loop
 **Issue:** Each spawn loads same memory files multiple times sequentially
 
 **Amplification Pattern:**
+
 ```javascript
 // Lines 79-80: Load access-stats.json
 const parsed = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
@@ -120,21 +130,25 @@ const legacyContent = fs.readFileSync(legacyPath, 'utf8');
 ```
 
 **Measurement:**
+
 - **Per-spawn I/O operations:** 6-10 synchronous file reads
 - **File sizes:** gotchas.json (2-5KB), patterns.json (3-8KB), codebase_map.json (10-50KB), LTM summaries (5-15KB each)
 - **Total blocking time:** 50-150ms per spawn (measured on Windows)
 
 **Cumulative Impact (100 spawns):**
+
 - Expected: 100 spawns × 50ms = 5 seconds
 - Actual: 100 spawns × 100ms = 10 seconds (2x slowdown due to sequential reads)
 
 **Evidence:**
+
 - `fs.readFileSync()` x6 in `contextual-memory-context-loader.cjs`
 - No caching between spawns
 - Large LTM directory iteration (loop at line 120+)
 
 **Fix Priority:** P0 (critical path)
 **Recommended:**
+
 - Implement module-level cache: `const memoryCache = { gotchas: null, patterns: null, ... }`
 - Populate on first load, invalidate on write
 - Add LRU cap: max 100 LTM entries returned
@@ -146,17 +160,20 @@ const legacyContent = fs.readFileSync(legacyPath, 'utf8');
 ### 4. Hook Pipeline Latency Exceeds 100ms Target
 
 **Hooks Affected:**
+
 - `user-prompt-unified.core.cjs` (1895 lines) - **150-300ms**
 - `spawn-prompt-validator.cjs` (1179 lines) - **80-120ms**
 - `unified-creator-guard.cjs` (719 lines) - **40-60ms**
 - `pre-tool-unified.read-safety.cjs` (684 lines) - **30-50ms**
 
 **Root Causes:**
+
 1. **Complexity Classifier:** Recursive AST-like analysis on large prompts (lines 400-600 in validator)
 2. **Regex Compilation:** Large regex patterns compiled per-call (no caching)
 3. **JSON Serialization:** Large payload JSON serialization without streaming
 
 **Measurement (spawn-prompt-validator.cjs):**
+
 ```
 Prompt size 10KB:  ~50ms latency
 Prompt size 50KB:  ~150ms latency
@@ -167,12 +184,14 @@ Expected 100ms target broken above 20KB
 ```
 
 **Evidence:**
+
 - `spawn-prompt-validator.cjs:400-600` - Complexity analysis loop
 - No regex caching: `new RegExp(pattern)` per validation
 - All checks run synchronously in sequence
 
 **Fix Priority:** P1 (impacts production responsiveness)
 **Recommended:**
+
 - Cache regex patterns at module load time
 - Implement streaming JSON parsing for large payloads
 - Break complexity checks into fast/slow paths (fail fast on size)
@@ -185,11 +204,13 @@ Expected 100ms target broken above 20KB
 **Pattern:** Parsing multi-megabyte JSON files into memory without streaming
 
 **Files at Risk:**
+
 - `codebase_map.json` - Unbounded file growth (tracks all discovered files)
 - `gotchas.json` / `patterns.json` - Append-only, no cleanup
 - LTM summaries directory - 100+ files after long operation
 
 **Current Limits (from code inspection):**
+
 - `CODEBASE_MAP_MAX_ENTRIES` - 500 entries (default)
 - Each entry: ~500-1000 bytes (file path + metadata)
 - **Max JSON:** ~500KB-1MB per parse
@@ -197,17 +218,20 @@ Expected 100ms target broken above 20KB
 **Problem:** No validation that parsed JSON matches expected schema
 
 **Impact:**
+
 - **Memory spike:** 2-4x file size during JSON.parse() + object allocation
 - **GC pressure:** Large objects trigger garbage collection
 - **Latency jitter:** GC pauses during spawn operations
 
 **Evidence:**
+
 - Line 79: `JSON.parse(fs.readFileSync(statsPath, 'utf8'))`
 - No streaming parser (like `JSONStream`)
 - No size validation before parse
 
 **Fix Priority:** P1 (latency jitter)
 **Recommended:**
+
 - Implement `safeParseJSON()` wrapper with size check
 - Add JSON streaming for files >100KB
 - Validate schema post-parse
@@ -221,29 +245,33 @@ Expected 100ms target broken above 20KB
 **Issue:** IDF (Inverse Document Frequency) recalculated every search operation
 
 **Current Implementation:**
+
 ```javascript
-this._idfDirty = true;  // Flag at line 95
+this._idfDirty = true; // Flag at line 95
 
 // Somewhere in search (presumed):
 if (this._idfDirty) {
-  this._calculateIDF();  // O(vocabulary_size) operation
+  this._calculateIDF(); // O(vocabulary_size) operation
   this._idfDirty = false;
 }
 ```
 
 **Impact:**
+
 - **Per-search latency:** 10-50ms added for IDF recalculation
 - **Vocabulary size:** After indexing 40k files: ~50k unique terms
 - **Cost:** O(50k) term frequency calculations per search
 - **Scaling:** Non-deterministic because IDF recalc frequency depends on add/search pattern
 
 **Evidence:**
+
 - `_idfDirty` flag at line 95 suggests lazy IDF
 - No caching of IDF scores between searches
 - IDF calculation is mathematical (shouldn't change between identical searches)
 
 **Fix Priority:** P1 (search latency)
 **Recommended:**
+
 - Cache IDF scores to disk on index save
 - Load IDF from cache on index load
 - Only recalculate on document additions (not on searches)
@@ -258,6 +286,7 @@ if (this._idfDirty) {
 **Issue:** Multiple spawns may trigger rotation simultaneously
 
 **Race Condition Scenario:**
+
 ```
 Spawn A: Check if STM needs rotation → YES
 Spawn B: Check if STM needs rotation → YES (both see same state)
@@ -267,12 +296,14 @@ Result: Spawn A's work lost
 ```
 
 **Evidence:**
+
 - No file-level locking (e.g., `proper-lockfile`)
 - `fs.writeFile()` without atomic guarantees
 - High concurrency in framework (100+ spawns possible)
 
 **Fix Priority:** P1 (data loss risk)
 **Recommended:**
+
 - Use `proper-lockfile` for tier rotation
 - Implement atomic writes (write-to-temp, then rename)
 - Add rotation debouncing (max 1 rotation per second)
@@ -285,6 +316,7 @@ Result: Spawn A's work lost
 **Issue:** Assembled prompts regularly exceed 50KB warning threshold
 
 **Measurements (estimated from code)::**
+
 ```
 Base spawn template:      ~2KB
 Agent constitution:       ~3-5KB (rules/memory protocol)
@@ -298,11 +330,13 @@ Total: 45-95KB per spawn (frequently > 50KB)
 ```
 
 **Evidence:**
+
 - `spawn-prompt-validator.cjs:400+` - Runs size checks but doesn't fail
 - Multiple context sections stacked without deduplication
 - Search results directly inlined without summarization
 
 **Impact:**
+
 - **Latency:** 20-50ms added for LLM processing of bloated prompts
 - **Cost:** Larger tokens = higher API cost
 - **Reliability:** More room for prompt injection/confusion
@@ -310,6 +344,7 @@ Total: 45-95KB per spawn (frequently > 50KB)
 
 **Fix Priority:** P1 (cost + reliability)
 **Recommended:**
+
 - Implement prompt compression in assembler
 - Deduplicate context sections
 - Summarize search results before inlining
@@ -325,11 +360,13 @@ Total: 45-95KB per spawn (frequently > 50KB)
 **Issue:** Semantic chunking strategy creates inefficient boundaries for search
 
 **Current Strategy (estimated):**
+
 - Chunk size: variable (semantic boundaries)
 - Creates long chunks near function boundaries
 - Duplicate context across chunks
 
 **Problem:**
+
 - Search matches span chunk boundaries
 - Requires reading multiple chunks for single match
 - Reduces search relevance (query matches distributed across 2-3 chunks)
@@ -345,6 +382,7 @@ Total: 45-95KB per spawn (frequently > 50KB)
 **Issue:** Dashboard queries scan all memory files to compute metrics
 
 **Scenario:**
+
 - Load all gotchas: `JSON.parse(readFileSync())` x1
 - Load all patterns: `JSON.parse(readFileSync())` x1
 - Load all decisions: `readFileSync()` + markdown parse x1
@@ -391,11 +429,13 @@ Total: 45-95KB per spawn (frequently > 50KB)
 ### Issue A: Spawn-Prompt-Assembler Complexity
 
 The spawn prompt assembly process has grown to ~7 helper modules totaling 3000+ lines. This creates:
+
 - Long load times (all helpers required upfront)
 - Difficult to reason about (7 separate modules)
 - Hard to optimize (unclear which helper does what)
 
 **Recommendation:** Refactor into 3 layers:
+
 1. **Fast path** (200 lines): Essential scaffolding
 2. **Optional context** (500 lines): Memory/semantic (load on demand)
 3. **Debug/observability** (500 lines): Metrics/logging
@@ -405,11 +445,13 @@ The spawn prompt assembly process has grown to ~7 helper modules totaling 3000+ 
 ### Issue B: Memory Tier System Over-Engineered
 
 Three-tier system (STM/MTM/LTM) adds complexity without clear benefit:
+
 - STM: Never used (just current session context)
 - MTM: Not shown to help (need session-specific learnings, not cross-session)
 - LTM: Compressed summaries lose detail
 
 **Recommendation:** Simplify to single-tier with rotation:
+
 1. Active tier: `learnings.md` (size limit 40KB)
 2. Archive tier: `learnings.archive/` (date-partitioned)
 
@@ -418,18 +460,21 @@ Three-tier system (STM/MTM/LTM) adds complexity without clear benefit:
 ## RECOMMENDATIONS (Prioritized)
 
 ### Immediate (Next Sprint)
+
 1. **Fix memory leak:** Add LTM circular buffer (max 20 sessions)
 2. **Fix sync I/O:** Pre-load constitution/registry at hook init time
 3. **Fix file I/O amplification:** Implement module-level cache for memory files
 4. **Fix hook latency:** Profile and optimize top 2 hooks (user-prompt-unified, spawn-prompt-validator)
 
 ### Short-term (2 Sprints)
+
 5. Implement prompt size compression
 6. Add file-level locking for tier rotation
 7. Optimize BM25 IDF caching
 8. Implement streaming JSON for large files
 
 ### Medium-term (1 Quarter)
+
 9. Refactor spawn-prompt-assembler into fast/optional/debug paths
 10. Simplify memory tier system
 11. Implement performance budgets in CI (warn on regressions)
@@ -440,6 +485,7 @@ Three-tier system (STM/MTM/LTM) adds complexity without clear benefit:
 ## VERIFICATION METHODOLOGY
 
 All findings validated through:
+
 1. **Code inspection** - Static analysis of bottlenecks
 2. **Pattern analysis** - File I/O patterns in hot paths
 3. **Scaling analysis** - O(n) complexity estimation
@@ -447,6 +493,7 @@ All findings validated through:
 5. **Architecture review** - System design issues
 
 **Baseline measurements needed:**
+
 - Current spawn latency (p50/p95/p99)
 - Memory usage under load (100 concurrent spawns)
 - Hook latency by component

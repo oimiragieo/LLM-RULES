@@ -92,11 +92,13 @@
 ## Acceptance Criteria
 
 **Per Microtask**:
+
 - RED: All tests fail before implementation
 - GREEN: All tests pass, 0 lint errors, 0 format changes
 - REFACTOR: Code clean, documented, integrated
 
 **Per Parallel Group**:
+
 - G1 (P0): `pnpm test` + `pnpm validate:ci-gate` pass
 - G2 (P1): Archive retention metrics working, no regressions
 
@@ -127,13 +129,13 @@
 
 ## Risks & Mitigations
 
-| Risk | Mitigation |
-|------|----------|
-| safe-path regex too aggressive | Test with real project filenames (console.log, CONTRACT, etc.) |
-| CI gate too slow (500+ artifacts) | Add `--layer` flag, cache registry reads |
-| EXDEV mock not realistic | Test on actual multi-mount systems |
-| error-writer integration breaks existing tests | Keep changes minimal, run full suite at checkpoints |
-| M9+M12 conflict on error-writer.cjs | Sequential execution enforced |
+| Risk                                           | Mitigation                                                     |
+| ---------------------------------------------- | -------------------------------------------------------------- |
+| safe-path regex too aggressive                 | Test with real project filenames (console.log, CONTRACT, etc.) |
+| CI gate too slow (500+ artifacts)              | Add `--layer` flag, cache registry reads                       |
+| EXDEV mock not realistic                       | Test on actual multi-mount systems                             |
+| error-writer integration breaks existing tests | Keep changes minimal, run full suite at checkpoints            |
+| M9+M12 conflict on error-writer.cjs            | Sequential execution enforced                                  |
 
 ---
 

@@ -84,13 +84,13 @@ graph TB
 
 For each boundary pair, classify the relationship:
 
-| Relationship | Description | Migration Implication |
-|---|---|---|
-| **Shared Kernel** | Two contexts share a common model | Must be extracted first or kept temporarily shared |
-| **Customer/Supplier** | One context depends on another's output | Supplier should be extracted before customer |
-| **Conformist** | Downstream blindly follows upstream model | Downstream can be extracted independently |
-| **Anti-Corruption Layer** | Downstream translates upstream model | Natural service boundary -- extract with ACL |
-| **Published Language** | Shared schema (events, APIs) | Keep stable during migration |
+| Relationship              | Description                               | Migration Implication                              |
+| ------------------------- | ----------------------------------------- | -------------------------------------------------- |
+| **Shared Kernel**         | Two contexts share a common model         | Must be extracted first or kept temporarily shared |
+| **Customer/Supplier**     | One context depends on another's output   | Supplier should be extracted before customer       |
+| **Conformist**            | Downstream blindly follows upstream model | Downstream can be extracted independently          |
+| **Anti-Corruption Layer** | Downstream translates upstream model      | Natural service boundary -- extract with ACL       |
+| **Published Language**    | Shared schema (events, APIs)              | Keep stable during migration                       |
 
 ### 1.2 Dependency Mapping Approach
 
@@ -103,18 +103,18 @@ For each boundary pair, classify the relationship:
 **Runtime Analysis**
 
 1. **Distributed tracing** (even in a monolith): Instrument with OpenTelemetry to map actual call paths under production load
-2. **Database query logs**: Capture 1 week of production queries, group by module/table to find actual data access patterns (not just what code *could* access)
+2. **Database query logs**: Capture 1 week of production queries, group by module/table to find actual data access patterns (not just what code _could_ access)
 3. **API call frequency**: Log inter-module method calls to identify hot paths (high-frequency calls that will become expensive network calls)
 
 **Output: Dependency Matrix**
 
-| Module | Users | Orders | Payments | Inventory | Notifications |
-|---|---|---|---|---|---|
-| **Users** | -- | R | -- | -- | W |
-| **Orders** | R | -- | RW | R | W |
-| **Payments** | R | R | -- | -- | W |
-| **Inventory** | -- | R | -- | -- | -- |
-| **Notifications** | R | R | R | -- | -- |
+| Module            | Users | Orders | Payments | Inventory | Notifications |
+| ----------------- | ----- | ------ | -------- | --------- | ------------- |
+| **Users**         | --    | R      | --       | --        | W             |
+| **Orders**        | R     | --     | RW       | R         | W             |
+| **Payments**      | R     | R      | --       | --        | W             |
+| **Inventory**     | --    | R      | --       | --        | --            |
+| **Notifications** | R     | R      | R        | --        | --            |
 
 R = reads from, W = writes to, RW = both
 
@@ -128,17 +128,17 @@ For every database table, answer three questions:
 
 **Data Ownership Decision Table**
 
-| Table | Current Writers | Assigned Owner | Reader Services | Consistency |
-|---|---|---|---|---|
-| `users` | Auth, Admin, Profile | User Service | Orders, Payments, Notifications | Strong (auth), Eventual (profile) |
-| `orders` | Checkout, Admin | Order Service | Payments, Inventory, Analytics | Strong (creation), Eventual (status) |
-| `payments` | Checkout, Refund | Payment Service | Orders, Notifications | Strong |
-| `products` | Catalog, Inventory | Inventory Service | Orders, Search | Eventual |
-| `audit_log` | All modules | Audit Service | Compliance, Admin | Eventual |
+| Table       | Current Writers      | Assigned Owner    | Reader Services                 | Consistency                          |
+| ----------- | -------------------- | ----------------- | ------------------------------- | ------------------------------------ |
+| `users`     | Auth, Admin, Profile | User Service      | Orders, Payments, Notifications | Strong (auth), Eventual (profile)    |
+| `orders`    | Checkout, Admin      | Order Service     | Payments, Inventory, Analytics  | Strong (creation), Eventual (status) |
+| `payments`  | Checkout, Refund     | Payment Service   | Orders, Notifications           | Strong                               |
+| `products`  | Catalog, Inventory   | Inventory Service | Orders, Search                  | Eventual                             |
+| `audit_log` | All modules          | Audit Service     | Compliance, Admin               | Eventual                             |
 
 **Red Flag: Shared Mutable State**
 
-If a table has 3+ writers from different bounded contexts, it is a decomposition blocker. Resolve it *before* starting extraction by:
+If a table has 3+ writers from different bounded contexts, it is a decomposition blocker. Resolve it _before_ starting extraction by:
 
 1. Assigning a single owner and making other modules call that owner's API
 2. Splitting the table along context boundaries (e.g., `user_auth` vs `user_profile`)
@@ -150,14 +150,14 @@ If a table has 3+ writers from different bounded contexts, it is a decomposition
 
 ### 2.1 Strategy Comparison
 
-| Criterion | Strangler Fig | Big Bang | Parallel Run |
-|---|---|---|---|
-| **Risk** | Low (incremental) | Very High (all-at-once) | Medium (duplicate systems) |
-| **Duration** | 12-24 months typical | 3-6 months (if it works) | 12-18 months |
-| **Rollback** | Per-feature, trivial | All-or-nothing, catastrophic | Per-feature, moderate |
-| **Team disruption** | Low (business as usual) | Total (feature freeze) | High (maintaining two systems) |
-| **Data complexity** | Moderate (gradual) | Extreme (single cutover) | High (dual-write/sync) |
-| **Cost** | Moderate (gradual) | Low upfront, high if fails | High (double infrastructure) |
+| Criterion           | Strangler Fig           | Big Bang                     | Parallel Run                   |
+| ------------------- | ----------------------- | ---------------------------- | ------------------------------ |
+| **Risk**            | Low (incremental)       | Very High (all-at-once)      | Medium (duplicate systems)     |
+| **Duration**        | 12-24 months typical    | 3-6 months (if it works)     | 12-18 months                   |
+| **Rollback**        | Per-feature, trivial    | All-or-nothing, catastrophic | Per-feature, moderate          |
+| **Team disruption** | Low (business as usual) | Total (feature freeze)       | High (maintaining two systems) |
+| **Data complexity** | Moderate (gradual)      | Extreme (single cutover)     | High (dual-write/sync)         |
+| **Cost**            | Moderate (gradual)      | Low upfront, high if fails   | High (double infrastructure)   |
 
 **Recommendation: Strangler Fig Pattern**
 
@@ -203,13 +203,13 @@ Month 16-18: [Remaining services] → Monolith decommissioned
 
 **Extract in this order** (each builds on the previous):
 
-| Priority | Service | Rationale |
-|---|---|---|
-| 1 | **Edge/Leaf services** (Notifications, Audit) | Fewest inbound dependencies; low risk; team learns the process |
-| 2 | **Read-heavy services** (Search, Catalog, Reporting) | Can use CQRS read models; no write contention |
-| 3 | **Independent domain services** (User Management) | Clear bounded context; stable API surface |
-| 4 | **Core domain services** (Orders, Payments) | High business value but complex; team is experienced by now |
-| 5 | **Shared infrastructure** (Inventory, Pricing) | Most cross-cutting; extract last when other services have stable APIs |
+| Priority | Service                                              | Rationale                                                             |
+| -------- | ---------------------------------------------------- | --------------------------------------------------------------------- |
+| 1        | **Edge/Leaf services** (Notifications, Audit)        | Fewest inbound dependencies; low risk; team learns the process        |
+| 2        | **Read-heavy services** (Search, Catalog, Reporting) | Can use CQRS read models; no write contention                         |
+| 3        | **Independent domain services** (User Management)    | Clear bounded context; stable API surface                             |
+| 4        | **Core domain services** (Orders, Payments)          | High business value but complex; team is experienced by now           |
+| 5        | **Shared infrastructure** (Inventory, Pricing)       | Most cross-cutting; extract last when other services have stable APIs |
 
 **Anti-pattern: Extracting the core domain first.** Teams that start with Orders or Payments before extracting simpler services face maximum complexity with zero migration experience. Start with a leaf service.
 
@@ -369,14 +369,14 @@ Every inter-service call will fail eventually. Design every synchronous call wit
 
 **Decision Matrix: When to Use Each Pattern**
 
-| Scenario | Pattern | Protocol | Example |
-|---|---|---|---|
-| Client needs immediate response | Synchronous request/reply | REST (HTTP/JSON) or gRPC | `GET /users/{id}` |
-| High-throughput internal RPC | Synchronous, binary | gRPC (Protocol Buffers) | Inventory check during checkout |
-| Event notification (fire-and-forget) | Asynchronous event | Kafka/RabbitMQ | `OrderPlaced` event |
-| Long-running workflow | Asynchronous command | Kafka with correlation ID | Payment processing |
-| Data replication / read models | Asynchronous CDC | Debezium + Kafka | Search index updates |
-| Aggregating multiple services | API composition | BFF pattern (REST/GraphQL) | Product detail page |
+| Scenario                             | Pattern                   | Protocol                   | Example                         |
+| ------------------------------------ | ------------------------- | -------------------------- | ------------------------------- |
+| Client needs immediate response      | Synchronous request/reply | REST (HTTP/JSON) or gRPC   | `GET /users/{id}`               |
+| High-throughput internal RPC         | Synchronous, binary       | gRPC (Protocol Buffers)    | Inventory check during checkout |
+| Event notification (fire-and-forget) | Asynchronous event        | Kafka/RabbitMQ             | `OrderPlaced` event             |
+| Long-running workflow                | Asynchronous command      | Kafka with correlation ID  | Payment processing              |
+| Data replication / read models       | Asynchronous CDC          | Debezium + Kafka           | Search index updates            |
+| Aggregating multiple services        | API composition           | BFF pattern (REST/GraphQL) | Product detail page             |
 
 **REST vs gRPC Decision**
 
@@ -449,9 +449,7 @@ Use CloudEvents specification (CNCF standard) for all events:
     "userId": "USR-67890",
     "totalAmount": 99.99,
     "currency": "USD",
-    "items": [
-      { "productId": "PROD-111", "quantity": 2, "unitPrice": 49.99 }
-    ]
+    "items": [{ "productId": "PROD-111", "quantity": 2, "unitPrice": 49.99 }]
   }
 }
 ```
@@ -479,13 +477,13 @@ graph TB
 
 **Technology Selection**
 
-| Gateway | Best For | Avoid When |
-|---|---|---|
-| **Kong** | Plugin ecosystem, enterprise features | Budget-constrained, simple needs |
-| **NGINX + Lua** | High performance, custom logic | Complex auth flows |
-| **AWS API Gateway** | AWS-native, serverless backends | Multi-cloud, on-premise |
-| **Envoy** | Service mesh integration (Istio) | Standalone gateway (overkill) |
-| **Traefik** | Kubernetes-native, auto-discovery | Complex transformation needs |
+| Gateway             | Best For                              | Avoid When                       |
+| ------------------- | ------------------------------------- | -------------------------------- |
+| **Kong**            | Plugin ecosystem, enterprise features | Budget-constrained, simple needs |
+| **NGINX + Lua**     | High performance, custom logic        | Complex auth flows               |
+| **AWS API Gateway** | AWS-native, serverless backends       | Multi-cloud, on-premise          |
+| **Envoy**           | Service mesh integration (Istio)      | Standalone gateway (overkill)    |
+| **Traefik**         | Kubernetes-native, auto-discovery     | Complex transformation needs     |
 
 **Recommendation: Start with Traefik or Kong.** Traefik for Kubernetes-native deployments (auto-discovers services via labels). Kong if you need a rich plugin ecosystem (OAuth, rate limiting, request transformation). Avoid building a custom gateway.
 
@@ -564,12 +562,12 @@ graph LR
 
 **Trade-off Summary:**
 
-| | Orchestration | Choreography |
-|---|---|---|
-| Complexity | Centralized (easier to understand) | Distributed (harder to trace) |
-| Coupling | Orchestrator knows all participants | Services are loosely coupled |
-| Single point of failure | Orchestrator | None (but debugging is harder) |
-| Best for | Complex, multi-step, ordered | Simple, few-step, loosely-coupled |
+|                         | Orchestration                       | Choreography                      |
+| ----------------------- | ----------------------------------- | --------------------------------- |
+| Complexity              | Centralized (easier to understand)  | Distributed (harder to trace)     |
+| Coupling                | Orchestrator knows all participants | Services are loosely coupled      |
+| Single point of failure | Orchestrator                        | None (but debugging is harder)    |
+| Best for                | Complex, multi-step, ordered        | Simple, few-step, loosely-coupled |
 
 #### Transactional Outbox Pattern
 
@@ -660,11 +658,11 @@ A service mesh provides infrastructure-level networking capabilities (mTLS, load
 
 **Technology Selection:**
 
-| Mesh | Best For | Operational Cost |
-|---|---|---|
-| **Istio** | Full-featured, enterprise | High (complex control plane) |
-| **Linkerd** | Lightweight, simple | Low (smallest resource footprint) |
-| **Cilium** | eBPF-based, high performance | Medium (requires Linux kernel support) |
+| Mesh        | Best For                     | Operational Cost                       |
+| ----------- | ---------------------------- | -------------------------------------- |
+| **Istio**   | Full-featured, enterprise    | High (complex control plane)           |
+| **Linkerd** | Lightweight, simple          | Low (smallest resource footprint)      |
+| **Cilium**  | eBPF-based, high performance | Medium (requires Linux kernel support) |
 
 **Recommendation: Start without a service mesh.** Use application-level libraries (e.g., circuit breakers in code) for the first 5-10 services. Adopt Linkerd when you hit 10+ services and need infrastructure-level mTLS and observability. Consider Istio only if you need advanced traffic management (fault injection, traffic mirroring).
 
@@ -723,30 +721,30 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 0   # Zero-downtime deploys
+      maxUnavailable: 0 # Zero-downtime deploys
   template:
     spec:
       containers:
-      - name: order-service
-        resources:
-          requests:            # Guaranteed resources
-            cpu: 250m
-            memory: 256Mi
-          limits:              # Maximum resources
-            cpu: 500m
-            memory: 512Mi
-        livenessProbe:         # Restart if unhealthy
-          httpGet:
-            path: /health/live
-            port: 8080
-          initialDelaySeconds: 15
-          periodSeconds: 10
-        readinessProbe:        # Remove from LB if not ready
-          httpGet:
-            path: /health/ready
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: order-service
+          resources:
+            requests: # Guaranteed resources
+              cpu: 250m
+              memory: 256Mi
+            limits: # Maximum resources
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe: # Restart if unhealthy
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe: # Remove from LB if not ready
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ```
 
 ### 4.2 CI/CD Pipeline per Service
@@ -771,15 +769,15 @@ graph LR
 
 **Pipeline Configuration (per service):**
 
-| Stage | Tools | Duration |
-|---|---|---|
-| Build + Unit Test | Language-specific (go build, npm test, mvn test) | 1-3 min |
-| Integration Test | Testcontainers + docker-compose | 2-5 min |
-| Security Scan | Trivy (containers), Snyk/Grype (dependencies), Semgrep (SAST) | 1-3 min |
-| Container Build | Docker/Buildah with multi-stage builds | 1-2 min |
-| Deploy Staging | Helm/Kustomize + ArgoCD | 1-2 min |
-| E2E Smoke | Service-specific critical path tests | 2-5 min |
-| Production Deploy | ArgoCD progressive delivery | 10-30 min |
+| Stage             | Tools                                                         | Duration  |
+| ----------------- | ------------------------------------------------------------- | --------- |
+| Build + Unit Test | Language-specific (go build, npm test, mvn test)              | 1-3 min   |
+| Integration Test  | Testcontainers + docker-compose                               | 2-5 min   |
+| Security Scan     | Trivy (containers), Snyk/Grype (dependencies), Semgrep (SAST) | 1-3 min   |
+| Container Build   | Docker/Buildah with multi-stage builds                        | 1-2 min   |
+| Deploy Staging    | Helm/Kustomize + ArgoCD                                       | 1-2 min   |
+| E2E Smoke         | Service-specific critical path tests                          | 2-5 min   |
+| Production Deploy | ArgoCD progressive delivery                                   | 10-30 min |
 
 **Total pipeline time target: Under 15 minutes to staging, under 45 minutes to full production rollout.**
 
@@ -854,12 +852,12 @@ graph TB
 
 **Implementation Details:**
 
-| Pillar | Tool | Purpose |
-|---|---|---|
-| **Traces** | Jaeger or Grafana Tempo | Trace requests across service boundaries; find latency bottlenecks |
-| **Logs** | Loki (Grafana) or ELK | Centralized log aggregation; correlated by trace ID |
-| **Metrics** | Prometheus + Grafana | RED metrics (Rate, Errors, Duration) per service |
-| **Alerts** | Alertmanager | SLO-based alerting (not threshold-based) |
+| Pillar      | Tool                    | Purpose                                                            |
+| ----------- | ----------------------- | ------------------------------------------------------------------ |
+| **Traces**  | Jaeger or Grafana Tempo | Trace requests across service boundaries; find latency bottlenecks |
+| **Logs**    | Loki (Grafana) or ELK   | Centralized log aggregation; correlated by trace ID                |
+| **Metrics** | Prometheus + Grafana    | RED metrics (Rate, Errors, Duration) per service                   |
+| **Alerts**  | Alertmanager            | SLO-based alerting (not threshold-based)                           |
 
 **Mandatory Instrumentation per Service:**
 
@@ -907,11 +905,11 @@ sequenceDiagram
 
 **Token Strategy:**
 
-| Token Type | Lifetime | Storage | Purpose |
-|---|---|---|---|
-| Access Token (JWT) | 15 minutes | Memory (client) | API authentication |
-| Refresh Token | 7 days | HttpOnly cookie or OS keychain | Silent access token renewal |
-| API Key | Long-lived | Vault | Service-to-service, CI/CD |
+| Token Type         | Lifetime   | Storage                        | Purpose                     |
+| ------------------ | ---------- | ------------------------------ | --------------------------- |
+| Access Token (JWT) | 15 minutes | Memory (client)                | API authentication          |
+| Refresh Token      | 7 days     | HttpOnly cookie or OS keychain | Silent access token renewal |
+| API Key            | Long-lived | Vault                          | Service-to-service, CI/CD   |
 
 **JWT Claims Standard (propagated by gateway to downstream services):**
 
@@ -1065,22 +1063,22 @@ Database schema changes are NOT automatically reversible. Strategy:
 
 **Saga Rollback (compensating transactions):**
 
-| Forward Action | Compensating Action |
-|---|---|
-| CreateOrder | CancelOrder |
-| ProcessPayment | RefundPayment |
-| ReserveStock | ReleaseStock |
-| SendConfirmation | SendCancellation |
+| Forward Action   | Compensating Action |
+| ---------------- | ------------------- |
+| CreateOrder      | CancelOrder         |
+| ProcessPayment   | RefundPayment       |
+| ReserveStock     | ReleaseStock        |
+| SendConfirmation | SendCancellation    |
 
 ### 6.2 Data Migration Risks
 
-| Risk | Probability | Impact | Mitigation |
-|---|---|---|---|
-| Data loss during migration | Medium | Critical | Dual-write + reconciliation. Never delete source data until new service is proven stable for 2+ weeks |
-| Data inconsistency between services | High | High | Use CDC (Debezium) for replication. Run daily reconciliation jobs comparing source and target counts/checksums |
-| Foreign key violations | Medium | High | Migrate data in dependency order. Use soft references (IDs) instead of database-level FKs across services |
-| Performance degradation during migration | High | Medium | Migrate during low-traffic windows. Use batch processing with rate limiting. Monitor database CPU/IO |
-| Timeout/failure during large data migration | High | Medium | Use resumable migrations with checkpoints. Process in batches of 1000 rows. Log progress per batch |
+| Risk                                        | Probability | Impact   | Mitigation                                                                                                     |
+| ------------------------------------------- | ----------- | -------- | -------------------------------------------------------------------------------------------------------------- |
+| Data loss during migration                  | Medium      | Critical | Dual-write + reconciliation. Never delete source data until new service is proven stable for 2+ weeks          |
+| Data inconsistency between services         | High        | High     | Use CDC (Debezium) for replication. Run daily reconciliation jobs comparing source and target counts/checksums |
+| Foreign key violations                      | Medium      | High     | Migrate data in dependency order. Use soft references (IDs) instead of database-level FKs across services      |
+| Performance degradation during migration    | High        | Medium   | Migrate during low-traffic windows. Use batch processing with rate limiting. Monitor database CPU/IO           |
+| Timeout/failure during large data migration | High        | Medium   | Use resumable migrations with checkpoints. Process in batches of 1000 rows. Log progress per batch             |
 
 ### 6.3 Performance Regression Detection
 
@@ -1137,12 +1135,12 @@ AFTER (microservices teams):
 
 **Team topology recommendations:**
 
-| Team Type | Responsibility | Size |
-|---|---|---|
-| **Stream-aligned** | Owns one or more services end-to-end | 5-8 people |
-| **Platform** | Provides shared infrastructure (K8s, CI/CD, observability) | 3-5 people |
-| **Enabling** | Helps stream-aligned teams adopt new practices | 2-3 people (temporary) |
-| **Complicated subsystem** | Owns mathematically/algorithmically complex components | 3-5 specialists |
+| Team Type                 | Responsibility                                             | Size                   |
+| ------------------------- | ---------------------------------------------------------- | ---------------------- |
+| **Stream-aligned**        | Owns one or more services end-to-end                       | 5-8 people             |
+| **Platform**              | Provides shared infrastructure (K8s, CI/CD, observability) | 3-5 people             |
+| **Enabling**              | Helps stream-aligned teams adopt new practices             | 2-3 people (temporary) |
+| **Complicated subsystem** | Owns mathematically/algorithmically complex components     | 3-5 specialists        |
 
 **Do this before extracting services:** Reorganize teams to align with bounded contexts. A service extraction that does not come with a dedicated team will fail because nobody owns the operational responsibility.
 
@@ -1214,34 +1212,34 @@ Is your monolith causing deployment bottlenecks?
 
 You CAN use different languages per service (polyglot). You SHOULD NOT unless you have a strong reason.
 
-| Choose polyglot when | Stick to one language when |
-|---|---|
-| Team has deep expertise in a specific language for a specific domain | Team is small and context-switching between languages is costly |
-| Performance requirements demand it (e.g., Go for high-throughput, Python for ML) | Hiring is easier with a unified tech stack |
-| Acquiring a company with a different tech stack | Shared libraries and tooling work across services |
+| Choose polyglot when                                                             | Stick to one language when                                      |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Team has deep expertise in a specific language for a specific domain             | Team is small and context-switching between languages is costly |
+| Performance requirements demand it (e.g., Go for high-throughput, Python for ML) | Hiring is easier with a unified tech stack                      |
+| Acquiring a company with a different tech stack                                  | Shared libraries and tooling work across services               |
 
 **Database per Service:**
 
-| Service Characteristic | Recommended Database |
-|---|---|
-| Transactional, relational data | PostgreSQL (default choice) |
-| Document-oriented, schema flexibility | MongoDB |
-| High-throughput caching | Redis |
-| Full-text search | Elasticsearch or OpenSearch |
-| Time-series data (metrics, IoT) | TimescaleDB or InfluxDB |
-| Graph relationships | Neo4j |
-| Key-value at extreme scale | DynamoDB or Cassandra |
+| Service Characteristic                | Recommended Database        |
+| ------------------------------------- | --------------------------- |
+| Transactional, relational data        | PostgreSQL (default choice) |
+| Document-oriented, schema flexibility | MongoDB                     |
+| High-throughput caching               | Redis                       |
+| Full-text search                      | Elasticsearch or OpenSearch |
+| Time-series data (metrics, IoT)       | TimescaleDB or InfluxDB     |
+| Graph relationships                   | Neo4j                       |
+| Key-value at extreme scale            | DynamoDB or Cassandra       |
 
 **Default recommendation: PostgreSQL for everything unless you have a specific reason to use something else.** PostgreSQL supports JSON, full-text search, and time-series extensions, covering 90% of use cases.
 
 **Message Broker Selection:**
 
-| Broker | Best For | Avoid When |
-|---|---|---|
-| **Apache Kafka** | Event streaming, high throughput, event sourcing, replay | Simple pub/sub, small scale |
-| **RabbitMQ** | Task queues, routing, request/reply | Event replay, stream processing |
-| **Amazon SQS/SNS** | AWS-native, serverless | Multi-cloud, complex routing |
-| **NATS** | Ultra-low latency, edge computing | Complex routing, persistence |
+| Broker             | Best For                                                 | Avoid When                      |
+| ------------------ | -------------------------------------------------------- | ------------------------------- |
+| **Apache Kafka**   | Event streaming, high throughput, event sourcing, replay | Simple pub/sub, small scale     |
+| **RabbitMQ**       | Task queues, routing, request/reply                      | Event replay, stream processing |
+| **Amazon SQS/SNS** | AWS-native, serverless                                   | Multi-cloud, complex routing    |
+| **NATS**           | Ultra-low latency, edge computing                        | Complex routing, persistence    |
 
 **Default recommendation: Kafka for event-driven microservices.** It provides durable, replayable, ordered event streams. RabbitMQ if you primarily need task queues (work distribution) rather than event streams.
 
@@ -1302,29 +1300,29 @@ order-service/
 
 At the end of each service extraction, verify:
 
-| Gate | Criterion | Blocking? |
-|---|---|---|
-| Functional correctness | All existing tests pass + new service tests pass | YES |
-| Performance | p99 latency within 20% of monolith baseline | YES |
-| Data consistency | Reconciliation job shows 0 discrepancies for 48 hours | YES |
-| Observability | Traces, logs, and metrics visible in dashboards | YES |
-| Security | Security scan passes (no critical/high vulnerabilities) | YES |
-| Rollback | Rollback tested successfully in staging | YES |
-| Documentation | OpenAPI spec published, runbook written | NO (warning) |
-| Load test | Service handles 2x expected peak load | NO (warning) |
+| Gate                   | Criterion                                               | Blocking?    |
+| ---------------------- | ------------------------------------------------------- | ------------ |
+| Functional correctness | All existing tests pass + new service tests pass        | YES          |
+| Performance            | p99 latency within 20% of monolith baseline             | YES          |
+| Data consistency       | Reconciliation job shows 0 discrepancies for 48 hours   | YES          |
+| Observability          | Traces, logs, and metrics visible in dashboards         | YES          |
+| Security               | Security scan passes (no critical/high vulnerabilities) | YES          |
+| Rollback               | Rollback tested successfully in staging                 | YES          |
+| Documentation          | OpenAPI spec published, runbook written                 | NO (warning) |
+| Load test              | Service handles 2x expected peak load                   | NO (warning) |
 
 ### 8.4 Anti-Pattern Reference
 
-| Anti-Pattern | Symptom | Resolution |
-|---|---|---|
-| **Distributed Monolith** | Services must deploy together; shared database | Enforce data ownership; use events instead of direct DB access |
-| **Chatty Services** | 10+ synchronous calls per request | Aggregate in BFF; use events for non-critical data |
-| **God Service** | One service handles 50%+ of all traffic | Split by subdomain; apply bounded context analysis |
-| **Shared Database** | Multiple services read/write same tables | Stage 2-4 database decomposition (Section 2.4) |
-| **Nano Services** | Services with 1-2 endpoints, <500 LOC | Merge into parent bounded context |
-| **No Observability** | Cannot trace requests across services | OpenTelemetry + centralized logging BEFORE extraction |
-| **Big Bang Data Migration** | Moving all data at once | Dual-write + incremental migration + reconciliation |
-| **Ignoring Conway's Law** | Service boundaries do not match team boundaries | Inverse Conway maneuver: restructure teams first |
+| Anti-Pattern                | Symptom                                         | Resolution                                                     |
+| --------------------------- | ----------------------------------------------- | -------------------------------------------------------------- |
+| **Distributed Monolith**    | Services must deploy together; shared database  | Enforce data ownership; use events instead of direct DB access |
+| **Chatty Services**         | 10+ synchronous calls per request               | Aggregate in BFF; use events for non-critical data             |
+| **God Service**             | One service handles 50%+ of all traffic         | Split by subdomain; apply bounded context analysis             |
+| **Shared Database**         | Multiple services read/write same tables        | Stage 2-4 database decomposition (Section 2.4)                 |
+| **Nano Services**           | Services with 1-2 endpoints, <500 LOC           | Merge into parent bounded context                              |
+| **No Observability**        | Cannot trace requests across services           | OpenTelemetry + centralized logging BEFORE extraction          |
+| **Big Bang Data Migration** | Moving all data at once                         | Dual-write + incremental migration + reconciliation            |
+| **Ignoring Conway's Law**   | Service boundaries do not match team boundaries | Inverse Conway maneuver: restructure teams first               |
 
 ---
 
@@ -1343,4 +1341,4 @@ At the end of each service extraction, verify:
 
 ---
 
-*This document is a living architecture reference. Update it as migration progresses and patterns are validated against production reality.*
+_This document is a living architecture reference. Update it as migration progresses and patterns are validated against production reality._

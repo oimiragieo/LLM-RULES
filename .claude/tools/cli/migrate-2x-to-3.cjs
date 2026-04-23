@@ -123,7 +123,10 @@ function hasManifest(frontmatter) {
 function deriveAgentId(filePath, frontmatter) {
   const nameMatch = frontmatter.match(/^name:\s*["']?([^"'\r\n]+)["']?\s*$/m);
   if (nameMatch) {
-    return nameMatch[1].trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    return nameMatch[1]
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-');
   }
   return path.basename(filePath, '.md');
 }
@@ -138,7 +141,16 @@ function deriveAgentType(filePath, frontmatter) {
   const typeMatch = frontmatter.match(/^(?:type|subagent_type):\s*["']?([^"'\r\n]+)["']?\s*$/m);
   if (typeMatch) {
     const raw = typeMatch[1].trim().toLowerCase();
-    const VALID_TYPES = ['core', 'specialized', 'orchestrator', 'security', 'domain', 'creator', 'monitor', 'imported'];
+    const VALID_TYPES = [
+      'core',
+      'specialized',
+      'orchestrator',
+      'security',
+      'domain',
+      'creator',
+      'monitor',
+      'imported',
+    ];
     if (VALID_TYPES.includes(raw)) return raw;
     // Map common synonyms
     if (raw.includes('orchestrat')) return 'orchestrator';

@@ -24,13 +24,13 @@
 
 ## Risk Matrix
 
-| Area | Risk Level | Evidence | Impact | Probability |
-|------|-----------|----------|--------|-------------|
-| **Memory System** | HIGH | 4/5 paths unsanitized [mem:issues.md] | Data corruption, security | 60% |
-| **Routing Guard** | MEDIUM-HIGH | Recent bypass bugs [git:24fd1ef0, 57b77d0e] | False routing, crashes | 50% |
-| **Hook System** | MEDIUM | 646 console.log bypass [mem:issues.md#console-sprawl] | Debugging blind spots | 40% |
-| **Code Indexer** | LOW-MEDIUM | BM25-only stable [mem:learnings.md#indexer] | Search degradation | 20% |
-| **Module Size** | HIGH | 2 modules >100KB [mem:issues.md#oversized] | Refactoring accidents | 70% |
+| Area              | Risk Level  | Evidence                                              | Impact                    | Probability |
+| ----------------- | ----------- | ----------------------------------------------------- | ------------------------- | ----------- |
+| **Memory System** | HIGH        | 4/5 paths unsanitized [mem:issues.md]                 | Data corruption, security | 60%         |
+| **Routing Guard** | MEDIUM-HIGH | Recent bypass bugs [git:24fd1ef0, 57b77d0e]           | False routing, crashes    | 50%         |
+| **Hook System**   | MEDIUM      | 646 console.log bypass [mem:issues.md#console-sprawl] | Debugging blind spots     | 40%         |
+| **Code Indexer**  | LOW-MEDIUM  | BM25-only stable [mem:learnings.md#indexer]           | Search degradation        | 20%         |
+| **Module Size**   | HIGH        | 2 modules >100KB [mem:issues.md#oversized]            | Refactoring accidents     | 70%         |
 
 ---
 
@@ -39,18 +39,21 @@
 ### Recent Git Commits (Risk Profile)
 
 **Commit 24fd1ef0** (2026-02-15): `fix(debug-hardening): reduce non-MCP session failures`
+
 - **Risk**: Debug-mode instability still present after 3 sequential fixes
 - **Files touched**: 14 files, 248 insertions, 71 deletions
 - **Evidence**: Bypass routing bugs required multiple patches [git:log]
 - **Assessment**: MEDIUM risk - system not converging to stability
 
 **Commit 57b77d0e** (2026-02-15): `fix(debug-runs): harden bypass routing`
+
 - **Risk**: TaskList-first bypass + spawn/runtime hook fixes
 - **Files touched**: 22 files, 381 insertions, 1246 deletions
 - **Evidence**: Deleted 1206-line security-fixes doc suggests cleanup after incident [git:show]
 - **Assessment**: MEDIUM-HIGH risk - post-incident hardening
 
 **Commit e4fa67aa** (2026-02-15): `Fixed: enforce search/token-saver read governance`
+
 - **Risk**: Large unvalidated reads could crash sessions
 - **Files touched**: 8 files, 269+ line hook added
 - **Evidence**: New read-safety hook required [git:show]
@@ -61,16 +64,19 @@
 **Issue**: Memory Sanitization Incomplete (HIGH-004) [mem:issues.md#2026-02-13]
 
 **Evidence**:
+
 - Only 1 of 5 memory write paths has sanitization
 - 4 bypass paths: `archiveLearnings()`, `writeMemoryArray()`, `updateCodebaseMap()`, direct file writes
 - [rag:memory-manager.cjs] shows single sanitizer call path
 
 **Impact**:
+
 - Unsanitized writes → injection vectors
 - Data corruption risk in gotchas.json, patterns.json
 - Security bypass in memory-backed routing decisions
 
 **Mitigation**:
+
 - Create `memory-sanitizer.cjs` utility
 - Add to all 5 write paths
 - Add pre-write hook validation
@@ -84,20 +90,24 @@
 **Issue**: Routing Guard Bypass Bugs [git:24fd1ef0, 57b77d0e]
 
 **Evidence**:
+
 - 3 sequential commits fixing routing bypass bugs (2026-02-15)
 - Router self-check bypass fail-open behavior added [rag:routing-guard-core.checks-router.cjs]
 - TaskList-first bypass carveout added [git:show 57b77d0e]
 
 **Pattern**: [mem:learnings.md#defensive-programming]
+
 - "Defensive Programming Trilogy: Process hiding + command validation + existence guards"
 - Recent commits add existence guard layer → implies prior layer failures
 
 **Impact**:
+
 - Incorrect agent routing → wrong specialist, wasted work
 - Bypass mode allows non-compliant tool usage
 - Debug sessions may route differently than production
 
 **Risk Assessment**:
+
 - HIGH probability of residual bypass bugs (3 fixes in 1 day)
 - MEDIUM impact (routing errors catchable in review)
 
@@ -108,17 +118,20 @@
 **Issue**: Oversized Modules Require Refactoring (P0) [mem:issues.md#2026-02-13]
 
 **Evidence**:
+
 - 6 modules >50KB, 2 >100KB
 - `skill-creator/create.cjs`: 107KB, 3,677 lines
 - `routing-guard.cjs`: 79KB, 2,700+ lines
 - Refactor plan exists: skill-creator → 7 modules, routing-guard → 6 modules
 
 **Risk**:
+
 - Large files = high bug density
 - Refactoring accidents (breaking changes)
 - Testing coverage gaps in monolithic files
 
 **Pattern**: [mem:learnings.md#tri-audit-convergence]
+
 - "When 3+ independent audits identify same issue, it's systemic (P0)"
 - Security, architecture, code review ALL flagged oversized modules
 
@@ -132,20 +145,24 @@
 **Issue**: Console Usage Sprawl (646 Instances) [mem:issues.md#2026-02-13]
 
 **Evidence**:
+
 - 646 instances of `console.log/error` bypass structured logging
 - No observability in production hooks
 - Debugging blind spots when hooks fail silently
 
 **Gotcha**: [mem:gotchas.json#hook-crash-telemetry-missing]
+
 - "File existence guards don't log which files were expected"
 - Missing telemetry when optional files not found
 
 **Impact**:
+
 - Production debugging requires code inspection (no logs)
 - Hook failures invisible to Router
 - No audit trail for compliance
 
 **Mitigation**:
+
 - Batch refactor script (6-8 hours)
 - Enable ESLint `no-console` rule
 
@@ -158,6 +175,7 @@
 **Issue**: Reflection Queue Context Missing (P1) [mem:issues.md#2026-02-14]
 
 **Evidence**:
+
 - Task #13, Tasks 1-2 confirmed missing summary metadata
 - Incomplete learnings extraction
 - Broken audit trail
@@ -165,15 +183,18 @@
 **Pattern**: RECURRING - elevated to P1 due to recurrence
 
 **Impact**:
+
 - Cannot reconstruct what agents accomplished
 - Learnings extraction failures → memory gaps
 - Compliance audit failures (missing provenance)
 
 **Root Cause**:
+
 - `post-completion-chain.cjs` not validating summary field
 - TaskUpdate completions missing metadata
 
 **Mitigation**:
+
 - Add validation check to post-completion-chain.cjs
 - Enforce summary field on TaskUpdate completion
 - Backfill missing queue entries (if possible)
@@ -185,16 +206,19 @@
 **Issue**: Async Pipeline OOM at 600+ files [mem:learnings.md#code-indexer]
 
 **Evidence**:
+
 - BM25-only mode stable (1330 files in 19.5s)
 - Async pipeline OOMs due to V8 heap fragmentation
 - Sync fast-path bypasses async issues
 
 **Risk Assessment**:
+
 - LOW risk with `LANCEDB_EMBEDDING_MODE=off` (current stable mode)
 - MEDIUM risk if embeddings re-enabled without fixing async pipeline
 - Evidence: [mem:learnings.md#indexer-architecture]
 
 **Mitigation**:
+
 - Keep BM25-only as default
 - Document async pipeline as experimental
 - Fix heap fragmentation before re-enabling embeddings
@@ -207,6 +231,7 @@
 
 **Bug Risk**: HIGH
 **Evidence**:
+
 - 79KB, 2,700+ lines [mem:issues.md#oversized]
 - 3 bypass bugs fixed in last 24 hours [git:log]
 - Complexity creates hidden edge cases
@@ -219,6 +244,7 @@
 
 **Bug Risk**: HIGH
 **Evidence**:
+
 - 107KB, 3,677 lines [mem:issues.md#oversized]
 - Critical path for artifact creation
 - Refactor plan: 7 modules
@@ -231,6 +257,7 @@
 
 **Bug Risk**: MEDIUM-HIGH
 **Evidence**:
+
 - 57KB [mem:issues.md#oversized]
 - 4 of 5 write paths bypass sanitization [mem:issues.md#memory-sanitization]
 - [rag:memory-manager.cjs] shows single point of failure
@@ -250,6 +277,7 @@
 **Priority**: P1 (blocks production deployment)
 
 **Implementation**:
+
 ```javascript
 // .claude/lib/memory/memory-sanitizer.cjs
 function sanitize(content) {
@@ -259,6 +287,7 @@ module.exports = { sanitize };
 ```
 
 **Apply to**:
+
 - `archiveLearnings()`
 - `writeMemoryArray()`
 - `updateCodebaseMap()`
@@ -275,6 +304,7 @@ module.exports = { sanitize };
 **Priority**: P0 (systemic issue flagged by 3 audits)
 
 **Sequence**:
+
 1. skill-creator → 7 modules (12-16 hours)
 2. routing-guard → 6 modules (14-16 hours)
 
@@ -291,6 +321,7 @@ module.exports = { sanitize };
 **Priority**: P1 (RECURRING issue)
 
 **Implementation**:
+
 - Add validation to `post-completion-chain.cjs`
 - Block completions without summary
 - Add backfill script for existing queue
@@ -305,6 +336,7 @@ module.exports = { sanitize };
 **Hook Registration**: 10 active hooks unregistered (verification needed)
 
 **Evidence**:
+
 - [mem:learnings.md#tri-audit-learnings] - "Memory file budget crisis: decisions.md (74KB) and issues.md (62KB) 3-4x over budget"
 - [git:log] - 3 sequential debug-hardening commits (2026-02-15)
 
@@ -328,6 +360,7 @@ module.exports = { sanitize };
 **Recent Stability**: Declining (3 hotfixes in 24 hours) indicates active instability requiring attention.
 
 **Positive Signals**:
+
 - 99.3% test pass rate [mem:learnings.md#tri-audit]
 - 0 lint errors, 0 format violations [mem:learnings.md#progressive-quality-gates]
 - BM25-only indexer stable [mem:learnings.md#code-indexer]

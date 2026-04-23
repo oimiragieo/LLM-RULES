@@ -30,6 +30,7 @@ This review identifies **3 CRITICAL**, **4 HIGH**, **4 MEDIUM**, and **2 LOW** s
 The codebase contains **352 `JSON.parse()` calls across 230 `.cjs` files**. Only **84 calls across 22 files** use the safe parser (`safeParseJSON`/`safeReadJSON` from `.claude/lib/utils/safe-json.cjs`). This means **~268 calls (76%) parse JSON without prototype pollution protection, schema validation, or crash-safe error handling**.
 
 Any JSON.parse call processing external input (hook stdin, file content, agent responses, JSONL logs) is a potential:
+
 - **Crash vector**: Malformed JSON throws unhandled exceptions, crashing the hook process
 - **Prototype pollution vector**: `{"__proto__": {"isAdmin": true}}` modifies Object.prototype globally
 - **Denial of service**: Deeply nested JSON or extremely large payloads can OOM the process
@@ -37,6 +38,7 @@ Any JSON.parse call processing external input (hook stdin, file content, agent r
 ### Evidence
 
 Files with highest unprotected JSON.parse counts (sampled):
+
 - `.claude/hooks/safety/bash-pretool-bundle.cjs` - raw `JSON.parse()` in `tryParseJson()` (line ~60)
 - `.claude/lib/routing/router-state.cjs` - duplicated inline `safeJSONParse()` instead of shared utility
 - Various hooks using `JSON.parse(process.argv[2])` without safe-json.cjs
@@ -58,6 +60,7 @@ const data = safeParseJSON(content, null); // without schema (fallback path)
 ```
 
 **Implementation steps:**
+
 1. Create an ESLint rule blocking raw `JSON.parse()` in `.claude/` (warn initially, block after migration)
 2. Categorize all 268 unprotected calls by risk tier (external input = P0, file reads = P1, test fixtures = P2)
 3. Migrate P0 calls first (hooks, routing, memory operations)
@@ -92,6 +95,7 @@ for (const key of Object.keys(parsed)) {
 ```
 
 **Attack payload:**
+
 ```json
 {
   "config": {
@@ -221,13 +225,14 @@ const ADDITIONAL_INJECTION_PATTERNS = [
 
 Three active skill scripts use `spawn()` or `spawnSync()` with `shell: true`, which enables shell metacharacter interpretation on all arguments:
 
-| File | Line | Command |
-|---|---|---|
-| `.claude/skills/aws-cloud-ops/scripts/main.cjs` | ~62 | `spawn('aws', args, { shell: true })` |
-| `.claude/skills/gcloud-cli/scripts/main.cjs` | ~similar | `spawn('gcloud', args, { shell: true })` |
+| File                                              | Line     | Command                                   |
+| ------------------------------------------------- | -------- | ----------------------------------------- |
+| `.claude/skills/aws-cloud-ops/scripts/main.cjs`   | ~62      | `spawn('aws', args, { shell: true })`     |
+| `.claude/skills/gcloud-cli/scripts/main.cjs`      | ~similar | `spawn('gcloud', args, { shell: true })`  |
 | `.claude/skills/kubernetes-flux/scripts/main.cjs` | ~similar | `spawn('kubectl', args, { shell: true })` |
 
 Two archived files also have this pattern:
+
 - `.claude/skills/_archive/mcp-converter/convert.cjs`
 - `.claude/skills/_archive/github-ops/scripts/main.cjs`
 
@@ -237,11 +242,15 @@ Arguments come from `process.argv` which are user/agent-controlled. With `shell:
 
 ```javascript
 // aws-cloud-ops/scripts/main.cjs
-const child = spawn('aws', args.filter(a => a !== '--help'), {
-  stdio: 'inherit',
-  cwd: PROJECT_ROOT,
-  shell: true, // SECURITY RISK
-});
+const child = spawn(
+  'aws',
+  args.filter(a => a !== '--help'),
+  {
+    stdio: 'inherit',
+    cwd: PROJECT_ROOT,
+    shell: true, // SECURITY RISK
+  }
+);
 ```
 
 ### Remediation
@@ -255,10 +264,10 @@ const child = spawn('aws', args, { shell: true, stdio: 'inherit', cwd: PROJECT_R
 
 // AFTER:
 const child = spawn('aws', args, {
-  shell: false,  // Prevent shell metacharacter injection
+  shell: false, // Prevent shell metacharacter injection
   stdio: 'inherit',
   cwd: PROJECT_ROOT,
-  windowsHide: true  // Windows security compliance
+  windowsHide: true, // Windows security compliance
 });
 ```
 
@@ -332,6 +341,7 @@ Whether the caller actually blocks on `safe: false` depends entirely on the call
 **Effort:** MEDIUM (requires caller audit + behavior decision)
 
 **Option A (Recommended): Block on detection**
+
 ```javascript
 // In memory-manager.cjs or callers:
 const result = sanitizeMemoryContent(content);
@@ -341,6 +351,7 @@ if (!result.safe) {
 ```
 
 **Option B: Strip dangerous patterns**
+
 ```javascript
 // In sanitizeMemoryContent:
 let sanitized = contentStr;
@@ -409,7 +420,7 @@ function updateState(filePath, updater) {
 
   // Atomic write checks version before committing
   atomicWriteJSONSync(filePath, newState, {
-    expectedVersion // Fail if version changed since read
+    expectedVersion, // Fail if version changed since read
   });
 }
 ```
@@ -437,12 +448,11 @@ If an array contains objects with dangerous keys, those objects are copied as-is
 ```
 
 **Attack payload:**
+
 ```json
 {
   "tool_input": {
-    "items": [
-      { "__proto__": { "polluted": true } }
-    ]
+    "items": [{ "__proto__": { "polluted": true } }]
   }
 }
 ```
@@ -485,11 +495,13 @@ If an array contains objects with dangerous keys, those objects are copied as-is
 ### Description
 
 Multiple documentation files reference `.claude/lib/utils/safe-json-parse.cjs` but the actual file is `.claude/lib/utils/safe-json.cjs`. This causes:
+
 - Developers looking for the safe parser cannot find it
 - Copy-paste of require statements from docs fails with MODULE_NOT_FOUND
 - Security auditors may conclude the safe parser does not exist
 
 References found in:
+
 - `.claude/rules/security.md` (references `safe-json-parse.cjs`)
 - `.claude/lib/memory/memory-sanitizer.cjs` header comment (line 15: "Based on security patterns from: .claude/lib/utils/safe-json-parse.cjs")
 
@@ -547,7 +559,7 @@ The memory sanitizer (VUL-BYPASS-001 fix) now scans ALL content including code b
 - `import('module')` triggers "code execution: import()" detection
 - Backtick template literals trigger "shell injection: backtick execution"
 - Semicolons in any code trigger "shell injection: semicolon command chaining"
-- References to `__proto__` in security documentation trigger "code execution: __proto__ manipulation"
+- References to `__proto__` in security documentation trigger "code execution: **proto** manipulation"
 
 This means virtually every memory entry containing code examples will be flagged as `safe: false`, reducing signal-to-noise ratio to near zero.
 
@@ -563,6 +575,7 @@ This means virtually every memory entry containing code examples will be flagged
 **Effort:** MEDIUM
 
 Implement a tiered detection system:
+
 1. **CRITICAL patterns** (always block): `rm -rf /`, reverse shells, `curl|bash`, base64 decode pipe
 2. **HIGH patterns** (block outside code blocks): `eval()`, `Function()`, `__proto__`
 3. **INFO patterns** (log only): `require()`, `import()`, semicolons, backticks
@@ -587,12 +600,14 @@ const PATTERN_TIERS = {
 ### Description
 
 **Positive findings (controls working):**
+
 - `.gitignore` properly covers `.env`, `.env.local`, `.env.*.local`, `**/secrets/`, `**/*.key`, `**/*.pem`, `**/credentials.json`
 - `.env.example` files contain only placeholder values (no real secrets)
 - No hardcoded API keys, tokens, or passwords found in codebase search
 - `console.log` calls with sensitive keywords (`password`, `token`, `secret`, `key`, `credential`) found only in benign contexts (logging key names, not values)
 
 **Minor concern:**
+
 - 48 files use `execSync`/`exec`/`spawnSync` -- if any construct commands from environment variables without sanitization, secrets could leak via process arguments visible in `ps aux`. No concrete leak found, but the attack surface exists.
 
 ### Remediation
@@ -628,64 +643,64 @@ No immediate action required. When SEC-REM-001 migration is complete, this will 
 
 ## Remediation Priority Matrix
 
-| ID | Finding | Severity | CVSS | Priority | Effort | ETA |
-|---|---|---|---|---|---|---|
-| SEC-REM-001 | 76% unprotected JSON.parse calls | CRITICAL | 8.1 | P0 | MEDIUM | Week 1 |
-| SEC-REM-002 | Nested prototype pollution in fallback | CRITICAL | 7.5 | P0 | LOW | Week 1 |
-| SEC-REM-003 | Shell injection validator coverage gap | CRITICAL | 8.6 | P0 | MEDIUM | Week 1 |
-| SEC-REM-004 | `shell: true` in cloud skills | HIGH | 7.2 | P0 | LOW | Week 1 |
-| SEC-REM-005 | Duplicated safe parse logic | HIGH | 6.5 | P1 | LOW | Week 2 |
-| SEC-REM-006 | Memory sanitizer detection-only | HIGH | 6.8 | P1 | MEDIUM | Week 2 |
-| SEC-REM-007 | No read-lock on router state | HIGH | 5.9 | P1 | MEDIUM | Week 2 |
-| SEC-REM-008 | Array elements not sanitized in hook-input | MEDIUM | 5.3 | P1 | LOW | Week 2 |
-| SEC-REM-009 | Wrong filename in documentation | MEDIUM | 3.7 | P2 | TRIVIAL | Week 3 |
-| SEC-REM-010 | Raw JSON.parse in bash-pretool-bundle | MEDIUM | 5.0 | P2 | TRIVIAL | Week 2 |
-| SEC-REM-011 | Memory sanitizer false positives | MEDIUM | 4.3 | P2 | MEDIUM | Week 3 |
-| SEC-REM-012 | Secrets exposure (low risk) | LOW | 2.4 | P3 | LOW | Ongoing |
-| SEC-REM-013 | parseHookInputSync raw parse | LOW | 3.1 | P3 | TRIVIAL | Ongoing |
+| ID          | Finding                                    | Severity | CVSS | Priority | Effort  | ETA     |
+| ----------- | ------------------------------------------ | -------- | ---- | -------- | ------- | ------- |
+| SEC-REM-001 | 76% unprotected JSON.parse calls           | CRITICAL | 8.1  | P0       | MEDIUM  | Week 1  |
+| SEC-REM-002 | Nested prototype pollution in fallback     | CRITICAL | 7.5  | P0       | LOW     | Week 1  |
+| SEC-REM-003 | Shell injection validator coverage gap     | CRITICAL | 8.6  | P0       | MEDIUM  | Week 1  |
+| SEC-REM-004 | `shell: true` in cloud skills              | HIGH     | 7.2  | P0       | LOW     | Week 1  |
+| SEC-REM-005 | Duplicated safe parse logic                | HIGH     | 6.5  | P1       | LOW     | Week 2  |
+| SEC-REM-006 | Memory sanitizer detection-only            | HIGH     | 6.8  | P1       | MEDIUM  | Week 2  |
+| SEC-REM-007 | No read-lock on router state               | HIGH     | 5.9  | P1       | MEDIUM  | Week 2  |
+| SEC-REM-008 | Array elements not sanitized in hook-input | MEDIUM   | 5.3  | P1       | LOW     | Week 2  |
+| SEC-REM-009 | Wrong filename in documentation            | MEDIUM   | 3.7  | P2       | TRIVIAL | Week 3  |
+| SEC-REM-010 | Raw JSON.parse in bash-pretool-bundle      | MEDIUM   | 5.0  | P2       | TRIVIAL | Week 2  |
+| SEC-REM-011 | Memory sanitizer false positives           | MEDIUM   | 4.3  | P2       | MEDIUM  | Week 3  |
+| SEC-REM-012 | Secrets exposure (low risk)                | LOW      | 2.4  | P3       | LOW     | Ongoing |
+| SEC-REM-013 | parseHookInputSync raw parse               | LOW      | 3.1  | P3       | TRIVIAL | Ongoing |
 
 ---
 
 ## Positive Security Controls (Working Well)
 
-| Control | Location | Assessment |
-|---|---|---|
-| Schema-validated JSON parsing | `.claude/lib/utils/safe-json.cjs` | STRONG (where adopted) |
-| Hook input sanitization (SEC-007) | `.claude/lib/utils/hook-input.cjs` | STRONG (recursive, key whitelist) |
-| Atomic file writes | `.claude/lib/utils/atomic-write.cjs` | STRONG (proper-lockfile) |
-| Bash command allowlist | `.claude/hooks/safety/bash-command-validator.cjs` | STRONG (fail-closed) |
-| .gitignore coverage | `.gitignore` | STRONG (283 lines, comprehensive) |
-| Object.create(null) pattern | safe-json.cjs, hook-input.cjs | STRONG (prevents prototype chain) |
-| windowsHide compliance | spawn/spawnSync calls | STRONG (18+ files patched) |
-| Memory sanitizer detection | memory-sanitizer.cjs | MODERATE (detect-only, not block) |
-| Prototype pollution detection | safe-json.cjs, hook-input.cjs | MODERATE (gaps in adoption) |
+| Control                           | Location                                          | Assessment                        |
+| --------------------------------- | ------------------------------------------------- | --------------------------------- |
+| Schema-validated JSON parsing     | `.claude/lib/utils/safe-json.cjs`                 | STRONG (where adopted)            |
+| Hook input sanitization (SEC-007) | `.claude/lib/utils/hook-input.cjs`                | STRONG (recursive, key whitelist) |
+| Atomic file writes                | `.claude/lib/utils/atomic-write.cjs`              | STRONG (proper-lockfile)          |
+| Bash command allowlist            | `.claude/hooks/safety/bash-command-validator.cjs` | STRONG (fail-closed)              |
+| .gitignore coverage               | `.gitignore`                                      | STRONG (283 lines, comprehensive) |
+| Object.create(null) pattern       | safe-json.cjs, hook-input.cjs                     | STRONG (prevents prototype chain) |
+| windowsHide compliance            | spawn/spawnSync calls                             | STRONG (18+ files patched)        |
+| Memory sanitizer detection        | memory-sanitizer.cjs                              | MODERATE (detect-only, not block) |
+| Prototype pollution detection     | safe-json.cjs, hook-input.cjs                     | MODERATE (gaps in adoption)       |
 
 ---
 
 ## STRIDE Threat Model Summary
 
-| Threat | Status | Key Finding |
-|---|---|---|
-| **Spoofing** | LOW RISK | Hook input whitelist prevents unauthorized key injection |
-| **Tampering** | HIGH RISK | 76% unprotected JSON.parse + nested prototype pollution |
-| **Repudiation** | LOW RISK | Audit logging via stderr in sanitizer and hooks |
-| **Information Disclosure** | MEDIUM RISK | Shell injection gaps could enable data exfiltration |
-| **Denial of Service** | MEDIUM RISK | Malformed JSON crashes unprotected parsers |
-| **Elevation of Privilege** | HIGH RISK | Prototype pollution + shell: true = arbitrary code execution |
+| Threat                     | Status      | Key Finding                                                  |
+| -------------------------- | ----------- | ------------------------------------------------------------ |
+| **Spoofing**               | LOW RISK    | Hook input whitelist prevents unauthorized key injection     |
+| **Tampering**              | HIGH RISK   | 76% unprotected JSON.parse + nested prototype pollution      |
+| **Repudiation**            | LOW RISK    | Audit logging via stderr in sanitizer and hooks              |
+| **Information Disclosure** | MEDIUM RISK | Shell injection gaps could enable data exfiltration          |
+| **Denial of Service**      | MEDIUM RISK | Malformed JSON crashes unprotected parsers                   |
+| **Elevation of Privilege** | HIGH RISK   | Prototype pollution + shell: true = arbitrary code execution |
 
 ---
 
 ## Compliance Mapping
 
-| Framework | Requirement | Status | Gap |
-|---|---|---|---|
-| OWASP ASI01 | Agent Goal Hijacking Prevention | PARTIAL | Memory sanitizer detect-only |
-| OWASP ASI02 | Tool Misuse Prevention | PARTIAL | shell: true in 3 active files |
-| OWASP ASI06 | Memory Poisoning Prevention | PARTIAL | 76% unprotected JSON.parse |
-| OWASP A03 | Injection Prevention | PARTIAL | Shell validator coverage gap |
-| OWASP A08 | Software Integrity | PARTIAL | Prototype pollution in fallback |
-| SOC2 CC6.1 | Logical Access Controls | PASS | Tool whitelist enforced |
-| SOC2 CC7.2 | System Monitoring | PASS | Audit logging active |
+| Framework   | Requirement                     | Status  | Gap                             |
+| ----------- | ------------------------------- | ------- | ------------------------------- |
+| OWASP ASI01 | Agent Goal Hijacking Prevention | PARTIAL | Memory sanitizer detect-only    |
+| OWASP ASI02 | Tool Misuse Prevention          | PARTIAL | shell: true in 3 active files   |
+| OWASP ASI06 | Memory Poisoning Prevention     | PARTIAL | 76% unprotected JSON.parse      |
+| OWASP A03   | Injection Prevention            | PARTIAL | Shell validator coverage gap    |
+| OWASP A08   | Software Integrity              | PARTIAL | Prototype pollution in fallback |
+| SOC2 CC6.1  | Logical Access Controls         | PASS    | Tool whitelist enforced         |
+| SOC2 CC7.2  | System Monitoring               | PASS    | Audit logging active            |
 
 ---
 

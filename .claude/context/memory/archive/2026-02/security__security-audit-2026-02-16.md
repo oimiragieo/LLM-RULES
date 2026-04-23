@@ -13,13 +13,13 @@
 
 A security audit of the Agent Studio codebase identified **8 distinct vulnerabilities** across 4 severity categories. The most critical finding is a **hook bypass vulnerability** where the shell injection validator is invoked as a subprocess but has no executable entrypoint, causing it to silently pass all inputs. Three active skill scripts use `shell: true` creating command injection surface. The remaining findings are medium-to-low risk, with the framework demonstrating strong prototype pollution defenses via `safe-json.cjs`.
 
-| Severity | Count |
-|----------|-------|
-| Critical | 1     |
-| High     | 2     |
-| Medium   | 3     |
-| Low      | 2     |
-| **Total**| **8** |
+| Severity  | Count |
+| --------- | ----- |
+| Critical  | 1     |
+| High      | 2     |
+| Medium    | 3     |
+| Low       | 2     |
+| **Total** | **8** |
 
 ---
 
@@ -36,6 +36,7 @@ A security audit of the Agent Studio codebase identified **8 distinct vulnerabil
 `.claude/hooks/safety/bash-pretool-bundle.cjs` (line 11) registers `shell-injection-validator.cjs` as one of four hooks to run in sequence via `spawnSync`. However, `shell-injection-validator.cjs` exports only a `handler(input)` function with no `main()` entrypoint and does not read from stdin.
 
 When spawned as a subprocess by the bundle, the script:
+
 1. Loads the module
 2. Registers `module.exports = { handler, ... }`
 3. Exits immediately with code 0 (success), having validated nothing
@@ -130,7 +131,7 @@ const child = spawn(
   {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: true,  // VULNERABLE: shell metacharacter injection possible
+    shell: true, // VULNERABLE: shell metacharacter injection possible
   }
 );
 ```
@@ -148,7 +149,7 @@ const child = spawn(
   {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: false,  // SECURE: array args bypass shell
+    shell: false, // SECURE: array args bypass shell
     windowsHide: true,
   }
 );
@@ -181,6 +182,7 @@ const data = JSON.parse(fs.readFileSync(path, 'utf8')); // Raw JSON.parse
 ```
 
 Vectors:
+
 1. **Prototype pollution**: Malformed file content `{ "__proto__": { "isAdmin": true } }` modifies `Object.prototype`
 2. **Path injection**: `SLO_METRICS_PATH=/etc/passwd` would attempt to parse arbitrary files as JSON (DoS on failure)
 3. **Memory poisoning**: Malicious hook execution writes crafted JSON to the SLO path, influencing hook decisions
@@ -190,8 +192,10 @@ Vectors:
 ```javascript
 const { safeReadJSON } = require('../../lib/utils/safe-json.cjs');
 // ...
-const data = safeReadJSON(path, null);  // Schema-validated, prototype-safe
-if (!data) { process.exit(0); }
+const data = safeReadJSON(path, null); // Schema-validated, prototype-safe
+if (!data) {
+  process.exit(0);
+}
 ```
 
 ---
@@ -225,7 +229,7 @@ Implement atomic writes using a temporary file + rename pattern:
 ```javascript
 const tmpPath = statePath + '.tmp.' + process.pid;
 fs.writeFileSync(tmpPath, JSON.stringify(newState));
-fs.renameSync(tmpPath, statePath);  // Atomic on POSIX; use proper-lockfile for Windows
+fs.renameSync(tmpPath, statePath); // Atomic on POSIX; use proper-lockfile for Windows
 ```
 
 Or adopt `proper-lockfile` for cross-platform advisory locking. The `code-index-updater.cjs` already uses a "Simple lock file for cross-process coordination" pattern (line 78) — this should be applied to all 14 runtime state files.
@@ -292,14 +296,16 @@ Add sanitization layer in the memory injection functions:
 ```javascript
 function sanitizeMemoryContent(raw) {
   // Strip LLM prompt injection markers
-  return String(raw || '')
-    .replace(/\bIGNORE\s+(ALL\s+)?PREVIOUS\s+INSTRUCTIONS?\b/gi, '[REDACTED]')
-    .replace(/\bSYSTEM\s+PROMPT\b/gi, '[REDACTED]')
-    .replace(/\bDISREGARD\b/gi, '[REDACTED]')
-    // Normalize to inline text (prevent header injection)
-    .replace(/^#{1,6}\s+/gm, '')
-    // Cap at 180 chars (already applied)
-    .slice(0, 180);
+  return (
+    String(raw || '')
+      .replace(/\bIGNORE\s+(ALL\s+)?PREVIOUS\s+INSTRUCTIONS?\b/gi, '[REDACTED]')
+      .replace(/\bSYSTEM\s+PROMPT\b/gi, '[REDACTED]')
+      .replace(/\bDISREGARD\b/gi, '[REDACTED]')
+      // Normalize to inline text (prevent header injection)
+      .replace(/^#{1,6}\s+/gm, '')
+      // Cap at 180 chars (already applied)
+      .slice(0, 180)
+  );
 }
 ```
 
@@ -359,23 +365,23 @@ Replace `JSON.parse()` with `safeParseJSON()` from `safe-json.cjs`.
 
 ### Effective Controls (Working Correctly)
 
-| Control | Location | Status |
-|---------|----------|--------|
-| SEC-001: Prototype Pollution Defense | `safe-json.cjs:180-202` | EFFECTIVE — `stripDangerousKeys()` recursively removes `__proto__`, `constructor`, `prototype` |
-| SEC-002: Schema-Based JSON Validation | `safe-json.cjs:220+` | EFFECTIVE — 10 schemas defined; `Object.create(null)` prevents pollution |
-| SEC-003: Path Traversal Prevention | `project-root.cjs`, `validatePathWithinProject()` | EFFECTIVE — used by `code-index-updater.cjs` |
-| SEC-004: Bash Command Registry | `validators/registry.cjs` | EFFECTIVE — validators for 15 commands |
-| SEC-005: Fail-Closed on Error | `bash-command-validator.cjs:376-404` | EFFECTIVE — exits 2 on errors unless `BASH_VALIDATOR_FAIL_OPEN=true` |
-| SEC-006: Environment Variable Override Control | Multiple hooks | EFFECTIVE — `block|warn|off` pattern with `block` as default |
-| SEC-007: Concurrent Lock File | `code-index-updater.cjs:78` | PARTIAL — only one file protected |
+| Control                                        | Location                                          | Status                                                                                         |
+| ---------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| SEC-001: Prototype Pollution Defense           | `safe-json.cjs:180-202`                           | EFFECTIVE — `stripDangerousKeys()` recursively removes `__proto__`, `constructor`, `prototype` |
+| SEC-002: Schema-Based JSON Validation          | `safe-json.cjs:220+`                              | EFFECTIVE — 10 schemas defined; `Object.create(null)` prevents pollution                       |
+| SEC-003: Path Traversal Prevention             | `project-root.cjs`, `validatePathWithinProject()` | EFFECTIVE — used by `code-index-updater.cjs`                                                   |
+| SEC-004: Bash Command Registry                 | `validators/registry.cjs`                         | EFFECTIVE — validators for 15 commands                                                         |
+| SEC-005: Fail-Closed on Error                  | `bash-command-validator.cjs:376-404`              | EFFECTIVE — exits 2 on errors unless `BASH_VALIDATOR_FAIL_OPEN=true`                           |
+| SEC-006: Environment Variable Override Control | Multiple hooks                                    | EFFECTIVE — `block                                                                             | warn | off`pattern with`block` as default |
+| SEC-007: Concurrent Lock File                  | `code-index-updater.cjs:78`                       | PARTIAL — only one file protected                                                              |
 
 ### Weak/Missing Controls
 
-| Control Gap | Risk | Files |
-|-------------|------|-------|
-| Shell injection validator has no entrypoint | CRITICAL | `shell-injection-validator.cjs` |
-| Race condition on runtime state files | MEDIUM | 14 runtime JSON files |
-| Memory content sanitization for prompt injection | MEDIUM | `spawn-prompt-assembler.memory.cjs` |
+| Control Gap                                      | Risk     | Files                               |
+| ------------------------------------------------ | -------- | ----------------------------------- |
+| Shell injection validator has no entrypoint      | CRITICAL | `shell-injection-validator.cjs`     |
+| Race condition on runtime state files            | MEDIUM   | 14 runtime JSON files               |
+| Memory content sanitization for prompt injection | MEDIUM   | `spawn-prompt-assembler.memory.cjs` |
 
 ---
 
@@ -415,13 +421,13 @@ Replace `JSON.parse()` with `safeParseJSON()` from `safe-json.cjs`.
 
 ## Compliance Mapping
 
-| Control Area | SOC2 | OWASP |
-|--------------|------|-------|
+| Control Area                | SOC2  | OWASP    |
+| --------------------------- | ----- | -------- |
 | Shell injection bypass (F1) | CC6.1 | A05, A03 |
-| shell: true in skills (F2) | CC6.1 | A03 |
-| Raw JSON.parse (F3) | CC6.1 | A08 |
-| Race conditions (F4) | A2.1 | A04 |
-| Memory poisoning (F6) | CC6.6 | ASI06 |
+| shell: true in skills (F2)  | CC6.1 | A03      |
+| Raw JSON.parse (F3)         | CC6.1 | A08      |
+| Race conditions (F4)        | A2.1  | A04      |
+| Memory poisoning (F6)       | CC6.6 | ASI06    |
 
 ---
 
@@ -436,4 +442,4 @@ Replace `JSON.parse()` with `safeParseJSON()` from `safe-json.cjs`.
 
 ---
 
-*Report generated: 2026-02-16 | Task #3 | Security Architect Agent*
+_Report generated: 2026-02-16 | Task #3 | Security Architect Agent_

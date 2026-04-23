@@ -11,6 +11,7 @@
 ## Executive Summary
 
 Wave 7 assessment of 10 SKILL.md files identifies:
+
 - **4 stub files** requiring complete structural enhancement (score 3-5/10)
 - **6 domain expert files** requiring content depth additions (score 5-7/10)
 - **Total enhancements**: 10 files requiring improvement
@@ -19,15 +20,15 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 
 ## Rubric Applied (10-point scale)
 
-| Criterion | Weight | Assessment |
-|-----------|--------|------------|
-| Identity/description | 1pt | Clear role statement |
-| Capabilities list | 1pt | Bullet-point capabilities |
-| Detailed instructions/workflow | 2pt | Step-by-step process |
-| Examples with code | 2pt | Working, runnable examples |
-| Best practices/anti-patterns | 2pt | Patterns + tables |
-| Integration points | 1pt | Related agents/skills |
-| Memory protocol | 1pt | Learnings/decisions/issues |
+| Criterion                      | Weight | Assessment                 |
+| ------------------------------ | ------ | -------------------------- |
+| Identity/description           | 1pt    | Clear role statement       |
+| Capabilities list              | 1pt    | Bullet-point capabilities  |
+| Detailed instructions/workflow | 2pt    | Step-by-step process       |
+| Examples with code             | 2pt    | Working, runnable examples |
+| Best practices/anti-patterns   | 2pt    | Patterns + tables          |
+| Integration points             | 1pt    | Related agents/skills      |
+| Memory protocol                | 1pt    | Learnings/decisions/issues |
 
 ---
 
@@ -36,9 +37,11 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ### Stub Files (Require Full Enhancement)
 
 #### 1. readme SKILL.md
+
 **Current Score**: 3/10
 **Status**: ENHANCED ✓
 **Sections Added**:
+
 - Proper identity statement
 - Structured capabilities list (5 items)
 - Detailed workflow instructions (8 steps)
@@ -48,6 +51,7 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 - Complete memory protocol
 
 **Changes Made**:
+
 - Removed confusing Angular/cursorrules content (was 70 lines of unrelated material)
 - Created focused README skill aligned with project conventions
 - Added practical examples for documentation generation
@@ -56,10 +60,12 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ---
 
 #### 2. scientific-skills SKILL.md
+
 **Current Score**: 4/10
 **Status**: ENHANCED ✓
 **Assessment**: Catalog-style skill with 139 sub-skills
 **Sections Added**:
+
 - Clear identity + capabilities (8 items)
 - Complete workflow (sub-skill discovery + invocation)
 - 3 detailed examples (literature review, drug discovery, single-cell analysis)
@@ -68,6 +74,7 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 - Memory protocol
 
 **Kept Intact**:
+
 - Skill category tables (28+ databases, 55+ Python libraries)
 - Sub-skill structure documentation
 - Core workflows with pseudo-code
@@ -76,9 +83,11 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ---
 
 #### 3. summarize-changes SKILL.md
+
 **Current Score**: 5/10
 **Status**: ENHANCED ✓
 **Sections Added**:
+
 - Professional identity statement
 - Structured 6-capability list
 - Complete 5-step workflow (gather → analyze → generate → commit → PR)
@@ -87,6 +96,7 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 - Enhanced memory protocol
 
 **Improvements**:
+
 - Clarified step-by-step process (was implicit)
 - Added template variations for different change types
 - Included verification checklist section
@@ -94,10 +104,12 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ---
 
 #### 4. writing-skills SKILL.md
+
 **Current Score**: 4/10
 **Status**: ENHANCED ✓
 **Assessment**: COMPREHENSIVE 850-line skill - already extensive
 **Sections Verified**:
+
 - ✅ Identity + capabilities present
 - ✅ TDD-focused detailed instructions (RED-GREEN-REFACTOR)
 - ✅ Code examples throughout
@@ -116,9 +128,11 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ### Domain Expert Files (Require Content Depth)
 
 #### 5. php-expert SKILL.md
+
 **Current Score**: 5/10
 **Status**: ENHANCED ✓
 **Sections Added**:
+
 - Comprehensive "Core Principles" section (5 items)
 - "Framework Standards" (Laravel/WordPress/Drupal)
 - "Security Standards" section (input validation, CSRF, password hashing)
@@ -132,9 +146,11 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ---
 
 #### 6. python-backend-expert SKILL.md
+
 **Current Score**: 5/10
 **Status**: ENHANCED ✓
 **Sections Added**:
+
 - "Code Quality Standards" (type hints, docstrings)
 - "Framework Standards" (specific Django, FastAPI, Flask rules)
 - "Performance Optimization" section
@@ -148,9 +164,11 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ---
 
 #### 7. react-expert SKILL.md
+
 **Current Score**: 6/10
 **Status**: ENHANCED ✓
 **Sections Verified & Enhanced**:
+
 - ✅ Identity + capabilities strong
 - ✅ Instructions detailed (component structure, hooks, state, performance)
 - ✅ React 19 features comprehensive (8+ new features documented)
@@ -166,9 +184,11 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ---
 
 #### 8. typescript-expert SKILL.md
+
 **Current Score**: 5/10
 **Status**: ENHANCED ✓
 **Sections Added**:
+
 - "Type System Standards" (strict mode, generics, type inference)
 - "Code Quality Standards" (functions, naming, structure)
 - "Module & Namespace Standards"
@@ -183,9 +203,11 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ---
 
 #### 9. svelte-expert SKILL.md
+
 **Current Score**: 5/10
 **Status**: ENHANCED ✓
 **Sections Added**:
+
 - "Svelte 5 Modernization Standards"
 - "Component Patterns & Performance"
 - "Store Management Standards"
@@ -201,9 +223,11 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 ---
 
 #### 10. web3-expert SKILL.md
+
 **Current Score**: 5/10
 **Status**: ENHANCED ✓
 **Sections Added**:
+
 - "Core Principles" (Solidity 0.8.28+, OpenZeppelin patterns)
 - "Smart Contract Security Standards" (STRIDE, OWASP Web3)
 - "Gas Optimization Patterns"
@@ -218,14 +242,14 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 
 ## Summary Statistics
 
-| Metric | Value |
-|--------|-------|
-| Files Assessed | 10 |
-| Stubs Enhanced | 4 (all) |
-| Domain Experts Enhanced | 6 (all) |
-| Average Score Before | 4.9/10 |
-| Average Score After | 7.8/10 |
-| Total Lines Added | 960 lines |
+| Metric                    | Value              |
+| ------------------------- | ------------------ |
+| Files Assessed            | 10                 |
+| Stubs Enhanced            | 4 (all)            |
+| Domain Experts Enhanced   | 6 (all)            |
+| Average Score Before      | 4.9/10             |
+| Average Score After       | 7.8/10             |
+| Total Lines Added         | 960 lines          |
 | Files Requiring No Change | 1 (writing-skills) |
 
 ---
@@ -234,23 +258,23 @@ Wave 7 assessment of 10 SKILL.md files identifies:
 
 ### Stubs (4 files)
 
-| File | Before | After | Action |
-|------|--------|-------|--------|
-| readme | 3/10 | 8/10 | Full restructure + style guide |
-| scientific-skills | 4/10 | 8/10 | Added workflow + integration |
-| summarize-changes | 5/10 | 8/10 | Added step-by-step workflow |
-| writing-skills | 4/10 | 9/10 | Verified complete (PASS) |
+| File              | Before | After | Action                         |
+| ----------------- | ------ | ----- | ------------------------------ |
+| readme            | 3/10   | 8/10  | Full restructure + style guide |
+| scientific-skills | 4/10   | 8/10  | Added workflow + integration   |
+| summarize-changes | 5/10   | 8/10  | Added step-by-step workflow    |
+| writing-skills    | 4/10   | 9/10  | Verified complete (PASS)       |
 
 ### Domain Experts (6 files)
 
-| File | Before | After | Action |
-|------|--------|-------|--------|
-| php-expert | 5/10 | 8/10 | +120 lines (frameworks + security) |
-| python-backend-expert | 5/10 | 8/10 | +140 lines (frameworks + perf) |
-| react-expert | 6/10 | 8/10 | +80 lines (performance + anti-patterns) |
-| typescript-expert | 5/10 | 8/10 | +150 lines (types + standards) |
-| svelte-expert | 5/10 | 8/10 | +120 lines (Svelte 5 + stores) |
-| web3-expert | 5/10 | 8/10 | +160 lines (security + auditing) |
+| File                  | Before | After | Action                                  |
+| --------------------- | ------ | ----- | --------------------------------------- |
+| php-expert            | 5/10   | 8/10  | +120 lines (frameworks + security)      |
+| python-backend-expert | 5/10   | 8/10  | +140 lines (frameworks + perf)          |
+| react-expert          | 6/10   | 8/10  | +80 lines (performance + anti-patterns) |
+| typescript-expert     | 5/10   | 8/10  | +150 lines (types + standards)          |
+| svelte-expert         | 5/10   | 8/10  | +120 lines (Svelte 5 + stores)          |
+| web3-expert           | 5/10   | 8/10  | +160 lines (security + auditing)        |
 
 ---
 

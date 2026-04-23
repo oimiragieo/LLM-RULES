@@ -14,13 +14,13 @@
 
 ## Rubric Scores
 
-| Dimension       | Score  | Notes                                                             |
-| --------------- | ------ | ----------------------------------------------------------------- |
-| Completeness    | 0.90   | All 4 targeted files updated; no stated gaps                      |
-| Accuracy        | 0.92   | Hook logic verified correct: isValidFilesModified() guards entry  |
-| Clarity         | 0.85   | Iron Laws and MANDATORY labels are high-signal; code examples clear |
-| Consistency     | 0.88   | Enforcement default matches hook invocation pattern                |
-| Actionability   | 0.85   | Enforcement is live on next session start; override documented    |
+| Dimension     | Score | Notes                                                               |
+| ------------- | ----- | ------------------------------------------------------------------- |
+| Completeness  | 0.90  | All 4 targeted files updated; no stated gaps                        |
+| Accuracy      | 0.92  | Hook logic verified correct: isValidFilesModified() guards entry    |
+| Clarity       | 0.85  | Iron Laws and MANDATORY labels are high-signal; code examples clear |
+| Consistency   | 0.88  | Enforcement default matches hook invocation pattern                 |
+| Actionability | 0.85  | Enforcement is live on next session start; override documented      |
 
 **Overall (weighted)**: 0.88 / 1.0
 
@@ -79,11 +79,11 @@
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
-| Four-file enforcement contract pattern | **Retain** | High reuse value — applies to any new enforcement variable |
-| isValidFilesModified() implementation | **Retain** | Concrete pattern for array-presence validation |
-| Task irony (enforcement task missing filesModified) | **Retain as gotcha** | High retrieval relevance for future reflection scoring |
+| Item                                                | Decision             | Rationale                                                  |
+| --------------------------------------------------- | -------------------- | ---------------------------------------------------------- |
+| Four-file enforcement contract pattern              | **Retain**           | High reuse value — applies to any new enforcement variable |
+| isValidFilesModified() implementation               | **Retain**           | Concrete pattern for array-presence validation             |
+| Task irony (enforcement task missing filesModified) | **Retain as gotcha** | High retrieval relevance for future reflection scoring     |
 
 ---
 

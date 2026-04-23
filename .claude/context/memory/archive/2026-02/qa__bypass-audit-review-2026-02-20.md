@@ -12,12 +12,12 @@ All 3 PreToolUse hooks (unified-creator-guard.cjs, routing-guard-core.impl.cjs, 
 
 ## Files Reviewed
 
-| File | Lines | M# | Status |
-|------|-------|-----|--------|
-| `.claude/hooks/routing/unified-creator-guard.cjs` | 827 | M2 | ✅ APPROVED |
-| `.claude/hooks/routing/routing-guard-core.impl.cjs` | 635 | M3+M5 | ✅ APPROVED |
-| `.claude/hooks/safety/bash-command-validator.cjs` | 467 | M4 | ✅ APPROVED |
-| `tests/hooks/bypass-audit-integration.test.cjs` | 601 | M1 | ✅ APPROVED |
+| File                                                | Lines | M#    | Status      |
+| --------------------------------------------------- | ----- | ----- | ----------- |
+| `.claude/hooks/routing/unified-creator-guard.cjs`   | 827   | M2    | ✅ APPROVED |
+| `.claude/hooks/routing/routing-guard-core.impl.cjs` | 635   | M3+M5 | ✅ APPROVED |
+| `.claude/hooks/safety/bash-command-validator.cjs`   | 467   | M4    | ✅ APPROVED |
+| `tests/hooks/bypass-audit-integration.test.cjs`     | 601   | M1    | ✅ APPROVED |
 
 ---
 
@@ -26,6 +26,7 @@ All 3 PreToolUse hooks (unified-creator-guard.cjs, routing-guard-core.impl.cjs, 
 ### M2: unified-creator-guard.cjs — Call Location ✅
 
 **Lines 46-52:** Import with defensive wrapping
+
 ```javascript
 let _emitBlockVerdict;
 try {
@@ -38,9 +39,11 @@ try {
 ✅ GOOD: Try-catch wrapped, graceful degradation if module missing
 
 **Lines 701-712:** Call before exit(2) when block occurs
+
 ```javascript
 if (result.result === 'block') {
-  emitBypassAuditVerdict(  // Called BEFORE exit below
+  emitBypassAuditVerdict(
+    // Called BEFORE exit below
     toolName,
     filePath,
     'Direct artifact write without creator workflow',
@@ -52,12 +55,13 @@ if (result.result === 'block') {
   );
 }
 console.log(formatResult(result.result, result.message));
-process.exit(result.result === 'block' ? 2 : 0);  // Exit AFTER call
+process.exit(result.result === 'block' ? 2 : 0); // Exit AFTER call
 ```
 
 ✅ CORRECT: `emitBypassAuditVerdict()` is called immediately before `process.exit(2)` in the block path
 
 **Lines 742-754:** Call before exit(2) in error handler
+
 ```javascript
 if (_emitBlockVerdict) {
   try {
@@ -72,12 +76,13 @@ if (_emitBlockVerdict) {
     /* best-effort, never block on audit */
   }
 }
-process.exit(2);  // Exit AFTER call
+process.exit(2); // Exit AFTER call
 ```
 
 ✅ CORRECT: Error path also calls before exit(2)
 
 **Lines 589-606:** Helper function `emitBypassAuditVerdict()`
+
 ```javascript
 function emitBypassAuditVerdict(toolName, filePath, reason, extra) {
   if (!_emitBlockVerdict) return;
@@ -106,6 +111,7 @@ function emitBypassAuditVerdict(toolName, filePath, reason, extra) {
 ### M3+M5: routing-guard-core.impl.cjs — Call Locations ✅
 
 **Lines 5-10:** Import with defensive wrapping
+
 ```javascript
 let _emitBlockVerdict;
 try {
@@ -118,6 +124,7 @@ try {
 ✅ GOOD: Same pattern as M2, defensive wrapping
 
 **Lines 477-489:** Call before exit(2) when block occurs
+
 ```javascript
 try {
   const _inputHash = JSON.stringify(toolInput || {}).slice(0, 64);
@@ -132,15 +139,17 @@ try {
 } catch (_) {
   /* best-effort */
 }
-process.exit(result.result === 'block' ? 2 : 0);  // Exit AFTER call
+process.exit(result.result === 'block' ? 2 : 0); // Exit AFTER call
 ```
 
 ✅ CORRECT: Call immediately before exit(2)
+
 - Uses short-circuit evaluation (`&&`) instead of if statement
 - Gracefully handles if `_emitBlockVerdict` is undefined
 - Wrapped in try-catch
 
 **Lines 566-576:** Call before exit(2) in error handler
+
 ```javascript
 try {
   if (_emitBlockVerdict)
@@ -153,7 +162,7 @@ try {
 } catch (_) {
   /* best-effort */
 }
-process.exit(2);  // Exit AFTER call
+process.exit(2); // Exit AFTER call
 ```
 
 ✅ CORRECT: Error path also calls before exit(2)
@@ -163,6 +172,7 @@ process.exit(2);  // Exit AFTER call
 ### M4: bash-command-validator.cjs — Call Locations ✅
 
 **Lines 33-40:** Import with defensive wrapping
+
 ```javascript
 let _emitBlockVerdict;
 try {
@@ -176,6 +186,7 @@ try {
 ✅ GOOD: Defensive wrapping, correct module path (local `./` relative path)
 
 **Lines 49-62:** Helper function `emitBashBlockVerdict()`
+
 ```javascript
 function emitBashBlockVerdict(command, reason) {
   if (typeof _emitBlockVerdict !== 'function') return;
@@ -196,18 +207,20 @@ function emitBashBlockVerdict(command, reason) {
 ✅ GOOD: Type check, wrapped, graceful degradation
 
 **Lines 336-341:** Call before exit(2) for bad substitution
+
 ```javascript
 const badSubstitutionReason = detectBadSubstitutionRisk(command);
 if (badSubstitutionReason) {
   emitBashBlockVerdict(command, badSubstitutionReason);
   console.error(formatBlockedMessage(command, badSubstitutionReason));
-  process.exit(2);  // Exit AFTER call
+  process.exit(2); // Exit AFTER call
 }
 ```
 
 ✅ CORRECT: Call before exit(2)
 
 **Lines 343-348:** Call before exit(2) for unsupported ripgrep type
+
 ```javascript
 const ripgrepTypeReason = detectUnsupportedRipgrepType(command);
 if (ripgrepTypeReason) {
@@ -220,6 +233,7 @@ if (ripgrepTypeReason) {
 ✅ CORRECT: Call before exit(2)
 
 **Lines 350-355:** Call before exit(2) for ripgrep missing
+
 ```javascript
 const ripgrepMissingReason = detectRipgrepUnavailable(command);
 if (ripgrepMissingReason) {
@@ -232,6 +246,7 @@ if (ripgrepMissingReason) {
 ✅ CORRECT: Call before exit(2)
 
 **Lines 357-362:** Call before exit(2) for report write
+
 ```javascript
 const reportWriteReason = detectBashArtifactWrite(command);
 if (reportWriteReason) {
@@ -244,6 +259,7 @@ if (reportWriteReason) {
 ✅ CORRECT: Call before exit(2)
 
 **Lines 364-375:** Call before exit(2) for brittle count
+
 ```javascript
 const brittleCountReason = detectBrittleCrossShellCount(command);
 if (brittleCountReason) {
@@ -260,6 +276,7 @@ if (brittleCountReason) {
 ✅ CORRECT: Call before exit(2) (on the block path)
 
 **Lines 377-388:** Call before exit(2) for search bypass
+
 ```javascript
 const searchBypassReason = detectSearchBypassPattern(command);
 if (searchBypassReason) {
@@ -276,6 +293,7 @@ if (searchBypassReason) {
 ✅ CORRECT: Call before exit(2) (on the block path)
 
 **Lines 393-407:** Call before exit(2) for registry validation failure
+
 ```javascript
 if (!result.valid) {
   try {
@@ -292,6 +310,7 @@ if (!result.valid) {
 ✅ CORRECT: Call before exit(2)
 
 **Lines 432-443:** Call before exit(2) in error handler
+
 ```javascript
 emitBashBlockVerdict('', `error_fail_closed: ${err.message}`);
 process.exit(2);
@@ -306,6 +325,7 @@ process.exit(2);
 ### Import Safety ✅
 
 All 3 hooks wrap the require statement in try-catch:
+
 - **unified-creator-guard.cjs (lines 46-52):** ✅ Try-catch
 - **routing-guard-core.impl.cjs (lines 5-10):** ✅ Try-catch
 - **bash-command-validator.cjs (lines 33-40):** ✅ Try-catch
@@ -315,11 +335,12 @@ All 3 hooks wrap the require statement in try-catch:
 ### Call-Site Safety ✅
 
 All 3 hooks wrap their calls in try-catch blocks:
+
 - **unified-creator-guard.cjs `emitBypassAuditVerdict()` (lines 589-606):** ✅ Try-catch
 - **routing-guard-core.impl.cjs block path (lines 477-489):** ✅ Try-catch
 - **routing-guard-core.impl.cjs error path (lines 566-576):** ✅ Try-catch
 - **bash-command-validator.cjs `emitBashBlockVerdict()` (lines 49-62):** ✅ Try-catch
-- All 6 bash block locations (lines 336-407):** ✅ Helper function wrapped
+- All 6 bash block locations (lines 336-407):\*\* ✅ Helper function wrapped
 
 **Finding:** No call-site can crash the hook pipeline. Audit failures are silent and best-effort.
 
@@ -360,18 +381,22 @@ All 3 hooks wrap their calls in try-catch blocks:
 ### Test File: bypass-audit-integration.test.cjs
 
 **Test Suite 1: Direct API Tests (2 tests)**
+
 - INT-API-1: Calling `emitBlockVerdict()` directly writes block_verdict record → **PASSES** ✅
 - INT-API-2: `emitBlockVerdict()` with Write tool (creator-guard scenario) → **PASSES** ✅
 
 **Test Suite 2: routing-guard Integration (2 tests)**
+
 - INT-ROUTING-1: routing-guard blocks TaskCreate and writes audit record → **PASSES** ✅
 - INT-ROUTING-2: Ordering check (audit before exit) → **PASSES** ✅
 
 **Test Suite 3: unified-creator-guard Integration (2 tests)**
+
 - INT-CREATOR-1: creator-guard blocks Write to hook path → **PASSES** ✅
 - INT-CREATOR-2: creator-guard blocks Write to agent path → **PASSES** ✅
 
 **Test Suite 4: End-to-End Cycle (3 tests)**
+
 - INT-CYCLE-1: Block verdict + bypass detection cycle → **PASSES** ✅
 - INT-CYCLE-2: Multiple hooks emit verdicts, bypassDetection picks correct one → **PASSES** ✅
 - INT-CYCLE-3: Bypass detection respects BYPASS_AUDIT_ENABLED=false → **PASSES** ✅
@@ -381,6 +406,7 @@ All 3 hooks wrap their calls in try-catch blocks:
 ### Test Quality ✅
 
 **Strong points:**
+
 1. Tests use subprocess execution (`spawnSync`), not mocking → Real integration validation
 2. Tests verify exit code + audit file existence synchronously
 3. Tests validate both success cases (verdicts written) and edge cases (disabled, multiple hooks)
@@ -388,6 +414,7 @@ All 3 hooks wrap their calls in try-catch blocks:
 5. Tests verify temporal ordering (call before exit) by checking file exists after subprocess completes
 
 **Coverage:**
+
 - ✅ All 3 hooks tested in real subprocess
 - ✅ Block paths verified
 - ✅ Error paths verified
@@ -398,16 +425,16 @@ All 3 hooks wrap their calls in try-catch blocks:
 
 ## Code Quality Checklist
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Import wrapped in try-catch | ✅ | All 3 hooks |
-| Call wrapped in try-catch | ✅ | All call sites |
-| Call before exit(2) | ✅ | All block/error paths |
-| No unused variables | ✅ | Code reviewed |
-| No syntax errors | ✅ | Code structure valid |
-| Constants properly named | ✅ | E.g., `DEFAULT_TTL_MS`, `WATCHED_TOOLS` |
-| Function signatures match | ✅ | `emitBlockVerdict(verdict)` consistent |
-| Complexity annotations | ✅ | `eslint-disable max-lines` line 3 on routing-guard |
+| Item                        | Status | Notes                                              |
+| --------------------------- | ------ | -------------------------------------------------- |
+| Import wrapped in try-catch | ✅     | All 3 hooks                                        |
+| Call wrapped in try-catch   | ✅     | All call sites                                     |
+| Call before exit(2)         | ✅     | All block/error paths                              |
+| No unused variables         | ✅     | Code reviewed                                      |
+| No syntax errors            | ✅     | Code structure valid                               |
+| Constants properly named    | ✅     | E.g., `DEFAULT_TTL_MS`, `WATCHED_TOOLS`            |
+| Function signatures match   | ✅     | `emitBlockVerdict(verdict)` consistent             |
+| Complexity annotations      | ✅     | `eslint-disable max-lines` line 3 on routing-guard |
 
 ---
 

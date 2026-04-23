@@ -16,6 +16,7 @@ Updated framework documentation to reflect security and quality improvements fro
 ### 1. Memory Files
 
 #### `.claude/context/memory/learnings.md`
+
 - **Added:** New section "2026-02-13: Security Hardening - Shell Execution & JSON Parsing Safety"
 - **Content:** Documents 4 key improvements:
   - Shell execution hardening: `shell: false` removal from skills
@@ -25,6 +26,7 @@ Updated framework documentation to reflect security and quality improvements fro
 - **Learning emphasis:** "Shell execution safety is binary—there is no safe shell: true"
 
 #### `.claude/context/memory/issues.md`
+
 - **Added:** New section "2026-02-13: RESOLVED - Security Fixes"
 - **Resolved items:**
   - CRITICAL-002 (shell injection) → RESOLVED
@@ -34,6 +36,7 @@ Updated framework documentation to reflect security and quality improvements fro
 - **Impact note:** "4 critical/high/P0 issues fixed with zero test regressions"
 
 #### `.claude/context/memory/decisions.md`
+
 - **Added 3 new ADRs:**
 
   **ADR-114: Shell Execution Hardening - shell: false Standard**
@@ -57,6 +60,7 @@ Updated framework documentation to reflect security and quality improvements fro
 ### 2. Rules Documentation
 
 #### `.claude/rules/security.md`
+
 - **Added 2 new subsections under "Command Execution Safety":**
 
   **shell: false Standard (CRITICAL)**

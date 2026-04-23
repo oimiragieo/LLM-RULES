@@ -18,6 +18,7 @@ Pipeline #10 completed a comprehensive configuration system audit and remediatio
 - **Task #108** (Cache Regeneration): Regenerated tool-manifest.json (16→49 agents) and rule-index-cache.json to fix stale aggregates
 
 **Key Deliverables:**
+
 - ADR-092 (Config System Overhaul) - Accepted, implementation complete
 - 2 new patterns extracted and recorded (aggregate staleness, phantom references)
 - 2 new gotchas recorded (aggregate drift, false config headers)
@@ -30,11 +31,13 @@ Pipeline #10 completed a comprehensive configuration system audit and remediatio
 ### Completeness (25%) — 0.94
 
 **Strengths:**
+
 - All required sections present: architecture audit, findings documented, fixes implemented
 - Root cause analysis thorough: identified dual model resolution paths, phantom references, stale metadata pattern
 - Complete coverage: all 3 tasks address distinct but complementary aspects
 
 **Gaps:**
+
 - Architecture plan document referenced in ADR-092 may not exist (gotchas.json notes this pattern from Pipeline #8)
 - Preventive automation incomplete: no CI validation script yet (proposed in ADR-093)
 
@@ -43,12 +46,14 @@ Pipeline #10 completed a comprehensive configuration system audit and remediatio
 ### Accuracy (25%) — 0.92
 
 **Strengths:**
+
 - Task #106: Config audit methodology sound (grep for consumers, verify wiring, inventory creation)
 - Task #107: P1 fix verified (phase-models.json `planning` and `qa` models changed sonnet→opus, aligned with config.yaml)
 - Task #108: Regeneration successful and verified (tool-manifest totalAgents: 16→49 matches agent-registry.json, rule-index updated)
 - ADR-092 accurately documents decision and consequences
 
 **Cautions:**
+
 - Tool-manifest was stale for unknown duration (16→49 agent gap suggests weeks of drift)
 - Config-allowlist.yaml header falsely claims validator reads it (validator was archived, library hardcodes instead)
 - No mechanism to detect when aggregates become stale
@@ -58,12 +63,14 @@ Pipeline #10 completed a comprehensive configuration system audit and remediatio
 ### Clarity (15%) — 0.88
 
 **Strengths:**
+
 - ADR-092 well-structured with clear context, decision, rationale, consequences
 - Learnings in learnings.md clearly articulate patterns
 - Decisions.md Pipeline #10 section well-organized
 - Config Authority Hierarchy documented (confirmed in learnings.md)
 
 **Areas for improvement:**
+
 - Dual model resolution paths explanation could be clearer in documentation
 - Phantom reference pattern needs more explicit documentation in code comments
 
@@ -72,12 +79,14 @@ Pipeline #10 completed a comprehensive configuration system audit and remediatio
 ### Consistency (15%) — 0.90
 
 **Strengths:**
+
 - Follows archive via `git mv` pattern from prior pipelines (proven pattern from Pipelines #3, #6, #7, #9)
 - ADR format matches ADR-087, ADR-089, ADR-090, ADR-091
 - Uses same decision/rationale/consequences structure
 - Config authority hierarchy pattern aligns with existing resolveAgentModel() function
 
 **Gaps:**
+
 - Dual resolution paths (phase-models.json vs config.yaml) not fully reconciled (could be merged into single source)
 - No explicit integration of aggregate staleness detection into CI yet
 
@@ -86,12 +95,14 @@ Pipeline #10 completed a comprehensive configuration system audit and remediatio
 ### Actionability (20%) — 0.85
 
 **Strengths:**
+
 - Task #106 provided clear next steps (archive 4 dead, fix 3 stale)
 - Task #107 executed clear P1 mitigation with regression tests
 - Task #108 regenerated caches with specific commands documented
 - ADR-092 provides clear rationale for future config changes
 
 **Gaps:**
+
 - No automated cache staleness detection (regeneration is manual)
 - No CI validation to prevent future staleness accumulation
 - Preventive automation proposed but not implemented (ADR-093 proposed status)
@@ -135,11 +146,13 @@ Pipeline #10 completed a comprehensive configuration system audit and remediatio
 Configuration files that contain aggregate counts (totalAgents, total_rules, totalTools) derive their values from dynamic sources. When sources change, aggregates become stale without explicit regeneration.
 
 **Evidence:**
+
 - `tool-manifest.json` had `totalAgents: 16` while agent-registry.json documented 49 agents
 - Duration stale: unknown (possibly weeks)
 - Discovery method: manual audit (Pipeline #10), not automated detection
 
 **Prevention Strategy:**
+
 - Create `pnpm validate:config-aggregates` script
 - Add to CI pipeline (include in validate:full chain)
 - Regenerate immediately after source changes, not deferred
@@ -149,11 +162,13 @@ Configuration files that contain aggregate counts (totalAgents, total_rules, tot
 Configuration files contain headers claiming certain tools/validators read them, but those claims may be outdated (tool archived, functionality hardcoded elsewhere).
 
 **Evidence:**
+
 - `command-allowlist.yaml` header: "Read by command-allowlist-validator.cjs"
 - Reality: Validator was archived in Pipeline #7, library hardcodes the allowlist in JavaScript
 - Pattern: Occurs after tool archival without header update
 
 **Prevention Strategy:**
+
 - During wiring audits, validate config header claims against actual require() statements
 - Update header when archiving associated consumer
 - Document this pattern in wiring audit checklists
@@ -161,15 +176,18 @@ Configuration files contain headers claiming certain tools/validators read them,
 ### Finding 3: Dual Model Resolution Paths Create Synchronization Burden
 
 The system has two model resolution paths that can contradict each other:
+
 1. **Primary:** `agent-config-reader.cjs` resolves by agent type (config.yaml → frontmatter → COMPLEXITY_DEFAULTS → "sonnet")
 2. **Secondary:** `phase-config.cjs` resolves by workflow phase (phase-models.json → defaults)
 
 **Evidence:**
+
 - Task #107 fixed P1 bug: phase-models.json had planning=sonnet, qa=sonnet while config.yaml specified planning=opus, qa=opus
 - Wrong path selected depending on which consumer invoked model resolution
 - Both paths must be manually synchronized
 
 **Recommendation:**
+
 - Consider merging phase-models.json into config.yaml (single source of truth)
 - Or explicitly document sync strategy with pre-commit validation
 
@@ -198,6 +216,7 @@ Configuration files with aggregate counts need explicit regeneration and CI vali
 **Applicability:** Any config system with aggregated counts derived from dynamic sources (agents, rules, tools, templates, etc.)
 
 **Prevention Checklist:**
+
 1. Identify all config files with aggregate counts
 2. Document the source of truth for each aggregate
 3. Create automated regeneration script for each
@@ -211,11 +230,13 @@ Configuration files with aggregate counts need explicit regeneration and CI vali
 Config file headers may claim consumer tools that have been archived or replaced. Validate header claims during wiring audits.
 
 **Detection Pattern:**
+
 - Grep for the claimed consumer tool/validator
 - Zero matches or only matches in the config header = dead claim
 - If consumer is archived, update header or delete config
 
 **Prevention:**
+
 - Include config header update in tool archival checklist
 - Periodic audit: validate each config's claimed consumers exist and actually read the config
 
@@ -275,7 +296,7 @@ A config file's own header may claim functionality that was archived, replaced, 
 
 6. **Create automated aggregate validation with targets**
    - totalAgents should equal agent-registry.json count
-   - total_rules should equal .claude/rules/*.md count
+   - total_rules should equal .claude/rules/\*.md count
    - Measured validation prevents accumulation
 
 ### LOW PRIORITY
@@ -294,6 +315,7 @@ A config file's own header may claim functionality that was archived, replaced, 
 Pipeline #10 successfully identified and resolved all critical configuration system issues through systematic audit and targeted implementation. The P1 model resolution bug was discovered and fixed immediately, preventing potential downstream issues in enterprise workflows. Dead configurations were properly archived with history preservation, following established patterns from prior pipelines.
 
 ### Strengths Demonstrated
+
 - Systematic audit methodology with comprehensive coverage
 - Security-first approach (P1 bug fixed immediately)
 - Proven archive pattern (git mv) enforced consistently
@@ -302,12 +324,14 @@ Pipeline #10 successfully identified and resolved all critical configuration sys
 - All immediate issues resolved (4 dead configs, 1 P1 bug, 3 stale values)
 
 ### Improvement Areas
+
 - No automated detection of aggregate staleness (manual audits only)
 - Preventive CI validation not yet implemented (proposed in ADR-093)
 - Dual model resolution paths not fully reconciled
 - Config header claims validation not formalized
 
 ### Impact
+
 - Reduced configuration tech debt (4 dead configs archived, 3 stale values corrected)
 - Documented aggregate staleness pattern for future reference
 - Proposed preventive CI validation (ADR-093)
@@ -320,6 +344,7 @@ Pipeline #10 successfully identified and resolved all critical configuration sys
 ## Memory System Updates
 
 **Files Modified:**
+
 - `.claude/context/memory/patterns.json` - Added 2 new patterns
 - `.claude/context/memory/gotchas.json` - Added 2 new gotchas
 - `.claude/context/memory/issues.md` - Added 1 new issue with resolution pattern
@@ -327,17 +352,21 @@ Pipeline #10 successfully identified and resolved all critical configuration sys
 - `.claude/context/memory/reflection-log.jsonl` - Appended batch summary entry
 
 **Patterns Documented:**
+
 1. aggregate-metadata-staleness-detection
 2. config-headers-claim-false-consumers
 
 **Gotchas Documented:**
+
 1. aggregate-counts-go-stale
 2. config-headers-as-false-documentation
 
 **Issues Documented:**
+
 1. No Automated Cache Staleness Validation (Pipeline #10) - MEDIUM impact
 
 **Decisions Documented:**
+
 1. ADR-093: Config System Staleness Prevention (proposed)
 
 ---

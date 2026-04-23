@@ -3,6 +3,7 @@
 # Reflection Report: Tasks #32 and #33
 
 **Reflection IDs:**
+
 - `task_completion:2026-02-17T01:14:33.086Z:32`
 - `task_completion:2026-02-17T01:17:41.451Z:33`
 
@@ -14,8 +15,8 @@
 
 ## Overall Assessment
 
-| Task | Score | Threshold | Notes |
-|------|-------|-----------|-------|
+| Task | Score | Threshold | Notes                                             |
+| ---- | ----- | --------- | ------------------------------------------------- |
 | #32  | 0.45  | WARNING   | No summary metadata; cannot assess output quality |
 | #33  | 0.45  | WARNING   | No summary metadata; cannot assess output quality |
 
@@ -29,6 +30,7 @@
 ## Step 1: Reflect — Data Ingestion
 
 **Available Evidence:**
+
 - Spawn request confirms: "Task 32 completed without summary metadata"
 - Spawn request confirms: "Task 33 completed without summary metadata"
 - Git history shows: `569a89f9 feat: implement 8 TDD finding fixes — workflow, memory, guardrails, handoff`
@@ -37,6 +39,7 @@
 - Memory shows recurring issue: "Developer TaskUpdate compliance weak (3 failures in pipeline)"
 
 **Critical Data Gap:** Both tasks completed without `metadata.summary` in TaskUpdate. This means:
+
 1. No filesModified list available
 2. No scores available from task agents
 3. No output artifacts referenced
@@ -50,25 +53,25 @@ Since neither task provided summary metadata, scoring is based on the metacognit
 
 ### Task #32 Scoring
 
-| Dimension | Score | Rationale |
-|-----------|-------|-----------|
-| Completeness | 0.40 | Cannot assess — no output evidence |
-| Accuracy | 0.50 | Unknown — no verification evidence |
-| Clarity | 0.50 | Unknown — no summary or artifacts |
-| Consistency | 0.40 | FAIL: Missing TaskUpdate metadata violates Iron Law |
-| Actionability | 0.45 | Low — reflection cannot extract concrete learnings without context |
+| Dimension     | Score | Rationale                                                          |
+| ------------- | ----- | ------------------------------------------------------------------ |
+| Completeness  | 0.40  | Cannot assess — no output evidence                                 |
+| Accuracy      | 0.50  | Unknown — no verification evidence                                 |
+| Clarity       | 0.50  | Unknown — no summary or artifacts                                  |
+| Consistency   | 0.40  | FAIL: Missing TaskUpdate metadata violates Iron Law                |
+| Actionability | 0.45  | Low — reflection cannot extract concrete learnings without context |
 
 **Weighted Score:** 0.45 (WARNING — below 0.7 pass threshold)
 
 ### Task #33 Scoring
 
-| Dimension | Score | Rationale |
-|-----------|-------|-----------|
-| Completeness | 0.40 | Cannot assess — no output evidence |
-| Accuracy | 0.50 | Unknown — no verification evidence |
-| Clarity | 0.50 | Unknown — no summary or artifacts |
-| Consistency | 0.40 | FAIL: Missing TaskUpdate metadata violates Iron Law |
-| Actionability | 0.45 | Low — reflection cannot extract concrete learnings without context |
+| Dimension     | Score | Rationale                                                          |
+| ------------- | ----- | ------------------------------------------------------------------ |
+| Completeness  | 0.40  | Cannot assess — no output evidence                                 |
+| Accuracy      | 0.50  | Unknown — no verification evidence                                 |
+| Clarity       | 0.50  | Unknown — no summary or artifacts                                  |
+| Consistency   | 0.40  | FAIL: Missing TaskUpdate metadata violates Iron Law                |
+| Actionability | 0.45  | Low — reflection cannot extract concrete learnings without context |
 
 **Weighted Score:** 0.45 (WARNING — below 0.7 pass threshold)
 

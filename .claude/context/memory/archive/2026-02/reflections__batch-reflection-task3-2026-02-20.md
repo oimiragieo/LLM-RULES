@@ -10,11 +10,11 @@ This is the second reflection batch of 2026-02-20. Reflections 1 and 2 were alre
 
 ## Phase 0: Data Sufficiency Gate
 
-| Reflection | Task | Summary Present | dataQuality | Action |
-|-----------|------|----------------|-------------|--------|
-| 1 | Task 1 | Yes — wave-executor audit | full | Score (already processed in prior batch) |
-| 2 | Task 2 | No — fallback string | insufficient | Score withheld (per Iron Law; prior batch used proxy scoring) |
-| 3 | Task 3 | Yes — skill-creator + skill-updater updates | full | Score |
+| Reflection | Task   | Summary Present                             | dataQuality  | Action                                                        |
+| ---------- | ------ | ------------------------------------------- | ------------ | ------------------------------------------------------------- |
+| 1          | Task 1 | Yes — wave-executor audit                   | full         | Score (already processed in prior batch)                      |
+| 2          | Task 2 | No — fallback string                        | insufficient | Score withheld (per Iron Law; prior batch used proxy scoring) |
+| 3          | Task 3 | Yes — skill-creator + skill-updater updates | full         | Score                                                         |
 
 ---
 
@@ -23,6 +23,7 @@ This is the second reflection batch of 2026-02-20. Reflections 1 and 2 were alre
 ### Context
 
 Task 3 responded directly to gaps identified in Task 1 audit and the prior reflection batch. Specifically:
+
 - Task 1 found that `skill-index.json` `agentPrimary` defaults to `["developer"]` when SKILL.md `agents:` field is not included in generator lookup tables
 - Prior batch reflection extracted the `skill-index-silent-stale` gotcha and `skill-index-generator-sourcing-discovery` pattern
 - Task 3 addressed the **upstream cause**: skill-creator was not guiding authors to set `agents:` frontmatter, and skill-updater was not including a post-regeneration verification step
@@ -40,13 +41,13 @@ Task 3 responded directly to gaps identified in Task 1 audit and the prior refle
 
 ### Rubric Scores (agent_output weights: completeness 0.25, accuracy 0.30, clarity 0.15, consistency 0.15, actionability 0.15)
 
-| Dimension | Score | Evidence |
-|-----------|-------|---------|
-| Completeness | 0.75 | Both target files addressed; no filesModified array to verify specific sections added; "guidance" added but scope of change unconfirmed |
-| Accuracy | 0.88 | Directly closes the identified gaps from Task 1 audit and prior reflection; skill-updater registration check matches `skill-index-silent-stale` gotcha |
-| Clarity | 0.85 | Concise two-part summary: clearly names both files modified and the type of change |
-| Consistency | 0.83 | Follows skill-updater workflow pattern for updating existing skills; consistent with prior skill update tasks |
-| Actionability | 0.70 | Shows gap closure; does not specify follow-up steps (e.g., "validate by re-running generate-skill-index.cjs on wave-executor") |
+| Dimension     | Score | Evidence                                                                                                                                               |
+| ------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Completeness  | 0.75  | Both target files addressed; no filesModified array to verify specific sections added; "guidance" added but scope of change unconfirmed                |
+| Accuracy      | 0.88  | Directly closes the identified gaps from Task 1 audit and prior reflection; skill-updater registration check matches `skill-index-silent-stale` gotcha |
+| Clarity       | 0.85  | Concise two-part summary: clearly names both files modified and the type of change                                                                     |
+| Consistency   | 0.83  | Follows skill-updater workflow pattern for updating existing skills; consistent with prior skill update tasks                                          |
+| Actionability | 0.70  | Shows gap closure; does not specify follow-up steps (e.g., "validate by re-running generate-skill-index.cjs on wave-executor")                         |
 
 **Weighted Score**:
 (0.75 × 0.25) + (0.88 × 0.30) + (0.85 × 0.15) + (0.83 × 0.15) + (0.70 × 0.15)
@@ -87,11 +88,11 @@ This task modifies skill documentation files (SKILL.md files), not wired framewo
 
 ## Consolidated Batch Summary (All 3 Reflections)
 
-| Task | Data Quality | Score | Threshold | Key Finding |
-|------|-------------|-------|-----------|-------------|
-| 1 | Full | 0.865 | PASS | Accurate skill-index.json gap identification |
-| 2 | Insufficient | — (withheld) | N/A | Missing metadata; prior batch proxy scored at 0.74 |
-| 3 | Full | 0.809 | PASS | Root-cause fix for skill-index.json agentPrimary defaults |
+| Task | Data Quality | Score        | Threshold | Key Finding                                               |
+| ---- | ------------ | ------------ | --------- | --------------------------------------------------------- |
+| 1    | Full         | 0.865        | PASS      | Accurate skill-index.json gap identification              |
+| 2    | Insufficient | — (withheld) | N/A       | Missing metadata; prior batch proxy scored at 0.74        |
+| 3    | Full         | 0.809        | PASS      | Root-cause fix for skill-index.json agentPrimary defaults |
 
 **Batch Average (scored tasks)**: (0.865 + 0.809) / 2 = **0.837** — PASS
 
@@ -111,12 +112,12 @@ This task modifies skill documentation files (SKILL.md files), not wired framewo
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
-| fast-remediation-loop-pattern | **Retain** (new pattern) | Demonstrates successful audit-to-fix sequence; high reuse value for future pipeline design |
-| skill-creator-guidance-ROI | **Retain** (pattern refinement) | Extends existing skill registration patterns; directly applicable to future skill creation |
-| Gap D registration check | **Retain** (already documented in skill-updater SKILL.md) | The authoritative version is now in skill-updater; this is its first reflection validation |
-| missing-metadata Task 2 occurrence | **Compress** | Already documented in gotchas.json as `missing-taskupdate-metadata-recurring`; adding occurrence count |
+| Item                               | Decision                                                  | Rationale                                                                                              |
+| ---------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| fast-remediation-loop-pattern      | **Retain** (new pattern)                                  | Demonstrates successful audit-to-fix sequence; high reuse value for future pipeline design             |
+| skill-creator-guidance-ROI         | **Retain** (pattern refinement)                           | Extends existing skill registration patterns; directly applicable to future skill creation             |
+| Gap D registration check           | **Retain** (already documented in skill-updater SKILL.md) | The authoritative version is now in skill-updater; this is its first reflection validation             |
+| missing-metadata Task 2 occurrence | **Compress**                                              | Already documented in gotchas.json as `missing-taskupdate-metadata-recurring`; adding occurrence count |
 
 ---
 

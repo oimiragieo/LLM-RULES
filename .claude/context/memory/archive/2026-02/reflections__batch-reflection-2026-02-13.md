@@ -31,6 +31,7 @@ All three identified patterns show **consistent application of defensive program
 **Pattern Applied:** Add `windowsHide: true` to all `spawn()` and `spawnSync()` calls across 18 files.
 
 **Files Modified (18 total):**
+
 - `.claude/lib/utils/command-exists.cjs`
 - `.claude/lib/utils/binary-resolver.cjs`
 - `.claude/lib/memory/contextual-memory.cjs`
@@ -51,19 +52,22 @@ All three identified patterns show **consistent application of defensive program
 - `.claude/skills/ripgrep/scripts/quick-search.mjs`
 
 **Pattern Example (from command-exists.cjs):**
+
 ```javascript
 const result = spawnSync(isWindows ? 'where' : 'which', [cmd], {
   stdio: 'pipe',
-  windowsHide: true,  // ← Added to prevent console window flashing
+  windowsHide: true, // ← Added to prevent console window flashing
 });
 ```
 
 **Why This Matters:**
+
 - **User Experience:** Prevents annoying console window flashing on Windows during subprocess execution
 - **Security:** Windows console windows can leak command arguments to screen capture/recording
 - **Consistency:** Applies uniformly to hooks, skills, library utilities (comprehensive coverage)
 
 **Coverage Assessment:**
+
 - 18 files modified across 3 subsystems (hooks, lib, skills)
 - Comprehensive search confirmed all `spawn` and `spawnSync` calls updated
 - No stragglers detected
@@ -75,9 +79,11 @@ const result = spawnSync(isWindows ? 'where' : 'which', [cmd], {
 **Pattern Applied:** Register `du` (disk usage) and `sleep` (pause execution) in bash command validator allowlist.
 
 **File Modified:**
+
 - `.claude/hooks/safety/validators/registry.cjs` (lines 186-187)
 
 **Before:**
+
 ```javascript
 const SAFE_COMMANDS_ALLOWLIST = [
   // ... existing commands ...
@@ -89,6 +95,7 @@ const SAFE_COMMANDS_ALLOWLIST = [
 ```
 
 **After:**
+
 ```javascript
 const SAFE_COMMANDS_ALLOWLIST = [
   // ... existing commands ...
@@ -101,12 +108,14 @@ const SAFE_COMMANDS_ALLOWLIST = [
 ```
 
 **Why This Matters:**
+
 - **`du` (disk usage):** Read-only command for measuring directory sizes — safe for diagnostics
 - **`sleep` (pause):** Benign timing utility used in polling/retry patterns
 - **Denial-by-default policy:** Framework blocks all unregistered commands (SEC-AUDIT-017) — explicit allowlist required
 - **Documentation:** Comments explain security rationale ("read-only", "benign timing")
 
 **Security Validation:**
+
 - Both commands are read-only or benign (no state modification)
 - No command injection vectors (neither command accepts shell metacharacters)
 - Aligns with SAFE_COMMANDS_ALLOWLIST philosophy (development tools, read-only operations)
@@ -118,6 +127,7 @@ const SAFE_COMMANDS_ALLOWLIST = [
 **Pattern Applied:** Add `fs.existsSync()` checks before reading files in hook code to prevent crashes from missing files.
 
 **Hooks Updated (specific files unknown from queue, but grep shows 51 hooks use existsSync):**
+
 - `.claude/hooks/memory/sync-memory-index.cjs`
 - `.claude/hooks/routing/pre-tool-unified.cjs`
 - `.claude/hooks/routing/pre-task-unified.cjs`
@@ -127,6 +137,7 @@ const SAFE_COMMANDS_ALLOWLIST = [
 - (Additional 45+ hooks with existence checks)
 
 **Pattern Example:**
+
 ```javascript
 // Before: Direct read (crashes if file missing)
 const data = fs.readFileSync(configPath, 'utf-8');
@@ -139,12 +150,14 @@ const data = fs.readFileSync(configPath, 'utf-8');
 ```
 
 **Why This Matters:**
+
 - **Reliability:** Hooks are fail-closed (exit 2 = block) — crashes cascade to block all operations
 - **Race conditions:** Files may be deleted between hook invocations (runtime/reflection-reminder.txt, integration-queue.jsonl)
 - **Graceful degradation:** Missing optional config should not block critical operations
 - **Defensive programming:** Validates assumptions before I/O
 
 **Impact:**
+
 - Prevents hook crashes from transient file deletions
 - Reduces "file not found" errors in production workflows
 - Improves system resilience during high-concurrency operations
@@ -165,13 +178,13 @@ const data = fs.readFileSync(configPath, 'utf-8');
 
 **Rubric Dimensions (0.0-1.0 scale):**
 
-| Dimension        | Score | Evidence                                                                                                   | Assessment                                                    |
-| ---------------- | ----- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| **Completeness** | 0.90  | 18 files updated (Task #10), 2 commands allowlisted (Task #11), 51 hooks with guards (Task #12)           | 90% — comprehensive coverage; Task #13 incomplete context     |
-| **Accuracy**     | 0.95  | All `windowsHide` placements correct, allowlist security rationale valid, existence checks properly placed | 95% — no errors detected; pattern application precise         |
-| **Clarity**      | 0.85  | Code changes self-documenting, comments explain rationale, pattern consistent across files                 | 85% — individual changes clear; Task #13 lacks summary        |
-| **Consistency**  | 0.90  | Uniform pattern application (windowsHide always true, existence checks before reads)                       | 90% — consistent across 3 subsystems; no stragglers           |
-| **Actionability** | 0.80  | Clear next steps: verify no regressions, document patterns, extend to new code                             | 80% — patterns clear; Task #13 follow-up unclear              |
+| Dimension         | Score | Evidence                                                                                                   | Assessment                                                |
+| ----------------- | ----- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| **Completeness**  | 0.90  | 18 files updated (Task #10), 2 commands allowlisted (Task #11), 51 hooks with guards (Task #12)            | 90% — comprehensive coverage; Task #13 incomplete context |
+| **Accuracy**      | 0.95  | All `windowsHide` placements correct, allowlist security rationale valid, existence checks properly placed | 95% — no errors detected; pattern application precise     |
+| **Clarity**       | 0.85  | Code changes self-documenting, comments explain rationale, pattern consistent across files                 | 85% — individual changes clear; Task #13 lacks summary    |
+| **Consistency**   | 0.90  | Uniform pattern application (windowsHide always true, existence checks before reads)                       | 90% — consistent across 3 subsystems; no stragglers       |
+| **Actionability** | 0.80  | Clear next steps: verify no regressions, document patterns, extend to new code                             | 80% — patterns clear; Task #13 follow-up unclear          |
 
 **Weighted Score:** `0.90×0.25 + 0.95×0.25 + 0.85×0.15 + 0.90×0.15 + 0.80×0.20 = 0.8825` → **0.88/1.0 (EXCELLENT)**
 
@@ -211,6 +224,7 @@ const data = fs.readFileSync(configPath, 'utf-8');
 #### Patterns Extracted (for patterns.json)
 
 **Pattern 1: Windows Process Hiding**
+
 ```json
 {
   "pattern": "windowsHide: true for all spawn/spawnSync calls",
@@ -224,6 +238,7 @@ const data = fs.readFileSync(configPath, 'utf-8');
 ```
 
 **Pattern 2: Bash Command Allowlist Management**
+
 ```json
 {
   "pattern": "Explicit allowlist for safe read-only commands",
@@ -237,6 +252,7 @@ const data = fs.readFileSync(configPath, 'utf-8');
 ```
 
 **Pattern 3: File Existence Guards in Hooks**
+
 ```json
 {
   "pattern": "fs.existsSync() before fs.readFileSync() in hooks",
@@ -252,18 +268,21 @@ const data = fs.readFileSync(configPath, 'utf-8');
 #### Issues Identified (for issues.md)
 
 **Issue 1: No Automated windowsHide Enforcement**
+
 - **Problem:** Manual pattern application across 18 files — future spawn calls may forget to include windowsHide
 - **Impact:** Console flashing regression on Windows
 - **Workaround:** Code review checklist includes windowsHide verification
 - **Solution:** Add ESLint rule requiring windowsHide: true on all spawn calls (or create spawn wrapper utility)
 
 **Issue 2: Task #13 Missing Context**
+
 - **Problem:** Reflection queue contained Task #13 completion but no summary metadata
 - **Impact:** Incomplete audit trail, cannot extract learnings from task
 - **Workaround:** Mark as "analyzed but incomplete" in reflection log
 - **Solution:** Investigate post-completion-chain.cjs to ensure summary metadata always included in reflection queue
 
 **Issue 3: Allowlist Lacks Categorization**
+
 - **Problem:** SAFE_COMMANDS_ALLOWLIST has 80+ commands in flat list (hard to understand security model)
 - **Impact:** Difficult to audit which command categories are permitted
 - **Workaround:** Comments explain individual commands
@@ -278,6 +297,7 @@ const data = fs.readFileSync(configPath, 'utf-8');
 **Integration Analysis:** N/A (no artifacts requiring integration)
 
 **Memory Integration:**
+
 - ✅ Learnings extracted to learnings.md (3 new patterns)
 - ✅ Issues documented to issues.md (3 issues identified)
 - ✅ Decisions implicit (defensive programming approach validated)
@@ -291,6 +311,7 @@ const data = fs.readFileSync(configPath, 'utf-8');
 ### Key Takeaway #1: Defensive Programming Trilogy
 
 Three complementary defensive patterns applied in sequence:
+
 1. **Process hiding** (UX + security) → `windowsHide: true`
 2. **Command validation** (security + functionality) → allowlist expansion
 3. **File existence guards** (reliability + resilience) → existsSync before read
@@ -300,6 +321,7 @@ Pattern: Security and reliability improvements work in layers. No single fix add
 ### Key Takeaway #2: Cross-Platform Awareness
 
 `windowsHide: true` specifically addresses Windows-only issue (console flashing). Framework must account for platform differences:
+
 - Windows: `where` command + windowsHide option
 - Unix: `which` command + no windowsHide needed
 
@@ -308,6 +330,7 @@ Pattern: When adding subprocess calls, always consider both Windows and Unix beh
 ### Key Takeaway #3: Allowlist Security Model
 
 SEC-AUDIT-017 enforces deny-by-default for bash commands:
+
 1. Registered validator (VALIDATOR_REGISTRY) — for security-critical commands (curl, wget, ssh)
 2. Safe allowlist (SAFE_COMMANDS_ALLOWLIST) — for read-only/benign commands (du, sleep, ls)
 3. Environment override (ALLOW_UNREGISTERED_COMMANDS=true) — for development only
@@ -319,6 +342,7 @@ Pattern: Before running any bash command, verify it's either in allowlist or has
 Hooks are fail-closed (exit 2 = block all operations). A single hook crash can halt the entire system.
 
 Pattern: All hooks must use defensive programming:
+
 - File existence checks before reads
 - Try-catch around JSON.parse (use safeParseJSON)
 - Graceful degradation for missing optional config
@@ -329,6 +353,7 @@ Pattern: All hooks must use defensive programming:
 **Pattern Consolidation Needed:** Three patterns identified here (windowsHide, allowlist management, existence guards) should be documented in centralized location: `.claude/docs/DEFENSIVE_PROGRAMMING_PATTERNS.md`
 
 **Contents:**
+
 1. Windows process hiding pattern
 2. Bash command allowlist protocol
 3. File existence guard pattern

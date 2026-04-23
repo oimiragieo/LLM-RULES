@@ -18,8 +18,9 @@ The enterprise supply chain security pipeline completed successfully with all 4 
 ## Individual Task Assessment
 
 ### Task 10: Blocker Fixes (Developer)
+
 - **Status**: COMPLETED
-- **Work**: Variable rename (MAX_REFLECTION_AGE_HOURS → _MAX_REFLECTION_AGE_HOURS for ESLint prefix allowance), .env.example Section 18 addition
+- **Work**: Variable rename (MAX_REFLECTION_AGE_HOURS → \_MAX_REFLECTION_AGE_HOURS for ESLint prefix allowance), .env.example Section 18 addition
 - **Validation**: Lint exit 0 confirmed
 - **Score**: 0.88 (PASS)
 - **RBT**:
@@ -28,6 +29,7 @@ The enterprise supply chain security pipeline completed successfully with all 4 
   - Thorns: None
 
 ### Task 11: Security-Architect Wave 2 Review
+
 - **Status**: APPROVED_WITH_NOTES
 - **Work**: Comprehensive security review with 30/30 checklist items passing
 - **Findings**: 0 critical, 0 high, 3 LOW (quarantine permissions, .env docs, filename collision edge case)
@@ -38,6 +40,7 @@ The enterprise supply chain security pipeline completed successfully with all 4 
   - Thorns: None (findings are non-blocking)
 
 ### Task 12: Deploy & Commit (DevOps)
+
 - **Status**: COMPLETED
 - **Work**: Two clean commits made (c4022e7d: security fixes; c5c8e3938: churn). 7130 files format-checked, all unchanged
 - **Governance**: `trusted-sources.json` correctly excluded (whitespace-only diff)
@@ -48,6 +51,7 @@ The enterprise supply chain security pipeline completed successfully with all 4 
   - Thorns: None
 
 ### Task 4: Enterprise Pipeline Parent (Orchestrator)
+
 - **Status**: COMPLETED
 - **Work**: 12 subtasks across full pipeline (Plan → Impl → Review Wave1 → Blocker Fix → Review Wave2 → Deploy)
 - **Gap Resolution**: 4/4 gaps identified pre-pipeline, 4/4 resolved before deploy (100%)
@@ -62,6 +66,7 @@ The enterprise supply chain security pipeline completed successfully with all 4 
 ## Batch Aggregate Score: 0.90 (EXCELLENT)
 
 Scoring methodology:
+
 - Task 10: 0.88 × 25% = 0.22
 - Task 11: 0.92 × 30% = 0.276
 - Task 12: 0.91 × 25% = 0.2275
@@ -79,6 +84,7 @@ Scoring methodology:
 **What It Is**: Separate commits for (1) security fixes + environment changes, (2) catalog/memory/skill churn
 
 **Evidence**: Task 12 execution
+
 - Commit 1 (c4022e7d): Real security and environment configuration changes
 - Commit 2 (c5c8e3938): Catalog updates, memory changes, skill updates (whitespace-only diffs)
 - Explicit whitespace-only exclusion (`trusted-sources.json`)
@@ -95,6 +101,7 @@ Scoring methodology:
 **What It Is**: Use explicit `git add <path>` instead of `git add -A` or `git add .`
 
 **Evidence**: Task 12 validation
+
 - 7130 files format-checked
 - Only intended files staged
 - No accidental modifications to unrelated code
@@ -110,6 +117,7 @@ Scoring methodology:
 **What It Is**: Formal approval category acknowledging non-blocking findings
 
 **Evidence**: Task 11 result
+
 - 0 critical/high findings (deployment-safe)
 - 3 LOW findings identified (tracked for next wave)
 - 30/30 checklist items PASS (full process confidence)
@@ -125,6 +133,7 @@ Scoring methodology:
 **What It Is**: Ordered execution of (Plan → Impl → Wave1 Review → Blocker Fix → Wave2 Security → Deploy) with clear gate conditions
 
 **Evidence**: Task 4 orchestration
+
 - 12 tasks executed without rework
 - Security wave saw blockers fixed before review
 - Deploy saw security approval before execution
@@ -139,11 +148,13 @@ Scoring methodology:
 ## Gotchas Identified
 
 ### Gotcha 1: Whitespace-Only Diffs in Commit Chains
+
 **Trigger**: When separating security fixes from churn in multi-commit deployments
 **Solution**: Explicitly document whitespace-only diffs in commit messages; validate with `git diff --check` before final push
 **Evidence**: Task 12 (`trusted-sources.json` correctly excluded from security commit)
 
 ### Gotcha 2: Late Blocker Discovery in Multi-Phase Pipelines
+
 **Trigger**: Blocker fixes deferred until dedicated phase instead of anticipated in design
 **Solution**: During design phase, identify naming conventions, API contracts, and environment configurations that could require refactoring
 **Evidence**: Task 10 (MAX_REFLECTION_AGE_HOURS variable rename in blocker-fix phase, could have been planned earlier)
@@ -153,11 +164,13 @@ Scoring methodology:
 ## Recommendations for Future Enterprise Pipelines
 
 ### High Priority
+
 1. **Adopt two-commit separation as SOP** for any deployment involving security/governance changes. Include in pipeline starter template and runbook.
 2. **Formalize APPROVED_WITH_NOTES outcome** as deployment-safe approval category. Establish process for tracking LOW findings in next maintenance cycle.
 3. **Add pre-deploy review task** to validate LOW findings have resolution plans (deferred vs fixed).
 
 ### Medium Priority
+
 4. **Address LOW security findings** from Task 11 in next maintenance wave:
    - Quarantine directory permissions review
    - .env.example documentation for 'off' values
@@ -169,6 +182,7 @@ Scoring methodology:
 ## Integration Health Check (ADR-100)
 
 **Artifact Integration Score**: 95% (EXCELLENT)
+
 - All 4 tasks provided full metadata
 - Reflection entries tracked in reflection-log.jsonl
 - Memory updates conform to framework schema
@@ -179,6 +193,7 @@ Scoring methodology:
 ## Memory Curation Summary
 
 **Retain** (4 patterns):
+
 - Two-commit strategy (high reuse, directly applicable)
 - Clean staging pattern (high reuse, audit-critical)
 - APPROVED_WITH_NOTES outcome (medium-high reuse, security workflows)

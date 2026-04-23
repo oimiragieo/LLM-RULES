@@ -11,35 +11,35 @@
 
 ## Audit Results by Rule
 
-| Rule File | Score (10pt) | Status | Notes |
-|-----------|--------------|--------|-------|
-| data-expert.md | 8/10 | PASS | Clear purpose, standards, examples, integrations. Missing: specific anti-patterns examples |
-| database-architect.md | 9/10 | PASS | Comprehensive standards, excellent examples (SQL code), detailed anti-patterns. Outstanding |
-| database-expert.md | 9/10 | PASS | Strong structure, multiple patterns (Prisma, Supabase), clear security standards |
-| debugging.md | 10/10 | PASS | Iron Law enforced, 4-phase process documented, red flags list, human partner signals included |
-| diagram-generator.md | 9/10 | PASS | Node limits documented, chunking strategy clear, multiple diagram types, anti-patterns included |
-| differential-review.md | 8/10 | PASS | Security prioritization (P0-P3), OWASP mapping, structure provided. Thin on workflow |
-| doc-generator.md | 4/10 | ENHANCE | Minimal stub — only 18 lines. Needs: core principles, when to use, guidelines, examples |
-| dry-principle.md | 8/10 | PASS | Clear principle definition, code examples (TS), "when NOT to apply" section strong |
-| expo-framework-rule.md | 8/10 | PASS | SDK standards clear, project structure defined, anti-patterns identified. Development workflow brief |
-| frontend-expert.md | 8/10 | PASS | Component, state, performance, accessibility standards. Anti-patterns included. Integration points clear |
-| gamedev-expert.md | 8/10 | PASS | Framework-specific (DragonRuby, Unity), performance optimization, design patterns. Memory protocol |
-| git-expert.md | 3/10 | ENHANCE | Stub only — 17 lines, just "When to Use" and link. Needs: actual Git workflow guidance |
-| git-workflow.md | 8/10 | PASS | Conventional commits enforced, AI attribution required, pre-commit gates clear |
-| go-expert.md | 8/10 | PASS | Modern Go (1.22+), API standards, concurrency patterns, testing framework specified |
-| graphql-expert.md | 8/10 | PASS | Schema design, Apollo standards, performance (DataLoader), security (auth, rate limiting) |
-| hook-creator.md | 8/10 | PASS | Hook structure template, categories, file placement, post-creation checklist |
-| hooks.md | 7/10 | PASS | Protocol documented, chain-of-responsibility pattern, performance budget (<100ms), categories |
-| incident-runbook-templates.md | 8/10 | PASS | Severity levels (P0-P4), escalation, communication, anti-patterns. Structure clear |
-| insecure-defaults.md | 9/10 | PASS | Comprehensive coverage (credentials, fail-open, config, crypto, headers, rate limiting). Detailed |
-| interactive-requirements-gathering.md | 7/10 | PASS | ONE question at a time enforced, output standards, workflow. Brief anti-patterns section |
-| insight-extraction.md | 9/10 | PASS | Extraction categories detailed, domain tagging, deduplication strategy, cross-referencing |
-| ios-expert.md | 8/10 | PASS | SwiftUI standards, project structure, UI design, performance, testing. Memory protocol included |
-| java-expert.md | 8/10 | PASS | Modern Java 21+ features, Spring Boot standards, testing (JUnit 5), performance |
-| k8s-manifest-generator.md | 8/10 | PASS | Security standards (non-root), HA patterns (replicas, anti-affinity), monitoring |
-| memory-forensics.md | 3/10 | ENHANCE | Stub only — 17 lines, just header + skill invocation. Needs: actual forensics guidance |
-| memory-protocol.md | 8/10 | PASS | Hierarchical tiers (HOT/WARM/COLD), budget limits, rotation triggers. Detailed |
-| mobile-first-design-rules.md | 9/10 | PASS | Layout, typography, touch interaction, performance, accessibility standards all included |
+| Rule File                             | Score (10pt) | Status  | Notes                                                                                                    |
+| ------------------------------------- | ------------ | ------- | -------------------------------------------------------------------------------------------------------- |
+| data-expert.md                        | 8/10         | PASS    | Clear purpose, standards, examples, integrations. Missing: specific anti-patterns examples               |
+| database-architect.md                 | 9/10         | PASS    | Comprehensive standards, excellent examples (SQL code), detailed anti-patterns. Outstanding              |
+| database-expert.md                    | 9/10         | PASS    | Strong structure, multiple patterns (Prisma, Supabase), clear security standards                         |
+| debugging.md                          | 10/10        | PASS    | Iron Law enforced, 4-phase process documented, red flags list, human partner signals included            |
+| diagram-generator.md                  | 9/10         | PASS    | Node limits documented, chunking strategy clear, multiple diagram types, anti-patterns included          |
+| differential-review.md                | 8/10         | PASS    | Security prioritization (P0-P3), OWASP mapping, structure provided. Thin on workflow                     |
+| doc-generator.md                      | 4/10         | ENHANCE | Minimal stub — only 18 lines. Needs: core principles, when to use, guidelines, examples                  |
+| dry-principle.md                      | 8/10         | PASS    | Clear principle definition, code examples (TS), "when NOT to apply" section strong                       |
+| expo-framework-rule.md                | 8/10         | PASS    | SDK standards clear, project structure defined, anti-patterns identified. Development workflow brief     |
+| frontend-expert.md                    | 8/10         | PASS    | Component, state, performance, accessibility standards. Anti-patterns included. Integration points clear |
+| gamedev-expert.md                     | 8/10         | PASS    | Framework-specific (DragonRuby, Unity), performance optimization, design patterns. Memory protocol       |
+| git-expert.md                         | 3/10         | ENHANCE | Stub only — 17 lines, just "When to Use" and link. Needs: actual Git workflow guidance                   |
+| git-workflow.md                       | 8/10         | PASS    | Conventional commits enforced, AI attribution required, pre-commit gates clear                           |
+| go-expert.md                          | 8/10         | PASS    | Modern Go (1.22+), API standards, concurrency patterns, testing framework specified                      |
+| graphql-expert.md                     | 8/10         | PASS    | Schema design, Apollo standards, performance (DataLoader), security (auth, rate limiting)                |
+| hook-creator.md                       | 8/10         | PASS    | Hook structure template, categories, file placement, post-creation checklist                             |
+| hooks.md                              | 7/10         | PASS    | Protocol documented, chain-of-responsibility pattern, performance budget (<100ms), categories            |
+| incident-runbook-templates.md         | 8/10         | PASS    | Severity levels (P0-P4), escalation, communication, anti-patterns. Structure clear                       |
+| insecure-defaults.md                  | 9/10         | PASS    | Comprehensive coverage (credentials, fail-open, config, crypto, headers, rate limiting). Detailed        |
+| interactive-requirements-gathering.md | 7/10         | PASS    | ONE question at a time enforced, output standards, workflow. Brief anti-patterns section                 |
+| insight-extraction.md                 | 9/10         | PASS    | Extraction categories detailed, domain tagging, deduplication strategy, cross-referencing                |
+| ios-expert.md                         | 8/10         | PASS    | SwiftUI standards, project structure, UI design, performance, testing. Memory protocol included          |
+| java-expert.md                        | 8/10         | PASS    | Modern Java 21+ features, Spring Boot standards, testing (JUnit 5), performance                          |
+| k8s-manifest-generator.md             | 8/10         | PASS    | Security standards (non-root), HA patterns (replicas, anti-affinity), monitoring                         |
+| memory-forensics.md                   | 3/10         | ENHANCE | Stub only — 17 lines, just header + skill invocation. Needs: actual forensics guidance                   |
+| memory-protocol.md                    | 8/10         | PASS    | Hierarchical tiers (HOT/WARM/COLD), budget limits, rotation triggers. Detailed                           |
+| mobile-first-design-rules.md          | 9/10         | PASS    | Layout, typography, touch interaction, performance, accessibility standards all included                 |
 
 ---
 
@@ -81,6 +81,7 @@ Rules requiring content addition:
 ### For `doc-generator.md`:
 
 Add sections:
+
 - **When to Use**: Feature descriptions, migration docs, architecture documentation
 - **Process**: 5-step documentation workflow (analyze → structure → draft → validate → integrate)
 - **Output Standards**: Template structure, examples, verification checklist
@@ -89,6 +90,7 @@ Add sections:
 ### For `git-expert.md`:
 
 Add sections:
+
 - **Advanced Workflows**: Interactive rebase, cherry-pick, squashing, bisect
 - **Branching Strategies**: Gitflow, trunk-based, feature branches
 - **Common Commands**: Rewriting history, stash workflows, reflog recovery
@@ -97,6 +99,7 @@ Add sections:
 ### For `memory-forensics.md`:
 
 Add sections:
+
 - **Memory Acquisition**: Dump tools (WinDbg, avml, Volatility plugin)
 - **Analysis Technique**: Process enumeration, module analysis, string searching
 - **Artifact Extraction**: Registry hives, network connections, malware detection

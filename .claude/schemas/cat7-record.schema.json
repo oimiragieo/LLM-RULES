@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CAT7 Memory Record Schema",
+  "description": "Cognitive Artifact Tier 7 (CAT7) memory record schema per arXiv 2604.19540 Mesh Memory Protocol. Lineage is a linear chain (not DAG) in v3.2.0 — DAG support deferred to v3.3.0 (DR-3 decision).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "concept", "attributes", "temporality", "provenance", "confidence", "lineage"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "Unique identifier for the CAT7 record (UUID or similar)"
+    },
+    "concept": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "description": "What is being remembered — a short human-readable label for the cognitive artifact"
+    },
+    "attributes": {
+      "type": "object",
+      "description": "Arbitrary key-value pairs carrying domain-specific metadata for the record"
+    },
+    "temporality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["created_at"],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the record was created"
+        },
+        "valid_from": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp from which the record is considered valid (null = from creation)"
+        },
+        "valid_until": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp after which the record expires (null = permanent)"
+        },
+        "last_accessed": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of the last read/access (null = never accessed)"
+        }
+      },
+      "description": "Temporal metadata governing when the record is valid and when it was last used"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_agent_id"],
+      "properties": {
+        "source_agent_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "Identifier of the agent that created this record"
+        },
+        "source_session_id": {
+          "type": ["string", "null"],
+          "maxLength": 128,
+          "description": "Session identifier in which the record was created"
+        },
+        "trigger": {
+          "type": ["string", "null"],
+          "maxLength": 256,
+          "description": "What triggered the creation of this record (e.g. 'task-completion', 'user-feedback')"
+        }
+      },
+      "description": "Provenance tracking to identify which agent and session produced the record"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence score [0, 1] indicating how certain the stored knowledge is. Drives tier routing: <0.4 → STM, 0.4–0.79 → MTM, >=0.8 → LTM"
+    },
+    "lineage": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      },
+      "description": "Ordered list of prior CAT7 record IDs this record derives from. Linear chain only in v3.2.0 — DAG deferred to v3.3.0 (DR-3: arXiv 2604.19540 §A.3 lineage semantics were ambiguous between linear and DAG; linear chain chosen for simplicity and traceability)"
+    },
+    "embedding_refs": {
+      "type": ["object", "null"],
+      "description": "Optional references to pre-computed vector embeddings for semantic recall. Nullable in v3.2.0.",
+      "properties": {
+        "model_name": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Name/identifier of the embedding model used"
+        },
+        "vector_id": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Vector store record ID for the embedding"
+        },
+        "checksum": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Checksum of the embedded content to detect staleness"
+        }
+      }
+    }
+  }
+}

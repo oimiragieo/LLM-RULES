@@ -29,11 +29,13 @@
  * @returns {string}
  */
 function slugify(name) {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 100) || 'imported-agent';
+  return (
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 100) || 'imported-agent'
+  );
 }
 
 /**
@@ -81,7 +83,15 @@ function mapSessionType(memory) {
 }
 
 // Tool types that have direct local equivalents in agent-studio
-const KNOWN_TOOL_TYPES = new Set(['custom', 'anthropic_builtin', 'function', 'computer_use', 'bash', 'text_editor', 'web_search']);
+const KNOWN_TOOL_TYPES = new Set([
+  'custom',
+  'anthropic_builtin',
+  'function',
+  'computer_use',
+  'bash',
+  'text_editor',
+  'web_search',
+]);
 
 /**
  * Classify tools: known (mappable to capabilities) vs unknown (warn + skip).
@@ -168,9 +178,10 @@ function convertManagedAgent(managedAgentJson) {
   const { known: knownTools, unknown: unknownTools } = classifyTools(src.tools);
 
   // Build warnings for unknown tools
-  const warnings = unknownTools.map(t =>
-    `Tool '${t.name}' (type: '${t.type || 'unknown'}') has no local agent-studio equivalent — skipped. ` +
-    `Manual mapping required after import.`
+  const warnings = unknownTools.map(
+    t =>
+      `Tool '${t.name}' (type: '${t.type || 'unknown'}') has no local agent-studio equivalent — skipped. ` +
+      `Manual mapping required after import.`
   );
 
   const importReport = {
@@ -210,9 +221,10 @@ function convertManagedAgent(managedAgentJson) {
   };
 
   // Build full agent .md content
-  const warningBlock = importReport.warnings.length > 0
-    ? `\n<!-- IMPORT WARNINGS:\n${importReport.warnings.map(w => `  - ${w}`).join('\n')}\n-->\n`
-    : '';
+  const warningBlock =
+    importReport.warnings.length > 0
+      ? `\n<!-- IMPORT WARNINGS:\n${importReport.warnings.map(w => `  - ${w}`).join('\n')}\n-->\n`
+      : '';
 
   const agentMd = `${buildProvenance(agentId, sourceId)}
 ---
@@ -241,9 +253,11 @@ ${systemPrompt ? `\`\`\`\n${systemPrompt}\n\`\`\`` : '_No system prompt captured
 
 ## Mapped Tools
 
-${knownTools.length > 0
-  ? knownTools.map(t => `- **${t.name}**: ${t.description || ''}`).join('\n')
-  : '_No tools mapped._'}
+${
+  knownTools.length > 0
+    ? knownTools.map(t => `- **${t.name}**: ${t.description || ''}`).join('\n')
+    : '_No tools mapped._'
+}
 
 ${importReport.skippedTools.length > 0 ? `## Skipped Tools (no local equivalent)\n\n${importReport.skippedTools.map(n => `- \`${n}\``).join('\n')}` : ''}
 `;

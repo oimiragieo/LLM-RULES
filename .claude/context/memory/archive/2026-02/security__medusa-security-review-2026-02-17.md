@@ -11,16 +11,16 @@
 
 ## Executive Summary
 
-| Category              | Findings | Critical | High | Medium | Low |
-|-----------------------|----------|----------|------|--------|-----|
-| JSON Parsing Safety   | 8        | 0        | 3    | 4      | 1   |
-| Memory Sanitization   | 3        | 0        | 2    | 1      | 0   |
-| Child Process Safety  | 4        | 0        | 1    | 2      | 1   |
-| Path Traversal        | 2        | 0        | 0    | 1      | 1   |
-| Prompt Injection      | 2        | 0        | 1    | 1      | 0   |
-| Hardcoded Credentials | 0        | 0        | 0    | 0      | 0   |
-| Shell Injection       | 2        | 0        | 0    | 1      | 1   |
-| **Total**             | **21**   | **0**    | **7**| **10** | **4**|
+| Category              | Findings | Critical | High  | Medium | Low   |
+| --------------------- | -------- | -------- | ----- | ------ | ----- |
+| JSON Parsing Safety   | 8        | 0        | 3     | 4      | 1     |
+| Memory Sanitization   | 3        | 0        | 2     | 1      | 0     |
+| Child Process Safety  | 4        | 0        | 1     | 2      | 1     |
+| Path Traversal        | 2        | 0        | 0     | 1      | 1     |
+| Prompt Injection      | 2        | 0        | 1     | 1      | 0     |
+| Hardcoded Credentials | 0        | 0        | 0     | 0      | 0     |
+| Shell Injection       | 2        | 0        | 0     | 1      | 1     |
+| **Total**             | **21**   | **0**    | **7** | **10** | **4** |
 
 **Overall Risk Rating**: **MEDIUM-HIGH** (no critical findings, but 7 high-severity gaps remain)
 
@@ -29,6 +29,7 @@
 ## Positive Security Controls (What Is Working Well)
 
 ### 1. safeParseJSON Utility (SEC-007) -- WELL IMPLEMENTED
+
 - **File**: `.claude/lib/utils/safe-json.cjs`
 - Strips `__proto__`, `constructor`, `prototype` keys recursively (depth-limited to 10)
 - Uses `Object.create(null)` to prevent prototype pollution
@@ -36,45 +37,53 @@
 - Adopted by 50+ files across hooks/lib/tools
 
 ### 2. Shell Injection Validator -- WELL IMPLEMENTED
+
 - **File**: `.claude/hooks/safety/shell-injection-validator.cjs`
 - Blocks chained `rm -rf`, `eval`, device redirects, command substitution
 - Configurable enforcement modes (block/warn/off)
 - Fail-closed on error (exit code 2)
 
 ### 3. Bash Command Validator -- WELL IMPLEMENTED
+
 - **File**: `.claude/hooks/safety/bash-command-validator.cjs`
 - Uses shared hook-input utility for consistent parsing
 - Validates commands via registry pattern
 - `shell: false` used for all spawnSync calls
 
 ### 4. Path Validator -- WELL IMPLEMENTED
+
 - **File**: `.claude/lib/utils/path-validator.cjs`
 - Blocks path traversal (`../`, `..\`), null bytes, template injection, URL encoding
 - Enforces project-root containment via `path.resolve` + `startsWith` check
 - Context-specific allowlists (SIDECAR, SHARED_MEMORY, KNOWLEDGE_BASE, etc.)
 
 ### 5. Memory Sanitizer -- PARTIALLY IMPLEMENTED
+
 - **File**: `.claude/lib/memory/memory-sanitizer.cjs`
 - Detects shell injection, prompt injection, code execution, encoded payloads
 - Scans all content (including code blocks) after VUL-BYPASS-001 fix
 - Audit trail via stderr logging
 
 ### 6. Windows Null Sanitizer -- WELL IMPLEMENTED
+
 - **File**: `.claude/hooks/safety/windows-null-sanitizer.cjs`
 - Correctly handles Git Bash vs cmd.exe/PowerShell null device differences
 - Prevents literal file creation from device name mismatches
 
 ### 7. Unified Pre-Write Hook -- WELL IMPLEMENTED
+
 - **File**: `.claude/hooks/safety/unified-pre-write-hook.cjs`
 - Consolidates 11 safety checks into single process (performance + security)
 - File placement guard, content scanning, creator guard, size validation
 
 ### 8. No Hardcoded Credentials Found
+
 - Full scan of `.claude/` directory for API keys, tokens, passwords, private keys: **CLEAN**
 - No AWS credentials (AKIA pattern), no SSH private keys, no connection strings with embedded credentials
 - `sensitive-scrubber.cjs` utility exists for runtime scrubbing
 
 ### 9. No `shell: true` in Active Code
+
 - `shell: true` found only in 2 archived/dead skill scripts (`.claude/skills/_archive/`)
 - All active `spawnSync` calls use `shell: false` with array arguments (SEC-009 pattern)
 
@@ -117,6 +126,7 @@ In contrast, `writeMemory()` and `writeMemoryArray()` in `memory-manager-core-st
 **Attack Vector**: A malicious agent or poisoned context could inject prompt injection payloads or shell commands into gotchas/patterns/codebase_map JSON files. These files are later read by spawn-prompt-assembler and injected into agent prompts, creating a memory poisoning attack chain (OWASP Agentic AI ASI06).
 
 **Remediation**:
+
 1. Import `sanitizeMemoryContent` in `memory-manager-core-recording.cjs`
 2. Call `sanitizeMemoryContent(gotcha.text)` before writing in `recordGotcha()`
 3. Call `sanitizeMemoryContent(pattern.text)` before writing in `recordPattern()`
@@ -185,6 +195,7 @@ Most parse trusted local files (lower risk), but some parse JSONL entries from a
 **Description**: The `sanitizeMemoryContent()` function returns the ORIGINAL content unchanged even when dangerous patterns are detected (`sanitized: contentStr`). It only logs detections to stderr. While `writeMemory()` and `writeMemoryArray()` check `result.safe` and throw errors, the recording functions (`recordGotcha`, `recordPattern`, `recordDiscovery`) do not call sanitizer at all (see HIGH-002). Even if they did, they would need to check `result.safe` and block the write.
 
 **Remediation**:
+
 1. Add sanitization calls to recording functions (HIGH-002 fix)
 2. Ensure all callers check `result.safe` before proceeding with writes
 
@@ -212,6 +223,7 @@ Most parse trusted local files (lower risk), but some parse JSONL entries from a
 **CWE**: CWE-16 (Configuration)
 
 **Description**: All enforcement hooks can be disabled via environment variables:
+
 - `SHELL_INJECTION_VALIDATOR=off`
 - `BASH_VALIDATOR_FAIL_OPEN=true`
 - `CREATOR_GUARD=off`
@@ -243,6 +255,7 @@ An agent with Bash tool access could potentially set these variables before exec
 
 **Severity**: MEDIUM
 **Files**:
+
 - `.claude/lib/memory/audit-trail-integration.cjs:283,453`
 - `.claude/lib/monitoring/metrics-reader.cjs:55,99`
 - `.claude/lib/monitoring/metrics-schema.cjs:203`
@@ -282,7 +295,7 @@ An agent with Bash tool access could potentially set these variables before exec
 **Severity**: MEDIUM
 **File**: `.claude/lib/utils/sensitive-scrubber.cjs`
 
-**Description**: The scrubber exists but its pattern coverage was not auditable in this scan. It needs verification that it covers: AWS access keys, GitHub tokens (ghp_/gho_/ghs_), Azure keys, Google Cloud service account keys, JWT tokens, private keys, and connection strings.
+**Description**: The scrubber exists but its pattern coverage was not auditable in this scan. It needs verification that it covers: AWS access keys, GitHub tokens (ghp*/gho*/ghs\_), Azure keys, Google Cloud service account keys, JWT tokens, private keys, and connection strings.
 
 **Remediation**: Audit the scrubber patterns against the comprehensive list in the `insecure-defaults` skill.
 
@@ -336,6 +349,7 @@ An agent with Bash tool access could potentially set these variables before exec
 
 **Severity**: LOW
 **Files**:
+
 - `.claude/skills/_archive/dead/mcp-converter/scripts/main.cjs:75`
 - `.claude/skills/_archive/dead/github-ops/scripts/main.cjs:66`
 
@@ -347,31 +361,31 @@ An agent with Bash tool access could potentially set these variables before exec
 
 ## STRIDE Threat Model Summary
 
-| Threat | Status | Key Control |
-|--------|--------|-------------|
-| **Spoofing** | MITIGATED | Agent identity via CLAUDE_AGENT_ID env var; routing-guard enforces |
-| **Tampering** | PARTIAL | Memory writes partially sanitized (HIGH-002); JSON parsing gaps (HIGH-004) |
-| **Repudiation** | MITIGATED | Audit trail via spawn-log.jsonl, flight-recorder, memory SLO metrics |
-| **Information Disclosure** | MITIGATED | sensitive-scrubber.cjs; no hardcoded credentials found |
-| **Denial of Service** | MITIGATED | Execution limit monitor; complexity classifier; loop detection |
-| **Elevation of Privilege** | PARTIAL | Prompt injection risk via memory poisoning (HIGH-002, HIGH-007) |
+| Threat                     | Status    | Key Control                                                                |
+| -------------------------- | --------- | -------------------------------------------------------------------------- |
+| **Spoofing**               | MITIGATED | Agent identity via CLAUDE_AGENT_ID env var; routing-guard enforces         |
+| **Tampering**              | PARTIAL   | Memory writes partially sanitized (HIGH-002); JSON parsing gaps (HIGH-004) |
+| **Repudiation**            | MITIGATED | Audit trail via spawn-log.jsonl, flight-recorder, memory SLO metrics       |
+| **Information Disclosure** | MITIGATED | sensitive-scrubber.cjs; no hardcoded credentials found                     |
+| **Denial of Service**      | MITIGATED | Execution limit monitor; complexity classifier; loop detection             |
+| **Elevation of Privilege** | PARTIAL   | Prompt injection risk via memory poisoning (HIGH-002, HIGH-007)            |
 
 ---
 
 ## OWASP Agentic AI Top 10 Mapping
 
-| OWASP ID | Threat | Status | Findings |
-|----------|--------|--------|----------|
-| ASI01 | Agent Goal Hijacking | PARTIAL | HIGH-007 (spawn prompt injection via config files) |
-| ASI02 | Tool Misuse | MITIGATED | routing-guard + tool-scope-validator enforce tool restrictions |
-| ASI03 | Privilege Escalation | MITIGATED | Least privilege per agent; router tool lockdown |
-| ASI04 | Excessive Autonomy | MITIGATED | Enforcement hooks, complexity gates, planner-first requirement |
-| ASI05 | Insufficient Sandboxing | LOW RISK | Claude Code sandbox; shell-injection-validator |
-| ASI06 | Memory & Context Poisoning | PARTIAL | HIGH-002 (recording bypass), HIGH-006 (detection-only sanitizer) |
-| ASI07 | Multi-Agent Coordination Issues | MITIGATED | Task lifecycle tracking; conductor pattern |
-| ASI08 | Insecure Output Handling | MITIGATED | Output filtering; citation guards |
-| ASI09 | Supply Chain | LOW RISK | npm packages locked; no evidence of dependency confusion |
-| ASI10 | Logging and Monitoring Gaps | MITIGATED | Flight recorder, metrics, audit trail |
+| OWASP ID | Threat                          | Status    | Findings                                                         |
+| -------- | ------------------------------- | --------- | ---------------------------------------------------------------- |
+| ASI01    | Agent Goal Hijacking            | PARTIAL   | HIGH-007 (spawn prompt injection via config files)               |
+| ASI02    | Tool Misuse                     | MITIGATED | routing-guard + tool-scope-validator enforce tool restrictions   |
+| ASI03    | Privilege Escalation            | MITIGATED | Least privilege per agent; router tool lockdown                  |
+| ASI04    | Excessive Autonomy              | MITIGATED | Enforcement hooks, complexity gates, planner-first requirement   |
+| ASI05    | Insufficient Sandboxing         | LOW RISK  | Claude Code sandbox; shell-injection-validator                   |
+| ASI06    | Memory & Context Poisoning      | PARTIAL   | HIGH-002 (recording bypass), HIGH-006 (detection-only sanitizer) |
+| ASI07    | Multi-Agent Coordination Issues | MITIGATED | Task lifecycle tracking; conductor pattern                       |
+| ASI08    | Insecure Output Handling        | MITIGATED | Output filtering; citation guards                                |
+| ASI09    | Supply Chain                    | LOW RISK  | npm packages locked; no evidence of dependency confusion         |
+| ASI10    | Logging and Monitoring Gaps     | MITIGATED | Flight recorder, metrics, audit trail                            |
 
 ---
 
@@ -408,14 +422,14 @@ An agent with Bash tool access could potentially set these variables before exec
 
 ## Security Controls Verification
 
-| Control ID | Description | Status |
-|------------|-------------|--------|
-| SEC-001 | Token Whitelist | ACTIVE (routing-guard.cjs) |
-| SEC-002 | Path Validation | ACTIVE (path-validator.cjs) |
-| SEC-003 | Input Sanitization | PARTIAL (memory recording bypass) |
-| SEC-004 | Transparency Markers | ACTIVE (provenance headers) |
-| SEC-007 | Safe JSON Parsing | PARTIAL (50+ adopters, 60+ remaining) |
-| SEC-009 | shell:false Standard | ACTIVE (no violations in active code) |
+| Control ID | Description          | Status                                |
+| ---------- | -------------------- | ------------------------------------- |
+| SEC-001    | Token Whitelist      | ACTIVE (routing-guard.cjs)            |
+| SEC-002    | Path Validation      | ACTIVE (path-validator.cjs)           |
+| SEC-003    | Input Sanitization   | PARTIAL (memory recording bypass)     |
+| SEC-004    | Transparency Markers | ACTIVE (provenance headers)           |
+| SEC-007    | Safe JSON Parsing    | PARTIAL (50+ adopters, 60+ remaining) |
+| SEC-009    | shell:false Standard | ACTIVE (no violations in active code) |
 
 ---
 
@@ -432,6 +446,7 @@ An agent with Bash tool access could potentially set these variables before exec
 ## Appendix: Files Examined
 
 ### Active Hooks (Non-Archived)
+
 - `.claude/hooks/safety/shell-injection-validator.cjs`
 - `.claude/hooks/safety/bash-command-validator.cjs`
 - `.claude/hooks/safety/windows-null-sanitizer.cjs`
@@ -441,6 +456,7 @@ An agent with Bash tool access could potentially set these variables before exec
 - `.claude/hooks/routing/spawn-prompt-assembler.cjs`
 
 ### Libraries
+
 - `.claude/lib/utils/safe-json.cjs`
 - `.claude/lib/utils/path-validator.cjs`
 - `.claude/lib/utils/sensitive-scrubber.cjs`
@@ -451,5 +467,6 @@ An agent with Bash tool access could potentially set these variables before exec
 - `.claude/lib/spawn/prompt-assembler-data.cjs`
 
 ### Scan Coverage
+
 - **Total .cjs files scanned**: ~200+ active (excluding `_archive/`)
-- **Total security patterns checked**: shell:true, JSON.parse, execSync/spawnSync, eval, __proto__, hardcoded credentials, path traversal, prompt injection markers
+- **Total security patterns checked**: shell:true, JSON.parse, execSync/spawnSync, eval, **proto**, hardcoded credentials, path traversal, prompt injection markers

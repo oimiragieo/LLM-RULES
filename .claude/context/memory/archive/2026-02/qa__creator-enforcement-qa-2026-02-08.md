@@ -175,12 +175,30 @@ Line 170: "command": "node .claude/hooks/validation/creator-compliance-validator
 
 ```javascript
 const CREATOR_INTENT_PATTERNS = [
-  { pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(agent|agents)\b/i, type: 'agent-creator' },
-  { pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(skill|skills)\b/i, type: 'skill-creator' },
-  { pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(hook|hooks)\b/i, type: 'hook-creator' },
-  { pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(workflow|workflows)\b/i, type: 'workflow-creator' },
-  { pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(template|templates)\b/i, type: 'template-creator' },
-  { pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(schema|schemas)\b/i, type: 'schema-creator' },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(agent|agents)\b/i,
+    type: 'agent-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(skill|skills)\b/i,
+    type: 'skill-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(hook|hooks)\b/i,
+    type: 'hook-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(workflow|workflows)\b/i,
+    type: 'workflow-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(template|templates)\b/i,
+    type: 'template-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(schema|schemas)\b/i,
+    type: 'schema-creator',
+  },
 ];
 ```
 
@@ -254,30 +272,30 @@ const CREATOR_INTENT_PATTERNS = [
 
 ## Manual Validation Checklist
 
-| #   | Validation Item                                 | Status     | Evidence                                             |
-| --- | ----------------------------------------------- | ---------- | ---------------------------------------------------- |
-| 1   | Test suite passes                               | ✅ PASS    | 0/0 tests, 0 failures                                |
-| 2   | Lint clean (0 errors)                           | ✅ PASS    | pnpm lint:fix exits cleanly                          |
-| 3   | Format clean (0 changes)                        | ✅ PASS    | 2851 files formatted, no changes needed              |
-| 4   | creator-compliance-validator.cjs exists         | ✅ PASS    | File found at .claude/hooks/validation/              |
-| 5   | Hook registered in settings.json                | ✅ PASS    | Line 170, TaskUpdate matcher                         |
-| 6   | Hook syntax valid (loads without errors)        | ✅ PASS    | require() succeeds for all 4 hooks                   |
-| 7   | routing-guard.cjs loads                         | ✅ PASS    | require() succeeds                                   |
-| 8   | user-prompt-unified.cjs loads                   | ✅ PASS    | require() succeeds                                   |
-| 9   | unified-creator-guard.cjs loads                 | ✅ PASS    | require() succeeds                                   |
-| 10  | Creator intent patterns exist                   | ✅ PASS    | 6 patterns for 6 artifact types                      |
-| 11  | Batch detection in patterns                     | ✅ PASS    | `(\d+\s+)?` capture group for batch quantities       |
-| 12  | detectCreatorIntent function implemented        | ✅ PASS    | Lines 297-306 in user-prompt-unified.cjs             |
-| 13  | Layer 1 (intent detection) registered           | ✅ PASS    | UserPromptSubmit matcher                             |
-| 14  | Layer 2 (write prevention) registered           | ✅ PASS    | Write\|Edit\|NotebookEdit matcher                    |
-| 15  | Layer 3 (compliance validation) registered      | ✅ PASS    | TaskUpdate matcher                                   |
-| 16  | Environment overrides available                 | ✅ PASS    | CREATOR_ROUTING_ENFORCEMENT, CREATOR_GUARD, etc.     |
-| 17  | Integration queue mechanism wired               | ✅ PASS    | Layer 3 logs to integration-queue.jsonl              |
-| 18  | Router Step 0.5 integration documented          | ✅ PASS    | CLAUDE.md Section 0 mentions integration queue check |
-| 19  | All code follows project conventions            | ✅ PASS    | Lint + format pass                                   |
-| 20  | No console.log in production code               | ✅ PASS    | Lint check includes check-console-log hook           |
-| 21  | CLAUDE.md Section 1.2 Gate 4 references Layer 2 | ✅ PASS    | Verified in CLAUDE.md                                |
-| 22  | CLAUDE.md Section 1.3 references enforcement    | ✅ PASS    | Verified in CLAUDE.md                                |
+| #   | Validation Item                                 | Status  | Evidence                                             |
+| --- | ----------------------------------------------- | ------- | ---------------------------------------------------- |
+| 1   | Test suite passes                               | ✅ PASS | 0/0 tests, 0 failures                                |
+| 2   | Lint clean (0 errors)                           | ✅ PASS | pnpm lint:fix exits cleanly                          |
+| 3   | Format clean (0 changes)                        | ✅ PASS | 2851 files formatted, no changes needed              |
+| 4   | creator-compliance-validator.cjs exists         | ✅ PASS | File found at .claude/hooks/validation/              |
+| 5   | Hook registered in settings.json                | ✅ PASS | Line 170, TaskUpdate matcher                         |
+| 6   | Hook syntax valid (loads without errors)        | ✅ PASS | require() succeeds for all 4 hooks                   |
+| 7   | routing-guard.cjs loads                         | ✅ PASS | require() succeeds                                   |
+| 8   | user-prompt-unified.cjs loads                   | ✅ PASS | require() succeeds                                   |
+| 9   | unified-creator-guard.cjs loads                 | ✅ PASS | require() succeeds                                   |
+| 10  | Creator intent patterns exist                   | ✅ PASS | 6 patterns for 6 artifact types                      |
+| 11  | Batch detection in patterns                     | ✅ PASS | `(\d+\s+)?` capture group for batch quantities       |
+| 12  | detectCreatorIntent function implemented        | ✅ PASS | Lines 297-306 in user-prompt-unified.cjs             |
+| 13  | Layer 1 (intent detection) registered           | ✅ PASS | UserPromptSubmit matcher                             |
+| 14  | Layer 2 (write prevention) registered           | ✅ PASS | Write\|Edit\|NotebookEdit matcher                    |
+| 15  | Layer 3 (compliance validation) registered      | ✅ PASS | TaskUpdate matcher                                   |
+| 16  | Environment overrides available                 | ✅ PASS | CREATOR_ROUTING_ENFORCEMENT, CREATOR_GUARD, etc.     |
+| 17  | Integration queue mechanism wired               | ✅ PASS | Layer 3 logs to integration-queue.jsonl              |
+| 18  | Router Step 0.5 integration documented          | ✅ PASS | CLAUDE.md Section 0 mentions integration queue check |
+| 19  | All code follows project conventions            | ✅ PASS | Lint + format pass                                   |
+| 20  | No console.log in production code               | ✅ PASS | Lint check includes check-console-log hook           |
+| 21  | CLAUDE.md Section 1.2 Gate 4 references Layer 2 | ✅ PASS | Verified in CLAUDE.md                                |
+| 22  | CLAUDE.md Section 1.3 references enforcement    | ✅ PASS | Verified in CLAUDE.md                                |
 
 **Total:** 22/22 checks passed (100%)
 
@@ -341,16 +359,16 @@ The `CREATOR_INTENT_PATTERNS` include a numeric capture group `(\d+\s+)?` to det
 
 ### IEEE 1028 Base Categories
 
-| Category           | Status     | Notes                                             |
-| ------------------ | ---------- | ------------------------------------------------- |
+| Category           | Status     | Notes                                            |
+| ------------------ | ---------- | ------------------------------------------------ |
 | Code Quality       | ✅ PASS    | Lint/format pass, hooks follow project structure |
-| Testing            | ✅ PASS    | Structural validation appropriate for hooks       |
-| Security           | ✅ PASS    | Environment overrides require audit trail         |
-| Performance        | ✅ PASS    | Hooks are lightweight (stdin/stdout JSON)         |
-| Documentation      | ✅ PASS    | Inline comments in all 4 hooks                    |
-| Error Handling     | ✅ PASS    | Hooks use try/catch and graceful degradation      |
-| TDD Compliance     | ⚠️ WARNING | No test-first for hooks (structural validation)   |
-| Lint/Format (GATE) | ✅ PASS    | Both gates passed (BLOCKING requirement)          |
+| Testing            | ✅ PASS    | Structural validation appropriate for hooks      |
+| Security           | ✅ PASS    | Environment overrides require audit trail        |
+| Performance        | ✅ PASS    | Hooks are lightweight (stdin/stdout JSON)        |
+| Documentation      | ✅ PASS    | Inline comments in all 4 hooks                   |
+| Error Handling     | ✅ PASS    | Hooks use try/catch and graceful degradation     |
+| TDD Compliance     | ⚠️ WARNING | No test-first for hooks (structural validation)  |
+| Lint/Format (GATE) | ✅ PASS    | Both gates passed (BLOCKING requirement)         |
 
 **TDD Warning Justification:** Hooks are infrastructure code validated via structural checks. Test-first approach not applicable for stdin/stdout JSON protocol hooks. Syntax validation (require() without errors) is sufficient quality gate.
 

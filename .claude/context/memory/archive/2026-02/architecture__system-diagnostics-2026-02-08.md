@@ -16,6 +16,7 @@ After consolidating 6 wildcard hooks into 2 unified hooks and archiving ~37 dead
 **Overall Health:** 16/19 checks passed (84%)
 
 **Key Findings:**
+
 1. ✅ New unified hooks load and execute correctly
 2. ✅ Router system loads without errors
 3. ✅ Memory system fully operational
@@ -32,39 +33,41 @@ After consolidating 6 wildcard hooks into 2 unified hooks and archiving ~37 dead
 
 All registered hooks exist on disk:
 
-| Hook File | Status | Path |
-|-----------|--------|------|
-| pre-tool-unified.cjs | ✅ EXISTS | `.claude/hooks/routing/` |
+| Hook File                     | Status    | Path                     |
+| ----------------------------- | --------- | ------------------------ |
+| pre-tool-unified.cjs          | ✅ EXISTS | `.claude/hooks/routing/` |
 | post-tool-metrics-unified.cjs | ✅ EXISTS | `.claude/hooks/metrics/` |
-| routing-guard.cjs | ✅ EXISTS | `.claude/hooks/routing/` |
-| user-prompt-unified.cjs | ✅ EXISTS | `.claude/hooks/routing/` |
-| spawn-prompt-assembler.cjs | ✅ EXISTS | `.claude/hooks/routing/` |
-| pre-task-unified.cjs | ✅ EXISTS | `.claude/hooks/routing/` |
+| routing-guard.cjs             | ✅ EXISTS | `.claude/hooks/routing/` |
+| user-prompt-unified.cjs       | ✅ EXISTS | `.claude/hooks/routing/` |
+| spawn-prompt-assembler.cjs    | ✅ EXISTS | `.claude/hooks/routing/` |
+| pre-task-unified.cjs          | ✅ EXISTS | `.claude/hooks/routing/` |
 
 **Result:** All 6 critical routing/safety hooks verified present.
 
 ### 1.2 Hook Execution Tests
 
-| Hook | Test Input | Exit Code | Result |
-|------|------------|-----------|--------|
-| pre-tool-unified.cjs | `{}` | 0 | ✅ PASS |
-| post-tool-metrics-unified.cjs | `{}` | 0 | ✅ PASS |
-| routing-guard.cjs | module load | - | ✅ PASS |
-| user-prompt-unified.cjs | module load | - | ✅ PASS |
-| spawn-prompt-assembler.cjs | module load | - | ✅ PASS |
-| pre-task-unified.cjs | module load | - | ✅ PASS |
+| Hook                          | Test Input  | Exit Code | Result  |
+| ----------------------------- | ----------- | --------- | ------- |
+| pre-tool-unified.cjs          | `{}`        | 0         | ✅ PASS |
+| post-tool-metrics-unified.cjs | `{}`        | 0         | ✅ PASS |
+| routing-guard.cjs             | module load | -         | ✅ PASS |
+| user-prompt-unified.cjs       | module load | -         | ✅ PASS |
+| spawn-prompt-assembler.cjs    | module load | -         | ✅ PASS |
+| pre-task-unified.cjs          | module load | -         | ✅ PASS |
 
 Both new unified hooks execute without crashes and return expected exit codes.
 
 ### 1.3 Hook Count Analysis
 
 **Before Consolidation:**
+
 - 6 wildcard PreToolUse hooks (routing/monitoring)
 - 6 wildcard PostToolUse hooks (monitoring)
 - ~39 matcher-specific hooks
 - **Total: ~45 active hooks**
 
 **After Consolidation:**
+
 - 1 unified PreToolUse hook (pre-tool-unified.cjs)
 - 1 unified PostToolUse hook (post-tool-metrics-unified.cjs)
 - ~35 matcher-specific hooks
@@ -77,6 +80,7 @@ Both new unified hooks execute without crashes and return expected exit codes.
 ✅ **No archived hooks registered in settings.json**
 
 All hooks in `_archive/` directories are correctly deregistered:
+
 - `.claude/hooks/monitoring/_archive/` (6 hooks)
 - `.claude/hooks/routing/_archive/` (captured by git status)
 - `.claude/hooks/session/_archive/` (captured by git status)
@@ -88,15 +92,16 @@ All hooks in `_archive/` directories are correctly deregistered:
 
 ### 2.1 Core Routing Modules
 
-| Module | Status | Export Check |
-|--------|--------|--------------|
-| routing-table.cjs | ✅ LOADS | 7 exports verified |
-| routing-guard.cjs | ✅ LOADS | No errors |
-| user-prompt-unified.cjs | ✅ LOADS | No errors |
-| spawn-prompt-assembler.cjs | ✅ LOADS | No errors |
-| pre-task-unified.cjs | ✅ LOADS | No errors |
+| Module                     | Status   | Export Check       |
+| -------------------------- | -------- | ------------------ |
+| routing-table.cjs          | ✅ LOADS | 7 exports verified |
+| routing-guard.cjs          | ✅ LOADS | No errors          |
+| user-prompt-unified.cjs    | ✅ LOADS | No errors          |
+| spawn-prompt-assembler.cjs | ✅ LOADS | No errors          |
+| pre-task-unified.cjs       | ✅ LOADS | No errors          |
 
 **routing-table.cjs exports:**
+
 ```
 ROUTING_TABLE, ROUTING_PREFIX_PATTERNS, ROUTING_PATTERNS,
 INTENT_KEYWORDS, INTENT_TO_AGENT, DISAMBIGUATION_RULES,
@@ -117,20 +122,20 @@ getPreferredAgent
 
 ### 3.1 Memory Files Verified
 
-| File | Status | Location |
-|------|--------|----------|
-| learnings.md | ✅ EXISTS | `.claude/context/memory/` |
-| decisions.md | ✅ EXISTS | `.claude/context/memory/` |
-| issues.md | ✅ EXISTS | `.claude/context/memory/` |
+| File              | Status    | Location                  |
+| ----------------- | --------- | ------------------------- |
+| learnings.md      | ✅ EXISTS | `.claude/context/memory/` |
+| decisions.md      | ✅ EXISTS | `.claude/context/memory/` |
+| issues.md         | ✅ EXISTS | `.claude/context/memory/` |
 | active_context.md | ✅ EXISTS | `.claude/context/memory/` |
-| memory.db | ✅ EXISTS | `.claude/context/data/` |
+| memory.db         | ✅ EXISTS | `.claude/context/data/`   |
 
 ### 3.2 Memory Modules
 
-| Module | Status | Notes |
-|--------|--------|-------|
+| Module             | Status   | Notes                                  |
+| ------------------ | -------- | -------------------------------------- |
 | memory-manager.cjs | ✅ LOADS | SQLite experimental warning (expected) |
-| memory-tiers.cjs | ✅ LOADS | No errors |
+| memory-tiers.cjs   | ✅ LOADS | No errors                              |
 
 ### 3.3 Archived Memory Modules
 
@@ -145,11 +150,13 @@ const smartPruner = safeRequire(path.join(libDir, 'smart-pruner.cjs'));
 ```
 
 **Impact:**
+
 - `runDeduplication()` function fails silently when smart-pruner not found
 - Falls back gracefully with `result.details = 'smart-pruner.cjs not available'`
 - No crashes, but feature is non-functional
 
 **Resolution Options:**
+
 1. Restore smart-pruner.cjs from archive
 2. Update memory-scheduler.cjs to use replacement deduplication logic
 3. Remove deduplication feature if no longer needed
@@ -162,11 +169,11 @@ const smartPruner = safeRequire(path.join(libDir, 'smart-pruner.cjs'));
 
 ### 4.1 Workflow Modules
 
-| Module | Status |
-|--------|--------|
+| Module                     | Status   |
+| -------------------------- | -------- |
 | workflow-state-manager.cjs | ✅ LOADS |
-| phase-advance-reader.cjs | ✅ LOADS |
-| complexity-classifier.cjs | ✅ LOADS |
+| phase-advance-reader.cjs   | ✅ LOADS |
+| complexity-classifier.cjs  | ✅ LOADS |
 
 All core workflow modules load without errors.
 
@@ -175,6 +182,7 @@ All core workflow modules load without errors.
 ⚠️ **FINDING: Test files import archived workflow modules**
 
 **Affected Test Files:**
+
 - `tests/spec-020-versioning.test.cjs` (23 imports of `deployment-manager.cjs`)
 - `tests/spec-021-legacy-integration.test.cjs` (2 imports of `strangler-fig.cjs`)
 - `tests/spec-018-composition.test.cjs` (1 import of `workflow-composer.cjs`)
@@ -184,6 +192,7 @@ All core workflow modules load without errors.
 - `tests/lib/workflow/_archive/saga-coordinator.test.cjs` (1 import)
 
 **Impact:**
+
 - These test files will fail with MODULE_NOT_FOUND errors
 - Tests are for archived/dead features, so failures are expected
 - Pre-existing test failures (confirmed in learnings.md)
@@ -236,6 +245,7 @@ All core workflow modules load without errors.
 **Status:** Could not run full test suite due to Windows command syntax issues in Bash tool.
 
 **Attempted Commands:**
+
 ```bash
 cd C:\dev\projects\agent-studio && pnpm test
 cd C:\dev\projects\agent-studio && node --test
@@ -246,11 +256,13 @@ Both failed with bash syntax errors (Windows path escaping issues).
 **Workaround Attempted:** Direct node test runner - failed
 
 **Impact:** Cannot verify:
+
 - Full test pass/fail rate
 - Regression detection
 - Integration test health
 
 **Recommendation:** Run tests manually:
+
 ```powershell
 cd C:\dev\projects\agent-studio
 pnpm test
@@ -262,17 +274,17 @@ pnpm test
 
 ## Summary Table
 
-| Category | Total Checks | Passed | Failed | Warning |
-|----------|--------------|--------|--------|---------|
-| Hook Files | 6 | 6 | 0 | 0 |
-| Hook Execution | 6 | 6 | 0 | 0 |
-| Router Modules | 5 | 5 | 0 | 0 |
-| Memory Files | 5 | 5 | 0 | 0 |
-| Memory Modules | 2 | 2 | 0 | 0 |
-| Workflow Modules | 3 | 3 | 0 | 0 |
-| Dependency Check | 3 | 0 | 0 | 3 |
-| Test Suite | 1 | 0 | 0 | 1 |
-| **TOTAL** | **31** | **27** | **0** | **4** |
+| Category         | Total Checks | Passed | Failed | Warning |
+| ---------------- | ------------ | ------ | ------ | ------- |
+| Hook Files       | 6            | 6      | 0      | 0       |
+| Hook Execution   | 6            | 6      | 0      | 0       |
+| Router Modules   | 5            | 5      | 0      | 0       |
+| Memory Files     | 5            | 5      | 0      | 0       |
+| Memory Modules   | 2            | 2      | 0      | 0       |
+| Workflow Modules | 3            | 3      | 0      | 0       |
+| Dependency Check | 3            | 0      | 0      | 3       |
+| Test Suite       | 1            | 0      | 0      | 1       |
+| **TOTAL**        | **31**       | **27** | **0**  | **4**   |
 
 **Pass Rate:** 87% (27/31 passed, 4 warnings)
 
@@ -281,12 +293,14 @@ pnpm test
 ## Recommendations
 
 ### Priority 1 (Immediate)
+
 1. **Manual test suite run** to verify no regressions
    - Command: `pnpm test` (PowerShell)
    - Record pass/fail metrics
    - Document any new failures vs. pre-existing
 
 ### Priority 2 (Next Sprint)
+
 2. **Fix memory-scheduler.cjs import** of smart-pruner.cjs
    - Option A: Restore smart-pruner.cjs
    - Option B: Remove deduplication feature
@@ -297,6 +311,7 @@ pnpm test
    - Update test suite documentation
 
 ### Priority 3 (Backlog)
+
 4. **Documentation cleanup**
    - Remove SPECIALIST_KEYWORDS references (not exported)
    - Update hook count in documentation (45→37)
@@ -320,6 +335,7 @@ The hook consolidation and dead module archival were **successful**. The system 
 ## Evidence
 
 ### Hook Registration Count
+
 ```json
 // .claude/settings.json analysis
 PreToolUse: 10 matchers × avg 2.5 hooks = ~25 hooks
@@ -332,6 +348,7 @@ Actual unique hooks: ~37
 ```
 
 ### Module Load Evidence
+
 ```
 ✅ routing-table.cjs: 7 exports, 132 agents
 ✅ memory-manager.cjs: loads (SQLite warning expected)
@@ -342,6 +359,7 @@ Actual unique hooks: ~37
 ```
 
 ### Archived Module Import Grep Results
+
 ```
 smart-pruner: 2 active imports (memory-scheduler.cjs line 347, 361)
 cold-storage: 1 test import (archived test file)
@@ -354,6 +372,7 @@ saga-coordinator: 1 test import (archived test file)
 ---
 
 **Next Steps:**
+
 1. Run manual test verification: `pnpm test`
 2. Create tasks for P1-P2 findings
 3. Update memory learnings with diagnostic results

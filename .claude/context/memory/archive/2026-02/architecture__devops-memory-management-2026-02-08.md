@@ -28,15 +28,16 @@ The memory management system is **READY FOR DEPLOYMENT** with 2 minor recommenda
 **File:** `.claude/config.yaml`
 
 **Memory Section (Lines 58-66):**
+
 ```yaml
 memory:
   rotation:
-    threshold_kb: 20        # Rotate files > 20KB
-    max_age_days: 30        # Archive warm files > 30 days
+    threshold_kb: 20 # Rotate files > 20KB
+    max_age_days: 30 # Archive warm files > 30 days
   pruning:
-    similarity_threshold: 0.6  # Jaccard similarity for deduplication
+    similarity_threshold: 0.6 # Jaccard similarity for deduplication
   cold_storage:
-    max_age_days: 30        # Move to cold after 30 days
+    max_age_days: 30 # Move to cold after 30 days
 ```
 
 **Assessment:** ✅ PASS
@@ -48,6 +49,7 @@ memory:
 - No hardcoded magic numbers in implementation
 
 **Evidence:**
+
 - `memory-rotator.cjs` uses `DEFAULT_THRESHOLD_KB = 20` (line 33) with override support
 - `smart-pruner.cjs` uses `DEFAULT_SIMILARITY_THRESHOLD = 0.5` (line 24) with override support
 - `cold-storage.cjs` uses `DEFAULT_MAX_AGE_DAYS = 30` (line 26) with override support
@@ -55,6 +57,7 @@ memory:
 ### 1.2 Configuration Access
 
 **Module Configuration Loading:**
+
 - All modules accept `options` parameter for configuration overrides
 - Defaults fallback to sensible values if config.yaml is inaccessible
 - No crashes on missing configuration
@@ -76,6 +79,7 @@ memory:
 **Assessment:** ✅ PASS
 
 **Evidence:**
+
 ```javascript
 // memory-rotator.cjs:150
 validatePathWithinProject(filePath, projectRoot);
@@ -107,12 +111,14 @@ function validateProjectRoot(projectRoot) {
 **Assessment:** ✅ PASS
 
 **Atomic Write Pattern:**
+
 - Write to temporary file with `.tmp` extension
 - `fsync()` to flush to disk
 - Atomic rename to target path
 - No partial writes survive crashes
 
 **Evidence:**
+
 ```javascript
 // memory-rotator.cjs:224
 atomicWriteSync(archiveFilePath, archiveContent);
@@ -134,6 +140,7 @@ atomicWriteSync(coldFile, existing + jsonlEntries, 'utf8');
 **Assessment:** ✅ PASS
 
 **Evidence:**
+
 ```javascript
 // memory-rotator.cjs:209
 if (!fs.existsSync(archiveDirPath)) {
@@ -149,6 +156,7 @@ if (!fs.existsSync(coldDir)) {
 ### 2.4 Windows Path Compatibility
 
 **Path Operations:**
+
 - All modules use `path.join()` for cross-platform path construction
 - All modules use `path.normalize()` where needed
 - No hardcoded forward/backslashes in path strings
@@ -156,6 +164,7 @@ if (!fs.existsSync(coldDir)) {
 **Assessment:** ✅ PASS
 
 **Evidence:**
+
 - `memory-rotator.cjs`: Uses `path.join()` for all path construction (lines 197-201)
 - `cold-storage.cjs`: Uses `path.join()` for directory paths (lines 44-46, 92)
 - No raw string concatenation with `/` or `\`
@@ -169,6 +178,7 @@ if (!fs.existsSync(coldDir)) {
 **File:** `.claude/hooks/memory/sync-memory-index.cjs`
 
 **Rotation Trigger (Lines 286-300):**
+
 ```javascript
 try {
   const stats = fs.statSync(absPath);
@@ -189,6 +199,7 @@ try {
 **Assessment:** ✅ PASS
 
 **Safety Features:**
+
 - Try/catch wrapper prevents hook pipeline breakage
 - Best-effort execution (failures don't block Edit/Write operations)
 - Size check before rotation invocation
@@ -199,6 +210,7 @@ try {
 **File:** `.claude/settings.json` (Lines 214-224)
 
 **Registration:**
+
 ```json
 {
   "matcher": "Edit|Write|NotebookEdit",
@@ -214,6 +226,7 @@ try {
 **Assessment:** ✅ PASS
 
 **Verification:**
+
 - Hook registered for PostToolUse event
 - Triggers on Edit, Write, NotebookEdit tools
 - No duplicate registrations
@@ -222,6 +235,7 @@ try {
 ### 3.3 Hook Error Handling
 
 **All hook failures are caught and logged (line 298):**
+
 ```javascript
 } catch (_e) {
   // Rotation is best-effort in hooks
@@ -231,6 +245,7 @@ try {
 **Assessment:** ✅ PASS
 
 **Resilience:**
+
 - Failures don't block user operations
 - Failures don't crash Claude Code session
 - Best-effort semantics clearly documented in comments
@@ -251,6 +266,7 @@ try {
 **Assessment:** ✅ PASS
 
 **Evidence:**
+
 ```javascript
 // memory-rotator.cjs:153-155
 if (!fs.existsSync(filePath)) {
@@ -275,6 +291,7 @@ if (!fs.existsSync(filePath)) {
 **Assessment:** ✅ PASS
 
 **Evidence:**
+
 ```javascript
 // memory-scheduler.cjs:329-352 (runRotation example)
 try {
@@ -307,6 +324,7 @@ try {
 **No module should crash the process on failure:**
 
 **Verification:**
+
 - All modules return result objects with `success` boolean
 - No unhandled exceptions propagate to caller
 - Hook integration uses try/catch and best-effort semantics
@@ -315,6 +333,7 @@ try {
 **Assessment:** ✅ PASS
 
 **Evidence:**
+
 - All scheduler task runners (lines 150-583) return structured result objects
 - Hook integration (lines 286-300) uses try/catch with best-effort comment
 - No `throw` statements outside try/catch blocks
@@ -328,6 +347,7 @@ try {
 **Regex Pattern Storage:**
 
 **sensitive-scrubber.cjs (lines 29-51):**
+
 - 3 regex patterns (JWT, email, API keys)
 - All compiled once at module load time
 - Negligible memory footprint (~1KB)
@@ -337,6 +357,7 @@ try {
 **File Read Patterns:**
 
 **All modules read files synchronously with bounded size:**
+
 - `memory-rotator.cjs` (line 166): Reads file only if size > threshold
 - `smart-pruner.cjs` (lines 86, 164): Reads full file into memory (acceptable for markdown files <100KB)
 - `cold-storage.cjs` (line 83): Reads archive files (typically <50KB each)
@@ -350,6 +371,7 @@ try {
 **Batch vs Individual:**
 
 **memory-scheduler.cjs integrates all operations:**
+
 - Rotation: Batch check of 3 files (line 331-343)
 - Deduplication: Batch check of 3 files (line 410-428)
 - Cold archival: Batch process of all archive files (line 66)
@@ -357,6 +379,7 @@ try {
 **Assessment:** ✅ PASS
 
 **I/O Optimization:**
+
 - Rotation only writes if threshold exceeded
 - Deduplication only writes if changes detected
 - Cold archival appends to single JSONL file per month
@@ -366,17 +389,20 @@ try {
 **File Handle Management:**
 
 **All modules use synchronous I/O (auto-closes handles):**
+
 - `fs.readFileSync()` - handle closed automatically
 - `fs.writeFileSync()` - handle closed automatically (via atomicWriteSync)
 - `fs.statSync()` - no handle opened
 
 **Hook integration (sync-memory-index.cjs):**
+
 - Uses DatabaseSync API (line 113) - requires manual close
 - Closes database after operations (line 170)
 
 **Assessment:** ✅ PASS
 
 **Evidence:**
+
 ```javascript
 // cold-storage.cjs:113-115
 const { DatabaseSync } = require('node:sqlite');
@@ -394,6 +420,7 @@ db.close(); // line 170
 **memory-scheduler.cjs task runners:**
 
 **Rotation (lines 312-355):**
+
 ```javascript
 function runRotation(projectRoot = PROJECT_ROOT) {
   const memoryRotator = safeRequire(path.join(libDir, 'memory-rotator.cjs'));
@@ -403,6 +430,7 @@ function runRotation(projectRoot = PROJECT_ROOT) {
 ```
 
 **Deduplication (lines 392-441):**
+
 ```javascript
 function runDeduplication(projectRoot = PROJECT_ROOT) {
   const smartPruner = safeRequire(path.join(libDir, 'smart-pruner.cjs'));
@@ -413,6 +441,7 @@ function runDeduplication(projectRoot = PROJECT_ROOT) {
 ```
 
 **Cold Archival (lines 486-522):**
+
 ```javascript
 function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
   const coldStorage = safeRequire(path.join(libDir, 'cold-storage.cjs'));
@@ -424,6 +453,7 @@ function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
 **Assessment:** ✅ PASS
 
 **Verification:**
+
 - All modules correctly imported via `safeRequire()`
 - Configuration values passed from config.yaml
 - Return values correctly processed
@@ -431,6 +461,7 @@ function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
 ### 6.2 Sensitive Scrubbing Integration
 
 **cold-storage.cjs (lines 85-86):**
+
 ```javascript
 const content = fs.readFileSync(archiveFile, 'utf8');
 const { scrubbed } = scrubSensitiveContent(content);
@@ -439,6 +470,7 @@ const { scrubbed } = scrubSensitiveContent(content);
 **Assessment:** ✅ PASS
 
 **Security Verification:**
+
 - Sensitive scrubbing applied BEFORE cold storage write
 - No raw credentials persist in JSONL format
 - Scrubbing patterns comprehensive (JWT, email, API keys, tokens)
@@ -463,6 +495,7 @@ const { scrubbed } = scrubSensitiveContent(content);
 ### Post-Deployment Monitoring
 
 **Metrics to Track:**
+
 1. Rotation frequency (files rotated per week)
 2. Deduplication effectiveness (duplicates removed)
 3. Cold storage growth rate (JSONL files per month)
@@ -470,6 +503,7 @@ const { scrubbed } = scrubSensitiveContent(content);
 5. Disk space usage (archive/, archive/cold/)
 
 **Alert Thresholds:**
+
 - Hook execution time >200ms (investigate I/O contention)
 - Rotation failures >5% (check file permissions)
 - Cold storage not appending (check disk space)
@@ -488,6 +522,7 @@ const { scrubbed } = scrubSensitiveContent(content);
 **Rationale:** Current implementation is safe; optimization can be deferred
 
 **Implementation Suggestion:**
+
 ```javascript
 // Future enhancement: stream-based rotation
 const { createReadStream, createWriteStream } = require('fs');
@@ -503,11 +538,12 @@ const { createReadStream, createWriteStream } = require('fs');
 **Rationale:** Nice-to-have for optimization analysis
 
 **Implementation Suggestion:**
+
 ```javascript
 // Add to cold-storage.cjs:
 const originalSize = fs.statSync(archiveFile).size;
 const compressedSize = fs.statSync(coldFile).size;
-const compressionRatio = 1 - (compressedSize / originalSize);
+const compressionRatio = 1 - compressedSize / originalSize;
 // Log/return compressionRatio
 ```
 
@@ -520,6 +556,7 @@ const compressionRatio = 1 - (compressedSize / originalSize);
 **Confidence Level:** 95%
 
 **Critical Safety Requirements:** ✅ ALL MET
+
 - Path traversal prevention: ✅
 - Atomic writes (crash safety): ✅
 - Error handling (permissions): ✅
@@ -527,6 +564,7 @@ const compressionRatio = 1 - (compressedSize / originalSize);
 - Hook pipeline safety: ✅
 
 **Operational Requirements:** ✅ ALL MET
+
 - Configuration accessible: ✅
 - Resource usage acceptable: ✅
 - No file handle leaks: ✅
@@ -534,6 +572,7 @@ const compressionRatio = 1 - (compressedSize / originalSize);
 - Integration wiring correct: ✅
 
 **Security Requirements:** ✅ ALL MET
+
 - Sensitive data scrubbing: ✅
 - Path validation: ✅
 
@@ -573,14 +612,14 @@ sync-memory-index.cjs (hook)
 
 ## Appendix B: Configuration Reference
 
-| Parameter                 | Location                      | Value | Purpose                        |
-| ------------------------- | ----------------------------- | ----- | ------------------------------ |
-| `threshold_kb`            | config.yaml:rotation          | 20    | Rotation trigger size          |
-| `max_age_days` (rotation) | config.yaml:rotation          | 30    | Warm file archival age         |
-| `max_age_days` (cold)     | config.yaml:cold_storage      | 30    | Cold archival age              |
-| `similarity_threshold`    | config.yaml:pruning           | 0.6   | Jaccard similarity for dedupes |
-| `keepSections`            | memory-rotator.cjs:DEFAULT    | 10    | Sections to retain in hot      |
-| `MIN_TOKEN_LENGTH`        | sensitive-scrubber.cjs:CONST  | 8     | Minimum token length to scrub  |
+| Parameter                 | Location                     | Value | Purpose                        |
+| ------------------------- | ---------------------------- | ----- | ------------------------------ |
+| `threshold_kb`            | config.yaml:rotation         | 20    | Rotation trigger size          |
+| `max_age_days` (rotation) | config.yaml:rotation         | 30    | Warm file archival age         |
+| `max_age_days` (cold)     | config.yaml:cold_storage     | 30    | Cold archival age              |
+| `similarity_threshold`    | config.yaml:pruning          | 0.6   | Jaccard similarity for dedupes |
+| `keepSections`            | memory-rotator.cjs:DEFAULT   | 10    | Sections to retain in hot      |
+| `MIN_TOKEN_LENGTH`        | sensitive-scrubber.cjs:CONST | 8     | Minimum token length to scrub  |
 
 ---
 

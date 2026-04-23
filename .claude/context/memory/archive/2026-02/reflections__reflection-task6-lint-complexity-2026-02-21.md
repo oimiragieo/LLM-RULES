@@ -12,13 +12,13 @@
 
 ## Rubric Scores
 
-| Dimension       | Score | Notes                                                                             |
-|----------------|-------|-----------------------------------------------------------------------------------|
-| Completeness   | 0.85  | Helper extraction complete; lint fix verified; test file present                  |
-| Accuracy       | 0.90  | Correct implementation: pure function, both params, used in checkReadSafety       |
-| Clarity        | 0.85  | Function name `isLargeUnwindowedFile` is highly readable and self-documenting     |
-| Consistency    | 0.82  | Follows existing hook patterns (helper functions at module top, exported cleanly) |
-| Actionability  | 0.80  | Change is minimal, targeted, no side effects visible                              |
+| Dimension     | Score | Notes                                                                             |
+| ------------- | ----- | --------------------------------------------------------------------------------- |
+| Completeness  | 0.85  | Helper extraction complete; lint fix verified; test file present                  |
+| Accuracy      | 0.90  | Correct implementation: pure function, both params, used in checkReadSafety       |
+| Clarity       | 0.85  | Function name `isLargeUnwindowedFile` is highly readable and self-documenting     |
+| Consistency   | 0.82  | Follows existing hook patterns (helper functions at module top, exported cleanly) |
+| Actionability | 0.80  | Change is minimal, targeted, no side effects visible                              |
 
 **Overall Score**: 0.84 (weighted: Completeness 25% + Accuracy 25% + Clarity 15% + Consistency 15% + Actionability 20%)
 
@@ -48,6 +48,7 @@
 **Integration Score**: 95% (excellent — hook is already registered in settings.json, tested, and integrated)
 
 No integration gaps detected. The modified file:
+
 - Is registered in `settings.json` PreToolUse(Read) chain
 - Has corresponding test coverage (`pre-tool-unified-read-safety.test.cjs`)
 - Is imported correctly by `pre-tool-unified.cjs` (parent orchestrator)
@@ -65,11 +66,11 @@ Integration Assessment: Well-integrated artifact. No integration tasks needed.
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
+| Item                                       | Decision   | Rationale                                                              |
+| ------------------------------------------ | ---------- | ---------------------------------------------------------------------- |
 | Pure helper extraction for lint compliance | **Retain** | High reuse value — applicable to any hook file at complexity threshold |
-| Lint-boundary warning (50 = still at edge) | **Retain** | High retrieval relevance — prevents recurrence |
-| isLargeUnwindowedFile specific name | Archive | Low reuse; one-off name reference |
+| Lint-boundary warning (50 = still at edge) | **Retain** | High retrieval relevance — prevents recurrence                         |
+| isLargeUnwindowedFile specific name        | Archive    | Low reuse; one-off name reference                                      |
 
 ## Recommendations
 

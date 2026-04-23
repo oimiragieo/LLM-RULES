@@ -40,6 +40,7 @@ However, this assessment identified **pre-existing security findings** that are 
 - No actual API keys, tokens, or credentials found in the tracked codebase.
 
 **Concern (PRE-EXISTING):** Hardcoded placeholder credentials exist in documentation/skill files:
+
 - `.claude/skills/scientific-skills/` contains 15+ files with placeholder API key patterns (`export API_KEY="your_key_here"`)
 - `.claude/skills/k8s-manifest-generator/SKILL.md` contains `DATABASE_PASSWORD: 'changeme'` and `API_KEY: 'secret-api-key'` (documentation examples)
 - `.claude/skills/scientific-skills/skills/omero-integration/` contains `PASSWORD = 'pass'` in 6 reference files
@@ -62,16 +63,16 @@ However, this assessment identified **pre-existing security findings** that are 
 
 The last 20 commits are all attributable to framework maintenance work:
 
-| Commit | Description | Risk |
-|--------|-------------|------|
-| `bfce1498` | Remove obsolete test | None |
-| `393373bc` | Cleanup session artifacts | None |
-| `3bb88ebb` | Batch 4 framework modernization | None |
-| `4bfaedcd` | Batch 3 framework modernization | None |
-| `0a08fcaa` | Batch 2 framework modernization | None |
+| Commit     | Description                           | Risk |
+| ---------- | ------------------------------------- | ---- |
+| `bfce1498` | Remove obsolete test                  | None |
+| `393373bc` | Cleanup session artifacts             | None |
+| `3bb88ebb` | Batch 4 framework modernization       | None |
+| `4bfaedcd` | Batch 3 framework modernization       | None |
+| `0a08fcaa` | Batch 2 framework modernization       | None |
 | `32636d93` | Document security lint false positive | None |
-| `2dcef445` | Batch 1 framework modernization | None |
-| `182e4739` | Archive 90+ obsolete test files | None |
+| `2dcef445` | Batch 1 framework modernization       | None |
+| `182e4739` | Archive 90+ obsolete test files       | None |
 
 No anomalous commits, no unauthorized contributors, no suspicious file additions.
 
@@ -108,6 +109,7 @@ Comprehensive search across the entire codebase found:
 **Finding: NOT APPLICABLE -- No payment endpoints exist.**
 
 The project does have authentication-related content:
+
 - `auth-security-expert` skill with OAuth 2.1, JWT, and authentication patterns (documentation only)
 - `security-architect` agent and skill for threat modeling
 - Example auth controllers in archived files (not active code)
@@ -126,14 +128,14 @@ However, the framework's own access control posture was assessed:
 
 **Framework Access Controls (Pre-Existing):**
 
-| Control | Status | Notes |
-|---------|--------|-------|
-| Router tool restrictions | ENFORCED | Whitelist-only tools via `routing-guard.cjs` |
-| Creator artifact guards | ENFORCED | `unified-creator-guard.cjs` blocks direct writes |
-| Shell injection validator | ENFORCED | `shell-injection-validator.cjs` in block mode |
-| Bash command validator | ENFORCED | `bash-command-validator.cjs` in block mode |
-| File safety hooks | ENFORCED | `unified-pre-write-hook.cjs` validates paths |
-| Security review enforcement | ENFORCED | `SECURITY_REVIEW_ENFORCEMENT=block` |
+| Control                     | Status   | Notes                                            |
+| --------------------------- | -------- | ------------------------------------------------ |
+| Router tool restrictions    | ENFORCED | Whitelist-only tools via `routing-guard.cjs`     |
+| Creator artifact guards     | ENFORCED | `unified-creator-guard.cjs` blocks direct writes |
+| Shell injection validator   | ENFORCED | `shell-injection-validator.cjs` in block mode    |
+| Bash command validator      | ENFORCED | `bash-command-validator.cjs` in block mode       |
+| File safety hooks           | ENFORCED | `unified-pre-write-hook.cjs` validates paths     |
+| Security review enforcement | ENFORCED | `SECURITY_REVIEW_ENFORCEMENT=block`              |
 
 ### 3.2 Recent Permission Changes
 
@@ -148,12 +150,14 @@ However, the framework's own access control posture was assessed:
 **Finding: ADEQUATE WITH CAVEATS**
 
 Positives:
+
 - `.env` is gitignored (line 120)
 - `.env.example` uses commented-out placeholders with no real values
 - `security-lint.cjs` scans for hardcoded credentials (SEC-001 through SEC-005)
 - Error sanitizer test (`error-sanitizer.test.cjs`) verifies password redaction
 
 Caveats (pre-existing):
+
 - `HOOK_FAIL_OPEN` environment variable can disable all enforcement (PENTEST finding CRIT-001)
 - 3 environment variable kill switches lack audit logging (SEC-ROUTER-003)
 - Placeholder credential patterns in scientific skills documentation normalize poor practices
@@ -167,6 +171,7 @@ Caveats (pre-existing):
 **Finding: NOT APPLICABLE**
 
 No customer payment data exists in this system. The framework processes:
+
 - Agent definition files (markdown)
 - Hook execution metadata (JSON/JSONL)
 - Memory files (learnings, decisions, issues -- markdown)
@@ -180,6 +185,7 @@ None of these contain customer PII, payment card data, or financial information.
 **Finding: PRE-EXISTING CONCERN (SEC-LOG-001)**
 
 A prior security assessment (2026-02-09) identified that Claude Code debug logs in `.tmp/*.txt` expose:
+
 1. Full file contents via `originalFile` field in hook payloads (98 instances)
 2. Configuration templates including secret placeholder names
 3. Session permission modes (`bypassPermissions: true/false`)
@@ -205,32 +211,32 @@ While no payment-related security issues were found, the following pre-existing 
 
 ### CRITICAL (2 findings)
 
-| ID | Description | Status |
-|----|-------------|--------|
-| CRIT-001 | `HOOK_FAIL_OPEN` env var can disable all enforcement | OPEN |
-| SEC-FND-001 | 6/14 schemas lack `additionalProperties: false` (property injection) | OPEN |
+| ID          | Description                                                          | Status |
+| ----------- | -------------------------------------------------------------------- | ------ |
+| CRIT-001    | `HOOK_FAIL_OPEN` env var can disable all enforcement                 | OPEN   |
+| SEC-FND-001 | 6/14 schemas lack `additionalProperties: false` (property injection) | OPEN   |
 
 ### HIGH (7 findings)
 
-| ID | Description | Status |
-|----|-------------|--------|
-| SEC-ROUTER-001 | `routing-guard.cjs` not registered for Edit/Write tools | OPEN |
-| SEC-ROUTER-003 | 3 env var kill switches lack audit logging | OPEN |
-| SEC-FND-002 | No prompt injection defense in rules/schemas | OPEN |
-| SEC-FND-003 | Runtime state files lack integrity verification | OPEN |
-| SEC-LOG-001 | Debug logs expose full file contents and user paths | OPEN |
-| T-MEM-002 | 38 instances of raw `JSON.parse()` without prototype pollution protection | OPEN |
-| PENTEST HIGH-003 | Memory entry sanitization missing (learnings.md poisoning) | OPEN |
+| ID               | Description                                                               | Status |
+| ---------------- | ------------------------------------------------------------------------- | ------ |
+| SEC-ROUTER-001   | `routing-guard.cjs` not registered for Edit/Write tools                   | OPEN   |
+| SEC-ROUTER-003   | 3 env var kill switches lack audit logging                                | OPEN   |
+| SEC-FND-002      | No prompt injection defense in rules/schemas                              | OPEN   |
+| SEC-FND-003      | Runtime state files lack integrity verification                           | OPEN   |
+| SEC-LOG-001      | Debug logs expose full file contents and user paths                       | OPEN   |
+| T-MEM-002        | 38 instances of raw `JSON.parse()` without prototype pollution protection | OPEN   |
+| PENTEST HIGH-003 | Memory entry sanitization missing (learnings.md poisoning)                | OPEN   |
 
 ### MEDIUM (5 findings)
 
-| ID | Description | Status |
-|----|-------------|--------|
-| SEC-ROUTER-002 | TaskList-first flag tracked but never enforced | OPEN |
-| Schema audit | 11 schemas missing property injection protection | OPEN |
-| Schema audit | 47 unbounded string fields, 38 unbounded array fields | OPEN |
-| T-MEM-004 | No integrity verification on compressed cold archives | OPEN |
-| T-MEM-005 | Race condition in read-modify-write (concurrent writes) | OPEN |
+| ID             | Description                                             | Status |
+| -------------- | ------------------------------------------------------- | ------ |
+| SEC-ROUTER-002 | TaskList-first flag tracked but never enforced          | OPEN   |
+| Schema audit   | 11 schemas missing property injection protection        | OPEN   |
+| Schema audit   | 47 unbounded string fields, 38 unbounded array fields   | OPEN   |
+| T-MEM-004      | No integrity verification on compressed cold archives   | OPEN   |
+| T-MEM-005      | Race condition in read-modify-write (concurrent writes) | OPEN   |
 
 ---
 

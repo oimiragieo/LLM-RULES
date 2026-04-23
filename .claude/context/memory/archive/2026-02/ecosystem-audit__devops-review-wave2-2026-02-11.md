@@ -11,6 +11,7 @@
 The agent-studio project maintains a **healthy DevOps foundation** with comprehensive hook infrastructure, active monitoring, and strong dependency management. However, three critical template/schema artifacts are missing from the framework, and metric log files are growing unbounded.
 
 **Key Strengths**:
+
 - ✅ Zero security vulnerabilities in production dependencies
 - ✅ All 48 registered hooks verified and functional
 - ✅ Strong CI/CD pipeline with 4 active workflows
@@ -48,6 +49,7 @@ Validation failure detected during `pnpm validate:full`:
 ```
 
 **Impact**:
+
 - Template-based artifact creation workflows cannot run
 - Schema validation gates are disabled
 - Workflow runner cannot initialize
@@ -55,6 +57,7 @@ Validation failure detected during `pnpm validate:full`:
 **Root Cause**: Framework refactoring during migration (2026-02-07 overhaul) archived files without restoration.
 
 **Action Items**:
+
 1. Restore from `.claude.archive/` or recreate critical templates
 2. Restore schema definitions (JSON schemas for PR validation)
 3. Restore workflow-runner.js
@@ -73,11 +76,13 @@ Validation failure detected during `pnpm validate:full`:
 Router agent exists at TWO locations. Both may be referenced during agent discovery.
 
 **Impact**:
+
 - Router registry may point to outdated copy
 - Config.yaml references may become stale
 - CI could fail on duplicate registration
 
 **Action Items**:
+
 1. Delete `.claude/agents/router.md` (root duplicate)
 2. Update agent-registry.json to reference only `.claude/agents/core/router.md`
 3. Verify config.yaml references core location
@@ -102,6 +107,7 @@ error-reports/*.jsonl:         7 files x 100+ lines each
 ```
 
 **Impact**:
+
 - Router violations not actionable (2000 queued entries)
 - Log files can grow to GB+ over months
 - Monitoring dashboards have stale data
@@ -110,6 +116,7 @@ error-reports/*.jsonl:         7 files x 100+ lines each
 **Root Cause**: No log rotation strategy or cleanup policy configured.
 
 **Action Items**:
+
 1. Implement log rotation in post-tool-metrics-unified.cjs:
    - Max 500 lines per JSONL file
    - Auto-archive to `.claude/context/memory/archive/` when threshold hit
@@ -129,23 +136,27 @@ error-reports/*.jsonl:         7 files x 100+ lines each
 
 **Finding**:
 Hooks with test files verified:
+
 ```
 [PASS] .claude/hooks/workflow/post-creation-integration.test.cjs
 [PASS] .claude/hooks/workflow/post-creation-integration-edge-cases.test.cjs
 ```
 
 But other critical hooks lack test coverage:
+
 - `bash-command-validator.cjs` - No test file
 - `unified-creator-guard.cjs` - No test file
 - `routing-guard.cjs` - No test file (most complex)
 - `spawn-prompt-validator.cjs` - No test file
 
 **Impact**:
+
 - Safety hooks may regress without tests
 - Refactoring is risky
 - Pre-commit validation unreliable
 
 **Action Items**:
+
 1. Create test files for 4 critical safety/routing hooks
 2. Run `pnpm test:framework:hooks` in CI
 3. Enforce minimum 80% coverage for hooks
@@ -161,23 +172,27 @@ But other critical hooks lack test coverage:
 
 **Finding**:
 Current CI workflows:
+
 - `commands-validate.yml`: Validates only commands (5min)
 - `skill-build-validate.yml`: Validates skills (10min)
 - `cuj-smoke-test.yml`: E2E tests
 - `agent-registry-consistency.yml`: Registry checks
 
 **Missing**:
+
 - No `pnpm lint:fix` in any workflow
 - No `pnpm format` in any workflow
 - No `pnpm test` or `pnpm test:ci` required step
 - No security scan (OWASP, secrets scanning)
 
 **Impact**:
+
 - Linting issues merge to main
 - Code style inconsistency
 - Lint warnings accumulate and are ignored
 
 **Action Items**:
+
 1. Add lint & format checks to CI pipeline:
    ```yaml
    - name: Lint check
@@ -203,6 +218,7 @@ Current CI workflows:
 Metrics are collected but enforcement thresholds may be too loose:
 
 From `package.json`:
+
 ```bash
 pnpm metrics:spawn:ci: assert-max-p95-ms 300ms
 pnpm metrics:routing:ci: assert-max-block-rate 70%
@@ -212,11 +228,13 @@ pnpm metrics:runtime:ci: assert-max-p95-ms 400ms
 But during normal operation, no warnings when thresholds exceeded.
 
 **Impact**:
+
 - Performance degradation not detected
 - Hook overhead creeps up (could reach 500ms+ before noticed)
 - Routing blocks not escalated to operators
 
 **Action Items**:
+
 1. Enable warning mode in normal metrics collection (not just CI)
 2. Add hook: `post-tool-metrics-unified.cjs` should warn if any hook >200ms
 3. Add dashboard alert: Route 70%+ block rate to incident log
@@ -231,6 +249,7 @@ But during normal operation, no warnings when thresholds exceeded.
 **Location**: `.claude/context/memory/access-stats.json`
 
 **Finding**:
+
 ```json
 {
   "learnings.md": { "reads": 120, "writes": 15, "last_read": "2026-02-11T02:05:00Z" },
@@ -240,15 +259,18 @@ But during normal operation, no warnings when thresholds exceeded.
 ```
 
 Statistics show:
+
 - 120 learnings reads vs 15 writes = 88% read-only (expected)
 - issues.md written frequently (20 writes) but read less (45x)
 - **Concern**: Are agents reading memory before work? Spot check: ~70% read-before-work
 
 **Impact**:
+
 - Memory protocol compliance unclear
 - Agents may not read memory before starting
 
 **Action Items**:
+
 1. Add memory-read hook to task start: force read learnings.md if not read in last 15min
 2. Add dashboard: "Agents reading memory before work" metric
 3. Quarterly: Review access-stats to detect degradation
@@ -266,6 +288,7 @@ Statistics show:
 
 **Finding**:
 Only ONE hook has explicit timeout:
+
 ```json
 {
   "type": "command",
@@ -277,11 +300,13 @@ Only ONE hook has explicit timeout:
 All other 48 hooks have **no timeout specified**. Claude Code defaults to ~30s, but should be explicit.
 
 **Impact**:
+
 - Hangs not caught if hook has infinite loop
 - Resource limits unclear
 - Testing cannot mock timeout behavior
 
 **Action Items**:
+
 1. Add explicit timeouts to all hooks in settings.json:
    - Safety/validation hooks: 1000ms
    - Routing hooks: 2000ms
@@ -299,19 +324,23 @@ All other 48 hooks have **no timeout specified**. Claude Code defaults to ~30s, 
 
 **Finding**:
 Windows path safety checks implemented in:
+
 - `windows-null-sanitizer.cjs` ✅ (blocks reserved names)
 - `unified-pre-write-hook.cjs` ✅ (validates write paths)
 
 But potential gaps:
+
 - Bash commands may generate backslash paths from `path.relative()`
 - Glob patterns internally normalized but user-provided patterns may not be
 - See memory note: "path.relative() returns backslash on Windows"
 
 **Impact**:
+
 - Edge cases on Windows CI/local dev could fail
 - Path traversal validation may miss `..\\..` patterns
 
 **Action Items**:
+
 1. Add path normalization test to bash-command-validator.cjs
 2. Test: `path.relative()` edge cases with backslashes
 3. Update pre-write-hook to normalize all paths before validation
@@ -327,11 +356,13 @@ But potential gaps:
 
 **Finding**:
 Running `pnpm validate:full` shows no timing breakdown:
+
 ```bash
 ✅ All validations passed!
 ```
 
 But internally runs:
+
 - validate-config.mjs
 - validate-model-names.mjs
 - validate-workflow.mjs
@@ -344,11 +375,13 @@ But internally runs:
 No per-validator timing reported. As framework grows, validation may slow down.
 
 **Impact**:
+
 - Unknown which validator is slow
 - Cannot optimize
 - Developer experience degrades if validation hits 30s+
 
 **Action Items**:
+
 1. Add `--verbose` flag to report per-validator timings
 2. Warn if any validator >5s
 3. Add to CI: report validation time (abort if >30s)
@@ -385,6 +418,7 @@ No per-validator timing reported. As framework grows, validation may slow down.
 ### CI/CD ✅ OPERATIONAL
 
 **Workflows running**:
+
 1. `commands-validate.yml`: ✅ On PR/push to `.claude/commands/**`
 2. `skill-build-validate.yml`: ✅ On PR/push to `.claude/skills/**`
 3. `cuj-smoke-test.yml`: ✅ (E2E tests)
@@ -419,6 +453,7 @@ No per-validator timing reported. As framework grows, validation may slow down.
 ### Monitoring ✅ OPERATIONAL
 
 **Metrics collected**:
+
 - Hook performance metrics (12 datapoints)
 - Router churn metrics (397 datapoints) - HEALTHY
 - Router violations (2000+ datapoints) - **OVERFLOW** ⚠️
@@ -431,6 +466,7 @@ No per-validator timing reported. As framework grows, validation may slow down.
 ### Dependency Management ✅ SECURE
 
 **Key dependencies**:
+
 - `@lancedb/lancedb`: Vector store for semantic search
 - `@xenova/transformers`: ML models for embeddings
 - `fastembed`: Fast embedding generation
@@ -439,9 +475,11 @@ No per-validator timing reported. As framework grows, validation may slow down.
 - `js-yaml`: YAML parsing
 
 **Overrides**:
+
 - `tar >= 7.5.7` (security fix)
 
 **Optional**:
+
 - `onnxruntime-node-gpu`: Not installed (GPU optional)
 
 ---
@@ -456,6 +494,7 @@ No per-validator timing reported. As framework grows, validation may slow down.
 - Bash command whitelist: Enforced ✅
 
 **Known issues** (from memory):
+
 - `path.relative()` returns backslashes on Windows
 - Glob patterns use forward slashes internally
 - Regex patterns need `.replace(/\\/g, '/')` normalization
@@ -474,6 +513,7 @@ No per-validator timing reported. As framework grows, validation may slow down.
 ### Hook Safety ✅ ENFORCED
 
 **Safety hooks active**:
+
 - `bash-command-validator.cjs`: Blocks dangerous commands
 - `shell-injection-validator.cjs`: Blocks injection patterns
 - `windows-null-sanitizer.cjs`: Prevents reserved name issues
@@ -493,46 +533,46 @@ No per-validator timing reported. As framework grows, validation may slow down.
 
 ### IMMEDIATE (This Week)
 
-| Priority | Task | Owner | Effort |
-|----------|------|-------|--------|
-| P0 | Restore 13 missing templates/schemas | devops | 2h |
-| P0 | Delete router.md duplicate | devops | 15min |
-| P0 | Implement log rotation for metrics | devops | 1.5h |
-| P1 | Add lint/format/test steps to CI | devops | 1h |
+| Priority | Task                                 | Owner  | Effort |
+| -------- | ------------------------------------ | ------ | ------ |
+| P0       | Restore 13 missing templates/schemas | devops | 2h     |
+| P0       | Delete router.md duplicate           | devops | 15min  |
+| P0       | Implement log rotation for metrics   | devops | 1.5h   |
+| P1       | Add lint/format/test steps to CI     | devops | 1h     |
 
 ### SHORT TERM (This Sprint)
 
-| Priority | Task | Owner | Effort |
-|----------|------|--------|--------|
-| P1 | Add test files for safety hooks | qa | 2h |
-| P1 | Enable metrics enforcement warnings | devops | 1h |
-| P2 | Add hook timeout configuration | devops | 30min |
-| P2 | Windows path normalization tests | devops | 1h |
+| Priority | Task                                | Owner  | Effort |
+| -------- | ----------------------------------- | ------ | ------ |
+| P1       | Add test files for safety hooks     | qa     | 2h     |
+| P1       | Enable metrics enforcement warnings | devops | 1h     |
+| P2       | Add hook timeout configuration      | devops | 30min  |
+| P2       | Windows path normalization tests    | devops | 1h     |
 
 ### MEDIUM TERM (This Quarter)
 
-| Priority | Task | Owner | Effort |
-|----------|------|--------|--------|
-| P2 | Add validation script timing breakdown | devops | 1h |
-| P1 | Memory protocol compliance dashboard | devops | 2h |
-| Nice | Git pre-commit hooks for lint/format | devops | 1h |
+| Priority | Task                                   | Owner  | Effort |
+| -------- | -------------------------------------- | ------ | ------ |
+| P2       | Add validation script timing breakdown | devops | 1h     |
+| P1       | Memory protocol compliance dashboard   | devops | 2h     |
+| Nice     | Git pre-commit hooks for lint/format   | devops | 1h     |
 
 ---
 
 ## 8. SUMMARY TABLE
 
-| Subsystem | Status | Notes |
-|-----------|--------|-------|
-| Dependencies | ✅ Secure | 0 vulnerabilities |
-| Build system | ✅ Healthy | Node 20, pnpm 9 |
-| Testing | ✅ Passing | 400+ tests, no failures |
-| Linting | ✅ Clean | 3038 files, all formatted |
-| Hooks | ✅ Operational | 48/48 verified |
-| CI/CD | ⚠️ Incomplete | Missing lint/format steps |
-| Memory | ✅ Healthy | Active maintenance |
-| Monitoring | ⚠️ Degraded | 2000+ metric violations queued |
-| Framework artifacts | ❌ MISSING | 13 templates/schemas/runners offline |
-| Agent discovery | ⚠️ Confused | Router duplicate at root |
+| Subsystem           | Status         | Notes                                |
+| ------------------- | -------------- | ------------------------------------ |
+| Dependencies        | ✅ Secure      | 0 vulnerabilities                    |
+| Build system        | ✅ Healthy     | Node 20, pnpm 9                      |
+| Testing             | ✅ Passing     | 400+ tests, no failures              |
+| Linting             | ✅ Clean       | 3038 files, all formatted            |
+| Hooks               | ✅ Operational | 48/48 verified                       |
+| CI/CD               | ⚠️ Incomplete  | Missing lint/format steps            |
+| Memory              | ✅ Healthy     | Active maintenance                   |
+| Monitoring          | ⚠️ Degraded    | 2000+ metric violations queued       |
+| Framework artifacts | ❌ MISSING     | 13 templates/schemas/runners offline |
+| Agent discovery     | ⚠️ Confused    | Router duplicate at root             |
 
 ---
 

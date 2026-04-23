@@ -3,6 +3,7 @@
 # Reflection Report: Smart-Debug Audit + Lint Fix Session
 
 **Processed Reflection IDs:**
+
 - `task_completion:2026-02-21T00:33:40.930Z:task-2` (smart-debug integration audit)
 - `task_completion:2026-02-21T00:38:05.799Z:3` (lint complexity fix)
 - `task_completion:2026-02-21T00:38:05.533Z:2` (audit task — insufficient metadata)
@@ -12,12 +13,12 @@
 
 ## Overall Assessment
 
-| Request | Output Type | Data Quality | Score | Threshold |
-|---------|------------|-------------|-------|-----------|
-| task-2 (smart-debug audit) | agent_output | partial | 0.72 | PASS |
-| task-3 (lint fix) | code_output | partial | 0.80 | PASS |
-| task-2 (audit task) | unknown | insufficient | N/A | WITHHELD |
-| task-1 (reflection batch) | unknown | insufficient | N/A | WITHHELD |
+| Request                    | Output Type  | Data Quality | Score | Threshold |
+| -------------------------- | ------------ | ------------ | ----- | --------- |
+| task-2 (smart-debug audit) | agent_output | partial      | 0.72  | PASS      |
+| task-3 (lint fix)          | code_output  | partial      | 0.80  | PASS      |
+| task-2 (audit task)        | unknown      | insufficient | N/A   | WITHHELD  |
+| task-1 (reflection batch)  | unknown      | insufficient | N/A   | WITHHELD  |
 
 ---
 
@@ -27,28 +28,31 @@
 
 ### Rubric Scores
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.75 | Good coverage of catalog/index/frontmatter; CLAUDE.md and debugging.md cross-reference gaps identified |
-| Accuracy | 0.85 | Correct identification of what was wired vs. missing |
-| Clarity | 0.70 | Summary is concise but lacks file paths and specific gaps detail |
-| Consistency | 0.72 | Follows audit pattern but TaskUpdate metadata contract not fully honored |
-| Actionability | 0.58 | Identifies gaps but does not create tasks or recommend next agent |
+| Dimension     | Score | Notes                                                                                                  |
+| ------------- | ----- | ------------------------------------------------------------------------------------------------------ |
+| Completeness  | 0.75  | Good coverage of catalog/index/frontmatter; CLAUDE.md and debugging.md cross-reference gaps identified |
+| Accuracy      | 0.85  | Correct identification of what was wired vs. missing                                                   |
+| Clarity       | 0.70  | Summary is concise but lacks file paths and specific gaps detail                                       |
+| Consistency   | 0.72  | Follows audit pattern but TaskUpdate metadata contract not fully honored                               |
+| Actionability | 0.58  | Identifies gaps but does not create tasks or recommend next agent                                      |
 
 **Overall Score: 0.72 / 1.0 (PASS)**
 
 ### RBT Diagnosis
 
 **Roses:**
+
 - Correctly identified 4 integration dimensions: frontmatter, catalog, index, agent assignments
 - Identified two specific remaining gaps: CLAUDE.md reference and debugging.md cross-reference
 
 **Buds:**
+
 - Could have specified which section of CLAUDE.md is missing the reference
 - No task created or queued for the integration gaps found
 - Missing files list in TaskUpdate (no `filesModified` array)
 
 **Thorns:**
+
 - skill-index.json shows `agentPrimary: ["developer"]` — catalog shows `developer, devops-troubleshooter, qa` — mismatch between index and catalog (SKILL.md frontmatter says `developer, devops-troubleshooter, qa`)
 - CLAUDE.md has no mention of `smart-debug` (confirmed via grep) — this is a real integration gap
 
@@ -68,28 +72,31 @@
 
 ### Rubric Scores
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.85 | Clear description of what was done; lint exit 0 confirmed |
-| Accuracy | 0.90 | Complexity reduction from 51 to 50 — specific and verifiable |
-| Clarity | 0.80 | Summary is precise; extracting isLargeUnwindowedFile helper is good pattern |
-| Consistency | 0.78 | Follows code-standards lint-first convention; TaskUpdate metadata partially complete |
-| Actionability | 0.68 | Lint passing confirmed but no test run evidence |
+| Dimension     | Score | Notes                                                                                |
+| ------------- | ----- | ------------------------------------------------------------------------------------ |
+| Completeness  | 0.85  | Clear description of what was done; lint exit 0 confirmed                            |
+| Accuracy      | 0.90  | Complexity reduction from 51 to 50 — specific and verifiable                         |
+| Clarity       | 0.80  | Summary is precise; extracting isLargeUnwindowedFile helper is good pattern          |
+| Consistency   | 0.78  | Follows code-standards lint-first convention; TaskUpdate metadata partially complete |
+| Actionability | 0.68  | Lint passing confirmed but no test run evidence                                      |
 
 **Overall Score: 0.80 / 1.0 (PASS)**
 
 ### RBT Diagnosis
 
 **Roses:**
+
 - Targeted minimal fix: extracted single helper rather than broad refactor
 - Confirmed lint exit 0 — verification-before-completion gate honored
 - ESLint complexity rule at 50 is enforced — correct threshold for pre-tool-unified.read-safety.cjs
 
 **Buds:**
+
 - No test run evidence in summary (pnpm test should be run after hook changes)
 - No `filesModified` array in TaskUpdate (pre-completion-validation.cjs should flag this)
 
 **Thorns:**
+
 - None (work appears complete and correct)
 
 ---
@@ -97,6 +104,7 @@
 ## Requests 3 and 4: Insufficient Data
 
 Both task-2 (audit task) and task-1 (reflection batch task) completed with fallback summary strings:
+
 - `"Task 2 completed without summary metadata (audit task)"`
 - `"Task 1 completed without summary metadata (reflection batch task)"`
 
@@ -110,14 +118,14 @@ Both task-2 (audit task) and task-1 (reflection batch task) completed with fallb
 
 **Artifact**: `skill:smart-debug`
 
-| Check | Status |
-|-------|--------|
-| SKILL.md frontmatter complete | PASS |
-| skill-catalog.md entry | PASS |
-| skill-index.json entry | PARTIAL — category "Other", agentPrimary missing devops-troubleshooter/qa |
-| agent assignment (developer) | PASS |
-| CLAUDE.md reference | FAIL — not present |
-| debugging.md cross-reference | FAIL — no when-to-use guidance |
+| Check                         | Status                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------- |
+| SKILL.md frontmatter complete | PASS                                                                      |
+| skill-catalog.md entry        | PASS                                                                      |
+| skill-index.json entry        | PARTIAL — category "Other", agentPrimary missing devops-troubleshooter/qa |
+| agent assignment (developer)  | PASS                                                                      |
+| CLAUDE.md reference           | FAIL — not present                                                        |
+| debugging.md cross-reference  | FAIL — no when-to-use guidance                                            |
 
 **Integration Score: ~65% (Gaps)**
 
@@ -139,13 +147,13 @@ Both task-2 (audit task) and task-1 (reflection batch task) completed with fallb
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
-| smart-debug CLAUDE.md gap | **Retain** | Actionable, recurs in all new skill audits, high reuse value |
-| skill-index agentPrimary narrowing | **Retain** | Systemic pattern (see gotcha `skill-index agentPrimary mismatch`) — affects all skills with multi-agent frontmatter |
-| debugging vs smart-debug disambiguation | **Retain** | Decision value: establishes need for `when-to-use` guidance in all overlapping skill pairs |
-| Lint complexity helper extraction pattern | **Compress** | Low-novelty pattern; code-standards already covers extraction; not worth a full pattern entry |
-| Insufficient metadata on tasks 1 and 2 | **Archive** | Covered by existing gotcha `missing-taskupdate-metadata-recurring` — no additional signal |
+| Item                                      | Decision     | Rationale                                                                                                           |
+| ----------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------- |
+| smart-debug CLAUDE.md gap                 | **Retain**   | Actionable, recurs in all new skill audits, high reuse value                                                        |
+| skill-index agentPrimary narrowing        | **Retain**   | Systemic pattern (see gotcha `skill-index agentPrimary mismatch`) — affects all skills with multi-agent frontmatter |
+| debugging vs smart-debug disambiguation   | **Retain**   | Decision value: establishes need for `when-to-use` guidance in all overlapping skill pairs                          |
+| Lint complexity helper extraction pattern | **Compress** | Low-novelty pattern; code-standards already covers extraction; not worth a full pattern entry                       |
+| Insufficient metadata on tasks 1 and 2    | **Archive**  | Covered by existing gotcha `missing-taskupdate-metadata-recurring` — no additional signal                           |
 
 ---
 

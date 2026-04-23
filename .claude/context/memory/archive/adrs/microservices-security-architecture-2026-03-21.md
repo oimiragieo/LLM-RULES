@@ -30,15 +30,15 @@
 
 A monolith exposes a single attack surface: one process, one network boundary, one set of credentials. Decomposing into microservices multiplies every dimension of that surface.
 
-| Dimension                | Monolith             | Microservices (N services)        | Risk Multiplier |
-| ------------------------ | -------------------- | --------------------------------- | --------------- |
-| Network endpoints        | 1 ingress            | N + internal mesh                 | N+              |
-| Credential sets          | 1 DB, 1 cache        | N DBs, N caches, N secrets        | N               |
-| TLS certificates         | 1 edge               | N + mesh sidecar certs            | N+1             |
-| Container images         | 1                    | N (each with own supply chain)    | N               |
-| Inter-process calls      | In-memory (0 network)| N*(N-1)/2 potential network paths  | Quadratic       |
-| Logging surfaces         | 1 log stream         | N log streams + aggregator        | N+1             |
-| Configuration surfaces   | 1 config set         | N config maps + shared config svc | N+1             |
+| Dimension              | Monolith              | Microservices (N services)         | Risk Multiplier |
+| ---------------------- | --------------------- | ---------------------------------- | --------------- |
+| Network endpoints      | 1 ingress             | N + internal mesh                  | N+              |
+| Credential sets        | 1 DB, 1 cache         | N DBs, N caches, N secrets         | N               |
+| TLS certificates       | 1 edge                | N + mesh sidecar certs             | N+1             |
+| Container images       | 1                     | N (each with own supply chain)     | N               |
+| Inter-process calls    | In-memory (0 network) | N\*(N-1)/2 potential network paths | Quadratic       |
+| Logging surfaces       | 1 log stream          | N log streams + aggregator         | N+1             |
+| Configuration surfaces | 1 config set          | N config maps + shared config svc  | N+1             |
 
 **Key insight:** The migration does not merely add services; it introduces an entirely new category of threat -- **east-west traffic** between services that previously communicated via in-process function calls with zero serialization, zero network exposure, and zero authentication overhead.
 
@@ -76,16 +76,16 @@ Provides workload identity via SVIDs (SPIFFE Verifiable Identity Documents). Eac
 
 The API gateway is the single point of ingress from external clients to the microservices mesh. It must enforce:
 
-| Control                    | Implementation                                      | Priority |
-| -------------------------- | --------------------------------------------------- | -------- |
-| Authentication termination | OAuth 2.1 + PKCE at gateway, JWT issued downstream  | P0       |
-| Rate limiting              | Per-client, per-endpoint, sliding window             | P0       |
-| WAF (Web Application Firewall) | OWASP CRS ruleset, custom rules for API abuse   | P0       |
-| Request validation         | OpenAPI schema validation before routing             | P1       |
-| TLS termination            | TLS 1.3, HSTS, certificate pinning for mobile       | P0       |
-| IP allowlisting            | For admin/internal endpoints only                    | P1       |
-| Request size limits        | Per-endpoint max body size                           | P1       |
-| Circuit breaking           | Prevent cascade failures from unhealthy backends     | P1       |
+| Control                        | Implementation                                     | Priority |
+| ------------------------------ | -------------------------------------------------- | -------- |
+| Authentication termination     | OAuth 2.1 + PKCE at gateway, JWT issued downstream | P0       |
+| Rate limiting                  | Per-client, per-endpoint, sliding window           | P0       |
+| WAF (Web Application Firewall) | OWASP CRS ruleset, custom rules for API abuse      | P0       |
+| Request validation             | OpenAPI schema validation before routing           | P1       |
+| TLS termination                | TLS 1.3, HSTS, certificate pinning for mobile      | P0       |
+| IP allowlisting                | For admin/internal endpoints only                  | P1       |
+| Request size limits            | Per-endpoint max body size                         | P1       |
+| Circuit breaking               | Prevent cascade failures from unhealthy backends   | P1       |
 
 **Anti-pattern:** Allowing direct service-to-service calls that bypass the gateway from external clients. Every external request must transit the gateway.
 
@@ -127,11 +127,11 @@ Network Policy Architecture:
 
 Replace network-based trust ("this IP is in the VPC, therefore trusted") with identity-based trust:
 
-| Old Model (Network Trust)              | New Model (Identity Trust)                          |
-| -------------------------------------- | --------------------------------------------------- |
-| Allow if source IP is in 10.0.0.0/16   | Allow if source SPIFFE ID is `spiffe://cluster/ns/orders/sa/order-svc` |
-| Firewall rules based on CIDR blocks   | Authorization policies based on workload identity   |
-| VPN = trusted                          | VPN = encrypted transport only, still verify identity |
+| Old Model (Network Trust)            | New Model (Identity Trust)                                             |
+| ------------------------------------ | ---------------------------------------------------------------------- |
+| Allow if source IP is in 10.0.0.0/16 | Allow if source SPIFFE ID is `spiffe://cluster/ns/orders/sa/order-svc` |
+| Firewall rules based on CIDR blocks  | Authorization policies based on workload identity                      |
+| VPN = trusted                        | VPN = encrypted transport only, still verify identity                  |
 
 ### 2.4 Least-Privilege Service Accounts
 
@@ -146,13 +146,13 @@ Each microservice runs with its own Kubernetes ServiceAccount. Each ServiceAccou
 
 ### 2.5 Secret Management
 
-| Requirement                    | Solution                                           | Notes                                    |
-| ------------------------------ | -------------------------------------------------- | ---------------------------------------- |
-| Database credentials           | HashiCorp Vault dynamic secrets or AWS Secrets Manager | Short-lived, auto-rotated             |
-| API keys for external services | Vault KV v2 with ACL per service                   | Audit log on every read                  |
-| TLS certificates               | cert-manager + SPIRE for automatic issuance        | Max 24h lifetime, auto-renewal           |
-| Encryption keys                | Vault Transit or AWS KMS                           | Envelope encryption, never export keys   |
-| K8s secrets                    | Sealed Secrets or External Secrets Operator         | Never store plaintext in etcd            |
+| Requirement                    | Solution                                               | Notes                                  |
+| ------------------------------ | ------------------------------------------------------ | -------------------------------------- |
+| Database credentials           | HashiCorp Vault dynamic secrets or AWS Secrets Manager | Short-lived, auto-rotated              |
+| API keys for external services | Vault KV v2 with ACL per service                       | Audit log on every read                |
+| TLS certificates               | cert-manager + SPIRE for automatic issuance            | Max 24h lifetime, auto-renewal         |
+| Encryption keys                | Vault Transit or AWS KMS                               | Envelope encryption, never export keys |
+| K8s secrets                    | Sealed Secrets or External Secrets Operator            | Never store plaintext in etcd          |
 
 **Iron law:** No secret may be stored in environment variables, ConfigMaps, container images, or source code. All secrets must be injected at runtime from a secrets manager with audit logging.
 
@@ -179,14 +179,14 @@ Each microservice runs with its own Kubernetes ServiceAccount. Each ServiceAccou
 
 **Data ownership model:**
 
-| Service        | Owns PII                      | May Receive (Read-Only)        | Must Never Receive             |
-| -------------- | ----------------------------- | ------------------------------ | ------------------------------ |
-| User Service   | email, name, phone, address   | --                             | --                             |
-| Order Service  | shipping address (copy)       | user_id (reference only)       | email, phone                   |
-| Payment Service| billing address, card token   | user_id (reference only)       | email, name, phone             |
-| Notification   | email (ephemeral, not stored) | user_id, notification prefs    | address, payment info          |
-| Analytics      | --                            | anonymized/pseudonymized data  | ANY raw PII                    |
-| Search/Catalog | --                            | --                             | ANY user PII                   |
+| Service         | Owns PII                      | May Receive (Read-Only)       | Must Never Receive    |
+| --------------- | ----------------------------- | ----------------------------- | --------------------- |
+| User Service    | email, name, phone, address   | --                            | --                    |
+| Order Service   | shipping address (copy)       | user_id (reference only)      | email, phone          |
+| Payment Service | billing address, card token   | user_id (reference only)      | email, name, phone    |
+| Notification    | email (ephemeral, not stored) | user_id, notification prefs   | address, payment info |
+| Analytics       | --                            | anonymized/pseudonymized data | ANY raw PII           |
+| Search/Catalog  | --                            | --                            | ANY user PII          |
 
 **Principles:**
 
@@ -199,13 +199,13 @@ Each microservice runs with its own Kubernetes ServiceAccount. Each ServiceAccou
 
 Distributing data across services creates compliance complexity:
 
-| Requirement           | Monolith Approach      | Microservices Approach                                |
-| --------------------- | ---------------------- | ----------------------------------------------------- |
+| Requirement           | Monolith Approach      | Microservices Approach                                 |
+| --------------------- | ---------------------- | ------------------------------------------------------ |
 | Right to erasure      | DELETE FROM users      | Orchestrated deletion across N services + event stores |
-| Data portability      | Single DB export       | Aggregation from N services via API                   |
-| Consent management    | Single consent table   | Distributed consent propagation via events            |
-| Data breach reporting | Single incident scope  | Multi-service blast radius assessment                 |
-| Audit trail           | Single application log | Correlated logs across N services (correlation IDs)   |
+| Data portability      | Single DB export       | Aggregation from N services via API                    |
+| Consent management    | Single consent table   | Distributed consent propagation via events             |
+| Data breach reporting | Single incident scope  | Multi-service blast radius assessment                  |
+| Audit trail           | Single application log | Correlated logs across N services (correlation IDs)    |
 
 **Mandatory controls:**
 
@@ -346,11 +346,11 @@ permit(
 
 Authentication (mTLS) answers "who is calling?" Authorization answers "is this caller allowed to call this endpoint?"
 
-| Method                        | Implementation                                      | Granularity |
-| ----------------------------- | --------------------------------------------------- | ----------- |
-| Istio AuthorizationPolicy     | YAML policies in K8s, enforced by Envoy sidecar     | Service-level |
-| OPA sidecar                   | Rego policies, evaluated per-request                 | Endpoint-level |
-| API key + scopes              | Service-specific API keys with declared scopes       | Scope-level |
+| Method                    | Implementation                                  | Granularity    |
+| ------------------------- | ----------------------------------------------- | -------------- |
+| Istio AuthorizationPolicy | YAML policies in K8s, enforced by Envoy sidecar | Service-level  |
+| OPA sidecar               | Rego policies, evaluated per-request            | Endpoint-level |
+| API key + scopes          | Service-specific API keys with declared scopes  | Scope-level    |
 
 **Example Istio AuthorizationPolicy:**
 
@@ -365,20 +365,20 @@ spec:
     matchLabels:
       app: order-service
   rules:
-  - from:
-    - source:
-        principals: ["cluster.local/ns/gateway/sa/api-gateway"]
-    to:
-    - operation:
-        methods: ["GET", "POST"]
-        paths: ["/api/orders/*"]
-  - from:
-    - source:
-        principals: ["cluster.local/ns/payments/sa/payment-service"]
-    to:
-    - operation:
-        methods: ["GET"]
-        paths: ["/api/orders/*/status"]
+    - from:
+        - source:
+            principals: ['cluster.local/ns/gateway/sa/api-gateway']
+      to:
+        - operation:
+            methods: ['GET', 'POST']
+            paths: ['/api/orders/*']
+    - from:
+        - source:
+            principals: ['cluster.local/ns/payments/sa/payment-service']
+      to:
+        - operation:
+            methods: ['GET']
+            paths: ['/api/orders/*/status']
 ```
 
 ---
@@ -397,13 +397,13 @@ Developer -> Dockerfile -> CI Build -> Image Scan -> Image Sign -> Registry -> D
                                     (CVE scan)     (cryptographic signature)
 ```
 
-| Gate              | Tool               | Threshold                                 | Action on Fail |
-| ----------------- | ------------------- | ----------------------------------------- | -------------- |
-| CVE scan          | Trivy or Grype      | 0 critical, 0 high (with no available fix)| Block deploy   |
-| SBOM generation   | Syft                | Must produce valid SPDX/CycloneDX         | Block deploy   |
-| Image signing     | Cosign (Sigstore)   | Must be signed with CI identity            | Block deploy   |
-| Signature verify  | Kyverno/OPA Gatekeeper | Reject unsigned images at admission     | Block deploy   |
-| Base image check  | CI policy           | Only approved base images (distroless, alpine) | Block deploy |
+| Gate             | Tool                   | Threshold                                      | Action on Fail |
+| ---------------- | ---------------------- | ---------------------------------------------- | -------------- |
+| CVE scan         | Trivy or Grype         | 0 critical, 0 high (with no available fix)     | Block deploy   |
+| SBOM generation  | Syft                   | Must produce valid SPDX/CycloneDX              | Block deploy   |
+| Image signing    | Cosign (Sigstore)      | Must be signed with CI identity                | Block deploy   |
+| Signature verify | Kyverno/OPA Gatekeeper | Reject unsigned images at admission            | Block deploy   |
+| Base image check | CI policy              | Only approved base images (distroless, alpine) | Block deploy   |
 
 ### 5.2 Base Image Hardening
 
@@ -427,24 +427,24 @@ Developer -> Dockerfile -> CI Build -> Image Scan -> Image Sign -> Registry -> D
 
 ### 5.3 Runtime Security
 
-| Control                 | Tool                | Purpose                                    |
-| ----------------------- | ------------------- | ------------------------------------------ |
-| Syscall filtering       | seccomp profiles    | Block dangerous syscalls (ptrace, mount)   |
-| Capability dropping     | K8s SecurityContext | Drop ALL, add only NET_BIND_SERVICE if needed |
-| File system read-only   | readOnlyRootFilesystem | Prevent runtime file modification       |
-| Runtime threat detection| Falco               | Detect anomalous behavior (shell in container, unexpected network) |
-| Process monitoring      | Tetragon (eBPF)     | Kernel-level observability without agents  |
+| Control                  | Tool                   | Purpose                                                            |
+| ------------------------ | ---------------------- | ------------------------------------------------------------------ |
+| Syscall filtering        | seccomp profiles       | Block dangerous syscalls (ptrace, mount)                           |
+| Capability dropping      | K8s SecurityContext    | Drop ALL, add only NET_BIND_SERVICE if needed                      |
+| File system read-only    | readOnlyRootFilesystem | Prevent runtime file modification                                  |
+| Runtime threat detection | Falco                  | Detect anomalous behavior (shell in container, unexpected network) |
+| Process monitoring       | Tetragon (eBPF)        | Kernel-level observability without agents                          |
 
 **Mandatory Kubernetes SecurityContext:**
 
 ```yaml
 securityContext:
   runAsNonRoot: true
-  runAsUser: 65534  # nobody
+  runAsUser: 65534 # nobody
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
   capabilities:
-    drop: ["ALL"]
+    drop: ['ALL']
   seccompProfile:
     type: RuntimeDefault
 ```
@@ -466,28 +466,28 @@ Every service image must have an associated SBOM (Software Bill of Materials) in
 
 Applied to the microservices migration topology described in `microservices-architecture-2026-02-08.md`.
 
-| # | Threat Category          | Threat Description                                                          | Affected Component           | Likelihood | Impact   | Risk    | Mitigation                                                                           |
-|---|--------------------------|-----------------------------------------------------------------------------|------------------------------|------------|----------|---------|--------------------------------------------------------------------------------------|
-| T1| **Spoofing**             | Attacker impersonates a microservice via forged mTLS certificate            | Service Mesh                 | Medium     | Critical | HIGH    | SPIFFE/SPIRE with short-lived SVIDs (1h max), certificate pinning in mesh            |
-| T2| **Spoofing**             | Stolen JWT used to impersonate user across services                         | API Gateway, All Services    | High       | Critical | CRITICAL| Token exchange (RFC 8693), DPoP binding, 15-min max lifetime                         |
-| T3| **Spoofing**             | DNS spoofing redirects service discovery to malicious endpoint              | Kubernetes DNS (CoreDNS)     | Low        | Critical | MEDIUM  | DNSSEC, mTLS (DNS spoofing irrelevant when mTLS validates identity)                  |
-| T4| **Tampering**            | Man-in-the-middle modifies east-west traffic between services               | Internal Network             | Medium     | High     | HIGH    | Mandatory mTLS for all inter-service communication                                    |
-| T5| **Tampering**            | Compromised service modifies event payloads on message bus                  | Event Bus (Kafka/NATS)       | Medium     | High     | HIGH    | Signed events (producer signs, consumer verifies), schema registry validation         |
-| T6| **Tampering**            | Container image tampered with in registry                                   | Container Registry           | Low        | Critical | MEDIUM  | Image signing (Cosign), admission controller verification (Kyverno)                   |
-| T7| **Repudiation**          | Service denies performing a destructive operation (delete user data)        | Any Service                  | Medium     | High     | HIGH    | Immutable audit log with correlation IDs, signed audit entries                        |
-| T8| **Repudiation**          | Admin denies policy change that weakened security                           | OPA/Authorization Service    | Low        | High     | MEDIUM  | Git-versioned policies, signed commits, four-eyes review for policy changes           |
-| T9| **Information Disclosure**| PII leaked via unencrypted east-west traffic                               | Internal Network             | Medium     | Critical | HIGH    | Mandatory mTLS, application-level PII encryption                                      |
-|T10| **Information Disclosure**| Service logs contain PII (email, phone) in plaintext                       | Logging Pipeline             | High       | High     | HIGH    | Log sanitization middleware, PII detection in log aggregator                          |
-|T11| **Information Disclosure**| Database credentials exposed in K8s ConfigMap or env var                   | Kubernetes Secrets           | Medium     | Critical | HIGH    | External Secrets Operator + Vault, encrypted etcd, never env vars for secrets         |
-|T12| **Information Disclosure**| Excessive error details returned to client (stack traces, internal IPs)    | All Services                 | High       | Medium   | MEDIUM  | Generic error responses to clients, detailed errors to internal logs only              |
-|T13| **Denial of Service**    | Cascading failure: one service failure takes down dependent services         | Service Mesh                 | High       | High     | HIGH    | Circuit breakers (Istio), retry budgets, bulkhead isolation, graceful degradation     |
-|T14| **Denial of Service**    | Resource exhaustion via unbounded request concurrency                       | Any Service                  | High       | High     | HIGH    | Rate limiting at gateway AND per-service, K8s resource limits and quotas              |
-|T15| **Denial of Service**    | Event bus backpressure causes producer blocking                             | Event Bus (Kafka)            | Medium     | Medium   | MEDIUM  | Dead letter queues, consumer group lag monitoring, partition-level backpressure        |
-|T16| **Elevation of Privilege**| Compromised low-privilege service escalates via shared service account      | Kubernetes RBAC              | Medium     | Critical | HIGH    | Per-service ServiceAccount, minimal RBAC bindings, no cluster-admin for workloads     |
-|T17| **Elevation of Privilege**| JWT claim manipulation grants admin role                                   | Auth Service                 | Medium     | Critical | HIGH    | RS256/ES256 signing (not HS256), server-side claim validation, no client-editable claims|
-|T18| **Elevation of Privilege**| Container escape via kernel exploit (unpatched node)                        | Kubernetes Nodes             | Low        | Critical | HIGH    | Node auto-patching, Pod Security Standards (restricted), seccomp, AppArmor/SELinux    |
-|T19| **Spoofing**             | Supply chain attack via malicious dependency in one service                 | CI/CD Pipeline               | Medium     | Critical | HIGH    | SBOM per service, lockfile enforcement, Dependabot/Socket.dev, private registry scope |
-|T20| **Tampering**            | Kubernetes admission bypassed allows unsigned image deployment              | Admission Controller         | Low        | Critical | MEDIUM  | Kyverno/Gatekeeper in enforce mode, audit mode disabled in production                 |
+| #   | Threat Category            | Threat Description                                                      | Affected Component        | Likelihood | Impact   | Risk     | Mitigation                                                                               |
+| --- | -------------------------- | ----------------------------------------------------------------------- | ------------------------- | ---------- | -------- | -------- | ---------------------------------------------------------------------------------------- |
+| T1  | **Spoofing**               | Attacker impersonates a microservice via forged mTLS certificate        | Service Mesh              | Medium     | Critical | HIGH     | SPIFFE/SPIRE with short-lived SVIDs (1h max), certificate pinning in mesh                |
+| T2  | **Spoofing**               | Stolen JWT used to impersonate user across services                     | API Gateway, All Services | High       | Critical | CRITICAL | Token exchange (RFC 8693), DPoP binding, 15-min max lifetime                             |
+| T3  | **Spoofing**               | DNS spoofing redirects service discovery to malicious endpoint          | Kubernetes DNS (CoreDNS)  | Low        | Critical | MEDIUM   | DNSSEC, mTLS (DNS spoofing irrelevant when mTLS validates identity)                      |
+| T4  | **Tampering**              | Man-in-the-middle modifies east-west traffic between services           | Internal Network          | Medium     | High     | HIGH     | Mandatory mTLS for all inter-service communication                                       |
+| T5  | **Tampering**              | Compromised service modifies event payloads on message bus              | Event Bus (Kafka/NATS)    | Medium     | High     | HIGH     | Signed events (producer signs, consumer verifies), schema registry validation            |
+| T6  | **Tampering**              | Container image tampered with in registry                               | Container Registry        | Low        | Critical | MEDIUM   | Image signing (Cosign), admission controller verification (Kyverno)                      |
+| T7  | **Repudiation**            | Service denies performing a destructive operation (delete user data)    | Any Service               | Medium     | High     | HIGH     | Immutable audit log with correlation IDs, signed audit entries                           |
+| T8  | **Repudiation**            | Admin denies policy change that weakened security                       | OPA/Authorization Service | Low        | High     | MEDIUM   | Git-versioned policies, signed commits, four-eyes review for policy changes              |
+| T9  | **Information Disclosure** | PII leaked via unencrypted east-west traffic                            | Internal Network          | Medium     | Critical | HIGH     | Mandatory mTLS, application-level PII encryption                                         |
+| T10 | **Information Disclosure** | Service logs contain PII (email, phone) in plaintext                    | Logging Pipeline          | High       | High     | HIGH     | Log sanitization middleware, PII detection in log aggregator                             |
+| T11 | **Information Disclosure** | Database credentials exposed in K8s ConfigMap or env var                | Kubernetes Secrets        | Medium     | Critical | HIGH     | External Secrets Operator + Vault, encrypted etcd, never env vars for secrets            |
+| T12 | **Information Disclosure** | Excessive error details returned to client (stack traces, internal IPs) | All Services              | High       | Medium   | MEDIUM   | Generic error responses to clients, detailed errors to internal logs only                |
+| T13 | **Denial of Service**      | Cascading failure: one service failure takes down dependent services    | Service Mesh              | High       | High     | HIGH     | Circuit breakers (Istio), retry budgets, bulkhead isolation, graceful degradation        |
+| T14 | **Denial of Service**      | Resource exhaustion via unbounded request concurrency                   | Any Service               | High       | High     | HIGH     | Rate limiting at gateway AND per-service, K8s resource limits and quotas                 |
+| T15 | **Denial of Service**      | Event bus backpressure causes producer blocking                         | Event Bus (Kafka)         | Medium     | Medium   | MEDIUM   | Dead letter queues, consumer group lag monitoring, partition-level backpressure          |
+| T16 | **Elevation of Privilege** | Compromised low-privilege service escalates via shared service account  | Kubernetes RBAC           | Medium     | Critical | HIGH     | Per-service ServiceAccount, minimal RBAC bindings, no cluster-admin for workloads        |
+| T17 | **Elevation of Privilege** | JWT claim manipulation grants admin role                                | Auth Service              | Medium     | Critical | HIGH     | RS256/ES256 signing (not HS256), server-side claim validation, no client-editable claims |
+| T18 | **Elevation of Privilege** | Container escape via kernel exploit (unpatched node)                    | Kubernetes Nodes          | Low        | Critical | HIGH     | Node auto-patching, Pod Security Standards (restricted), seccomp, AppArmor/SELinux       |
+| T19 | **Spoofing**               | Supply chain attack via malicious dependency in one service             | CI/CD Pipeline            | Medium     | Critical | HIGH     | SBOM per service, lockfile enforcement, Dependabot/Socket.dev, private registry scope    |
+| T20 | **Tampering**              | Kubernetes admission bypassed allows unsigned image deployment          | Admission Controller      | Low        | Critical | MEDIUM   | Kyverno/Gatekeeper in enforce mode, audit mode disabled in production                    |
 
 ### 6.2 Top 10 Migration-Specific Threats (Prioritized)
 
@@ -540,13 +540,13 @@ Applied to the microservices migration topology described in `microservices-arch
 
 Rolling back a decomposed service to the monolith introduces specific security risks:
 
-| Rollback Scenario                       | Security Risk                                        | Mitigation                                   |
-| --------------------------------------- | ---------------------------------------------------- | -------------------------------------------- |
-| Service rolled back, data in new DB     | Data may be stranded in isolated database             | Ensure bidirectional data sync during canary  |
-| Service rolled back, events still flowing| Events targeting removed service accumulate in DLQ   | Consumer group cleanup procedure documented   |
-| Service rolled back, secrets still exist | Orphaned credentials in Vault                        | Automated secret cleanup on service teardown  |
-| Service rolled back, NetworkPolicies stale| Policies may block traffic to monolith              | Rollback procedure includes policy revert     |
-| Service rolled back mid-migration        | Dual-write inconsistency between monolith and new DB | Two-phase commit or saga compensation logic   |
+| Rollback Scenario                          | Security Risk                                        | Mitigation                                   |
+| ------------------------------------------ | ---------------------------------------------------- | -------------------------------------------- |
+| Service rolled back, data in new DB        | Data may be stranded in isolated database            | Ensure bidirectional data sync during canary |
+| Service rolled back, events still flowing  | Events targeting removed service accumulate in DLQ   | Consumer group cleanup procedure documented  |
+| Service rolled back, secrets still exist   | Orphaned credentials in Vault                        | Automated secret cleanup on service teardown |
+| Service rolled back, NetworkPolicies stale | Policies may block traffic to monolith               | Rollback procedure includes policy revert    |
+| Service rolled back mid-migration          | Dual-write inconsistency between monolith and new DB | Two-phase commit or saga compensation logic  |
 
 ---
 
@@ -728,43 +728,43 @@ graph LR
 
 ### P0 -- Must Have Before Production (Blocking)
 
-| ID       | Control                                              | OWASP Mapping | STRIDE Threat | Status |
-| -------- | ---------------------------------------------------- | ------------- | ------------- | ------ |
-| SEC-P0-01| mTLS enforced for ALL east-west traffic              | A02, A04      | T4, T9        | [ ]    |
-| SEC-P0-02| OAuth 2.1 + PKCE at API gateway                     | A07           | T2            | [ ]    |
-| SEC-P0-03| JWT access token max 15 minutes, refresh rotation   | A07           | T2            | [ ]    |
-| SEC-P0-04| Per-service ServiceAccount with minimal RBAC         | A01           | T16           | [ ]    |
-| SEC-P0-05| Secrets in Vault/KMS only (no env vars, no ConfigMaps)| A02          | T11           | [ ]    |
-| SEC-P0-06| Container images signed and verified at admission    | A08, A03      | T6, T19       | [ ]    |
-| SEC-P0-07| NetworkPolicy default-deny per namespace             | A01           | T4, T16       | [ ]    |
-| SEC-P0-08| Rate limiting at gateway AND per-service             | A01           | T14           | [ ]    |
-| SEC-P0-09| Correlation ID propagation in all logs               | A09           | T7            | [ ]    |
-| SEC-P0-10| SecurityContext: runAsNonRoot, readOnly, drop ALL    | A02, A05      | T18           | [ ]    |
+| ID        | Control                                                | OWASP Mapping | STRIDE Threat | Status |
+| --------- | ------------------------------------------------------ | ------------- | ------------- | ------ |
+| SEC-P0-01 | mTLS enforced for ALL east-west traffic                | A02, A04      | T4, T9        | [ ]    |
+| SEC-P0-02 | OAuth 2.1 + PKCE at API gateway                        | A07           | T2            | [ ]    |
+| SEC-P0-03 | JWT access token max 15 minutes, refresh rotation      | A07           | T2            | [ ]    |
+| SEC-P0-04 | Per-service ServiceAccount with minimal RBAC           | A01           | T16           | [ ]    |
+| SEC-P0-05 | Secrets in Vault/KMS only (no env vars, no ConfigMaps) | A02           | T11           | [ ]    |
+| SEC-P0-06 | Container images signed and verified at admission      | A08, A03      | T6, T19       | [ ]    |
+| SEC-P0-07 | NetworkPolicy default-deny per namespace               | A01           | T4, T16       | [ ]    |
+| SEC-P0-08 | Rate limiting at gateway AND per-service               | A01           | T14           | [ ]    |
+| SEC-P0-09 | Correlation ID propagation in all logs                 | A09           | T7            | [ ]    |
+| SEC-P0-10 | SecurityContext: runAsNonRoot, readOnly, drop ALL      | A02, A05      | T18           | [ ]    |
 
 ### P1 -- Should Have Within First Sprint Post-Launch
 
-| ID       | Control                                              | OWASP Mapping | STRIDE Threat | Status |
-| -------- | ---------------------------------------------------- | ------------- | ------------- | ------ |
-| SEC-P1-01| OPA/Cedar fine-grained authorization per service     | A01           | T16, T17      | [ ]    |
-| SEC-P1-02| Token exchange (RFC 8693) for cross-service calls    | A07           | T2            | [ ]    |
-| SEC-P1-03| SBOM generated per service, stored in OCI registry   | A03           | T19           | [ ]    |
-| SEC-P1-04| PII field-level encryption (application layer)       | A04           | T9            | [ ]    |
-| SEC-P1-05| Log sanitization: no PII in application logs         | A09           | T10           | [ ]    |
-| SEC-P1-06| Circuit breakers for all outbound service calls      | --            | T13           | [ ]    |
-| SEC-P1-07| Event signing (producer signs, consumer verifies)    | A08           | T5            | [ ]    |
-| SEC-P1-08| Falco/Tetragon runtime threat detection deployed     | A09           | T18           | [ ]    |
-| SEC-P1-09| Deletion orchestrator for GDPR right-to-erasure      | Compliance    | --            | [ ]    |
-| SEC-P1-10| Penetration test per service before GA               | All           | All           | [ ]    |
+| ID        | Control                                            | OWASP Mapping | STRIDE Threat | Status |
+| --------- | -------------------------------------------------- | ------------- | ------------- | ------ |
+| SEC-P1-01 | OPA/Cedar fine-grained authorization per service   | A01           | T16, T17      | [ ]    |
+| SEC-P1-02 | Token exchange (RFC 8693) for cross-service calls  | A07           | T2            | [ ]    |
+| SEC-P1-03 | SBOM generated per service, stored in OCI registry | A03           | T19           | [ ]    |
+| SEC-P1-04 | PII field-level encryption (application layer)     | A04           | T9            | [ ]    |
+| SEC-P1-05 | Log sanitization: no PII in application logs       | A09           | T10           | [ ]    |
+| SEC-P1-06 | Circuit breakers for all outbound service calls    | --            | T13           | [ ]    |
+| SEC-P1-07 | Event signing (producer signs, consumer verifies)  | A08           | T5            | [ ]    |
+| SEC-P1-08 | Falco/Tetragon runtime threat detection deployed   | A09           | T18           | [ ]    |
+| SEC-P1-09 | Deletion orchestrator for GDPR right-to-erasure    | Compliance    | --            | [ ]    |
+| SEC-P1-10 | Penetration test per service before GA             | All           | All           | [ ]    |
 
 ### P2 -- Nice to Have / Hardening
 
-| ID       | Control                                              | OWASP Mapping | STRIDE Threat | Status |
-| -------- | ---------------------------------------------------- | ------------- | ------------- | ------ |
-| SEC-P2-01| DPoP (Proof of Possession) for all OAuth tokens      | A07           | T2            | [ ]    |
-| SEC-P2-02| Passkeys/WebAuthn for admin access                   | A07           | T2            | [ ]    |
-| SEC-P2-03| Chaos engineering: security failure injection testing | All           | T13           | [ ]    |
-| SEC-P2-04| Immutable audit log (S3 Object Lock or similar)      | A09           | T7, T8        | [ ]    |
-| SEC-P2-05| Data catalog with automated PII classification       | Compliance    | T9, T10       | [ ]    |
+| ID        | Control                                               | OWASP Mapping | STRIDE Threat | Status |
+| --------- | ----------------------------------------------------- | ------------- | ------------- | ------ |
+| SEC-P2-01 | DPoP (Proof of Possession) for all OAuth tokens       | A07           | T2            | [ ]    |
+| SEC-P2-02 | Passkeys/WebAuthn for admin access                    | A07           | T2            | [ ]    |
+| SEC-P2-03 | Chaos engineering: security failure injection testing | All           | T13           | [ ]    |
+| SEC-P2-04 | Immutable audit log (S3 Object Lock or similar)       | A09           | T7, T8        | [ ]    |
+| SEC-P2-05 | Data catalog with automated PII classification        | Compliance    | T9, T10       | [ ]    |
 
 ---
 
@@ -806,14 +806,14 @@ graph LR
 
 ## Appendix B: Compliance Mapping
 
-| Compliance Framework | Relevant Controls from This Document                          |
-| -------------------- | ------------------------------------------------------------- |
-| SOC 2 Type II        | SEC-P0-04 (access control), SEC-P0-09 (logging), SEC-P2-04 (audit trail) |
-| GDPR                 | SEC-P1-04 (encryption), SEC-P1-05 (PII in logs), SEC-P1-09 (erasure) |
-| PCI DSS 4.0          | SEC-P0-01 (encryption in transit), SEC-P0-05 (secrets), Payment namespace isolation |
+| Compliance Framework | Relevant Controls from This Document                                                    |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| SOC 2 Type II        | SEC-P0-04 (access control), SEC-P0-09 (logging), SEC-P2-04 (audit trail)                |
+| GDPR                 | SEC-P1-04 (encryption), SEC-P1-05 (PII in logs), SEC-P1-09 (erasure)                    |
+| PCI DSS 4.0          | SEC-P0-01 (encryption in transit), SEC-P0-05 (secrets), Payment namespace isolation     |
 | HIPAA                | SEC-P1-04 (PHI encryption), SEC-P0-09 (audit logging), SEC-P0-07 (network segmentation) |
-| ISO 27001            | All P0 controls map to Annex A controls (A.8 access, A.10 crypto, A.12 operations) |
+| ISO 27001            | All P0 controls map to Annex A controls (A.8 access, A.10 crypto, A.12 operations)      |
 
 ---
 
-*End of Security Architecture Companion Document*
+_End of Security Architecture Companion Document_

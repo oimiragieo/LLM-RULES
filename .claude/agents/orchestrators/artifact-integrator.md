@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-04-21T11:57:25.087Z
+lastVerifiedAt: 2026-04-22T11:47:33.920Z
 name: artifact-integrator
 version: 1.0.0
 description: >-
@@ -54,6 +54,21 @@ mcp_servers:
   - Exa
   - Ref
   - filesystem
+manifest:
+  manifest_version: '1.0'
+  agent_id: 'artifact-integrator'
+  agent_type: 'orchestrator'
+  capabilities: []
+  memory_tier: STM
+  cost_envelope:
+    max_tokens_per_task: 80000
+    max_usd_per_session: 5
+    preferred_model: sonnet
+  session_type: ephemeral
+  a2a_interop:
+    supports_mcp: true
+    supports_aip_tokens: true
+    supports_maf: false
 ---
 
 <!-- agent-template-contract:v1 -->

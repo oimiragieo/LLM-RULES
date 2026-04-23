@@ -68,7 +68,7 @@ const { spawnSync } = require('child_process');
 const revertResult = spawnSync('git', ['revert', '--no-edit', commit.hash], {
   cwd: repoPath,
   encoding: 'utf8',
-  shell: false,  // CRITICAL: Prevents shell injection
+  shell: false, // CRITICAL: Prevents shell injection
 });
 
 if (revertResult.status !== 0) {
@@ -114,6 +114,7 @@ if (!isValidCommitHash(commit.hash)) {
 ### Missing Patterns
 
 The hook checks for:
+
 - `;` with `rm -rf`
 - `|` with `rm -rf`
 - `&&` with `rm -rf`
@@ -164,7 +165,10 @@ const INJECTION_PATTERNS = [
   { pattern: /\b(wget|curl|nc|netcat)\b/, message: 'Network tool detected (exfiltration risk)' },
 
   // NEW: Code execution interpreters
-  { pattern: /(python|perl|ruby|node)\s+-[ce]/, message: 'Code execution via interpreter detected' },
+  {
+    pattern: /(python|perl|ruby|node)\s+-[ce]/,
+    message: 'Code execution via interpreter detected',
+  },
 ];
 ```
 
@@ -189,6 +193,7 @@ const INJECTION_PATTERNS = [
 9. `.claude/skills/skill-creator/scripts/convert.cjs` - Line 21
 
 **Common pattern**:
+
 ```javascript
 execSync(`some command ${userInput}`, { ... });
 ```
@@ -203,22 +208,24 @@ execSync(`some command ${userInput}`, { ... });
 
 **Breakdown**:
 
-| Category | Count | Severity | Notes |
-|----------|-------|----------|-------|
-| Documentation/Examples | 45 | INFO | Teaching examples, references |
-| Test Files | 12 | INFO | Testing that eval is blocked |
-| Python ML Code (`model.eval()`) | 15 | INFO | PyTorch model evaluation mode (not JavaScript eval) |
-| Security Patterns (negated) | 2 | INFO | Search patterns for finding eval (not using it) |
+| Category                        | Count | Severity | Notes                                               |
+| ------------------------------- | ----- | -------- | --------------------------------------------------- |
+| Documentation/Examples          | 45    | INFO     | Teaching examples, references                       |
+| Test Files                      | 12    | INFO     | Testing that eval is blocked                        |
+| Python ML Code (`model.eval()`) | 15    | INFO     | PyTorch model evaluation mode (not JavaScript eval) |
+| Security Patterns (negated)     | 2     | INFO     | Search patterns for finding eval (not using it)     |
 
 **Real eval() concerns**:
+
 - None found in production code
 - All instances in docs, tests, or Python code
 - Security tooling correctly blocks eval() (verified in unified-pre-write-hook.cjs line 148)
 
 **Example benign usage**:
+
 ```javascript
 // .claude/context/artifacts/specs/AST_GREP_PATTERNS.md:703
-eval($CODE)  // <-- This is a SEARCH PATTERN for finding eval, not actual eval usage
+eval($CODE); // <-- This is a SEARCH PATTERN for finding eval, not actual eval usage
 ```
 
 ---
@@ -228,6 +235,7 @@ eval($CODE)  // <-- This is a SEARCH PATTERN for finding eval, not actual eval u
 **File**: `.claude/context/memory/archive/learnings-2026-02.md`
 
 **Evidence**: Already remediated per learning entry:
+
 > "decision-handler.mjs used new Function() with user input for workflow expression evaluation. Replaced with SafeExpressionParser (recursive descent parser supporting only literals, comparisons, logical operators)."
 
 **Status**: FIXED (replaced with safe parser)
@@ -238,15 +246,16 @@ eval($CODE)  // <-- This is a SEARCH PATTERN for finding eval, not actual eval u
 
 **Breakdown**:
 
-| Pattern | Count | Risk Level | Notes |
-|---------|-------|------------|-------|
-| `spawnSync` with array args | 58 | LOW | Safe pattern (no shell interpretation) |
-| `spawn` with array args | 45 | LOW | Safe pattern |
-| `exec` (async) | 23 | HIGH | Requires audit - uses shell by default |
+| Pattern                     | Count | Risk Level | Notes                                  |
+| --------------------------- | ----- | ---------- | -------------------------------------- |
+| `spawnSync` with array args | 58    | LOW        | Safe pattern (no shell interpretation) |
+| `spawn` with array args     | 45    | LOW        | Safe pattern                           |
+| `exec` (async)              | 23    | HIGH       | Requires audit - uses shell by default |
 
 **High-risk exec() instances requiring audit**:
 
 1. `.claude/lib/code-indexing/gpu-detector.cjs:9`
+
    ```javascript
    const { exec } = require('child_process');
    // Line 9 - Likely safe (hardware detection) but verify
@@ -259,6 +268,7 @@ eval($CODE)  // <-- This is a SEARCH PATTERN for finding eval, not actual eval u
    ```
 
 **Recommendation**: Audit all `exec()` calls to verify:
+
 - No user-controlled input in command strings
 - Consider replacing with `spawnSync` where possible
 - If exec is required, use `shell: false` option
@@ -272,6 +282,7 @@ eval($CODE)  // <-- This is a SEARCH PATTERN for finding eval, not actual eval u
 **Finding**: No obvious path traversal vulnerabilities detected in grep results.
 
 **Note**: Path traversal detection requires deeper analysis of:
+
 - `fs.readFile()`, `fs.writeFile()` calls
 - `path.join()` without `path.resolve()` validation
 - User-controlled filenames
@@ -377,15 +388,15 @@ testCases.forEach(({ cmd, shouldBlock, desc }) => {
 
 ## Appendix: Full Search Results Summary
 
-| Search Target | Instances Found | Risk Level | Notes |
-|--------------|-----------------|------------|-------|
-| `execSync` | 60+ | HIGH | 24 with string interpolation require audit |
-| `exec(` | 74 | HIGH | 23 child_process.exec() require audit |
-| `spawnSync` | 103 | LOW | Safe pattern (array args) |
-| `child_process` | 126 | VARIES | Mostly safe usage patterns |
-| `eval(` | 74 | INFO | All in docs/tests/Python, none in production |
-| Command Injection Vulnerabilities | 3 | CRITICAL | H-01 in logical-unit-tracker.cjs |
-| Shell Validation Gaps | 6 | MEDIUM | Missing patterns in hook |
+| Search Target                     | Instances Found | Risk Level | Notes                                        |
+| --------------------------------- | --------------- | ---------- | -------------------------------------------- |
+| `execSync`                        | 60+             | HIGH       | 24 with string interpolation require audit   |
+| `exec(`                           | 74              | HIGH       | 23 child_process.exec() require audit        |
+| `spawnSync`                       | 103             | LOW        | Safe pattern (array args)                    |
+| `child_process`                   | 126             | VARIES     | Mostly safe usage patterns                   |
+| `eval(`                           | 74              | INFO       | All in docs/tests/Python, none in production |
+| Command Injection Vulnerabilities | 3               | CRITICAL   | H-01 in logical-unit-tracker.cjs             |
+| Shell Validation Gaps             | 6               | MEDIUM     | Missing patterns in hook                     |
 
 ---
 

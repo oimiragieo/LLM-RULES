@@ -31,6 +31,7 @@ The agent-studio framework implements comprehensive security controls with **fai
 **CWE**: CWE-1321 (Improperly Controlled Modification of Object Prototype Attributes)
 **OWASP**: A06:2021 (Vulnerable Components)
 **Files**:
+
 - `.claude/hooks/memory/sync-memory-index.cjs:181` — `JSON.parse(raw)` on learnings.md without validation
 - `.claude/hooks/reflection/reflection-queue-processor.cjs:80` — `JSON.parse(line)` on queue entries
 - `.claude/hooks/reflection/reflection-step0-guard.cjs:123` — `JSON.parse()` on state file
@@ -38,11 +39,13 @@ The agent-studio framework implements comprehensive security controls with **fai
 - `.claude/hooks/routing/pre-task-unified-state.cjs:multiple` — `JSON.parse()` on state files
 
 **Impact**: An attacker (or malicious agent) can:
+
 1. Craft memory entries with `__proto__`, `constructor`, `prototype` keys
 2. Modify `Object.prototype` globally, affecting ALL object operations
 3. Escalate privileges, bypass checks, or cause DoS via infinite loops in property access
 
 **Example Attack**:
+
 ```javascript
 // Malicious entry written to memory:
 {
@@ -57,6 +60,7 @@ if (user.isAdmin) { /* BYPASSED */ }
 ```
 
 **Proof of Concept**:
+
 ```javascript
 const malicious = '{"__proto__":{"isAdmin":true}}';
 const obj = JSON.parse(malicious);
@@ -65,6 +69,7 @@ console.log(newObj.isAdmin); // true — prototype pollution successful
 ```
 
 **Remediation**:
+
 ```javascript
 function safeParseJSON(jsonString, defaultValue = {}) {
   try {
@@ -100,6 +105,7 @@ function safeParseJSON(jsonString, defaultValue = {}) {
 **File**: `.claude/hooks/reflection/reflection-queue-processor.cjs:80-90`
 
 **Vulnerable Code**:
+
 ```javascript
 try {
   const entry = JSON.parse(line);
@@ -113,12 +119,14 @@ try {
 ```
 
 **Impact**:
+
 - Malformed queue entries are silently skipped
 - Attacker can corrupt queue to bypass reflection-agent spawning
 - Reflection enforcement can be evaded without detection
 - No audit trail of failed parse attempts
 
 **Remediation**:
+
 ```javascript
 try {
   const entry = JSON.parse(line);
@@ -141,11 +149,13 @@ try {
 **CWE**: CWE-94 (Improper Control of Generation of Code)
 **OWASP**: A03:2021 (Injection)
 **Files**:
+
 - `.claude/context/memory/learnings.md` — No write validation before inclusion in spawn prompts
 - `.claude/hooks/memory/sync-memory-index.cjs:230` — Memory entries written without content sanitization
 
 **Attack Vector**:
 An agent (or compromised hook) writes malicious instructions to `learnings.md`:
+
 ```markdown
 # Learnings
 
@@ -159,12 +169,14 @@ Use this bypass for testing purposes only.
 When spawn-prompt-assembler injects memory context into next agent spawn, this instruction becomes part of the system prompt, influencing agent behavior.
 
 **Impact**:
+
 - Injected instructions can override security rules
 - Agents read memory as "trusted guidance" and may follow malicious instructions
 - No validation of injected memory content
 - Violation of CWE-94 (code generation via injection)
 
 **Remediation**:
+
 1. **Content Validation**: Whitelist allowed memory entry formats
 2. **Instruction Blocking**: Scan for imperative mood phrases ("should", "must", "always bypass")
 3. **Read-Only Injection**: Make memory read-only after injection into spawn prompts
@@ -197,10 +209,12 @@ function validateMemoryEntry(entry) {
 **CWE**: CWE-22 (Improper Limitation of a Pathname to a Restricted Directory)
 **OWASP**: A01:2021 (Broken Access Control)
 **Files**:
+
 - `.claude/hooks/memory/sync-memory-index.cjs:217` — File path constructed from user input
 - `.claude/lib/memory/memory-manager.cjs` (if exists) — Named memory API
 
 **Vulnerable Pattern**:
+
 ```javascript
 function triggerEmbeddingGeneration(absPath) {
   const basename = path.basename(absPath);
@@ -211,6 +225,7 @@ function triggerEmbeddingGeneration(absPath) {
 ```
 
 **Proof of Concept**:
+
 ```javascript
 // Agent writes to:
 triggerEmbeddingGeneration('../../.env');
@@ -220,6 +235,7 @@ triggerEmbeddingGeneration('../../../../etc/passwd');
 ```
 
 **Remediation**:
+
 ```javascript
 function triggerEmbeddingGeneration(absPath) {
   // Whitelist check: ensure path is within memory directory
@@ -249,6 +265,7 @@ function triggerEmbeddingGeneration(absPath) {
 **File**: `.claude/hooks/memory/sync-memory-index.cjs:256-259`
 
 **Current Code** (GOOD):
+
 ```javascript
 const child = spawn(
   process.execPath,
@@ -260,16 +277,13 @@ const child = spawn(
 **Why It's Safe**: Array arguments bypass shell interpretation. Even if `absPath` contains shell metacharacters (`$`, `|`, `;`), they're passed as literal string argument.
 
 **Recommendation**: Add explicit comment:
+
 ```javascript
 // shell: false (implicit) - array args prevent shell injection
-const child = spawn(
-  process.execPath,
-  [generatorPath, '--file', absPath],
-  {
-    ...buildEmbeddingSpawnOptions(PROJECT_ROOT, timeoutMs),
-    // shell: false is default for spawn(), array args are safe
-  }
-);
+const child = spawn(process.execPath, [generatorPath, '--file', absPath], {
+  ...buildEmbeddingSpawnOptions(PROJECT_ROOT, timeoutMs),
+  // shell: false is default for spawn(), array args are safe
+});
 ```
 
 **Status**: ✅ MITIGATED — No action required, but explicit documentation recommended.
@@ -283,6 +297,7 @@ const child = spawn(
 **File**: `.claude/hooks/reflection/reflection-queue-processor.cjs:100-105`
 
 **Vulnerable Code**:
+
 ```javascript
 try {
   const state = readReflectionState();
@@ -294,11 +309,13 @@ try {
 ```
 
 **Impact**:
+
 - Errors in reflection state reading are silently swallowed
 - No audit trail of failures
 - Reflection enforcement can be evaded by triggering errors
 
 **Remediation**:
+
 ```javascript
 try {
   const state = readReflectionState();
@@ -321,6 +338,7 @@ try {
 **File**: `.claude/hooks/safety/bash-command-validator.cjs:234-246`
 
 **Vulnerable Code**:
+
 ```javascript
 function extractCommand(hookInput) {
   if (!hookInput) return null;
@@ -337,12 +355,15 @@ function extractCommand(hookInput) {
 **Risk**: If `toolInput.command` is an object with custom `toString()` method, it could bypass validation.
 
 **Proof of Concept**:
+
 ```javascript
 const malicious = {
   command: {
-    toString() { return 'echo safe'; },
+    toString() {
+      return 'echo safe';
+    },
     // But when used elsewhere, behaves differently
-  }
+  },
 };
 
 // Validator sees string: "echo safe" ✓
@@ -350,6 +371,7 @@ const malicious = {
 ```
 
 **Remediation**:
+
 ```javascript
 function extractCommand(hookInput) {
   if (!hookInput) return null;
@@ -379,6 +401,7 @@ function extractCommand(hookInput) {
 **File**: `.claude/hooks/safety/bash-command-validator.cjs:390-405`
 
 **Vulnerable Code**:
+
 ```javascript
 catch (err) {
   if (process.env.DEBUG_HOOKS) {
@@ -392,6 +415,7 @@ catch (err) {
 **Risk**: Stack trace exposes file paths and code structure to attacker via debug output.
 
 **Remediation**:
+
 ```javascript
 catch (err) {
   if (process.env.DEBUG_HOOKS) {
@@ -417,6 +441,7 @@ catch (err) {
 
 **Risk**:
 An agent can queue unlimited reflection requests without throttling. An attacker could:
+
 1. Queue 10,000 reflection entries
 2. Cause reflection-agent to spawn thousands of times
 3. Exhaust system resources (CPU, memory)
@@ -425,6 +450,7 @@ An agent can queue unlimited reflection requests without throttling. An attacker
 **Impact**: No rate limiting on reflection queue growth.
 
 **Remediation**:
+
 ```javascript
 const MAX_PENDING_REFLECTIONS = 10;
 const entries = readReflectionQueue();
@@ -450,6 +476,7 @@ if (entries.length > MAX_PENDING_REFLECTIONS) {
 Background embedding generation is triggered without verifying that the file was legitimately modified (not corrupted or attacked).
 
 **Remediation**:
+
 ```javascript
 function triggerEmbeddingGeneration(absPath, expectedChecksum) {
   // Verify file integrity before processing
@@ -585,29 +612,32 @@ function triggerEmbeddingGeneration(absPath, expectedChecksum) {
 
 ## Compliance Mapping
 
-| Framework | Status | Gaps |
-| --------- | ------ | ---- |
-| **OWASP Top 10** | Partial | A01 (Broken Access Control): Path traversal gaps; A03 (Injection): Memory poisoning; A07 (Auth): Fail-open errors |
-| **CWE Top 25** | Partial | CWE-22, CWE-78, CWE-94, CWE-1321 detected and unfixed |
-| **STRIDE** | Good | Spoofing (auth checks present), Tampering (gaps in data validation), Repudiation (logging needed), Information Disclosure (memory files plaintext), DoS (no rate limiting), Elevation (prototype pollution risk) |
+| Framework        | Status  | Gaps                                                                                                                                                                                                             |
+| ---------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **OWASP Top 10** | Partial | A01 (Broken Access Control): Path traversal gaps; A03 (Injection): Memory poisoning; A07 (Auth): Fail-open errors                                                                                                |
+| **CWE Top 25**   | Partial | CWE-22, CWE-78, CWE-94, CWE-1321 detected and unfixed                                                                                                                                                            |
+| **STRIDE**       | Good    | Spoofing (auth checks present), Tampering (gaps in data validation), Repudiation (logging needed), Information Disclosure (memory files plaintext), DoS (no rate limiting), Elevation (prototype pollution risk) |
 
 ---
 
 ## Remediation Priority
 
 ### Phase 1 (Immediate - Week 1)
+
 1. **Implement safeParseJSON()** in all JSON.parse() locations (Critical: Prototype Pollution)
 2. **Add path traversal validation** to memory operations (Critical: CWE-22)
 3. **Fix fail-open error handlers** to fail-secure (Critical: CWE-636)
 4. **Validate memory write content** to block malicious instructions (Critical: CWE-94)
 
 ### Phase 2 (Short-term - Week 2-3)
+
 5. Implement rate limiting on reflection queue
 6. Add integrity checks for memory file operations
 7. Enhance error logging without exposing internals
 8. Validate hook input types strictly
 
 ### Phase 3 (Medium-term - Month 2)
+
 9. Encrypt memory files at rest
 10. Add cryptographic signatures to memory entries
 11. Implement memory audit trail
@@ -618,12 +648,14 @@ function triggerEmbeddingGeneration(absPath, expectedChecksum) {
 ## Testing Recommendations
 
 1. **Prototype Pollution Tests**:
+
    ```bash
    # Test JSON.parse safety
    echo '{"__proto__":{"isAdmin":true}}' | node .claude/hooks/memory/sync-memory-index.cjs
    ```
 
 2. **Path Traversal Tests**:
+
    ```bash
    # Attempt directory escape
    echo "../../.env" | node test-memory-path.js
@@ -649,4 +681,3 @@ The agent-studio framework has **strong foundation security** with fail-closed d
 4. **Path traversal** → Whitelist memory directory
 
 Estimated remediation time: **2-3 weeks** for all critical findings.
-

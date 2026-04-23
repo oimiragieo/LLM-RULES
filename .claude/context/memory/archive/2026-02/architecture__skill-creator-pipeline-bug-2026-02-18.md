@@ -76,6 +76,7 @@ For `gemini-cli-security`, the node `skill:gemini-cli-security` was **never adde
 **File**: `.claude/skills/skill-creator/SKILL.md` (lines 895–1179)
 
 The skill-creator defines detailed post-creation steps (Steps 6–11):
+
 - Step 6: Update CLAUDE.md
 - Step 7: Assign to agents
 - Step 8: Update skill catalog
@@ -95,6 +96,7 @@ The skill explicitly calls out post-creation integration via `runIntegrationChec
 **File**: `.claude/agents/orchestrators/artifact-integrator.md`
 
 The artifact-integrator agent definition does NOT specify what metadata format must be included in its TaskUpdate calls. Specifically, there is no requirement documented in the agent file that:
+
 - `metadata.creatorType` must be set to `"skill"` when invoking skill-creator
 - `metadata.artifactName` must match the skill name
 - `metadata.artifactPath` must point to the SKILL.md
@@ -140,13 +142,13 @@ Catalog NOT updated, agents NOT assigned, CLAUDE.md NOT updated
 
 ## Root Cause Summary
 
-| # | Root Cause | Severity | Mechanism |
-|---|-----------|---------|-----------|
-| 1 | `post-creation-integration.cjs` cannot intercept `Skill()` invocations — only `TaskUpdate` events | P0 | Hook trigger mismatch. Skill() is not a TaskUpdate, so PostToolUse(TaskUpdate) never fires for the skill-creator invocation. |
-| 2 | Even when TaskUpdate IS called, `metadata.creatorType` is often absent and pattern matching is fragile | P1 | Both detection methods (explicit field + regex) can fail silently for imprecise summaries |
-| 3 | `artifact-graph.json` is not updated during skill creation — node `skill:gemini-cli-security` absent | P1 | Graph only updated by periodic batch tool, not by skill-creator itself |
-| 4 | skill-creator's post-creation Steps 6–11 are LLM-instructed, not automated — prone to being skipped | P1 | No enforced code path guarantees catalog/agent-assignment steps execute |
-| 5 | artifact-integrator agent definition does not mandate specific TaskUpdate metadata format | P2 | No contract enforcement on `creatorType`, `artifactName`, `artifactPath` metadata |
+| #   | Root Cause                                                                                             | Severity | Mechanism                                                                                                                    |
+| --- | ------------------------------------------------------------------------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `post-creation-integration.cjs` cannot intercept `Skill()` invocations — only `TaskUpdate` events      | P0       | Hook trigger mismatch. Skill() is not a TaskUpdate, so PostToolUse(TaskUpdate) never fires for the skill-creator invocation. |
+| 2   | Even when TaskUpdate IS called, `metadata.creatorType` is often absent and pattern matching is fragile | P1       | Both detection methods (explicit field + regex) can fail silently for imprecise summaries                                    |
+| 3   | `artifact-graph.json` is not updated during skill creation — node `skill:gemini-cli-security` absent   | P1       | Graph only updated by periodic batch tool, not by skill-creator itself                                                       |
+| 4   | skill-creator's post-creation Steps 6–11 are LLM-instructed, not automated — prone to being skipped    | P1       | No enforced code path guarantees catalog/agent-assignment steps execute                                                      |
+| 5   | artifact-integrator agent definition does not mandate specific TaskUpdate metadata format              | P2       | No contract enforcement on `creatorType`, `artifactName`, `artifactPath` metadata                                            |
 
 ---
 
@@ -175,14 +177,14 @@ Add an iron law to skill-creator's SKILL.md (and the create.cjs script, if it ca
 
 ```javascript
 TaskUpdate({
-  taskId: "...",
-  status: "completed",
+  taskId: '...',
+  status: 'completed',
   metadata: {
-    creatorType: "skill",           // MANDATORY for hook detection
-    artifactName: "{skill-name}",   // MANDATORY for artifact ID
-    artifactPath: ".claude/skills/{skill-name}/SKILL.md",  // MANDATORY
-    summary: "Created skill {skill-name}"
-  }
+    creatorType: 'skill', // MANDATORY for hook detection
+    artifactName: '{skill-name}', // MANDATORY for artifact ID
+    artifactPath: '.claude/skills/{skill-name}/SKILL.md', // MANDATORY
+    summary: 'Created skill {skill-name}',
+  },
 });
 ```
 
@@ -196,7 +198,7 @@ const graph = new ArtifactGraph(DEFAULT_ARTIFACT_GRAPH_PATH);
 graph.addNode(`skill:${skillName}`, {
   type: 'skill',
   path: `.claude/skills/${skillName}/SKILL.md`,
-  integrationStatus: 'created'
+  integrationStatus: 'created',
 });
 graph.save();
 ```
@@ -213,6 +215,7 @@ Add to artifact-integrator's agent definition a required metadata contract:
 ## TaskUpdate Completion Contract (MANDATORY)
 
 When completing a skill creation task, TaskUpdate MUST include:
+
 - metadata.creatorType: "skill" | "agent" | "hook" | etc.
 - metadata.artifactName: the artifact's name
 - metadata.artifactPath: relative path to primary artifact file
@@ -222,16 +225,16 @@ When completing a skill creation task, TaskUpdate MUST include:
 
 ## Files Examined
 
-| File | Key Finding |
-|------|-------------|
+| File                                                   | Key Finding                                                                                                                  |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | `.claude/hooks/workflow/post-creation-integration.cjs` | Hook only triggers on TaskUpdate; cannot intercept Skill() calls; detection logic requires fragile metadata or pattern match |
-| `.claude/hooks/routing/unified-creator-guard.cjs` | Guards against direct writes to creator paths; does NOT trigger post-creation integration itself |
-| `.claude/skills/skill-creator/SKILL.md` | Post-creation steps are LLM instructions, not automated code; SKILL.md exists but integration is aspirational |
-| `.claude/context/runtime/integration-queue.jsonl` | Empty (1 line) — confirms hook never fired for gemini-cli-security |
-| `.claude/context/data/artifact-graph.json` | `skill:gemini-cli-security` node absent — graph not updated during creation |
-| `.claude/agents/orchestrators/artifact-integrator.md` | No mandatory TaskUpdate metadata contract for creatorType/artifactName |
-| `.claude/settings.json` | `post-creation-integration.cjs` registered only on `PostToolUse(TaskUpdate)` — confirms trigger scope limitation |
-| `.claude/lib/workflow/artifact-graph.cjs` | `quickIntegrationCheck` returns `not-in-graph` if node absent; correct behavior but depends on node existing |
+| `.claude/hooks/routing/unified-creator-guard.cjs`      | Guards against direct writes to creator paths; does NOT trigger post-creation integration itself                             |
+| `.claude/skills/skill-creator/SKILL.md`                | Post-creation steps are LLM instructions, not automated code; SKILL.md exists but integration is aspirational                |
+| `.claude/context/runtime/integration-queue.jsonl`      | Empty (1 line) — confirms hook never fired for gemini-cli-security                                                           |
+| `.claude/context/data/artifact-graph.json`             | `skill:gemini-cli-security` node absent — graph not updated during creation                                                  |
+| `.claude/agents/orchestrators/artifact-integrator.md`  | No mandatory TaskUpdate metadata contract for creatorType/artifactName                                                       |
+| `.claude/settings.json`                                | `post-creation-integration.cjs` registered only on `PostToolUse(TaskUpdate)` — confirms trigger scope limitation             |
+| `.claude/lib/workflow/artifact-graph.cjs`              | `quickIntegrationCheck` returns `not-in-graph` if node absent; correct behavior but depends on node existing                 |
 
 ---
 

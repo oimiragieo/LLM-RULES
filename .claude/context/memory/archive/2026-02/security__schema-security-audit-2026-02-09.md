@@ -25,6 +25,7 @@ This audit examined 28 active JSON schemas for security vulnerabilities across 1
 **Risk Context:** These schemas are used internally by the agent-studio framework for validating agent definitions, workflow state, and artifact metadata. They are NOT exposed as public API schemas. The attack surface is limited to framework contributors and spawned agents. However, since spawned agents can produce JSON data validated against these schemas, unbounded fields could be used by a misbehaving agent to exhaust memory.
 
 **Priority Remediation:**
+
 1. (HIGH) Add `additionalProperties: false` to 11 schemas missing it
 2. (MEDIUM) Add `maxLength` to 47 unbounded string fields across 16 schemas
 3. (MEDIUM) Add `maxItems` to 38 unbounded array fields across 19 schemas
@@ -40,36 +41,36 @@ This audit examined 28 active JSON schemas for security vulnerabilities across 1
 
 Schemas without `additionalProperties: false` (or `unevaluatedProperties: false`) allow arbitrary properties to be injected into validated data. In an agent framework, this means a misbehaving agent could inject unexpected metadata fields that propagate through the system.
 
-| Schema | Has Protection | Notes |
-|--------|---------------|-------|
-| `adr-template.schema.json` | YES | `additionalProperties: false` |
-| `agent-capability-card.schema.json` | YES | `additionalProperties: false` on all sub-definitions |
-| `agent-definition.schema.json` | NO | Root object and `frontmatter` both lack it |
-| `agent-identity.schema.json` | YES | `additionalProperties: false` |
-| `artifact_manifest.schema.json` | NO | Root and all nested objects lack it |
-| `evolution-state.schema.json` | NO | Root object lacks it; some `$defs` lack it |
-| `hook-definition.schema.json` | NO | Root object lacks it |
-| `implementation-plan.schema.json` | INVERTED | Has `additionalProperties: true` explicitly |
-| `phase-models.schema.json` | YES | `additionalProperties: false` |
-| `plan.schema.json` | NO | Root and all nested objects lack it |
-| `presets.schema.json` | YES | `additionalProperties: false` at all levels |
-| `product_requirements.schema.json` | NO | Root and all nested objects lack it |
-| `project-analysis.schema.json` | NO | Root object lacks it (sub-objects have some) |
-| `project_brief.schema.json` | NO | Root and all nested objects lack it |
-| `skill-definition.schema.json` | YES | `unevaluatedProperties: false` (2020-12 draft) |
-| `skill-diagram-generator-output.schema.json` | YES | `additionalProperties: false` |
-| `skill-repo-rag-output.schema.json` | YES | `additionalProperties: false` |
-| `skill-test-generator-output.schema.json` | YES | `additionalProperties: false` |
-| `specification-template.schema.json` | YES | `additionalProperties: false` |
-| `system_architecture.schema.json` | NO | Root and all nested objects lack it |
-| `test-results.schema.json` | NO | Root and all nested objects lack it |
-| `test_plan.schema.json` | NO | Root and all nested objects lack it |
-| `tool-manifest.schema.json` | NO | Root object lacks it |
-| `track-metadata.schema.json` | INVERTED | Has `additionalProperties: true` explicitly |
-| `ux_spec.schema.json` | NO | Root and all nested objects lack it |
-| `workflow-definition.schema.json` | YES | `unevaluatedProperties: false` at all levels |
-| `artifact-graph.schema.json` | NO | Root lacks it; nodes/edges metadata allow arbitrary |
-| `agent-config.schema.json` | YES | `additionalProperties: false` |
+| Schema                                       | Has Protection | Notes                                                |
+| -------------------------------------------- | -------------- | ---------------------------------------------------- |
+| `adr-template.schema.json`                   | YES            | `additionalProperties: false`                        |
+| `agent-capability-card.schema.json`          | YES            | `additionalProperties: false` on all sub-definitions |
+| `agent-definition.schema.json`               | NO             | Root object and `frontmatter` both lack it           |
+| `agent-identity.schema.json`                 | YES            | `additionalProperties: false`                        |
+| `artifact_manifest.schema.json`              | NO             | Root and all nested objects lack it                  |
+| `evolution-state.schema.json`                | NO             | Root object lacks it; some `$defs` lack it           |
+| `hook-definition.schema.json`                | NO             | Root object lacks it                                 |
+| `implementation-plan.schema.json`            | INVERTED       | Has `additionalProperties: true` explicitly          |
+| `phase-models.schema.json`                   | YES            | `additionalProperties: false`                        |
+| `plan.schema.json`                           | NO             | Root and all nested objects lack it                  |
+| `presets.schema.json`                        | YES            | `additionalProperties: false` at all levels          |
+| `product_requirements.schema.json`           | NO             | Root and all nested objects lack it                  |
+| `project-analysis.schema.json`               | NO             | Root object lacks it (sub-objects have some)         |
+| `project_brief.schema.json`                  | NO             | Root and all nested objects lack it                  |
+| `skill-definition.schema.json`               | YES            | `unevaluatedProperties: false` (2020-12 draft)       |
+| `skill-diagram-generator-output.schema.json` | YES            | `additionalProperties: false`                        |
+| `skill-repo-rag-output.schema.json`          | YES            | `additionalProperties: false`                        |
+| `skill-test-generator-output.schema.json`    | YES            | `additionalProperties: false`                        |
+| `specification-template.schema.json`         | YES            | `additionalProperties: false`                        |
+| `system_architecture.schema.json`            | NO             | Root and all nested objects lack it                  |
+| `test-results.schema.json`                   | NO             | Root and all nested objects lack it                  |
+| `test_plan.schema.json`                      | NO             | Root and all nested objects lack it                  |
+| `tool-manifest.schema.json`                  | NO             | Root object lacks it                                 |
+| `track-metadata.schema.json`                 | INVERTED       | Has `additionalProperties: true` explicitly          |
+| `ux_spec.schema.json`                        | NO             | Root and all nested objects lack it                  |
+| `workflow-definition.schema.json`            | YES            | `unevaluatedProperties: false` at all levels         |
+| `artifact-graph.schema.json`                 | NO             | Root lacks it; nodes/edges metadata allow arbitrary  |
+| `agent-config.schema.json`                   | YES            | `additionalProperties: false`                        |
 
 **Schemas needing `additionalProperties: false`:** `agent-definition`, `artifact_manifest`, `evolution-state`, `hook-definition`, `plan`, `product_requirements`, `project_brief`, `system_architecture`, `test-results`, `test_plan`, `ux_spec`
 
@@ -109,26 +110,27 @@ Many string fields lack `maxLength` constraints. While these schemas are interna
 
 **Schemas with SOME unbounded strings:**
 
-| Schema | Unbounded String Fields (Examples) |
-|--------|-----------------------------------|
-| `agent-definition` | `frontmatter.name` (has pattern but no maxLength), `content` (only minLength) |
-| `artifact_manifest` | `manifestVersion`, `project.name`, `project.version`, `project.description`, all artifact fields |
-| `evolution-state` | `researchEntry.query`, `researchEntry.source`, `researchEntry.findings`, `completedEvolution.name`, `completedEvolution.description`, `completedEvolution.trigger`, many others |
-| `hook-definition` | `matcher` (regex pattern string - no length limit) |
-| `plan.schema.json` | `title`, `version`, `author`, all task descriptions |
-| `product_requirements` | `documentTitle`, `executiveSummary`, `productOverview.productVision`, `architecture`, `apis`, `dataModels` |
-| `project-analysis` | `project_root`, `framework.name`, `framework.version` |
-| `project_brief` | `projectName`, `executiveSummary`, all scope items, `budget` |
-| `system_architecture` | Nearly all fields unbounded |
-| `test-results` | `results_id`, `test_executor`, `error_message`, `stack_trace` |
-| `test_plan` | `feature_name`, `overview`, `test_strategy`, `docker_compose`, `setup_instructions` |
-| `tool-manifest` | Many nested string fields |
-| `track-metadata` | `assignee`, `description` (has minLength 10 only) |
-| `ux_spec` | Nearly all fields unbounded |
-| `artifact-graph` | `node.path`, edge `from`/`to` |
-| `agent-config` | `version`, all agent property strings |
+| Schema                 | Unbounded String Fields (Examples)                                                                                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `agent-definition`     | `frontmatter.name` (has pattern but no maxLength), `content` (only minLength)                                                                                                   |
+| `artifact_manifest`    | `manifestVersion`, `project.name`, `project.version`, `project.description`, all artifact fields                                                                                |
+| `evolution-state`      | `researchEntry.query`, `researchEntry.source`, `researchEntry.findings`, `completedEvolution.name`, `completedEvolution.description`, `completedEvolution.trigger`, many others |
+| `hook-definition`      | `matcher` (regex pattern string - no length limit)                                                                                                                              |
+| `plan.schema.json`     | `title`, `version`, `author`, all task descriptions                                                                                                                             |
+| `product_requirements` | `documentTitle`, `executiveSummary`, `productOverview.productVision`, `architecture`, `apis`, `dataModels`                                                                      |
+| `project-analysis`     | `project_root`, `framework.name`, `framework.version`                                                                                                                           |
+| `project_brief`        | `projectName`, `executiveSummary`, all scope items, `budget`                                                                                                                    |
+| `system_architecture`  | Nearly all fields unbounded                                                                                                                                                     |
+| `test-results`         | `results_id`, `test_executor`, `error_message`, `stack_trace`                                                                                                                   |
+| `test_plan`            | `feature_name`, `overview`, `test_strategy`, `docker_compose`, `setup_instructions`                                                                                             |
+| `tool-manifest`        | Many nested string fields                                                                                                                                                       |
+| `track-metadata`       | `assignee`, `description` (has minLength 10 only)                                                                                                                               |
+| `ux_spec`              | Nearly all fields unbounded                                                                                                                                                     |
+| `artifact-graph`       | `node.path`, edge `from`/`to`                                                                                                                                                   |
+| `agent-config`         | `version`, all agent property strings                                                                                                                                           |
 
 **Recommended maxLength values by field type:**
+
 - Identifiers/names: 200
 - Descriptions: 2000
 - Long-form content (error messages, stack traces): 10000
@@ -145,29 +147,30 @@ Many array fields lack `maxItems` constraints. Large arrays could cause memory i
 
 **Schemas with ALL unbounded arrays:**
 
-| Schema | Unbounded Array Fields |
-|--------|----------------------|
-| `adr-template` | `stakeholders`, `tags` |
-| `agent-capability-card` | `capabilities`, `triggerPhrases`, `requiredTools`, `skills`, `examples`, `tags`, `agents`, `references`, `dependencies` |
-| `agent-definition` | `frontmatter.tools`, `frontmatter.disallowedTools`, `frontmatter.skills`, `frontmatter.context_files` |
-| `artifact_manifest` | `artifacts`, `relationships`, `workflows`, all nested arrays |
-| `evolution-state` | `evolutions`, `patterns`, `suggestions`, `research`, `filesCreated`, `filesModified`, `basedOnPatterns`, `relatedPatterns` |
-| `hook-definition` | `agents`, `skills` |
-| `plan.schema.json` | `objectives`, `milestones`, `tasks`, `risks` |
-| `product_requirements` | All arrays (functionalRequirements, keyFeatures, acceptanceCriteria, timeline, etc.) |
-| `project-analysis` | `frameworks`, `outdated`, `vulnerabilities`, `patterns_detected`, `recommendations`, `errors` |
-| `project_brief` | `objectives`, `teamMembers`, `keyStakeholders`, `keyMilestones`, `successCriteria`, `risks`, `assumptions`, `technology`, `nextSteps` |
-| `system_architecture` | All arrays (references, goals, stakeholders, constraints, components, etc.) |
-| `test-results` | `test_executions`, `failed_tests`, `recommendations`, `regression_issues` |
-| `test_plan` | All arrays (unit, integration, e2e, test_scenarios, test_data_requirements, emulators, etc.) |
-| `tool-manifest` | `core`, `mcp`, `mandatory` |
-| `track-metadata` | `classification`, `acceptance_criteria`, `dependencies`, `blocked_by`, `blocks`, `reporting.insights` |
-| `ux_spec` | All arrays (userStories, acceptanceCriteria, componentSpecifications, wireframes, etc.) |
-| `workflow-definition` | `steps`, `agents`, `hooks.entry`, `hooks.exit`, `hooks.error` |
-| `artifact-graph` | `edges`, `missingIntegrations` |
-| `agent-config` | `agents.*.tools`, `validation.mandatory` |
+| Schema                  | Unbounded Array Fields                                                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `adr-template`          | `stakeholders`, `tags`                                                                                                                |
+| `agent-capability-card` | `capabilities`, `triggerPhrases`, `requiredTools`, `skills`, `examples`, `tags`, `agents`, `references`, `dependencies`               |
+| `agent-definition`      | `frontmatter.tools`, `frontmatter.disallowedTools`, `frontmatter.skills`, `frontmatter.context_files`                                 |
+| `artifact_manifest`     | `artifacts`, `relationships`, `workflows`, all nested arrays                                                                          |
+| `evolution-state`       | `evolutions`, `patterns`, `suggestions`, `research`, `filesCreated`, `filesModified`, `basedOnPatterns`, `relatedPatterns`            |
+| `hook-definition`       | `agents`, `skills`                                                                                                                    |
+| `plan.schema.json`      | `objectives`, `milestones`, `tasks`, `risks`                                                                                          |
+| `product_requirements`  | All arrays (functionalRequirements, keyFeatures, acceptanceCriteria, timeline, etc.)                                                  |
+| `project-analysis`      | `frameworks`, `outdated`, `vulnerabilities`, `patterns_detected`, `recommendations`, `errors`                                         |
+| `project_brief`         | `objectives`, `teamMembers`, `keyStakeholders`, `keyMilestones`, `successCriteria`, `risks`, `assumptions`, `technology`, `nextSteps` |
+| `system_architecture`   | All arrays (references, goals, stakeholders, constraints, components, etc.)                                                           |
+| `test-results`          | `test_executions`, `failed_tests`, `recommendations`, `regression_issues`                                                             |
+| `test_plan`             | All arrays (unit, integration, e2e, test_scenarios, test_data_requirements, emulators, etc.)                                          |
+| `tool-manifest`         | `core`, `mcp`, `mandatory`                                                                                                            |
+| `track-metadata`        | `classification`, `acceptance_criteria`, `dependencies`, `blocked_by`, `blocks`, `reporting.insights`                                 |
+| `ux_spec`               | All arrays (userStories, acceptanceCriteria, componentSpecifications, wireframes, etc.)                                               |
+| `workflow-definition`   | `steps`, `agents`, `hooks.entry`, `hooks.exit`, `hooks.error`                                                                         |
+| `artifact-graph`        | `edges`, `missingIntegrations`                                                                                                        |
+| `agent-config`          | `agents.*.tools`, `validation.mandatory`                                                                                              |
 
 **Recommended maxItems by field type:**
+
 - Tags/labels: 50
 - Skill/tool lists: 100
 - Requirements/criteria: 200
@@ -181,14 +184,14 @@ Many array fields lack `maxItems` constraints. Large arrays could cause memory i
 
 All enum fields were reviewed. Most are appropriate for their context. Notable observations:
 
-| Schema | Field | Enum Values | Assessment |
-|--------|-------|------------|------------|
-| `agent-definition` | `model` | sonnet, opus, haiku, inherit + full IDs | GOOD - covers all current models |
-| `agent-capability-card` | `domain` | 15 values | GOOD - comprehensive |
-| `evolution-state` | `state` | 9 values including terminal states | GOOD |
-| `hook-definition` | `type` | PreToolUse, PostToolUse, UserPromptSubmit | INCOMPLETE - missing `Stop` (referenced in agent-definition) |
-| `test_plan` | `local_emulation.test_environment` | local, staging, production | GOOD |
-| `track-metadata` | `classification` | 7 values | Could add "accessibility", "internationalization" |
+| Schema                  | Field                              | Enum Values                               | Assessment                                                   |
+| ----------------------- | ---------------------------------- | ----------------------------------------- | ------------------------------------------------------------ |
+| `agent-definition`      | `model`                            | sonnet, opus, haiku, inherit + full IDs   | GOOD - covers all current models                             |
+| `agent-capability-card` | `domain`                           | 15 values                                 | GOOD - comprehensive                                         |
+| `evolution-state`       | `state`                            | 9 values including terminal states        | GOOD                                                         |
+| `hook-definition`       | `type`                             | PreToolUse, PostToolUse, UserPromptSubmit | INCOMPLETE - missing `Stop` (referenced in agent-definition) |
+| `test_plan`             | `local_emulation.test_environment` | local, staging, production                | GOOD                                                         |
+| `track-metadata`        | `classification`                   | 7 values                                  | Could add "accessibility", "internationalization"            |
 
 **Action:** Add `Stop` to `hook-definition.type` enum.
 
@@ -198,14 +201,14 @@ All enum fields were reviewed. Most are appropriate for their context. Notable o
 
 Most schemas have appropriate `required` fields. Concerns:
 
-| Schema | Issue |
-|--------|-------|
-| `artifact_manifest` | Artifact items only require `id`, `name`, `type`, `path` - missing `version` and `status` as required |
-| `hook-definition` | Missing `enabled` as required (defaults to `true` but could be omitted) |
-| `plan.schema.json` | Only requires `title` and `objectives` - `tasks` should arguably be required |
-| `project_brief` | Only requires `projectName`, `executiveSummary`, `objectives` - reasonable |
-| `test_plan` | Good required fields |
-| `implementation-plan` | No required fields at all - extremely permissive |
+| Schema                | Issue                                                                                                 |
+| --------------------- | ----------------------------------------------------------------------------------------------------- |
+| `artifact_manifest`   | Artifact items only require `id`, `name`, `type`, `path` - missing `version` and `status` as required |
+| `hook-definition`     | Missing `enabled` as required (defaults to `true` but could be omitted)                               |
+| `plan.schema.json`    | Only requires `title` and `objectives` - `tasks` should arguably be required                          |
+| `project_brief`       | Only requires `projectName`, `executiveSummary`, `objectives` - reasonable                            |
+| `test_plan`           | Good required fields                                                                                  |
+| `implementation-plan` | No required fields at all - extremely permissive                                                      |
 
 **Action:** Consider adding `required` fields to `implementation-plan` (at minimum `feature` and `status`).
 
@@ -216,6 +219,7 @@ Most schemas have appropriate `required` fields. Concerns:
 All properties across all 28 schemas have explicit type declarations. No untyped properties were found.
 
 Notable type patterns:
+
 - `evolution-state` uses `oneOf: [{ type: "null" }, { type: "string" }]` correctly for nullable fields
 - `agent-definition` uses `oneOf` for the `tools` field (array or string), which is appropriate
 - `agent-config` uses `oneOf: [{ type: "integer" }, { type: "null" }]` for thinking budget map values
@@ -228,27 +232,27 @@ Notable type patterns:
 
 Default values were reviewed across all schemas. All defaults are safe:
 
-| Schema | Field | Default | Assessment |
-|--------|-------|---------|------------|
-| `agent-capability-card` | maxConcurrentTasks | 5 | SAFE |
-| `agent-capability-card` | preferredModel | "sonnet" | SAFE |
-| `agent-capability-card` | successRate | 1.0 | SAFE - optimistic but appropriate |
-| `agent-capability-card` | consecutiveFailures | 0 | SAFE |
-| `hook-definition` | category | "custom" | SAFE |
-| `hook-definition` | priority | 50 | SAFE |
-| `hook-definition` | enabled | true | SAFE |
-| `skill-definition` | version | "1.0" | SAFE |
-| `skill-definition` | model | "sonnet" | SAFE |
-| `skill-definition` | invoked_by | "both" | Review: could default to "agent" for tighter security |
-| `skill-definition` | user_invocable | true | Review: defaults to user-accessible |
-| `skill-definition` | error_handling | "graceful" | SAFE |
-| `skill-definition` | context_fork | false | SAFE |
-| `evolution-state` | research | [] | SAFE |
-| `evolution-state` | suggestion.priority | "medium" | SAFE |
-| `evolution-state` | suggestion.status | "pending" | SAFE |
-| `evolution-state` | completedEvolution.success | true | Optimistic but SAFE |
-| `test_plan` | local_emulation.test_environment | "local" | SAFE |
-| `track-metadata` | metrics.effortMultiplier | Range 0.5-5 | SAFE |
+| Schema                  | Field                            | Default     | Assessment                                            |
+| ----------------------- | -------------------------------- | ----------- | ----------------------------------------------------- |
+| `agent-capability-card` | maxConcurrentTasks               | 5           | SAFE                                                  |
+| `agent-capability-card` | preferredModel                   | "sonnet"    | SAFE                                                  |
+| `agent-capability-card` | successRate                      | 1.0         | SAFE - optimistic but appropriate                     |
+| `agent-capability-card` | consecutiveFailures              | 0           | SAFE                                                  |
+| `hook-definition`       | category                         | "custom"    | SAFE                                                  |
+| `hook-definition`       | priority                         | 50          | SAFE                                                  |
+| `hook-definition`       | enabled                          | true        | SAFE                                                  |
+| `skill-definition`      | version                          | "1.0"       | SAFE                                                  |
+| `skill-definition`      | model                            | "sonnet"    | SAFE                                                  |
+| `skill-definition`      | invoked_by                       | "both"      | Review: could default to "agent" for tighter security |
+| `skill-definition`      | user_invocable                   | true        | Review: defaults to user-accessible                   |
+| `skill-definition`      | error_handling                   | "graceful"  | SAFE                                                  |
+| `skill-definition`      | context_fork                     | false       | SAFE                                                  |
+| `evolution-state`       | research                         | []          | SAFE                                                  |
+| `evolution-state`       | suggestion.priority              | "medium"    | SAFE                                                  |
+| `evolution-state`       | suggestion.status                | "pending"   | SAFE                                                  |
+| `evolution-state`       | completedEvolution.success       | true        | Optimistic but SAFE                                   |
+| `test_plan`             | local_emulation.test_environment | "local"     | SAFE                                                  |
+| `track-metadata`        | metrics.effortMultiplier         | Range 0.5-5 | SAFE                                                  |
 
 **Note on `skill-definition` defaults:** `user_invocable: true` and `invoked_by: "both"` mean newly created skills are user-accessible by default. This follows a permissive-by-default model. In a zero-trust environment, consider defaulting to `invoked_by: "agent"` and `user_invocable: false`, requiring explicit opt-in for user-facing skills.
 
@@ -259,6 +263,7 @@ Default values were reviewed across all schemas. All defaults are safe:
 All `$ref` references are local (`#/$defs/...`). No external URL `$ref` references exist in any schema. The `$id` and `$schema` fields use URLs but these are identifiers, not fetched resources.
 
 Schemas using `$ref`:
+
 - `agent-capability-card` - References `#/$defs/Capability`, `#/$defs/Constraints`, `#/$defs/Health`, `#/$defs/Metadata`
 - `evolution-state` - References `#/$defs/activeEvolution`, `#/$defs/completedEvolution`, `#/$defs/pattern`, `#/$defs/suggestion`, `#/$defs/researchEntry`
 - `workflow-definition` - Uses `oneOf` inline, no `$ref`
@@ -286,11 +291,11 @@ Schema composition (`oneOf`, `allOf`, `anyOf`) usage was reviewed:
 
 Schemas use three different JSON Schema drafts:
 
-| Draft | Count | Schemas |
-|-------|-------|---------|
-| `draft-07` (`http://` or `https://`) | 19 | adr-template, agent-capability-card, agent-identity, artifact_manifest, implementation-plan, phase-models, plan, presets, product_requirements, project-analysis, project_brief, system_architecture, test-results, test_plan, tool-manifest, track-metadata, ux_spec, artifact-graph, agent-config |
-| `2020-12` | 5 | agent-definition, evolution-state, skill-definition, specification-template, workflow-definition |
-| `draft-07` (skill output schemas) | 4 | skill-diagram-generator-output, skill-repo-rag-output, skill-test-generator-output, hook-definition |
+| Draft                                | Count | Schemas                                                                                                                                                                                                                                                                                             |
+| ------------------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `draft-07` (`http://` or `https://`) | 19    | adr-template, agent-capability-card, agent-identity, artifact_manifest, implementation-plan, phase-models, plan, presets, product_requirements, project-analysis, project_brief, system_architecture, test-results, test_plan, tool-manifest, track-metadata, ux_spec, artifact-graph, agent-config |
+| `2020-12`                            | 5     | agent-definition, evolution-state, skill-definition, specification-template, workflow-definition                                                                                                                                                                                                    |
+| `draft-07` (skill output schemas)    | 4     | skill-diagram-generator-output, skill-repo-rag-output, skill-test-generator-output, hook-definition                                                                                                                                                                                                 |
 
 The `2020-12` schemas use `unevaluatedProperties` which is not available in `draft-07`. If a `draft-07` validator is used on a `2020-12` schema, `unevaluatedProperties` would be silently ignored, effectively disabling property injection protection.
 
@@ -300,36 +305,36 @@ The `2020-12` schemas use `unevaluatedProperties` which is not available in `dra
 
 ## Per-Schema Risk Summary
 
-| # | Schema | Property Injection | Unbounded Strings | Unbounded Arrays | Other Issues | Risk |
-|---|--------|-------------------|-------------------|-----------------|--------------|------|
-| 1 | `adr-template` | SAFE | SAFE | 2 arrays | - | LOW |
-| 2 | `agent-capability-card` | SAFE | 2 fields | 9 arrays | - | LOW |
-| 3 | `agent-definition` | MISSING | 2 fields | 4 arrays | Draft mismatch possible | MEDIUM |
-| 4 | `agent-identity` | SAFE | SAFE | SAFE | - | LOW |
-| 5 | `artifact_manifest` | MISSING | Many | Many | No required on metadata | HIGH |
-| 6 | `evolution-state` | PARTIAL | Many | Many | metadata allows arbitrary | MEDIUM |
-| 7 | `hook-definition` | MISSING | 2 fields | 2 arrays | Missing `Stop` in type enum | MEDIUM |
-| 8 | `implementation-plan` | INVERTED | 1 field | 2 arrays | No required fields | HIGH |
-| 9 | `phase-models` | SAFE | SAFE | - | - | LOW |
-| 10 | `plan` | MISSING | Many | Many | - | MEDIUM |
-| 11 | `presets` | SAFE | SAFE | 1 array | - | LOW |
-| 12 | `product_requirements` | MISSING | Many | Many | - | MEDIUM |
-| 13 | `project-analysis` | MISSING | Some | Many | - | MEDIUM |
-| 14 | `project_brief` | MISSING | Many | Many | - | MEDIUM |
-| 15 | `skill-definition` | SAFE | 1 field | 4 arrays | Default review needed | LOW |
-| 16 | `skill-diagram-generator-output` | SAFE | 1 field | 2 arrays | - | LOW |
-| 17 | `skill-repo-rag-output` | SAFE | SAFE | 4 arrays | - | LOW |
-| 18 | `skill-test-generator-output` | SAFE | SAFE | 3 arrays | - | LOW |
-| 19 | `specification-template` | SAFE | SAFE | 2 arrays | - | LOW |
-| 20 | `system_architecture` | MISSING | Many | Many | - | MEDIUM |
-| 21 | `test-results` | MISSING | Many | Many | - | MEDIUM |
-| 22 | `test_plan` | MISSING | Many | Many | - | MEDIUM |
-| 23 | `tool-manifest` | MISSING | Many | Many | - | MEDIUM |
-| 24 | `track-metadata` | INVERTED | 1 field | 6 arrays | `additionalProperties: true` | MEDIUM |
-| 25 | `ux_spec` | MISSING | Many | Many | - | MEDIUM |
-| 26 | `workflow-definition` | SAFE | SAFE | 5 arrays | - | LOW |
-| 27 | `artifact-graph` | PARTIAL | 2 fields | 2 arrays | metadata allows arbitrary | MEDIUM |
-| 28 | `agent-config` | SAFE | SAFE | 2 arrays | - | LOW |
+| #   | Schema                           | Property Injection | Unbounded Strings | Unbounded Arrays | Other Issues                 | Risk   |
+| --- | -------------------------------- | ------------------ | ----------------- | ---------------- | ---------------------------- | ------ |
+| 1   | `adr-template`                   | SAFE               | SAFE              | 2 arrays         | -                            | LOW    |
+| 2   | `agent-capability-card`          | SAFE               | 2 fields          | 9 arrays         | -                            | LOW    |
+| 3   | `agent-definition`               | MISSING            | 2 fields          | 4 arrays         | Draft mismatch possible      | MEDIUM |
+| 4   | `agent-identity`                 | SAFE               | SAFE              | SAFE             | -                            | LOW    |
+| 5   | `artifact_manifest`              | MISSING            | Many              | Many             | No required on metadata      | HIGH   |
+| 6   | `evolution-state`                | PARTIAL            | Many              | Many             | metadata allows arbitrary    | MEDIUM |
+| 7   | `hook-definition`                | MISSING            | 2 fields          | 2 arrays         | Missing `Stop` in type enum  | MEDIUM |
+| 8   | `implementation-plan`            | INVERTED           | 1 field           | 2 arrays         | No required fields           | HIGH   |
+| 9   | `phase-models`                   | SAFE               | SAFE              | -                | -                            | LOW    |
+| 10  | `plan`                           | MISSING            | Many              | Many             | -                            | MEDIUM |
+| 11  | `presets`                        | SAFE               | SAFE              | 1 array          | -                            | LOW    |
+| 12  | `product_requirements`           | MISSING            | Many              | Many             | -                            | MEDIUM |
+| 13  | `project-analysis`               | MISSING            | Some              | Many             | -                            | MEDIUM |
+| 14  | `project_brief`                  | MISSING            | Many              | Many             | -                            | MEDIUM |
+| 15  | `skill-definition`               | SAFE               | 1 field           | 4 arrays         | Default review needed        | LOW    |
+| 16  | `skill-diagram-generator-output` | SAFE               | 1 field           | 2 arrays         | -                            | LOW    |
+| 17  | `skill-repo-rag-output`          | SAFE               | SAFE              | 4 arrays         | -                            | LOW    |
+| 18  | `skill-test-generator-output`    | SAFE               | SAFE              | 3 arrays         | -                            | LOW    |
+| 19  | `specification-template`         | SAFE               | SAFE              | 2 arrays         | -                            | LOW    |
+| 20  | `system_architecture`            | MISSING            | Many              | Many             | -                            | MEDIUM |
+| 21  | `test-results`                   | MISSING            | Many              | Many             | -                            | MEDIUM |
+| 22  | `test_plan`                      | MISSING            | Many              | Many             | -                            | MEDIUM |
+| 23  | `tool-manifest`                  | MISSING            | Many              | Many             | -                            | MEDIUM |
+| 24  | `track-metadata`                 | INVERTED           | 1 field           | 6 arrays         | `additionalProperties: true` | MEDIUM |
+| 25  | `ux_spec`                        | MISSING            | Many              | Many             | -                            | MEDIUM |
+| 26  | `workflow-definition`            | SAFE               | SAFE              | 5 arrays         | -                            | LOW    |
+| 27  | `artifact-graph`                 | PARTIAL            | 2 fields          | 2 arrays         | metadata allows arbitrary    | MEDIUM |
+| 28  | `agent-config`                   | SAFE               | SAFE              | 2 arrays         | -                            | LOW    |
 
 ---
 
@@ -359,16 +364,16 @@ For schemas with intentional `additionalProperties: true` (implementation-plan, 
 
 Add `maxLength` to all unbounded string fields. Recommended limits:
 
-| Field Type | maxLength |
-|-----------|-----------|
-| Identifiers, names | 200 |
-| Short descriptions | 500 |
-| Long descriptions, summaries | 2000 |
-| Content bodies, code snippets | 10000 |
-| File paths | 500 |
-| Version strings | 50 |
-| Error messages | 5000 |
-| Stack traces | 50000 |
+| Field Type                    | maxLength |
+| ----------------------------- | --------- |
+| Identifiers, names            | 200       |
+| Short descriptions            | 500       |
+| Long descriptions, summaries  | 2000      |
+| Content bodies, code snippets | 10000     |
+| File paths                    | 500       |
+| Version strings               | 50        |
+| Error messages                | 5000      |
+| Stack traces                  | 50000     |
 
 **Most impactful schemas:** `artifact_manifest`, `evolution-state`, `product_requirements`, `system_architecture`, `test-results`, `ux_spec`
 
@@ -378,14 +383,14 @@ Add `maxLength` to all unbounded string fields. Recommended limits:
 
 Add `maxItems` to all unbounded array fields. Recommended limits:
 
-| Array Type | maxItems |
-|-----------|----------|
-| Tags, labels, classifications | 50 |
-| Tool/skill lists | 100 |
-| Requirements, criteria | 200 |
-| Components, artifacts | 500 |
-| Test cases, executions | 10000 |
-| History entries (evolutions) | 1000 |
+| Array Type                    | maxItems |
+| ----------------------------- | -------- |
+| Tags, labels, classifications | 50       |
+| Tool/skill lists              | 100      |
+| Requirements, criteria        | 200      |
+| Components, artifacts         | 500      |
+| Test cases, executions        | 10000    |
+| History entries (evolutions)  | 1000     |
 
 **Most impactful schemas:** `artifact_manifest`, `evolution-state`, `product_requirements`, `system_architecture`, `test-results`, `test_plan`
 
@@ -403,6 +408,7 @@ Add `maxItems` to all unbounded array fields. Recommended limits:
 ### Priority 5 (LOW) -- Default Value Tightening
 
 Review `skill-definition.schema.json` defaults:
+
 - Consider changing `invoked_by` default from `"both"` to `"agent"`
 - Consider changing `user_invocable` default from `true` to `false`
 - This follows least-privilege principle: skills are agent-only by default, opt-in for user access
@@ -445,37 +451,37 @@ Each schema was analyzed against the following 10-point checklist:
 
 ## Appendix: Schema Inventory
 
-| # | Schema File | Draft | $id | additionalProperties |
-|---|------------|-------|-----|---------------------|
-| 1 | adr-template.schema.json | draft-07 | Yes | false |
-| 2 | agent-capability-card.schema.json | draft-07 | Yes | false (all levels) |
-| 3 | agent-config.schema.json | draft-07 | Yes | false |
-| 4 | agent-definition.schema.json | 2020-12 | Yes | MISSING |
-| 5 | agent-identity.schema.json | draft-07 | Yes | false |
-| 6 | artifact-graph.schema.json | draft-07 | Yes | PARTIAL |
-| 7 | artifact_manifest.schema.json | draft-07 | No $id | MISSING |
-| 8 | evolution-state.schema.json | 2020-12 | Yes | PARTIAL |
-| 9 | hook-definition.schema.json | 2020-12 | Yes | MISSING |
-| 10 | implementation-plan.schema.json | draft-07 | Yes | true (explicit) |
-| 11 | phase-models.schema.json | draft-07 | Yes | false |
-| 12 | plan.schema.json | draft-07 | No $id | MISSING |
-| 13 | presets.schema.json | draft-07 | Yes | false |
-| 14 | product_requirements.schema.json | draft-07 | No $id | MISSING |
-| 15 | project-analysis.schema.json | draft-07 | Yes | MISSING |
-| 16 | project_brief.schema.json | draft-07 | No $id | MISSING |
-| 17 | skill-definition.schema.json | 2020-12 | Yes | unevaluatedProperties: false |
-| 18 | skill-diagram-generator-output.schema.json | draft-07 | Yes | false |
-| 19 | skill-repo-rag-output.schema.json | draft-07 | Yes | false |
-| 20 | skill-test-generator-output.schema.json | draft-07 | Yes | false |
-| 21 | specification-template.schema.json | 2020-12 | Yes | false |
-| 22 | system_architecture.schema.json | draft-07 | No $id | MISSING |
-| 23 | test-results.schema.json | draft-07 | Yes | MISSING |
-| 24 | test_plan.schema.json | draft-07 | Yes | MISSING |
-| 25 | tool-manifest.schema.json | draft-07 | Yes | MISSING |
-| 26 | track-metadata.schema.json | draft-07 | Yes | true (explicit) |
-| 27 | ux_spec.schema.json | draft-07 | No $id | MISSING |
-| 28 | workflow-definition.schema.json | 2020-12 | Yes | unevaluatedProperties: false |
+| #   | Schema File                                | Draft    | $id    | additionalProperties         |
+| --- | ------------------------------------------ | -------- | ------ | ---------------------------- |
+| 1   | adr-template.schema.json                   | draft-07 | Yes    | false                        |
+| 2   | agent-capability-card.schema.json          | draft-07 | Yes    | false (all levels)           |
+| 3   | agent-config.schema.json                   | draft-07 | Yes    | false                        |
+| 4   | agent-definition.schema.json               | 2020-12  | Yes    | MISSING                      |
+| 5   | agent-identity.schema.json                 | draft-07 | Yes    | false                        |
+| 6   | artifact-graph.schema.json                 | draft-07 | Yes    | PARTIAL                      |
+| 7   | artifact_manifest.schema.json              | draft-07 | No $id | MISSING                      |
+| 8   | evolution-state.schema.json                | 2020-12  | Yes    | PARTIAL                      |
+| 9   | hook-definition.schema.json                | 2020-12  | Yes    | MISSING                      |
+| 10  | implementation-plan.schema.json            | draft-07 | Yes    | true (explicit)              |
+| 11  | phase-models.schema.json                   | draft-07 | Yes    | false                        |
+| 12  | plan.schema.json                           | draft-07 | No $id | MISSING                      |
+| 13  | presets.schema.json                        | draft-07 | Yes    | false                        |
+| 14  | product_requirements.schema.json           | draft-07 | No $id | MISSING                      |
+| 15  | project-analysis.schema.json               | draft-07 | Yes    | MISSING                      |
+| 16  | project_brief.schema.json                  | draft-07 | No $id | MISSING                      |
+| 17  | skill-definition.schema.json               | 2020-12  | Yes    | unevaluatedProperties: false |
+| 18  | skill-diagram-generator-output.schema.json | draft-07 | Yes    | false                        |
+| 19  | skill-repo-rag-output.schema.json          | draft-07 | Yes    | false                        |
+| 20  | skill-test-generator-output.schema.json    | draft-07 | Yes    | false                        |
+| 21  | specification-template.schema.json         | 2020-12  | Yes    | false                        |
+| 22  | system_architecture.schema.json            | draft-07 | No $id | MISSING                      |
+| 23  | test-results.schema.json                   | draft-07 | Yes    | MISSING                      |
+| 24  | test_plan.schema.json                      | draft-07 | Yes    | MISSING                      |
+| 25  | tool-manifest.schema.json                  | draft-07 | Yes    | MISSING                      |
+| 26  | track-metadata.schema.json                 | draft-07 | Yes    | true (explicit)              |
+| 27  | ux_spec.schema.json                        | draft-07 | No $id | MISSING                      |
+| 28  | workflow-definition.schema.json            | 2020-12  | Yes    | unevaluatedProperties: false |
 
 ---
 
-*End of Schema Security Audit Report*
+_End of Schema Security Audit Report_

@@ -31,24 +31,24 @@ The template loading system operates as follows:
 
 ### Trust Boundaries
 
-| Boundary | Description | Trust Level |
-|----------|-------------|-------------|
-| Router -> Hook | Router constructs Task() call parameters | Semi-trusted (Router is a prompt, not executable code) |
-| Hook -> Assembler | Hook passes toolInput to assembler | Trusted (same process) |
-| Assembler -> Filesystem | Assembler reads config files, manifests, registries | Trusted (local filesystem) |
-| Config Files -> Assembler | JSON parsed from disk (presets.json, agent-registry.json, etc.) | Semi-trusted (files could be modified by other agents) |
-| Template Content -> Spawned Agent | Assembled prompt sent to subagent | Trusted (output of controlled pipeline) |
+| Boundary                          | Description                                                     | Trust Level                                            |
+| --------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------ |
+| Router -> Hook                    | Router constructs Task() call parameters                        | Semi-trusted (Router is a prompt, not executable code) |
+| Hook -> Assembler                 | Hook passes toolInput to assembler                              | Trusted (same process)                                 |
+| Assembler -> Filesystem           | Assembler reads config files, manifests, registries             | Trusted (local filesystem)                             |
+| Config Files -> Assembler         | JSON parsed from disk (presets.json, agent-registry.json, etc.) | Semi-trusted (files could be modified by other agents) |
+| Template Content -> Spawned Agent | Assembled prompt sent to subagent                               | Trusted (output of controlled pipeline)                |
 
 ### STRIDE Analysis
 
-| Threat | Applicability | Risk | Existing Controls |
-|--------|---------------|------|-------------------|
-| **S - Spoofing** | A non-orchestrator agent could be spawned with orchestrator-level privileges | MEDIUM | `ORCHESTRATOR_IDS` set in assembler, `isOrchestratorSpawn()` check in validator |
-| **T - Tampering** | Template content or config files could be modified to inject malicious instructions | MEDIUM | `unified-creator-guard.cjs` blocks direct writes to template paths |
-| **R - Repudiation** | Template rendering operations not fully audited | LOW | Partial - spawn-log.cjs logs spawn starts, validator logs validation results |
-| **I - Information Disclosure** | Template catalog could expose internal system architecture | LOW | Templates are internal to `.claude/` directory, not user-facing |
-| **D - Denial of Service** | Oversized prompts could exhaust context window | LOW | `MAX_PROMPT_LENGTH = 500KB` in validator |
-| **E - Elevation of Privilege** | Agent could gain Task tool (orchestrator capability) through prompt manipulation | MEDIUM | `enrichAllowedTools()` resolves tools from registry, not from prompt content |
+| Threat                         | Applicability                                                                       | Risk   | Existing Controls                                                               |
+| ------------------------------ | ----------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------- |
+| **S - Spoofing**               | A non-orchestrator agent could be spawned with orchestrator-level privileges        | MEDIUM | `ORCHESTRATOR_IDS` set in assembler, `isOrchestratorSpawn()` check in validator |
+| **T - Tampering**              | Template content or config files could be modified to inject malicious instructions | MEDIUM | `unified-creator-guard.cjs` blocks direct writes to template paths              |
+| **R - Repudiation**            | Template rendering operations not fully audited                                     | LOW    | Partial - spawn-log.cjs logs spawn starts, validator logs validation results    |
+| **I - Information Disclosure** | Template catalog could expose internal system architecture                          | LOW    | Templates are internal to `.claude/` directory, not user-facing                 |
+| **D - Denial of Service**      | Oversized prompts could exhaust context window                                      | LOW    | `MAX_PROMPT_LENGTH = 500KB` in validator                                        |
+| **E - Elevation of Privilege** | Agent could gain Task tool (orchestrator capability) through prompt manipulation    | MEDIUM | `enrichAllowedTools()` resolves tools from registry, not from prompt content    |
 
 ---
 
@@ -76,6 +76,7 @@ The `ruleSnippetPath` value comes from `presets.json` which is a JSON config fil
 There is **no validation** that the resolved path stays within `PROJECT_ROOT` or within the `.claude/` directory.
 
 **Impact:** An attacker who can modify `presets.json` (or a compromised agent that bypasses creator-guard) could inject the content of ANY readable file into spawn prompts. This includes:
+
 - `.env` files containing secrets
 - `~/.ssh/` key files
 - System configuration files
@@ -107,12 +108,11 @@ The `isOrchestratorSpawn()` function checks if a spawn is for an orchestrator by
 ```javascript
 const description = (toolInput.description || '').toLowerCase();
 const subagentType = (toolInput.subagent_type || '').toLowerCase();
-return orchestratorTypes.some(orch =>
-  description.includes(orch) || subagentType.includes(orch)
-);
+return orchestratorTypes.some(orch => description.includes(orch) || subagentType.includes(orch));
 ```
 
 When `isOrchestratorSpawn()` returns `true`, the validator **skips ALL validation** (exits with code 0). This means:
+
 - No TaskUpdate warning box check
 - No Task ID reference check
 - No PROJECT_ROOT context check
@@ -153,6 +153,7 @@ The spawn-prompt-assembler hook has a catch-all error handler that calls `proces
 ```
 
 This means if there is ANY error during prompt assembly (file read error, JSON parse error, module load failure, etc.), the ORIGINAL un-assembled prompt is sent to the spawned agent. The original prompt may lack:
+
 - Tool/skill awareness sections
 - Memory context
 - Constitution/behaviour principles
@@ -187,19 +188,13 @@ Add a configurable fail mode (default: warn). When the assembler fails, at minim
 The `buildContextModePrompt()` function in `prompt-factory.cjs` performs placeholder substitution on context/mode prompts:
 
 ```javascript
-fragmentBody = fragmentBody.replace(
-  /\{\{\s*available_tools\s*\}\}/gi,
-  activeToolNames.join(', ')
-);
-fragmentBody = fragmentBody.replace(
-  /\{\{\s*context_system_prompt\s*\}\}/gi, contextPrompt
-);
-fragmentBody = fragmentBody.replace(
-  /\{\{\s*mode_system_prompts\s*\}\}/gi, modePrompts
-);
+fragmentBody = fragmentBody.replace(/\{\{\s*available_tools\s*\}\}/gi, activeToolNames.join(', '));
+fragmentBody = fragmentBody.replace(/\{\{\s*context_system_prompt\s*\}\}/gi, contextPrompt);
+fragmentBody = fragmentBody.replace(/\{\{\s*mode_system_prompts\s*\}\}/gi, modePrompts);
 ```
 
 The substituted values (`activeToolNames`, `contextPrompt`, `modePrompts`) come from context/mode configuration files loaded from disk. While these files are within the `.claude/config/` directory and protected by `unified-creator-guard.cjs`, the substitution values are NOT sanitized for:
+
 - Nested template placeholders (e.g., `{{available_tools}}` in a value would cause recursive substitution)
 - Markdown injection (headings, code blocks that could override template structure)
 - Instruction injection (values that contain "## Instructions" or "IGNORE PREVIOUS INSTRUCTIONS")
@@ -216,7 +211,7 @@ Implement the sanitization controls described in the template-renderer skill as 
 ```javascript
 function sanitizeSubstitutionValue(value) {
   return String(value)
-    .replace(/\{\{/g, '{ {')  // Prevent nested template injection
+    .replace(/\{\{/g, '{ {') // Prevent nested template injection
     .replace(/\}\}/g, '} }');
 }
 ```
@@ -236,6 +231,7 @@ const promptsDir = path.join(agentDir, 'prompts');
 ```
 
 If the agent registry returns a `filePath` that contains `..` segments, the prompts directory could resolve outside `.claude/agents/`. However, the risk is mitigated because:
+
 1. The agent registry is a JSON file in `.claude/context/` protected by normal filesystem permissions
 2. The `findAgentFilePath()` fallback searches only within `.claude/agents/`
 3. Only `.md` files in the prompts directory are loaded
@@ -260,6 +256,7 @@ if (!resolved.startsWith(path.resolve(projectRoot, '.claude', 'agents'))) return
 
 **Description:**
 The template catalog (43 templates across 10 directories) contains detailed information about:
+
 - Internal directory structure (`.claude/agents/`, `.claude/hooks/`, etc.)
 - Hook names and enforcement modes
 - Agent types and orchestrator identifiers
@@ -283,15 +280,15 @@ No action needed. The information is required for agents to function. Ensure the
 
 The following templates contain security-relevant content and MUST be retained:
 
-| Template | Path | Reason |
-|----------|------|--------|
-| **security-design-checklist.md** | `.claude/templates/security-design-checklist.md` | Contains the STRIDE threat model checklist used during EVOLVE Phase E. Removing this would eliminate the "security as afterthought" prevention mechanism. It is the only template that provides structured security assessment guidance for artifact creation. **MUST KEEP.** |
-| **error-recovery-template.md** | `.claude/templates/error-recovery-template.md` | Contains standardized error recovery patterns (fail-closed, fail-open, retry) with SecurityError, TransientError, and PermanentError classes. Used as reference for hook development. Removing would weaken incident response patterns. **MUST KEEP.** |
-| **spawn/universal-agent-spawn.md** | `.claude/templates/spawn/universal-agent-spawn.md` | Core spawn template. Obviously must keep. |
-| **spawn/orchestrator-spawn.md** | `.claude/templates/spawn/orchestrator-spawn.md` | Core orchestrator spawn template. Obviously must keep. |
-| **spawn/bash-safe-background.md** | `.claude/templates/spawn/bash-safe-background.md` | Contains shell security validators reference. Must keep. |
-| **spawn/subordinate-once.md** | `.claude/templates/spawn/subordinate-once.md` | One-shot agent pattern. Must keep. |
-| **spawn/agent-identity-integration.md** | `.claude/templates/spawn/agent-identity-integration.md` | Identity integration template. Must keep. |
+| Template                                | Path                                                    | Reason                                                                                                                                                                                                                                                                        |
+| --------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **security-design-checklist.md**        | `.claude/templates/security-design-checklist.md`        | Contains the STRIDE threat model checklist used during EVOLVE Phase E. Removing this would eliminate the "security as afterthought" prevention mechanism. It is the only template that provides structured security assessment guidance for artifact creation. **MUST KEEP.** |
+| **error-recovery-template.md**          | `.claude/templates/error-recovery-template.md`          | Contains standardized error recovery patterns (fail-closed, fail-open, retry) with SecurityError, TransientError, and PermanentError classes. Used as reference for hook development. Removing would weaken incident response patterns. **MUST KEEP.**                        |
+| **spawn/universal-agent-spawn.md**      | `.claude/templates/spawn/universal-agent-spawn.md`      | Core spawn template. Obviously must keep.                                                                                                                                                                                                                                     |
+| **spawn/orchestrator-spawn.md**         | `.claude/templates/spawn/orchestrator-spawn.md`         | Core orchestrator spawn template. Obviously must keep.                                                                                                                                                                                                                        |
+| **spawn/bash-safe-background.md**       | `.claude/templates/spawn/bash-safe-background.md`       | Contains shell security validators reference. Must keep.                                                                                                                                                                                                                      |
+| **spawn/subordinate-once.md**           | `.claude/templates/spawn/subordinate-once.md`           | One-shot agent pattern. Must keep.                                                                                                                                                                                                                                            |
+| **spawn/agent-identity-integration.md** | `.claude/templates/spawn/agent-identity-integration.md` | Identity integration template. Must keep.                                                                                                                                                                                                                                     |
 
 ### Templates Safe to Archive (No Security Concerns)
 
@@ -331,6 +328,7 @@ The template catalog itself does not present a significant security risk because
 ### Risk: Catalog Expansion
 
 If the template catalog is expanded to include:
+
 - Template content previews or summaries
 - Cross-references to other templates
 - Metadata about template usage patterns
@@ -340,6 +338,7 @@ Then the catalog becomes a richer information source. The risk is LOW because th
 ### Recommendation
 
 Validate that any expanded template catalog:
+
 - Contains only relative paths (no absolute paths)
 - Does not include file content or sensitive metadata
 - Is generated from a trusted source (not user-editable)
@@ -350,17 +349,17 @@ Validate that any expanded template catalog:
 
 ### Existing Controls Assessment
 
-| Control | Status | Effectiveness |
-|---------|--------|---------------|
-| SEC-SPEC-002 (Path validation) | DOCUMENTED ONLY | Not implemented as executable code in prompt-assembler |
-| SEC-SPEC-003 (Token whitelist) | DOCUMENTED ONLY | Not implemented as executable code in prompt-factory |
-| SEC-SPEC-004 (Input sanitization) | DOCUMENTED ONLY | Not implemented as executable code |
-| ROUTING-001 (Tool whitelist) | IMPLEMENTED | Effective - `enrichAllowedTools()` uses registry, not prompt |
-| CREATOR-001 (Artifact output paths) | IMPLEMENTED | Effective - `unified-creator-guard.cjs` blocks direct writes |
-| VULN-001 (Unicode normalization) | IMPLEMENTED | Effective - `normalizeUnicode()` in validator |
-| VULN-002 (ReDoS-safe regex) | IMPLEMENTED | Effective - `safeRegexTest()` with timeout |
-| VULN-003 (Prompt length limit) | IMPLEMENTED | Effective - 500KB limit |
-| VULN-006 (Required tool flags) | IMPLEMENTED | Effective - mandatory tools always included |
+| Control                             | Status          | Effectiveness                                                |
+| ----------------------------------- | --------------- | ------------------------------------------------------------ |
+| SEC-SPEC-002 (Path validation)      | DOCUMENTED ONLY | Not implemented as executable code in prompt-assembler       |
+| SEC-SPEC-003 (Token whitelist)      | DOCUMENTED ONLY | Not implemented as executable code in prompt-factory         |
+| SEC-SPEC-004 (Input sanitization)   | DOCUMENTED ONLY | Not implemented as executable code                           |
+| ROUTING-001 (Tool whitelist)        | IMPLEMENTED     | Effective - `enrichAllowedTools()` uses registry, not prompt |
+| CREATOR-001 (Artifact output paths) | IMPLEMENTED     | Effective - `unified-creator-guard.cjs` blocks direct writes |
+| VULN-001 (Unicode normalization)    | IMPLEMENTED     | Effective - `normalizeUnicode()` in validator                |
+| VULN-002 (ReDoS-safe regex)         | IMPLEMENTED     | Effective - `safeRegexTest()` with timeout                   |
+| VULN-003 (Prompt length limit)      | IMPLEMENTED     | Effective - 500KB limit                                      |
+| VULN-006 (Required tool flags)      | IMPLEMENTED     | Effective - mandatory tools always included                  |
 
 ### Gap: SEC-SPEC-002/003/004 Documentation vs Implementation
 
@@ -396,16 +395,16 @@ The template system is approved for the proposed changes (overhaul, cleanup, cat
 
 ## Appendix: Files Reviewed
 
-| File | Path |
-|------|------|
-| Spawn Prompt Assembler (hook) | `C:\dev\projects\agent-studio\.claude\hooks\routing\spawn-prompt-assembler.cjs` |
-| Prompt Assembler (library) | `C:\dev\projects\agent-studio\.claude\lib\spawn\prompt-assembler.cjs` |
-| Prompt Factory | `C:\dev\projects\agent-studio\.claude\lib\spawn\prompt-factory.cjs` |
-| Spawn Prompt Validator | `C:\dev\projects\agent-studio\.claude\hooks\safety\spawn-prompt-validator.cjs` |
-| Unified Creator Guard | `C:\dev\projects\agent-studio\.claude\hooks\routing\unified-creator-guard.cjs` |
+| File                           | Path                                                                            |
+| ------------------------------ | ------------------------------------------------------------------------------- |
+| Spawn Prompt Assembler (hook)  | `C:\dev\projects\agent-studio\.claude\hooks\routing\spawn-prompt-assembler.cjs` |
+| Prompt Assembler (library)     | `C:\dev\projects\agent-studio\.claude\lib\spawn\prompt-assembler.cjs`           |
+| Prompt Factory                 | `C:\dev\projects\agent-studio\.claude\lib\spawn\prompt-factory.cjs`             |
+| Spawn Prompt Validator         | `C:\dev\projects\agent-studio\.claude\hooks\safety\spawn-prompt-validator.cjs`  |
+| Unified Creator Guard          | `C:\dev\projects\agent-studio\.claude\hooks\routing\unified-creator-guard.cjs`  |
 | Universal Agent Spawn Template | `C:\dev\projects\agent-studio\.claude\templates\spawn\universal-agent-spawn.md` |
-| Orchestrator Spawn Template | `C:\dev\projects\agent-studio\.claude\templates\spawn\orchestrator-spawn.md` |
-| Security Design Checklist | `C:\dev\projects\agent-studio\.claude\templates\security-design-checklist.md` |
-| Error Recovery Template | `C:\dev\projects\agent-studio\.claude\templates\error-recovery-template.md` |
-| Template Renderer Skill | `C:\dev\projects\agent-studio\.claude\skills\template-renderer\SKILL.md` |
-| Template directory listing | `C:\dev\projects\agent-studio\.claude\templates\` (43 files) |
+| Orchestrator Spawn Template    | `C:\dev\projects\agent-studio\.claude\templates\spawn\orchestrator-spawn.md`    |
+| Security Design Checklist      | `C:\dev\projects\agent-studio\.claude\templates\security-design-checklist.md`   |
+| Error Recovery Template        | `C:\dev\projects\agent-studio\.claude\templates\error-recovery-template.md`     |
+| Template Renderer Skill        | `C:\dev\projects\agent-studio\.claude\skills\template-renderer\SKILL.md`        |
+| Template directory listing     | `C:\dev\projects\agent-studio\.claude\templates\` (43 files)                    |

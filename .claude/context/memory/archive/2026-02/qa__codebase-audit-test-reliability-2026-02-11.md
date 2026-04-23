@@ -13,16 +13,17 @@
 
 **Overall Health**: 🔴 **NEEDS URGENT ATTENTION** (42/100)
 
-| Category | Score | Status | Critical Issues |
-|----------|-------|--------|----------------|
-| **Test Coverage** | 35/100 | 🔴 CRITICAL | 114 archived tests (31%), 1 test failure, 253 active tests only |
-| **Test Quality** | 45/100 | 🟠 POOR | Minimal assertions, no integration boundary tests, missing edge cases |
-| **Configuration** | 55/100 | 🟠 POOR | settings.json missing, 6+ config locations (sprawl), inconsistent state |
-| **Dependencies** | 70/100 | 🟡 FAIR | 5 outdated (eslint major upgrade available), no critical CVEs |
-| **Reliability** | 25/100 | 🔴 CRITICAL | 1 test failure, 114 archived tests, 104 hooks (many untested), flaky patterns present |
-| **Stale Artifacts** | 30/100 | 🔴 CRITICAL | 354 orphaned skills (78%), 114 archived tests (31%), dead hook registrations |
+| Category            | Score  | Status      | Critical Issues                                                                       |
+| ------------------- | ------ | ----------- | ------------------------------------------------------------------------------------- |
+| **Test Coverage**   | 35/100 | 🔴 CRITICAL | 114 archived tests (31%), 1 test failure, 253 active tests only                       |
+| **Test Quality**    | 45/100 | 🟠 POOR     | Minimal assertions, no integration boundary tests, missing edge cases                 |
+| **Configuration**   | 55/100 | 🟠 POOR     | settings.json missing, 6+ config locations (sprawl), inconsistent state               |
+| **Dependencies**    | 70/100 | 🟡 FAIR     | 5 outdated (eslint major upgrade available), no critical CVEs                         |
+| **Reliability**     | 25/100 | 🔴 CRITICAL | 1 test failure, 114 archived tests, 104 hooks (many untested), flaky patterns present |
+| **Stale Artifacts** | 30/100 | 🔴 CRITICAL | 354 orphaned skills (78%), 114 archived tests (31%), dead hook registrations          |
 
 **BLOCKING ISSUES** (must fix before production):
+
 1. **31% of tests archived** — 114 test files disabled (.archived suffix)
 2. **Missing settings.json** — Hook registration config file doesn't exist
 3. **78% skill orphan rate** — 354/454 skills never cataloged
@@ -40,6 +41,7 @@
 **Archived Tests**: 114 (31%) 🔴
 
 **Active Test Distribution**:
+
 - `tests/` directory: 367 total files
 - Framework tests (`.claude/hooks/**/*.test.cjs`, `.claude/lib/**/*.test.cjs`): 2 files
 - Code indexing tests: ~36 files
@@ -47,6 +49,7 @@
 - Agent tests: ~5 active, ~5 archived
 
 **Test Count by Script**:
+
 ```
 pnpm test:count → 214 tests across 12 files (100% pass rate, 1 failed to load)
 ```
@@ -55,39 +58,41 @@ pnpm test:count → 214 tests across 12 files (100% pass rate, 1 failed to load)
 
 #### Missing Test Coverage (High Priority)
 
-| Module | Files | Tests | Coverage | Risk |
-|--------|-------|-------|----------|------|
-| **Hooks** | 104 hooks | ~15 tested (14%) | 🔴 **14%** | CRITICAL — hooks enforce framework rules |
-| **Skills** | 454 skills | 0 tested | 🔴 **0%** | HIGH — skills contain business logic |
-| **Agents** | 59 agents | ~5 tested (8%) | 🔴 **8%** | HIGH — agents are execution units |
-| **Workflows** | ~20 workflows | 0 tested | 🔴 **0%** | MEDIUM — workflows coordinate agents |
-| **Tools** | 66 active tools | ~10 tested (15%) | 🔴 **15%** | MEDIUM — tools execute CLI operations |
-| **Memory System** | ~8 modules | 2 tested (25%) | 🟠 **25%** | MEDIUM — memory persistence critical |
+| Module            | Files           | Tests            | Coverage   | Risk                                     |
+| ----------------- | --------------- | ---------------- | ---------- | ---------------------------------------- |
+| **Hooks**         | 104 hooks       | ~15 tested (14%) | 🔴 **14%** | CRITICAL — hooks enforce framework rules |
+| **Skills**        | 454 skills      | 0 tested         | 🔴 **0%**  | HIGH — skills contain business logic     |
+| **Agents**        | 59 agents       | ~5 tested (8%)   | 🔴 **8%**  | HIGH — agents are execution units        |
+| **Workflows**     | ~20 workflows   | 0 tested         | 🔴 **0%**  | MEDIUM — workflows coordinate agents     |
+| **Tools**         | 66 active tools | ~10 tested (15%) | 🔴 **15%** | MEDIUM — tools execute CLI operations    |
+| **Memory System** | ~8 modules      | 2 tested (25%)   | 🟠 **25%** | MEDIUM — memory persistence critical     |
 
 #### Untested Critical Hooks (Security Risk)
 
 These hooks enforce framework safety but have NO TESTS:
 
-| Hook | Purpose | Risk Level |
-|------|---------|-----------|
-| `bash-command-validator.cjs` | Blocks dangerous shell commands | 🔴 CRITICAL |
-| `shell-injection-validator.cjs` | Prevents shell injection | 🔴 CRITICAL |
-| `unified-creator-guard.cjs` | Enforces creator workflow | 🔴 CRITICAL |
-| `routing-guard.cjs` | Enforces planner-first, security review | 🔴 CRITICAL |
-| `spawn-prompt-validator.cjs` | Validates spawn prompts | 🔴 CRITICAL |
-| `unified-pre-write-hook.cjs` | 11 consolidated write safety checks | 🔴 CRITICAL |
+| Hook                            | Purpose                                 | Risk Level  |
+| ------------------------------- | --------------------------------------- | ----------- |
+| `bash-command-validator.cjs`    | Blocks dangerous shell commands         | 🔴 CRITICAL |
+| `shell-injection-validator.cjs` | Prevents shell injection                | 🔴 CRITICAL |
+| `unified-creator-guard.cjs`     | Enforces creator workflow               | 🔴 CRITICAL |
+| `routing-guard.cjs`             | Enforces planner-first, security review | 🔴 CRITICAL |
+| `spawn-prompt-validator.cjs`    | Validates spawn prompts                 | 🔴 CRITICAL |
+| `unified-pre-write-hook.cjs`    | 11 consolidated write safety checks     | 🔴 CRITICAL |
 
 **Impact**: Framework security relies on untested code. A single bug could bypass all safety enforcement.
 
 ### 1.3 Archived Tests (Debt Analysis)
 
 **114 archived tests** (31% of total) — highest concentration in:
+
 - **Agent tests**: `tests/agents/*` (~15 files)
 - **Hook tests**: `tests/hooks/*` (~50 files)
 - **A2A framework tests**: `tests/a2a-framework/*` (entire directory archived)
 - **Artifact tests**: `tests/artifacts/*` (~10 files)
 
 **Why archived** (from learnings.md):
+
 - "Hook tests archived — see .claude.archive/.claude.old/tests/" (package.json:48)
 - "A2A tests archived — see .claude.archive/.claude.old/tests/a2a-framework/" (package.json:61)
 - Pattern: bulk archival during refactoring; tests never re-enabled
@@ -144,6 +149,7 @@ test('planner creates task breakdown', async () => {
 **Pattern**: Tests only cover happy path, not edge cases.
 
 Examples of missing edge case tests:
+
 - **Hooks**: No tests for hook failures (what happens if hook crashes?)
 - **Memory**: No tests for memory corruption or concurrent writes
 - **Code indexing**: No tests for large files (>512KB), binary files, or encoding errors
@@ -154,6 +160,7 @@ Examples of missing edge case tests:
 **From ADR-103** (testing.md): "Focus: Test at integration boundaries, not internal implementation."
 
 **Current state**: Most tests are unit tests (isolated functions). Very few integration tests validate boundaries:
+
 - Agent → Skill integration: 0 tests
 - Hook → Tool integration: 0 tests
 - Memory → Embedding integration: 0 tests
@@ -165,11 +172,11 @@ Examples of missing edge case tests:
 
 **Potential Flaky Tests** (detected patterns):
 
-| Pattern | Risk | Examples |
-|---------|------|----------|
-| **Timing dependencies** | HIGH | Code indexing tests rely on async indexing completion (no wait condition) |
-| **Shared state** | MEDIUM | Memory tests may pollute `learnings.md` if not isolated |
-| **Non-deterministic order** | LOW | Test suite runs sequentially (`--test-concurrency=1`), reduces risk |
+| Pattern                     | Risk   | Examples                                                                  |
+| --------------------------- | ------ | ------------------------------------------------------------------------- |
+| **Timing dependencies**     | HIGH   | Code indexing tests rely on async indexing completion (no wait condition) |
+| **Shared state**            | MEDIUM | Memory tests may pollute `learnings.md` if not isolated                   |
+| **Non-deterministic order** | LOW    | Test suite runs sequentially (`--test-concurrency=1`), reduces risk       |
 
 **Evidence**: `--test-concurrency=1` in package.json:45 suggests flaky tests exist (otherwise would use parallel execution).
 
@@ -196,6 +203,7 @@ settings.json not found
 **Workaround**: Hooks may be registered via alternative mechanism (hardcoded in hook loader?), but this violates framework contract.
 
 **Recommendation**:
+
 1. Generate `settings.json` from current hook inventory (`find .claude/hooks -name "*.cjs"`)
 2. Add to version control
 3. Add validation test: `test('settings.json exists and is valid JSON')`
@@ -205,6 +213,7 @@ settings.json not found
 **From learnings.md**: "Configuration Sprawl (6+ config locations) — No single source of truth"
 
 **Current Config Locations**:
+
 1. `.env` / `.env.example` (environment variables — 1768 lines!)
 2. `config.yaml` (agent models)
 3. `package.json` (scripts, dependencies)
@@ -213,11 +222,13 @@ settings.json not found
 6. `.claude/lib/config/environment.cjs` (defaults)
 
 **Impact**:
+
 - Developer confusion (where to set what?)
 - Merge conflicts (overlapping config)
 - Inconsistent behavior (which config takes precedence?)
 
 **Recommendation**:
+
 1. **Consolidate** to 3 locations max: `.env` (env-specific), `config.yaml` (framework), `package.json` (build)
 2. **Document precedence** in README
 3. **Add validation** script: `pnpm validate:config` (check for conflicts)
@@ -227,6 +238,7 @@ settings.json not found
 **.env.example**: **1768 lines** of configuration variables
 
 **Breakdown**:
+
 - Sections: 24
 - Variables: 200+
 - Comments: 50% of file
@@ -234,6 +246,7 @@ settings.json not found
 **Problem**: Cognitive overload. Developer can't know which variables matter.
 
 **Recommendation**:
+
 1. **Split into tiers**: `.env.minimal` (10 essential vars), `.env.example` (full reference)
 2. **Mark required vars** with `# REQUIRED` comment
 3. **Provide presets**: `.env.development`, `.env.production`
@@ -246,15 +259,16 @@ settings.json not found
 
 **Command**: `pnpm outdated`
 
-| Package | Current | Latest | Type | Priority |
-|---------|---------|--------|------|----------|
-| **eslint** | 9.39.2 | 10.0.0 | dev | 🔴 **MAJOR** |
-| @types/node | 20.19.30 | 25.2.3 | dev | 🟠 MAJOR |
-| prettier | 3.7.4 | 3.8.1 | dev | 🟢 MINOR |
-| glob | 13.0.0 | 13.0.2 | prod | 🟢 PATCH |
-| @lancedb/lancedb | 0.24.1 | 0.26.2 | prod | 🟠 MINOR |
+| Package          | Current  | Latest | Type | Priority     |
+| ---------------- | -------- | ------ | ---- | ------------ |
+| **eslint**       | 9.39.2   | 10.0.0 | dev  | 🔴 **MAJOR** |
+| @types/node      | 20.19.30 | 25.2.3 | dev  | 🟠 MAJOR     |
+| prettier         | 3.7.4    | 3.8.1  | dev  | 🟢 MINOR     |
+| glob             | 13.0.0   | 13.0.2 | prod | 🟢 PATCH     |
+| @lancedb/lancedb | 0.24.1   | 0.26.2 | prod | 🟠 MINOR     |
 
 **Immediate Actions**:
+
 1. **eslint 10.0.0**: Breaking changes — review migration guide, update config
 2. **@types/node 25.x**: Node.js 25 types — only upgrade if targeting Node 25+
 3. **@lancedb/lancedb 0.26.2**: Vector store update — test embedding compatibility
@@ -266,6 +280,7 @@ settings.json not found
 **Detection**: No automated unused dependency check in CI.
 
 **Recommendation**: Add `depcheck` to CI:
+
 ```json
 {
   "scripts": {
@@ -277,6 +292,7 @@ settings.json not found
 ### 4.3 Missing Dev Dependencies
 
 **Potential gaps** (from test patterns):
+
 - **@types/jest**: Tests use Jest globals but no type definitions
 - **c8** or **nyc**: No coverage tool in devDependencies (package.json:60 uses `--experimental-test-coverage`)
 
@@ -298,6 +314,7 @@ settings.json not found
 ### 5.2 Format Status
 
 **No format check in test output**, but package.json includes:
+
 ```json
 "format": "node scripts/format-tracked.mjs --write",
 "format:check": "node scripts/format-tracked.mjs --check"
@@ -312,12 +329,14 @@ settings.json not found
 **Registered Hooks**: Unknown (settings.json missing)
 
 **Potential Dead Hooks**:
+
 - `.claude/hooks/monitoring/_archive/` contains 3 archived hooks
 - May still be registered in (missing) settings.json
 
 **Detection Method**: No automated dead hook detection.
 
 **Recommendation**:
+
 1. Create `settings.json` from hook inventory
 2. Add CI check: `pnpm verify:hooks` (compare registered vs. filesystem)
 
@@ -331,6 +350,7 @@ settings.json not found
 **Impact**: Agent discovery broken. Router can't spawn agents programmatically.
 
 **Recommendation**:
+
 1. Generate registry: `pnpm agents:registry`
 2. Verify: `pnpm agents:registry:validate`
 3. Add to version control
@@ -344,21 +364,25 @@ settings.json not found
 **From learnings.md**: "354 orphaned skills (454 created, 100 cataloged = 78% orphan rate)"
 
 **Evidence**:
+
 - 454 skills created (bulk generation)
 - 100 cataloged in `skill-catalog.md`
 - **354 never integrated** (78%)
 
 **Root Cause** (from learnings.md 5 Whys):
+
 1. Batch creation skipped post-creation integration
 2. No enforcement hook blocked completion without integration
 3. `post-creation-integration.cjs` exists but defaults to "warn" mode (not blocking)
 
 **Impact**:
+
 - Skills are invisible to agents (can't invoke via `Skill()` tool)
 - Wasted development effort (354 skills created but unusable)
 - Confusing directory structure (454 skills dirs, only 100 work)
 
 **Recommendation**:
+
 1. **Audit skills**: `pnpm detect:orphans` (check which skills lack catalog entry)
 2. **Integrate top 20**: Prioritize high-value skills (tdd, debugging, code-review, etc.)
 3. **Archive rest**: Move unused skills to `_archive/`
@@ -373,6 +397,7 @@ settings.json not found
 **Interpretation**: Even when skills get cataloged, 68% are eventually archived (unused/obsolete).
 
 **Recommendation**:
+
 1. Review archive criteria (why were these archived?)
 2. Delete archived skills older than 6 months (no restoration needed)
 3. Document skill lifecycle: draft → active → archived → deleted
@@ -403,39 +428,41 @@ settings.json not found
 
 **Blockers** (must fix before production):
 
-| Issue | Severity | Impact | Est. Fix Time |
-|-------|----------|--------|--------------|
-| 31% tests archived | 🔴 CRITICAL | Regression risk, no safety net | 40 hours |
-| settings.json missing | 🔴 CRITICAL | Hook registration broken | 2 hours |
-| 78% skill orphan rate | 🔴 CRITICAL | Framework unusable (skills don't work) | 20 hours |
-| 14% hook test coverage | 🔴 CRITICAL | Security rules untested | 30 hours |
-| 1 test failure | 🟠 HIGH | Feature broken (adaptive disclosure) | 4 hours |
-| 6+ config locations | 🟠 HIGH | Developer confusion, merge conflicts | 8 hours |
+| Issue                  | Severity    | Impact                                 | Est. Fix Time |
+| ---------------------- | ----------- | -------------------------------------- | ------------- |
+| 31% tests archived     | 🔴 CRITICAL | Regression risk, no safety net         | 40 hours      |
+| settings.json missing  | 🔴 CRITICAL | Hook registration broken               | 2 hours       |
+| 78% skill orphan rate  | 🔴 CRITICAL | Framework unusable (skills don't work) | 20 hours      |
+| 14% hook test coverage | 🔴 CRITICAL | Security rules untested                | 30 hours      |
+| 1 test failure         | 🟠 HIGH     | Feature broken (adaptive disclosure)   | 4 hours       |
+| 6+ config locations    | 🟠 HIGH     | Developer confusion, merge conflicts   | 8 hours       |
 
 **Total Fix Estimate**: ~104 hours (13 days @ 8hr/day)
 
 ### 7.2 Technical Debt Breakdown
 
-| Debt Category | Severity | Effort to Fix | Priority |
-|--------------|----------|--------------|----------|
-| **Archived tests** | 🔴 CRITICAL | 40 hours | P0 |
-| **Untested hooks** | 🔴 CRITICAL | 30 hours | P0 |
-| **Orphaned skills** | 🔴 CRITICAL | 20 hours | P0 |
-| **Missing config files** | 🔴 CRITICAL | 2 hours | P0 |
-| **Test quality** | 🟠 HIGH | 20 hours | P1 |
-| **Config sprawl** | 🟠 HIGH | 8 hours | P1 |
-| **Dependency updates** | 🟢 LOW | 4 hours | P2 |
+| Debt Category            | Severity    | Effort to Fix | Priority |
+| ------------------------ | ----------- | ------------- | -------- |
+| **Archived tests**       | 🔴 CRITICAL | 40 hours      | P0       |
+| **Untested hooks**       | 🔴 CRITICAL | 30 hours      | P0       |
+| **Orphaned skills**      | 🔴 CRITICAL | 20 hours      | P0       |
+| **Missing config files** | 🔴 CRITICAL | 2 hours       | P0       |
+| **Test quality**         | 🟠 HIGH     | 20 hours      | P1       |
+| **Config sprawl**        | 🟠 HIGH     | 8 hours       | P1       |
+| **Dependency updates**   | 🟢 LOW      | 4 hours       | P2       |
 
 **Total Debt**: ~124 hours
 
 ### 7.3 Regression Risk Analysis
 
 **Current Protection**:
+
 - 253 active tests (down from 367 original)
 - 0 linting errors
 - TDD skill enforced (per testing.md)
 
 **Gaps**:
+
 - **No integration tests** — can't detect cross-component failures
 - **No E2E tests** — can't detect full workflow failures
 - **No property-based tests** — can't detect algorithmic edge cases
@@ -444,10 +471,12 @@ settings.json not found
 **Regression Likelihood**: 🔴 **HIGH**
 
 **Evidence**:
+
 - 114 archived tests suggest past regressions broke tests (or tests became irrelevant)
 - 1 existing test failure indicates regression already occurred
 
 **Recommendation**: Implement regression testing strategy:
+
 1. Restore critical tests (hooks, agents)
 2. Add integration boundary tests (10+ tests)
 3. Add mutation testing (`stryker-js`) to verify test quality
@@ -537,24 +566,28 @@ settings.json not found
 ## 9. Test Improvement Roadmap
 
 ### Phase 1: Stabilize (Week 1-2)
+
 - ✅ Fix test failure
 - ✅ Restore 20 critical tests
 - ✅ Create missing config files
 - **Target**: 0 test failures, 273 active tests
 
 ### Phase 2: Coverage (Week 3-6)
+
 - ✅ Add 12 hook tests
 - ✅ Add 10 integration boundary tests
 - ✅ Integrate 20 orphaned skills
 - **Target**: 50% hook coverage, 10+ integration tests
 
 ### Phase 3: Quality (Month 2-3)
+
 - ✅ Add mutation testing
 - ✅ Add property-based tests
 - ✅ Add E2E tests for critical workflows
 - **Target**: 60% mutation score, 5+ E2E tests
 
 ### Phase 4: Automation (Month 4)
+
 - ✅ CI pipeline with coverage gates
 - ✅ Pre-commit hooks for format/lint
 - ✅ Automated dependency updates
@@ -566,19 +599,20 @@ settings.json not found
 
 ### 10.1 Current State (Baseline)
 
-| Metric | Current | Target | Gap |
-|--------|---------|--------|-----|
-| Active Tests | 253 | 400+ | -147 |
-| Test Pass Rate | 99.6% | 100% | -0.4% |
-| Hook Test Coverage | 14% | 80% | -66% |
-| Skill Orphan Rate | 78% | <10% | +68% |
-| Integration Tests | 0 | 10+ | -10 |
-| Mutation Score | Unknown | 60% | TBD |
-| Config Locations | 6+ | 3 | -3 |
+| Metric             | Current | Target | Gap   |
+| ------------------ | ------- | ------ | ----- |
+| Active Tests       | 253     | 400+   | -147  |
+| Test Pass Rate     | 99.6%   | 100%   | -0.4% |
+| Hook Test Coverage | 14%     | 80%    | -66%  |
+| Skill Orphan Rate  | 78%     | <10%   | +68%  |
+| Integration Tests  | 0       | 10+    | -10   |
+| Mutation Score     | Unknown | 60%    | TBD   |
+| Config Locations   | 6+      | 3      | -3    |
 
 ### 10.2 Success Criteria (3 Months)
 
 **Minimum Viable Quality**:
+
 - ✅ 0 test failures
 - ✅ 80% hook test coverage
 - ✅ 10+ integration boundary tests
@@ -587,6 +621,7 @@ settings.json not found
 - ✅ 60% mutation score
 
 **Stretch Goals**:
+
 - ✅ 90% hook test coverage
 - ✅ 20+ integration tests
 - ✅ 70% mutation score
@@ -600,22 +635,26 @@ settings.json not found
 ### 11.1 Active Test Files by Category
 
 **Code Indexing Tests** (~36 files):
+
 - `tests/code-indexing/ast-grep-wrapper.test.cjs`
 - `tests/code-indexing/hybrid-search.test.cjs`
 - `tests/code-indexing/vector-store-lancedb.test.cjs`
 - (33 more files)
 
 **Hook Tests** (~15 active):
+
 - `tests/hooks/bash-command-validator.test.cjs`
 - `tests/hooks/check-console-log.test.cjs`
 - `tests/hooks/code-index-updater.test.cjs`
 - (12 more files)
 
 **Memory Tests**:
+
 - `tests/memory-monitor.test.cjs`
 - `tests/cli/memory-dashboard.test.cjs`
 
 **Framework Tests**:
+
 - `tests/agents/core/planner.test.cjs`
 - `tests/routing-table.test.cjs`
 - `tests/checkpoint-manager.test.cjs`
@@ -624,6 +663,7 @@ settings.json not found
 ### 11.2 Archived Test Files (High Priority for Restoration)
 
 **Agent Tests** (5 files):
+
 - `tests/agents/architect-agent.test.cjs.archived`
 - `tests/agents/developer-agent.test.cjs.archived`
 - `tests/agents/qa-agent.test.cjs.archived`
@@ -631,9 +671,11 @@ settings.json not found
 - `tests/agents/factory.test.cjs.archived`
 
 **Hook Tests** (~50 files in `tests/hooks/*`):
+
 - Priority: routing hooks, safety hooks, evolution hooks
 
 **A2A Framework** (entire directory):
+
 - `tests/a2a-framework/*` — agent-to-agent coordination tests
 
 ---
@@ -643,18 +685,21 @@ settings.json not found
 **Overall Assessment**: The agent-studio framework has **significant test and reliability debt** that must be addressed before production use.
 
 **Critical Findings**:
+
 1. **31% of tests archived** — major regression risk
 2. **78% skill orphan rate** — framework partially broken (skills don't work)
 3. **14% hook test coverage** — security rules are untested
 4. **Missing config files** — settings.json and agent-registry.json don't exist
 
 **Positive Findings**:
+
 1. ✅ Lint-clean codebase (0 errors)
 2. ✅ 99.6% test pass rate (1 failure only)
 3. ✅ Active test infrastructure (214 tests running)
 4. ✅ TDD culture enforced (per testing.md)
 
 **Recommended Path Forward**:
+
 1. **Week 1**: Fix blockers (test failure, config files, restore 20 tests)
 2. **Month 1**: Add hook tests, integrate orphaned skills
 3. **Month 2-3**: Quality improvements (mutation testing, E2E tests)

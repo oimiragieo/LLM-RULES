@@ -8,6 +8,7 @@
 ## Artifacts Created
 
 ### accessibility Skill
+
 - **Rule**: `.claude/rules/accessibility.md` (300+ lines)
   - WCAG 2.1 standards (A, AA, AAA levels)
   - Semantic HTML requirements
@@ -21,6 +22,7 @@
   - Output validation: wcag_level, checks (semantic_html, aria, keyboard, color_contrast), summary
 
 ### database-architect Skill
+
 - **Rule**: `.claude/rules/database-architect.md` (350+ lines)
   - Normalization standards (1NF, 2NF, 3NF, BCNF)
   - Index strategy and query optimization
@@ -33,6 +35,7 @@
   - Output validation: database_type, schema_design (tables, columns, indexes), index_strategy, migration_scripts, performance_considerations, er_diagram, summary
 
 ### on-call-handoff-patterns Skill
+
 - **Rule**: `.claude/rules/on-call-handoff-patterns.md` (400+ lines)
   - Handoff documentation standards
   - Timing standards (30-minute overlap)

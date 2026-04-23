@@ -32,11 +32,11 @@ Skipped/Disabled: 0
 
 ### Failure Breakdown
 
-| Test File | Failures | Severity | Status |
-|-----------|----------|----------|--------|
-| `routing-guard-comprehensive.test.cjs` Check 3 | 1 subtest | **NON-BLOCKING** | Test expects TaskCreate deduplication via session_id, implementation may differ |
+| Test File                                      | Failures   | Severity         | Status                                                                          |
+| ---------------------------------------------- | ---------- | ---------------- | ------------------------------------------------------------------------------- |
+| `routing-guard-comprehensive.test.cjs` Check 3 | 1 subtest  | **NON-BLOCKING** | Test expects TaskCreate deduplication via session_id, implementation may differ |
 | `routing-guard-comprehensive.test.cjs` Check 7 | 3 subtests | **NON-BLOCKING** | Specialist routing warnings not emitted (enforcement=warn mode may be disabled) |
-| `routing-guard-comprehensive.test.cjs` Check 8 | 1 subtest | **NON-BLOCKING** | TaskList-first gate not blocking as expected (delegation to pre-task-unified) |
+| `routing-guard-comprehensive.test.cjs` Check 8 | 1 subtest  | **NON-BLOCKING** | TaskList-first gate not blocking as expected (delegation to pre-task-unified)   |
 
 **Classification**: All 5 failures are in **routing enforcement edge cases**. Core functionality works; failures are in warning/audit modes, not blocking modes.
 
@@ -45,37 +45,44 @@ Skipped/Disabled: 0
 ### 1. Untested Hooks (17 files with NO tests)
 
 #### Routing Hooks (3 untested)
+
 - `.claude/hooks/routing/code-index-updater.cjs` ⚠️ **P1** (index maintenance critical)
 - `.claude/hooks/routing/post-task-unified.cjs` ⚠️ **P0** (task lifecycle)
 - `.claude/hooks/routing/pre-task-unified.cjs` ⚠️ **P0** (task validation)
 
 #### Safety Hooks (4 untested)
+
 - `.claude/hooks/safety/bash-command-validator.cjs` ⚠️ **P0** (command injection prevention)
 - `.claude/hooks/safety/bash-pretool-bundle.cjs` ⚠️ **P0** (comprehensive bash validation)
 - `.claude/hooks/safety/hybrid-search-enforcer.cjs` ⚠️ **P1** (search policy enforcement)
 - `.claude/hooks/safety/spawn-prompt-validator.cjs` ⚠️ **P1** (prompt size validation)
 
 #### Workflow Hooks (2 untested)
+
 - `.claude/hooks/workflow/post-completion-chain.cjs` ⚠️ **P1** (phase advancement)
 - `.claude/hooks/workflow/post-creation-integration.cjs` ⚠️ **P1** (artifact integration queue)
 
 #### Session Hooks (4 untested)
+
 - `.claude/hooks/session/adaptive-quality-gate.cjs` ⚠️ **P2** (adaptive quality)
 - `.claude/hooks/session/drift-detector.cjs` ⚠️ **P2** (session drift)
 - `.claude/hooks/session/post-edit-scanner.cjs` ⚠️ **P2** (edit scanning)
 - `.claude/hooks/session/user-prompt-orchestrator.cjs` ⚠️ **P1** (prompt orchestration)
 
 #### Validation Hooks (2 untested)
+
 - `.claude/hooks/validation/creator-compliance-validator.cjs` ⚠️ **P1** (creator workflow compliance)
 - `.claude/hooks/validation/pre-completion-validation.cjs` ⚠️ **P1** (completion gates)
 
 #### Reflection Hooks (2 untested)
+
 - `.claude/hooks/reflection/error-summary-extractor.cjs` ⚠️ **P1** (error pattern extraction)
 - `.claude/hooks/reflection/unified-reflection-handler.cjs` ⚠️ **P1** (reflection orchestration)
 
 ### 2. Untested Lib Modules (24 files with NO tests)
 
 #### Memory Subsystem (7 untested)
+
 - `.claude/lib/memory/entity-query.cjs` ⚠️ **P2** (semantic entity query)
 - `.claude/lib/memory/intent-analyzer.cjs` ⚠️ **P2** (query intent analysis)
 - `.claude/lib/memory/memory-areas.cjs` ⚠️ **P2** (memory boundaries)
@@ -85,6 +92,7 @@ Skipped/Disabled: 0
 - `.claude/lib/memory/session-summary.cjs` ⚠️ **P2** (session summarization)
 
 #### Workflow Subsystem (6 untested)
+
 - `.claude/lib/workflow/conditional-executor.cjs` ⚠️ **P2** (conditional execution)
 - `.claude/lib/workflow/cycle-detector.cjs` ⚠️ **P1** (circular dependency detection)
 - `.claude/lib/workflow/lazy-loader.cjs` ⚠️ **P2** (lazy workflow loading)
@@ -93,11 +101,13 @@ Skipped/Disabled: 0
 - `.claude/lib/workflow/task-router.cjs` ⚠️ **P1** (task routing)
 
 #### Routing Subsystem (3 untested)
+
 - `.claude/lib/routing/router-state.cjs` ⚠️ **P1** (router state management)
 - `.claude/lib/routing/agent-registry-resolver.cjs` - **HAS TESTS** ✅ (found at `tests/lib/routing/agent-registry-resolver.test.cjs`)
 - `.claude/lib/routing/pattern-router.cjs` - **HAS TESTS** ✅ (found at `tests/lib/routing/pattern-router.test.cjs`)
 
 #### Utils Subsystem (8 untested)
+
 - `.claude/lib/utils/atomic-write.cjs` ⚠️ **P1** (atomic file writes)
 - `.claude/lib/utils/bottleneck-analyzer.cjs` ⚠️ **P3** (performance profiling)
 - `.claude/lib/utils/compression-trigger.cjs` ⚠️ **P2** (context compression)
@@ -138,6 +148,7 @@ Skipped/Disabled: 0
 #### Missing Edge Cases
 
 **Identified gaps**:
+
 - **Concurrent file operations**: No tests for multi-process database locking (ADR-116)
 - **Memory rotation**: No tests for hierarchical HOT→WARM→COLD rotation (ADR-102)
 - **Hybrid search modes**: Limited tests for `HYBRID_EMBEDDINGS=off|on` behavior
@@ -150,12 +161,14 @@ Skipped/Disabled: 0
 **All tests correctly placed in `tests/` directory mirroring source structure** ✅
 
 **Naming consistency**:
+
 - Pattern: `{source-file-name}.test.cjs` ✅
 - Edge case: Some integration tests use `{feature-name}-integration.test.cjs` ✅ (acceptable)
 
 #### Missing Test Fixtures
 
 **Current state**:
+
 - `tests/fixtures/code-indexing/` exists (3 sample files)
 - `tests/fixtures/sample-code/` exists (for parser tests)
 - **Missing**:
@@ -181,6 +194,7 @@ All 352 test suites are actively running. 5 failures are assertion failures, not
 ### Multi-Hook Chains (missing E2E)
 
 **Example missing chains**:
+
 - **Task spawn lifecycle**: `pre-task-unified` → `routing-guard` → `spawn-prompt-validator` → `post-task-unified`
 - **File write lifecycle**: `unified-creator-guard` → `unified-pre-write-hook` → `sync-memory-index` → `code-index-updater`
 - **Memory extraction lifecycle**: `post-edit-scanner` → `memory-extractor` → `memory-extraction-writer` → `lancedb-client`
@@ -188,6 +202,7 @@ All 352 test suites are actively running. 5 failures are assertion failures, not
 ### Framework-Level Integration
 
 **Missing**:
+
 - **Agent spawning E2E**: Router → Task → spawn-prompt-assembler → Agent execution → TaskUpdate → reflection
 - **Evolution workflow E2E**: User request → evolution-state-guard → research-enforcement → evolution-orchestrator → artifact creation
 - **Memory rotation E2E**: Session end → compression-trigger → memory-scheduler → HOT→WARM→COLD rotation
@@ -272,15 +287,15 @@ All 352 test suites are actively running. 5 failures are assertion failures, not
 
 ### Coverage Statistics (Estimated)
 
-| Component | Files | Tests | Estimated Coverage |
-|-----------|-------|-------|-------------------|
-| Hooks | 108 total | 63 test files | ~58% |
-| Lib | 102 total | 54 test files | ~53% |
-| Code Indexing | 15 total | 15 test files | ~100% ✅ |
-| Memory | 20 total | 12 test files | ~60% |
-| Routing | 8 total | 8 test files | ~100% ✅ |
-| Workflow | 12 total | 6 test files | ~50% |
-| Utils | 25 total | 10 test files | ~40% |
+| Component     | Files     | Tests         | Estimated Coverage |
+| ------------- | --------- | ------------- | ------------------ |
+| Hooks         | 108 total | 63 test files | ~58%               |
+| Lib           | 102 total | 54 test files | ~53%               |
+| Code Indexing | 15 total  | 15 test files | ~100% ✅           |
+| Memory        | 20 total  | 12 test files | ~60%               |
+| Routing       | 8 total   | 8 test files  | ~100% ✅           |
+| Workflow      | 12 total  | 6 test files  | ~50%               |
+| Utils         | 25 total  | 10 test files | ~40%               |
 
 **Overall Estimated Coverage**: ~60% (file-level), likely higher at line-level for tested files.
 
@@ -308,11 +323,13 @@ Test Pollution: 0 detected ✅
 ## Verification Commands
 
 **Run full test suite**:
+
 ```bash
 pnpm test
 ```
 
 **Run specific test category**:
+
 ```bash
 node --test tests/hooks/**/*.test.cjs
 node --test tests/lib/**/*.test.cjs
@@ -320,11 +337,13 @@ node --test tests/code-indexing/**/*.test.cjs
 ```
 
 **Run failing tests only**:
+
 ```bash
 node --test tests/hooks/routing-guard-comprehensive.test.cjs
 ```
 
 **Check test coverage** (if coverage tool installed):
+
 ```bash
 pnpm test:coverage
 ```
@@ -334,6 +353,7 @@ pnpm test:coverage
 **Overall Assessment**: The agent-studio test suite is in GOOD health with strong coverage of critical paths (code indexing, core routing, memory systems). However, 17 untested hooks and 24 untested lib modules represent significant risk, especially in safety and workflow subsystems.
 
 **Immediate Action Required**:
+
 1. Add P0 tests for safety hooks (command injection prevention)
 2. Fix 5 routing-guard test failures to prevent future regressions
 3. Add integration tests for critical multi-hook chains
@@ -341,6 +361,7 @@ pnpm test:coverage
 **Long-Term Goal**: Achieve 80%+ file-level coverage across all components, with comprehensive edge case coverage for security-critical paths.
 
 **Risk Level**:
+
 - **Current**: MEDIUM (untested critical paths exist)
 - **Target**: LOW (80%+ coverage with edge cases)
 - **Timeline**: 4 weeks to achieve target
@@ -350,6 +371,7 @@ pnpm test:coverage
 ### Hooks (63 test files)
 
 **Tested**:
+
 - `check-console-log.test.cjs` ✅
 - `conflict-detector.test.cjs` ✅
 - `database-validators.test.cjs` ✅
@@ -374,6 +396,7 @@ pnpm test:coverage
 ### Lib (54 test files)
 
 **Tested**:
+
 - `agent-config.test.cjs` ✅
 - `bm25-indexer.test.cjs` ✅
 - `hybrid-search.test.cjs` ✅
@@ -398,6 +421,7 @@ pnpm test:coverage
 **File**: `tests/hooks/routing-guard-comprehensive.test.cjs:311`
 
 **Error**:
+
 ```
 Expected values to be strictly equal:
 false !== true
@@ -407,11 +431,13 @@ Actual: false (did not dedupe)
 ```
 
 **Hypothesis**:
+
 - Test expects deduplication to use `hookInput.session_id` when `process.env.CLAUDE_CODE_SESSION_ID` is absent
 - Implementation may use different deduplication key or mechanism
 - Non-blocking: Deduplication is optimization, not correctness requirement
 
 **Recommended Fix**:
+
 1. Read routing-guard.cjs deduplication logic (lines ~250-350)
 2. Verify what key is used for deduplication
 3. Update test to match actual implementation or fix implementation if test is correct
@@ -421,6 +447,7 @@ Actual: false (did not dedupe)
 **File**: `tests/hooks/routing-guard-comprehensive.test.cjs:467,478,488`
 
 **Error** (all 3 tests):
+
 ```
 Expected values to be strictly equal:
 false !== true
@@ -430,16 +457,19 @@ Actual: false (warning NOT emitted)
 ```
 
 **Test Cases**:
+
 1. Developer spawned for "update docs/README" (should warn: use technical-writer)
 2. Developer spawned for "refactor code" (should warn: use code-simplifier)
 3. Developer spawned for "run tests" (should warn: use qa)
 
 **Hypothesis**:
+
 - `SPECIALIST_ROUTING_ENFORCEMENT` may be `off` or `block` during test execution
 - Tests expect `warn` mode to emit warnings
 - Non-blocking: Routing quality check, not security-critical
 
 **Recommended Fix**:
+
 1. Verify `SPECIALIST_ROUTING_ENFORCEMENT` value in test environment
 2. Explicitly set `SPECIALIST_ROUTING_ENFORCEMENT=warn` before these tests
 3. Add debug logging to routing-guard.cjs to trace warning emission
@@ -449,6 +479,7 @@ Actual: false (warning NOT emitted)
 **File**: `tests/hooks/routing-guard-comprehensive.test.cjs:552`
 
 **Error**:
+
 ```
 Expected values to be strictly equal:
 false !== true
@@ -460,11 +491,13 @@ Actual: false (Task allowed)
 **Test Case**: Should block Task when TaskList not called in router mode
 
 **Hypothesis**:
+
 - Routing-guard delegates TaskList-first check to `pre-task-unified.cjs`
 - Delegation may change blocking behavior
 - Non-blocking: Coordination check, not security-critical
 
 **Recommended Fix**:
+
 1. Verify delegation behavior in routing-guard.cjs (Check 8 logic)
 2. Update test to expect delegation instead of direct blocking
 3. Add integration test for routing-guard → pre-task-unified coordination

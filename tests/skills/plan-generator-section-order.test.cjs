@@ -8,10 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 
-const SKILL_PATH = path.resolve(
-  __dirname,
-  '../../.claude/skills/plan-generator/SKILL.md'
-);
+const SKILL_PATH = path.resolve(__dirname, '../../.claude/skills/plan-generator/SKILL.md');
 
 const CANONICAL_SECTIONS = [
   '## Problem',
@@ -34,10 +31,7 @@ test('plan-generator SKILL.md contains Canonical Section Order heading', () => {
 test('plan-generator SKILL.md lists all 6 canonical sections', () => {
   const content = fs.readFileSync(SKILL_PATH, 'utf8');
   for (const section of CANONICAL_SECTIONS) {
-    assert.ok(
-      content.includes(section),
-      `SKILL.md should mention canonical section: ${section}`
-    );
+    assert.ok(content.includes(section), `SKILL.md should mention canonical section: ${section}`);
   }
 });
 

@@ -15,6 +15,7 @@
 **Summary Provided**: "Reflection on task 15: INSUFFICIENT_DATA gate triggered. Task does not exist. No summary metadata. Score withheld per reflection protocol."
 
 **Gate Assessment**:
+
 - Summary is NOT a fallback string — it describes an actual reflection outcome
 - No `filesModified` or `outputArtifacts` provided
 - DataQuality: **PARTIAL** — summary describes outcome; no underlying artifacts available
@@ -24,13 +25,13 @@
 
 ## Rubric Scores (Partial Evidence)
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.80 | INSUFFICIENT_DATA gate correctly triggered; protocol followed |
-| Accuracy | 0.90 | Score withheld per Iron Law — accurate behavior |
-| Clarity | 0.85 | Summary clearly states outcome and reason |
-| Consistency | 0.85 | Consistent with prior ghost-task handling patterns |
-| Actionability | 0.70 | Gate triggers but no downstream action visible from summary |
+| Dimension     | Score | Notes                                                         |
+| ------------- | ----- | ------------------------------------------------------------- |
+| Completeness  | 0.80  | INSUFFICIENT_DATA gate correctly triggered; protocol followed |
+| Accuracy      | 0.90  | Score withheld per Iron Law — accurate behavior               |
+| Clarity       | 0.85  | Summary clearly states outcome and reason                     |
+| Consistency   | 0.85  | Consistent with prior ghost-task handling patterns            |
+| Actionability | 0.70  | Gate triggers but no downstream action visible from summary   |
 
 **Overall Score**: 0.83 / 1.0 (PASS — partial evidence)
 **Threshold**: pass
@@ -71,6 +72,7 @@ This confirms the **ghost-task pattern**: previously completed tasks are removed
 ### INSUFFICIENT_DATA Gate Functioning
 
 The gate is working as designed:
+
 - Summary received: fallback-like string indicating task not found
 - Score withheld: correct per Iron Law
 - No fabricated score: confirms gate integrity
@@ -86,13 +88,16 @@ This validates the INSUFFICIENT_DATA gate implementation — it correctly preven
 ## Memory Curation Decisions
 
 ### Retain
+
 - Ghost-task pattern confirmation (high reuse value, recurring evidence)
 - INSUFFICIENT_DATA gate effectiveness validation (high signal)
 
 ### Compress
+
 - Verbose historical echo loop documentation (already in gotchas.json)
 
 ### Archive
+
 - N/A — no stale content introduced
 
 **Rationale**: The INSUFFICIENT_DATA gate functioning correctly is high-signal validation evidence worth retaining. The ghost-task pattern is already well-documented; this entry adds confirmation count only.

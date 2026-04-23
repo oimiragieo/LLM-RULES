@@ -9,32 +9,33 @@
 
 ## Scoring Criteria
 
-| Criterion | Points | Description |
-|-----------|--------|-------------|
-| Identity/Description | 1 | Has clear identity/description section |
-| Capabilities | 1 | Has capabilities section with bullet list |
-| Instructions/Workflow | 2 | Has detailed instructions or step-by-step workflow |
-| Examples | 2 | Has practical examples with code snippets |
-| Best Practices | 2 | Has best practices or anti-patterns section |
-| Integration Points | 1 | Has integration points or related references |
-| Memory Protocol | 1 | Has mandatory memory protocol section |
+| Criterion             | Points | Description                                        |
+| --------------------- | ------ | -------------------------------------------------- |
+| Identity/Description  | 1      | Has clear identity/description section             |
+| Capabilities          | 1      | Has capabilities section with bullet list          |
+| Instructions/Workflow | 2      | Has detailed instructions or step-by-step workflow |
+| Examples              | 2      | Has practical examples with code snippets          |
+| Best Practices        | 2      | Has best practices or anti-patterns section        |
+| Integration Points    | 1      | Has integration points or related references       |
+| Memory Protocol       | 1      | Has mandatory memory protocol section              |
 
 **Threshold**: Skills scoring < 7/10 require enhancement
 
 ## Summary
 
-| Metric | Count | Percentage |
-|--------|-------|------------|
-| Total Skills | 18 | 100% |
-| Passing (≥7/10) | 18 | 100% |
-| Enhanced | 0 | 0% |
-| Average Score | 9.4/10 | 94% |
+| Metric          | Count  | Percentage |
+| --------------- | ------ | ---------- |
+| Total Skills    | 18     | 100%       |
+| Passing (≥7/10) | 18     | 100%       |
+| Enhanced        | 0      | 0%         |
+| Average Score   | 9.4/10 | 94%        |
 
 ## Detailed Scorecard
 
 ### 1. expo-framework-rule (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -44,6 +45,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Comprehensive identity with detailed principles
 - Well-structured capabilities across all Expo aspects
 - Extensive instructions covering project structure, development, router, native functionality, performance
@@ -59,6 +61,7 @@
 ### 2. frontend-expert (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -68,6 +71,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Consolidated from 2 skills with clear identity
 - Comprehensive capabilities covering components, state, performance, accessibility
 - Detailed instructions for all major frontend concerns
@@ -83,6 +87,7 @@
 ### 3. gamedev-expert (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -92,6 +97,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Consolidated from 4 skills with clear game development identity
 - Strong capabilities covering DragonRuby, Unity, design patterns
 - Detailed instructions for naming, syntax, error handling, Unity standards
@@ -107,6 +113,7 @@
 ### 4. git-expert (9/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -116,6 +123,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear identity as Git operations wrapper
 - Strong capabilities for complex git workflows
 - Detailed instructions with efficiency focus
@@ -124,6 +132,7 @@
 - Complete memory protocol
 
 **Minor Weakness**:
+
 - Limited concrete git command examples (mostly prose description)
 
 **Enhancement**: None required (score above threshold)
@@ -133,6 +142,7 @@
 ### 5. go-expert (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -142,6 +152,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear Go 1.22+ identity with modern idioms
 - Comprehensive capabilities covering API dev, concurrency, testing
 - Detailed instructions for code standards, API development, performance
@@ -157,6 +168,7 @@
 ### 6. graphql-expert (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -166,6 +178,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear GraphQL identity with schema-first approach
 - Comprehensive capabilities covering schema design, Apollo Server/Client, performance, security
 - Detailed instructions for all major GraphQL concerns
@@ -181,6 +194,7 @@
 ### 7. hook-creator (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -190,6 +204,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Exceptionally comprehensive at 1092 lines
 - Clear identity for hook system development
 - Extensive capabilities covering all hook types and operations
@@ -206,6 +221,7 @@
 ### 8. incident-runbook-templates (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -215,6 +231,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear identity for incident response documentation
 - Comprehensive capabilities covering all runbook aspects
 - Detailed step-by-step instructions for creating runbooks
@@ -230,6 +247,7 @@
 ### 9. insecure-defaults (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -239,6 +257,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear security-focused identity
 - Comprehensive capabilities for detecting insecure defaults
 - Detailed step-by-step instructions with detection patterns
@@ -254,6 +273,7 @@
 ### 10. insight-extraction (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -263,6 +283,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear identity for learning extraction
 - Comprehensive capabilities covering all insight types
 - Detailed step-by-step workflow with explicit instructions
@@ -278,6 +299,7 @@
 ### 11. interactive-requirements-gathering (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -287,6 +309,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear identity for structured requirements gathering
 - Comprehensive capabilities covering questioning framework
 - Detailed step-by-step workflow for A/B/C/D/E pattern
@@ -302,6 +325,7 @@
 ### 12. ios-expert (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -311,6 +335,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear Swift/SwiftUI identity with modern iOS focus
 - Comprehensive capabilities covering SwiftUI, project structure, UI design, performance, testing
 - Detailed instructions for all major iOS concerns
@@ -326,6 +351,7 @@
 ### 13. java-expert (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -335,6 +361,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear Java 21+ identity with modern features
 - Comprehensive capabilities covering virtual threads, pattern matching, records, Spring Boot
 - Detailed instructions for all major Java/Spring concerns
@@ -350,6 +377,7 @@
 ### 14. k8s-manifest-generator (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -359,6 +387,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear Kubernetes manifest generation identity
 - Comprehensive capabilities covering all manifest types
 - Detailed step-by-step workflow with validation
@@ -374,6 +403,7 @@
 ### 15. memory-forensics (9/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -383,6 +413,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear Volatility framework identity
 - Comprehensive capabilities covering all forensics aspects
 - Detailed step-by-step workflow for memory analysis
@@ -392,6 +423,7 @@
 - Complete memory protocol
 
 **Minor Weakness**:
+
 - Limited output interpretation examples (mostly command syntax)
 
 **Enhancement**: None required (score above threshold)
@@ -401,6 +433,7 @@
 ### 16. mobile-first-design-rules (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -410,6 +443,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear mobile-first design identity
 - Comprehensive capabilities covering layout, typography, touch interaction, performance, accessibility
 - Detailed instructions for all major mobile design concerns
@@ -425,6 +459,7 @@
 ### 17. nextjs-expert (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -434,6 +469,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear Next.js 14/15 identity with App Router focus
 - Comprehensive capabilities covering async request API, component architecture, data fetching, performance
 - Detailed instructions for all major Next.js concerns
@@ -449,6 +485,7 @@
 ### 18. nodejs-expert (10/10) ✅ PASS
 
 **Score Breakdown**:
+
 - Identity/Description: 1/1 ✓
 - Capabilities: 1/1 ✓
 - Instructions/Workflow: 2/2 ✓
@@ -458,6 +495,7 @@
 - Memory Protocol: 1/1 ✓
 
 **Strengths**:
+
 - Clear Node.js/NestJS identity
 - Comprehensive capabilities covering NestJS module structure, core module, shared module, testing
 - Detailed instructions for all major Node.js backend concerns
@@ -475,12 +513,12 @@
 ### Overall Quality Distribution
 
 | Score Range | Count | Percentage |
-|-------------|-------|------------|
-| 10/10 | 16 | 88.9% |
-| 9/10 | 2 | 11.1% |
-| 8/10 | 0 | 0% |
-| 7/10 | 0 | 0% |
-| < 7/10 | 0 | 0% |
+| ----------- | ----- | ---------- |
+| 10/10       | 16    | 88.9%      |
+| 9/10        | 2     | 11.1%      |
+| 8/10        | 0     | 0%         |
+| 7/10        | 0     | 0%         |
+| < 7/10      | 0     | 0%         |
 
 ### Common Strengths Across All Skills
 

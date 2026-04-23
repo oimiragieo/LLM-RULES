@@ -19,6 +19,7 @@ Comprehensive review of actively modified core runtime code in `.claude/hooks/ro
 **Impact:** Undetected state file corruption goes unlogged
 
 **Issue:**
+
 ```javascript
 try {
   validated[key] = JSON.parse(JSON.stringify(value));
@@ -29,6 +30,7 @@ try {
 ```
 
 **Problems:**
+
 1. Exception discarded - no logging of what failed
 2. Fallback to defaults may mask corrupted input (silent data loss)
 3. Deep copy via JSON.stringify() loses functions, circular references
@@ -42,6 +44,7 @@ try {
 ### CRITICAL-002: Race Conditions in Concurrent File Access
 
 **Files Affected:**
+
 - `.claude/lib/routing/router-state.cjs` - No file locking
 - `.claude/hooks/routing/pre-tool-unified.read-safety.cjs:104` - Raw JSON.parse
 - `.claude/lib/memory/memory-manager.cjs` - Index writes
@@ -49,6 +52,7 @@ try {
 **Severity:** CRITICAL (Lost updates, infinite loops)
 
 **Issue:**
+
 ```
 Session A: Read router-state (v1) → Modify → Write v2
 Session B: Read router-state (v1) → Modify → Write v2 (OVERWRITES A)
@@ -66,14 +70,16 @@ Session B: Read router-state (v1) → Modify → Write v2 (OVERWRITES A)
 ### CRITICAL-003: Unbounded Data Structures (Memory Leaks)
 
 **Files Affected:**
+
 - `.claude/lib/utils/safe-json.cjs:24` - `warnedSchemas = new Set()` (grows indefinitely)
 - Similar patterns in 5+ other files
 
 **Severity:** CRITICAL (OOM after weeks of uptime)
 
 **Issue:**
+
 ```javascript
-const warnedSchemas = new Set();  // Never cleaned, grows unbounded
+const warnedSchemas = new Set(); // Never cleaned, grows unbounded
 ```
 
 **Impact:** Long-running processes exhibit memory bloat; V8 GC cycles increase
@@ -90,6 +96,7 @@ const warnedSchemas = new Set();  // Never cleaned, grows unbounded
 **File:** `.claude/hooks/routing/pre-tool-unified.cjs:33-35`
 
 **Issue:**
+
 ```javascript
 try {
   eventBus.emit(EventTypes.TOOL_BLOCKED, {...});
@@ -111,8 +118,9 @@ try {
 
 **Issue:** 40+ commands in flat list, complex regex for output detection
 
-**Problems:** 
-- Doesn't catch `cmd | tee file` 
+**Problems:**
+
+- Doesn't catch `cmd | tee file`
 - Allowlist unsorted and hard to maintain
 - No unit tests for edge cases
 
@@ -161,6 +169,7 @@ try {
 ### MEDIUM-002: Oversized Modules Violate SRP
 
 **Files:**
+
 - user-prompt-unified.core.cjs - 1893 lines
 - routing-guard-core.cjs - 79KB
 - skill-creator - 107KB, 3677 lines
@@ -219,20 +228,14 @@ try {
 ## Recommendations
 
 **P0 (This Sprint - 6-9 hours):**
+
 1. Fix safe-json.cjs data loss (2-3h)
 2. Add file locking to state files (4-5h)
 3. Cap unbounded caches (3-4h)
 
-**P1 (Sprint 2 - 15-18 hours):**
-4. Add circuit breaker to event bus (3h)
-5. Refactor shell validator (4h)
-6. Migrate to async file I/O (6-8h)
-7. Add hook input validation (2-3h)
+**P1 (Sprint 2 - 15-18 hours):** 4. Add circuit breaker to event bus (3h) 5. Refactor shell validator (4h) 6. Migrate to async file I/O (6-8h) 7. Add hook input validation (2-3h)
 
-**P2 (Sprint 3-4 - 15+ hours):**
-8. Sanitize memory write paths (4h)
-9. Decompose mega-modules (26-32h)
-10. Replace console with structured logging (6-8h)
+**P2 (Sprint 3-4 - 15+ hours):** 8. Sanitize memory write paths (4h) 9. Decompose mega-modules (26-32h) 10. Replace console with structured logging (6-8h)
 
 ---
 
@@ -243,4 +246,3 @@ Framework demonstrates **solid defensive engineering with well-applied security 
 **Ready to merge:** NO (P0 blockers)
 **Estimated fix timeline:** 21-28 hours (1 developer, 3-4 days)
 **Post-fix score:** 8.5/10
-

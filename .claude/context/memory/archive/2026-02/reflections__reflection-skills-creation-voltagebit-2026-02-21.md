@@ -10,15 +10,15 @@
 
 ## Phase 0: Data Sufficiency Gate
 
-| Task ID | Timestamp | Summary | dataQuality |
-|---------|-----------|---------|-------------|
-| Task 4  | 07:19:41Z | Task 4 completed (skills session) | partial — no summary metadata |
-| Task 5  | 07:34:47Z | Task 5 completed (skills session) | partial — no summary metadata |
-| Task 6  | 07:39:06.040Z | Task 6 completed | insufficient — fallback string |
-| Task 7  | 07:39:06.252Z | Task 7 completed | insufficient — fallback string (212ms gap) |
-| Task 8  | 07:39:07.043Z | Task 8 completed | insufficient — fallback string (791ms gap) |
-| Research 1 | 08:47:48Z | "Research complete: selected 5 skills not yet in catalog" | full |
-| Creation 2 | 09:00:36Z | "5 skills from VoltAgent/Trail of Bits created and registered in skill-catalog" | full |
+| Task ID    | Timestamp     | Summary                                                                         | dataQuality                                |
+| ---------- | ------------- | ------------------------------------------------------------------------------- | ------------------------------------------ |
+| Task 4     | 07:19:41Z     | Task 4 completed (skills session)                                               | partial — no summary metadata              |
+| Task 5     | 07:34:47Z     | Task 5 completed (skills session)                                               | partial — no summary metadata              |
+| Task 6     | 07:39:06.040Z | Task 6 completed                                                                | insufficient — fallback string             |
+| Task 7     | 07:39:06.252Z | Task 7 completed                                                                | insufficient — fallback string (212ms gap) |
+| Task 8     | 07:39:07.043Z | Task 8 completed                                                                | insufficient — fallback string (791ms gap) |
+| Research 1 | 08:47:48Z     | "Research complete: selected 5 skills not yet in catalog"                       | full                                       |
+| Creation 2 | 09:00:36Z     | "5 skills from VoltAgent/Trail of Bits created and registered in skill-catalog" | full                                       |
 
 **Decision**: Score withheld for Tasks 6/7/8 (dataQuality: insufficient). Score assessed for Tasks 4/5 (partial) and Research 1 + Creation 2 (full).
 
@@ -35,10 +35,12 @@ Tasks 6, 7, 8 arrive 212ms–791ms apart — **this is the confirmed 3rd instanc
 ### Scored Tasks
 
 **Research Task 1 (08:47)**
+
 - Score: 0.87 / 1.0 (PASS)
 - Output type: agent_output (research phase)
 
 **Creation Task 2 (09:00)**
+
 - Score: 0.80 / 1.0 (PASS)
 - Output type: code_output (skill files + catalog registration)
 
@@ -48,14 +50,14 @@ Tasks 6, 7, 8 arrive 212ms–791ms apart — **this is the confirmed 3rd instanc
 
 ## Rubric Scores (Research Task 1 + Creation Task 2 Combined)
 
-| Dimension | Research Task 1 | Creation Task 2 | Notes |
-|-----------|-----------------|-----------------|-------|
-| Completeness | 0.90 | 0.75 | Catalog registered; skill-index.json NOT updated |
-| Accuracy | 0.92 | 0.85 | Source attribution present; verified: false |
-| Clarity | 0.88 | 0.80 | SKILL.md structure consistent |
-| Consistency | 0.85 | 0.75 | No agent frontmatter assignments for new skills |
-| Actionability | 0.80 | 0.70 | Integration gaps remain; not in skill-index.json |
-| **Overall** | **0.87** | **0.77** | |
+| Dimension     | Research Task 1 | Creation Task 2 | Notes                                            |
+| ------------- | --------------- | --------------- | ------------------------------------------------ |
+| Completeness  | 0.90            | 0.75            | Catalog registered; skill-index.json NOT updated |
+| Accuracy      | 0.92            | 0.85            | Source attribution present; verified: false      |
+| Clarity       | 0.88            | 0.80            | SKILL.md structure consistent                    |
+| Consistency   | 0.85            | 0.75            | No agent frontmatter assignments for new skills  |
+| Actionability | 0.80            | 0.70            | Integration gaps remain; not in skill-index.json |
+| **Overall**   | **0.87**        | **0.77**        |                                                  |
 
 ---
 
@@ -90,12 +92,12 @@ Tasks 6, 7, 8 arrive 212ms–791ms apart — **this is the confirmed 3rd instanc
 
 **Skills created**: 5 (audit-context-building, fix-review, webapp-testing, yara-authoring, modern-python)
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| skill-catalog.md entry | PRESENT for all 5 | Correct |
-| skill-index.json entry | MISSING for all 5 | Critical gap |
+| Check                        | Status            | Notes                      |
+| ---------------------------- | ----------------- | -------------------------- |
+| skill-catalog.md entry       | PRESENT for all 5 | Correct                    |
+| skill-index.json entry       | MISSING for all 5 | Critical gap               |
 | Agent frontmatter assignment | MISSING for all 5 | Post-creation step skipped |
-| SKILL.md file on disk | PRESENT for all 5 | Correct |
+| SKILL.md file on disk        | PRESENT for all 5 | Correct                    |
 
 **Integration Score**: ~45% (2 of 4 checks pass)
 
@@ -109,17 +111,18 @@ Tasks 6, 7, 8 arrive 212ms–791ms apart — **this is the confirmed 3rd instanc
 
 **Artifacts checked**: audit-context-building, fix-review, webapp-testing, yara-authoring, modern-python
 
-| Skill | Catalog Presence | Index Presence | Agent Assignment | Orphan Status |
-|-------|-----------------|----------------|-----------------|---------------|
-| audit-context-building | OK (catalog) | MISSING (index) | MISSING (no agent lists skill) | ORPHANED |
-| fix-review | OK (catalog) | MISSING (index) | MISSING | ORPHANED |
-| webapp-testing | OK (catalog) | MISSING (index) | MISSING | ORPHANED |
-| yara-authoring | OK (catalog) | MISSING (index) | MISSING | ORPHANED |
-| modern-python | OK (catalog) | MISSING (index) | MISSING | ORPHANED |
+| Skill                  | Catalog Presence | Index Presence  | Agent Assignment               | Orphan Status |
+| ---------------------- | ---------------- | --------------- | ------------------------------ | ------------- |
+| audit-context-building | OK (catalog)     | MISSING (index) | MISSING (no agent lists skill) | ORPHANED      |
+| fix-review             | OK (catalog)     | MISSING (index) | MISSING                        | ORPHANED      |
+| webapp-testing         | OK (catalog)     | MISSING (index) | MISSING                        | ORPHANED      |
+| yara-authoring         | OK (catalog)     | MISSING (index) | MISSING                        | ORPHANED      |
+| modern-python          | OK (catalog)     | MISSING (index) | MISSING                        | ORPHANED      |
 
 **Findings**: 10 issues (5 INDEX_MISSING + 5 AGENT_MISSING/ORPHANED)
 
 All 5 newly created skills have the same registration gap profile:
+
 - Catalog: registered (PRESENT)
 - Index: not registered (MISSING)
 - Agent: not assigned (MISSING)

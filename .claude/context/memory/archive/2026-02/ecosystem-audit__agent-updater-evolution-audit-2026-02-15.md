@@ -86,7 +86,7 @@ This means the gate always passes and the phase can be skipped entirely.
 ```yaml
 obtain:
   description: Research best practices for the change type
-  optional: false  # Align with evolution-workflow.md Iron Law 1
+  optional: false # Align with evolution-workflow.md Iron Law 1
   steps:
     # ... existing steps unchanged
   gates:
@@ -122,11 +122,12 @@ If Option B is chosen, `research-enforcement.cjs` must also be updated to allow 
   - A `compensate` section with `restore_backup` and `revert_routing` actions (lines 328-335)
 
 However:
-  - `main.cjs` contains zero backup logic (no backup creation, no backup restoration)
-  - The backup directory `.claude/context/backups/` contains only `.gitkeep`
-  - No `createBackup` handler implementation exists anywhere in the skill directory
-  - No `restore_backup` compensate handler exists
-  - grep for `createBackup|restore_backup|backup_id` in the agent-updater skill returns zero matches
+
+- `main.cjs` contains zero backup logic (no backup creation, no backup restoration)
+- The backup directory `.claude/context/backups/` contains only `.gitkeep`
+- No `createBackup` handler implementation exists anywhere in the skill directory
+- No `restore_backup` compensate handler exists
+- grep for `createBackup|restore_backup|backup_id` in the agent-updater skill returns zero matches
 
 - **Gap**: The workflow YAML specifies backup as a blocking gate (`gate-lock-backup` requires `backup_id !== null`), but no code implements it. If the WorkflowEngine actually evaluates this gate, it would always fail and abort.
 - **Impact**: (1) Agent updates have no safety net -- if an update corrupts an agent file, there is no automated rollback path. (2) The workflow YAML is aspirational, not functional. (3) The `compensate` section creates a false sense of safety.
@@ -174,14 +175,16 @@ function restoreBackup(backupPath, agentPath) {
 ```
 
 But `main.cjs` actually returns additional fields that are not in the schema:
-  - `trigger` (string: "manual" | "reflection" | "evolve")
-  - `requiredInvocations` (array of strings)
-  - `tddBacklog` (array of objects with `phase` and `items`)
+
+- `trigger` (string: "manual" | "reflection" | "evolve")
+- `requiredInvocations` (array of strings)
+- `tddBacklog` (array of objects with `phase` and `items`)
 
 It also returns error-case fields not in the schema:
-  - `stage` (string)
-  - `error` (string)
-  - `recommendation` (string)
+
+- `stage` (string)
+- `error` (string)
+- `recommendation` (string)
 
 - **Gap**: (1) The schema is incomplete -- consumers validating output against the schema would reject valid output with `trigger`, `requiredInvocations`, `tddBacklog`. (2) No runtime validation of the schema exists in `main.cjs` (it never references or loads the schema file). (3) The input schema is similarly underspecified -- it accepts `agent`, `trigger`, `mode`, `changes` but `main.cjs` also accepts `name` and `help` as flags.
 - **Impact**: Downstream consumers (evolution-orchestrator, WorkflowEngine) cannot reliably validate agent-updater output. Schema drift makes the schemas misleading rather than useful.
@@ -366,9 +369,10 @@ Check the target agent's full integration surface:
 - **Current State**: The `agent-updater-workflow.yaml` has steps like `update-state-evaluate`, `update-state-validate`, etc., that call `updateEvolutionState` handlers. These presumably write to `evolution-state.json`. The `evolution-state-guard.cjs` hook monitors Write/Edit operations targeting `evolution-state.json` and validates state transitions.
 
 However:
-  - The workflow YAML does not reference `evolution-state-guard.cjs` in any enforcement or gate definition
-  - The state updates in the YAML use `handler: updateEvolutionState` but this handler is not implemented in `main.cjs`
-  - The `main.cjs` script does not read or write `evolution-state.json` at all
+
+- The workflow YAML does not reference `evolution-state-guard.cjs` in any enforcement or gate definition
+- The state updates in the YAML use `handler: updateEvolutionState` but this handler is not implemented in `main.cjs`
+- The `main.cjs` script does not read or write `evolution-state.json` at all
 
 - **Gap**: The workflow YAML assumes a WorkflowEngine that calls named handlers (`checkEvolutionState`, `loadExistingAgent`, `createBackup`, `updateEvolutionState`, etc.), but no such engine implementation exists that is wired to these specific handlers. The `main.cjs` script is a standalone CLI tool that outputs a plan -- it does not drive the full workflow.
 - **Impact**: (1) The workflow YAML is a specification document, not an executable workflow -- there is a gap between what it describes and what `main.cjs` implements. (2) State transitions during agent updates are not validated against the evolution state machine unless the full EVOLVE orchestrator is used. (3) Running `main.cjs` directly will not update `evolution-state.json`, leaving the state machine out of sync.
@@ -532,28 +536,28 @@ pnpm format
 
 ## Cross-Reference Summary
 
-| Artifact | Path | Status |
-|---|---|---|
-| SKILL.md | `.claude/skills/agent-updater/SKILL.md` | Needs artifact-integrator, gap analysis, execution model docs |
-| main.cjs | `.claude/skills/agent-updater/scripts/main.cjs` | CRITICAL: hardcoded patchPlan, missing backup, missing integrator |
-| Workflow YAML | `.claude/workflows/updaters/agent-updater-workflow.yaml` | HIGH: optional OBTAIN contradicts Iron Law 1 |
-| Output schema | `.claude/skills/agent-updater/schemas/output.schema.json` | MEDIUM: missing 3 fields |
-| Input schema | `.claude/skills/agent-updater/schemas/input.schema.json` | LOW: missing `name` and `help` flags |
-| Command | `.claude/commands/agent-updater.md` | OK: properly wired |
-| Rules | `.claude/skills/agent-updater/rules/agent-updater.md` | OK: 5 rules, accurate |
-| Skill workflow | `.claude/workflows/agent-updater-skill-workflow.md` | OK: 7-step summary accurate |
-| evolution-workflow.md | `.claude/workflows/core/evolution-workflow.md` | Source of truth, correct |
-| evolution-state-guard.cjs | `.claude/hooks/evolution/evolution-state-guard.cjs` | OK: state machine enforcement correct |
-| research-enforcement.cjs | `.claude/hooks/evolution/research-enforcement.cjs` | OK: blocks artifact writes without research |
-| evolution-orchestrator.md | `.claude/agents/orchestrators/evolution-orchestrator.md` | MEDIUM: Phase E template missing update types |
+| Artifact                  | Path                                                      | Status                                                            |
+| ------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------- |
+| SKILL.md                  | `.claude/skills/agent-updater/SKILL.md`                   | Needs artifact-integrator, gap analysis, execution model docs     |
+| main.cjs                  | `.claude/skills/agent-updater/scripts/main.cjs`           | CRITICAL: hardcoded patchPlan, missing backup, missing integrator |
+| Workflow YAML             | `.claude/workflows/updaters/agent-updater-workflow.yaml`  | HIGH: optional OBTAIN contradicts Iron Law 1                      |
+| Output schema             | `.claude/skills/agent-updater/schemas/output.schema.json` | MEDIUM: missing 3 fields                                          |
+| Input schema              | `.claude/skills/agent-updater/schemas/input.schema.json`  | LOW: missing `name` and `help` flags                              |
+| Command                   | `.claude/commands/agent-updater.md`                       | OK: properly wired                                                |
+| Rules                     | `.claude/skills/agent-updater/rules/agent-updater.md`     | OK: 5 rules, accurate                                             |
+| Skill workflow            | `.claude/workflows/agent-updater-skill-workflow.md`       | OK: 7-step summary accurate                                       |
+| evolution-workflow.md     | `.claude/workflows/core/evolution-workflow.md`            | Source of truth, correct                                          |
+| evolution-state-guard.cjs | `.claude/hooks/evolution/evolution-state-guard.cjs`       | OK: state machine enforcement correct                             |
+| research-enforcement.cjs  | `.claude/hooks/evolution/research-enforcement.cjs`        | OK: blocks artifact writes without research                       |
+| evolution-orchestrator.md | `.claude/agents/orchestrators/evolution-orchestrator.md`  | MEDIUM: Phase E template missing update types                     |
 
 ---
 
 ## Appendix: Findings Severity Distribution
 
-| Severity | Count | Finding Numbers |
-|---|---|---|
-| CRITICAL | 1 | #1 (Hardcoded patchPlan) |
-| HIGH | 2 | #2 (OBTAIN optionality), #3 (Backup not implemented) |
-| MEDIUM | 4 | #4 (Schema drift), #5 (Type dispatch), #6 (Missing integrator), #7 (Parity gap) |
-| LOW | 1 | #8 (YAML vs main.cjs execution gap) |
+| Severity | Count | Finding Numbers                                                                 |
+| -------- | ----- | ------------------------------------------------------------------------------- |
+| CRITICAL | 1     | #1 (Hardcoded patchPlan)                                                        |
+| HIGH     | 2     | #2 (OBTAIN optionality), #3 (Backup not implemented)                            |
+| MEDIUM   | 4     | #4 (Schema drift), #5 (Type dispatch), #6 (Missing integrator), #7 (Parity gap) |
+| LOW      | 1     | #8 (YAML vs main.cjs execution gap)                                             |

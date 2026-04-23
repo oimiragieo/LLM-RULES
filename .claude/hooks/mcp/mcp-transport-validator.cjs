@@ -60,7 +60,7 @@ function main() {
   let rawInput = '';
 
   process.stdin.setEncoding('utf8');
-  process.stdin.on('data', (chunk) => {
+  process.stdin.on('data', chunk => {
     rawInput += chunk;
   });
 
@@ -71,7 +71,9 @@ function main() {
 
       if (!result.allow) {
         if (MCP_TRANSPORT_VALIDATOR_ENFORCEMENT === 'off') {
-          process.stderr.write(`[mcp-transport-validator] WARN (enforcement=off): ${result.message}\n`);
+          process.stderr.write(
+            `[mcp-transport-validator] WARN (enforcement=off): ${result.message}\n`
+          );
           process.exit(0);
         }
 

@@ -51,6 +51,7 @@
 **Description**: Consolidate scattered environment variable defaults into single module. Export object with all enforcement flags. Import in all hooks instead of inline `process.env.X || 'default'` logic.
 
 **Benefits**:
+
 - Single source of truth for enforcement modes
 - Eliminates duplicate fallback logic (8+ hooks → 1 module)
 - Easier auditing (one file vs scattered)
@@ -67,11 +68,12 @@
 **Description**: Wrap event emission in try-catch with 5-second timeout. Prevents hook crashes from blocking tool execution pipeline.
 
 **Implementation**:
+
 ```javascript
 try {
   await Promise.race([
     eventBus.emit('event', data),
-    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000)),
   ]);
 } catch (error) {
   logger.error('Event emission failed', { error });
@@ -80,6 +82,7 @@ try {
 ```
 
 **Benefits**:
+
 - Hook failures don't block agent workflows
 - 5s timeout prevents indefinite hangs
 - Structured error logging for debugging
@@ -98,6 +101,7 @@ try {
 **Solution**: Add exponential backoff, cache TTL, and retry limits. Document race conditions explicitly.
 
 **Prevention**:
+
 - Never use unbounded `while(true)` loops in production code
 - Always include sleep/backoff in polling patterns
 - Add timeout + retry limits
@@ -184,16 +188,20 @@ Evidence quality is MEDIUM-HIGH across all learnings. Higher scores require conc
 ## Memory Updates
 
 **Patterns Added**:
+
 1. Centralized enforcement configuration pattern (enforcement-defaults.cjs consolidation)
 2. Error boundary + timeout pattern for event emitters (hook reliability)
 
 **Gotchas Added**:
+
 1. CPU spin in cache implementations (router-state.cjs)
 
 **Decisions Referenced**:
+
 - ADR-125-129: Enterprise audit bug fix architecture (context for this session's work)
 
 **Issues Addressed**:
+
 - Oversized modules: enforcement-defaults.cjs reduces hook file sizes by consolidating config
 - Console usage: Error boundaries use structured logging instead of console.error
 - Memory sanitization: Shell injection validator hardening indirectly improves input sanitization

@@ -28,12 +28,12 @@ const path = require('node:path');
 const NO_COLOR = process.env.NO_COLOR || !process.stdout.isTTY;
 
 const c = {
-  green: (s) => (NO_COLOR ? s : `\x1b[32m${s}\x1b[0m`),
-  yellow: (s) => (NO_COLOR ? s : `\x1b[33m${s}\x1b[0m`),
-  red: (s) => (NO_COLOR ? s : `\x1b[31m${s}\x1b[0m`),
-  cyan: (s) => (NO_COLOR ? s : `\x1b[36m${s}\x1b[0m`),
-  bold: (s) => (NO_COLOR ? s : `\x1b[1m${s}\x1b[0m`),
-  dim: (s) => (NO_COLOR ? s : `\x1b[2m${s}\x1b[0m`),
+  green: s => (NO_COLOR ? s : `\x1b[32m${s}\x1b[0m`),
+  yellow: s => (NO_COLOR ? s : `\x1b[33m${s}\x1b[0m`),
+  red: s => (NO_COLOR ? s : `\x1b[31m${s}\x1b[0m`),
+  cyan: s => (NO_COLOR ? s : `\x1b[36m${s}\x1b[0m`),
+  bold: s => (NO_COLOR ? s : `\x1b[1m${s}\x1b[0m`),
+  dim: s => (NO_COLOR ? s : `\x1b[2m${s}\x1b[0m`),
 };
 
 // ---------------------------------------------------------------------------
@@ -211,7 +211,7 @@ function main() {
   const allLines = raw
     .split('\n')
     .filter(Boolean)
-    .map((l) => {
+    .map(l => {
       try {
         return JSON.parse(l);
       } catch (_e) {
@@ -219,7 +219,7 @@ function main() {
       }
     });
 
-  const filtered = allLines.filter((l) => matchesFilters(l, opts));
+  const filtered = allLines.filter(l => matchesFilters(l, opts));
 
   if (filtered.length === 0) {
     console.log(c.dim('No trace lines match the given filters.'));

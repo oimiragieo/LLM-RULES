@@ -14,6 +14,7 @@
 **Status**: 🟡 **MODERATE COVERAGE WITH CRITICAL GAPS**
 
 **Key Findings**:
+
 - **362 active test files** covering ~40% of lib modules and ~60% of hooks
 - **90+ untested modules** in `.claude/lib/` (33% uncovered)
 - **29 untested hook modules** (37% uncovered)
@@ -21,6 +22,7 @@
 - **Strong test organization** with proper TDD structure
 
 **Priority Actions**:
+
 1. **P0**: Add tests for 40+ core untested modules (memory, routing, events)
 2. **P1**: Replace timing-based waits with condition polling (7 tests)
 3. **P2**: Add integration tests for hook chains and workflow phases
@@ -33,6 +35,7 @@
 ### 1.1 High-Risk Untested Modules (.claude/lib/)
 
 #### **Memory Subsystem** (14 untested modules - HIGH RISK)
+
 ```
 ❌ .claude/lib/memory/contextual-memory-context-loader.cjs
 ❌ .claude/lib/memory/contextual-memory-search-fallback.cjs
@@ -57,6 +60,7 @@
 ---
 
 #### **Routing & Task Management** (12 untested modules - HIGH RISK)
+
 ```
 ❌ .claude/lib/routing/fuzzy-intent-matcher.cjs
 ❌ .claude/lib/routing/pattern-router.cjs
@@ -79,6 +83,7 @@
 ---
 
 #### **Code Indexing** (8 untested modules - MEDIUM RISK)
+
 ```
 ❌ .claude/lib/code-indexing/code-parser.cjs
 ❌ .claude/lib/code-indexing/hybrid-lazy-indexer-methods-a.cjs
@@ -97,6 +102,7 @@
 ---
 
 #### **Events & Error Handling** (5 untested modules - MEDIUM RISK)
+
 ```
 ❌ .claude/lib/events/event-bus-sink.cjs
 ❌ .claude/lib/events/event-types.cjs
@@ -110,6 +116,7 @@
 ---
 
 #### **Configuration & Context** (3 untested modules - LOW RISK)
+
 ```
 ❌ .claude/lib/config/context-mode-loader.cjs
 ❌ .claude/lib/config/resolve-runtime-context.cjs
@@ -123,6 +130,7 @@
 ### 1.2 Untested Hook Modules (.claude/hooks/)
 
 #### **Critical Path Hooks** (11 untested - HIGH RISK)
+
 ```
 ❌ .claude/hooks/routing/routing-guard-core.cjs (main entry point!)
 ❌ .claude/hooks/routing/routing-guard-core.impl.cjs
@@ -146,6 +154,7 @@
 ---
 
 #### **Pre-Tool Unified Hooks** (6 untested - HIGH RISK)
+
 ```
 ❌ .claude/hooks/routing/pre-tool-unified.cleanup.cjs
 ❌ .claude/hooks/routing/pre-tool-unified.execution.cjs
@@ -162,6 +171,7 @@
 ---
 
 #### **Reflection System** (3 untested - MEDIUM RISK)
+
 ```
 ❌ .claude/hooks/reflection/error-summary-extractor.cjs
 ❌ .claude/hooks/reflection/unified-reflection-actions.cjs
@@ -174,6 +184,7 @@
 ---
 
 #### **Monitoring & Session** (3 untested - LOW RISK)
+
 ```
 ❌ .claude/hooks/monitoring/error-tracker.cjs
 ❌ .claude/hooks/session/adaptive-quality-gate.cjs
@@ -199,6 +210,7 @@
 ```
 
 **Problem**: Arbitrary timeouts (e.g., `setTimeout(200)`) cause intermittent failures:
+
 - Too short → test fails on slow CI
 - Too long → slow test suite
 
@@ -230,11 +242,13 @@ await waitForCondition(() => fs.existsSync(filePath));
 ### 2.2 File System State Dependencies (MEDIUM RISK)
 
 Several tests create/delete files during test runs:
+
 - `tests/hooks/code-index-updater.test.cjs` - writes index files
 - `tests/integration/artifact-graph-persistence.test.cjs` - modifies artifact graph
 - `tests/misc/evolution-state-sync.test.cjs` - writes evolution state
 
 **Problem**: Tests may fail if:
+
 - Parallel execution causes file conflicts
 - Cleanup doesn't run (test aborted)
 - External process has file open
@@ -266,6 +280,7 @@ afterEach(() => {
 ```
 
 **Example Pattern** (hypothetical from pattern):
+
 ```javascript
 it('should validate database connection', () => {
   const result = validateConnection('postgres://...');
@@ -274,6 +289,7 @@ it('should validate database connection', () => {
 ```
 
 **Fix**: Assert actual behavior:
+
 ```javascript
 it('should validate database connection', () => {
   const result = validateConnection('postgres://valid');
@@ -300,6 +316,7 @@ it('should reject invalid database connection', () => {
 ✅ **Explicit Test Descriptions**: Use `describe()` and `it()` with clear names
 
 **Example** (routing-guard.test.cjs):
+
 ```javascript
 describe('routing-guard', () => {
   describe('module exports', () => {
@@ -320,6 +337,7 @@ describe('routing-guard', () => {
 **Issue**: Some tests modify global state (process.env, file system) without full isolation.
 
 **Example** (routing-guard.test.cjs line 40-58):
+
 ```javascript
 beforeEach(() => {
   originalEnv = { ...process.env }; // ✅ Save env
@@ -352,16 +370,19 @@ afterEach(() => {
 **Evidence from learnings.md**:
 
 ✅ **windowsHide compliance** (line 90-99):
+
 - Bug: 3 missing `windowsHide: true` flags
 - Test: `tests/lib/utils/windows-hide-compliance.test.cjs` added
 - Status: 0 violations confirmed
 
 ✅ **JSON.parse safety** (line 208-212):
+
 - Bug: 76% unprotected JSON.parse calls (68 occurrences)
 - Pattern: safeParseJSON adoption
 - Status: Remediation in progress (P0)
 
 ✅ **Hook registration** (line 43):
+
 - Bug: 10 active hooks unregistered in settings.json
 - Validation: Implicit via integration tests
 - Status: Needs explicit validation test
@@ -373,16 +394,19 @@ afterEach(() => {
 **High-Risk Patterns Without Tests**:
 
 ❌ **Memory file budget overflow** (learnings.md line 41):
+
 - Bug: decisions.md (74KB), issues.md (62KB) 3-4x over budget
 - Missing: Test that fails if memory files exceed 20KB
 - Risk: Spawn prompt bloat, context overflow
 
 ❌ **Schema sprawl** (learnings.md line 42):
+
 - Bug: 111/133 unreferenced schemas (83% unused)
 - Missing: Test that validates all schemas are used
 - Risk: Dead code, confusion
 
 ❌ **Environment variable documentation gap** (learnings.md line 44):
+
 - Bug: 262/282 undocumented env vars (93%)
 - Missing: Test that validates all env vars in .env.example
 - Risk: Discoverability, misconfiguration
@@ -397,6 +421,7 @@ afterEach(() => {
 **Missing**: Multi-hook interaction tests
 
 **Example Needed**:
+
 ```javascript
 describe('Hook Chain: Task Spawn Flow', () => {
   it('should execute pre-task → routing-guard → spawn-prompt-assembler → post-task', async () => {
@@ -404,7 +429,7 @@ describe('Hook Chain: Task Spawn Flow', () => {
     const result = await simulateTaskSpawn({
       task_id: 'test-1',
       subagent_type: 'developer',
-      prompt: 'Test task'
+      prompt: 'Test task',
     });
 
     assert.strictEqual(result.hooksExecuted.length, 4);
@@ -423,17 +448,19 @@ describe('Hook Chain: Task Spawn Flow', () => {
 **Missing**: Enterprise workflow phase advancement tests
 
 **Workflow Context** (learnings.md line 145-174):
+
 - 8-Phase Enterprise Pipeline: Research → PM → Architecture + Security → Planning → Developer → Code Review → QA → Reflection
 - Phase advancement logic in `post-completion-chain.cjs`
 - Complexity-based phase skipping
 
 **Example Needed**:
+
 ```javascript
 describe('Enterprise Workflow: Phase Advancement', () => {
   it('should advance TRIVIAL task through Implement → Review only', async () => {
     const workflow = await startWorkflow({
       complexity: 'TRIVIAL',
-      task: 'Fix typo in README'
+      task: 'Fix typo in README',
     });
 
     assert.deepStrictEqual(workflow.phases, ['Implement', 'Review']);
@@ -443,7 +470,7 @@ describe('Enterprise Workflow: Phase Advancement', () => {
   it('should advance HIGH task through all phases except Dynamic Creation', async () => {
     const workflow = await startWorkflow({
       complexity: 'HIGH',
-      task: 'Add user authentication'
+      task: 'Add user authentication',
     });
 
     assert.strictEqual(workflow.phases.length, 7);
@@ -459,6 +486,7 @@ describe('Enterprise Workflow: Phase Advancement', () => {
 ### 6.1 Current Performance
 
 **Configuration** (package.json line 69):
+
 ```json
 "test": "node --test --test-concurrency=1 \"tests/**/*.test.{mjs,cjs}\""
 ```
@@ -475,6 +503,7 @@ describe('Enterprise Workflow: Phase Advancement', () => {
 ### 6.2 Performance Optimization Opportunities
 
 **Current Bottlenecks**:
+
 1. Sequential execution (no parallelism)
 2. File system operations in tests (slow on Windows)
 3. No test categorization (unit vs integration)
@@ -486,6 +515,7 @@ describe('Enterprise Workflow: Phase Advancement', () => {
    - Integration tests: File system, hooks → run sequential
 
 2. **Parallel Unit Tests**:
+
    ```json
    "test:unit:parallel": "node --test tests/unit/**/*.test.{mjs,cjs}",
    "test:integration:sequential": "node --test --test-concurrency=1 tests/integration/**/*.test.{mjs,cjs}"
@@ -500,6 +530,7 @@ describe('Enterprise Workflow: Phase Advancement', () => {
 ### 7.1 Code Paths Without Tests
 
 **Router → Agent Spawn Flow** (CRITICAL):
+
 ```
 1. user-prompt-unified.cjs (✅ tested: user-prompt-unified.test.cjs)
 2. routing-guard-core.cjs (❌ NOT TESTED - only old routing-guard.cjs tested)
@@ -514,6 +545,7 @@ describe('Enterprise Workflow: Phase Advancement', () => {
 ---
 
 **Memory Write → Index Sync Flow** (CRITICAL):
+
 ```
 1. MemoryRecord tool (✅ part of framework)
 2. sync-memory-index.cjs hook (✅ tested: sync-memory-index implicit via integration)
@@ -528,6 +560,7 @@ describe('Enterprise Workflow: Phase Advancement', () => {
 ---
 
 **Code Search Flow** (MEDIUM):
+
 ```
 1. hybrid-search.cjs (✅ tested: hybrid-search.test.cjs)
 2. query-analyzer.cjs (✅ tested: query-analyzer.test.cjs)
@@ -547,14 +580,14 @@ describe('Enterprise Workflow: Phase Advancement', () => {
 
 **Estimated Coverage** (manual analysis):
 
-| Category                  | Files | Tested | Coverage | Risk |
-|---------------------------|-------|--------|----------|------|
-| **Hooks (active)**        | 79    | 50     | ~63%     | HIGH |
-| **Lib modules**           | 271   | 181    | ~67%     | HIGH |
-| **Code indexing**         | 26    | 18     | ~69%     | MED  |
-| **Memory subsystem**      | 40    | 26     | ~65%     | HIGH |
-| **Routing & workflows**   | 35    | 23     | ~66%     | HIGH |
-| **Tools (CLI)**           | 66    | 45     | ~68%     | MED  |
+| Category                | Files | Tested | Coverage | Risk |
+| ----------------------- | ----- | ------ | -------- | ---- |
+| **Hooks (active)**      | 79    | 50     | ~63%     | HIGH |
+| **Lib modules**         | 271   | 181    | ~67%     | HIGH |
+| **Code indexing**       | 26    | 18     | ~69%     | MED  |
+| **Memory subsystem**    | 40    | 26     | ~65%     | HIGH |
+| **Routing & workflows** | 35    | 23     | ~66%     | HIGH |
+| **Tools (CLI)**         | 66    | 45     | ~68%     | MED  |
 
 **Overall Estimated Coverage**: **~66%**
 
@@ -687,16 +720,19 @@ function isPlannerSpawn({ prompt }) {
 ### 10.3 Test Categories
 
 **Unit Tests** (Pure logic, no I/O):
+
 - Location: `tests/unit/`
 - Run: Fast (<100ms per test), parallel safe
 - Example: `fuzzy-intent-matcher.test.cjs`
 
 **Integration Tests** (File system, hooks, external dependencies):
+
 - Location: `tests/integration/`
 - Run: Slower (100-1000ms per test), sequential
 - Example: `artifact-graph-persistence.test.cjs`
 
 **End-to-End Tests** (Full workflows):
+
 - Location: `tests/e2e/`
 - Run: Slowest (>1s per test), sequential
 - Example: `enterprise-workflow-phase-advancement.test.cjs` (TO BE CREATED)
@@ -706,25 +742,30 @@ function isPlannerSpawn({ prompt }) {
 ## 11. Conclusion
 
 ### Strengths
+
 - **Good test structure**: TDD patterns, proper naming, isolated tests
 - **High pass rate**: 99.3% of tests passing consistently
 - **Recent bugs covered**: windowsHide, JSON safety have tests
 
 ### Critical Weaknesses
+
 - **33% of lib modules untested**: 90+ untested modules, including core routing/memory
 - **37% of hooks untested**: 29 untested hook modules, including newly decomposed routing-guard-core
 - **Flaky tests**: 7 tests with timing dependencies
 - **No workflow integration tests**: Enterprise pipeline phases not tested end-to-end
 
 ### Risk Assessment
+
 **Current Risk Level**: 🟡 **MODERATE-HIGH**
 
 **Why Moderate-High**:
+
 - Router and memory subsystems are partially tested (50-65% coverage)
 - Recent decomposition (routing-guard, pre-tool-unified) broke test coverage
 - No regression tests for known failure patterns (memory budget overflow, schema sprawl)
 
 **Blocking Issues for Production**:
+
 1. Routing guard core modules untested (router is entry point for ALL work)
 2. Spawn prompt assembler core untested (spawn is how work gets distributed)
 3. Memory subsystem core untested (context persistence is foundational)
@@ -770,6 +811,7 @@ function isPlannerSpawn({ prompt }) {
 ### Lib Modules (90 untested)
 
 **Memory (14)**:
+
 - contextual-memory-context-loader.cjs
 - contextual-memory-search-fallback.cjs
 - core/memory-extraction.cjs
@@ -786,6 +828,7 @@ function isPlannerSpawn({ prompt }) {
 - memory-extractor.cjs
 
 **Routing (12)**:
+
 - fuzzy-intent-matcher.cjs
 - pattern-router.cjs
 - semantic-router.cjs
@@ -800,6 +843,7 @@ function isPlannerSpawn({ prompt }) {
 - workflow/task-cleanup-manager.cjs
 
 **Code Indexing (8)**:
+
 - code-parser.cjs
 - hybrid-lazy-indexer-methods-a.cjs
 - hybrid-lazy-indexer-methods-b.cjs
@@ -810,6 +854,7 @@ function isPlannerSpawn({ prompt }) {
 - parse-utils.cjs
 
 **Events & Error (5)**:
+
 - events/event-bus-sink.cjs
 - events/event-types.cjs
 - error-pattern-detector.cjs
@@ -817,6 +862,7 @@ function isPlannerSpawn({ prompt }) {
 - evolution-state-sync.cjs
 
 **Config (3)**:
+
 - config/context-mode-loader.cjs
 - config/resolve-runtime-context.cjs
 - clients/model-client.cjs
@@ -828,6 +874,7 @@ function isPlannerSpawn({ prompt }) {
 ### Hook Modules (29 untested)
 
 **Routing (18)**:
+
 - routing-guard-core.cjs
 - routing-guard-core.impl.cjs
 - routing-guard-core.checks-router.cjs
@@ -848,17 +895,20 @@ function isPlannerSpawn({ prompt }) {
 - user-prompt-unified.core.cjs
 
 **Reflection (4)**:
+
 - error-summary-extractor.cjs
 - unified-reflection-actions.cjs
 - unified-reflection-events.cjs
 - unified-reflection-insights.cjs
 
 **Monitoring (3)**:
+
 - monitoring/error-tracker.cjs
 - session/adaptive-quality-gate.cjs (PARTIAL - test file exists but may not cover core)
 - routing/post-task-unified-completion.helpers.cjs
 
 **Helpers (4)**:
+
 - routing/post-task-unified.helpers.cjs
 - routing/pre-task-unified-helpers.cjs
 - routing/pre-task-unified-state.cjs
@@ -894,6 +944,7 @@ pnpm test:ci
 **End of Report**
 
 **Summary for Router**:
+
 - **362 active tests**, **271 lib modules**, **79 active hooks**
 - **Coverage**: ~66% overall, **critical gaps in routing and memory**
 - **P0 Actions**: Add tests for routing-guard-core (200 tests), spawn-prompt-assembler-core (150 tests), pre-tool-unified modules (180 tests), fix 7 flaky tests

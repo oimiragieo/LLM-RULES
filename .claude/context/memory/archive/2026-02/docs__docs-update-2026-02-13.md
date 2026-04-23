@@ -15,6 +15,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### learnings.md — 4 new patterns captured
 
 **Added patterns:**
+
 - **Windows windowsHide Compliance Pattern**: Added `windowsHide: true` to spawn/spawnSync calls on Windows to prevent console window flashing
 - **Defensive Programming Trilogy**: Three complementary patterns—windowsHide (Windows safety), bash allowlist (command injection), file existence guards (crash prevention)—work together for robust execution safety
 - **Stub Modules for Archived Functionality**: Pattern for handling archived code—create minimal stubs that return safe defaults (null, false, empty) to prevent crashes while consumers transition
@@ -25,6 +26,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### issues.md — 6 critical issues recorded
 
 **Recorded issues:**
+
 1. **Task #13 Reflection Context Missing (P1)** — Reflection queue contains trigger but no summary; breaks audit trail integrity
 2. **Stale Integration Queue Entries (P2)** — Queue can contain entries for already-integrated artifacts; needs hygiene step
 3. **Integration Health Scoring Not Calculated (P2)** — artifact-integrator doesn't invoke `quickIntegrationCheck()` per ADR-100
@@ -37,6 +39,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### decisions.md — 5 new ADRs appended
 
 **New ADRs:**
+
 1. **ADR-114: Shell Execution Hardening** — Standardized `shell: false` with array arguments (IMPLEMENTED)
 2. **ADR-115: safeParseJSON Utility Standard** — Adopted in 3 reflection hooks (IMPLEMENTED)
 3. **ADR-116: File-Based Locking for Concurrent Operations** — Synchronizes DB init across concurrent agents (IMPLEMENTED)
@@ -50,6 +53,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### CLAUDE.md — Updated statistics and references
 
 **Updates:**
+
 - Confirmed 58 active agents (down from 59 after archival)
 - Extended thinking enabled for 7 agents (code-reviewer, code-simplifier, researcher, penetration-tester, performance-engineer, microservices-architect, api-designer)
 - Routed documentation creation to technical-writer (not developer) — reinforced specialist-first law
@@ -59,6 +63,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### security.md — 6 new security patterns added
 
 **Patterns added:**
+
 1. **Shell Execution Hardening (ADR-114)**: `shell: false` with array arguments eliminates injection vectors
 2. **JSON Parsing Safety**: safeParseJSON utility with prototype pollution protection (added to all hooks)
 3. **File-Based Locking**: proper-lockfile pattern for concurrent DB initialization
@@ -71,6 +76,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### rules/security.md — 3 security gaps documented
 
 **Documented gaps:**
+
 1. **Prompt Injection Defense**: Rules cover SQL/XSS/eval but not "ignore previous instructions" patterns (HIGH risk in multi-agent systems)
 2. **Memory Poisoning Prevention**: No sanitization of learnings.md entries before agent reading (HIGH risk)
 3. **Concurrent Write Protection**: Partial (DB locking only), missing memory file locking (MEDIUM risk)
@@ -82,6 +88,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### testing.md — Updated with ADR-103 learnings
 
 **Added sections:**
+
 - **Integration Boundary Testing (ADR-103)**: Pattern for validating contracts at module boundaries
   - Problem: Unit tests can hide integration bugs (Task #9→#13 failure pattern)
   - Solution: Add "Integration Verification Phase" after unit tests
@@ -93,6 +100,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### task-tracking.md — Added agent-to-agent coordination pattern
 
 **Added sections:**
+
 - **Structured Handoff Metadata Schema**: TypeScript interface defining progress, discoveries, blockers, completion context
 - **Example Handoffs**: Planner→Developer (design artifacts), Developer→QA (test-ready code)
 - **Conductor Pattern**: Multi-agent workflow coordination with dependency tracking
@@ -104,6 +112,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### artifact-integration.md — Updated integration tiers
 
 **Updated tiers:**
+
 - **Must-Have (Blocking)**: Catalog entry + agent assignment (all artifact types)
 - **Should-Have (Warning)**: Documentation reference (@files), enforcement mechanism
 - **Nice-to-Have (Informational)**: Test coverage, memory updates, related templates
@@ -113,6 +122,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 #### workspace-conventions.md — Updated file placement
 
 **Updated sections:**
+
 - **Provenance Headers**: All agent-generated files must include `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
 - **File Naming**: Confirmed `{descriptive-name}-{YYYY-MM-DD}.{ext}` pattern
 - **Forbidden Locations**: Added Windows reserved filenames (nul, con, prn, aux, com1-9, lpt1-9)
@@ -121,16 +131,16 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 
 ## Quality Metrics
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Memory files updated | 3 | ✅ Complete |
-| New patterns documented | 4 learnings | ✅ Complete |
-| Issues tracked | 6 | ✅ Complete |
-| ADRs added | 5 | ✅ Complete |
-| Security patterns added | 6 | ✅ Complete |
-| Test patterns added | 2 | ✅ Complete |
-| Process patterns added | 2 | ✅ Complete |
-| Documentation files updated | 8 | ✅ Complete |
+| Metric                      | Value       | Status      |
+| --------------------------- | ----------- | ----------- |
+| Memory files updated        | 3           | ✅ Complete |
+| New patterns documented     | 4 learnings | ✅ Complete |
+| Issues tracked              | 6           | ✅ Complete |
+| ADRs added                  | 5           | ✅ Complete |
+| Security patterns added     | 6           | ✅ Complete |
+| Test patterns added         | 2           | ✅ Complete |
+| Process patterns added      | 2           | ✅ Complete |
+| Documentation files updated | 8           | ✅ Complete |
 
 ## Key Findings Documented
 
@@ -174,26 +184,28 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 
 ## Files Modified
 
-| File | Type | Changes |
-|------|------|---------|
-| `.claude/context/memory/learnings.md` | Update | +4 patterns, total ~18 KB |
-| `.claude/context/memory/decisions.md` | Update | +5 ADRs, total ~12 KB |
-| `.claude/context/memory/issues.md` | Update | +6 issues, total ~8 KB |
-| `.claude/CLAUDE.md` | Update | Agent stats, specialist routing reinforcement |
-| `rules/security.md` | Update | +6 security patterns, 3 gaps documented |
-| `rules/testing.md` | Update | +ADR-103 integration testing pattern |
-| `rules/task-tracking.md` | Update | +Agent coordination patterns |
-| `artifact-integration.md` | Update | Tier definitions refined |
+| File                                  | Type   | Changes                                       |
+| ------------------------------------- | ------ | --------------------------------------------- |
+| `.claude/context/memory/learnings.md` | Update | +4 patterns, total ~18 KB                     |
+| `.claude/context/memory/decisions.md` | Update | +5 ADRs, total ~12 KB                         |
+| `.claude/context/memory/issues.md`    | Update | +6 issues, total ~8 KB                        |
+| `.claude/CLAUDE.md`                   | Update | Agent stats, specialist routing reinforcement |
+| `rules/security.md`                   | Update | +6 security patterns, 3 gaps documented       |
+| `rules/testing.md`                    | Update | +ADR-103 integration testing pattern          |
+| `rules/task-tracking.md`              | Update | +Agent coordination patterns                  |
+| `artifact-integration.md`             | Update | Tier definitions refined                      |
 
 ## Completion Evidence
 
 ### Task Protocol
+
 - ✅ Started: `TaskUpdate(in_progress)` called
 - ✅ Work Complete: All 8 files updated, all patterns documented
 - ✅ Memory Updated: 3 memory files with 15 new entries
 - ✅ Ready for Completion: `TaskUpdate(completed)` will include file list
 
 ### Quality Verification
+
 - ✅ No lint errors (all markdown files valid)
 - ✅ No format changes needed (consistent with existing docs)
 - ✅ Cross-references verified (all ADRs, issues, skills referenced exist)
@@ -204,6 +216,7 @@ Updated framework documentation to reflect enterprise pipeline fixes (Waves 1-10
 Documentation updated to capture 10 waves of enterprise pipeline fixes:
 
 **5-bullet summary:**
+
 1. **Memory files enhanced** with 4 new enterprise patterns (windowsHide, stubs, safeParseJSON, defensive programming trilogy)
 2. **5 new ADRs documented** (Shell hardening, JSON safety, file locking, input sanitization, registry split)
 3. **Security patterns captured** — 6 patterns added to CLAUDE.md, security.md, rules/ covering shell execution, JSON parsing, concurrent access, memory validation

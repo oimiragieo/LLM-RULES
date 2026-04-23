@@ -11,33 +11,37 @@
 ## Completed Work
 
 ### 1. Hook Enum Extension (COMPLETE)
+
 - **File:** `hook-definition.schema.json`
 - **Change:** Added `"Stop"` to the `type` enum
 - **Status:** ✅ Complete
 - **Impact:** Aligns schema with actual hook usage in agent-definition.schema.json
 
 ### 2. Property Injection Protection (COMPLETE)
+
 Added `additionalProperties: false` to all schemas missing it:
 
-| Schema | Status |
-|--------|--------|
-| `plan.schema.json` | ✅ Added |
+| Schema                             | Status   |
+| ---------------------------------- | -------- |
+| `plan.schema.json`                 | ✅ Added |
 | `product-requirements.schema.json` | ✅ Added |
-| `project-brief.schema.json` | ✅ Added |
-| `system-architecture.schema.json` | ✅ Added |
-| `artifact-manifest.schema.json` | ✅ Added |
-| `test-results.schema.json` | ✅ Added |
-| `test-plan.schema.json` | ✅ Added |
-| `tool-manifest.schema.json` | ✅ Added |
-| `ux-spec.schema.json` | ✅ Added |
+| `project-brief.schema.json`        | ✅ Added |
+| `system-architecture.schema.json`  | ✅ Added |
+| `artifact-manifest.schema.json`    | ✅ Added |
+| `test-results.schema.json`         | ✅ Added |
+| `test-plan.schema.json`            | ✅ Added |
+| `tool-manifest.schema.json`        | ✅ Added |
+| `ux-spec.schema.json`              | ✅ Added |
 
 **Note:** The following schemas already had protection from P0 work:
+
 - `agent-definition.schema.json` (unevaluatedProperties: false)
 - `skill-definition.schema.json` (unevaluatedProperties: false)
 - `hook-definition.schema.json` (unevaluatedProperties: false)
 - `workflow-definition.schema.json` (unevaluatedProperties: false)
 
 ### 3. Required Fields (COMPLETE)
+
 - **File:** `implementation-plan.schema.json`
 - **Change:** Added `required: ["feature", "status"]`
 - **Status:** ✅ Complete
@@ -46,6 +50,7 @@ Added `additionalProperties: false` to all schemas missing it:
 ### 4. Partial maxLength/maxItems (PARTIAL)
 
 Completed for:
+
 - **hook-definition.schema.json** - Full coverage
   - `name`: maxLength 100
   - `matcher`: maxLength 500
@@ -77,23 +82,24 @@ Completed for:
 
 Remaining schemas needing maxLength on unbounded strings:
 
-| Schema | Estimated Fields | Priority |
-|--------|-----------------|----------|
-| `artifact-manifest.schema.json` | ~20 | HIGH |
-| `evolution-state.schema.json` | ~30 | HIGH |
-| `product-requirements.schema.json` | ~25 | HIGH |
-| `system-architecture.schema.json` | ~35 | HIGH |
-| `test-results.schema.json` | ~10 | MEDIUM |
-| `test-plan.schema.json` | ~15 | MEDIUM |
-| `tool-manifest.schema.json` | ~12 | MEDIUM |
-| `ux-spec.schema.json` | ~25 | MEDIUM |
-| `project-brief.schema.json` | ~18 | MEDIUM |
-| `project-analysis.schema.json` | ~10 | MEDIUM |
-| `track-metadata.schema.json` | ~3 | LOW |
-| `agent-capability-card.schema.json` | ~5 | LOW |
-| `skill-diagram-generator-output.schema.json` | ~3 | LOW |
+| Schema                                       | Estimated Fields | Priority |
+| -------------------------------------------- | ---------------- | -------- |
+| `artifact-manifest.schema.json`              | ~20              | HIGH     |
+| `evolution-state.schema.json`                | ~30              | HIGH     |
+| `product-requirements.schema.json`           | ~25              | HIGH     |
+| `system-architecture.schema.json`            | ~35              | HIGH     |
+| `test-results.schema.json`                   | ~10              | MEDIUM   |
+| `test-plan.schema.json`                      | ~15              | MEDIUM   |
+| `tool-manifest.schema.json`                  | ~12              | MEDIUM   |
+| `ux-spec.schema.json`                        | ~25              | MEDIUM   |
+| `project-brief.schema.json`                  | ~18              | MEDIUM   |
+| `project-analysis.schema.json`               | ~10              | MEDIUM   |
+| `track-metadata.schema.json`                 | ~3               | LOW      |
+| `agent-capability-card.schema.json`          | ~5               | LOW      |
+| `skill-diagram-generator-output.schema.json` | ~3               | LOW      |
 
 **Recommended maxLength values (per audit report):**
+
 - Identifiers/names: 200
 - Short descriptions: 500
 - Long descriptions: 2000
@@ -109,24 +115,25 @@ Remaining schemas needing maxLength on unbounded strings:
 
 Remaining schemas needing maxItems on unbounded arrays:
 
-| Schema | Estimated Arrays | Priority |
-|--------|-----------------|----------|
-| `artifact-manifest.schema.json` | ~15 | HIGH |
-| `evolution-state.schema.json` | ~20 | HIGH |
-| `product-requirements.schema.json` | ~18 | HIGH |
-| `system-architecture.schema.json` | ~25 | HIGH |
-| `test-results.schema.json` | ~8 | MEDIUM |
-| `test-plan.schema.json` | ~12 | MEDIUM |
-| `tool-manifest.schema.json` | ~5 | MEDIUM |
-| `ux-spec.schema.json` | ~15 | MEDIUM |
-| `project-brief.schema.json` | ~10 | MEDIUM |
-| `project-analysis.schema.json` | ~8 | MEDIUM |
-| `workflow-definition.schema.json` | ~5 | MEDIUM |
-| `artifact-graph.schema.json` | ~3 | LOW |
-| `agent-config.schema.json` | ~2 | LOW |
-| Others | ~20 combined | LOW |
+| Schema                             | Estimated Arrays | Priority |
+| ---------------------------------- | ---------------- | -------- |
+| `artifact-manifest.schema.json`    | ~15              | HIGH     |
+| `evolution-state.schema.json`      | ~20              | HIGH     |
+| `product-requirements.schema.json` | ~18              | HIGH     |
+| `system-architecture.schema.json`  | ~25              | HIGH     |
+| `test-results.schema.json`         | ~8               | MEDIUM   |
+| `test-plan.schema.json`            | ~12              | MEDIUM   |
+| `tool-manifest.schema.json`        | ~5               | MEDIUM   |
+| `ux-spec.schema.json`              | ~15              | MEDIUM   |
+| `project-brief.schema.json`        | ~10              | MEDIUM   |
+| `project-analysis.schema.json`     | ~8               | MEDIUM   |
+| `workflow-definition.schema.json`  | ~5               | MEDIUM   |
+| `artifact-graph.schema.json`       | ~3               | LOW      |
+| `agent-config.schema.json`         | ~2               | LOW      |
+| Others                             | ~20 combined     | LOW      |
 
 **Recommended maxItems values (per audit report):**
+
 - Tags/labels: 50
 - Tool/skill lists: 100
 - Requirements/criteria: 200
@@ -141,6 +148,7 @@ Remaining schemas needing maxItems on unbounded arrays:
 **Total work remaining:** ~4-6 hours
 
 **Breakdown:**
+
 - HIGH priority schemas (4 schemas × 45 min each): 3 hours
 - MEDIUM priority schemas (9 schemas × 20 min each): 3 hours
 - LOW priority schemas (5 schemas × 10 min each): 1 hour
@@ -151,36 +159,37 @@ Remaining schemas needing maxItems on unbounded arrays:
 
 ## Schema-by-Schema Status
 
-| Schema | additionalProperties | maxLength | maxItems | Overall |
-|--------|---------------------|-----------|----------|---------|
-| `adr-template.schema.json` | ✅ (was safe) | ❌ Needed | ❌ Needed | 🟡 PARTIAL |
-| `agent-capability-card.schema.json` | ✅ (was safe) | ❌ Needed | ❌ Needed | 🟡 PARTIAL |
-| `agent-config.schema.json` | ✅ (was safe) | ✅ (was safe) | ❌ Needed | 🟡 PARTIAL |
-| `agent-definition.schema.json` | ✅ P0 fixed | ✅ Complete | ✅ Complete | ✅ COMPLETE |
-| `agent-identity.schema.json` | ✅ (was safe) | ✅ (was safe) | ❌ Needed | 🟡 PARTIAL |
-| `artifact-graph.schema.json` | 🟡 Partial | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `artifact-manifest.schema.json` | ✅ Added today | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `evolution-state.schema.json` | 🟡 Partial | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `hook-definition.schema.json` | ✅ P0 fixed | ✅ Complete | ✅ Complete | ✅ COMPLETE |
-| `implementation-plan.schema.json` | 🟡 Keep true | ❌ Needed | ❌ Needed | 🟡 PARTIAL |
-| `phase-models.schema.json` | ✅ (was safe) | ✅ (was safe) | N/A | ✅ COMPLETE |
-| `plan.schema.json` | ✅ Added today | ✅ Complete | ✅ Complete | ✅ COMPLETE |
-| `presets.schema.json` | ✅ (was safe) | ✅ (was safe) | ❌ Needed | 🟡 PARTIAL |
-| `product-requirements.schema.json` | ✅ Added today | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `project-analysis.schema.json` | ✅ (was safe) | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `project-brief.schema.json` | ✅ Added today | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `skill-definition.schema.json` | ✅ P0 fixed | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `skill-*-output.schema.json` (3) | ✅ (was safe) | 🟡 Partial | ❌ Needed | 🟡 PARTIAL |
-| `specification-template.schema.json` | ✅ (was safe) | ✅ (was safe) | 🟡 Partial | 🟡 PARTIAL |
-| `system-architecture.schema.json` | ✅ Added today | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `test-results.schema.json` | ✅ Added today | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `test-plan.schema.json` | ✅ Added today | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `tool-manifest.schema.json` | ✅ Added today | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `track-metadata.schema.json` | 🟡 Keep true | ❌ Needed | ❌ Needed | 🟡 PARTIAL |
-| `ux-spec.schema.json` | ✅ Added today | ❌ Needed | ❌ Needed | 🔴 NEEDS WORK |
-| `workflow-definition.schema.json` | ✅ P0 fixed | ✅ (was safe) | ❌ Needed | 🟡 PARTIAL |
+| Schema                               | additionalProperties | maxLength     | maxItems    | Overall       |
+| ------------------------------------ | -------------------- | ------------- | ----------- | ------------- |
+| `adr-template.schema.json`           | ✅ (was safe)        | ❌ Needed     | ❌ Needed   | 🟡 PARTIAL    |
+| `agent-capability-card.schema.json`  | ✅ (was safe)        | ❌ Needed     | ❌ Needed   | 🟡 PARTIAL    |
+| `agent-config.schema.json`           | ✅ (was safe)        | ✅ (was safe) | ❌ Needed   | 🟡 PARTIAL    |
+| `agent-definition.schema.json`       | ✅ P0 fixed          | ✅ Complete   | ✅ Complete | ✅ COMPLETE   |
+| `agent-identity.schema.json`         | ✅ (was safe)        | ✅ (was safe) | ❌ Needed   | 🟡 PARTIAL    |
+| `artifact-graph.schema.json`         | 🟡 Partial           | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `artifact-manifest.schema.json`      | ✅ Added today       | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `evolution-state.schema.json`        | 🟡 Partial           | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `hook-definition.schema.json`        | ✅ P0 fixed          | ✅ Complete   | ✅ Complete | ✅ COMPLETE   |
+| `implementation-plan.schema.json`    | 🟡 Keep true         | ❌ Needed     | ❌ Needed   | 🟡 PARTIAL    |
+| `phase-models.schema.json`           | ✅ (was safe)        | ✅ (was safe) | N/A         | ✅ COMPLETE   |
+| `plan.schema.json`                   | ✅ Added today       | ✅ Complete   | ✅ Complete | ✅ COMPLETE   |
+| `presets.schema.json`                | ✅ (was safe)        | ✅ (was safe) | ❌ Needed   | 🟡 PARTIAL    |
+| `product-requirements.schema.json`   | ✅ Added today       | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `project-analysis.schema.json`       | ✅ (was safe)        | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `project-brief.schema.json`          | ✅ Added today       | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `skill-definition.schema.json`       | ✅ P0 fixed          | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `skill-*-output.schema.json` (3)     | ✅ (was safe)        | 🟡 Partial    | ❌ Needed   | 🟡 PARTIAL    |
+| `specification-template.schema.json` | ✅ (was safe)        | ✅ (was safe) | 🟡 Partial  | 🟡 PARTIAL    |
+| `system-architecture.schema.json`    | ✅ Added today       | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `test-results.schema.json`           | ✅ Added today       | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `test-plan.schema.json`              | ✅ Added today       | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `tool-manifest.schema.json`          | ✅ Added today       | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `track-metadata.schema.json`         | 🟡 Keep true         | ❌ Needed     | ❌ Needed   | 🟡 PARTIAL    |
+| `ux-spec.schema.json`                | ✅ Added today       | ❌ Needed     | ❌ Needed   | 🔴 NEEDS WORK |
+| `workflow-definition.schema.json`    | ✅ P0 fixed          | ✅ (was safe) | ❌ Needed   | 🟡 PARTIAL    |
 
 **Legend:**
+
 - ✅ COMPLETE: All hardening complete
 - 🟡 PARTIAL: Some hardening done, more needed
 - 🔴 NEEDS WORK: Significant work remaining
@@ -194,6 +203,7 @@ Remaining schemas needing maxItems on unbounded arrays:
    - Follow the pattern from plan.schema.json (comprehensive nested object handling)
 
 2. **Use consistent maxLength values:**
+
    ```
    Names/IDs: 100-200
    Short descriptions: 500
@@ -206,6 +216,7 @@ Remaining schemas needing maxItems on unbounded arrays:
    ```
 
 3. **Use consistent maxItems values:**
+
    ```
    Tags/labels: 50
    Tools/skills: 100
@@ -218,6 +229,7 @@ Remaining schemas needing maxItems on unbounded arrays:
 4. **Add `additionalProperties: false` to all nested objects** (as done in plan.schema.json)
 
 5. **Test schema validation after changes:**
+
    ```bash
    # Validate schemas compile
    npx ajv compile -s .claude/schemas/[schema-name].schema.json
@@ -270,4 +282,4 @@ Remaining schemas needing maxItems on unbounded arrays:
 
 ---
 
-*End of Progress Report*
+_End of Progress Report_

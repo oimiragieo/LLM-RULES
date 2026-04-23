@@ -23,6 +23,7 @@ This comprehensive audit examined 268+ files across hooks, lib, and tools direct
 ## Critical Issues (Must Fix - P0)
 
 ### BUG-001: Race Condition in Atomic Write Cleanup (TOCTOU)
+
 **File:** `.claude/lib/utils/atomic-write.cjs:92-99`  
 **Severity:** CRITICAL  
 **Type:** Race Condition / Logic Error
@@ -34,6 +35,7 @@ The atomic write cleanup suppresses non-ENOENT errors when DEBUG_ATOMIC_WRITE is
 ---
 
 ### BUG-002: Shell Injection Validator Has False Negatives
+
 **File:** `.claude/hooks/safety/shell-injection-validator.cjs:33-50`  
 **Severity:** CRITICAL  
 **Type:** Security - Insufficient Validation
@@ -45,6 +47,7 @@ Patterns can be bypassed with whitespace variations, case changes, and flag reor
 ---
 
 ### BUG-003: Windows Path Normalization Bug in Creator Guard
+
 **File:** `.claude/hooks/routing/unified-creator-guard.cjs:198`  
 **Severity:** CRITICAL  
 **Type:** Windows Compatibility / Logic Error
@@ -56,6 +59,7 @@ Path normalization to forward slashes creates mismatch with regex patterns that 
 ---
 
 ### BUG-004: Memory Search Missing Error Handling for Database Failures
+
 **File:** `.claude/lib/memory/memory-search.cjs:21-24`  
 **Severity:** HIGH  
 **Type:** Error Handling Gap
@@ -66,7 +70,8 @@ Missing validation for null/undefined results causes crashes on database corrupt
 
 ---
 
-### BUG-005: BM25 Index IDF Calculation Race Condition  
+### BUG-005: BM25 Index IDF Calculation Race Condition
+
 **File:** `.claude/lib/code-indexing/bm25-indexer.cjs:134-163`  
 **Severity:** MEDIUM-HIGH  
 **Type:** Race Condition

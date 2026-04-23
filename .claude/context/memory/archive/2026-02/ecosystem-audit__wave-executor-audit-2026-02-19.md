@@ -18,18 +18,18 @@ The `wave-executor` skill is substantially complete and better-integrated than m
 
 All files present under `.claude/skills/wave-executor/`:
 
-| File | Present | Notes |
-|------|---------|-------|
-| `SKILL.md` | YES | Complete, well-structured |
-| `scripts/main.cjs` | YES | CLI dispatcher; uses `shell: false` |
-| `hooks/pre-execute.cjs` | YES | Validates plan + SDK availability |
-| `hooks/post-execute.cjs` | YES | Appends run summary to learnings.md |
-| `schemas/input.schema.json` | YES | JSON Schema 2020-12, `additionalProperties: false` |
-| `schemas/output.schema.json` | YES | JSON Schema 2020-12, `additionalProperties: false` |
-| `commands/wave-executor.md` | YES | Thin delegator with `disable-model-invocation: true` |
-| `rules/wave-executor.md` | YES | When-to-use and anti-patterns |
-| `templates/implementation-template.md` | YES | Wave plan template with guidelines |
-| `references/research-requirements.md` | YES | Root cause citations and design decisions |
+| File                                   | Present | Notes                                                |
+| -------------------------------------- | ------- | ---------------------------------------------------- |
+| `SKILL.md`                             | YES     | Complete, well-structured                            |
+| `scripts/main.cjs`                     | YES     | CLI dispatcher; uses `shell: false`                  |
+| `hooks/pre-execute.cjs`                | YES     | Validates plan + SDK availability                    |
+| `hooks/post-execute.cjs`               | YES     | Appends run summary to learnings.md                  |
+| `schemas/input.schema.json`            | YES     | JSON Schema 2020-12, `additionalProperties: false`   |
+| `schemas/output.schema.json`           | YES     | JSON Schema 2020-12, `additionalProperties: false`   |
+| `commands/wave-executor.md`            | YES     | Thin delegator with `disable-model-invocation: true` |
+| `rules/wave-executor.md`               | YES     | When-to-use and anti-patterns                        |
+| `templates/implementation-template.md` | YES     | Wave plan template with guidelines                   |
+| `references/research-requirements.md`  | YES     | Root cause citations and design decisions            |
 
 CLI tool: `.claude/tools/cli/wave-executor.mjs` — Present and exports testable pure functions (`parseWaveArgs`, `readPlanFile`, `readInventory`, `updateInventory`, `buildWavePrompt`).
 
@@ -75,6 +75,7 @@ The skill is indexed (line 7607):
 ```
 
 **Gaps found:**
+
 - `category` is `"Other"` but should be `"Planning & Architecture"` (matches skill-catalog)
 - `domain` is `"other"` but should be `"planning"` or `"architecture"`
 - `agentPrimary` is `["developer"]` but should be `["router", "master-orchestrator", "planner"]` (matches SKILL.md frontmatter and skill-catalog)
@@ -92,10 +93,10 @@ The skill is indexed (line 7607):
 
 Wave-executor is referenced in the `skills:` array of three agent files:
 
-| Agent File | Reference | Correct? |
-|------------|-----------|----------|
-| `.claude/agents/core/router.md` | `wave-executor` | YES — router is primary consumer |
-| `.claude/agents/core/planner.md` | `wave-executor` | YES — planner creates wave plans |
+| Agent File                                            | Reference       | Correct?                                 |
+| ----------------------------------------------------- | --------------- | ---------------------------------------- |
+| `.claude/agents/core/router.md`                       | `wave-executor` | YES — router is primary consumer         |
+| `.claude/agents/core/planner.md`                      | `wave-executor` | YES — planner creates wave plans         |
 | `.claude/agents/orchestrators/master-orchestrator.md` | `wave-executor` | YES — orchestrator invokes for EPIC work |
 
 No other agent files reference it, which is appropriate (it is a specialized skill for EPIC-tier work).
@@ -118,30 +119,30 @@ The skill's hooks (`pre-execute.cjs`, `post-execute.cjs`) are **not** registered
 
 Checked against skill-creator schema requirements:
 
-| Required Element | Present | Quality |
-|-----------------|---------|---------|
-| Frontmatter: `name` | YES | Correct |
-| Frontmatter: `description` | YES | Clear and specific |
-| Frontmatter: `version` | YES (`1.0`) | Present |
-| Frontmatter: `model` | YES (`sonnet`) | Appropriate |
-| Frontmatter: `invoked_by` | YES (`both`) | Correct |
-| Frontmatter: `user_invocable` | YES (`true`) | Correct — has slash command |
-| Frontmatter: `tools` | YES | `[Read, Write, Bash, Glob, Grep]` |
-| Frontmatter: `aliases` | YES | `[batch-executor, ralph-loop]` |
-| Frontmatter: `best_practices` | YES | 5 clear directives |
-| Frontmatter: `error_handling` | YES (`strict`) | Present |
-| Frontmatter: `streaming` | YES (`supported`) | Present |
-| **Missing**: `agents` | NO | Should list `[router, master-orchestrator, planner]` |
-| **Missing**: `category` | NO | Should be `planning-architecture` |
-| **Missing**: `tags` | NO | Tags missing from frontmatter |
-| Section: Overview | YES | Clear, explains Ralph pattern + bug context |
-| Section: When to Use | YES | EPIC-tier criteria clearly defined |
-| Section: How It Works | YES | Diagram + key invariant |
-| Section: Invocation | YES | Bash and slash command forms |
-| Section: Plan File Format | YES | JSON example with all fields |
-| Section: Inventory Tracking | YES | Resume, monitoring, cost tracking |
-| Section: Integration with Router | YES | 4-step flow |
-| Section: Memory Protocol | YES | Before/after instructions |
+| Required Element                 | Present           | Quality                                              |
+| -------------------------------- | ----------------- | ---------------------------------------------------- |
+| Frontmatter: `name`              | YES               | Correct                                              |
+| Frontmatter: `description`       | YES               | Clear and specific                                   |
+| Frontmatter: `version`           | YES (`1.0`)       | Present                                              |
+| Frontmatter: `model`             | YES (`sonnet`)    | Appropriate                                          |
+| Frontmatter: `invoked_by`        | YES (`both`)      | Correct                                              |
+| Frontmatter: `user_invocable`    | YES (`true`)      | Correct — has slash command                          |
+| Frontmatter: `tools`             | YES               | `[Read, Write, Bash, Glob, Grep]`                    |
+| Frontmatter: `aliases`           | YES               | `[batch-executor, ralph-loop]`                       |
+| Frontmatter: `best_practices`    | YES               | 5 clear directives                                   |
+| Frontmatter: `error_handling`    | YES (`strict`)    | Present                                              |
+| Frontmatter: `streaming`         | YES (`supported`) | Present                                              |
+| **Missing**: `agents`            | NO                | Should list `[router, master-orchestrator, planner]` |
+| **Missing**: `category`          | NO                | Should be `planning-architecture`                    |
+| **Missing**: `tags`              | NO                | Tags missing from frontmatter                        |
+| Section: Overview                | YES               | Clear, explains Ralph pattern + bug context          |
+| Section: When to Use             | YES               | EPIC-tier criteria clearly defined                   |
+| Section: How It Works            | YES               | Diagram + key invariant                              |
+| Section: Invocation              | YES               | Bash and slash command forms                         |
+| Section: Plan File Format        | YES               | JSON example with all fields                         |
+| Section: Inventory Tracking      | YES               | Resume, monitoring, cost tracking                    |
+| Section: Integration with Router | YES               | 4-step flow                                          |
+| Section: Memory Protocol         | YES               | Before/after instructions                            |
 
 **Key gap:** The frontmatter lacks the `agents` field that skill-creator standards require for agent assignment. The `tags` and `category` fields are also missing from frontmatter (they are inferred by skill-index but not declared in the file itself).
 
@@ -198,15 +199,15 @@ The following are fully correct and require no action:
 
 ## 10. Gaps Summary
 
-| Gap | Severity | File to Fix |
-|-----|----------|-------------|
-| `skill-index.json`: `category` = `"Other"` instead of `"Planning & Architecture"` | MEDIUM | `.claude/config/skill-index.json` |
-| `skill-index.json`: `domain` = `"other"` instead of `"planning"` | MEDIUM | `.claude/config/skill-index.json` |
-| `skill-index.json`: `agentPrimary` = `["developer"]` instead of `["router", "master-orchestrator", "planner"]` | HIGH | `.claude/config/skill-index.json` |
-| `skill-index.json`: missing tags `["batch", "orchestration", "epic-tier", "planning"]` | LOW | `.claude/config/skill-index.json` |
-| `SKILL.md` frontmatter: missing `agents` field | MEDIUM | `.claude/skills/wave-executor/SKILL.md` |
-| `SKILL.md` frontmatter: missing `category` and `tags` fields | LOW | `.claude/skills/wave-executor/SKILL.md` |
-| No framework-level schema at `.claude/schemas/skill-wave-executor-output.schema.json` | LOW | New file needed |
+| Gap                                                                                                            | Severity | File to Fix                             |
+| -------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------- |
+| `skill-index.json`: `category` = `"Other"` instead of `"Planning & Architecture"`                              | MEDIUM   | `.claude/config/skill-index.json`       |
+| `skill-index.json`: `domain` = `"other"` instead of `"planning"`                                               | MEDIUM   | `.claude/config/skill-index.json`       |
+| `skill-index.json`: `agentPrimary` = `["developer"]` instead of `["router", "master-orchestrator", "planner"]` | HIGH     | `.claude/config/skill-index.json`       |
+| `skill-index.json`: missing tags `["batch", "orchestration", "epic-tier", "planning"]`                         | LOW      | `.claude/config/skill-index.json`       |
+| `SKILL.md` frontmatter: missing `agents` field                                                                 | MEDIUM   | `.claude/skills/wave-executor/SKILL.md` |
+| `SKILL.md` frontmatter: missing `category` and `tags` fields                                                   | LOW      | `.claude/skills/wave-executor/SKILL.md` |
+| No framework-level schema at `.claude/schemas/skill-wave-executor-output.schema.json`                          | LOW      | New file needed                         |
 
 ---
 
@@ -264,4 +265,4 @@ If missing, the skill will fail with an actionable error from the pre-execute ho
 
 ---
 
-*Report generated by developer agent | Task #1 | Session 2026-02-19*
+_Report generated by developer agent | Task #1 | Session 2026-02-19_

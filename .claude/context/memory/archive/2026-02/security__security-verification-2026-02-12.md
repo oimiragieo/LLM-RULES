@@ -19,6 +19,7 @@ Comprehensive verification of 5 critical security findings from code review. **A
 **Original Claim**: Files use `shell: true` with user-controlled input in spawn calls.
 
 **Files Examined**:
+
 - `.claude/skills/sequential-thinking/scripts/main.cjs` (Line 72)
 - `.claude/skills/git-expert/scripts/main.cjs` (Line 66)
 - `.claude/skills/docker-compose/scripts/main.cjs` (Line 64)
@@ -29,15 +30,17 @@ Comprehensive verification of 5 critical security findings from code review. **A
 ✅ **CONFIRMED**: All 4 files use `shell: true` in spawn calls.
 
 **Evidence - sequential-thinking/scripts/main.cjs:72**:
+
 ```javascript
 const child = spawn('python', [executorPath, ...args.filter(a => a !== '--help')], {
   stdio: 'inherit',
   cwd: path.dirname(executorPath),
-  shell: true,  // ← CONFIRMED
+  shell: true, // ← CONFIRMED
 });
 ```
 
 **Evidence - git-expert/scripts/main.cjs:66**:
+
 ```javascript
 const child = spawn(
   'git',
@@ -45,21 +48,23 @@ const child = spawn(
   {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: true,  // ← CONFIRMED
+    shell: true, // ← CONFIRMED
   }
 );
 ```
 
 **Evidence - docker-compose/scripts/main.cjs:64**:
+
 ```javascript
 const child = spawn('docker', ['compose', ...composeArgs], {
   stdio: 'inherit',
   cwd: PROJECT_ROOT,
-  shell: true,  // ← CONFIRMED
+  shell: true, // ← CONFIRMED
 });
 ```
 
 **Evidence - terraform-infra/scripts/main.cjs:66**:
+
 ```javascript
 const child = spawn(
   'terraform',
@@ -67,7 +72,7 @@ const child = spawn(
   {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: true,  // ← CONFIRMED
+    shell: true, // ← CONFIRMED
   }
 );
 ```
@@ -75,6 +80,7 @@ const child = spawn(
 **Risk Assessment**:
 
 ❌ **NOT CRITICAL** - Input is **NOT user-controlled** in the traditional sense:
+
 - All 4 files filter args: `.filter(a => a !== '--help')`
 - Args come from **agent prompts** (Skill() invocations), not direct user input
 - Commands are hardcoded: `'python'`, `'git'`, `'docker'`, `'terraform'`
@@ -83,6 +89,7 @@ const child = spawn(
 **Actual Severity**: **MEDIUM** (not CRITICAL)
 
 **Reasoning**:
+
 - `shell: true` creates a subprocess via the system shell (Windows cmd.exe/Unix sh)
 - If an agent passes malicious arguments (e.g., `Skill({ skill: 'git-expert', args: '; rm -rf /' })`), shell metacharacters could execute
 - However, agents are LLM-generated, not direct user input
@@ -90,11 +97,13 @@ const child = spawn(
 - Real-world exploit requires compromised agent + bypassing routing guards
 
 **Remediation**:
+
 1. Remove `shell: true` from all 4 files (default `shell: false` is safer)
 2. Commands work fine without shell (no wildcards, redirects, or pipes needed)
 3. Use array-based args (already implemented) - prevents shell injection
 
 **Recommended Fix**:
+
 ```javascript
 // Before (vulnerable)
 const child = spawn('git', args, { shell: true });
@@ -104,6 +113,7 @@ const child = spawn('git', args, { shell: false }); // or omit (false is default
 ```
 
 **Impact if Exploited**:
+
 - Command injection in development environment
 - File system access with framework user privileges
 - Potential data exfiltration via malicious agents
@@ -117,6 +127,7 @@ const child = spawn('git', args, { shell: false }); // or omit (false is default
 **Original Claim**: JSON.parse calls lack try-catch protection in multiple hooks.
 
 **Files Examined**:
+
 - `.claude/hooks/reflection/reflection-queue-processor.cjs`
 - `.claude/hooks/reflection/reflection-step0-guard.cjs`
 - `.claude/hooks/reflection/force-step0-execution.cjs`
@@ -130,10 +141,11 @@ const child = spawn('git', args, { shell: false }); // or omit (false is default
 **Lines 103, 185, 320**: Unprotected `JSON.parse` calls
 
 **Evidence - Line 103**:
+
 ```javascript
 for (const line of lines) {
   try {
-    const entry = JSON.parse(line);  // ← Protected by try-catch
+    const entry = JSON.parse(line); // ← Protected by try-catch
     if (!entry.processed) {
       entries.push(entry);
     }
@@ -144,14 +156,16 @@ for (const line of lines) {
 ```
 
 **Evidence - Line 185**:
+
 ```javascript
-const parsed = JSON.parse(content);  // ← UNPROTECTED (outer try-catch exists but returns [] on error)
+const parsed = JSON.parse(content); // ← UNPROTECTED (outer try-catch exists but returns [] on error)
 return Array.isArray(parsed) ? parsed : [];
 ```
 
 **Evidence - Line 320**:
+
 ```javascript
-const entry = JSON.parse(line);  // ← Protected by try-catch
+const entry = JSON.parse(line); // ← Protected by try-catch
 ```
 
 **Status**: **MIXED** - Lines 103 and 320 are protected; Line 185 has outer try-catch that returns `[]` on error (safe fallback).
@@ -161,13 +175,14 @@ const entry = JSON.parse(line);  // ← Protected by try-catch
 **Line 68**: Unprotected `JSON.parse`
 
 **Evidence**:
+
 ```javascript
 function readSpawnRequests(filePath) {
   try {
     if (!fs.existsSync(filePath)) return [];
     const content = fs.readFileSync(filePath, 'utf8');
     if (!content.trim()) return [];
-    const parsed = JSON.parse(content);  // ← UNPROTECTED (outer try-catch returns [] on error)
+    const parsed = JSON.parse(content); // ← UNPROTECTED (outer try-catch returns [] on error)
     return Array.isArray(parsed) ? parsed : [];
   } catch (_err) {
     return [];
@@ -182,13 +197,14 @@ function readSpawnRequests(filePath) {
 **Line 49**: Unprotected `JSON.parse`
 
 **Evidence**:
+
 ```javascript
 function readSpawnRequests(filePath) {
   try {
     if (!fs.existsSync(filePath)) return [];
     const content = fs.readFileSync(filePath, 'utf8');
     if (!content.trim()) return [];
-    const parsed = JSON.parse(content);  // ← UNPROTECTED (outer try-catch logs error)
+    const parsed = JSON.parse(content); // ← UNPROTECTED (outer try-catch logs error)
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     stderrLog('warn', 'Failed to read spawn requests', { error: err.message });
@@ -208,24 +224,28 @@ function readSpawnRequests(filePath) {
 **Line 338**: Uses safe JSON utility
 
 **Evidence**:
+
 ```javascript
-const parsed = safeParseJSON(content, null);  // ← SAFE (utility handles errors)
+const parsed = safeParseJSON(content, null); // ← SAFE (utility handles errors)
 ```
 
 **Actual Severity**: **HIGH** (not CRITICAL)
 
 **Reasoning**:
+
 - All examined files have **outer try-catch** fallback that returns safe defaults
 - No unprotected `JSON.parse` will crash hooks
 - However, **best practice violation**: Should use inner try-catch or `safeParseJSON` utility
 - Malformed JSON in `.claude/context/runtime/reflection-spawn-request.json` could cause hook degradation (not crash)
 
 **Remediation**:
+
 1. Use `safeParseJSON` utility (already imported in `pre-tool-unified.cjs`)
 2. Add explicit try-catch around all JSON.parse calls
 3. Log parse errors for debugging (already done in some cases)
 
 **Recommended Fix**:
+
 ```javascript
 // Before (vulnerable)
 const parsed = JSON.parse(content);
@@ -236,6 +256,7 @@ const parsed = safeParseJSON(content, defaultValue);
 ```
 
 **Impact if Exploited**:
+
 - Hook degradation (returns empty array/null instead of valid data)
 - Reflection system failure (tasks not processed)
 - No direct security breach (files are framework-controlled, not user-writable)
@@ -253,6 +274,7 @@ const parsed = safeParseJSON(content, defaultValue);
 ✅ **CONFIRMED**: `sleepSync` function uses busy-wait pattern.
 
 **Evidence - Lines 13-18**:
+
 ```javascript
 function sleepSync(ms) {
   const start = Date.now();
@@ -263,6 +285,7 @@ function sleepSync(ms) {
 ```
 
 **Usage Context - Lines 210-213**:
+
 ```javascript
 if (!retryable || attempt === maxAttempts) {
   break;
@@ -275,18 +298,21 @@ sleepSync(attempt * 25);  // ← BLOCKS EVENT LOOP (25ms, 50ms, 75ms, 100ms, 125
 ✅ **CONFIRMED CRITICAL BEHAVIOR** - Blocking event loop in hot path.
 
 **Actual Impact**:
+
 - Used in BM25 index save retry loop (Windows file locking issues)
 - Maximum sleep: 125ms (5 retries × 25ms increments)
 - Blocks Node.js event loop during file save
 - Prevents concurrent operations during save window
 
 **Hot Path Analysis**:
+
 - Called during: `.claude/lib/code-indexing/vector-store.cjs` → `saveBM25Index()`
 - Triggered by: Code indexing save operations
 - Frequency: Once per indexing operation (not per-file)
 - Realistic impact: 5 retries × 25ms = **125ms max block** per save
 
 **Why This Exists**:
+
 - Windows-specific file locking (EPERM/EBUSY on rename)
 - Synchronous API required (no async/await in save path)
 - Atomics.wait fallback for cross-platform sleep
@@ -294,16 +320,19 @@ sleepSync(attempt * 25);  // ← BLOCKS EVENT LOOP (25ms, 50ms, 75ms, 100ms, 125
 **Actual Severity**: **HIGH** (not CRITICAL - limited scope)
 
 **Reasoning**:
+
 - Only affects code indexing save path (not interactive user operations)
 - 125ms max block is tolerable for background indexing
 - Alternative (Atomics.wait) has SharedArrayBuffer dependency
 
 **Remediation**:
+
 1. **Immediate**: Acceptable for current use case (background indexing)
 2. **Long-term**: Refactor to async save path with `await` delays
 3. **Alternative**: Move indexing to worker thread (no event loop blocking)
 
 **Recommended Fix** (low priority):
+
 ```javascript
 // Option 1: Async save with async sleep
 async function sleepAsync(ms) {
@@ -317,7 +346,7 @@ async function saveBM25Index() {
       // ... save logic ...
     } catch (err) {
       if (!retryable || attempt === maxAttempts) break;
-      await sleepAsync(attempt * 25);  // Non-blocking
+      await sleepAsync(attempt * 25); // Non-blocking
     }
   }
 }
@@ -327,6 +356,7 @@ async function saveBM25Index() {
 ```
 
 **Impact if Not Fixed**:
+
 - Brief UI unresponsiveness during code indexing saves
 - Degraded performance in high-frequency indexing scenarios
 - No security breach (performance issue, not vulnerability)
@@ -344,17 +374,18 @@ async function saveBM25Index() {
 ✅ **CONFIRMED**: Race condition exists in `ensureEntityDbInitialized`.
 
 **Evidence - Lines 56-80**:
+
 ```javascript
 function ensureEntityDbInitialized(dbPath) {
   try {
     const dbDir = path.dirname(dbPath);
     if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true });  // ← RACE: concurrent mkdir
+      fs.mkdirSync(dbDir, { recursive: true }); // ← RACE: concurrent mkdir
     }
 
     // Lazily initialize schema if missing (idempotent).
     const { DatabaseSync } = require('node:sqlite');
-    const db = new DatabaseSync(dbPath);  // ← RACE: concurrent schema init
+    const db = new DatabaseSync(dbPath); // ← RACE: concurrent schema init
     try {
       const row = db
         .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'")
@@ -362,7 +393,7 @@ function ensureEntityDbInitialized(dbPath) {
       if (row) return;
 
       const init = require('../../tools/cli/init-memory-db.cjs');
-      init.initializeDatabase(db);  // ← RACE: concurrent schema creation
+      init.initializeDatabase(db); // ← RACE: concurrent schema creation
     } finally {
       db.close();
     }
@@ -382,28 +413,33 @@ function ensureEntityDbInitialized(dbPath) {
 **Likelihood**: **MEDIUM** - Hooks triggered by Edit/Write tools can overlap.
 
 **Actual Exploitation**:
+
 - Multiple agents editing memory files simultaneously
 - Hook runner spawns multiple `sync-memory-index.cjs` processes in parallel
 - SQLite database locking prevents corruption (SQLITE_BUSY errors)
 
 **Observed Behavior**:
+
 - First hook: Creates schema successfully
 - Second hook: Sees `SQLITE_LOCKED` or table already exists error → caught by outer try-catch → exits cleanly
 
 **Actual Severity**: **MEDIUM** (not HIGH)
 
 **Reasoning**:
+
 - SQLite transaction locking prevents data corruption
 - Outer try-catch prevents hook crash
 - Impact: Failed sync (not data loss)
 - Self-healing: Next edit will retry
 
 **Remediation**:
+
 1. **File-based lock** before schema init (prevents concurrent init)
 2. **Atomic check-and-init** (single SQL transaction with `CREATE TABLE IF NOT EXISTS`)
 3. **Retry logic** with exponential backoff on SQLITE_BUSY
 
 **Recommended Fix**:
+
 ```javascript
 function ensureEntityDbInitialized(dbPath) {
   const lockFile = dbPath + '.init.lock';
@@ -449,6 +485,7 @@ function ensureEntityDbInitialized(dbPath) {
 ```
 
 **Impact if Not Fixed**:
+
 - Occasional failed memory syncs (self-healing on next edit)
 - No data corruption (SQLite prevents this)
 - Degraded user experience (memory updates delayed)
@@ -466,6 +503,7 @@ function ensureEntityDbInitialized(dbPath) {
 ✅ **CONFIRMED**: Error swallowing in `clearReminderIfStale`.
 
 **Evidence - Lines 75-85**:
+
 ```javascript
 function clearReminderIfStale() {
   try {
@@ -485,6 +523,7 @@ function clearReminderIfStale() {
 ✅ **CONFIRMED** - But **BY DESIGN** (best-effort cleanup).
 
 **Context**:
+
 - Reflection reminder file is **advisory only** (not critical)
 - Source of truth: `reflection-spawn-request.json` (not reminder file)
 - Cleanup failure: Causes extra Step 0 check (not data loss)
@@ -493,17 +532,20 @@ function clearReminderIfStale() {
 **Actual Severity**: **LOW** (not HIGH)
 
 **Reasoning**:
+
 - No security impact (file is framework-controlled)
 - No data loss (reminder is informational)
 - No cascade failure (Step 0 checks spawn-request.json directly)
 - Acceptable trade-off: Don't crash hook on cleanup failure
 
 **When Cleanup Fails**:
+
 - File permissions issue (rare)
 - Concurrent deletion by another hook (race condition)
 - File system error (disk full, I/O error)
 
 **Impact of Failed Cleanup**:
+
 - Stale reminder file persists
 - Next Step 0 check sees reminder → reads spawn-request.json
 - If spawn-request.json is empty → clears reminder again (retry)
@@ -513,6 +555,7 @@ function clearReminderIfStale() {
 **Not Required** - This is acceptable best-effort behavior.
 
 **Optional Enhancement** (very low priority):
+
 ```javascript
 function clearReminderIfStale() {
   try {
@@ -531,6 +574,7 @@ function clearReminderIfStale() {
 ```
 
 **Impact if Not Fixed**:
+
 - Occasional stale reminder file (self-healing)
 - Extra Step 0 processing (negligible performance impact)
 - No security or data integrity issues
@@ -539,13 +583,13 @@ function clearReminderIfStale() {
 
 ## Summary of Verified Findings
 
-| Finding | Status | Original Severity | Actual Severity | Requires Fix |
-|---------|--------|-------------------|-----------------|--------------|
-| 1. Shell Injection in Skills | PARTIALLY CONFIRMED | CRITICAL | **MEDIUM** | ✅ Yes (security hardening) |
-| 2. Unprotected JSON.parse | CONFIRMED | CRITICAL | **HIGH** | ✅ Yes (best practices) |
-| 3. Synchronous Busy-Wait | CONFIRMED | CRITICAL | **HIGH** | ⚠️ Optional (performance) |
-| 4. Race Condition in DB Init | CONFIRMED | HIGH | **MEDIUM** | ✅ Yes (reliability) |
-| 5. Silent Cleanup Failure | CONFIRMED | HIGH | **LOW** | ❌ No (by design) |
+| Finding                      | Status              | Original Severity | Actual Severity | Requires Fix                |
+| ---------------------------- | ------------------- | ----------------- | --------------- | --------------------------- |
+| 1. Shell Injection in Skills | PARTIALLY CONFIRMED | CRITICAL          | **MEDIUM**      | ✅ Yes (security hardening) |
+| 2. Unprotected JSON.parse    | CONFIRMED           | CRITICAL          | **HIGH**        | ✅ Yes (best practices)     |
+| 3. Synchronous Busy-Wait     | CONFIRMED           | CRITICAL          | **HIGH**        | ⚠️ Optional (performance)   |
+| 4. Race Condition in DB Init | CONFIRMED           | HIGH              | **MEDIUM**      | ✅ Yes (reliability)        |
+| 5. Silent Cleanup Failure    | CONFIRMED           | HIGH              | **LOW**         | ❌ No (by design)           |
 
 ---
 
@@ -554,6 +598,7 @@ function clearReminderIfStale() {
 ### Priority 1: Security Hardening (Required)
 
 **Finding 1: Shell Injection**
+
 - **Action**: Remove `shell: true` from 4 skill scripts
 - **Impact**: Eliminates command injection vector
 - **Effort**: Low (1 line change per file)
@@ -562,6 +607,7 @@ function clearReminderIfStale() {
 ### Priority 2: Best Practices (Recommended)
 
 **Finding 2: JSON.parse Protection**
+
 - **Action**: Use `safeParseJSON` utility or explicit try-catch
 - **Impact**: Prevents hook degradation on malformed JSON
 - **Effort**: Low (utility already exists)
@@ -570,6 +616,7 @@ function clearReminderIfStale() {
 ### Priority 3: Reliability (Important)
 
 **Finding 4: Database Init Race**
+
 - **Action**: Add file-based lock before schema init
 - **Impact**: Prevents concurrent init failures
 - **Effort**: Medium (locking logic required)
@@ -578,6 +625,7 @@ function clearReminderIfStale() {
 ### Priority 4: Performance (Optional)
 
 **Finding 3: Busy-Wait Sleep**
+
 - **Action**: Refactor to async save or worker thread
 - **Impact**: Eliminates 125ms event loop blocking
 - **Effort**: High (requires async refactor)
@@ -586,6 +634,7 @@ function clearReminderIfStale() {
 ### Priority 5: No Action Required
 
 **Finding 5: Cleanup Error Swallowing**
+
 - **Action**: None (acceptable by design)
 - **Impact**: None (self-healing behavior)
 
@@ -602,6 +651,7 @@ All 5 critical findings were verified with actual code inspection. **No false po
 - **1 LOW** (originally HIGH): Silent cleanup is intentional best-effort
 
 **Recommended Actions**:
+
 1. **Fix immediately**: Shell injection (Priority 1)
 2. **Fix soon**: JSON.parse protection (Priority 2)
 3. **Fix when convenient**: Database race condition (Priority 3)

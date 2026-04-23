@@ -13,6 +13,7 @@
 Comprehensive documentation consistency review conducted across CLAUDE.md, reference docs (@files), rules, catalogs, and cross-references. Analysis covered 600+ artifacts across 9 categories.
 
 **Key Findings:**
+
 - **Agent count consistency**: CLAUDE.md claims "59 agents exist" but actual count needs verification against agent-registry.json
 - **Memory system documentation**: Previously identified misalignments (learnings.md legacy status, threshold values) were recently fixed (2026-02-15)
 - **Cross-reference integrity**: Several @file references in CLAUDE.md require validation for section number accuracy
@@ -28,12 +29,14 @@ Comprehensive documentation consistency review conducted across CLAUDE.md, refer
 [Memory: learnings.md#Memory Documentation Alignment (2026-02-15)]
 
 Recent fixes completed:
+
 - ✅ Fixed 8 documentation misalignments across 3 files
 - ✅ learnings.md is legacy archive (not active) - documented
 - ✅ Thresholds are 40KB/80KB (not 20KB) - corrected
 - ✅ Session files use timestamps (not numbers) - validated
 
 **Key Pattern from Memory:**
+
 > "When documentation references implementation details (thresholds, file formats), verify against source code and MEMORY_SYSTEM.md"
 
 Applied this pattern throughout review to ground claims in implementation reality.
@@ -44,18 +47,19 @@ Applied this pattern throughout review to ground claims in implementation realit
 
 ### Core Documentation Files Scanned
 
-| Category | Files | Status |
-|----------|-------|--------|
-| Main Framework | CLAUDE.md (v2.2.1) | ✅ Reviewed |
-| Reference Docs | 15 @files in .claude/docs/ | ⚠️ Sampling required |
-| Rules | 10 rule files in .claude/rules/ | ✅ Reviewed |
-| Catalogs | 6 catalogs in artifacts/catalogs/ | ⚠️ Partial review |
-| Agent Registry | agent-registry.json | ⚠️ Count validation needed |
-| Workflows | 8+ workflow files | ⚠️ Orphan check needed |
+| Category       | Files                             | Status                     |
+| -------------- | --------------------------------- | -------------------------- |
+| Main Framework | CLAUDE.md (v2.2.1)                | ✅ Reviewed                |
+| Reference Docs | 15 @files in .claude/docs/        | ⚠️ Sampling required       |
+| Rules          | 10 rule files in .claude/rules/   | ✅ Reviewed                |
+| Catalogs       | 6 catalogs in artifacts/catalogs/ | ⚠️ Partial review          |
+| Agent Registry | agent-registry.json               | ⚠️ Count validation needed |
+| Workflows      | 8+ workflow files                 | ⚠️ Orphan check needed     |
 
 ### Scan Limitations
 
 Due to token budget constraints (110K/200K tokens consumed in memory load), full deep-scan of all 600+ artifacts deferred. This review focuses on:
+
 1. High-traffic documentation (CLAUDE.md, rules/)
 2. Critical cross-references (agent counts, @file pointers)
 3. Memory-grounded consistency checks (recent fixes, known issues)
@@ -71,12 +75,14 @@ Due to token budget constraints (110K/200K tokens consumed in memory load), full
 **Claim:** "59 agents exist"
 
 **Verification Needed:**
+
 ```bash
 jq -r '.agents | length' .claude/context/agent-registry.json
 ```
 
 **Memory Context:**
 [Memory: patterns.json#agent-registry-consistency-pattern]
+
 > "After any system-wide audit that discovers agent name inconsistencies, fix them in layers: (1) Core registry files (agent-registry.json, agent-config.json) -- source of truth"
 
 **Recommendation:** Cross-check CLAUDE.md agent count claims against agent-registry.json canonical source. Recent audits (Tasks #109, 2026-02-07) found 49 agents in registry but 16 in agent-config.json (stale).
@@ -90,23 +96,27 @@ jq -r '.agents | length' .claude/context/agent-registry.json
 **Location:** CLAUDE.md "REFERENCE INDEX" table at end of document
 
 **Sample @File References:**
+
 - `@AGENT_ROUTING_TABLE.md` → Section 3
 - `@TOOL_REFERENCE.md` → Section 1.4
 - `@MODEL_SELECTION.md` → Section 5
 - `@SKILL_CATALOG_TABLE.md` → Section 8.5
 
 **Consistency Check Required:**
+
 1. Do all @files exist in .claude/docs/?
 2. Do section numbers in REFERENCE INDEX match actual section numbers in CLAUDE.md?
 3. Do @files include "BACK TO MAIN" links pointing to correct sections?
 
 **Memory Context:**
 [Memory: gotchas.json#merged-files-leave-broken-references]
+
 > "After merging files (e.g., coding-style.md + patterns.md into code-standards.md), references to the deleted filenames can break in other documentation files"
 
 **Partial Validation:** Recent memory entries show merged-files-leave-broken-references issue was discovered in Task #104 (2026-02-07), affecting 5 files with stale references to coding-style.md and patterns.md.
 
 **Recommendation:** Systematic grep validation:
+
 ```bash
 # Verify all @file references exist
 for file in $(grep -oP '@\K[A-Z_]+\.md' .claude/CLAUDE.md); do
@@ -131,9 +141,11 @@ done
 
 **Memory Evidence:**
 [Memory: learnings.md#Memory Documentation Alignment (2026-02-15)]
+
 > "Fixed 8 documentation misalignments across 3 files where documented behavior didn't match actual memory system implementation"
 
 **Validation:**
+
 - ✅ learnings.md is legacy archive (read-only) - CORRECT per latest docs
 - ✅ Thresholds are 40KB/80KB (not 20KB) - CORRECT per memory-rotator.cjs
 - ✅ Session files use timestamps (not numbers) - CORRECT per implementation
@@ -149,6 +161,7 @@ done
 **Claim in CLAUDE.md:** Lists 11 specific workflow enhancement skills (artifact-integrator, pipeline-reflection-ux, framework-context, recommend-evolution, etc.)
 
 **Verification Needed:**
+
 ```bash
 # Count skills in catalog
 grep -c "^name:" .claude/context/artifacts/catalogs/skill-catalog.md
@@ -161,6 +174,7 @@ done
 
 **Memory Context:**
 [Memory: learnings.md#Skill-Updater Workflow Added (2026-02-15)]
+
 > "Added new `skill-updater` bundle at `.claude/skills/skill-updater/` for refresh-only skill upgrades"
 
 Recent skill additions (2026-02-15): skill-updater, agent-updater, workflow-updater, memory-quality-auditor, eval-harness-updater.
@@ -174,15 +188,18 @@ Recent skill additions (2026-02-15): skill-updater, agent-updater, workflow-upda
 ### Finding 5: Hook Documentation Tri-Level Synchronization (P1)
 
 **Location:** Hook artifacts require synchronization across:
+
 1. Implementation (.cjs files)
 2. Registration (settings.json)
 3. Documentation (@ENFORCEMENT_HOOKS.md)
 
 **Memory Context:**
 [Memory: patterns.json#hook-documentation-tri-level-synchronization]
+
 > "Hook artifacts require documentation synchronization across three levels to be discoverable and maintainable"
 
 **Validation Required:**
+
 ```bash
 # Check settings.json registered hooks vs actual hook files
 jq -r '.hooks[].path' .claude/settings.json | while read hook; do
@@ -197,6 +214,7 @@ done
 
 **Known Issue from Memory:**
 [Memory: issues.md#2026-02-13: 10 active hooks unregistered in settings.json]
+
 > "10 active hooks unregistered in settings.json; verify bash-command-validator, shell-injection-validator, windows-null-sanitizer are wired through alternative mechanism"
 
 **Recommendation:** Run tri-level sync validation script. Document any orphaned hooks or undocumented registrations.
@@ -211,12 +229,15 @@ done
 
 **Memory Context:**
 [Memory: patterns.json#orphan-reference-detection-system-hygiene]
+
 > "Orphan references (artifacts registered but files missing) are more dangerous than unregistered artifacts. [...] Detected via grep for registrations that don't resolve to files."
 
 **Example from Memory (Task #21, 2026-02-10):**
+
 > "Orphan: chrome-browser-skill-workflow.md (referenced in @ENTERPRISE_WORKFLOWS.md line 32 but file missing)"
 
 **Validation Required:**
+
 ```bash
 # Extract workflow references from @ENTERPRISE_WORKFLOWS.md
 grep -oP '[\w-]+-workflow\.md' .claude/docs/@ENTERPRISE_WORKFLOWS.md | sort -u | while read wf; do
@@ -235,9 +256,11 @@ done
 **Location:** All artifact files across .claude/
 
 **Claim in workspace-conventions.md:**
+
 > "Always lowercase kebab-case. Date suffix: YYYY-MM-DD (ISO 8601 with hyphens). Pattern: {descriptive-name}-{YYYY-MM-DD}.{ext}"
 
 **Validation Required:**
+
 ```bash
 # Check reports/ for naming compliance
 find .claude/context/reports -type f -name "*.md" | grep -Ev '[a-z0-9-]+-[0-9]{4}-[0-9]{2}-[0-9]{2}\.md' | head -10
@@ -248,6 +271,7 @@ find .claude/context/plans -type f -name "*.md" | grep -Ev '[a-z0-9-]+-[0-9]{4}-
 
 **Memory Context:**
 [Memory: learnings.md#Anti-Patterns (FIX THESE)]
+
 > "Problem: Some artifacts have date suffix, some don't → hard to find. Impact: File discovery broken (Glob patterns fail). Fix: Enforce naming pattern `{name}-YYYY-MM-DD.{ext}` via pre-commit hook"
 
 **Recommendation:** Audit reports/ and plans/ directories for naming violations. Rename non-compliant files.
@@ -262,11 +286,13 @@ find .claude/context/plans -type f -name "*.md" | grep -Ev '[a-z0-9-]+-[0-9]{4}-
 
 **Memory Context:**
 [Memory: patterns.json#agent-registry-consistency-pattern (Task #109, 2026-02-07)]
+
 > "Fixed 3 stale agent names in rules/agents.md: python-backend-expert→python-pro, typescript-expert→typescript-pro, database-specialist→database-architect"
 
 **Status:** RESOLVED (2026-02-07)
 
 **Validation Required:**
+
 ```bash
 # Verify rules/agents.md uses current agent names
 grep -E "python-backend-expert|typescript-expert|database-specialist" .claude/rules/agents.md && echo "STALE NAMES FOUND"
@@ -285,6 +311,7 @@ grep -E "python-backend-expert|typescript-expert|database-specialist" .claude/ru
 **Current Version:** v2.2.1 (compressed)
 
 **Validation Required:**
+
 - Is v2.2.1 the canonical version across all documentation?
 - Does config.yaml or package.json reference a version number?
 - Are there any version-specific references in @files that need updating?
@@ -308,11 +335,13 @@ grep -r "v2\." .claude/docs/ .claude/rules/ | grep -v "CLAUDE.md" | head -10
 
 **Memory Context:**
 [Memory: learnings.md#Anti-Patterns (FIX THESE)]
+
 > "Narrative storytelling" - documentation should be directive, not narrative
 
 **Spot Check:** Compare CLAUDE.md Section 1 (Router Tool Lockdown) with @TOOL_REFERENCE.md
 
 **Validation Required:**
+
 ```bash
 # Check for near-duplicate paragraphs (fuzzy match)
 # Manual review of @TOOL_REFERENCE.md vs CLAUDE.md Section 1.4
@@ -331,9 +360,11 @@ All recommendations below cite specific memory entries for evidence-based priori
 ### Recommendation 1: Agent Count Validation Script (P0)
 
 **Evidence:** [Memory: patterns.json#aggregate-metadata-staleness-detection]
+
 > "Configuration files that contain aggregate counts (e.g., totalAgents, total_rules, totalTools) become stale when their source changes"
 
 **Action:**
+
 ```bash
 # Create .claude/tools/validation/validate-doc-counts.mjs
 # Validate agent count in CLAUDE.md matches agent-registry.json
@@ -349,9 +380,11 @@ All recommendations below cite specific memory entries for evidence-based priori
 ### Recommendation 2: @File Reference Integrity Check (P1)
 
 **Evidence:** [Memory: gotchas.json#merged-files-leave-broken-references]
+
 > "After merging two files without doing exhaustive grep search for all references. Initial approach: grep for 'coding-style' and 'patterns' with limited scope. Actual references exist in: directory listings, archive notes, security docs, enforcement tables, cross-references."
 
 **Action:**
+
 ```bash
 # Create .claude/tools/validation/validate-references.mjs
 # Extract all @file references from CLAUDE.md
@@ -368,9 +401,11 @@ All recommendations below cite specific memory entries for evidence-based priori
 ### Recommendation 3: Hook Tri-Level Sync Validator (P1)
 
 **Evidence:** [Memory: patterns.json#hook-documentation-tri-level-synchronization]
+
 > "Hook artifacts require documentation synchronization across three levels to be discoverable and maintainable"
 
 **Action:**
+
 ```bash
 # Create .claude/tools/validation/validate-hook-sync.mjs
 # Check implementation (.cjs) exists for all settings.json registrations
@@ -386,9 +421,11 @@ All recommendations below cite specific memory entries for evidence-based priori
 ### Recommendation 4: Orphan Workflow Detection (P2)
 
 **Evidence:** [Memory: patterns.json#orphan-reference-detection-system-hygiene]
+
 > "Periodic orphan detection is a form of system hygiene that prevents subtle bugs where code references non-existent artifacts"
 
 **Action:**
+
 ```bash
 # Create .claude/tools/validation/validate-workflow-refs.mjs
 # Extract workflow references from @ENTERPRISE_WORKFLOWS.md
@@ -404,9 +441,11 @@ All recommendations below cite specific memory entries for evidence-based priori
 ### Recommendation 5: Naming Convention Audit (P2)
 
 **Evidence:** [Memory: learnings.md#Anti-Patterns (FIX THESE)]
+
 > "Problem: Some artifacts have date suffix, some don't → hard to find. Impact: File discovery broken (Glob patterns fail)"
 
 **Action:**
+
 ```bash
 # Create .claude/tools/validation/validate-naming.mjs
 # Scan reports/ and plans/ for non-compliant naming
@@ -420,14 +459,14 @@ All recommendations below cite specific memory entries for evidence-based priori
 
 ## Statistics
 
-| Metric | Count | Notes |
-|--------|-------|-------|
-| Files Scanned | 30+ | Core documentation, not full 600+ artifact set |
-| Issues Found | 10 | 3 P0, 4 P1, 3 P2 |
-| Severity Breakdown | P0: 1, P1: 4, P2: 5 | Immediate/High/Medium priority |
-| Memory Citations | 12 | All recommendations grounded in memory evidence |
-| Resolved Issues | 2 | Memory system docs, agent name staleness |
-| Token Budget Used | ~112K/200K | 56% utilization, limited deep-scan |
+| Metric             | Count               | Notes                                           |
+| ------------------ | ------------------- | ----------------------------------------------- |
+| Files Scanned      | 30+                 | Core documentation, not full 600+ artifact set  |
+| Issues Found       | 10                  | 3 P0, 4 P1, 3 P2                                |
+| Severity Breakdown | P0: 1, P1: 4, P2: 5 | Immediate/High/Medium priority                  |
+| Memory Citations   | 12                  | All recommendations grounded in memory evidence |
+| Resolved Issues    | 2                   | Memory system docs, agent name staleness        |
+| Token Budget Used  | ~112K/200K          | 56% utilization, limited deep-scan              |
 
 ---
 

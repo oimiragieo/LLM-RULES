@@ -108,7 +108,9 @@ Every validator module must export a single function conforming to this interfac
  * @param {CheckContext} ctx
  * @returns {CheckResult}
  */
-module.exports = function checkPlannerFirst(ctx) { /* ... */ };
+module.exports = function checkPlannerFirst(ctx) {
+  /* ... */
+};
 ```
 
 ### Orchestrator Logic (routing-guard.cjs slim)
@@ -159,12 +161,12 @@ async function main() {
 
 ### Risk Assessment
 
-| Risk | Mitigation |
-|------|-----------|
-| Broken check ordering | `guards/index.cjs` defines explicit order array; integration test verifies |
-| State cache not shared | Single `stateCache` object passed via `ctx` to all validators |
-| Performance regression | Single file-read per invocation preserved; validators are sync |
-| Test breakage | Re-export layer or batch test-import update |
+| Risk                   | Mitigation                                                                 |
+| ---------------------- | -------------------------------------------------------------------------- |
+| Broken check ordering  | `guards/index.cjs` defines explicit order array; integration test verifies |
+| State cache not shared | Single `stateCache` object passed via `ctx` to all validators              |
+| Performance regression | Single file-read per invocation preserved; validators are sync             |
+| Test breakage          | Re-export layer or batch test-import update                                |
 
 ### Estimated Effort
 
@@ -215,6 +217,7 @@ graph LR
 **Tier 1 (Critical, 36 files):** Hook stdin parsing - every hook reads `JSON.parse(stdin)` to get tool invocation data. This is the primary crash vector.
 
 Priority files (by occurrence count):
+
 - `user-prompt-unified.cjs` (7 occurrences)
 - `spawn-prompt-assembler.cjs` (6 occurrences)
 - `unified-creator-guard.cjs` (5 occurrences)
@@ -267,11 +270,13 @@ For each hook file:
 3. Handle the return value: `safeParseJSON` returns `{ success, data, error }`.
 
 **Before:**
+
 ```javascript
 const input = JSON.parse(rawInput);
 ```
 
 **After:**
+
 ```javascript
 const { success, data: input, error } = safeParseJSON(rawInput, 'hook-input');
 if (!success) {
@@ -331,14 +336,14 @@ Multiple hooks and agents write to shared JSONL/JSON files concurrently (observa
 
 ### Target Files
 
-| File | Access Pattern | Contention Level |
-|------|---------------|-----------------|
-| `observations.jsonl` | Append-only, high frequency | HIGH |
-| `spawn-log.jsonl` | Append-only, per-spawn | MEDIUM |
-| `integration-queue.jsonl` | Append + read-and-clear | HIGH |
-| `workflow-state.json` | Read-modify-write | MEDIUM |
-| `router-state.json` | Read-modify-write | LOW |
-| `spawn-assembly-cache.json` | Read-modify-write | LOW |
+| File                        | Access Pattern              | Contention Level |
+| --------------------------- | --------------------------- | ---------------- |
+| `observations.jsonl`        | Append-only, high frequency | HIGH             |
+| `spawn-log.jsonl`           | Append-only, per-spawn      | MEDIUM           |
+| `integration-queue.jsonl`   | Append + read-and-clear     | HIGH             |
+| `workflow-state.json`       | Read-modify-write           | MEDIUM           |
+| `router-state.json`         | Read-modify-write           | LOW              |
+| `spawn-assembly-cache.json` | Read-modify-write           | LOW              |
 
 ### Architecture: proper-lockfile with Graceful Degradation
 
@@ -375,7 +380,9 @@ graph TD
  * @param {LockOptions} [options]
  * @returns {{ acquired: boolean, release: Function, error?: string }}
  */
-function acquireLock(filePath, options = {}) { /* ... */ }
+function acquireLock(filePath, options = {}) {
+  /* ... */
+}
 
 /**
  * Convenience wrapper: lock, execute callback, release.
@@ -384,7 +391,9 @@ function acquireLock(filePath, options = {}) { /* ... */ }
  * @param {LockOptions} [options]
  * @returns {{ success: boolean, result?: any, error?: string }}
  */
-function withLock(filePath, callback, options = {}) { /* ... */ }
+function withLock(filePath, callback, options = {}) {
+  /* ... */
+}
 ```
 
 ### Lock Mechanism: mkdir-based
@@ -396,13 +405,13 @@ function withLock(filePath, callback, options = {}) { /* ... */ }
 
 ### Per-File Lock Configuration
 
-| File | Timeout | Stale Threshold | Fail Mode |
-|------|---------|----------------|-----------|
-| `observations.jsonl` | 2000ms | 5000ms | fail-open (skip write) |
-| `spawn-log.jsonl` | 2000ms | 5000ms | fail-open (skip write) |
-| `integration-queue.jsonl` | 3000ms | 10000ms | fail-open (log warning) |
-| `workflow-state.json` | 5000ms | 15000ms | fail-closed (retry) |
-| `router-state.json` | 3000ms | 10000ms | fail-open (use cached) |
+| File                      | Timeout | Stale Threshold | Fail Mode               |
+| ------------------------- | ------- | --------------- | ----------------------- |
+| `observations.jsonl`      | 2000ms  | 5000ms          | fail-open (skip write)  |
+| `spawn-log.jsonl`         | 2000ms  | 5000ms          | fail-open (skip write)  |
+| `integration-queue.jsonl` | 3000ms  | 10000ms         | fail-open (log warning) |
+| `workflow-state.json`     | 5000ms  | 15000ms         | fail-closed (retry)     |
+| `router-state.json`       | 3000ms  | 10000ms         | fail-open (use cached)  |
 
 ### Usage Pattern (JSONL append)
 
@@ -500,11 +509,11 @@ function safeHookMain(hookFn, options = {}) {
   const { hookName, failOpen = true, timeoutMs = 5000 } = options;
 
   // Process-level safety nets
-  process.on('uncaughtException', (err) => {
+  process.on('uncaughtException', err => {
     process.stderr.write(`[${hookName}] Uncaught: ${err.message}\n`);
     outputAndExit(failOpen);
   });
-  process.on('unhandledRejection', (reason) => {
+  process.on('unhandledRejection', reason => {
     process.stderr.write(`[${hookName}] Unhandled rejection: ${reason}\n`);
     outputAndExit(failOpen);
   });
@@ -520,7 +529,10 @@ function safeHookMain(hookFn, options = {}) {
     try {
       const rawInput = readStdin();
       const { success, data: input } = safeParseJSON(rawInput, 'hook-input');
-      if (!success) { outputAndExit(failOpen); return; }
+      if (!success) {
+        outputAndExit(failOpen);
+        return;
+      }
 
       const result = await hookFn(input);
       clearTimeout(timer);
@@ -539,12 +551,15 @@ function safeHookMain(hookFn, options = {}) {
 ### Hook Adoption Pattern
 
 **Before (current pattern):**
+
 ```javascript
 async function main() {
   let rawInput = '';
-  process.stdin.on('data', (chunk) => { rawInput += chunk; });
+  process.stdin.on('data', chunk => {
+    rawInput += chunk;
+  });
   process.stdin.on('end', async () => {
-    const input = JSON.parse(rawInput);  // crashes on bad input
+    const input = JSON.parse(rawInput); // crashes on bad input
     // ... hook logic with no error boundary ...
     process.stdout.write(JSON.stringify({ allow: true }));
   });
@@ -553,15 +568,19 @@ main();
 ```
 
 **After (standardized):**
+
 ```javascript
 const { safeHookMain } = require('../../lib/utils/safe-hook-main.cjs');
 
-safeHookMain(async (input) => {
-  // Hook logic only - no boilerplate
-  // Errors are caught automatically
-  // stdin parsing is handled
-  return { allow: true };
-}, { hookName: 'my-hook', failOpen: true, timeoutMs: 3000 });
+safeHookMain(
+  async input => {
+    // Hook logic only - no boilerplate
+    // Errors are caught automatically
+    // stdin parsing is handled
+    return { allow: true };
+  },
+  { hookName: 'my-hook', failOpen: true, timeoutMs: 3000 }
+);
 ```
 
 ### Migration Strategy
@@ -637,8 +656,8 @@ Add two modes to the existing script:
 
 ```javascript
 function detectDrift(indexEntries, diskSkills) {
-  const orphans = [];  // On disk but not in index
-  const ghosts = [];   // In index but not on disk
+  const orphans = []; // On disk but not in index
+  const ghosts = []; // In index but not on disk
 
   for (const skill of diskSkills) {
     if (!indexEntries.has(skill.name)) orphans.push(skill);
@@ -739,25 +758,33 @@ const MANIFEST = `${TMP_DIR}/.manifest.json`;
  * @param {TempOptions} [options]
  * @returns {string} Full path to created file
  */
-function createTemp(filename, content, options = {}) { /* ... */ }
+function createTemp(filename, content, options = {}) {
+  /* ... */
+}
 
 /**
  * Clean up expired temp files.
  * @returns {{ deleted: string[], kept: string[], errors: string[] }}
  */
-function cleanExpired() { /* ... */ }
+function cleanExpired() {
+  /* ... */
+}
 
 /**
  * Force clean ALL temp files (manual wipe).
  * @returns {{ deleted: string[], errors: string[] }}
  */
-function cleanAll() { /* ... */ }
+function cleanAll() {
+  /* ... */
+}
 
 /**
  * List all tracked temp files with their TTL status.
  * @returns {Array<{ path, createdAt, ttlMs, expired: boolean }>}
  */
-function listTemp() { /* ... */ }
+function listTemp() {
+  /* ... */
+}
 ```
 
 ### Manifest Structure
@@ -778,13 +805,13 @@ function listTemp() { /* ... */ }
 
 ### TTL Defaults by Category
 
-| Category | Default TTL | Rationale |
-|----------|------------|-----------|
-| `debug` | 4 hours | Short-lived diagnostic data |
-| `cache` | 24 hours | Day-scoped caching |
-| `reports` | 72 hours | Allow time for review |
-| `session` | 8 hours | Single work session |
-| `uncategorized` | 24 hours | Safe default |
+| Category        | Default TTL | Rationale                   |
+| --------------- | ----------- | --------------------------- |
+| `debug`         | 4 hours     | Short-lived diagnostic data |
+| `cache`         | 24 hours    | Day-scoped caching          |
+| `reports`       | 72 hours    | Allow time for review       |
+| `session`       | 8 hours     | Single work session         |
+| `uncategorized` | 24 hours    | Safe default                |
 
 ### Cleanup Triggers
 
@@ -848,16 +875,16 @@ graph LR
 
 ### Recommended Execution Order
 
-| Sprint Day | Critical Path | Parallel Track |
-|-----------|--------------|----------------|
-| Day 1 | P0.6: Implement safe-hook-main.cjs | P0.5: Implement file-lock.cjs |
-| Day 2 | P0.4: Extend schemas + begin Tier 1 | P0.5: Integrate locking + tests |
-| Day 3 | P0.4: Complete Tier 1 migration | P0.2: Skill index reconciliation |
-| Day 4 | P0.4: Tier 2+3 + ESLint rule | P1.4: TempFileManager + cleanup |
-| Day 5 | P0.1: Extract shared modules | P1.4: Retrofit + hook integration |
-| Day 6 | P0.1: Extract validators (batch 1) | Testing + integration |
-| Day 7 | P0.1: Extract validators (batch 2) | Testing + integration |
-| Day 8 | P0.1: Slim orchestrator + test updates | Final integration testing |
+| Sprint Day | Critical Path                          | Parallel Track                    |
+| ---------- | -------------------------------------- | --------------------------------- |
+| Day 1      | P0.6: Implement safe-hook-main.cjs     | P0.5: Implement file-lock.cjs     |
+| Day 2      | P0.4: Extend schemas + begin Tier 1    | P0.5: Integrate locking + tests   |
+| Day 3      | P0.4: Complete Tier 1 migration        | P0.2: Skill index reconciliation  |
+| Day 4      | P0.4: Tier 2+3 + ESLint rule           | P1.4: TempFileManager + cleanup   |
+| Day 5      | P0.1: Extract shared modules           | P1.4: Retrofit + hook integration |
+| Day 6      | P0.1: Extract validators (batch 1)     | Testing + integration             |
+| Day 7      | P0.1: Extract validators (batch 2)     | Testing + integration             |
+| Day 8      | P0.1: Slim orchestrator + test updates | Final integration testing         |
 
 **Total: 8 working days** (with 2-track parallelism)
 
@@ -871,6 +898,7 @@ graph LR
 ### Rollback Strategy
 
 All remediations are designed for incremental rollback:
+
 - **P0.1**: Each validator extraction is independent. Revert one file to restore that check inline.
 - **P0.4**: Each file's safeParseJSON migration is independent. Revert individual files.
 - **P0.5**: File locking is additive. Remove `withLock()` wrappers to revert.
@@ -882,13 +910,13 @@ All remediations are designed for incremental rollback:
 
 ## Summary
 
-| Remediation | Approach | New Files | Effort | Risk |
-|------------|----------|-----------|--------|------|
-| P0.1 routing-guard decomposition | Chain-of-responsibility, 12 validator modules + shared | 16 new files | 4 days | Medium (behavior parity) |
-| P0.4 safeParseJSON migration | Tiered replacement + ESLint gate | 0 new (extend existing) | 3 days | Low (mechanical) |
-| P0.5 File locking | mkdir-based locks, withLock wrapper | 1 new file | 2 days | Low (additive) |
-| P0.6 Async error handling | safeHookMain wrapper | 1 new file | 0.75 days | Low (additive) |
-| P0.2 Skill index reconciliation | CI gate + validate/sync modes | 0 new (extend existing) | 1 day | Low (additive) |
-| P1.4 Temp file cleanup | TempFileManager + manifest + TTL | 1 new file | 1.5 days | Low (additive) |
+| Remediation                      | Approach                                               | New Files               | Effort    | Risk                     |
+| -------------------------------- | ------------------------------------------------------ | ----------------------- | --------- | ------------------------ |
+| P0.1 routing-guard decomposition | Chain-of-responsibility, 12 validator modules + shared | 16 new files            | 4 days    | Medium (behavior parity) |
+| P0.4 safeParseJSON migration     | Tiered replacement + ESLint gate                       | 0 new (extend existing) | 3 days    | Low (mechanical)         |
+| P0.5 File locking                | mkdir-based locks, withLock wrapper                    | 1 new file              | 2 days    | Low (additive)           |
+| P0.6 Async error handling        | safeHookMain wrapper                                   | 1 new file              | 0.75 days | Low (additive)           |
+| P0.2 Skill index reconciliation  | CI gate + validate/sync modes                          | 0 new (extend existing) | 1 day     | Low (additive)           |
+| P1.4 Temp file cleanup           | TempFileManager + manifest + TTL                       | 1 new file              | 1.5 days  | Low (additive)           |
 
 **Total effort: ~12.25 days** (8 days with 2-track parallelism)

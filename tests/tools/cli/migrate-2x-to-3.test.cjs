@@ -18,11 +18,10 @@ const CLI_PATH = path.resolve(__dirname, '../../../.claude/tools/cli/migrate-2x-
  * a hard-coded path, so we run in --dry-run mode for safety in tests.
  */
 function runCli(extraArgs = []) {
-  return spawnSync(
-    process.execPath,
-    [CLI_PATH, ...extraArgs],
-    { encoding: 'utf8', timeout: 15000 }
-  );
+  return spawnSync(process.execPath, [CLI_PATH, ...extraArgs], {
+    encoding: 'utf8',
+    timeout: 15000,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -51,8 +50,10 @@ test('--dry-run emits report and writes no files', () => {
 test('script exits 0 without arguments', () => {
   const result = runCli([]);
   assert.strictEqual(result.status, 0, `CLI exited non-zero: ${result.stderr}`);
-  assert.ok(result.stdout.includes('Migration complete') || result.stdout.includes('BC-1'),
-    'output should contain migration content');
+  assert.ok(
+    result.stdout.includes('Migration complete') || result.stdout.includes('BC-1'),
+    'output should contain migration content'
+  );
 });
 
 // ---------------------------------------------------------------------------

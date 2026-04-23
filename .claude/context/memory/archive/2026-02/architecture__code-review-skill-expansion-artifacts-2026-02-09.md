@@ -16,6 +16,7 @@
 **Reference Spec**: Skill expansion batch creation (Batches 3-4, framework modernization)
 
 **Deviations:**
+
 1. **Schema quality inconsistency**: Schema-creator rules mandate Draft 2020-12, but all 116 schemas use Draft-07. The schema-creator post-creation checklist requires properties with descriptions and unique dollar-id values, yet 12 schemas are hollow stubs with zero domain properties.
 
 2. **Two incompatible root envelopes**: Pre-existing schemas (tdd, debugging, plan-generator, code-analyzer) use a rich envelope (skillName, version, timestamp, output with additionalProperties:false). New batch schemas use a minimal envelope (status enum + output object). No ADR documents this divergence.
@@ -32,12 +33,14 @@
 
 **S1. Command Pattern Compliance (100%)**
 All 95 commands follow the identical thin-delegation pattern:
+
 - YAML frontmatter with disable-model-invocation: true
 - Single instruction line: Invoke the {skill-name} skill and follow it exactly as presented to you
 - Zero deviation across all 95 files. This is exemplary consistency.
 
 **S2. Trail of Bits Security Skills (Exceptional Quality)**
 Five new security skills sourced from Trail of Bits (CC-BY-SA-4.0):
+
 - differential-review: File priority classification (P0-P3), verdict criteria, OWASP references
 - insecure-defaults: Credential detection, fail-open prevention, crypto defaults
 - semgrep-rule-creator: Pattern writing, taint mode, testing standards, OWASP coverage
@@ -48,6 +51,7 @@ These are the highest-quality additions in the entire expansion. Each has both a
 
 **S3. Tier-1 Schemas Are Gold Standard**
 Several schemas demonstrate excellent validation design:
+
 - skill-tdd-output.schema.json (102 lines): redGreenRefactorCycle with phase enums, coverage with min/max constraints, additionalProperties:false at both root and output levels
 - skill-plan-generator-output.schema.json (210 lines): maxItems:7 enforcement matching the Iron Law, regex patterns for task IDs
 - skill-debugging-output.schema.json (141 lines): investigation model with evidence type system, phase enums
@@ -55,6 +59,7 @@ Several schemas demonstrate excellent validation design:
 
 **S4. Domain-Expert Rules Quality**
 Many rules files provide genuinely actionable guidance:
+
 - tdd.md: Iron Laws, Red-Green-Refactor cycle, common rationalizations table, pre-completion gates
 - debugging.md: Four-phase methodology, human partner signals, red flags
 - security-architect.md: STRIDE table, OWASP Top 10 with specific checks, severity SLA table
@@ -148,29 +153,29 @@ Fix: Enhance the 5 security skill schemas with domain-specific properties extrac
 
 ## Consistency Matrix
 
-| Attribute | Schemas (116) | Rules (100) | Commands (95) |
-|-----------|--------------|-------------|---------------|
-| Naming convention (kebab-case) | PASS | PASS | PASS |
-| File placement (correct dir) | PASS | PASS | PASS |
-| Structural template followed | PASS (2 templates) | PARTIAL (15 stubs) | PASS (100%) |
-| Cross-references accurate | PASS | PASS | PASS |
-| Provenance headers | FAIL (~85% missing) | FAIL (~70% missing) | N/A (too small) |
-| Domain consistency (dollar-id) | FAIL (mixed domains) | N/A | N/A |
-| Draft version consistency | PARTIAL (all draft-07 but rules say 2020-12) | N/A | N/A |
-| additionalProperties:false | FAIL (~70 missing) | N/A | N/A |
-| SKILL.md path references | PASS | PASS | PASS |
-| Catalog registration | PASS | N/A (no catalog) | PASS |
+| Attribute                      | Schemas (116)                                | Rules (100)         | Commands (95)   |
+| ------------------------------ | -------------------------------------------- | ------------------- | --------------- |
+| Naming convention (kebab-case) | PASS                                         | PASS                | PASS            |
+| File placement (correct dir)   | PASS                                         | PASS                | PASS            |
+| Structural template followed   | PASS (2 templates)                           | PARTIAL (15 stubs)  | PASS (100%)     |
+| Cross-references accurate      | PASS                                         | PASS                | PASS            |
+| Provenance headers             | FAIL (~85% missing)                          | FAIL (~70% missing) | N/A (too small) |
+| Domain consistency (dollar-id) | FAIL (mixed domains)                         | N/A                 | N/A             |
+| Draft version consistency      | PARTIAL (all draft-07 but rules say 2020-12) | N/A                 | N/A             |
+| additionalProperties:false     | FAIL (~70 missing)                           | N/A                 | N/A             |
+| SKILL.md path references       | PASS                                         | PASS                | PASS            |
+| Catalog registration           | PASS                                         | N/A (no catalog)    | PASS            |
 
 ---
 
 ## Tier Classification
 
-| Tier | Description | Count | Examples |
-|------|-------------|-------|---------|
-| Tier 1 (Exemplary) | Rich domain validation, additionalProperties:false, constraints | ~19 schemas, ~25 rules | tdd, debugging, plan-generator, code-analyzer, security-architect |
-| Tier 2 (Adequate) | Domain properties but no additionalProperties:false or constraints | ~50 schemas, ~60 rules | gamedev-expert, checklist-generator, frontend-expert, react-expert |
-| Tier 3 (Minimal) | Basic structure, few domain properties | ~35 schemas | architecture-review (schema only), complexity-assessment (schema only) |
-| Tier 4 (Hollow Stub) | Accept any JSON / provide no guidance | ~12 schemas, ~15 rules | swarm-coordination, consensus-voting, binary-analysis-patterns |
+| Tier                 | Description                                                        | Count                  | Examples                                                               |
+| -------------------- | ------------------------------------------------------------------ | ---------------------- | ---------------------------------------------------------------------- |
+| Tier 1 (Exemplary)   | Rich domain validation, additionalProperties:false, constraints    | ~19 schemas, ~25 rules | tdd, debugging, plan-generator, code-analyzer, security-architect      |
+| Tier 2 (Adequate)    | Domain properties but no additionalProperties:false or constraints | ~50 schemas, ~60 rules | gamedev-expert, checklist-generator, frontend-expert, react-expert     |
+| Tier 3 (Minimal)     | Basic structure, few domain properties                             | ~35 schemas            | architecture-review (schema only), complexity-assessment (schema only) |
+| Tier 4 (Hollow Stub) | Accept any JSON / provide no guidance                              | ~12 schemas, ~15 rules | swarm-coordination, consensus-voting, binary-analysis-patterns         |
 
 ---
 
@@ -216,16 +221,19 @@ Fix: Enhance the 5 security skill schemas with domain-specific properties extrac
 ## Stage 3: Integration Verification
 
 ### Catalog Registration
+
 - [x] All 116 schemas appear in schema-catalog.md
 - [x] All 100 skills appear in skill-catalog.md
 - [x] All 95 commands appear in command-catalog.md
 - [x] SKILL.md path references are accurate in rules and commands
 
 ### Orphan Check
+
 - [ ] 12 hollow stub schemas are registered but provide no validation value (functional orphans)
 - [ ] 15 stub rules are registered but provide no guidance value (functional orphans)
 
 ### Broken Edge Check
+
 - [x] No broken references detected (all SKILL.md paths resolve)
 - [x] No deleted/renamed artifacts referenced
 
@@ -236,6 +244,7 @@ Fix: Enhance the 5 security skill schemas with domain-specific properties extrac
 **Ready to merge?** Yes, with conditions.
 
 **Conditions:**
+
 1. (P1) Create ADR documenting canonical schema envelope structure
 2. (P1) Add additionalProperties:false to at least the ~50 Tier-2 schemas
 3. (P1) Delete or enhance the 15 stub rules files

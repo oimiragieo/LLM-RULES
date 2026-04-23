@@ -38,6 +38,21 @@ skills:
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion
+manifest:
+  manifest_version: '1.0'
+  agent_id: 'devops-troubleshooter'
+  agent_type: 'specialized'
+  capabilities: []
+  memory_tier: STM
+  cost_envelope:
+    max_tokens_per_task: 80000
+    max_usd_per_session: 5
+    preferred_model: sonnet
+  session_type: ephemeral
+  a2a_interop:
+    supports_mcp: true
+    supports_aip_tokens: true
+    supports_maf: false
 ---
 
 <!-- agent-template-contract:v1 -->

@@ -30,15 +30,15 @@
 
 ### 1.1 Strategy Comparison Matrix
 
-| Criterion | Strangler Fig | Branch by Abstraction | Parallel Run | Big Bang |
-|---|---|---|---|---|
-| **Risk Level** | Low (incremental) | Medium (abstraction layer) | High (dual systems) | Very High (all-at-once) |
-| **Downtime** | Zero (traffic shifting) | Zero (toggle-based) | Zero (shadow mode) | Non-zero (cutover window) |
-| **Rollback** | Per-service (route back) | Per-feature (toggle off) | Full (switch back) | None (rewrite is separate) |
-| **Cost** | Moderate (gateway + services) | Low (single codebase) | High (2x infrastructure) | Very High (full rewrite) |
-| **Team Size** | 2+ teams | 1 team | 2+ teams | Large team |
-| **Best For** | Production monoliths > 50K LOC | Internal modules, libraries | Financial/regulated systems | Greenfield replacement |
-| **Duration** | 12-24 months | 6-12 months | 6-18 months | 12-36 months |
+| Criterion      | Strangler Fig                  | Branch by Abstraction       | Parallel Run                | Big Bang                   |
+| -------------- | ------------------------------ | --------------------------- | --------------------------- | -------------------------- |
+| **Risk Level** | Low (incremental)              | Medium (abstraction layer)  | High (dual systems)         | Very High (all-at-once)    |
+| **Downtime**   | Zero (traffic shifting)        | Zero (toggle-based)         | Zero (shadow mode)          | Non-zero (cutover window)  |
+| **Rollback**   | Per-service (route back)       | Per-feature (toggle off)    | Full (switch back)          | None (rewrite is separate) |
+| **Cost**       | Moderate (gateway + services)  | Low (single codebase)       | High (2x infrastructure)    | Very High (full rewrite)   |
+| **Team Size**  | 2+ teams                       | 1 team                      | 2+ teams                    | Large team                 |
+| **Best For**   | Production monoliths > 50K LOC | Internal modules, libraries | Financial/regulated systems | Greenfield replacement     |
+| **Duration**   | 12-24 months                   | 6-12 months                 | 6-18 months                 | 12-36 months               |
 
 ### 1.2 Recommended Strategy: Strangler Fig (Primary) + Branch by Abstraction (Tactical)
 
@@ -237,28 +237,28 @@ flowchart TB
 
 ### 2.3 Context Relationship Types
 
-| Relationship | Upstream | Downstream | Pattern | Rationale |
-|---|---|---|---|---|
-| Identity to Orders | Identity | Orders | Customer-Supplier | Orders depend on user identity but should not dictate auth design |
-| Orders to Payments | Orders | Payments | Customer-Supplier | Orders initiate payments; payment service defines its own API |
-| Orders to Inventory | Orders | Inventory | Customer-Supplier | Orders request reservations; inventory owns stock truth |
-| Catalog to Orders | Catalog | Orders | Published Language | Product data shared via a stable, versioned schema |
-| Inventory to Catalog | Catalog | Inventory | Anti-Corruption Layer | Inventory translates catalog product IDs to internal SKU model |
-| Orders to Notification | Orders | Notification | Event Notification | Notification is a generic subscriber; no coupling to order internals |
-| Orders to Shipping | Orders | Shipping | Customer-Supplier | Orders request fulfillment; shipping owns logistics |
+| Relationship           | Upstream | Downstream   | Pattern               | Rationale                                                            |
+| ---------------------- | -------- | ------------ | --------------------- | -------------------------------------------------------------------- |
+| Identity to Orders     | Identity | Orders       | Customer-Supplier     | Orders depend on user identity but should not dictate auth design    |
+| Orders to Payments     | Orders   | Payments     | Customer-Supplier     | Orders initiate payments; payment service defines its own API        |
+| Orders to Inventory    | Orders   | Inventory    | Customer-Supplier     | Orders request reservations; inventory owns stock truth              |
+| Catalog to Orders      | Catalog  | Orders       | Published Language    | Product data shared via a stable, versioned schema                   |
+| Inventory to Catalog   | Catalog  | Inventory    | Anti-Corruption Layer | Inventory translates catalog product IDs to internal SKU model       |
+| Orders to Notification | Orders   | Notification | Event Notification    | Notification is a generic subscriber; no coupling to order internals |
+| Orders to Shipping     | Orders   | Shipping     | Customer-Supplier     | Orders request fulfillment; shipping owns logistics                  |
 
 ### 2.4 Subdomain Classification
 
-| Subdomain | Type | Investment Level | Build vs Buy |
-|---|---|---|---|
-| Order Management | Core | High -- competitive advantage | Build |
-| Payment Processing | Core | High -- revenue critical | Build + integrate gateway |
-| User/Identity | Core | Medium -- foundational | Build (or Auth0/Keycloak) |
-| Inventory | Supporting | Medium | Build |
-| Catalog/Search | Supporting | Medium | Build + Elasticsearch |
-| Shipping | Supporting | Low-Medium | Integrate (ShipStation, EasyPost) |
-| Notification | Generic | Low | Build thin layer + SaaS (SendGrid, Twilio) |
-| Audit/Logging | Generic | Low | Build thin layer + ELK/Datadog |
+| Subdomain          | Type       | Investment Level              | Build vs Buy                               |
+| ------------------ | ---------- | ----------------------------- | ------------------------------------------ |
+| Order Management   | Core       | High -- competitive advantage | Build                                      |
+| Payment Processing | Core       | High -- revenue critical      | Build + integrate gateway                  |
+| User/Identity      | Core       | Medium -- foundational        | Build (or Auth0/Keycloak)                  |
+| Inventory          | Supporting | Medium                        | Build                                      |
+| Catalog/Search     | Supporting | Medium                        | Build + Elasticsearch                      |
+| Shipping           | Supporting | Low-Medium                    | Integrate (ShipStation, EasyPost)          |
+| Notification       | Generic    | Low                           | Build thin layer + SaaS (SendGrid, Twilio) |
+| Audit/Logging      | Generic    | Low                           | Build thin layer + ELK/Datadog             |
 
 ### 2.5 Anti-Corruption Layer Design
 
@@ -297,14 +297,14 @@ flowchart LR
 
 Use these heuristics to validate whether a proposed service boundary is correctly sized:
 
-| Heuristic | Signal | Action |
-|---|---|---|
-| **Single team ownership** | Service requires coordinated work across 3+ teams | Service is too large -- split by bounded context |
-| **Independent deployability** | Deploying this service requires deploying another | Services are coupled -- find the shared dependency |
-| **Data ownership** | Service shares database tables with another | Merge into one service or introduce CDC |
-| **Communication volume** | Service makes 10+ sync calls to another per request | Services are too granular (nanoservices) -- consider merging |
-| **Cognitive load** | New developer cannot understand service in 1 week | Service is too complex -- split by aggregate |
-| **Rewrite feasibility** | Service could be rewritten in 2 weeks | Service is correctly sized |
+| Heuristic                     | Signal                                              | Action                                                       |
+| ----------------------------- | --------------------------------------------------- | ------------------------------------------------------------ |
+| **Single team ownership**     | Service requires coordinated work across 3+ teams   | Service is too large -- split by bounded context             |
+| **Independent deployability** | Deploying this service requires deploying another   | Services are coupled -- find the shared dependency           |
+| **Data ownership**            | Service shares database tables with another         | Merge into one service or introduce CDC                      |
+| **Communication volume**      | Service makes 10+ sync calls to another per request | Services are too granular (nanoservices) -- consider merging |
+| **Cognitive load**            | New developer cannot understand service in 1 week   | Service is too complex -- split by aggregate                 |
+| **Rewrite feasibility**       | Service could be rewritten in 2 weeks               | Service is correctly sized                                   |
 
 ---
 
@@ -312,16 +312,16 @@ Use these heuristics to validate whether a proposed service boundary is correctl
 
 ### 3.1 Communication Pattern Decision Matrix
 
-| Scenario | Pattern | Protocol | Why |
-|---|---|---|---|
-| User authentication check | Synchronous | gRPC | Low latency required; real-time auth decision |
-| Order placement | Synchronous (API) + Async (events) | REST + Kafka | API returns order ID; downstream processing is async |
-| Payment processing | Synchronous | gRPC | Must confirm payment before order confirmation |
-| Inventory reservation | Async (command) | Kafka | Can tolerate slight delay; decouples order from inventory |
-| Notification dispatch | Async (event) | Kafka | Fire-and-forget; notification failure must not block orders |
-| Search index update | Async (CDC) | Debezium + Kafka | Eventual consistency acceptable; read-heavy optimization |
-| Shipping label generation | Async (command) | RabbitMQ | Task queue pattern; retryable, order-independent |
-| Price lookup | Synchronous | gRPC + cache | Needs current price at order time; cache for performance |
+| Scenario                  | Pattern                            | Protocol         | Why                                                         |
+| ------------------------- | ---------------------------------- | ---------------- | ----------------------------------------------------------- |
+| User authentication check | Synchronous                        | gRPC             | Low latency required; real-time auth decision               |
+| Order placement           | Synchronous (API) + Async (events) | REST + Kafka     | API returns order ID; downstream processing is async        |
+| Payment processing        | Synchronous                        | gRPC             | Must confirm payment before order confirmation              |
+| Inventory reservation     | Async (command)                    | Kafka            | Can tolerate slight delay; decouples order from inventory   |
+| Notification dispatch     | Async (event)                      | Kafka            | Fire-and-forget; notification failure must not block orders |
+| Search index update       | Async (CDC)                        | Debezium + Kafka | Eventual consistency acceptable; read-heavy optimization    |
+| Shipping label generation | Async (command)                    | RabbitMQ         | Task queue pattern; retryable, order-independent            |
+| Price lookup              | Synchronous                        | gRPC + cache     | Needs current price at order time; cache for performance    |
 
 ### 3.2 Communication Selection Flowchart
 
@@ -416,9 +416,7 @@ All events follow a canonical envelope format with CloudEvents metadata:
   "data": {
     "orderId": "order-42",
     "customerId": "user-7",
-    "items": [
-      { "productId": "prod-100", "quantity": 2, "unitPrice": 29.99 }
-    ],
+    "items": [{ "productId": "prod-100", "quantity": 2, "unitPrice": 29.99 }],
     "total": 59.98,
     "currency": "USD"
   }
@@ -511,14 +509,14 @@ sequenceDiagram
 
 #### 3.5.3 Saga Decision Criteria
 
-| Criteria | Choreography | Orchestration |
-|---|---|---|
-| Number of steps | 2-4 (simple) | 5+ (complex) |
-| Compensation complexity | Simple reverse | Multi-step rollback |
-| Observability need | Low (distributed logs) | High (central state machine) |
-| Coupling | Very low | Moderate (to coordinator) |
-| Error handling | Per-consumer compensating events | Central compensation logic |
-| **Recommendation** | Notification flows, audit logging | Order fulfillment, payment flows |
+| Criteria                | Choreography                      | Orchestration                    |
+| ----------------------- | --------------------------------- | -------------------------------- |
+| Number of steps         | 2-4 (simple)                      | 5+ (complex)                     |
+| Compensation complexity | Simple reverse                    | Multi-step rollback              |
+| Observability need      | Low (distributed logs)            | High (central state machine)     |
+| Coupling                | Very low                          | Moderate (to coordinator)        |
+| Error handling          | Per-consumer compensating events  | Central compensation logic       |
+| **Recommendation**      | Notification flows, audit logging | Order fulfillment, payment flows |
 
 ---
 
@@ -574,15 +572,15 @@ Splitting a shared monolithic database is the hardest part of migration. Follow 
 
 Map every table to its owning bounded context:
 
-| Table | Owner Context | Consumers | Migration Phase |
-|---|---|---|---|
-| `users` | Identity | Orders, Payments, Notifications | Phase 3 |
-| `orders` | Orders | Payments, Shipping, Notifications | Phase 3 |
-| `order_items` | Orders | Inventory, Shipping | Phase 3 |
-| `payments` | Payments | Orders, Notifications | Phase 3 |
-| `products` | Catalog | Orders, Inventory, Search | Phase 2 |
-| `inventory` | Inventory | Orders, Catalog | Phase 4 |
-| `notifications` | Notification | -- | Phase 1 |
+| Table           | Owner Context | Consumers                         | Migration Phase |
+| --------------- | ------------- | --------------------------------- | --------------- |
+| `users`         | Identity      | Orders, Payments, Notifications   | Phase 3         |
+| `orders`        | Orders        | Payments, Shipping, Notifications | Phase 3         |
+| `order_items`   | Orders        | Inventory, Shipping               | Phase 3         |
+| `payments`      | Payments      | Orders, Notifications             | Phase 3         |
+| `products`      | Catalog       | Orders, Inventory, Search         | Phase 2         |
+| `inventory`     | Inventory     | Orders, Catalog                   | Phase 4         |
+| `notifications` | Notification  | --                                | Phase 1         |
 
 **Step 2: Introduce Database Views as Seams**
 
@@ -653,13 +651,13 @@ flowchart LR
 
 **When to Use Event Sourcing:**
 
-| Use Case | Event Sourcing? | Rationale |
-|---|---|---|
-| Order lifecycle | Yes | Full audit trail, temporal queries, complex state machine |
-| Payment processing | Yes | Regulatory audit requirements, reconciliation |
-| User profile CRUD | No | Simple state, no audit requirements |
-| Catalog management | No | Read-heavy, no temporal queries needed |
-| Inventory levels | Maybe | Depends on audit requirements; snapshot-based may suffice |
+| Use Case           | Event Sourcing? | Rationale                                                 |
+| ------------------ | --------------- | --------------------------------------------------------- |
+| Order lifecycle    | Yes             | Full audit trail, temporal queries, complex state machine |
+| Payment processing | Yes             | Regulatory audit requirements, reconciliation             |
+| User profile CRUD  | No              | Simple state, no audit requirements                       |
+| Catalog management | No              | Read-heavy, no temporal queries needed                    |
+| Inventory levels   | Maybe           | Depends on audit requirements; snapshot-based may suffice |
 
 ### 4.4 Outbox Pattern for Reliable Event Publishing
 
@@ -702,14 +700,14 @@ CREATE INDEX idx_outbox_unpublished ON outbox (created_at) WHERE published = FAL
 
 ### 4.5 Data Consistency Patterns Summary
 
-| Pattern | Consistency | Latency | Complexity | Use When |
-|---|---|---|---|---|
-| Synchronous API call | Strong | Low | Low | Auth checks, price lookups |
-| Saga (orchestration) | Eventual | Medium | High | Multi-service transactions |
-| Saga (choreography) | Eventual | Medium | Medium | Simple 2-3 step flows |
-| Outbox + CDC | Eventual | Low-Medium | Medium | Reliable event publishing |
-| Event sourcing | Eventual (reads) | Medium | High | Audit trail, temporal queries |
-| CQRS | Eventual (reads) | Low (reads) | High | Read/write scaling separation |
+| Pattern              | Consistency      | Latency     | Complexity | Use When                      |
+| -------------------- | ---------------- | ----------- | ---------- | ----------------------------- |
+| Synchronous API call | Strong           | Low         | Low        | Auth checks, price lookups    |
+| Saga (orchestration) | Eventual         | Medium      | High       | Multi-service transactions    |
+| Saga (choreography)  | Eventual         | Medium      | Medium     | Simple 2-3 step flows         |
+| Outbox + CDC         | Eventual         | Low-Medium  | Medium     | Reliable event publishing     |
+| Event sourcing       | Eventual (reads) | Medium      | High       | Audit trail, temporal queries |
+| CQRS                 | Eventual (reads) | Low (reads) | High       | Read/write scaling separation |
 
 ---
 
@@ -769,24 +767,24 @@ flowchart TB
 
 **Gateway Selection:**
 
-| Gateway | Best For | Trade-off |
-|---|---|---|
-| Kong | General purpose, plugin ecosystem | Heavyweight for small deployments |
-| Ambassador/Emissary | Kubernetes-native, Envoy-based | Tighter K8s coupling |
-| AWS API Gateway | Serverless, managed | Vendor lock-in, cold starts |
-| Traefik | Auto-discovery, Docker/K8s native | Less enterprise plugin ecosystem |
+| Gateway             | Best For                          | Trade-off                         |
+| ------------------- | --------------------------------- | --------------------------------- |
+| Kong                | General purpose, plugin ecosystem | Heavyweight for small deployments |
+| Ambassador/Emissary | Kubernetes-native, Envoy-based    | Tighter K8s coupling              |
+| AWS API Gateway     | Serverless, managed               | Vendor lock-in, cold starts       |
+| Traefik             | Auto-discovery, Docker/K8s native | Less enterprise plugin ecosystem  |
 
 ### 5.2 Service Mesh
 
 Deploy a service mesh when cross-cutting concerns justify the operational overhead:
 
-| Concern | Service Mesh Handles | Without Mesh |
-|---|---|---|
-| mTLS between services | Automatic (sidecar) | Manual cert management per service |
-| Traffic management | Canary, A/B, fault injection | Custom load balancer config |
-| Observability | Automatic metrics, traces | Manual instrumentation per service |
-| Rate limiting | Per-service policies | Application-level implementation |
-| Retry/timeout | Mesh-level policies | Library-level (Polly, resilience4j) |
+| Concern               | Service Mesh Handles         | Without Mesh                        |
+| --------------------- | ---------------------------- | ----------------------------------- |
+| mTLS between services | Automatic (sidecar)          | Manual cert management per service  |
+| Traffic management    | Canary, A/B, fault injection | Custom load balancer config         |
+| Observability         | Automatic metrics, traces    | Manual instrumentation per service  |
+| Rate limiting         | Per-service policies         | Application-level implementation    |
+| Retry/timeout         | Mesh-level policies          | Library-level (Polly, resilience4j) |
 
 **Recommendation:** Start without a service mesh. Add Linkerd (lighter weight) when you have 8+ services and cross-cutting concerns justify the operational complexity. Linkerd over Istio for lower resource overhead and simpler operations (ADR-006).
 
@@ -818,38 +816,38 @@ spec:
         version: v1.2.3
     spec:
       containers:
-      - name: order-service
-        image: registry.example.com/order-service:v1.2.3
-        ports:
-        - containerPort: 8080
-          name: http
-        - containerPort: 9090
-          name: grpc
-        resources:
-          requests:
-            cpu: 250m
-            memory: 256Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
-        livenessProbe:
-          httpGet:
-            path: /health/live
-            port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 15
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: order-service-secrets
-              key: database-url
+        - name: order-service
+          image: registry.example.com/order-service:v1.2.3
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 9090
+              name: grpc
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: order-service-secrets
+                  key: database-url
 ```
 
 ### 5.4 CI/CD Pipeline per Service
@@ -917,12 +915,12 @@ flowchart TB
 
 **Golden Signals per Service:**
 
-| Signal | Metric | Alert Threshold |
-|---|---|---|
-| Latency | P99 request duration | > 500ms for 5 min |
-| Traffic | Requests per second | > 2x baseline for 10 min |
-| Errors | Error rate (5xx / total) | > 1% for 5 min |
-| Saturation | CPU / Memory / Connection pool | > 80% for 10 min |
+| Signal     | Metric                         | Alert Threshold          |
+| ---------- | ------------------------------ | ------------------------ |
+| Latency    | P99 request duration           | > 500ms for 5 min        |
+| Traffic    | Requests per second            | > 2x baseline for 10 min |
+| Errors     | Error rate (5xx / total)       | > 1% for 5 min           |
+| Saturation | CPU / Memory / Connection pool | > 80% for 10 min         |
 
 **Distributed Tracing Requirements:**
 
@@ -933,12 +931,12 @@ flowchart TB
 
 ### 5.6 Service Discovery and Configuration Management
 
-| Concern | Recommended | Pattern |
-|---|---|---|
-| Service Discovery | Kubernetes DNS | Services register as K8s Services; clients resolve `order-service.default.svc.cluster.local` |
-| Configuration | ConfigMap + Sealed Secrets | Non-sensitive config in ConfigMaps; secrets encrypted with SealedSecrets or external-secrets-operator |
-| Feature Flags | LaunchDarkly / Unleash | Server-side evaluation; SDK per service; gradual rollout + kill switch |
-| API Versioning | URI path prefix | `/v1/orders`, `/v2/orders`; old versions maintained for deprecation period |
+| Concern           | Recommended                | Pattern                                                                                               |
+| ----------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Service Discovery | Kubernetes DNS             | Services register as K8s Services; clients resolve `order-service.default.svc.cluster.local`          |
+| Configuration     | ConfigMap + Sealed Secrets | Non-sensitive config in ConfigMaps; secrets encrypted with SealedSecrets or external-secrets-operator |
+| Feature Flags     | LaunchDarkly / Unleash     | Server-side evaluation; SDK per service; gradual rollout + kill switch                                |
+| API Versioning    | URI path prefix            | `/v1/orders`, `/v2/orders`; old versions maintained for deprecation period                            |
 
 ---
 
@@ -966,23 +964,23 @@ stateDiagram-v2
 
 **Configuration per Dependency:**
 
-| Dependency | Failure Threshold | Timeout | Fallback Strategy |
-|---|---|---|---|
-| Payment Service | 5 failures / 60s | 30s | Queue for retry |
-| Inventory Service | 3 failures / 30s | 15s | Return cached availability |
-| Notification Service | 10 failures / 120s | 60s | Drop silently (non-critical) |
-| Catalog Service | 3 failures / 30s | 15s | Return stale cache |
+| Dependency           | Failure Threshold  | Timeout | Fallback Strategy            |
+| -------------------- | ------------------ | ------- | ---------------------------- |
+| Payment Service      | 5 failures / 60s   | 30s     | Queue for retry              |
+| Inventory Service    | 3 failures / 30s   | 15s     | Return cached availability   |
+| Notification Service | 10 failures / 120s | 60s     | Drop silently (non-critical) |
+| Catalog Service      | 3 failures / 30s   | 15s     | Return stale cache           |
 
 ### 6.2 Bulkhead Pattern
 
 Isolate resources per dependency to prevent one slow dependency from consuming all resources:
 
-| Resource | Bulkhead Strategy | Pool Size | Rationale |
-|---|---|---|---|
-| Payment Gateway HTTP | Thread pool | 20 threads | Prevent slow payments from blocking orders |
-| Inventory gRPC | Connection pool | 10 connections | Inventory is read-heavy, needs less |
-| Database connections | Connection pool | 25 per service | Prevent connection exhaustion |
-| Kafka producers | Separate producer per topic | 1 per topic | Isolate topic-level failures |
+| Resource             | Bulkhead Strategy           | Pool Size      | Rationale                                  |
+| -------------------- | --------------------------- | -------------- | ------------------------------------------ |
+| Payment Gateway HTTP | Thread pool                 | 20 threads     | Prevent slow payments from blocking orders |
+| Inventory gRPC       | Connection pool             | 10 connections | Inventory is read-heavy, needs less        |
+| Database connections | Connection pool             | 25 per service | Prevent connection exhaustion              |
+| Kafka producers      | Separate producer per topic | 1 per topic    | Isolate topic-level failures               |
 
 ### 6.3 Retry with Exponential Backoff and Jitter
 
@@ -1015,11 +1013,11 @@ Client --> API Gateway (10s) --> Order Service (5s) --> Payment Service (3s)
 
 ### 6.5 Health Check Design
 
-| Check Type | Endpoint | Purpose | Failure Action |
-|---|---|---|---|
-| Liveness | `/health/live` | Process is alive | Kubernetes restarts pod |
-| Readiness | `/health/ready` | Can serve traffic | Kubernetes removes from load balancer |
-| Startup | `/health/startup` | Initialization complete | Kubernetes waits for startup |
+| Check Type | Endpoint          | Purpose                 | Failure Action                        |
+| ---------- | ----------------- | ----------------------- | ------------------------------------- |
+| Liveness   | `/health/live`    | Process is alive        | Kubernetes restarts pod               |
+| Readiness  | `/health/ready`   | Can serve traffic       | Kubernetes removes from load balancer |
+| Startup    | `/health/startup` | Initialization complete | Kubernetes waits for startup          |
 
 **Readiness Check Includes:**
 
@@ -1093,21 +1091,21 @@ flowchart TB
 
 **Team Topology Types (from Team Topologies by Skelton & Pais):**
 
-| Team Type | Purpose | Lifespan | Service Ownership |
-|---|---|---|---|
-| **Stream-Aligned** | Owns a value stream (business capability) end-to-end | Permanent | Yes -- owns 1-3 services |
-| **Platform** | Provides self-service infrastructure and tooling | Permanent | Internal platform services |
-| **Enabling** | Coaches stream-aligned teams on new practices | Temporary (weeks-months) | None -- advisory only |
-| **Complicated Subsystem** | Owns a technically complex component (ML, search engine) | Permanent | Yes -- owns 1 specialist service |
+| Team Type                 | Purpose                                                  | Lifespan                 | Service Ownership                |
+| ------------------------- | -------------------------------------------------------- | ------------------------ | -------------------------------- |
+| **Stream-Aligned**        | Owns a value stream (business capability) end-to-end     | Permanent                | Yes -- owns 1-3 services         |
+| **Platform**              | Provides self-service infrastructure and tooling         | Permanent                | Internal platform services       |
+| **Enabling**              | Coaches stream-aligned teams on new practices            | Temporary (weeks-months) | None -- advisory only            |
+| **Complicated Subsystem** | Owns a technically complex component (ML, search engine) | Permanent                | Yes -- owns 1 specialist service |
 
 **Migration-Phase Team Evolution:**
 
-| Phase | Team Structure | Rationale |
-|---|---|---|
-| Phase 0-1 | 1 platform team + 1 extraction team | Platform builds foundation; extraction team learns the pattern |
-| Phase 2 | 1 platform + 2 stream-aligned | Second team formed for read-heavy services |
-| Phase 3 | 1 platform + 3-4 stream-aligned + 1 enabling (SRE) | Core domain extraction needs more teams; SRE coaches reliability |
-| Phase 4+ | 1 platform + 4-6 stream-aligned + 1 security enabling | Full fleet; security enables compliance across all services |
+| Phase     | Team Structure                                        | Rationale                                                        |
+| --------- | ----------------------------------------------------- | ---------------------------------------------------------------- |
+| Phase 0-1 | 1 platform team + 1 extraction team                   | Platform builds foundation; extraction team learns the pattern   |
+| Phase 2   | 1 platform + 2 stream-aligned                         | Second team formed for read-heavy services                       |
+| Phase 3   | 1 platform + 3-4 stream-aligned + 1 enabling (SRE)    | Core domain extraction needs more teams; SRE coaches reliability |
+| Phase 4+  | 1 platform + 4-6 stream-aligned + 1 security enabling | Full fleet; security enables compliance across all services      |
 
 ### 7.2 Cognitive Load Management
 
@@ -1120,13 +1118,13 @@ Each stream-aligned team should own a bounded context that fits within their cog
 
 ### 7.3 Migration Phases and Milestones
 
-| Milestone | Gate Criteria | Decision Point |
-|---|---|---|
-| **M0: Foundation Complete** | API Gateway routes 100% traffic; observability dashboards operational; CI/CD template validated | Proceed to Phase 1 or extend foundation |
-| **M1: Leaf Services Live** | Notification + Audit services serving production traffic for 2 weeks with SLOs met | Proceed to Phase 2; validate team can execute the extraction pattern |
-| **M2: Read Services Live** | Catalog + Search services operational; CDC lag < 5s; search latency P99 < 100ms | Proceed to Phase 3 (core domain) |
-| **M3: Core Domain Live** | Order, Payment, Identity services operational; saga completion rate > 99.5%; SLOs met for 30 days | Proceed to Phase 4 (completion) |
-| **M4: Monolith Decommissioned** | Zero traffic to monolith; monolith database shut down; all endpoints return 404 | Migration complete |
+| Milestone                       | Gate Criteria                                                                                     | Decision Point                                                       |
+| ------------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **M0: Foundation Complete**     | API Gateway routes 100% traffic; observability dashboards operational; CI/CD template validated   | Proceed to Phase 1 or extend foundation                              |
+| **M1: Leaf Services Live**      | Notification + Audit services serving production traffic for 2 weeks with SLOs met                | Proceed to Phase 2; validate team can execute the extraction pattern |
+| **M2: Read Services Live**      | Catalog + Search services operational; CDC lag < 5s; search latency P99 < 100ms                   | Proceed to Phase 3 (core domain)                                     |
+| **M3: Core Domain Live**        | Order, Payment, Identity services operational; saga completion rate > 99.5%; SLOs met for 30 days | Proceed to Phase 4 (completion)                                      |
+| **M4: Monolith Decommissioned** | Zero traffic to monolith; monolith database shut down; all endpoints return 404                   | Migration complete                                                   |
 
 **Phase Gate Process:**
 
@@ -1142,13 +1140,13 @@ At each milestone, the migration steering committee reviews:
 
 **Risk Matrix:**
 
-| Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|
-| Data inconsistency during CDC | Medium | High | CDC lag monitoring with auto-alerting; manual reconciliation scripts; fallback to monolith queries |
-| Saga failure causing stuck orders | Medium | High | Saga timeout with dead letter queue; manual resolution UI; compensating transactions |
-| Service mesh outage | Low | High | Start without mesh; application-level fallback for mTLS and retries |
-| Team knowledge silos | High | Medium | Cross-team pairing; shared extraction playbook; enabling team coaching |
-| Scope creep (rewriting instead of extracting) | High | Medium | Strict extraction mandate: move code, do not rewrite; refactoring only after extraction |
+| Risk                                          | Likelihood | Impact | Mitigation                                                                                         |
+| --------------------------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------- |
+| Data inconsistency during CDC                 | Medium     | High   | CDC lag monitoring with auto-alerting; manual reconciliation scripts; fallback to monolith queries |
+| Saga failure causing stuck orders             | Medium     | High   | Saga timeout with dead letter queue; manual resolution UI; compensating transactions               |
+| Service mesh outage                           | Low        | High   | Start without mesh; application-level fallback for mTLS and retries                                |
+| Team knowledge silos                          | High       | Medium | Cross-team pairing; shared extraction playbook; enabling team coaching                             |
+| Scope creep (rewriting instead of extracting) | High       | Medium | Strict extraction mandate: move code, do not rewrite; refactoring only after extraction            |
 
 **Rollback Strategy per Phase:**
 
@@ -1172,12 +1170,12 @@ flowchart TD
 
 ### 7.5 Communication and Stakeholder Management
 
-| Stakeholder | Communication Cadence | Content |
-|---|---|---|
-| Engineering Leadership | Bi-weekly | Phase progress, SLO dashboard, risk register, team capacity |
-| Product Teams | Weekly | Feature impact of migration; API changes; deprecation timelines |
-| Operations/SRE | Daily (during extraction) | Deployment schedule, rollback readiness, on-call coverage |
-| Executive Sponsors | Monthly | Budget burn, timeline progress, strategic risk assessment |
+| Stakeholder            | Communication Cadence     | Content                                                         |
+| ---------------------- | ------------------------- | --------------------------------------------------------------- |
+| Engineering Leadership | Bi-weekly                 | Phase progress, SLO dashboard, risk register, team capacity     |
+| Product Teams          | Weekly                    | Feature impact of migration; API changes; deprecation timelines |
+| Operations/SRE         | Daily (during extraction) | Deployment schedule, rollback readiness, on-call coverage       |
+| Executive Sponsors     | Monthly                   | Budget burn, timeline progress, strategic risk assessment       |
 
 ---
 
@@ -1185,36 +1183,36 @@ flowchart TD
 
 ### 8.1 Phase-by-Phase Timeline with Rollback Points
 
-| Phase | Duration | Services | Rollback Strategy | Success Criteria |
-|---|---|---|---|---|
-| **Phase 0: Foundation** | 2 months | -- | Remove gateway, route directly | Gateway routes 100% traffic; observability dashboards live |
-| **Phase 1: Leaf Services** | 2 months | Notification, Audit | Route traffic back to monolith | < 1% error rate; P99 < 200ms; all notifications delivered |
-| **Phase 2: Read-Heavy** | 3 months | Catalog/Search | CDC rollback to monolith queries | Search latency P99 < 100ms; catalog data consistency < 5s lag |
-| **Phase 3: Core Domain** | 5 months | User, Order, Payment | Feature flags; route back to monolith | SLOs met for 30 days; saga completion rate > 99.5% |
-| **Phase 4: Completion** | 3 months | Inventory; decommission | Re-enable monolith paths | All monolith endpoints return 404; zero traffic to monolith DB |
+| Phase                      | Duration | Services                | Rollback Strategy                     | Success Criteria                                               |
+| -------------------------- | -------- | ----------------------- | ------------------------------------- | -------------------------------------------------------------- |
+| **Phase 0: Foundation**    | 2 months | --                      | Remove gateway, route directly        | Gateway routes 100% traffic; observability dashboards live     |
+| **Phase 1: Leaf Services** | 2 months | Notification, Audit     | Route traffic back to monolith        | < 1% error rate; P99 < 200ms; all notifications delivered      |
+| **Phase 2: Read-Heavy**    | 3 months | Catalog/Search          | CDC rollback to monolith queries      | Search latency P99 < 100ms; catalog data consistency < 5s lag  |
+| **Phase 3: Core Domain**   | 5 months | User, Order, Payment    | Feature flags; route back to monolith | SLOs met for 30 days; saga completion rate > 99.5%             |
+| **Phase 4: Completion**    | 3 months | Inventory; decommission | Re-enable monolith paths              | All monolith endpoints return 404; zero traffic to monolith DB |
 
 ### 8.2 Risk Assessment per Phase
 
-| Phase | Risk Level | Top Risks | Mitigations |
-|---|---|---|---|
-| Phase 0 | Low | Gateway misconfiguration | Canary with 1% traffic; automated rollback |
-| Phase 1 | Low | Lost notifications | Dead letter queue; monitoring; manual resend capability |
-| Phase 2 | Medium | Search data inconsistency | CDC lag monitoring; fallback to monolith search |
-| Phase 3 | High | Transaction failures across services | Saga compensation; extensive load testing; parallel run for payments |
-| Phase 4 | Medium | Undiscovered monolith dependencies | Dependency scan; gradual traffic reduction; keep monolith warm for 30 days |
+| Phase   | Risk Level | Top Risks                            | Mitigations                                                                |
+| ------- | ---------- | ------------------------------------ | -------------------------------------------------------------------------- |
+| Phase 0 | Low        | Gateway misconfiguration             | Canary with 1% traffic; automated rollback                                 |
+| Phase 1 | Low        | Lost notifications                   | Dead letter queue; monitoring; manual resend capability                    |
+| Phase 2 | Medium     | Search data inconsistency            | CDC lag monitoring; fallback to monolith search                            |
+| Phase 3 | High       | Transaction failures across services | Saga compensation; extensive load testing; parallel run for payments       |
+| Phase 4 | Medium     | Undiscovered monolith dependencies   | Dependency scan; gradual traffic reduction; keep monolith warm for 30 days |
 
 ### 8.3 SLOs per Service
 
-| Service | Availability | Latency (P99) | Error Budget (30d) |
-|---|---|---|---|
-| API Gateway | 99.99% | < 50ms (routing only) | 4.3 min/month |
-| Identity Service | 99.95% | < 100ms | 21.9 min/month |
-| Order Service | 99.9% | < 500ms | 43.8 min/month |
-| Payment Service | 99.9% | < 1000ms | 43.8 min/month |
-| Catalog Service | 99.9% | < 200ms | 43.8 min/month |
-| Inventory Service | 99.5% | < 300ms | 3.6 hr/month |
-| Notification Service | 99.5% | < 5000ms | 3.6 hr/month |
-| Search Service | 99.5% | < 100ms | 3.6 hr/month |
+| Service              | Availability | Latency (P99)         | Error Budget (30d) |
+| -------------------- | ------------ | --------------------- | ------------------ |
+| API Gateway          | 99.99%       | < 50ms (routing only) | 4.3 min/month      |
+| Identity Service     | 99.95%       | < 100ms               | 21.9 min/month     |
+| Order Service        | 99.9%        | < 500ms               | 43.8 min/month     |
+| Payment Service      | 99.9%        | < 1000ms              | 43.8 min/month     |
+| Catalog Service      | 99.9%        | < 200ms               | 43.8 min/month     |
+| Inventory Service    | 99.5%        | < 300ms               | 3.6 hr/month       |
+| Notification Service | 99.5%        | < 5000ms              | 3.6 hr/month       |
+| Search Service       | 99.5%        | < 100ms               | 3.6 hr/month       |
 
 ---
 
@@ -1278,12 +1276,14 @@ flowchart TD
 **Symptom:** Services cannot be deployed independently. A change in one service requires coordinated deployment of others.
 
 **Causes:**
+
 - Shared database between services
 - Synchronous call chains that create temporal coupling
 - Shared libraries with business logic (not just utilities)
 - Coordinated release schedules
 
 **Prevention:**
+
 - Database-per-service is non-negotiable
 - Default to async communication; sync only when consistency requires it
 - Share only utility libraries (logging, tracing); never share domain logic
@@ -1294,11 +1294,13 @@ flowchart TD
 **Symptom:** A single user request triggers dozens of inter-service calls, each adding latency. Services have 1-2 API endpoints each.
 
 **Causes:**
+
 - Services decomposed around individual entities instead of bounded contexts
 - No data denormalization -- every query requires joins across services
 - Missing BFF (Backend for Frontend) aggregation layer
 
 **Prevention:**
+
 - Right-size services around bounded contexts, not individual entities
 - Denormalize read models (CQRS) to reduce cross-service queries
 - Use BFF to aggregate multiple service calls into a single client response
@@ -1309,10 +1311,12 @@ flowchart TD
 **Symptom:** Multiple services read/write the same database tables.
 
 **Causes:**
+
 - Expedient shortcut during migration
 - "Just this one table" exception that multiplies
 
 **Prevention:**
+
 - Enforce database-per-service from day 1 of migration
 - Use CDC or API calls for cross-service data access
 - No exceptions, no "temporary" shared tables
@@ -1322,10 +1326,12 @@ flowchart TD
 **Symptom:** Service A calls Service B which calls Service C which calls Service D synchronously. Any failure in the chain blocks the entire request. Latency compounds.
 
 **Causes:**
+
 - Treating inter-service calls like in-process function calls
 - Not considering failure modes of distributed communication
 
 **Prevention:**
+
 - Limit synchronous call depth to 2 hops maximum (Gateway -> Service -> 1 downstream)
 - Use async communication (events) for anything beyond the immediate request-response flow
 - Apply circuit breakers at every synchronous boundary
@@ -1336,6 +1342,7 @@ flowchart TD
 **Symptom:** API changes break consumers. Coordinated deployments become necessary.
 
 **Prevention:**
+
 - Version all APIs from day 1 (URI versioning: `/v1/`, `/v2/`)
 - Never remove or rename fields in published schemas
 - Deprecation lifecycle: announce, sunset header, grace period, remove
@@ -1345,6 +1352,7 @@ flowchart TD
 **Symptom:** CRUD services burdened with event stores, projections, and snapshot management.
 
 **Prevention:**
+
 - Event sourcing only for core domains with audit trail or temporal query requirements
 - Standard CRUD with outbox pattern for supporting and generic subdomains
 - Evaluate each bounded context independently
@@ -1354,6 +1362,7 @@ flowchart TD
 **Symptom:** Duplicate payments, double inventory reservations, duplicate notifications when retries occur.
 
 **Prevention:**
+
 - All cross-service mutating operations must accept an idempotency key
 - Idempotency store with TTL (Redis or database)
 - Kafka consumer offset management with exactly-once semantics (transactional consumers)
@@ -1363,6 +1372,7 @@ flowchart TD
 **Symptom:** Service boundaries do not match team boundaries. Multiple teams modify the same service. No team owns a service end-to-end.
 
 **Prevention:**
+
 - Align service boundaries with team boundaries
 - Each service is owned by one team (two-pizza team)
 - Teams own the full stack of their service (API, business logic, database, deployment)
@@ -1373,35 +1383,35 @@ flowchart TD
 
 ### 11.1 Technical KPIs
 
-| Metric | Target | Measurement Method |
-|---|---|---|
-| **Deployment Frequency** | Daily (per service) | CI/CD pipeline metrics |
-| **Lead Time for Changes** | < 1 day (commit to production) | Git commit to production deployment timestamp |
-| **Mean Time to Recovery (MTTR)** | < 30 minutes | Incident tracking system |
-| **Change Failure Rate** | < 5% | Failed deployments / total deployments |
-| **Service SLO Compliance** | > 99% of periods meeting SLO | Prometheus SLO burn rate alerts |
-| **Inter-Service Latency (P99)** | < 50ms (gRPC), < 200ms (REST) | OpenTelemetry trace metrics |
-| **Saga Completion Rate** | > 99.5% | Saga coordinator state metrics |
-| **CDC Replication Lag** | < 5 seconds (P99) | Debezium connector lag metrics |
+| Metric                           | Target                         | Measurement Method                            |
+| -------------------------------- | ------------------------------ | --------------------------------------------- |
+| **Deployment Frequency**         | Daily (per service)            | CI/CD pipeline metrics                        |
+| **Lead Time for Changes**        | < 1 day (commit to production) | Git commit to production deployment timestamp |
+| **Mean Time to Recovery (MTTR)** | < 30 minutes                   | Incident tracking system                      |
+| **Change Failure Rate**          | < 5%                           | Failed deployments / total deployments        |
+| **Service SLO Compliance**       | > 99% of periods meeting SLO   | Prometheus SLO burn rate alerts               |
+| **Inter-Service Latency (P99)**  | < 50ms (gRPC), < 200ms (REST)  | OpenTelemetry trace metrics                   |
+| **Saga Completion Rate**         | > 99.5%                        | Saga coordinator state metrics                |
+| **CDC Replication Lag**          | < 5 seconds (P99)              | Debezium connector lag metrics                |
 
 ### 11.2 Migration Progress KPIs
 
-| Metric | Formula | Target |
-|---|---|---|
-| **Monolith Traffic Percentage** | Monolith requests / Total requests | 0% at completion |
-| **Services Extracted** | Extracted services / Total planned services | 100% at Phase 4 |
-| **Monolith LOC** | Lines of code remaining in monolith | 0 at decommission |
-| **Database Tables in Monolith** | Tables still in shared DB | 0 at decommission |
-| **Teams Owning Services** | Stream-aligned teams operational | 4-6 teams at Phase 4 |
+| Metric                          | Formula                                     | Target               |
+| ------------------------------- | ------------------------------------------- | -------------------- |
+| **Monolith Traffic Percentage** | Monolith requests / Total requests          | 0% at completion     |
+| **Services Extracted**          | Extracted services / Total planned services | 100% at Phase 4      |
+| **Monolith LOC**                | Lines of code remaining in monolith         | 0 at decommission    |
+| **Database Tables in Monolith** | Tables still in shared DB                   | 0 at decommission    |
+| **Teams Owning Services**       | Stream-aligned teams operational            | 4-6 teams at Phase 4 |
 
 ### 11.3 Organizational KPIs
 
-| Metric | Target | Rationale |
-|---|---|---|
-| **Team Autonomy Score** | > 80% of deploys require no cross-team coordination | Validates service boundaries align with team boundaries |
-| **On-Call Response Time** | < 5 min acknowledgment | Validates team ownership of services |
-| **Knowledge Sharing** | Extraction playbook completion rate > 90% | Validates enabling team effectiveness |
-| **Developer Satisfaction** | NPS > 50 (internal developer survey) | Validates platform team is reducing cognitive load |
+| Metric                     | Target                                              | Rationale                                               |
+| -------------------------- | --------------------------------------------------- | ------------------------------------------------------- |
+| **Team Autonomy Score**    | > 80% of deploys require no cross-team coordination | Validates service boundaries align with team boundaries |
+| **On-Call Response Time**  | < 5 min acknowledgment                              | Validates team ownership of services                    |
+| **Knowledge Sharing**      | Extraction playbook completion rate > 90%           | Validates enabling team effectiveness                   |
+| **Developer Satisfaction** | NPS > 50 (internal developer survey)                | Validates platform team is reducing cognitive load      |
 
 ### 11.4 Monitoring Dashboard Requirements
 
@@ -1418,22 +1428,22 @@ Each service must have a dashboard with the following panels:
 
 ## Appendix A: Technology Selection Summary
 
-| Concern | Recommended | Alternatives |
-|---|---|---|
-| API Gateway | Kong | Ambassador, Traefik, AWS API Gateway |
-| Service Communication (sync) | gRPC | REST (external), GraphQL (query aggregation) |
-| Service Communication (async) | Apache Kafka | RabbitMQ (task queues), NATS (lightweight pub/sub) |
-| Event Schema Registry | Confluent Schema Registry | Apicurio, AWS Glue Schema Registry |
-| Database | PostgreSQL (per service) | MySQL, DynamoDB (for specific use cases) |
-| Search | Elasticsearch | OpenSearch, Meilisearch |
-| Cache | Redis | Memcached (simple caching only) |
-| CDC | Debezium | Maxwell, AWS DMS |
-| Container Orchestration | Kubernetes | ECS (AWS-native), Nomad |
-| Service Mesh | Linkerd (when needed) | Istio (heavier, more features) |
-| Observability | OpenTelemetry + Grafana stack | Datadog (managed), New Relic |
-| CI/CD | GitHub Actions / GitLab CI | ArgoCD (GitOps), Tekton |
-| Feature Flags | LaunchDarkly / Unleash | Split.io, custom (not recommended) |
-| Secrets Management | External Secrets Operator + Vault | Sealed Secrets, AWS Secrets Manager |
+| Concern                       | Recommended                       | Alternatives                                       |
+| ----------------------------- | --------------------------------- | -------------------------------------------------- |
+| API Gateway                   | Kong                              | Ambassador, Traefik, AWS API Gateway               |
+| Service Communication (sync)  | gRPC                              | REST (external), GraphQL (query aggregation)       |
+| Service Communication (async) | Apache Kafka                      | RabbitMQ (task queues), NATS (lightweight pub/sub) |
+| Event Schema Registry         | Confluent Schema Registry         | Apicurio, AWS Glue Schema Registry                 |
+| Database                      | PostgreSQL (per service)          | MySQL, DynamoDB (for specific use cases)           |
+| Search                        | Elasticsearch                     | OpenSearch, Meilisearch                            |
+| Cache                         | Redis                             | Memcached (simple caching only)                    |
+| CDC                           | Debezium                          | Maxwell, AWS DMS                                   |
+| Container Orchestration       | Kubernetes                        | ECS (AWS-native), Nomad                            |
+| Service Mesh                  | Linkerd (when needed)             | Istio (heavier, more features)                     |
+| Observability                 | OpenTelemetry + Grafana stack     | Datadog (managed), New Relic                       |
+| CI/CD                         | GitHub Actions / GitLab CI        | ArgoCD (GitOps), Tekton                            |
+| Feature Flags                 | LaunchDarkly / Unleash            | Split.io, custom (not recommended)                 |
+| Secrets Management            | External Secrets Operator + Vault | Sealed Secrets, AWS Secrets Manager                |
 
 ## Appendix B: Migration Checklist per Service Extraction
 
@@ -1460,15 +1470,15 @@ Each service must have a dashboard with the following panels:
 
 ## Appendix C: Glossary
 
-| Term | Definition |
-|---|---|
-| **Bounded Context** | A boundary within which a particular domain model is defined and applicable. The ubiquitous language is consistent within the boundary. |
-| **Strangler Fig** | Migration pattern where new functionality is built in new services while old functionality is gradually routed away from the monolith. |
-| **Saga** | A pattern for managing distributed transactions as a sequence of local transactions, each with a compensating action for rollback. |
-| **CDC (Change Data Capture)** | A pattern that captures database changes as a stream of events, enabling real-time data replication between systems. |
-| **CQRS** | Command Query Responsibility Segregation -- separating read and write models for independent optimization. |
-| **Outbox Pattern** | Writing events to a database table in the same transaction as domain data, then publishing to a message broker asynchronously. |
-| **ACL (Anti-Corruption Layer)** | A translation layer between bounded contexts that prevents one context's model from leaking into another. |
-| **BFF (Backend for Frontend)** | A service that aggregates multiple backend service calls into a single response optimized for a specific client type. |
-| **Circuit Breaker** | A resilience pattern that prevents cascading failures by failing fast when a downstream dependency is unhealthy. |
-| **Stream-Aligned Team** | A team organized around a flow of work (business capability) with full ownership of its services. |
+| Term                            | Definition                                                                                                                              |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bounded Context**             | A boundary within which a particular domain model is defined and applicable. The ubiquitous language is consistent within the boundary. |
+| **Strangler Fig**               | Migration pattern where new functionality is built in new services while old functionality is gradually routed away from the monolith.  |
+| **Saga**                        | A pattern for managing distributed transactions as a sequence of local transactions, each with a compensating action for rollback.      |
+| **CDC (Change Data Capture)**   | A pattern that captures database changes as a stream of events, enabling real-time data replication between systems.                    |
+| **CQRS**                        | Command Query Responsibility Segregation -- separating read and write models for independent optimization.                              |
+| **Outbox Pattern**              | Writing events to a database table in the same transaction as domain data, then publishing to a message broker asynchronously.          |
+| **ACL (Anti-Corruption Layer)** | A translation layer between bounded contexts that prevents one context's model from leaking into another.                               |
+| **BFF (Backend for Frontend)**  | A service that aggregates multiple backend service calls into a single response optimized for a specific client type.                   |
+| **Circuit Breaker**             | A resilience pattern that prevents cascading failures by failing fast when a downstream dependency is unhealthy.                        |
+| **Stream-Aligned Team**         | A team organized around a flow of work (business capability) with full ownership of its services.                                       |

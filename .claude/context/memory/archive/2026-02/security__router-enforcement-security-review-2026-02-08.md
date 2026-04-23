@@ -36,6 +36,7 @@ This report provides a STRIDE-based threat model for 5 enforcement gaps identifi
 ### Description
 
 In `settings.json`, the `routing-guard.cjs` hook is registered for these PreToolUse matchers:
+
 - `Bash` (line 54)
 - `Glob|Grep|WebSearch` (line 63)
 - `TaskCreate` (line 124)
@@ -49,14 +50,14 @@ The `Edit|Write|NotebookEdit` matcher (line 68) registers `unified-creator-guard
 
 ### STRIDE Analysis
 
-| Threat | Applicable | Analysis |
-|--------|-----------|----------|
-| **Spoofing** | YES | Router can impersonate an agent by directly using Write/Edit tools. Since routing-guard never fires, there is no check that `state.mode === 'agent'` or `state.taskSpawned === true`. |
-| **Tampering** | YES | Router can directly modify any file not protected by creator-guard or pre-write-hook. Memory files (`.claude/context/memory/`) and runtime files (`.claude/context/runtime/`) are explicitly allowed by `ALWAYS_ALLOWED_WRITE_PATTERNS` in routing-guard. |
-| **Repudiation** | NO | Write operations are logged by post-tool hooks (`sync-memory-index.cjs`, `code-index-updater.cjs`). |
-| **Information Disclosure** | NO | Write operations do not disclose information. |
-| **Denial of Service** | LOW | Router could corrupt critical runtime files. |
-| **Elevation of Privilege** | YES | Router can bypass the agent-spawning requirement and directly modify code, effectively operating as a developer agent without the spawn protocol. This violates the Router Iron Laws. |
+| Threat                     | Applicable | Analysis                                                                                                                                                                                                                                                  |
+| -------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Spoofing**               | YES        | Router can impersonate an agent by directly using Write/Edit tools. Since routing-guard never fires, there is no check that `state.mode === 'agent'` or `state.taskSpawned === true`.                                                                     |
+| **Tampering**              | YES        | Router can directly modify any file not protected by creator-guard or pre-write-hook. Memory files (`.claude/context/memory/`) and runtime files (`.claude/context/runtime/`) are explicitly allowed by `ALWAYS_ALLOWED_WRITE_PATTERNS` in routing-guard. |
+| **Repudiation**            | NO         | Write operations are logged by post-tool hooks (`sync-memory-index.cjs`, `code-index-updater.cjs`).                                                                                                                                                       |
+| **Information Disclosure** | NO         | Write operations do not disclose information.                                                                                                                                                                                                             |
+| **Denial of Service**      | LOW        | Router could corrupt critical runtime files.                                                                                                                                                                                                              |
+| **Elevation of Privilege** | YES        | Router can bypass the agent-spawning requirement and directly modify code, effectively operating as a developer agent without the spawn protocol. This violates the Router Iron Laws.                                                                     |
 
 ### Risk Rating: **CRITICAL**
 
@@ -74,12 +75,12 @@ The `Read` tool matcher in `settings.json` (line 102) registers only `validate-s
 
 ### STRIDE Analysis
 
-| Threat | Applicable | Analysis |
-|--------|-----------|----------|
-| **Spoofing** | NO | Read is explicitly whitelisted for Router. |
-| **Tampering** | NO | Read does not modify data. |
-| **Information Disclosure** | LOW | Router can read any file, including potentially sensitive configuration. The CLAUDE.md restricts Read to "agent files / routing docs only" but there is no enforcement of this restriction. The Router can read `.env`, `config.yaml`, or any source file. |
-| **Elevation of Privilege** | NO | Read does not grant execution capabilities. |
+| Threat                     | Applicable | Analysis                                                                                                                                                                                                                                                   |
+| -------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Spoofing**               | NO         | Read is explicitly whitelisted for Router.                                                                                                                                                                                                                 |
+| **Tampering**              | NO         | Read does not modify data.                                                                                                                                                                                                                                 |
+| **Information Disclosure** | LOW        | Router can read any file, including potentially sensitive configuration. The CLAUDE.md restricts Read to "agent files / routing docs only" but there is no enforcement of this restriction. The Router can read `.env`, `config.yaml`, or any source file. |
+| **Elevation of Privilege** | NO         | Read does not grant execution capabilities.                                                                                                                                                                                                                |
 
 ### Risk Rating: **LOW**
 
@@ -94,6 +95,7 @@ The Read tool is explicitly whitelisted for the Router in the protocol. The lack
 ### Description
 
 The CLAUDE.md protocol states: "FIRST ROUTING TOOL CALL MUST BE: TaskList()". The system tracks whether TaskList was called via:
+
 1. `task-list-tracker.cjs` (PostToolUse(TaskList)) -- sets `taskListCalledSincePrompt = true` in `router-state.json`
 2. `router-state.cjs` exposes `isTaskListCalledSincePrompt()` and `setTaskListCalled()`
 
@@ -103,13 +105,13 @@ However, there is **no PreToolUse hook** that checks `isTaskListCalledSincePromp
 
 ### STRIDE Analysis
 
-| Threat | Applicable | Analysis |
-|--------|-----------|----------|
-| **Spoofing** | NO | No identity-related impact. |
-| **Tampering** | LOW | Could lead to duplicate task creation, but does not directly modify data. |
-| **Repudiation** | YES | Without TaskList-first, the Router may not see existing tasks. If it spawns a duplicate agent, the provenance trail becomes confused -- which agent owns which work? |
-| **Denial of Service** | MEDIUM | Duplicate agent spawns waste compute and memory resources. Under memory pressure (Check 6), this could trigger cascading failures. |
-| **Elevation of Privilege** | NO | TaskList-first is a workflow control, not an authorization control. |
+| Threat                     | Applicable | Analysis                                                                                                                                                             |
+| -------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Spoofing**               | NO         | No identity-related impact.                                                                                                                                          |
+| **Tampering**              | LOW        | Could lead to duplicate task creation, but does not directly modify data.                                                                                            |
+| **Repudiation**            | YES        | Without TaskList-first, the Router may not see existing tasks. If it spawns a duplicate agent, the provenance trail becomes confused -- which agent owns which work? |
+| **Denial of Service**      | MEDIUM     | Duplicate agent spawns waste compute and memory resources. Under memory pressure (Check 6), this could trigger cascading failures.                                   |
+| **Elevation of Privilege** | NO         | TaskList-first is a workflow control, not an authorization control.                                                                                                  |
 
 ### Risk Rating: **MEDIUM**
 
@@ -126,6 +128,7 @@ The `taskListCalledSincePrompt` flag is tracked but never enforced. The state in
 The `router-state.json` file persists on disk between sessions. If a session ends with `mode: 'agent'` and `taskSpawned: true`, a new session inherits this stale state.
 
 **Current Mitigations:**
+
 1. **`state-reset.cjs`** (UserPromptSubmit hook, registered first in hook chain at line 14) -- Resets state to defaults on every user prompt. This includes `mode: 'router'`, `taskSpawned: false`, `complexity: 'trivial'`, etc.
 2. **`user-prompt-unified.cjs`** (UserPromptSubmit hook, registered second at line 18) -- Also calls `routerState.resetToRouterMode()` and detects session boundaries via `sessionId` comparison (ROUTING-003 fix).
 3. **`state-reset.cjs`** resets the `version` field to `Date.now() % 10000` (not monotonically increasing), which is a minor issue for optimistic concurrency but not security-critical.
@@ -134,13 +137,13 @@ The `router-state.json` file persists on disk between sessions. If a session end
 
 ### STRIDE Analysis
 
-| Threat | Applicable | Analysis |
-|--------|-----------|----------|
-| **Spoofing** | YES (mitigated) | Stale `mode: 'agent'` state would allow the Router to use blacklisted tools (Edit, Write, Glob, etc.) without spawning an agent. The state-reset hooks mitigate this by resetting state on every prompt. |
-| **Tampering** | YES | **`router-state.json` can be directly modified** by any process with filesystem access. An agent (or manually edited file) could set `mode: 'agent'`, `taskSpawned: true` to bypass routing checks. The `safeJSONParse` function in `router-state.cjs` protects against prototype pollution but not against semantically invalid state values. |
-| **Information Disclosure** | LOW | The state file contains session IDs and task descriptions. |
-| **Denial of Service** | LOW | Corrupting the state file would trigger `getDefaultState()` fallback (fail-safe to router mode). |
-| **Elevation of Privilege** | YES (mitigated) | If state were not reset, the Router would inherit agent privileges from the previous session. The double-reset (state-reset.cjs + user-prompt-unified.cjs) provides defense-in-depth. |
+| Threat                     | Applicable      | Analysis                                                                                                                                                                                                                                                                                                                                       |
+| -------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Spoofing**               | YES (mitigated) | Stale `mode: 'agent'` state would allow the Router to use blacklisted tools (Edit, Write, Glob, etc.) without spawning an agent. The state-reset hooks mitigate this by resetting state on every prompt.                                                                                                                                       |
+| **Tampering**              | YES             | **`router-state.json` can be directly modified** by any process with filesystem access. An agent (or manually edited file) could set `mode: 'agent'`, `taskSpawned: true` to bypass routing checks. The `safeJSONParse` function in `router-state.cjs` protects against prototype pollution but not against semantically invalid state values. |
+| **Information Disclosure** | LOW             | The state file contains session IDs and task descriptions.                                                                                                                                                                                                                                                                                     |
+| **Denial of Service**      | LOW             | Corrupting the state file would trigger `getDefaultState()` fallback (fail-safe to router mode).                                                                                                                                                                                                                                               |
+| **Elevation of Privilege** | YES (mitigated) | If state were not reset, the Router would inherit agent privileges from the previous session. The double-reset (state-reset.cjs + user-prompt-unified.cjs) provides defense-in-depth.                                                                                                                                                          |
 
 ### Risk Rating: **HIGH**
 
@@ -166,11 +169,11 @@ The security-architect agent file defines this agent's role as "Security-First A
 
 ### STRIDE Analysis
 
-| Threat | Applicable | Analysis |
-|--------|-----------|----------|
-| **Spoofing** | LOW | An agent prompt could be crafted to include Router-identity directives, causing the agent to self-restrict or behave as Router. This is prompt injection via spawn prompt, not a hooks gap. |
-| **Tampering** | LOW | Agent identity is set by the spawn prompt, which is constructed server-side by hooks. |
-| **Elevation of Privilege** | LOW | Agents already have full tool access. The identity conflict could cause agents to attempt Router-like behavior (spawning sub-agents when they should implement directly), but this is a prompt engineering issue, not a security bypass. |
+| Threat                     | Applicable | Analysis                                                                                                                                                                                                                                 |
+| -------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Spoofing**               | LOW        | An agent prompt could be crafted to include Router-identity directives, causing the agent to self-restrict or behave as Router. This is prompt injection via spawn prompt, not a hooks gap.                                              |
+| **Tampering**              | LOW        | Agent identity is set by the spawn prompt, which is constructed server-side by hooks.                                                                                                                                                    |
+| **Elevation of Privilege** | LOW        | Agents already have full tool access. The identity conflict could cause agents to attempt Router-like behavior (spawning sub-agents when they should implement directly), but this is a prompt engineering issue, not a security bypass. |
 
 ### Risk Rating: **LOW**
 
@@ -182,24 +185,25 @@ This gap is a UX/behavioral concern rather than a security vulnerability. The sp
 
 The following environment variables can individually disable enforcement checks. Each one represents a security override that, if set, reduces the defense surface.
 
-| Env Var | Default | Values | Disables | Audit Logged | Used By |
-|---------|---------|--------|----------|--------------|---------|
-| `ROUTER_BASH_GUARD` | `block` | block/warn/off | Check 0: Bash whitelist enforcement | YES (`auditSecurityOverride`) | `routing-guard.cjs` |
-| `ROUTER_SELF_CHECK` | `block` | block/warn/off | Check 1: Blacklisted tools enforcement | YES (implicit via `getEnforcementMode`) | `routing-guard.cjs` |
-| `PLANNER_FIRST_ENFORCEMENT` | `block` | block/warn/off | Check 2+3: Planner-first requirement | YES (`auditSecurityOverride`) | `routing-guard.cjs`, `pre-task-unified.cjs` |
-| `SECURITY_REVIEW_ENFORCEMENT` | `block` | block/warn/off | Check 4: Security review requirement | NO (missing audit on `=off`) | `routing-guard.cjs`, `pre-task-unified.cjs` |
-| `ROUTER_WRITE_GUARD` | `block` | block/warn/off | Check 5: Router write blocking | YES (`auditSecurityOverride`) | `routing-guard.cjs` |
-| `MEMORY_SPAWN_THROTTLING` | `true` | true/false | Check 6: Memory pressure spawn blocking | NO (no audit on `=false`) | `routing-guard.cjs` |
-| `SPECIALIST_ROUTING_ENFORCEMENT` | `warn` | warn/block/off | Check 7: Specialist-first routing | NO (no audit on `=off`) | `routing-guard.cjs` |
-| `HOOK_FAIL_OPEN` | unset | true | Error handler: fail-open instead of fail-closed | YES (`auditLog`) | `routing-guard.cjs` |
-| `ALLOW_ROUTER_WRITE` | unset | true | Write guard bypass (separate from ROUTER_WRITE_GUARD) | YES (inline `console.error`) | `router-state.cjs` |
-| `CREATOR_GUARD` | `block` | block/warn/off | Creator artifact path protection | YES (in `unified-creator-guard.cjs`) | `unified-creator-guard.cjs` |
-| `TOOL_SCOPE_VALIDATOR` | `warn` | warn/block/off | Tool scope restriction enforcement | NO | `pre-tool-unified.cjs` |
-| `ROUTER_DEBUG` | unset | false | Disables debug logging (suppresses detection info) | N/A | `routing-guard.cjs` |
+| Env Var                          | Default | Values         | Disables                                              | Audit Logged                            | Used By                                     |
+| -------------------------------- | ------- | -------------- | ----------------------------------------------------- | --------------------------------------- | ------------------------------------------- |
+| `ROUTER_BASH_GUARD`              | `block` | block/warn/off | Check 0: Bash whitelist enforcement                   | YES (`auditSecurityOverride`)           | `routing-guard.cjs`                         |
+| `ROUTER_SELF_CHECK`              | `block` | block/warn/off | Check 1: Blacklisted tools enforcement                | YES (implicit via `getEnforcementMode`) | `routing-guard.cjs`                         |
+| `PLANNER_FIRST_ENFORCEMENT`      | `block` | block/warn/off | Check 2+3: Planner-first requirement                  | YES (`auditSecurityOverride`)           | `routing-guard.cjs`, `pre-task-unified.cjs` |
+| `SECURITY_REVIEW_ENFORCEMENT`    | `block` | block/warn/off | Check 4: Security review requirement                  | NO (missing audit on `=off`)            | `routing-guard.cjs`, `pre-task-unified.cjs` |
+| `ROUTER_WRITE_GUARD`             | `block` | block/warn/off | Check 5: Router write blocking                        | YES (`auditSecurityOverride`)           | `routing-guard.cjs`                         |
+| `MEMORY_SPAWN_THROTTLING`        | `true`  | true/false     | Check 6: Memory pressure spawn blocking               | NO (no audit on `=false`)               | `routing-guard.cjs`                         |
+| `SPECIALIST_ROUTING_ENFORCEMENT` | `warn`  | warn/block/off | Check 7: Specialist-first routing                     | NO (no audit on `=off`)                 | `routing-guard.cjs`                         |
+| `HOOK_FAIL_OPEN`                 | unset   | true           | Error handler: fail-open instead of fail-closed       | YES (`auditLog`)                        | `routing-guard.cjs`                         |
+| `ALLOW_ROUTER_WRITE`             | unset   | true           | Write guard bypass (separate from ROUTER_WRITE_GUARD) | YES (inline `console.error`)            | `router-state.cjs`                          |
+| `CREATOR_GUARD`                  | `block` | block/warn/off | Creator artifact path protection                      | YES (in `unified-creator-guard.cjs`)    | `unified-creator-guard.cjs`                 |
+| `TOOL_SCOPE_VALIDATOR`           | `warn`  | warn/block/off | Tool scope restriction enforcement                    | NO                                      | `pre-tool-unified.cjs`                      |
+| `ROUTER_DEBUG`                   | unset   | false          | Disables debug logging (suppresses detection info)    | N/A                                     | `routing-guard.cjs`                         |
 
 ### Kill Switch Threat Assessment
 
 **Aggregate Risk:** If an attacker (or misconfigured `.env` file) sets ALL kill switches to `off`/`false`/`true`:
+
 - All 8 routing checks disabled
 - Router can use any tool directly
 - No planner-first, no security review, no write blocking
@@ -207,6 +211,7 @@ The following environment variables can individually disable enforcement checks.
 - Creator guard disabled
 
 **Mitigation:** Kill switches require environment variable access, which is only available to:
+
 1. The `.env` file (gitignored, local only)
 2. Process startup configuration
 3. Code that sets `process.env` before requiring hook modules
@@ -216,6 +221,7 @@ The following environment variables can individually disable enforcement checks.
 ### Audit Logging Gaps
 
 Three kill switches lack explicit `auditSecurityOverride()` calls when set to `off`:
+
 1. `SECURITY_REVIEW_ENFORCEMENT=off` (Check 4, line 858) -- calls `return { pass: true }` without audit
 2. `MEMORY_SPAWN_THROTTLING=false` (Check 6, line 965) -- calls `return { pass: true }` without audit
 3. `SPECIALIST_ROUTING_ENFORCEMENT=off` (Check 7, line 1059) -- calls `return { pass: true }` without audit
@@ -227,6 +233,7 @@ Three kill switches lack explicit `auditSecurityOverride()` calls when set to `o
 ### State File Concurrency
 
 `router-state.json` is shared across multiple hooks running in separate Node.js processes:
+
 - `state-reset.cjs` (UserPromptSubmit) writes full reset
 - `user-prompt-unified.cjs` (UserPromptSubmit) writes reset + sessionId + preset
 - `routing-guard.cjs` (PreToolUse) reads state for routing decisions
@@ -234,6 +241,7 @@ Three kill switches lack explicit `auditSecurityOverride()` calls when set to `o
 - `post-task-unified.cjs` (PostToolUse) writes `mode: 'agent'`
 
 **Sequence Risk:**
+
 1. UserPromptSubmit fires `state-reset.cjs` and `user-prompt-unified.cjs` sequentially (same hook chain). These both reset to router mode. Safe.
 2. PreToolUse fires `routing-guard.cjs` which reads state. If this fires between two UserPromptSubmit hooks (within same chain), the state could be partially reset. Low risk because hooks in the same chain are sequential.
 3. PostToolUse(Task) fires `post-task-unified.cjs` which writes `mode: 'agent'`. If the Router spawns two agents in parallel, two post-task-unified hooks could race on the state file. The `saveStateWithRetry` with optimistic concurrency (5 retries, exponential backoff) mitigates this.
@@ -256,6 +264,7 @@ The code comments (line 556-570 in `router-state.cjs`) acknowledge that `fs.rena
 **Action:** Add `routing-guard.cjs` to the `Edit|Write|NotebookEdit` PreToolUse matcher in `settings.json`. Place it BEFORE `unified-creator-guard.cjs` so the Router self-check fires first.
 
 **Current (line 68-90):**
+
 ```json
 {
   "matcher": "Edit|Write|NotebookEdit",
@@ -268,6 +277,7 @@ The code comments (line 556-570 in `router-state.cjs`) acknowledge that `fs.rena
 ```
 
 **Proposed:**
+
 ```json
 {
   "matcher": "Edit|Write|NotebookEdit",
@@ -287,6 +297,7 @@ The code comments (line 556-570 in `router-state.cjs`) acknowledge that `fs.rena
 
 **Gap:** Environment variable inventory
 **Action:** Add `auditSecurityOverride()` calls to:
+
 - `checkSecurityReview()` when `SECURITY_REVIEW_ENFORCEMENT=off`
 - `checkMemoryPressure()` when `MEMORY_SPAWN_THROTTLING=false`
 - `checkSpecialistOverride()` when `SPECIALIST_ROUTING_ENFORCEMENT=off`
@@ -300,6 +311,7 @@ The code comments (line 556-570 in `router-state.cjs`) acknowledge that `fs.rena
 
 **Gap:** #4
 **Action:** Add schema validation to `getState()` in `router-state.cjs`. Verify that:
+
 - `mode` is exactly `'router'` or `'agent'` (not arbitrary strings)
 - `complexity` is in `VALID_COMPLEXITY_LEVELS`
 - `taskSpawned` is boolean (not truthy string like `'true'`)
@@ -314,6 +326,7 @@ If validation fails, fall back to `getDefaultState()` (fail-safe to router mode)
 
 **Gap:** #4
 **Action:** The `ALWAYS_ALLOWED_WRITE_PATTERNS` in `routing-guard.cjs` allows writes to ALL files under `.claude/context/runtime/`. This includes `router-state.json`, `workflow-state.json`, `execution-limits.json`, and other sensitive runtime state. Consider either:
+
 - (a) Removing `router-state.json` from the always-allowed pattern and managing it only through library functions, or
 - (b) Adding write validation to `router-state.cjs` that rejects writes from non-hook processes (checking `process.env.CLAUDE_HOOK_TYPE` or similar)
 
@@ -344,17 +357,18 @@ If validation fails, fall back to `getDefaultState()` (fail-safe to router mode)
 
 ## <a name="risk-matrix"></a>Risk Matrix
 
-| Gap | Description | Risk | Exploitability | Impact | Mitigation Exists | Recommendation |
-|-----|-------------|------|----------------|--------|-------------------|----------------|
-| #1 | routing-guard not triggered for writes | **CRITICAL** | HIGH (Router can directly Edit/Write) | HIGH (bypasses agent-spawn requirement) | Partial (creator-guard, pre-write-hook) | R-1 |
-| #2 | routing-guard not triggered for Read | **LOW** | N/A (Read is whitelisted by design) | LOW (info disclosure only) | Full (Read is whitelisted) | None required |
-| #3 | No TaskList-first enforcement | **MEDIUM** | MEDIUM (Router skips TaskList) | MEDIUM (duplicate work, missed tasks) | Partial (flag tracked but not enforced) | R-5 |
-| #4 | Stale router-state.json | **HIGH** | LOW (requires file system access) | HIGH (bypasses all routing checks) | Strong (double-reset on UserPromptSubmit) | R-3, R-4, R-6 |
-| #5 | System prompt identity conflict | **LOW** | LOW (prompt engineering only) | LOW (behavioral, not security) | Full (spawn-prompt-assembler scopes identity) | None required |
+| Gap | Description                            | Risk         | Exploitability                        | Impact                                  | Mitigation Exists                             | Recommendation |
+| --- | -------------------------------------- | ------------ | ------------------------------------- | --------------------------------------- | --------------------------------------------- | -------------- |
+| #1  | routing-guard not triggered for writes | **CRITICAL** | HIGH (Router can directly Edit/Write) | HIGH (bypasses agent-spawn requirement) | Partial (creator-guard, pre-write-hook)       | R-1            |
+| #2  | routing-guard not triggered for Read   | **LOW**      | N/A (Read is whitelisted by design)   | LOW (info disclosure only)              | Full (Read is whitelisted)                    | None required  |
+| #3  | No TaskList-first enforcement          | **MEDIUM**   | MEDIUM (Router skips TaskList)        | MEDIUM (duplicate work, missed tasks)   | Partial (flag tracked but not enforced)       | R-5            |
+| #4  | Stale router-state.json                | **HIGH**     | LOW (requires file system access)     | HIGH (bypasses all routing checks)      | Strong (double-reset on UserPromptSubmit)     | R-3, R-4, R-6  |
+| #5  | System prompt identity conflict        | **LOW**      | LOW (prompt engineering only)         | LOW (behavioral, not security)          | Full (spawn-prompt-assembler scopes identity) | None required  |
 
 ### Overall System Security Posture
 
 **Strengths:**
+
 - Fail-closed error handling (SEC-008) in routing-guard
 - Defense-in-depth: state-reset + user-prompt-unified double-reset
 - Optimistic concurrency control with retry on state writes
@@ -364,6 +378,7 @@ If validation fails, fall back to `getDefaultState()` (fail-safe to router mode)
 - Memory pressure monitoring prevents resource exhaustion
 
 **Weaknesses:**
+
 - 7+ environment variable kill switches with no centralized monitoring
 - 3 audit logging gaps in kill switch override detection
 - No schema validation on router-state.json contents
@@ -376,38 +391,38 @@ If validation fails, fall back to `getDefaultState()` (fail-safe to router mode)
 
 Complete `settings.json` PreToolUse hook coverage:
 
-| Tool | routing-guard | creator-guard | pre-write-hook | bash-validator | shell-injection | pre-tool-unified | pre-task-unified | skill-invocation |
-|------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Bash | YES | - | - | YES | YES | YES | - | - |
-| Glob | YES | - | - | - | - | YES | - | - |
-| Grep | YES | - | - | - | - | YES | - | - |
-| WebSearch | YES | - | - | - | - | YES | - | - |
-| Edit | **NO** | YES | YES | - | - | YES | - | - |
-| Write | **NO** | YES | YES | - | - | YES | - | - |
-| NotebookEdit | **NO** | YES | YES | - | - | YES | - | - |
-| Read | - | - | - | - | - | YES | - | YES |
-| Task | - | - | - | - | - | YES | YES | - |
-| TaskCreate | YES | - | - | - | - | YES | - | - |
-| TaskList | - | - | - | - | - | YES | - | - |
-| TaskUpdate | - | - | - | - | - | YES | - | - |
+| Tool         | routing-guard | creator-guard | pre-write-hook | bash-validator | shell-injection | pre-tool-unified | pre-task-unified | skill-invocation |
+| ------------ | :-----------: | :-----------: | :------------: | :------------: | :-------------: | :--------------: | :--------------: | :--------------: |
+| Bash         |      YES      |       -       |       -        |      YES       |       YES       |       YES        |        -         |        -         |
+| Glob         |      YES      |       -       |       -        |       -        |        -        |       YES        |        -         |        -         |
+| Grep         |      YES      |       -       |       -        |       -        |        -        |       YES        |        -         |        -         |
+| WebSearch    |      YES      |       -       |       -        |       -        |        -        |       YES        |        -         |        -         |
+| Edit         |    **NO**     |      YES      |      YES       |       -        |        -        |       YES        |        -         |        -         |
+| Write        |    **NO**     |      YES      |      YES       |       -        |        -        |       YES        |        -         |        -         |
+| NotebookEdit |    **NO**     |      YES      |      YES       |       -        |        -        |       YES        |        -         |        -         |
+| Read         |       -       |       -       |       -        |       -        |        -        |       YES        |        -         |       YES        |
+| Task         |       -       |       -       |       -        |       -        |        -        |       YES        |       YES        |        -         |
+| TaskCreate   |      YES      |       -       |       -        |       -        |        -        |       YES        |        -         |        -         |
+| TaskList     |       -       |       -       |       -        |       -        |        -        |       YES        |        -         |        -         |
+| TaskUpdate   |       -       |       -       |       -        |       -        |        -        |       YES        |        -         |        -         |
 
 **Legend:** YES = hook fires for this tool, **NO** = gap (should fire but does not), `-` = not applicable
 
 ## Appendix B: Files Analyzed
 
-| File | Path | Lines | Purpose |
-|------|------|-------|---------|
-| routing-guard.cjs | `.claude/hooks/routing/routing-guard.cjs` | 1449 | Unified routing enforcement (8 checks) |
-| router-state.cjs | `.claude/lib/routing/router-state.cjs` | 720 | State management for router/agent mode |
-| state-reset.cjs | `.claude/hooks/session/state-reset.cjs` | 105 | UserPromptSubmit state reset |
-| user-prompt-unified.cjs | `.claude/hooks/routing/user-prompt-unified.cjs` | 1533 | UserPromptSubmit analysis and reset |
-| pre-tool-unified.cjs | `.claude/hooks/routing/pre-tool-unified.cjs` | 598 | Wildcard PreToolUse (cleanup, limits, scope) |
-| pre-task-unified.cjs | `.claude/hooks/routing/pre-task-unified.cjs` | 500+ | PreToolUse(Task) routing enforcement |
-| task-list-tracker.cjs | `.claude/hooks/routing/task-list-tracker.cjs` | 68 | PostToolUse(TaskList) flag setter |
-| settings.json | `.claude/settings.json` | 273 | Hook registration matrix |
-| router-state.json | `.claude/context/runtime/router-state.json` | 20 | Runtime router state |
-| hook-input.cjs | `.claude/lib/utils/hook-input.cjs` | 494 | Shared hook input parsing |
+| File                    | Path                                            | Lines | Purpose                                      |
+| ----------------------- | ----------------------------------------------- | ----- | -------------------------------------------- |
+| routing-guard.cjs       | `.claude/hooks/routing/routing-guard.cjs`       | 1449  | Unified routing enforcement (8 checks)       |
+| router-state.cjs        | `.claude/lib/routing/router-state.cjs`          | 720   | State management for router/agent mode       |
+| state-reset.cjs         | `.claude/hooks/session/state-reset.cjs`         | 105   | UserPromptSubmit state reset                 |
+| user-prompt-unified.cjs | `.claude/hooks/routing/user-prompt-unified.cjs` | 1533  | UserPromptSubmit analysis and reset          |
+| pre-tool-unified.cjs    | `.claude/hooks/routing/pre-tool-unified.cjs`    | 598   | Wildcard PreToolUse (cleanup, limits, scope) |
+| pre-task-unified.cjs    | `.claude/hooks/routing/pre-task-unified.cjs`    | 500+  | PreToolUse(Task) routing enforcement         |
+| task-list-tracker.cjs   | `.claude/hooks/routing/task-list-tracker.cjs`   | 68    | PostToolUse(TaskList) flag setter            |
+| settings.json           | `.claude/settings.json`                         | 273   | Hook registration matrix                     |
+| router-state.json       | `.claude/context/runtime/router-state.json`     | 20    | Runtime router state                         |
+| hook-input.cjs          | `.claude/lib/utils/hook-input.cjs`              | 494   | Shared hook input parsing                    |
 
 ---
 
-*End of Security Review*
+_End of Security Review_

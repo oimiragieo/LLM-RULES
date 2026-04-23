@@ -51,58 +51,58 @@ This document provides a comprehensive security architecture review for adding O
 
 ### 1.1 Spoofing (Identity Verification)
 
-| Threat ID | Threat | Attack Vector | Likelihood | Impact | Mitigation |
-|-----------|--------|---------------|------------|--------|------------|
-| S-001 | Identity provider spoofing | Attacker sets up fake OAuth provider with similar domain | MEDIUM | CRITICAL | Strict issuer (`iss`) claim validation; hardcoded provider allowlist; HTTPS-only discovery endpoints |
-| S-002 | Token forgery | Attacker crafts JWT with `alg: none` or weak algorithm | HIGH | CRITICAL | Algorithm whitelist enforcement (RS256/ES256 only); reject `none` algorithm; verify signature before any claim processing |
-| S-003 | Session hijacking via stolen tokens | XSS or network interception steals access/refresh tokens | HIGH | HIGH | HttpOnly + Secure + SameSite=Strict cookies; short-lived access tokens (<=15 min); TLS 1.2+ everywhere |
-| S-004 | Client impersonation | Attacker registers malicious OAuth client with legitimate-looking name | MEDIUM | HIGH | Client authentication for confidential clients; exact redirect URI matching; client ID/secret rotation policy |
-| S-005 | Credential stuffing | Automated login attempts with breached credential databases | HIGH | MEDIUM | Rate limiting on token endpoint; account lockout after N failures; MFA for privileged accounts |
+| Threat ID | Threat                              | Attack Vector                                                          | Likelihood | Impact   | Mitigation                                                                                                                |
+| --------- | ----------------------------------- | ---------------------------------------------------------------------- | ---------- | -------- | ------------------------------------------------------------------------------------------------------------------------- |
+| S-001     | Identity provider spoofing          | Attacker sets up fake OAuth provider with similar domain               | MEDIUM     | CRITICAL | Strict issuer (`iss`) claim validation; hardcoded provider allowlist; HTTPS-only discovery endpoints                      |
+| S-002     | Token forgery                       | Attacker crafts JWT with `alg: none` or weak algorithm                 | HIGH       | CRITICAL | Algorithm whitelist enforcement (RS256/ES256 only); reject `none` algorithm; verify signature before any claim processing |
+| S-003     | Session hijacking via stolen tokens | XSS or network interception steals access/refresh tokens               | HIGH       | HIGH     | HttpOnly + Secure + SameSite=Strict cookies; short-lived access tokens (<=15 min); TLS 1.2+ everywhere                    |
+| S-004     | Client impersonation                | Attacker registers malicious OAuth client with legitimate-looking name | MEDIUM     | HIGH     | Client authentication for confidential clients; exact redirect URI matching; client ID/secret rotation policy             |
+| S-005     | Credential stuffing                 | Automated login attempts with breached credential databases            | HIGH       | MEDIUM   | Rate limiting on token endpoint; account lockout after N failures; MFA for privileged accounts                            |
 
 ### 1.2 Tampering (Token and Data Integrity)
 
-| Threat ID | Threat | Attack Vector | Likelihood | Impact | Mitigation |
-|-----------|--------|---------------|------------|--------|------------|
-| T-001 | Authorization code injection | Attacker substitutes stolen authorization code during exchange | HIGH | CRITICAL | PKCE mandatory (S256 only); exact state parameter validation |
-| T-002 | CSRF on callback endpoint | Attacker tricks user into completing OAuth flow with attacker's code | MEDIUM | HIGH | State parameter with cryptographic binding; SameSite cookie attribute |
-| T-003 | Token scope escalation | Attacker modifies token claims to add unauthorized scopes | LOW | CRITICAL | Asymmetric signing (RS256/ES256); server-side scope enforcement on every request; never trust client-asserted scopes |
-| T-004 | Redirect URI manipulation | Attacker modifies redirect_uri to capture authorization codes | HIGH | CRITICAL | Exact string matching for redirect URIs; no wildcards; no subdomain patterns |
-| T-005 | PKCE downgrade attack | Attacker strips code_challenge from authorization request | MEDIUM | HIGH | Server MUST reject authorization requests without code_challenge; no backward compatibility with non-PKCE flows |
+| Threat ID | Threat                       | Attack Vector                                                        | Likelihood | Impact   | Mitigation                                                                                                           |
+| --------- | ---------------------------- | -------------------------------------------------------------------- | ---------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
+| T-001     | Authorization code injection | Attacker substitutes stolen authorization code during exchange       | HIGH       | CRITICAL | PKCE mandatory (S256 only); exact state parameter validation                                                         |
+| T-002     | CSRF on callback endpoint    | Attacker tricks user into completing OAuth flow with attacker's code | MEDIUM     | HIGH     | State parameter with cryptographic binding; SameSite cookie attribute                                                |
+| T-003     | Token scope escalation       | Attacker modifies token claims to add unauthorized scopes            | LOW        | CRITICAL | Asymmetric signing (RS256/ES256); server-side scope enforcement on every request; never trust client-asserted scopes |
+| T-004     | Redirect URI manipulation    | Attacker modifies redirect_uri to capture authorization codes        | HIGH       | CRITICAL | Exact string matching for redirect URIs; no wildcards; no subdomain patterns                                         |
+| T-005     | PKCE downgrade attack        | Attacker strips code_challenge from authorization request            | MEDIUM     | HIGH     | Server MUST reject authorization requests without code_challenge; no backward compatibility with non-PKCE flows      |
 
 ### 1.3 Repudiation (Audit and Accountability)
 
-| Threat ID | Threat | Attack Vector | Likelihood | Impact | Mitigation |
-|-----------|--------|---------------|------------|--------|------------|
-| R-001 | Untracked authentication events | No logging of login/logout/token refresh events | HIGH | MEDIUM | Structured audit logging for all auth events (login, logout, token refresh, token revocation, failed attempts) |
-| R-002 | Session activity not attributable | Actions cannot be traced to authenticated user | MEDIUM | HIGH | Include user ID and session ID in all audit logs; correlate with JWT `jti` claim |
-| R-003 | Token abuse without detection | Stolen tokens used without any alerts | HIGH | HIGH | Anomaly detection: unusual IP, user agent, geolocation changes trigger re-authentication |
+| Threat ID | Threat                            | Attack Vector                                   | Likelihood | Impact | Mitigation                                                                                                     |
+| --------- | --------------------------------- | ----------------------------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| R-001     | Untracked authentication events   | No logging of login/logout/token refresh events | HIGH       | MEDIUM | Structured audit logging for all auth events (login, logout, token refresh, token revocation, failed attempts) |
+| R-002     | Session activity not attributable | Actions cannot be traced to authenticated user  | MEDIUM     | HIGH   | Include user ID and session ID in all audit logs; correlate with JWT `jti` claim                               |
+| R-003     | Token abuse without detection     | Stolen tokens used without any alerts           | HIGH       | HIGH   | Anomaly detection: unusual IP, user agent, geolocation changes trigger re-authentication                       |
 
 ### 1.4 Information Disclosure (Token and Data Leakage)
 
-| Threat ID | Threat | Attack Vector | Likelihood | Impact | Mitigation |
-|-----------|--------|---------------|------------|--------|------------|
-| I-001 | Token exposure in URLs | Access tokens in query parameters visible in server logs, browser history, Referer headers | HIGH | CRITICAL | Bearer tokens ONLY in Authorization header; never in URL query parameters (OAuth 2.1 mandate) |
-| I-002 | Token exposure in localStorage | XSS vulnerability exfiltrates tokens from client-side storage | HIGH | CRITICAL | HttpOnly cookies for ALL tokens; never use localStorage/sessionStorage for tokens |
-| I-003 | Sensitive data in JWT claims | PII, passwords, or secrets encoded in JWT payload | MEDIUM | HIGH | Minimal claims in access tokens (sub, scope, exp, iat, jti); no PII beyond email; never store passwords/secrets |
-| I-004 | Error message information leakage | Auth errors reveal whether user exists, password is wrong, etc. | MEDIUM | MEDIUM | Generic error messages ("Invalid credentials"); same response time for user-not-found and wrong-password |
-| I-005 | CORS misconfiguration | Overly permissive CORS allows token theft from malicious origins | MEDIUM | HIGH | Strict CORS origin allowlist; no `Access-Control-Allow-Origin: *` for authenticated endpoints |
+| Threat ID | Threat                            | Attack Vector                                                                              | Likelihood | Impact   | Mitigation                                                                                                      |
+| --------- | --------------------------------- | ------------------------------------------------------------------------------------------ | ---------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| I-001     | Token exposure in URLs            | Access tokens in query parameters visible in server logs, browser history, Referer headers | HIGH       | CRITICAL | Bearer tokens ONLY in Authorization header; never in URL query parameters (OAuth 2.1 mandate)                   |
+| I-002     | Token exposure in localStorage    | XSS vulnerability exfiltrates tokens from client-side storage                              | HIGH       | CRITICAL | HttpOnly cookies for ALL tokens; never use localStorage/sessionStorage for tokens                               |
+| I-003     | Sensitive data in JWT claims      | PII, passwords, or secrets encoded in JWT payload                                          | MEDIUM     | HIGH     | Minimal claims in access tokens (sub, scope, exp, iat, jti); no PII beyond email; never store passwords/secrets |
+| I-004     | Error message information leakage | Auth errors reveal whether user exists, password is wrong, etc.                            | MEDIUM     | MEDIUM   | Generic error messages ("Invalid credentials"); same response time for user-not-found and wrong-password        |
+| I-005     | CORS misconfiguration             | Overly permissive CORS allows token theft from malicious origins                           | MEDIUM     | HIGH     | Strict CORS origin allowlist; no `Access-Control-Allow-Origin: *` for authenticated endpoints                   |
 
 ### 1.5 Denial of Service (Availability)
 
-| Threat ID | Threat | Attack Vector | Likelihood | Impact | Mitigation |
-|-----------|--------|---------------|------------|--------|------------|
-| D-001 | Token endpoint abuse | Automated requests exhaust server resources or trigger account lockout | HIGH | MEDIUM | Rate limiting: 10 requests/minute per IP for token endpoint; exponential backoff after failures |
-| D-002 | Refresh token flooding | Attacker generates thousands of refresh tokens per user | MEDIUM | MEDIUM | Maximum 5 active refresh tokens per user; oldest revoked on new issuance |
-| D-003 | JWKS endpoint cache poisoning | Frequent JWKS endpoint hits bypass caching, exhaust provider | LOW | LOW | Cache JWKS keys with minimum 5-minute TTL; implement circuit breaker for key fetching |
+| Threat ID | Threat                        | Attack Vector                                                          | Likelihood | Impact | Mitigation                                                                                      |
+| --------- | ----------------------------- | ---------------------------------------------------------------------- | ---------- | ------ | ----------------------------------------------------------------------------------------------- |
+| D-001     | Token endpoint abuse          | Automated requests exhaust server resources or trigger account lockout | HIGH       | MEDIUM | Rate limiting: 10 requests/minute per IP for token endpoint; exponential backoff after failures |
+| D-002     | Refresh token flooding        | Attacker generates thousands of refresh tokens per user                | MEDIUM     | MEDIUM | Maximum 5 active refresh tokens per user; oldest revoked on new issuance                        |
+| D-003     | JWKS endpoint cache poisoning | Frequent JWKS endpoint hits bypass caching, exhaust provider           | LOW        | LOW    | Cache JWKS keys with minimum 5-minute TTL; implement circuit breaker for key fetching           |
 
 ### 1.6 Elevation of Privilege (Access Control)
 
-| Threat ID | Threat | Attack Vector | Likelihood | Impact | Mitigation |
-|-----------|--------|---------------|------------|--------|------------|
-| E-001 | Scope escalation via token exchange | Attacker requests broader scopes than authorized | MEDIUM | CRITICAL | Server-side scope enforcement; scope downscoping on every token issuance; never issue broader scope than originally consented |
-| E-002 | Role escalation via claim manipulation | Attacker modifies role claims in JWT | LOW | CRITICAL | Server-side role lookup (never trust JWT role claim alone for admin operations); defense-in-depth with database RBAC check |
-| E-003 | Privilege persistence after revocation | Revoked user retains access via cached tokens | HIGH | HIGH | Short-lived access tokens (<=15 min); mandatory token revocation list check for sensitive operations; immediate session invalidation on role change |
-| E-004 | OAuth provider account takeover | Attacker compromises user's OAuth provider account | MEDIUM | CRITICAL | Support account linking with multiple providers; allow password-based recovery flow; email notification on new OAuth provider linking |
+| Threat ID | Threat                                 | Attack Vector                                      | Likelihood | Impact   | Mitigation                                                                                                                                          |
+| --------- | -------------------------------------- | -------------------------------------------------- | ---------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| E-001     | Scope escalation via token exchange    | Attacker requests broader scopes than authorized   | MEDIUM     | CRITICAL | Server-side scope enforcement; scope downscoping on every token issuance; never issue broader scope than originally consented                       |
+| E-002     | Role escalation via claim manipulation | Attacker modifies role claims in JWT               | LOW        | CRITICAL | Server-side role lookup (never trust JWT role claim alone for admin operations); defense-in-depth with database RBAC check                          |
+| E-003     | Privilege persistence after revocation | Revoked user retains access via cached tokens      | HIGH       | HIGH     | Short-lived access tokens (<=15 min); mandatory token revocation list check for sensitive operations; immediate session invalidation on role change |
+| E-004     | OAuth provider account takeover        | Attacker compromises user's OAuth provider account | MEDIUM     | CRITICAL | Support account linking with multiple providers; allow password-based recovery flow; email notification on new OAuth provider linking               |
 
 ---
 
@@ -117,6 +117,7 @@ OAuth 2.1 (draft-ietf-oauth-v2-1) consolidates security best practices. The foll
 **Requirement:** PKCE (Proof Key for Code Exchange, RFC 7636) MUST be required for ALL OAuth clients, including confidential clients.
 
 **Implementation:**
+
 - Code verifier: 43-128 cryptographically random URL-safe characters
 - Code challenge: `BASE64URL(SHA256(code_verifier))`
 - Code challenge method: MUST be `S256` (never `plain`)
@@ -124,6 +125,7 @@ OAuth 2.1 (draft-ietf-oauth-v2-1) consolidates security best practices. The foll
 - Server MUST reject token requests without valid `code_verifier`
 
 **PKCE Downgrade Prevention:**
+
 ```
 Authorization endpoint MUST:
   1. Reject requests without code_challenge (400 invalid_request)
@@ -141,6 +143,7 @@ Token endpoint MUST:
 **Requirement:** The implicit flow (`response_type=token`) MUST NOT be supported.
 
 **Implementation:**
+
 - Authorization server MUST reject `response_type=token`
 - Authorization server MUST reject `response_type=id_token token`
 - Only `response_type=code` is permitted
@@ -153,6 +156,7 @@ Token endpoint MUST:
 **Requirement:** Resource Owner Password Credentials (`grant_type=password`) MUST NOT be supported.
 
 **Implementation:**
+
 - Token endpoint MUST reject `grant_type=password`
 - No username/password fields accepted at the token endpoint
 - Users authenticate ONLY through the authorization endpoint (browser-based)
@@ -166,6 +170,7 @@ Token endpoint MUST:
 **Requirement:** Redirect URIs MUST be compared using exact string matching.
 
 **Implementation:**
+
 - No wildcard patterns (`https://*.example.com` -- FORBIDDEN)
 - No partial matching or subdomain patterns
 - Each redirect URI registered explicitly per client
@@ -176,6 +181,7 @@ Token endpoint MUST:
 **Requirement:** Access tokens MUST NOT be transmitted via URL query parameters.
 
 **Implementation:**
+
 - Authorization header: `Authorization: Bearer <token>`
 - Or POST body parameter (for form submissions only)
 - Server MUST reject requests with `access_token` query parameter
@@ -185,6 +191,7 @@ Token endpoint MUST:
 **Requirement:** Refresh tokens MUST implement rotation with reuse detection.
 
 **Implementation:**
+
 - Every refresh request issues a NEW refresh token and invalidates the old one
 - Old refresh tokens are marked as "used" (not deleted)
 - If a "used" refresh token is presented again, ALL tokens for that user/session are revoked (theft detection)
@@ -196,6 +203,7 @@ Token endpoint MUST:
 **Requirement:** The `state` parameter MUST be included in all authorization requests for CSRF protection.
 
 **Implementation:**
+
 - Client generates cryptographically random state value (minimum 128 bits)
 - State stored in session (httpOnly cookie or server-side session)
 - On callback, client validates state matches stored value
@@ -206,6 +214,7 @@ Token endpoint MUST:
 **Requirement:** ALL OAuth endpoints and redirect URIs MUST use HTTPS.
 
 **Implementation:**
+
 - Authorization endpoint: HTTPS only
 - Token endpoint: HTTPS only
 - Redirect URIs: HTTPS only (localhost exception for development)
@@ -216,6 +225,7 @@ Token endpoint MUST:
 **Requirement:** If using OpenID Connect, the `nonce` parameter MUST be included and validated.
 
 **Implementation:**
+
 - Client generates cryptographically random nonce
 - Nonce included in authorization request
 - ID token MUST contain matching `nonce` claim
@@ -230,16 +240,19 @@ Token endpoint MUST:
 #### REQ-JWT-001: Algorithm Whitelist [CRITICAL]
 
 **Allowed algorithms:**
+
 - `RS256` (RSA + SHA-256) -- RECOMMENDED for distributed systems
 - `ES256` (ECDSA + SHA-256) -- RECOMMENDED for performance-sensitive systems
 
 **Forbidden algorithms:**
+
 - `none` -- MUST be rejected; enables token forgery
 - `HS256` -- MUST NOT be used in multi-service architectures (shared secret leakage risk)
 - `RS384`, `RS512` -- unnecessary overhead without proportional security benefit
 - Any algorithm not in the whitelist -- rejected by default
 
 **Implementation:**
+
 ```
 jwt.verify(token, publicKey, {
   algorithms: ['RS256', 'ES256'],  // WHITELIST ONLY
@@ -253,18 +266,19 @@ jwt.verify(token, publicKey, {
 
 Every JWT MUST be validated for ALL of the following:
 
-| Claim | Validation Rule | Failure Action |
-|-------|-----------------|----------------|
-| `alg` (header) | Must be in whitelist (RS256, ES256) | Reject token |
-| `iss` (issuer) | Must match expected issuer URL exactly | Reject token |
-| `aud` (audience) | Must include this service's identifier | Reject token |
-| `exp` (expiration) | Must be in the future (with <=30s clock skew tolerance) | Reject token |
-| `iat` (issued at) | Must be present; must be in the past | Reject token |
-| `nbf` (not before) | If present, must be in the past | Reject token |
-| `sub` (subject) | Must be present and non-empty | Reject token |
-| `jti` (JWT ID) | Must be present for revocation checking | Reject token |
+| Claim              | Validation Rule                                         | Failure Action |
+| ------------------ | ------------------------------------------------------- | -------------- |
+| `alg` (header)     | Must be in whitelist (RS256, ES256)                     | Reject token   |
+| `iss` (issuer)     | Must match expected issuer URL exactly                  | Reject token   |
+| `aud` (audience)   | Must include this service's identifier                  | Reject token   |
+| `exp` (expiration) | Must be in the future (with <=30s clock skew tolerance) | Reject token   |
+| `iat` (issued at)  | Must be present; must be in the past                    | Reject token   |
+| `nbf` (not before) | If present, must be in the past                         | Reject token   |
+| `sub` (subject)    | Must be present and non-empty                           | Reject token   |
+| `jti` (JWT ID)     | Must be present for revocation checking                 | Reject token   |
 
 **Validation Order:**
+
 1. Check `alg` header (reject `none` first)
 2. Verify cryptographic signature
 3. Validate `exp` (reject expired)
@@ -276,18 +290,19 @@ Every JWT MUST be validated for ALL of the following:
 
 ### 3.3 Token Lifetimes
 
-| Token Type | Maximum Lifetime | Recommended | Storage |
-|------------|------------------|-------------|---------|
-| Access Token | 15 minutes | 5-10 minutes | HttpOnly cookie |
-| Refresh Token | 30 days | 7 days | HttpOnly cookie (restricted path) |
-| ID Token | 60 minutes | 5-15 minutes | Memory only (never persisted) |
-| Authorization Code | 10 minutes | 1-5 minutes | Server-side only; single-use |
+| Token Type         | Maximum Lifetime | Recommended  | Storage                           |
+| ------------------ | ---------------- | ------------ | --------------------------------- |
+| Access Token       | 15 minutes       | 5-10 minutes | HttpOnly cookie                   |
+| Refresh Token      | 30 days          | 7 days       | HttpOnly cookie (restricted path) |
+| ID Token           | 60 minutes       | 5-15 minutes | Memory only (never persisted)     |
+| Authorization Code | 10 minutes       | 1-5 minutes  | Server-side only; single-use      |
 
 ### 3.4 Key Management
 
 #### REQ-JWT-003: Key Rotation [MEDIUM]
 
 **Requirements:**
+
 - RSA/ECDSA key pairs MUST be rotated at least every 90 days
 - Use `kid` (key ID) header claim to identify which key signed the token
 - Maintain previous key for grace period (24-48 hours) to validate in-flight tokens
@@ -302,6 +317,7 @@ Every JWT MUST be validated for ALL of the following:
 ### 4.1 Recommended: HttpOnly Cookies (Server-Side Token Management)
 
 **Access Token Cookie:**
+
 ```
 Set-Cookie: access_token=<jwt>;
   HttpOnly;        // Cannot be accessed by JavaScript (XSS protection)
@@ -313,6 +329,7 @@ Set-Cookie: access_token=<jwt>;
 ```
 
 **Refresh Token Cookie:**
+
 ```
 Set-Cookie: refresh_token=<jwt>;
   HttpOnly;
@@ -327,17 +344,18 @@ Set-Cookie: refresh_token=<jwt>;
 
 The following storage mechanisms MUST NOT be used for tokens:
 
-| Storage | Risk | Severity |
-|---------|------|----------|
-| `localStorage` | XSS attack exfiltrates tokens; persists across sessions | CRITICAL |
-| `sessionStorage` | XSS attack exfiltrates tokens; slightly less persistent | CRITICAL |
-| URL query parameters | Visible in logs, history, Referer headers | CRITICAL |
-| URL fragments | Accessible to JavaScript; leaked via Referer in some browsers | HIGH |
-| `document.cookie` (non-HttpOnly) | XSS attack reads via `document.cookie` | HIGH |
+| Storage                          | Risk                                                          | Severity |
+| -------------------------------- | ------------------------------------------------------------- | -------- |
+| `localStorage`                   | XSS attack exfiltrates tokens; persists across sessions       | CRITICAL |
+| `sessionStorage`                 | XSS attack exfiltrates tokens; slightly less persistent       | CRITICAL |
+| URL query parameters             | Visible in logs, history, Referer headers                     | CRITICAL |
+| URL fragments                    | Accessible to JavaScript; leaked via Referer in some browsers | HIGH     |
+| `document.cookie` (non-HttpOnly) | XSS attack reads via `document.cookie`                        | HIGH     |
 
 ### 4.3 CORS Configuration
 
 **Authenticated Endpoints:**
+
 ```
 Access-Control-Allow-Origin: https://app.example.com  // EXACT origin, never *
 Access-Control-Allow-Credentials: true
@@ -347,6 +365,7 @@ Access-Control-Max-Age: 86400
 ```
 
 **Public Endpoints (JWKS, OpenID Configuration):**
+
 ```
 Access-Control-Allow-Origin: *  // Acceptable for public key endpoints only
 Access-Control-Allow-Methods: GET, OPTIONS
@@ -361,6 +380,7 @@ Access-Control-Allow-Methods: GET, OPTIONS
 **Relevance:** CRITICAL -- OAuth2 is the primary access control mechanism.
 
 **Requirements:**
+
 - Deny by default: all endpoints require authentication unless explicitly public
 - Scope-based authorization: validate token scopes on every API request
 - Role-based access control (RBAC): implement server-side role checks for admin operations
@@ -370,6 +390,7 @@ Access-Control-Allow-Methods: GET, OPTIONS
 - Log all access control failures for security monitoring
 
 **Security Controls:**
+
 - SEC-AUTH-001: Token scope enforcement middleware
 - SEC-AUTH-002: Resource ownership validation
 - SEC-AUTH-003: Admin operation double-check (JWT + database)
@@ -379,6 +400,7 @@ Access-Control-Allow-Methods: GET, OPTIONS
 **Relevance:** CRITICAL -- JWT signing, token hashing, password hashing, TLS.
 
 **Requirements:**
+
 - JWT signing: RS256 or ES256 only (asymmetric); no HS256 in distributed systems
 - Refresh token storage: SHA-256 hash in database (never plaintext)
 - Password hashing (if local accounts): Argon2id (memory=19456, time=2, parallelism=1) or bcrypt (cost >= 14)
@@ -393,6 +415,7 @@ Access-Control-Allow-Methods: GET, OPTIONS
 **Relevance:** CRITICAL -- This is the core attack surface.
 
 **Requirements:**
+
 - Credential stuffing protection: rate limit login/token endpoint (5 attempts per minute per IP; 10 per account)
 - Account lockout: temporary lockout after 10 consecutive failures (15-minute window)
 - User enumeration prevention: identical error responses for "user not found" and "invalid password"
@@ -402,6 +425,7 @@ Access-Control-Allow-Methods: GET, OPTIONS
 - Logout: revoke refresh token; clear all auth cookies; invalidate server-side session
 
 **Additional Controls:**
+
 - Brute force detection with automatic IP blocking (temporary)
 - Failed login attempt logging (IP, timestamp, username attempted -- NOT password)
 - Account recovery via trusted email with time-limited, single-use tokens
@@ -535,6 +559,7 @@ The following controls MUST be implemented as part of the OAuth2 feature. Each c
 ### 7.1 Unit Tests (Per-Control)
 
 Each security control (SEC-OAUTH-001 through SEC-OAUTH-014) MUST have dedicated unit tests covering:
+
 - Positive case (valid input accepted)
 - Negative case (invalid input rejected)
 - Edge cases (empty, null, oversized, malformed)
@@ -542,28 +567,28 @@ Each security control (SEC-OAUTH-001 through SEC-OAUTH-014) MUST have dedicated 
 
 ### 7.2 Integration Tests
 
-| Test Scenario | Description | Priority |
-|---------------|-------------|----------|
-| Full OAuth flow | Authorization request -> callback -> token exchange -> API access -> token refresh -> logout | CRITICAL |
-| PKCE validation | Flow with valid PKCE; flow without PKCE (must fail); flow with wrong verifier (must fail) | CRITICAL |
-| Refresh token rotation | Refresh -> verify new tokens -> reuse old token -> verify all revoked | HIGH |
-| CSRF protection | Flow without state (must fail); flow with wrong state (must fail) | HIGH |
-| Token expiration | Wait for access token expiry -> verify 401 -> refresh -> verify new token works | HIGH |
-| Concurrent sessions | Multiple active sessions per user; selective revocation; "logout all" | MEDIUM |
-| Provider switching | Login with Provider A -> link Provider B -> login with Provider B | MEDIUM |
+| Test Scenario          | Description                                                                                  | Priority |
+| ---------------------- | -------------------------------------------------------------------------------------------- | -------- |
+| Full OAuth flow        | Authorization request -> callback -> token exchange -> API access -> token refresh -> logout | CRITICAL |
+| PKCE validation        | Flow with valid PKCE; flow without PKCE (must fail); flow with wrong verifier (must fail)    | CRITICAL |
+| Refresh token rotation | Refresh -> verify new tokens -> reuse old token -> verify all revoked                        | HIGH     |
+| CSRF protection        | Flow without state (must fail); flow with wrong state (must fail)                            | HIGH     |
+| Token expiration       | Wait for access token expiry -> verify 401 -> refresh -> verify new token works              | HIGH     |
+| Concurrent sessions    | Multiple active sessions per user; selective revocation; "logout all"                        | MEDIUM   |
+| Provider switching     | Login with Provider A -> link Provider B -> login with Provider B                            | MEDIUM   |
 
 ### 7.3 Security-Specific Tests
 
-| Test Category | Description | Tools |
-|---------------|-------------|-------|
-| JWT algorithm confusion | Attempt `none` algorithm, HS256 with public key as secret | Manual + automated |
-| Token injection | Use token from different audience/issuer | Manual + automated |
-| SSRF on redirect_uri | Use internal IPs, localhost, metadata endpoints as redirect | Automated |
-| Open redirect | Use untrusted domains as redirect_uri | Automated |
-| Timing attacks | Measure response time for valid vs. invalid users | Automated |
-| Rate limit bypass | Test with different IPs, headers, user agents | Automated |
-| Cookie security | Verify HttpOnly, Secure, SameSite attributes programmatically | Automated |
-| CORS validation | Test with unauthorized origins; verify preflight responses | Automated |
+| Test Category           | Description                                                   | Tools              |
+| ----------------------- | ------------------------------------------------------------- | ------------------ |
+| JWT algorithm confusion | Attempt `none` algorithm, HS256 with public key as secret     | Manual + automated |
+| Token injection         | Use token from different audience/issuer                      | Manual + automated |
+| SSRF on redirect_uri    | Use internal IPs, localhost, metadata endpoints as redirect   | Automated          |
+| Open redirect           | Use untrusted domains as redirect_uri                         | Automated          |
+| Timing attacks          | Measure response time for valid vs. invalid users             | Automated          |
+| Rate limit bypass       | Test with different IPs, headers, user agents                 | Automated          |
+| Cookie security         | Verify HttpOnly, Secure, SameSite attributes programmatically | Automated          |
+| CORS validation         | Test with unauthorized origins; verify preflight responses    | Automated          |
 
 ### 7.4 Penetration Testing Checklist
 
@@ -585,35 +610,35 @@ Each security control (SEC-OAUTH-001 through SEC-OAUTH-014) MUST have dedicated 
 
 ### 8.1 GDPR
 
-| Requirement | Implementation |
-|-------------|---------------|
-| Data minimization | Request minimum OAuth scopes (openid, email); do not request profile/contacts unless needed |
-| Consent | Display scope descriptions in plain language before authorization; allow selective consent |
-| Right to erasure | Account deletion MUST revoke all tokens, delete refresh token hashes, remove user data |
-| Data portability | Support export of user profile data in machine-readable format |
-| Breach notification | Auth breach detected -> notify users within 72 hours; notify DPA if required |
+| Requirement           | Implementation                                                                                            |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| Data minimization     | Request minimum OAuth scopes (openid, email); do not request profile/contacts unless needed               |
+| Consent               | Display scope descriptions in plain language before authorization; allow selective consent                |
+| Right to erasure      | Account deletion MUST revoke all tokens, delete refresh token hashes, remove user data                    |
+| Data portability      | Support export of user profile data in machine-readable format                                            |
+| Breach notification   | Auth breach detected -> notify users within 72 hours; notify DPA if required                              |
 | Cross-border transfer | If using external OAuth providers, verify data processing agreements; validate provider's GDPR compliance |
 
 ### 8.2 SOC2
 
-| Trust Principle | Auth-Related Controls |
-|-----------------|----------------------|
-| Security | All SEC-OAUTH controls; encryption at rest/transit; access logging |
-| Availability | Rate limiting; DDoS protection on auth endpoints; failover for auth service |
-| Processing Integrity | Token validation on every request; PKCE prevents code injection |
-| Confidentiality | Tokens never logged; passwords hashed; secrets in environment variables |
-| Privacy | Minimum scope collection; user consent; data retention policy |
+| Trust Principle      | Auth-Related Controls                                                       |
+| -------------------- | --------------------------------------------------------------------------- |
+| Security             | All SEC-OAUTH controls; encryption at rest/transit; access logging          |
+| Availability         | Rate limiting; DDoS protection on auth endpoints; failover for auth service |
+| Processing Integrity | Token validation on every request; PKCE prevents code injection             |
+| Confidentiality      | Tokens never logged; passwords hashed; secrets in environment variables     |
+| Privacy              | Minimum scope collection; user consent; data retention policy               |
 
 ### 8.3 Data Retention
 
-| Data Type | Retention Period | Deletion Method |
-|-----------|-----------------|-----------------|
-| Access tokens | Until expiry (15 min) | Stateless (not stored server-side) |
-| Refresh token hashes | Until expiry or revocation (max 30 days) | Database deletion + audit log |
-| Authorization codes | Until exchange or expiry (max 10 min) | Database deletion |
-| Audit logs (auth events) | 90 days | Automated rotation with secure deletion |
-| Failed login attempts | 30 days | Automated rotation |
-| User consent records | Duration of account + 7 years | Archive then delete |
+| Data Type                | Retention Period                         | Deletion Method                         |
+| ------------------------ | ---------------------------------------- | --------------------------------------- |
+| Access tokens            | Until expiry (15 min)                    | Stateless (not stored server-side)      |
+| Refresh token hashes     | Until expiry or revocation (max 30 days) | Database deletion + audit log           |
+| Authorization codes      | Until exchange or expiry (max 10 min)    | Database deletion                       |
+| Audit logs (auth events) | 90 days                                  | Automated rotation with secure deletion |
+| Failed login attempts    | 30 days                                  | Automated rotation                      |
+| User consent records     | Duration of account + 7 years            | Archive then delete                     |
 
 ---
 
@@ -621,17 +646,18 @@ Each security control (SEC-OAUTH-001 through SEC-OAUTH-014) MUST have dedicated 
 
 ### 9.1 Detection Triggers
 
-| Trigger | Severity | Action |
-|---------|----------|--------|
-| Refresh token reuse detected | HIGH | Revoke all user tokens; alert user; log incident |
-| >100 failed logins from single IP in 1 hour | MEDIUM | Block IP (temporary); alert security team |
-| JWT signing key compromise suspected | CRITICAL | Rotate all keys immediately; revoke all tokens; force re-authentication |
-| OAuth provider breach announced | HIGH | Force re-authentication for all users from that provider; review access logs |
-| Unusual access pattern (impossible travel) | MEDIUM | Require re-authentication; alert user |
+| Trigger                                     | Severity | Action                                                                       |
+| ------------------------------------------- | -------- | ---------------------------------------------------------------------------- |
+| Refresh token reuse detected                | HIGH     | Revoke all user tokens; alert user; log incident                             |
+| >100 failed logins from single IP in 1 hour | MEDIUM   | Block IP (temporary); alert security team                                    |
+| JWT signing key compromise suspected        | CRITICAL | Rotate all keys immediately; revoke all tokens; force re-authentication      |
+| OAuth provider breach announced             | HIGH     | Force re-authentication for all users from that provider; review access logs |
+| Unusual access pattern (impossible travel)  | MEDIUM   | Require re-authentication; alert user                                        |
 
 ### 9.2 Response Procedures
 
 **Level 1 (CRITICAL) -- Signing Key Compromise:**
+
 1. Generate new RSA/ECDSA key pair immediately
 2. Deploy new public key to JWKS endpoint
 3. Revoke ALL active refresh tokens (database purge)
@@ -641,6 +667,7 @@ Each security control (SEC-OAUTH-001 through SEC-OAUTH-014) MUST have dedicated 
 7. Post-incident review within 48 hours
 
 **Level 2 (HIGH) -- Token Theft/Replay:**
+
 1. Identify affected user(s) via audit logs
 2. Revoke all tokens for affected users
 3. Force password change (if local accounts)
@@ -649,6 +676,7 @@ Each security control (SEC-OAUTH-001 through SEC-OAUTH-014) MUST have dedicated 
 6. Determine if data was exfiltrated
 
 **Level 3 (MEDIUM) -- Brute Force/Credential Stuffing:**
+
 1. Verify rate limiting is active and effective
 2. Block attacking IPs
 3. Force password change for targeted accounts
@@ -658,6 +686,7 @@ Each security control (SEC-OAUTH-001 through SEC-OAUTH-014) MUST have dedicated 
 ### 9.3 Communication Templates
 
 **User Notification (Token Theft):**
+
 ```
 Subject: Security Alert - Unusual Activity on Your Account
 
@@ -705,22 +734,22 @@ For questions, contact security@[domain].
 
 ### Priority Matrix
 
-| Priority | Control ID | Description | Effort |
-|----------|-----------|-------------|--------|
-| P0 (CRITICAL) | SEC-OAUTH-001 | PKCE enforcement | 4-8 hours |
-| P0 (CRITICAL) | SEC-OAUTH-002 | JWT algorithm whitelist | 2-4 hours |
-| P0 (CRITICAL) | SEC-OAUTH-003 | HttpOnly cookie token storage | 4-8 hours |
-| P1 (HIGH) | SEC-OAUTH-004 | Exact redirect URI matching | 2-4 hours |
-| P1 (HIGH) | SEC-OAUTH-005 | Refresh token rotation | 8-16 hours |
-| P1 (HIGH) | SEC-OAUTH-006 | Rate limiting on auth endpoints | 4-8 hours |
-| P1 (HIGH) | SEC-OAUTH-007 | CSRF state parameter | 2-4 hours |
-| P1 (HIGH) | SEC-OAUTH-008 | Scope enforcement middleware | 4-8 hours |
-| P1 (HIGH) | SEC-OAUTH-009 | Structured audit logging | 4-8 hours |
-| P2 (MEDIUM) | SEC-OAUTH-010 | Security headers | 2-4 hours |
-| P2 (MEDIUM) | SEC-OAUTH-011 | Error message safety | 2-4 hours |
-| P2 (MEDIUM) | SEC-OAUTH-012 | Token revocation (RFC 7009) | 4-8 hours |
-| P2 (MEDIUM) | SEC-OAUTH-013 | Key rotation mechanism | 4-8 hours |
-| P2 (MEDIUM) | SEC-OAUTH-014 | OAuth parameter input validation | 2-4 hours |
+| Priority      | Control ID    | Description                      | Effort     |
+| ------------- | ------------- | -------------------------------- | ---------- |
+| P0 (CRITICAL) | SEC-OAUTH-001 | PKCE enforcement                 | 4-8 hours  |
+| P0 (CRITICAL) | SEC-OAUTH-002 | JWT algorithm whitelist          | 2-4 hours  |
+| P0 (CRITICAL) | SEC-OAUTH-003 | HttpOnly cookie token storage    | 4-8 hours  |
+| P1 (HIGH)     | SEC-OAUTH-004 | Exact redirect URI matching      | 2-4 hours  |
+| P1 (HIGH)     | SEC-OAUTH-005 | Refresh token rotation           | 8-16 hours |
+| P1 (HIGH)     | SEC-OAUTH-006 | Rate limiting on auth endpoints  | 4-8 hours  |
+| P1 (HIGH)     | SEC-OAUTH-007 | CSRF state parameter             | 2-4 hours  |
+| P1 (HIGH)     | SEC-OAUTH-008 | Scope enforcement middleware     | 4-8 hours  |
+| P1 (HIGH)     | SEC-OAUTH-009 | Structured audit logging         | 4-8 hours  |
+| P2 (MEDIUM)   | SEC-OAUTH-010 | Security headers                 | 2-4 hours  |
+| P2 (MEDIUM)   | SEC-OAUTH-011 | Error message safety             | 2-4 hours  |
+| P2 (MEDIUM)   | SEC-OAUTH-012 | Token revocation (RFC 7009)      | 4-8 hours  |
+| P2 (MEDIUM)   | SEC-OAUTH-013 | Key rotation mechanism           | 4-8 hours  |
+| P2 (MEDIUM)   | SEC-OAUTH-014 | OAuth parameter input validation | 2-4 hours  |
 
 **Total Estimated Effort:** 48-96 hours (security controls only; excludes feature implementation)
 
@@ -749,13 +778,13 @@ The agent-studio codebase has an extensive security framework (hooks, validators
 
 Per the issues.md analysis, the following EXISTING security issues intersect with OAuth and should be addressed as prerequisites or concurrent work:
 
-| Issue | Intersection with OAuth | Priority |
-|-------|------------------------|----------|
-| SEC-LIB-001 (execSync command injection) | Auth tokens could be exfiltrated via command injection | P1 -- Fix before OAuth |
-| SEC-CTX-003 (memory file integrity) | Constitution/behaviour files injected into prompts; compromised auth config could propagate | P2 -- Fix concurrent |
-| SEC-HOOK-001 (HOOK_FAIL_OPEN kill switch) | Single env var disables all security guards, including auth checks | P1 -- Fix before OAuth |
-| SEC-HOOK-003 (21 env var overrides) | Individual security controls can be disabled | P2 -- Consolidate with OAuth deploy |
-| H-001 (Skill name injection) | Auth-related skills could be spoofed | P2 -- Fix concurrent |
+| Issue                                     | Intersection with OAuth                                                                     | Priority                            |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------- |
+| SEC-LIB-001 (execSync command injection)  | Auth tokens could be exfiltrated via command injection                                      | P1 -- Fix before OAuth              |
+| SEC-CTX-003 (memory file integrity)       | Constitution/behaviour files injected into prompts; compromised auth config could propagate | P2 -- Fix concurrent                |
+| SEC-HOOK-001 (HOOK_FAIL_OPEN kill switch) | Single env var disables all security guards, including auth checks                          | P1 -- Fix before OAuth              |
+| SEC-HOOK-003 (21 env var overrides)       | Individual security controls can be disabled                                                | P2 -- Consolidate with OAuth deploy |
+| H-001 (Skill name injection)              | Auth-related skills could be spoofed                                                        | P2 -- Fix concurrent                |
 
 ---
 
@@ -791,13 +820,13 @@ Per the issues.md analysis, the following EXISTING security issues intersect wit
 
 ## Appendix B: Dependency Recommendations
 
-| Package | Purpose | License | Notes |
-|---------|---------|---------|-------|
-| `openid-client` | OIDC/OAuth 2.x client | MIT | Handles PKCE, discovery, token management |
-| `jose` | JWT signing/verification | MIT | RFC 8725 compliant; algorithm whitelist built-in |
-| `helmet` | Security headers middleware | MIT | Sets HSTS, CSP, X-Frame-Options, etc. |
-| `express-rate-limit` | Rate limiting | MIT | Token endpoint protection |
-| `argon2` | Password hashing | MIT | Argon2id for local accounts |
+| Package              | Purpose                     | License | Notes                                            |
+| -------------------- | --------------------------- | ------- | ------------------------------------------------ |
+| `openid-client`      | OIDC/OAuth 2.x client       | MIT     | Handles PKCE, discovery, token management        |
+| `jose`               | JWT signing/verification    | MIT     | RFC 8725 compliant; algorithm whitelist built-in |
+| `helmet`             | Security headers middleware | MIT     | Sets HSTS, CSP, X-Frame-Options, etc.            |
+| `express-rate-limit` | Rate limiting               | MIT     | Token endpoint protection                        |
+| `argon2`             | Password hashing            | MIT     | Argon2id for local accounts                      |
 
 **Note:** Do NOT use `jsonwebtoken` (npm) for new projects. While widely used, `jose` is more actively maintained and has better RFC compliance. `jsonwebtoken` has had historical vulnerabilities with algorithm confusion.
 
@@ -833,14 +862,14 @@ For environments where opening a browser is not possible (headless servers, SSH 
 
 **Security comparison:**
 
-| Aspect | Loopback Redirect | Device Authorization |
-|--------|------------------|---------------------|
-| User experience | Better (automatic browser open) | Acceptable (manual URL visit) |
-| Phishing risk | LOW (loopback is trusted) | MEDIUM (user must verify correct URL) |
-| Headless support | NO (requires local browser) | YES |
-| PKCE support | YES (mandatory) | N/A (different flow) |
-| Replay protection | PKCE code_verifier | Device code single-use |
-| Implementation complexity | MEDIUM | LOW-MEDIUM |
+| Aspect                    | Loopback Redirect               | Device Authorization                  |
+| ------------------------- | ------------------------------- | ------------------------------------- |
+| User experience           | Better (automatic browser open) | Acceptable (manual URL visit)         |
+| Phishing risk             | LOW (loopback is trusted)       | MEDIUM (user must verify correct URL) |
+| Headless support          | NO (requires local browser)     | YES                                   |
+| PKCE support              | YES (mandatory)                 | N/A (different flow)                  |
+| Replay protection         | PKCE code_verifier              | Device code single-use                |
+| Implementation complexity | MEDIUM                          | LOW-MEDIUM                            |
 
 **Recommendation:** Implement loopback redirect as PRIMARY with device authorization as FALLBACK for headless environments.
 
@@ -853,6 +882,7 @@ For environments where opening a browser is not possible (headless servers, SSH 
 **Rationale:** Binding to `0.0.0.0` exposes the callback server to the local network, allowing other machines to intercept the authorization code.
 
 **Implementation:**
+
 ```
 server.listen(0, '127.0.0.1', () => {
   // Port auto-assigned by OS; only localhost can reach it
@@ -860,6 +890,7 @@ server.listen(0, '127.0.0.1', () => {
 ```
 
 **Security constraints:**
+
 - MUST use `127.0.0.1` (not `localhost`, which may resolve to `::1` on some systems)
 - MUST use an ephemeral port (port 0 = OS-assigned) -- never a fixed port
 - MUST shut down the HTTP server immediately after receiving the authorization code (within 1 second)
@@ -871,6 +902,7 @@ server.listen(0, '127.0.0.1', () => {
 **Threat:** Another process on the same machine could race to bind the same port.
 
 **Mitigation:**
+
 - Use port 0 (OS-assigned random ephemeral port) rather than a fixed port
 - Include the dynamically assigned port in the redirect_uri
 - Authorization server MUST validate exact redirect_uri match (including port)
@@ -883,6 +915,7 @@ server.listen(0, '127.0.0.1', () => {
 **Requirement:** The CLI MUST minimize the window during which the local HTTP server accepts connections.
 
 **Implementation:**
+
 ```
 const CALLBACK_TIMEOUT_MS = 120000; // 2 minutes max
 const server = http.createServer(handleCallback);
@@ -908,21 +941,23 @@ CLI applications cannot use HttpOnly cookies. Tokens must be stored on the files
 
 #### Storage Option Comparison
 
-| Option | Security | Cross-Platform | User Transparency | Recommended |
-|--------|----------|----------------|-------------------|-------------|
-| OS Keychain (via `keytar`) | HIGHEST | Windows/macOS/Linux | Token encrypted by OS | YES (primary) |
-| Encrypted file (`~/.agent-studio/auth.enc`) | HIGH | All platforms | Token encrypted with derived key | YES (fallback) |
-| Environment variable | MEDIUM | All platforms | Token visible to child processes | NO (only for CI/CD) |
-| Plaintext file (`~/.agent-studio/auth.json`) | LOW | All platforms | Token readable by any process as user | NO |
+| Option                                       | Security | Cross-Platform      | User Transparency                     | Recommended         |
+| -------------------------------------------- | -------- | ------------------- | ------------------------------------- | ------------------- |
+| OS Keychain (via `keytar`)                   | HIGHEST  | Windows/macOS/Linux | Token encrypted by OS                 | YES (primary)       |
+| Encrypted file (`~/.agent-studio/auth.enc`)  | HIGH     | All platforms       | Token encrypted with derived key      | YES (fallback)      |
+| Environment variable                         | MEDIUM   | All platforms       | Token visible to child processes      | NO (only for CI/CD) |
+| Plaintext file (`~/.agent-studio/auth.json`) | LOW      | All platforms       | Token readable by any process as user | NO                  |
 
 #### REQ-CLI-004: OS Keychain Integration [HIGH]
 
 **Primary storage:** Use the OS credential manager via `keytar` (or equivalent):
+
 - **Windows:** Windows Credential Manager (DPAPI encryption)
 - **macOS:** Keychain (hardware-backed on Apple Silicon)
 - **Linux:** libsecret (GNOME Keyring / KWallet)
 
 **Implementation:**
+
 ```
 const keytar = require('keytar');
 
@@ -986,6 +1021,7 @@ await keytar.deletePassword('agent-studio', 'access_token');
 - Display clear instructions: "Visit {url} and enter code: {user_code}"
 
 **Phishing mitigation:**
+
 - Display the verification URI prominently and WARN users to verify the domain
 - Consider displaying a QR code for the verification URL (reduces typo risk)
 - The user_code should be short and human-readable (8 characters, hyphenated: `ABCD-1234`)
@@ -1003,6 +1039,7 @@ await keytar.deletePassword('agent-studio', 'access_token');
 5. If refresh succeeds, store new tokens and proceed
 
 **Implementation pattern:**
+
 ```
 async function getValidAccessToken() {
   const accessToken = await tokenStore.getAccessToken();
@@ -1069,12 +1106,12 @@ Likelihood  HIGH   D-003  D-001    S-003    T-001
 
 ### Risk Categories
 
-| Risk Level | Count | Action |
-|------------|-------|--------|
-| CRITICAL (High Likelihood x Critical Impact) | 4 | MUST fix before deployment; blocks release |
-| HIGH (combination of High/Critical) | 10 | MUST fix before production; may not block beta |
-| MEDIUM | 8 | SHOULD fix before production; scheduled for remediation |
-| LOW | 3 | Nice-to-have; track for future improvement |
+| Risk Level                                   | Count | Action                                                  |
+| -------------------------------------------- | ----- | ------------------------------------------------------- |
+| CRITICAL (High Likelihood x Critical Impact) | 4     | MUST fix before deployment; blocks release              |
+| HIGH (combination of High/Critical)          | 10    | MUST fix before production; may not block beta          |
+| MEDIUM                                       | 8     | SHOULD fix before production; scheduled for remediation |
+| LOW                                          | 3     | Nice-to-have; track for future improvement              |
 
 ### Top 5 Risks (Prioritized)
 
@@ -1094,39 +1131,40 @@ Likelihood  HIGH   D-003  D-001    S-003    T-001
 
 ### Mandatory (BLOCKING -- Must implement before any deployment)
 
-| Control | Priority | OWASP | Description |
-|---------|----------|-------|-------------|
-| SEC-OAUTH-001 | P0 | A07 | PKCE enforcement (S256, no downgrade) |
-| SEC-OAUTH-002 | P0 | A02 | JWT algorithm whitelist (RS256/ES256 only) |
-| SEC-OAUTH-003 | P0 | A02 | Secure token storage (keychain + encrypted file for CLI) |
-| SEC-OAUTH-004 | P1 | A01 | Exact redirect URI matching |
-| SEC-OAUTH-005 | P1 | A07 | Refresh token rotation with reuse detection |
-| SEC-OAUTH-006 | P1 | A07 | Rate limiting on auth endpoints |
-| SEC-OAUTH-007 | P1 | A01 | CSRF state parameter |
-| SEC-OAUTH-008 | P1 | A01 | Server-side scope enforcement |
-| REQ-CLI-001 | P0 | A05 | Loopback-only callback server (127.0.0.1) |
-| REQ-CLI-004 | P1 | A02 | OS keychain for token storage |
+| Control       | Priority | OWASP | Description                                              |
+| ------------- | -------- | ----- | -------------------------------------------------------- |
+| SEC-OAUTH-001 | P0       | A07   | PKCE enforcement (S256, no downgrade)                    |
+| SEC-OAUTH-002 | P0       | A02   | JWT algorithm whitelist (RS256/ES256 only)               |
+| SEC-OAUTH-003 | P0       | A02   | Secure token storage (keychain + encrypted file for CLI) |
+| SEC-OAUTH-004 | P1       | A01   | Exact redirect URI matching                              |
+| SEC-OAUTH-005 | P1       | A07   | Refresh token rotation with reuse detection              |
+| SEC-OAUTH-006 | P1       | A07   | Rate limiting on auth endpoints                          |
+| SEC-OAUTH-007 | P1       | A01   | CSRF state parameter                                     |
+| SEC-OAUTH-008 | P1       | A01   | Server-side scope enforcement                            |
+| REQ-CLI-001   | P0       | A05   | Loopback-only callback server (127.0.0.1)                |
+| REQ-CLI-004   | P1       | A02   | OS keychain for token storage                            |
 
 ### Recommended (SHOULD-HAVE -- Implement before production)
 
-| Control | Priority | OWASP | Description |
-|---------|----------|-------|-------------|
-| SEC-OAUTH-009 | P1 | A09 | Structured audit logging |
-| SEC-OAUTH-010 | P2 | A05 | Security headers (HSTS, CSP) |
-| SEC-OAUTH-011 | P2 | A07 | Error message safety (no user enumeration) |
-| SEC-OAUTH-012 | P2 | A01 | Token revocation endpoint (RFC 7009) |
-| SEC-OAUTH-013 | P2 | A02 | Key rotation (90-day cycle) |
-| SEC-OAUTH-014 | P2 | A03 | OAuth parameter input validation |
-| REQ-CLI-005 | P2 | A02 | Encrypted file fallback storage |
-| REQ-CLI-007 | P2 | A07 | Device flow polling security |
-| REQ-CLI-008 | P1 | A07 | Token refresh on CLI invocation |
-| REQ-CLI-009 | P2 | A01 | Secure CLI logout with token revocation |
+| Control       | Priority | OWASP | Description                                |
+| ------------- | -------- | ----- | ------------------------------------------ |
+| SEC-OAUTH-009 | P1       | A09   | Structured audit logging                   |
+| SEC-OAUTH-010 | P2       | A05   | Security headers (HSTS, CSP)               |
+| SEC-OAUTH-011 | P2       | A07   | Error message safety (no user enumeration) |
+| SEC-OAUTH-012 | P2       | A01   | Token revocation endpoint (RFC 7009)       |
+| SEC-OAUTH-013 | P2       | A02   | Key rotation (90-day cycle)                |
+| SEC-OAUTH-014 | P2       | A03   | OAuth parameter input validation           |
+| REQ-CLI-005   | P2       | A02   | Encrypted file fallback storage            |
+| REQ-CLI-007   | P2       | A07   | Device flow polling security               |
+| REQ-CLI-008   | P1       | A07   | Token refresh on CLI invocation            |
+| REQ-CLI-009   | P2       | A01   | Secure CLI logout with token revocation    |
 
 ---
 
 **End of Security Review**
 
 **Next Steps:**
+
 1. Implementation team incorporates all SEC-OAUTH and REQ-CLI controls as acceptance criteria
 2. Security architect reviews implementation before merge (Gate 2 enforcement)
 3. Penetration testing after implementation (Section 7.4 checklist)

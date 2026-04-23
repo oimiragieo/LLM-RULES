@@ -45,13 +45,13 @@
 
 ### Scoring (Limited by Missing Metadata)
 
-| Dimension       | Score | Reasoning                                           |
-| --------------- | ----- | --------------------------------------------------- |
-| Completeness    | 0.60  | Research was completed but evidence is missing      |
-| Accuracy        | 0.50  | Cannot verify accuracy without seeing research data |
-| Clarity         | 0.45  | Summary is vague ("domains synthesized")            |
-| Consistency     | 0.65  | Follows expected orchestrator pattern               |
-| Actionability   | 0.40  | No next steps or deliverable references provided   |
+| Dimension     | Score | Reasoning                                           |
+| ------------- | ----- | --------------------------------------------------- |
+| Completeness  | 0.60  | Research was completed but evidence is missing      |
+| Accuracy      | 0.50  | Cannot verify accuracy without seeing research data |
+| Clarity       | 0.45  | Summary is vague ("domains synthesized")            |
+| Consistency   | 0.65  | Follows expected orchestrator pattern               |
+| Actionability | 0.40  | No next steps or deliverable references provided    |
 
 **Overall Score: 0.52 (WARNING - Below Pass Threshold of 0.7)**
 
@@ -106,13 +106,13 @@ From learnings.md lines 22-39, gotcha `missing-taskupdate-metadata-recurring`:
 
 ### Scoring Task Metadata Governance
 
-| Dimension       | Score | Reasoning                                                    |
-| --------------- | ----- | ------------------------------------------------------------ |
-| Completeness    | 0.30  | Problem identified but solution NOT implemented (>0 days TBD) |
-| Accuracy        | 0.95  | Root cause accurately documented with 12+ evidence cases     |
-| Clarity         | 0.85  | Prevention steps clearly enumerated (4 specific actions)      |
-| Consistency     | 0.50  | Inconsistent enforcement: training docs vs actual behavior   |
-| Actionability   | 0.40  | Recommended hook not implemented; blocker unresolved         |
+| Dimension     | Score | Reasoning                                                     |
+| ------------- | ----- | ------------------------------------------------------------- |
+| Completeness  | 0.30  | Problem identified but solution NOT implemented (>0 days TBD) |
+| Accuracy      | 0.95  | Root cause accurately documented with 12+ evidence cases      |
+| Clarity       | 0.85  | Prevention steps clearly enumerated (4 specific actions)      |
+| Consistency   | 0.50  | Inconsistent enforcement: training docs vs actual behavior    |
+| Actionability | 0.40  | Recommended hook not implemented; blocker unresolved          |
 
 **Overall Score: 0.56 (CRITICAL FAIL — Below Pass Threshold, Requires Action)**
 
@@ -153,6 +153,7 @@ From gotchas.json line 25:
 **Pattern Name**: "Orchestrator Completion Metadata Schema"
 
 **Evidence**: artifact-integrator PowerShell research completion lacked:
+
 - `repositories` (which repos were processed)
 - `domainsFound` (enumerated findings)
 - `outputArtifacts` (research report paths)
@@ -186,11 +187,13 @@ From gotchas.json line 25:
 **Principle**: When a protocol is critical to system health (task metadata for reflection) and training has failed repeatedly, implement runtime enforcement via pre-completion hooks.
 
 **Hook Model**:
+
 ```
 PreToolUse(TaskUpdate) → validate metadata.summary non-empty → if empty, exit 2 (block)
 ```
 
 **Applicability**: Any agent behavior that:
+
 1. Is documented in rules/contracts
 2. Has failed in >5 tasks
 3. Blocking system workflow (reflection stalls)
@@ -297,9 +300,7 @@ The reflection system detects failures but cannot enforce prevention. Hook-based
     "P1: Implement ghost-task deduplication in reflection queue processor",
     "P2: Audit recent orchestrator outputs for metadata completeness"
   ],
-  "blockedBy": [
-    "pre-completion-validation.cjs implementation (P0)"
-  ],
+  "blockedBy": ["pre-completion-validation.cjs implementation (P0)"],
   "processedReflectionIds": [
     "task_completion:2026-02-17T22:45:46.788Z:1",
     "task_completion:2026-02-17T23:13:38.198Z:1"

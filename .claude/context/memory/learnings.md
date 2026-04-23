@@ -72,6 +72,12 @@ Removed 50 orphaned worktree directories. Skipped 9 (reasons: 2 registered+locke
 - Pattern learned: `developer` agent auto-worktrees (~150K context injection); use `general-purpose` for <10 LOC edits to avoid "Prompt too long".
 - Scheduled: Phase 0.6.1 mission-engine runtime wiring; Phase 0.7 module-size refactor candidates (state-mutex, pre-tool-unified.taskupdate, routing-table, routing-guard-core, memory-tiers, spawn-prompt-assembler × 2, prompt-assembler-memory).
 
+## v3.1.0 SA: skill-creator frontmatter block emission — 2026-04-20
+
+- [PATTERN] Skill-creator's `generateSkillContent()` in `create-templates.cjs` now emits an optional `frontmatter:` block (with `triggers`, `token_budget`, commented-out `output_schema_ref` and `requires_skills`) in all newly scaffolded SKILL.md files. This aligns with the `frontmatter` property added to `skill-definition.schema.json` in v3.1.0 SA.
+- [BACKWARD COMPAT] The `frontmatter` property is NOT in `required[]` in the schema — existing skills without it continue to validate normally. No migration needed.
+- [PATTERN] Lightweight YAML parser for test assertions must strip inline `# comments` from values before type coercion. Pattern: `val.replace(/\s+#.*$/, '').trim()` before number/boolean coerce.
+
 ## v2.1.1 Hotfix Reflection — 2026-04-20
 
 - [PATTERN 1 — RELEASE QUALITY] Phase plans that predict future sibling writers but only harden a subset produce next-cycle hotfixes. Phase 0.6 plan explicitly named `_archive/channel-auto-start.cjs` as a candidate writer (alongside the patched `bypass-audit-hook.cjs`) but scoped the fix to the hook only. One-line `..×3` path bug in channel-auto-start caused the nested `.claude/.claude/` regeneration observed in soak-test #1 post-ship. **Rule candidate**: every Phase plan that identifies candidate writers MUST either (a) harden ALL in-scope candidates in that phase, or (b) create a follow-up task BEFORE the phase is declared shipped.

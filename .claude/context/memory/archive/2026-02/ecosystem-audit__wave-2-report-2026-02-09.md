@@ -12,12 +12,14 @@ Created 5 missing output schemas for skills identified in Wave 2 of the EPIC Ski
 ## Schemas Created
 
 ### 1. skill-doc-generator-output.schema.json
+
 - **Purpose**: Validates documentation generation outputs
 - **Key Fields**: documentationType (enum), outputFile, sectionsGenerated
 - **Documentation Types**: api-documentation, developer-guide, architecture-docs, user-manual, openapi-spec
 - **Validation**: Completeness checks for endpoints, examples, and link validation
 
 ### 2. skill-writing-skills-output.schema.json
+
 - **Purpose**: Validates TDD cycle for skill creation
 - **Key Fields**: skillFile, tddCycle (red/green/refactor phases), frontmatterValid
 - **TDD Validation**: Tracks rationalization detection and plugging
@@ -25,12 +27,14 @@ Created 5 missing output schemas for skills identified in Wave 2 of the EPIC Ski
 - **Deployment**: Checklist for testing with subagents and rationalization tables
 
 ### 3. skill-readme-output.schema.json
+
 - **Purpose**: Validates README generation outputs
 - **Key Fields**: readmeFile, sectionsIncluded (minItems: 1)
 - **Sections**: title, description, installation, usage, features, configuration, examples, api-reference, contributing, license
 - **Quality Checks**: Installation instructions, usage examples, contributing guide, license, valid links, syntax-valid code blocks
 
 ### 4. skill-summarize-changes-output.schema.json
+
 - **Purpose**: Validates change summaries
 - **Key Fields**: overview (10-500 chars), changesMade (new/modified/deleted files)
 - **Technical Details**: Key decisions, dependencies added/removed
@@ -38,6 +42,7 @@ Created 5 missing output schemas for skills identified in Wave 2 of the EPIC Ski
 - **Verification**: Unit tests pass, integration tests pass, documentation updated
 
 ### 5. skill-git-expert-output.schema.json
+
 - **Purpose**: Validates git operation outputs
 - **Key Fields**: operationType (enum), commandsExecuted (minItems: 1)
 - **Operation Types**: status-check, commit, branch, merge, rebase, pull, push, reset, restore, stash, log, diff, cherry-pick, tag
@@ -48,6 +53,7 @@ Created 5 missing output schemas for skills identified in Wave 2 of the EPIC Ski
 ## Pattern Followed
 
 All schemas adhere to JSON Schema Draft 2020-12 standard with:
+
 - `$schema`: "https://json-schema.org/draft/2020-12/schema"
 - `$id`: "https://agent-studio.dev/schemas/skill-{name}-output.json"
 - Required `status` enum: success, partial, failed
@@ -59,6 +65,7 @@ All schemas adhere to JSON Schema Draft 2020-12 standard with:
 ## Validation Coverage
 
 Each schema provides comprehensive validation for:
+
 - ✅ Status tracking (success/partial/failed)
 - ✅ Required output fields specific to each skill
 - ✅ Type validation (string, integer, boolean, array, object)
@@ -88,6 +95,7 @@ Each schema provides comprehensive validation for:
 ## Integration
 
 These schemas enable:
+
 - Runtime validation of skill outputs
 - Type-safe skill invocation contracts
 - Automated testing of skill implementations

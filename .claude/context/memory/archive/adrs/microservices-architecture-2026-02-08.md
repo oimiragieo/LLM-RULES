@@ -73,12 +73,12 @@ The API Gateway is the single entry point for all client traffic. It handles cro
 
 **Technology Recommendation:**
 
-| Scenario | Gateway | Rationale |
-|---|---|---|
-| Kubernetes-native | Traefik | Auto-discovers services via labels, minimal configuration |
-| Plugin ecosystem needed | Kong | Rich plugin marketplace (OAuth, rate limiting, transformation) |
-| AWS-native | AWS API Gateway | Integrates with Lambda, IAM, CloudWatch |
-| Service mesh integration | Envoy (as mesh ingress) | Unified data plane for mesh and edge |
+| Scenario                 | Gateway                 | Rationale                                                      |
+| ------------------------ | ----------------------- | -------------------------------------------------------------- |
+| Kubernetes-native        | Traefik                 | Auto-discovers services via labels, minimal configuration      |
+| Plugin ecosystem needed  | Kong                    | Rich plugin marketplace (OAuth, rate limiting, transformation) |
+| AWS-native               | AWS API Gateway         | Integrates with Lambda, IAM, CloudWatch                        |
+| Service mesh integration | Envoy (as mesh ingress) | Unified data plane for mesh and edge                           |
 
 ### 1.4 Service Mesh
 
@@ -86,11 +86,11 @@ A service mesh provides infrastructure-level networking capabilities (mTLS, load
 
 **Adopt a service mesh at 10+ services.** Below 10, application-level libraries (circuit breaker, retry) are simpler and lower overhead.
 
-| Mesh | When to Use | Operational Cost |
-|---|---|---|
-| Linkerd | First mesh; lightweight; simple | Low |
-| Istio | Advanced traffic management; fault injection; traffic mirroring | High |
-| Cilium | eBPF-based; high performance; Linux kernel 5.10+ | Medium |
+| Mesh    | When to Use                                                     | Operational Cost |
+| ------- | --------------------------------------------------------------- | ---------------- |
+| Linkerd | First mesh; lightweight; simple                                 | Low              |
+| Istio   | Advanced traffic management; fault injection; traffic mirroring | High             |
+| Cilium  | eBPF-based; high performance; Linux kernel 5.10+                | Medium           |
 
 **Recommendation:** Start without a mesh. Adopt Linkerd at 10+ services. Consider Istio only if you need advanced traffic management features.
 
@@ -124,47 +124,50 @@ Service boundaries MUST align with bounded contexts, not technical layers. A bou
 
 ### 2.2 Service Decomposition Principles
 
-| Principle | Description | Violation Signal |
-|---|---|---|
-| **Bounded Context Alignment** | Each service maps to exactly one bounded context | A user story requires changes to 3+ services |
-| **Single Data Ownership** | Each service exclusively owns its data | Two services write to the same database table |
-| **Independent Deployability** | No coordinated releases across services | Deploying Service A requires redeploying Service B |
-| **Two-Pizza Team** | Owned by 5-8 people, full-stack | Service requires 15+ contributors |
-| **Design for Failure** | Every inter-service call has circuit breaker + timeout + fallback | A downstream outage cascades to all upstream services |
-| **Rewritable in 2-4 weeks** | Service is small enough to rewrite | Service has 30+ endpoints or 20+ database tables |
+| Principle                     | Description                                                       | Violation Signal                                      |
+| ----------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
+| **Bounded Context Alignment** | Each service maps to exactly one bounded context                  | A user story requires changes to 3+ services          |
+| **Single Data Ownership**     | Each service exclusively owns its data                            | Two services write to the same database table         |
+| **Independent Deployability** | No coordinated releases across services                           | Deploying Service A requires redeploying Service B    |
+| **Two-Pizza Team**            | Owned by 5-8 people, full-stack                                   | Service requires 15+ contributors                     |
+| **Design for Failure**        | Every inter-service call has circuit breaker + timeout + fallback | A downstream outage cascades to all upstream services |
+| **Rewritable in 2-4 weeks**   | Service is small enough to rewrite                                | Service has 30+ endpoints or 20+ database tables      |
 
 ### 2.3 Recommended Initial Service Candidates
 
 **Extraction order is critical.** Start with leaf services (fewest inbound dependencies) and work inward to core domain services.
 
-| Priority | Service | Bounded Context | Rationale for Ordering |
-|---|---|---|---|
-| 1 | **Notification Service** | Notifications | Pure consumer (no inbound deps); fire-and-forget; low risk |
-| 2 | **Audit Service** | Audit & Compliance | Write-only (event consumer); no inbound queries during extraction |
-| 3 | **Search Service** | Discovery | Read-only; CQRS read model; independent index (Elasticsearch) |
-| 4 | **Auth Service** | Identity & Access | Clear boundary; critical but well-understood; enables mTLS rollout |
-| 5 | **User Service** | User Management | Stable domain; many services depend on it (extract early to stabilize API) |
-| 6 | **Order Service** | Order Management | Core domain; complex sagas; team is experienced by this point |
-| 7 | **Payment Service** | Payments & Billing | High compliance; security-sensitive; strong data isolation required |
-| 8 | **Inventory Service** | Inventory & Catalog | Most cross-cutting; extract last when all dependent services have stable APIs |
+| Priority | Service                  | Bounded Context     | Rationale for Ordering                                                        |
+| -------- | ------------------------ | ------------------- | ----------------------------------------------------------------------------- |
+| 1        | **Notification Service** | Notifications       | Pure consumer (no inbound deps); fire-and-forget; low risk                    |
+| 2        | **Audit Service**        | Audit & Compliance  | Write-only (event consumer); no inbound queries during extraction             |
+| 3        | **Search Service**       | Discovery           | Read-only; CQRS read model; independent index (Elasticsearch)                 |
+| 4        | **Auth Service**         | Identity & Access   | Clear boundary; critical but well-understood; enables mTLS rollout            |
+| 5        | **User Service**         | User Management     | Stable domain; many services depend on it (extract early to stabilize API)    |
+| 6        | **Order Service**        | Order Management    | Core domain; complex sagas; team is experienced by this point                 |
+| 7        | **Payment Service**      | Payments & Billing  | High compliance; security-sensitive; strong data isolation required           |
+| 8        | **Inventory Service**    | Inventory & Catalog | Most cross-cutting; extract last when all dependent services have stable APIs |
 
 **Anti-pattern: Extracting the core domain first.** Teams that start with Orders or Payments before simpler services face maximum complexity with zero migration experience.
 
 ### 2.4 Service Sizing Guidelines
 
 **Too Coarse (Distributed Monolith):**
+
 - 10+ database tables
 - 20+ API endpoints
 - 5+ teams contributing
 - Requires coordinated deployments
 
 **Too Fine (Nano-Service):**
+
 - 1-2 API endpoints
 - Less than 500 LOC
 - Called synchronously by only one service
 - More services than developers
 
 **Right-Sized:**
+
 - 3-15 API endpoints
 - 3-8 database tables
 - Owned by 1 team (5-8 people)
@@ -242,15 +245,15 @@ http://<service-name>.<namespace>.svc.cluster.local:<port>
 
 **Versioning Discipline:**
 
-| Change Type | Version Impact | Example |
-|---|---|---|
-| Adding a field to response | None (backward compatible) | Add `middleName` to User |
-| Adding an optional request field | None (backward compatible) | Add optional `note` to Order |
-| Removing a field | BREAKING (new version) | Remove `legacyId` from User |
-| Renaming a field | BREAKING (new version) | Rename `name` to `fullName` |
-| Changing field type | BREAKING (new version) | Change `price` from string to number |
-| Adding a new endpoint | None (backward compatible) | Add `GET /users/{id}/preferences` |
-| Removing an endpoint | BREAKING (new version) | Remove `GET /users/{id}/legacy` |
+| Change Type                      | Version Impact             | Example                              |
+| -------------------------------- | -------------------------- | ------------------------------------ |
+| Adding a field to response       | None (backward compatible) | Add `middleName` to User             |
+| Adding an optional request field | None (backward compatible) | Add optional `note` to Order         |
+| Removing a field                 | BREAKING (new version)     | Remove `legacyId` from User          |
+| Renaming a field                 | BREAKING (new version)     | Rename `name` to `fullName`          |
+| Changing field type              | BREAKING (new version)     | Change `price` from string to number |
+| Adding a new endpoint            | None (backward compatible) | Add `GET /users/{id}/preferences`    |
+| Removing an endpoint             | BREAKING (new version)     | Remove `GET /users/{id}/legacy`      |
 
 ---
 
@@ -268,16 +271,16 @@ Each service MUST own its database exclusively. No other service may read from o
 
 **Technology selection per service:**
 
-| Service | Database | Rationale |
-|---|---|---|
-| Auth Service | PostgreSQL | Transactional, relational (users, roles, permissions) |
-| User Service | PostgreSQL | Transactional, relational (profiles, preferences) |
-| Order Service | PostgreSQL | ACID transactions for order lifecycle |
-| Payment Service | PostgreSQL | Strong consistency required for financial data |
-| Inventory Service | PostgreSQL | Transactional (stock levels, reservations) |
-| Notification Service | Redis + PostgreSQL | Redis for queue/rate limiting; PostgreSQL for templates/history |
-| Search Service | Elasticsearch | Full-text search, faceted queries, relevance scoring |
-| Audit Service | PostgreSQL (append-only) | Immutable event log; optional Event Sourcing |
+| Service              | Database                 | Rationale                                                       |
+| -------------------- | ------------------------ | --------------------------------------------------------------- |
+| Auth Service         | PostgreSQL               | Transactional, relational (users, roles, permissions)           |
+| User Service         | PostgreSQL               | Transactional, relational (profiles, preferences)               |
+| Order Service        | PostgreSQL               | ACID transactions for order lifecycle                           |
+| Payment Service      | PostgreSQL               | Strong consistency required for financial data                  |
+| Inventory Service    | PostgreSQL               | Transactional (stock levels, reservations)                      |
+| Notification Service | Redis + PostgreSQL       | Redis for queue/rate limiting; PostgreSQL for templates/history |
+| Search Service       | Elasticsearch            | Full-text search, faceted queries, relevance scoring            |
+| Audit Service        | PostgreSQL (append-only) | Immutable event log; optional Event Sourcing                    |
 
 **Default: PostgreSQL for everything.** It supports JSON, full-text search, and time-series extensions, covering 90% of use cases. Polyglot persistence is a feature, not a goal -- add specialized databases only when PostgreSQL demonstrably cannot meet requirements.
 
@@ -295,12 +298,12 @@ Each service listens for events and reacts independently. No central coordinator
 
 **Compensating Transactions:**
 
-| Forward Action | Compensating Action |
-|---|---|
-| CreateOrder | CancelOrder |
-| ProcessPayment | RefundPayment |
-| ReserveStock | ReleaseStock |
-| SendConfirmation | SendCancellation |
+| Forward Action   | Compensating Action |
+| ---------------- | ------------------- |
+| CreateOrder      | CancelOrder         |
+| ProcessPayment   | RefundPayment       |
+| ReserveStock     | ReleaseStock        |
+| SendConfirmation | SendCancellation    |
 
 **Critical: Never split a transaction boundary across services until you have a saga implementation ready.**
 
@@ -351,12 +354,12 @@ Read Path:  Client --> API --> Query Handler --> Read DB (denormalized, fast)
 
 **Services where CQRS applies:**
 
-| Service | CQRS? | Rationale |
-|---|---|---|
-| Search Service | YES | Read-only materialized view from multiple sources |
-| Order Service | MAYBE | If order history queries are heavy; write model is complex |
-| User Service | NO | Simple CRUD; read/write models are nearly identical |
-| Notification Service | NO | Primarily write (send); few read queries |
+| Service              | CQRS? | Rationale                                                  |
+| -------------------- | ----- | ---------------------------------------------------------- |
+| Search Service       | YES   | Read-only materialized view from multiple sources          |
+| Order Service        | MAYBE | If order history queries are heavy; write model is complex |
+| User Service         | NO    | Simple CRUD; read/write models are nearly identical        |
+| Notification Service | NO    | Primarily write (send); few read queries                   |
 
 ### 4.5 Data Migration Strategy
 
@@ -372,13 +375,13 @@ Database decomposition proceeds in four stages. Never skip stages.
 
 **Data Migration Risks and Mitigations:**
 
-| Risk | Mitigation |
-|---|---|
-| Data loss | Dual-write + reconciliation; never delete source until 2+ weeks stable |
-| Data inconsistency | CDC (Debezium) for replication; daily reconciliation jobs |
-| Foreign key violations | Migrate in dependency order; use soft references (IDs) across services |
+| Risk                    | Mitigation                                                              |
+| ----------------------- | ----------------------------------------------------------------------- |
+| Data loss               | Dual-write + reconciliation; never delete source until 2+ weeks stable  |
+| Data inconsistency      | CDC (Debezium) for replication; daily reconciliation jobs               |
+| Foreign key violations  | Migrate in dependency order; use soft references (IDs) across services  |
 | Performance degradation | Migrate during low-traffic windows; batch processing with rate limiting |
-| Migration failure | Resumable migrations with checkpoints; process in batches of 1000 rows |
+| Migration failure       | Resumable migrations with checkpoints; process in batches of 1000 rows  |
 
 ---
 
@@ -419,17 +422,20 @@ Kubernetes is the default choice. It provides service discovery (DNS), rolling d
 ### 5.3 API Gateway (Traefik or Kong)
 
 **Traefik** for Kubernetes-native deployments:
+
 - Auto-discovers services via Kubernetes annotations
 - Automatic TLS certificate management (Let's Encrypt)
 - Middleware chains (rate limiting, auth, compression, retry)
 - Dashboard for real-time traffic visualization
 
 **Kong** when plugin ecosystem matters:
+
 - 100+ plugins (OAuth, rate limiting, request transformation, logging)
 - Admin API for dynamic configuration
 - Database-backed (PostgreSQL) or DB-less (declarative YAML)
 
 **API Gateway responsibilities:**
+
 1. TLS termination
 2. Authentication (JWT validation)
 3. Rate limiting (per-client, per-route)
@@ -443,6 +449,7 @@ Kubernetes is the default choice. It provides service discovery (DNS), rolling d
 Kafka is the recommended message broker for event-driven microservices.
 
 **Kafka cluster sizing:**
+
 - **Development:** 1 broker, 1 partition per topic
 - **Staging:** 3 brokers, 3 partitions per topic, replication factor 2
 - **Production:** 3+ brokers, 6-12 partitions per topic, replication factor 3
@@ -454,6 +461,7 @@ Kafka is the recommended message broker for event-driven microservices.
 **Schema Registry:** Use Confluent Schema Registry (or Apicurio) with Avro or Protobuf schemas. Enforce backward compatibility to prevent breaking consumers.
 
 **When to use RabbitMQ instead:**
+
 - Task queues (work distribution, not event streaming)
 - Request/reply patterns
 - Complex routing (topic exchanges, header-based routing)
@@ -463,12 +471,12 @@ Kafka is the recommended message broker for event-driven microservices.
 
 **The Four Pillars:**
 
-| Pillar | Tool | Purpose |
-|---|---|---|
-| **Traces** | Jaeger or Grafana Tempo | Trace requests across service boundaries |
-| **Logs** | Loki (Grafana stack) | Centralized log aggregation, correlated by trace ID |
-| **Metrics** | Prometheus + Grafana | RED metrics (Rate, Errors, Duration) per service |
-| **Alerts** | Alertmanager + PagerDuty | SLO-based alerting (error budget burn rate) |
+| Pillar      | Tool                     | Purpose                                             |
+| ----------- | ------------------------ | --------------------------------------------------- |
+| **Traces**  | Jaeger or Grafana Tempo  | Trace requests across service boundaries            |
+| **Logs**    | Loki (Grafana stack)     | Centralized log aggregation, correlated by trace ID |
+| **Metrics** | Prometheus + Grafana     | RED metrics (Rate, Errors, Duration) per service    |
+| **Alerts**  | Alertmanager + PagerDuty | SLO-based alerting (error budget burn rate)         |
 
 **Collection:** OpenTelemetry SDK in every service, sending to a central OTel Collector.
 
@@ -482,6 +490,7 @@ Kafka is the recommended message broker for event-driven microservices.
 **SLO-based alerting (not threshold-based):**
 
 Define SLOs:
+
 - "99.9% of requests complete within 500ms" (latency)
 - "99.95% of requests return non-5xx responses" (availability)
 
@@ -493,14 +502,14 @@ Each service gets its own independent pipeline. This is non-negotiable for indep
 
 **Pipeline stages:**
 
-| Stage | Tools | Duration |
-|---|---|---|
-| Build + Unit Test | Language-specific (go build, npm test, mvn test) | 1-3 min |
-| Integration Test | Testcontainers + docker-compose | 2-5 min |
-| Security Scan | Trivy (containers), Snyk (deps), Semgrep (SAST) | 1-3 min |
-| Container Build | Docker multi-stage builds | 1-2 min |
-| Deploy Staging | Helm/Kustomize + ArgoCD | 1-2 min |
-| E2E Smoke | Critical path tests | 2-5 min |
+| Stage             | Tools                                                            | Duration  |
+| ----------------- | ---------------------------------------------------------------- | --------- |
+| Build + Unit Test | Language-specific (go build, npm test, mvn test)                 | 1-3 min   |
+| Integration Test  | Testcontainers + docker-compose                                  | 2-5 min   |
+| Security Scan     | Trivy (containers), Snyk (deps), Semgrep (SAST)                  | 1-3 min   |
+| Container Build   | Docker multi-stage builds                                        | 1-2 min   |
+| Deploy Staging    | Helm/Kustomize + ArgoCD                                          | 1-2 min   |
+| E2E Smoke         | Critical path tests                                              | 2-5 min   |
 | Production Deploy | ArgoCD progressive delivery (canary 5% --> 25% --> 50% --> 100%) | 10-30 min |
 
 **Targets:** Under 15 minutes to staging. Under 45 minutes to full production rollout.
@@ -521,12 +530,14 @@ Each service gets its own independent pipeline. This is non-negotiable for indep
 **Decision:** Use the Strangler Fig pattern for incremental service extraction. Route traffic through an API Gateway that directs requests to either the monolith or extracted services based on URL path.
 
 **Rationale:**
+
 - Incremental value delivery (each service is independently deployable)
 - Per-service rollback (route traffic back to monolith)
 - No feature freeze required
 - Risk contained to individual service extractions
 
 **Consequences:**
+
 - Migration takes 12-24 months (longer than Big Bang)
 - API Gateway becomes a critical path component
 - Temporary complexity of running monolith + services simultaneously
@@ -542,12 +553,14 @@ Each service gets its own independent pipeline. This is non-negotiable for indep
 **Decision:** Use Apache Kafka as the primary event streaming platform. Use CloudEvents specification for event schema. Use Transactional Outbox pattern for atomic database write + event publish.
 
 **Rationale:**
+
 - Kafka provides durable, replayable, ordered event streams
 - CloudEvents is a CNCF standard with broad ecosystem support
 - Transactional Outbox prevents split-brain (DB written but event lost, or vice versa)
 - Kafka Streams / ksqlDB enable stream processing without additional infrastructure
 
 **Consequences:**
+
 - Operational complexity of running Kafka (3+ brokers, ZooKeeper or KRaft)
 - Team must learn event-driven patterns and eventual consistency
 - Schema Registry required for event schema evolution
@@ -563,12 +576,14 @@ Each service gets its own independent pipeline. This is non-negotiable for indep
 **Decision:** Each service owns its own PostgreSQL database. Polyglot persistence (Elasticsearch for Search, Redis for caching) is permitted only when PostgreSQL demonstrably cannot meet requirements.
 
 **Rationale:**
+
 - PostgreSQL covers 90% of use cases (relational, JSON, full-text search, time-series)
 - Single database technology reduces operational burden
 - Database-per-service enforces data ownership
 - Polyglot persistence adds operational complexity per additional technology
 
 **Consequences:**
+
 - No cross-service database JOINs (use API calls or events)
 - Distributed transactions replaced by Saga pattern
 - Data duplication across services (read models)
@@ -584,12 +599,14 @@ Each service gets its own independent pipeline. This is non-negotiable for indep
 **Decision:** Use Orchestration Sagas for workflows with 5+ steps (e.g., order placement). Use Choreography Sagas for simple workflows with 2-4 steps (e.g., notification chains).
 
 **Rationale:**
+
 - Orchestration provides centralized visibility and control for complex workflows
 - Orchestrator can be implemented as a state machine (testable, debuggable)
 - Choreography is simpler for small workflows but becomes unmanageable at scale
 - Compensating transactions handle partial failures gracefully
 
 **Consequences:**
+
 - Orchestrator service is a single point of failure (mitigate with HA deployment)
 - Must define compensating transactions for every forward action
 - Eventually consistent (not ACID) -- business must accept this
@@ -605,12 +622,14 @@ Each service gets its own independent pipeline. This is non-negotiable for indep
 **Decision:** Use Kubernetes for container orchestration. Adopt Linkerd as the service mesh when the service count reaches 10+. Use application-level resilience libraries (circuit breakers, retries) for the first 5-10 services.
 
 **Rationale:**
+
 - Kubernetes is the industry standard with the widest ecosystem
 - Linkerd is the lightest service mesh (smallest resource footprint)
 - Application-level libraries are simpler for small service counts
 - Linkerd provides automatic mTLS, golden metrics, and traffic splitting
 
 **Consequences:**
+
 - Kubernetes operational complexity (cluster management, upgrades)
 - Linkerd adds ~10-20MB memory per pod (sidecar proxy)
 - Team must learn Kubernetes concepts (Deployments, Services, HPA, PDB)
@@ -626,12 +645,14 @@ Each service gets its own independent pipeline. This is non-negotiable for indep
 **Decision:** Apply CQRS (separate read/write models) where read:write ratio exceeds 10:1. Do NOT adopt Event Sourcing unless a specific business requirement demands it (audit trail, temporal queries, regulatory compliance).
 
 **Rationale:**
+
 - CQRS without Event Sourcing provides 80% of the benefit with 20% of the complexity
 - Event Sourcing adds event versioning, snapshots, and projection rebuild complexity
 - Most services do not need temporal queries or event replay
 - CQRS enables independent scaling of read and write paths
 
 **Consequences:**
+
 - Eventual consistency between write and read models (acceptable for most use cases)
 - Read model materialization via event consumers
 - Must monitor and alert on read model lag
@@ -934,4 +955,4 @@ graph TB
 
 ---
 
-*This document is a living architecture reference. Update it as migration progresses and patterns are validated against production reality.*
+_This document is a living architecture reference. Update it as migration progresses and patterns are validated against production reality._

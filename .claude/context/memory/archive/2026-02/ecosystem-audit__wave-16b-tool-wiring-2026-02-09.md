@@ -5,6 +5,7 @@
 ## Summary
 
 Successfully wired 3 CLI tools to package.json scripts for developer discoverability:
+
 - `detect:orphans` → `.claude/tools/_archive/detect-orphans.mjs`
 - `verify:git-notes` → `.claude/tools/cli/git-notes-verify.cjs`
 - `assess:ecosystem` → `.claude/tools/analysis/ecosystem-assessor/assess-ecosystem.mjs`
@@ -14,18 +15,21 @@ Successfully wired 3 CLI tools to package.json scripts for developer discoverabi
 ### 1. Tool Verification
 
 #### detect-orphans.mjs
+
 - **Location**: `.claude/tools/_archive/detect-orphans.mjs` (archived tools)
 - **Status**: Verified exists
 - **Description**: Detects skills that are not assigned to any agent
 - **Entry**: ES Module with shebang
 
 #### git-notes-verify.cjs
+
 - **Location**: `.claude/tools/cli/git-notes-verify.cjs`
 - **Status**: Verified exists
 - **Description**: Verify and report on git notes audit trail
 - **Entry**: CommonJS with shebang
 
 #### ecosystem-assessor
+
 - **Location**: `.claude/tools/analysis/ecosystem-assessor/assess-ecosystem.mjs`
 - **Status**: Verified exists
 - **Description**: Ecosystem assessor - main orchestrator for ecosystem analysis
@@ -44,6 +48,7 @@ Added 3 new scripts to package.json (lines 100-102):
 ### 3. Developer Discoverability
 
 Scripts can now be run via:
+
 ```bash
 pnpm detect:orphans      # Find unassigned skills
 pnpm verify:git-notes    # Check git notes audit trail

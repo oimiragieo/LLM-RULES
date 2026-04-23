@@ -26,6 +26,7 @@
 ### What Was Done
 
 **File 1: `.claude/workflows/core/router-decision.md`** — Added Step 5.5: Context-Pressure Check (MANDATORY):
+
 - Threshold: 80% context window utilization triggers compression
 - Action sequence: spawn context-compressor (haiku, background) → wait → then spawn specialist
 - Log compression event to `.claude/context/runtime/compression-log.jsonl`
@@ -33,6 +34,7 @@
 - Skip condition: compression-reminder.txt already exists + compression triggered in last 3 steps
 
 **File 2: `.claude/workflows/core/reflection-workflow.md`** — Added Phase 5.6: Anomaly Detection Gate (Pre-Analysis):
+
 - 4 anomaly signals: HIGH/EPIC task in <5 seconds, 0 file modifications, generic-only summary, 0–1 tool calls for 5+ expected
 - When anomaly detected: set confidence LOW, log to issues.md with "Hallucinated Completion Suspected" header, add ANOMALY DETECTED banner to report
 - Cross-reference against historical baselines in learnings.md
@@ -40,13 +42,13 @@
 
 ### Rubric Scoring (Task 24)
 
-| Dimension | Score | Notes |
-|---|---|---|
-| Completeness | 0.90 | Step 5.5 covers threshold, action, logging, heuristic, and skip condition. Phase 5.6 covers all 4 anomaly signals, when-detected steps, and baseline reference. |
-| Accuracy | 0.92 | Content verified against actual file state. Compression heuristic (40 exchanges / 50k tokens) is reasonable. |
-| Clarity | 0.88 | Well-structured with numbered steps. Skip condition could use more detail on "last 3 steps" boundary. |
-| Consistency | 0.87 | Both additions follow existing workflow format (numbered steps, bold headers). Skip condition wording is slightly ambiguous. |
-| Actionability | 0.90 | Step 5.5: Router can directly implement heuristic. Phase 5.6: 4 concrete signals with clear outcome mapping. |
+| Dimension     | Score | Notes                                                                                                                                                           |
+| ------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.90  | Step 5.5 covers threshold, action, logging, heuristic, and skip condition. Phase 5.6 covers all 4 anomaly signals, when-detected steps, and baseline reference. |
+| Accuracy      | 0.92  | Content verified against actual file state. Compression heuristic (40 exchanges / 50k tokens) is reasonable.                                                    |
+| Clarity       | 0.88  | Well-structured with numbered steps. Skip condition could use more detail on "last 3 steps" boundary.                                                           |
+| Consistency   | 0.87  | Both additions follow existing workflow format (numbered steps, bold headers). Skip condition wording is slightly ambiguous.                                    |
+| Actionability | 0.90  | Step 5.5: Router can directly implement heuristic. Phase 5.6: 4 concrete signals with clear outcome mapping.                                                    |
 
 **Overall Score (Task 24)**: 0.90 (EXCELLENT)
 
@@ -59,6 +61,7 @@
 ### What Was Done
 
 **File 1: `.claude/workflows/core/ecosystem-creation-workflow.md`** — Added SEC-ICE-002: Auto-Spawn Amplification Limits:
+
 - Problem statement: local variable depth counters break across distributed agent nodes
 - Solution: distributed trace context header (`spawnDepth` + `traceId`) in TaskUpdate metadata
 - 5-step protocol: root sets depth=0 + traceId, each spawn reads/increments/propagates
@@ -67,6 +70,7 @@
 - Why-over-local-variable section with 4 rationale points
 
 **File 2: `.claude/workflows/core/post-creation-validation.md`** — Added Item 7 (Addition): Dependency Vulnerability Scan:
+
 - Trigger: any artifact that imports/requires external libraries
 - Commands provided for npm (pnpm audit), Python (pip audit), Rust (cargo audit)
 - Block condition: HIGH or CRITICAL CVEs block completion
@@ -76,13 +80,13 @@
 
 ### Rubric Scoring (Task 25)
 
-| Dimension | Score | Notes |
-|---|---|---|
-| Completeness | 0.93 | SEC-ICE-002 covers problem, solution, full protocol, hard limit, enforcement, trace format, and rationale. Item 7 Addition covers trigger, commands, block condition, pass conditions, exception, and logging. |
-| Accuracy | 0.94 | Distributed trace header pattern is architecturally sound. pnpm/pip/cargo audit commands are correct. CVE severity thresholds (high/critical) are standard CVSS mapping. |
-| Clarity | 0.92 | SEC-ICE-002 has excellent "why distributed header > local variable" comparison section. Item 7 Addition is well-structured with clear trigger and block/pass conditions. |
-| Consistency | 0.90 | Trace log format JSON sample provided. Follows existing security controls pattern (SEC-ICE-001). Item 7 Addition follows existing Item N format. |
-| Actionability | 0.93 | Protocol is step-by-step and immediately implementable. Enforcement hook reference concrete (routing-guard.cjs + TaskGet). pnpm audit command ready to run. |
+| Dimension     | Score | Notes                                                                                                                                                                                                          |
+| ------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.93  | SEC-ICE-002 covers problem, solution, full protocol, hard limit, enforcement, trace format, and rationale. Item 7 Addition covers trigger, commands, block condition, pass conditions, exception, and logging. |
+| Accuracy      | 0.94  | Distributed trace header pattern is architecturally sound. pnpm/pip/cargo audit commands are correct. CVE severity thresholds (high/critical) are standard CVSS mapping.                                       |
+| Clarity       | 0.92  | SEC-ICE-002 has excellent "why distributed header > local variable" comparison section. Item 7 Addition is well-structured with clear trigger and block/pass conditions.                                       |
+| Consistency   | 0.90  | Trace log format JSON sample provided. Follows existing security controls pattern (SEC-ICE-001). Item 7 Addition follows existing Item N format.                                                               |
+| Actionability | 0.93  | Protocol is step-by-step and immediately implementable. Enforcement hook reference concrete (routing-guard.cjs + TaskGet). pnpm audit command ready to run.                                                    |
 
 **Overall Score (Task 25)**: 0.92 (EXCELLENT)
 
@@ -125,12 +129,14 @@
 **Integration Score**: ~78% (bud category)
 
 **Assessment**:
+
 - All 4 files are core workflow documents already wired into CLAUDE.md references and agent routing
 - No new artifacts requiring catalog/registry entry
 - SEC-ICE-002 references `routing-guard.cjs` enforcement — this enforcement path should be verified to exist
 - Step 5.5 references `compression-log.jsonl` as a new log file — no entry in tool-catalog.md or artifact-graph.json
 
 **Integration Gaps**:
+
 - [ ] Verify `routing-guard.cjs` contains spawnDepth enforcement logic (Task 25 SEC-ICE-002)
 - [ ] Add `compression-log.jsonl` to relevant catalog if new runtime artifact
 - [ ] No agent registry updates required (existing agents, existing workflows)
@@ -146,6 +152,7 @@
 **Key insight**: Local variable counters break across distributed agent nodes because each new agent context starts fresh. TaskUpdate metadata + TaskGet creates a persistent shared state layer that survives context resets and agent boundaries.
 
 **Implementation template**:
+
 1. Root sets: `{ stateKey: initialValue, traceId: uuid }` in TaskUpdate
 2. Each child: reads parent TaskGet → checks constraint → increments → propagates to grandchildren
 3. Enforcement hook: reads parent metadata via TaskGet before allowing Tool call
@@ -170,13 +177,13 @@
 
 ## Memory Curation Decisions
 
-| Item | Decision | Score | Rationale |
-|---|---|---|---|
-| Distributed trace context pattern | **Retain** | 0.9 | High reuse value — applicable to any multi-agent depth/quota enforcement; novel distributed systems insight |
-| Multi-condition pass gates | **Retain** | 0.85 | Reusable for future security gate design; prevents over-blocking pattern |
-| Anomaly detection as confidence modifier | **Retain** | 0.85 | Generalizable to other quality gate design decisions |
-| Step 5.5 skip condition ambiguity | **Retain as gotcha** | 0.8 | Actionable for future workflow documentation |
-| 14th+ missing-TaskUpdate occurrence | **Retain (escalate)** | 1.0 | P0 systemic issue, high reuse, critical for session continuity |
+| Item                                     | Decision              | Score | Rationale                                                                                                   |
+| ---------------------------------------- | --------------------- | ----- | ----------------------------------------------------------------------------------------------------------- |
+| Distributed trace context pattern        | **Retain**            | 0.9   | High reuse value — applicable to any multi-agent depth/quota enforcement; novel distributed systems insight |
+| Multi-condition pass gates               | **Retain**            | 0.85  | Reusable for future security gate design; prevents over-blocking pattern                                    |
+| Anomaly detection as confidence modifier | **Retain**            | 0.85  | Generalizable to other quality gate design decisions                                                        |
+| Step 5.5 skip condition ambiguity        | **Retain as gotcha**  | 0.8   | Actionable for future workflow documentation                                                                |
+| 14th+ missing-TaskUpdate occurrence      | **Retain (escalate)** | 1.0   | P0 systemic issue, high reuse, critical for session continuity                                              |
 
 ---
 

@@ -74,6 +74,14 @@ ELEVENLABS_API_KEY=<key>      # or OPENAI_API_KEY for fallback
 
 Full docs: `.claude/docs/TELEGRAM_ARCHITECTURE.md`
 
+## Memory Marketplace Platform (v3.2.0)
+
+Agent Studio v3.2.0 ships two tightly integrated capabilities: structured memory provenance and verified skill distribution.
+
+**CAT7 Memory** extends the STM/MTM/LTM memory tiers with a 7-field schema that records `concept`, `attributes`, `temporality`, `provenance`, `confidence`, `lineage`, and `embedding_refs` on every record. The `cat7-writer.cjs` routes records automatically to the correct tier based on `temporality`. The MMP CLI (`pnpm mmp:lineage`, `pnpm mmp:descendants`) lets you walk and inspect the full derivation graph of any memory record, so agents can audit where a belief came from and which downstream records it influenced.
+
+**Skill Marketplace** provides a verified distribution channel for skill packages. Packages are signed with HMAC-SHA256 and scored on a 4-tier trust ladder before installation. Path-traversal guards and a minimum-key-length policy prevent supply-chain abuse. Install a package with `pnpm skill:install <package>` — the installer verifies the signature, checks the trust score against `SKILL_MARKETPLACE_MIN_TRUST`, and unpacks only to the allowed skills directory.
+
 ## Observability & Cost Control (v2.4.0)
 
 Agent Studio v2.4.0 is the "production-grade" release. It addresses the two most-reported community pain points: opaque agent execution and unpredictable API spend.
@@ -536,6 +544,14 @@ pnpm agents:registry
 pnpm skills:index
 pnpm manifest:generate
 pnpm routing:prototypes
+```
+
+3. Memory lineage and Skill Marketplace (v3.2.0):
+
+```bash
+pnpm mmp:lineage <record-id>      # walk ancestry chain for a CAT7 memory record
+pnpm mmp:descendants <record-id>  # list all downstream records
+pnpm skill:install <package>      # install a verified skill package from the marketplace
 ```
 
 2. Track memory and operational health:

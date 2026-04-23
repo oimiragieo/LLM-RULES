@@ -22,6 +22,7 @@ The hybrid search integration has been successfully validated. All agent skill a
 **Command**: `node --test --test-concurrency=1 tests/code-indexing/*.test.cjs`
 
 **Results**:
+
 - **Total tests**: 294
 - **Suites**: 92
 - **Passed**: 293
@@ -47,15 +48,18 @@ Error: MD5 hash should be 32 characters (expected: 32, actual: 64)
 Verified 6 agents across all 3 tiers:
 
 #### Tier 3: All 3 Search Skills ✅
+
 - **python-pro**: ripgrep ✅, code-semantic-search ✅, code-structural-search ✅
 - **ios-pro**: ripgrep ✅, code-semantic-search ✅, code-structural-search ✅
 - **data-engineer**: ripgrep ✅, code-semantic-search ✅, code-structural-search ✅
 
 #### Tier 2: ripgrep + code-semantic-search ✅
+
 - **planner**: ripgrep ✅, code-semantic-search ✅
 - **devops**: ripgrep ✅, code-semantic-search ✅
 
 #### Tier 1: ripgrep Only ✅
+
 - **master-orchestrator**: ripgrep ✅
 
 **Finding**: All 6 sampled agents have correct skill assignments matching their tier.
@@ -73,6 +77,7 @@ Verified 6 agents across all 3 tiers:
 **File**: `.claude/context/artifacts/catalogs/skill-catalog.md`
 
 **Findings**:
+
 - **ripgrep**: Assigned to "36+ agents (all domain agents)" ✅
 - **code-semantic-search**: Assigned to "36+ agents (all domain agents)" ✅
 - **code-structural-search**: Assigned to "36+ agents (all domain agents)" ✅
@@ -84,6 +89,7 @@ Verified 6 agents across all 3 tiers:
 ### Step 5: Quality Gates (BLOCKING) ✅ PASSED
 
 #### Lint Gate ✅
+
 **Command**: `pnpm lint:fix`
 
 **Result**: Exit code 0, no errors, no changes produced.
@@ -91,9 +97,11 @@ Verified 6 agents across all 3 tiers:
 **Status**: PASSED
 
 #### Format Gate ✅
+
 **Command**: `pnpm format`
 
 **Result**:
+
 - Checked 2,838 tracked files
 - All files "unchanged"
 - No formatting changes produced
@@ -105,6 +113,7 @@ Verified 6 agents across all 3 tiers:
 **Command**: `pnpm search:code "safeParseJSON"`
 
 **Result**:
+
 - **Query**: "safeParseJSON"
 - **Results**: 3 matches found
 - **Performance**: 532ms (hybrid: 2 text + 50 semantic = 3 fused)
@@ -114,6 +123,7 @@ Verified 6 agents across all 3 tiers:
   - `tests/lib/utils/safe-json.test.cjs`
 
 **Verification**:
+
 - Hybrid search is operational ✅
 - Results include both text (ripgrep) and semantic matches ✅
 - Performance is acceptable (<1s) ✅
@@ -122,6 +132,7 @@ Verified 6 agents across all 3 tiers:
 ## Test Coverage Analysis
 
 ### Code Indexing Tests
+
 - **Total test suites**: 21 (for code-indexing)
 - **Test categories**:
   - AST grep integration ✅
@@ -137,21 +148,25 @@ Verified 6 agents across all 3 tiers:
   - Vector store (LanceDB) ✅
 
 ### Coverage Gaps
+
 None identified. All major hybrid search components have test coverage.
 
 ## Integration Verification
 
 ### Agent-Skill Wiring ✅
+
 - 36+ agents assigned search skills
 - Skill assignments match tier requirements
 - No missing skill assignments in sampled agents
 
 ### Catalog Consistency ✅
+
 - Skill catalog reflects correct agent counts
 - Search category lists all 3 skills
 - Agent assignments documented accurately
 
 ### Documentation ✅
+
 - Search-First Protocol section present in developer agent
 - Skill catalog updated with 36+ agent assignments
 - Integration plan requirements met
@@ -159,6 +174,7 @@ None identified. All major hybrid search components have test coverage.
 ## Performance Metrics
 
 ### Hybrid Search Performance
+
 - **Query time**: 532ms for "safeParseJSON"
 - **Text search**: 2 results (ripgrep)
 - **Semantic search**: 50 results (embeddings)
@@ -166,6 +182,7 @@ None identified. All major hybrid search components have test coverage.
 - **Performance target**: <1s ✅
 
 ### Test Suite Performance
+
 - **Duration**: 71,811ms (~1.2 minutes)
 - **Tests per second**: ~4.1
 - **Acceptable**: Yes for comprehensive integration tests
@@ -194,6 +211,7 @@ None identified. All major hybrid search components have test coverage.
 **Fix**: Update test assertion to expect 64 characters and rename test
 
 **Recommended change**:
+
 ```javascript
 // Before
 test('getCacheKey generates MD5 hash', () => {
@@ -211,6 +229,7 @@ test('getCacheKey generates SHA-256 hash', () => {
 ## Recommendations
 
 ### Immediate Actions
+
 1. ✅ COMPLETED: Verify agent skill assignments (6 agents sampled)
 2. ✅ COMPLETED: Verify search-first protocol documentation
 3. ✅ COMPLETED: Verify skill catalog updates
@@ -218,11 +237,13 @@ test('getCacheKey generates SHA-256 hash', () => {
 5. ✅ COMPLETED: Verify hybrid search functionality
 
 ### Follow-Up Actions
+
 1. **Update test assertion** in `embedding-generator.test.cjs` to expect SHA-256 (64 chars)
 2. **Re-run test suite** after test update to verify 294/294 passing
 3. **Document** SHA-256 cache key change in memory learnings
 
 ### Optional Enhancements
+
 1. Add performance benchmarks for hybrid search (track query times over time)
 2. Add integration test for agent skill usage (verify agents can invoke search skills)
 3. Consider adding E2E test for search-first protocol workflow
@@ -244,6 +265,7 @@ The hybrid search integration is **production-ready** with one minor test update
 ## Appendix: Evidence
 
 ### A. Test Execution Output
+
 ```
 TAP version 13
 # tests 294
@@ -254,6 +276,7 @@ TAP version 13
 ```
 
 ### B. Failing Test Details
+
 ```
 not ok - getCacheKey generates MD5 hash
 Error: MD5 hash should be 32 characters
@@ -263,6 +286,7 @@ Error: MD5 hash should be 32 characters
 ```
 
 ### C. Hybrid Search Query Output
+
 ```
 🔍 Searching: "safeParseJSON"
 [hybrid-search] "safeParseJSON..." - 2 text + 50 semantic = 3 fused (530ms)
@@ -273,6 +297,7 @@ Found 3 results in 532ms
 ```
 
 ### D. Quality Gate Results
+
 ```bash
 # Lint
 > pnpm lint:fix

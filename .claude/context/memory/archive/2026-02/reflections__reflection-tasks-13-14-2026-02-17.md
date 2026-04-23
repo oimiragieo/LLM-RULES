@@ -10,11 +10,11 @@
 **Output Type:** code_output
 **Agent:** developer (inferred from task context)
 
-| Task | Score | Threshold |
-|------|-------|-----------|
-| #13 (Phase 1) | 0.7925 | PASS |
-| #14 (Phase 2) | 0.8025 | PASS |
-| Combined Average | 0.7975 | PASS |
+| Task             | Score  | Threshold |
+| ---------------- | ------ | --------- |
+| #13 (Phase 1)    | 0.7925 | PASS      |
+| #14 (Phase 2)    | 0.8025 | PASS      |
+| Combined Average | 0.7975 | PASS      |
 
 ---
 
@@ -24,16 +24,17 @@ Using `code_output` weights: completeness 0.20, accuracy 0.35, clarity 0.15, con
 
 ### Task #13 — Memory Chain Flattening Phase 1
 
-| Dimension | Score | Weight | Weighted |
-|-----------|-------|--------|---------|
-| Completeness | 0.75 | 0.20 | 0.150 |
-| Accuracy | 0.80 | 0.35 | 0.280 |
-| Clarity | 0.85 | 0.15 | 0.128 |
-| Consistency | 0.80 | 0.20 | 0.160 |
-| Actionability | 0.75 | 0.10 | 0.075 |
-| **Weighted Total** | | | **0.793** |
+| Dimension          | Score | Weight | Weighted  |
+| ------------------ | ----- | ------ | --------- |
+| Completeness       | 0.75  | 0.20   | 0.150     |
+| Accuracy           | 0.80  | 0.35   | 0.280     |
+| Clarity            | 0.85  | 0.15   | 0.128     |
+| Consistency        | 0.80  | 0.20   | 0.160     |
+| Actionability      | 0.75  | 0.10   | 0.075     |
+| **Weighted Total** |       |        | **0.793** |
 
 **Scoring rationale:**
+
 - Completeness (0.75): Goal clearly stated; no explicit test evidence or modified file list provided
 - Accuracy (0.80): 4-hop → 2-hop chain reduction is concrete; merge of core-impl + core-ops into core.cjs is verifiable
 - Clarity (0.85): Clean, unambiguous description of architectural change
@@ -42,16 +43,17 @@ Using `code_output` weights: completeness 0.20, accuracy 0.35, clarity 0.15, con
 
 ### Task #14 — Memory Chain Flattening Phase 2
 
-| Dimension | Score | Weight | Weighted |
-|-----------|-------|--------|---------|
-| Completeness | 0.80 | 0.20 | 0.160 |
-| Accuracy | 0.80 | 0.35 | 0.280 |
-| Clarity | 0.85 | 0.15 | 0.128 |
-| Consistency | 0.80 | 0.20 | 0.160 |
-| Actionability | 0.75 | 0.10 | 0.075 |
-| **Weighted Total** | | | **0.803** |
+| Dimension          | Score | Weight | Weighted  |
+| ------------------ | ----- | ------ | --------- |
+| Completeness       | 0.80  | 0.20   | 0.160     |
+| Accuracy           | 0.80  | 0.35   | 0.280     |
+| Clarity            | 0.85  | 0.15   | 0.128     |
+| Consistency        | 0.80  | 0.20   | 0.160     |
+| Actionability      | 0.75  | 0.10   | 0.075     |
+| **Weighted Total** |       |        | **0.803** |
 
 **Scoring rationale:**
+
 - Completeness (0.80): Phase 2 completes Phase 1 goal; 5 helpers extracted is concrete count
 - Accuracy (0.80): ESLint compliance goal achieved; Windows EBUSY documented as known flake
 - Clarity (0.85): Clear continuation narrative, distinct from Phase 1
@@ -101,13 +103,13 @@ Integration health check skipped for this reflection batch — no new artifacts 
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
-| ESLint max-lines consolidation gotcha | **Retain** | High reuse value — any consolidation task will hit this; evidence quality high (concrete example with file names and line counts) |
-| Windows EBUSY SQLite flake gotcha | **Retain** | High retrieval relevance — Windows dev environment; prevents false regression investigations |
-| Router scope-staging gotcha | **Retain** | High reuse value — pattern recurs across multiple pipelines; reinforces existing haiku-scope-creep gotcha with broader applicability |
-| Issue: ESLint max-lines consolidation | **Retain** | P2 issue — actionable fix (pre-merge LOC estimation) |
-| Issue: Router scope-staging protocol | **Retain** | P1 issue — blocking quality pattern across multiple sessions |
+| Item                                  | Decision   | Rationale                                                                                                                            |
+| ------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ESLint max-lines consolidation gotcha | **Retain** | High reuse value — any consolidation task will hit this; evidence quality high (concrete example with file names and line counts)    |
+| Windows EBUSY SQLite flake gotcha     | **Retain** | High retrieval relevance — Windows dev environment; prevents false regression investigations                                         |
+| Router scope-staging gotcha           | **Retain** | High reuse value — pattern recurs across multiple pipelines; reinforces existing haiku-scope-creep gotcha with broader applicability |
+| Issue: ESLint max-lines consolidation | **Retain** | P2 issue — actionable fix (pre-merge LOC estimation)                                                                                 |
+| Issue: Router scope-staging protocol  | **Retain** | P1 issue — blocking quality pattern across multiple sessions                                                                         |
 
 No items compressed or archived — all new knowledge; compact entries.
 

@@ -45,13 +45,13 @@
 
 ### Rubric Scores (Request 1)
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.88 | Both requests processed, memory updated, report generated |
-| Accuracy | 0.92 | No factual errors detected in prior reflection |
-| Clarity | 0.88 | ADRs and recommendations clearly written |
-| Consistency | 0.85 | Followed RECE loop, RBT format, reflection-log schema |
-| Actionability | 0.85 | P0/P1/P2/P3 recommendations with concrete steps |
+| Dimension     | Score | Notes                                                     |
+| ------------- | ----- | --------------------------------------------------------- |
+| Completeness  | 0.88  | Both requests processed, memory updated, report generated |
+| Accuracy      | 0.92  | No factual errors detected in prior reflection            |
+| Clarity       | 0.88  | ADRs and recommendations clearly written                  |
+| Consistency   | 0.85  | Followed RECE loop, RBT format, reflection-log schema     |
+| Actionability | 0.85  | P0/P1/P2/P3 recommendations with concrete steps           |
 
 **Overall Score**: 0.876 (PASS — approaching EXCELLENT threshold)
 
@@ -72,6 +72,7 @@
 **Artifact discovered at**: `C:/dev/projects/agent-studio/.claude/skills/gemini-cli-security/`
 
 Files confirmed present:
+
 - `SKILL.md` — full 257-line specification with capabilities, workflow, usage, agent assignments
 - `scripts/main.cjs` — execution script
 - `hooks/pre-execute.cjs` — pre-execution hook
@@ -82,6 +83,7 @@ Files confirmed present:
 - `commands/gemini-cli-security.md` — command delegator
 
 **SKILL.md metadata confirms**:
+
 - Source: `https://github.com/gemini-cli-extensions/security`
 - License: Apache 2.0
 - Performance: 90% precision, 93% recall (OpenSSF CVE benchmark)
@@ -117,13 +119,13 @@ Files confirmed present:
 
 ### Rubric Scores (Request 2)
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Completeness | 0.82 | Full 8-file skill bundle, but integration (catalog, routing) unknown |
-| Accuracy | 0.90 | SKILL.md content appears accurate, performance benchmarks cited |
-| Clarity | 0.88 | Well-structured skill with clear sections and examples |
-| Consistency | 0.70 | Missing TaskUpdate metadata breaks protocol; catalog/routing unknown |
-| Actionability | 0.65 | Skill usable but not discoverable without integration steps |
+| Dimension     | Score | Notes                                                                |
+| ------------- | ----- | -------------------------------------------------------------------- |
+| Completeness  | 0.82  | Full 8-file skill bundle, but integration (catalog, routing) unknown |
+| Accuracy      | 0.90  | SKILL.md content appears accurate, performance benchmarks cited      |
+| Clarity       | 0.88  | Well-structured skill with clear sections and examples               |
+| Consistency   | 0.70  | Missing TaskUpdate metadata breaks protocol; catalog/routing unknown |
+| Actionability | 0.65  | Skill usable but not discoverable without integration steps          |
 
 **Overall Score**: 0.79 (PASS — integration gaps prevent EXCELLENT rating)
 
@@ -164,12 +166,12 @@ Integration gaps found — recommend artifact-integrator analysis of `skill:gemi
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
-| LLM safety security category pattern | **Retain** | High reuse value — new domain requiring explicit checklist item for security-architect |
-| External repo skill adaptation via artifact-integrator | **Retain** | Confirms ADR-137 workflow is viable; high reuse in future external integrations |
-| Metadata omission 14th occurrence | **Compress** | Already well-documented in gotchas.json (missing-taskupdate-metadata-recurring); no new insight |
-| Integration gap pattern for new skills | **Retain** | Medium reuse — reminds that skill creation without catalog/routing = invisible artifact |
+| Item                                                   | Decision     | Rationale                                                                                       |
+| ------------------------------------------------------ | ------------ | ----------------------------------------------------------------------------------------------- |
+| LLM safety security category pattern                   | **Retain**   | High reuse value — new domain requiring explicit checklist item for security-architect          |
+| External repo skill adaptation via artifact-integrator | **Retain**   | Confirms ADR-137 workflow is viable; high reuse in future external integrations                 |
+| Metadata omission 14th occurrence                      | **Compress** | Already well-documented in gotchas.json (missing-taskupdate-metadata-recurring); no new insight |
+| Integration gap pattern for new skills                 | **Retain**   | Medium reuse — reminds that skill creation without catalog/routing = invisible artifact         |
 
 ---
 

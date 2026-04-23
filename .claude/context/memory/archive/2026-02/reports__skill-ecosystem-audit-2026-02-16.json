@@ -104,9 +104,7 @@
         "tool.companion": false,
         "workflow.skill": true
       },
-      "missing": [
-        "tool.companion"
-      ],
+      "missing": ["tool.companion"],
       "archived": false
     },
     {
@@ -266,10 +264,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -1133,9 +1128,7 @@
         "tool.companion": false,
         "workflow.skill": true
       },
-      "missing": [
-        "tool.companion"
-      ],
+      "missing": ["tool.companion"],
       "archived": false
     },
     {
@@ -1255,10 +1248,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -1778,9 +1768,7 @@
         "tool.companion": false,
         "workflow.skill": true
       },
-      "missing": [
-        "tool.companion"
-      ],
+      "missing": ["tool.companion"],
       "archived": false
     },
     {
@@ -2220,10 +2208,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -5463,9 +5448,7 @@
         "tool.companion": false,
         "workflow.skill": true
       },
-      "missing": [
-        "tool.companion"
-      ],
+      "missing": ["tool.companion"],
       "archived": false
     },
     {
@@ -6297,9 +6280,7 @@
         "tool.companion": false,
         "workflow.skill": true
       },
-      "missing": [
-        "tool.companion"
-      ],
+      "missing": ["tool.companion"],
       "archived": false
     },
     {

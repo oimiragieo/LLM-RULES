@@ -50,7 +50,11 @@ describe('manifest-validator — Test 1: valid manifest passes', () => {
   it('accepts a fully specified valid manifest', () => {
     const manifest = buildValidManifest();
     const result = validateManifest(manifest);
-    assert.equal(result.valid, true, `Expected valid=true, got errors: ${JSON.stringify(result.errors)}`);
+    assert.equal(
+      result.valid,
+      true,
+      `Expected valid=true, got errors: ${JSON.stringify(result.errors)}`
+    );
     assert.deepEqual(result.errors, []);
   });
 
@@ -116,10 +120,7 @@ describe('manifest-validator — Test 2: missing required fields', () => {
       delete manifest[field];
       const result = validateManifest(manifest);
       assert.equal(result.valid, false, `Expected invalid when '${field}' is absent`);
-      assert.ok(
-        result.errors.length > 0,
-        `Expected at least one error when '${field}' is absent`
-      );
+      assert.ok(result.errors.length > 0, `Expected at least one error when '${field}' is absent`);
       // Error must mention the missing field
       const errorText = result.errors.join(' ');
       assert.ok(
@@ -215,17 +216,11 @@ describe('manifest-validator — Test 4: BC-2 startup enforcement', () => {
   });
 
   it('loadManifest throws ManifestStartupError when manifest is undefined', () => {
-    assert.throws(
-      () => loadManifest(undefined, { strict: true }),
-      ManifestStartupError
-    );
+    assert.throws(() => loadManifest(undefined, { strict: true }), ManifestStartupError);
   });
 
   it('loadManifest throws ManifestStartupError when manifest is empty object', () => {
-    assert.throws(
-      () => loadManifest({}, { strict: true }),
-      ManifestStartupError
-    );
+    assert.throws(() => loadManifest({}, { strict: true }), ManifestStartupError);
   });
 
   it('ManifestStartupError message includes agent_id when available', () => {

@@ -18,6 +18,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 **Domain**: AI/ML code analysis and best practices
 
 **Key Properties**:
+
 - `analysis_type`: code_review | architecture_guidance | pattern_recommendation | model_optimization | framework_integration | best_practices
 - `domain`: pytorch | langchain | llm_integration | scientific_computing | tensorflow | transformers | general
 - `findings`: Array of issues with severity, category, file location, and recommendations
@@ -26,6 +27,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 - `frameworks_analyzed`: Detected AI/ML frameworks
 
 **Validation Highlights**:
+
 - Severity enum: critical | high | medium | low | info
 - Priority enum: high | medium | low
 - Code examples in recommendations
@@ -36,6 +38,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 **Domain**: Comprehensive scientific research toolkit (139 sub-skills)
 
 **Key Properties**:
+
 - `workflow_type`: database_query | bioinformatics_analysis | cheminformatics_analysis | data_analysis | literature_review | machine_learning | visualization | multi_step_workflow
 - `category`: scientific-databases | bioinformatics | cheminformatics | machine-learning | data-analysis | scientific-writing
 - `skills_invoked`: Array of sub-skills used (from 139 available)
@@ -46,6 +49,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 - `code_generated`: Python/R/Julia code with dependencies
 
 **Validation Highlights**:
+
 - Minimum 1 skill invoked (proves actual execution)
 - Database query count tracking
 - Analysis method documentation
@@ -57,6 +61,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 **Domain**: Disassembly, decompilation, control flow analysis
 
 **Key Properties**:
+
 - `analysis_type`: disassembly | decompilation | control_flow_analysis | pattern_recognition | function_identification | vulnerability_detection | malware_analysis
 - `target_binary`: File path, architecture (x86/x86-64/ARM/ARM64/MIPS/PowerPC/RISC-V), format (ELF/PE/Mach-O/raw), compiler, stripped status
 - `functions_identified`: Address, name, size, calling convention, prototype, complexity score
@@ -66,6 +71,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 - `disassembly_output`: Full disassembly, decompiled code, CFG diagrams
 
 **Validation Highlights**:
+
 - Hex address pattern validation (^0x[0-9a-fA-F]+$)
 - Architecture enum with 7 supported platforms
 - CWE ID pattern validation (^CWE-[0-9]+$)
@@ -76,6 +82,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 **Domain**: Memory dump analysis using Volatility
 
 **Key Properties**:
+
 - `analysis_type`: process_analysis | network_connections | malware_detection | artifact_extraction | timeline_reconstruction | credential_extraction | full_forensic_analysis
 - `memory_dump`: File path, OS type (Windows/Linux/macOS), architecture, size, acquisition method
 - `processes_found`: PID, PPID, name, path, command line, creation time, suspicious flags
@@ -86,6 +93,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 - `volatility_plugins_used`: Plugins executed
 
 **Validation Highlights**:
+
 - OS enum with Unknown fallback
 - Protocol enum for network analysis
 - IOC severity classification
@@ -97,6 +105,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 **Domain**: Network protocol analysis and documentation
 
 **Key Properties**:
+
 - `analysis_type`: packet_capture | protocol_dissection | message_format_analysis | state_machine_reconstruction | protocol_specification | fuzzing_harness
 - `protocol_info`: Name, transport layer (TCP/UDP/HTTP/HTTPS/WebSocket/custom), port, encryption, type (text-based/binary/hybrid)
 - `capture_details`: PCAP file, packet count, duration, source/destination addresses
@@ -107,6 +116,7 @@ Successfully created 5 missing output schemas for domain-expert skills, ensuring
 - `protocol_specification`: Markdown spec, Wireshark dissector, Kaitai Struct definition
 
 **Validation Highlights**:
+
 - Transport layer enum with 6 options
 - Port range validation (1-65535)
 - Message direction enum (client_to_server | server_to_client | bidirectional)
@@ -133,6 +143,7 @@ All 5 schemas follow these standards:
 ### Analysis Type Enums
 
 Each skill has a specific set of analysis types reflecting its core capabilities:
+
 - **ai-ml-expert**: Focus on code review, patterns, optimization
 - **scientific-skills**: Research workflows from database queries to literature reviews
 - **binary-analysis-patterns**: Disassembly through vulnerability detection
@@ -142,6 +153,7 @@ Each skill has a specific set of analysis types reflecting its core capabilities
 ### Severity Classification
 
 Standardized severity levels where applicable:
+
 - **critical**: Exploitable vulnerabilities, system compromise
 - **high**: Significant security/quality issues
 - **medium**: Important but not critical
@@ -151,6 +163,7 @@ Standardized severity levels where applicable:
 ### Output Verification
 
 Each schema requires proof of execution:
+
 - **ai-ml-expert**: `findings` array (can be empty but must exist)
 - **scientific-skills**: `skills_invoked` (minItems: 1)
 - **binary-analysis-patterns**: `target_binary` (required)
@@ -159,13 +172,13 @@ Each schema requires proof of execution:
 
 ## Validation Coverage
 
-| Skill | Schema | Fields | Enums | Patterns | Arrays | Objects |
-|-------|--------|--------|-------|----------|--------|---------|
-| ai-ml-expert | ✅ | 8 | 4 | 0 | 4 | 2 |
-| scientific-skills | ✅ | 12 | 9 | 0 | 5 | 5 |
-| binary-analysis-patterns | ✅ | 11 | 11 | 2 | 4 | 7 |
-| memory-forensics | ✅ | 12 | 11 | 2 | 5 | 7 |
-| protocol-reverse-engineering | ✅ | 12 | 10 | 1 | 6 | 7 |
+| Skill                        | Schema | Fields | Enums | Patterns | Arrays | Objects |
+| ---------------------------- | ------ | ------ | ----- | -------- | ------ | ------- |
+| ai-ml-expert                 | ✅     | 8      | 4     | 0        | 4      | 2       |
+| scientific-skills            | ✅     | 12     | 9     | 0        | 5      | 5       |
+| binary-analysis-patterns     | ✅     | 11     | 11    | 2        | 4      | 7       |
+| memory-forensics             | ✅     | 12     | 11    | 2        | 5      | 7       |
+| protocol-reverse-engineering | ✅     | 12     | 10    | 1        | 6      | 7       |
 
 **Total Coverage**: 55 top-level fields, 45 enums, 5 regex patterns, 24 arrays, 28 nested objects
 

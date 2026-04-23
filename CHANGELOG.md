@@ -5,6 +5,29 @@ All notable changes to Agent Studio are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2026-04-23 — Memory-Marketplace Release
+
+### Added
+
+- **CAT7 memory schema** (`.claude/schemas/cat7-record.schema.json`) — 7-field record structure: `concept`, `attributes`, `temporality`, `provenance`, `confidence`, `lineage`, `embedding_refs`. STM/MTM/LTM tier routing via `cat7-writer.cjs`.
+- **Agent-to-agent lineage API** (`.claude/lib/memory/cat7-lineage.cjs`) — linear chain lineage tracking; agents record how memory records derive from prior records. DAG lineage deferred to v3.3.0.
+- **MMP CLI** (`.claude/tools/cli/mmp.cjs`) — two commands: `pnpm mmp:lineage <record-id>` walks the ancestry chain for a CAT7 record; `pnpm mmp:descendants <record-id>` lists all downstream records.
+- **Skill Marketplace** — HMAC-SHA256 package signer (`.claude/lib/marketplace/signer.cjs`), 4-tier trust scorer (`.claude/lib/marketplace/trust-scorer.cjs`), and `skill:install` CLI (`.claude/tools/cli/skill-install.cjs`) for verified skill package installation.
+- **New env vars**: `SKILL_MARKETPLACE_HMAC_KEY`, `SKILL_MARKETPLACE_MIN_TRUST`, `SKILL_MARKETPLACE_REGISTRY_URL`.
+
+### Changed
+
+- `cat7-writer.cjs` routes records to STM/MTM/LTM based on `temporality` field — replaces flat write used by earlier MemoryRecord calls.
+
+### Security
+
+- Path-traversal guards on all marketplace install paths — rejects `..` and URL-encoded variants.
+- HMAC key length enforced at ≥32 characters; shorter keys rejected at startup.
+- Length-prefixed canonical payload prevents HMAC extension attacks.
+- NaN-safe trust threshold parsing prevents `parseFloat("")` accepting all trust scores.
+
+---
+
 ## [3.1.2] - 2026-04-20 — design.md Pattern Completion (Token Refs + Severity Tiers)
 
 ### Added

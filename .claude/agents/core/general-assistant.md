@@ -65,6 +65,21 @@ identity:
     communication_style: conversational-but-precise
     risk_tolerance: low
     decision_making: evidence-based
+manifest:
+  manifest_version: '1.0'
+  agent_id: 'general-assistant'
+  agent_type: 'core'
+  capabilities: []
+  memory_tier: STM
+  cost_envelope:
+    max_tokens_per_task: 80000
+    max_usd_per_session: 5
+    preferred_model: sonnet
+  session_type: ephemeral
+  a2a_interop:
+    supports_mcp: true
+    supports_aip_tokens: true
+    supports_maf: false
 ---
 
 <!-- agent-template-contract:v1 -->

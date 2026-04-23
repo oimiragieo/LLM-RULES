@@ -32,11 +32,13 @@ $ ls -lh nul
 ### Root Cause
 
 A **Windows reserved filename** (`nul`) was created as a file instead of using the device `NUL`. This violates workspace conventions (`.claude/rules/workspace-conventions.md`) which explicitly forbids creating files named:
+
 - `nul`, `con`, `prn`, `aux`, `com1`-`com9`, `lpt1`-`lpt9` (Windows reserved names)
 
 ### Previous Context
 
 From git history:
+
 ```
 dd2574f3 fix(windows): enhance NUL file prevention to catch all reserved name patterns
 c06c5d75 chore: remove NUL file and malformed database file from project root
@@ -47,6 +49,7 @@ This is a **recurring issue**. The hook system has been enhanced to prevent this
 ### How It Happens
 
 From memory archive (`learnings-2026-02.md`):
+
 - Lowercase redirects create files: `> nul`, `> null`, `> con` → **creates files** ❌
 - Uppercase redirects use devices: `> NUL`, `> CON` → **uses device** ✅
 
@@ -56,9 +59,10 @@ From memory archive (`learnings-2026-02.md`):
 
 ✅ **File deleted**: `rm nul` executed successfully
 ✅ **Prevention in place**: `windows-null-sanitizer.cjs` hook normalizes lowercase → uppercase:
-  - `> nul` → `> NUL`
-  - `2> nul` → `2> NUL`
-  - `> null` → `> NUL`
+
+- `> nul` → `> NUL`
+- `2> nul` → `2> NUL`
+- `> null` → `> NUL`
 
 ### Recommendations
 
@@ -109,6 +113,7 @@ Require stack:
 **Common Pattern**: Hooks reference internal modules that don't exist in the repository.
 
 **Verification**:
+
 ```bash
 $ ls .claude/hooks/routing/router-state.cjs
 ls: cannot access '.claude/hooks/routing/router-state.cjs': No such file or directory
@@ -162,6 +167,7 @@ C:\Users\oimir\.claude\projects\C--dev-projects-omega-main\*.jsonl (1 file)
 ### No OOM Indicators Found
 
 **Searched for**:
+
 - `OOM`, `ENOMEM`, `heap`, `memory` → ❌ No matches
 - `freeze`, `hang`, `timeout` → ❌ No matches
 - Large output buffers → ❌ No evidence
@@ -242,15 +248,15 @@ Read .claude/context/runtime/reflection-spawn-request.json
 
 ## Timeline Reconstruction
 
-| Time (UTC) | Event | Notes |
-|------------|-------|-------|
-| 21:16 | `nul` file created | Before session start |
-| 02:25:51 | Session initialized | Claude Code startup |
-| 02:25:56 | Background plugin check | 0 plugins to install |
-| 02:27:01 | User prompt submitted | Blocked by reflection gate |
-| 02:27:01 | Hook errors detected | 3 modules missing |
-| 02:27:04 | Conversation file errors | 9 missing files from other projects |
-| 02:27:23 | Last log entry | Session continues |
+| Time (UTC) | Event                    | Notes                               |
+| ---------- | ------------------------ | ----------------------------------- |
+| 21:16      | `nul` file created       | Before session start                |
+| 02:25:51   | Session initialized      | Claude Code startup                 |
+| 02:25:56   | Background plugin check  | 0 plugins to install                |
+| 02:27:01   | User prompt submitted    | Blocked by reflection gate          |
+| 02:27:01   | Hook errors detected     | 3 modules missing                   |
+| 02:27:04   | Conversation file errors | 9 missing files from other projects |
+| 02:27:23   | Last log entry           | Session continues                   |
 
 **Duration**: ~2 minutes of logged activity
 **No freeze indicators** in this specific log

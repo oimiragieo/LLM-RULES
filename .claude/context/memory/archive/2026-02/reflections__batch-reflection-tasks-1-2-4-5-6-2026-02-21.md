@@ -20,13 +20,13 @@
 **Output Type**: code_output
 **Summary**: ajv override added to package.json pnpm.overrides; pnpm-lock.yaml regenerated. ajv now resolves to 6.14.0 in eslint chain.
 
-| Dimension | Score |
-|---|---|
-| Completeness | 0.85 |
-| Accuracy | 0.90 |
-| Clarity | 0.80 |
-| Consistency | 0.88 |
-| Actionability | 0.75 |
+| Dimension          | Score     |
+| ------------------ | --------- |
+| Completeness       | 0.85      |
+| Accuracy           | 0.90      |
+| Clarity            | 0.80      |
+| Consistency        | 0.88      |
+| Actionability      | 0.75      |
 | **Weighted Total** | **0.856** |
 
 **Threshold**: PASS
@@ -37,13 +37,13 @@
 **Output Type**: agent_output
 **Summary**: Batch reflection of 5 tasks, avg score 0.832. SEC-ICE-002 P1 paper control risk confirmed active. ADR-2026-02-21-006 proposed for CHANGELOG pre-commit hook.
 
-| Dimension | Score |
-|---|---|
-| Completeness | 0.88 |
-| Accuracy | 0.90 |
-| Clarity | 0.85 |
-| Consistency | 0.88 |
-| Actionability | 0.85 |
+| Dimension          | Score     |
+| ------------------ | --------- |
+| Completeness       | 0.88      |
+| Accuracy           | 0.90      |
+| Clarity            | 0.85      |
+| Consistency        | 0.88      |
+| Actionability      | 0.85      |
 | **Weighted Total** | **0.877** |
 
 **Threshold**: PASS
@@ -54,13 +54,13 @@
 **Output Type**: code_output
 **Summary**: validate:skills pnpm script added to package.json, tool-catalog.md entry added. Tool runs and found 177 registration drift errors (CI-gate-ready).
 
-| Dimension | Score |
-|---|---|
-| Completeness | 0.90 |
-| Accuracy | 0.92 |
-| Clarity | 0.85 |
-| Consistency | 0.88 |
-| Actionability | 0.85 |
+| Dimension          | Score     |
+| ------------------ | --------- |
+| Completeness       | 0.90      |
+| Accuracy           | 0.92      |
+| Clarity            | 0.85      |
+| Consistency        | 0.88      |
+| Actionability      | 0.85      |
 | **Weighted Total** | **0.890** |
 
 **Threshold**: PASS
@@ -73,13 +73,13 @@
 **Output Type**: documentation_output
 **Summary**: Canonical dep scan command `pnpm audit --audit-level=high` documented. ecosystem-creation-workflow.md updated to reference post-creation-validation.md Item 7.
 
-| Dimension | Score |
-|---|---|
-| Completeness | 0.85 |
-| Accuracy | 0.90 |
-| Clarity | 0.88 |
-| Consistency | 0.90 |
-| Actionability | 0.75 |
+| Dimension          | Score     |
+| ------------------ | --------- |
+| Completeness       | 0.85      |
+| Accuracy           | 0.90      |
+| Clarity            | 0.88      |
+| Consistency        | 0.90      |
+| Actionability      | 0.75      |
 | **Weighted Total** | **0.874** |
 
 **Threshold**: PASS
@@ -90,13 +90,13 @@
 **Output Type**: code_output
 **Summary**: CHANGELOG pre-commit hook created via hook-creator skill. Warn-mode only, non-blocking. Registered in settings.json.
 
-| Dimension | Score |
-|---|---|
-| Completeness | 0.88 |
-| Accuracy | 0.90 |
-| Clarity | 0.85 |
-| Consistency | 0.90 |
-| Actionability | 0.80 |
+| Dimension          | Score     |
+| ------------------ | --------- |
+| Completeness       | 0.88      |
+| Accuracy           | 0.90      |
+| Clarity            | 0.85      |
+| Consistency        | 0.90      |
+| Actionability      | 0.80      |
 | **Weighted Total** | **0.879** |
 
 **Threshold**: PASS
@@ -154,6 +154,7 @@ The `validate:skills` tool found **177 registration drift errors** — this IS t
 **Status**: CRITICAL — artifact ecosystem has widespread integration gaps
 
 **Key Impact**:
+
 - Skills invisible to agents relying on skill-index.json
 - artifact-integrator cannot detect companions for unregistered skills
 - Integration health checks (ADR-100) report inaccurate scores for unregistered artifacts
@@ -176,11 +177,11 @@ The `validate:skills` tool found **177 registration drift errors** — this IS t
 
 **Artifact checked**: CHANGELOG pre-commit hook (settings.json registration)
 
-| Check | Status |
-|---|---|
-| settings.json registration | PRESENT (confirmed in summary) |
-| Non-blocking mode | CONFIRMED (warn-mode only) |
-| Creator workflow used | CONFIRMED (hook-creator skill invoked) |
+| Check                      | Status                                 |
+| -------------------------- | -------------------------------------- |
+| settings.json registration | PRESENT (confirmed in summary)         |
+| Non-blocking mode          | CONFIRMED (warn-mode only)             |
+| Creator workflow used      | CONFIRMED (hook-creator skill invoked) |
 
 **Finding**: No registration gaps for Task #5 artifact. Hook created via correct workflow.
 
@@ -191,6 +192,7 @@ The `validate:skills` tool found **177 registration drift errors** — this IS t
 ## Memory Curation Decisions
 
 **Retain**:
+
 - 177 skill/agent drift errors finding (high-signal, immediate action needed) → issues.md ADDED
 - ADR-2026-02-21-007 (validate:skills CI gate mandatory) → decisions.md ADDED
 - ADR-2026-02-21-008 (dep scan command canonicalization) → decisions.md ADDED

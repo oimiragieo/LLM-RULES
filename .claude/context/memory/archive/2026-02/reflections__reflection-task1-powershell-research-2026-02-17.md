@@ -19,14 +19,14 @@
 
 ## Rubric Scores
 
-| Dimension      | Weight | Score | Weighted |
-|----------------|--------|-------|----------|
-| Completeness   | 25%    | 0.80  | 0.200    |
-| Accuracy       | 25%    | 0.88  | 0.220    |
-| Clarity        | 15%    | 0.85  | 0.128    |
-| Consistency    | 15%    | 0.75  | 0.113    |
-| Actionability  | 20%    | 0.75  | 0.150    |
-| **TOTAL**      |        |       | **0.811**|
+| Dimension     | Weight | Score | Weighted  |
+| ------------- | ------ | ----- | --------- |
+| Completeness  | 25%    | 0.80  | 0.200     |
+| Accuracy      | 25%    | 0.88  | 0.220     |
+| Clarity       | 15%    | 0.85  | 0.128     |
+| Consistency   | 15%    | 0.75  | 0.113     |
+| Actionability | 20%    | 0.75  | 0.150     |
+| **TOTAL**     |        |       | **0.811** |
 
 ---
 
@@ -72,15 +72,15 @@
 **Artifact:** research-report:powershell-expert-research-2026-02-17
 **Integration Score:** 55% (Gaps — Bud category)
 
-| Integration Check | Status |
-|-------------------|--------|
-| File exists at correct path | PASS |
-| Provenance header present | PASS |
-| Naming convention compliant | PASS |
-| Catalog/registry entry | NOT APPLICABLE (research reports are not cataloged) |
-| Consumer artifact created | FAIL — powershell-expert skill not yet created |
-| Routing keywords wired | FAIL — dependent on skill-creator completion |
-| Agent assignment | FAIL — dependent on skill-creator completion |
+| Integration Check           | Status                                              |
+| --------------------------- | --------------------------------------------------- |
+| File exists at correct path | PASS                                                |
+| Provenance header present   | PASS                                                |
+| Naming convention compliant | PASS                                                |
+| Catalog/registry entry      | NOT APPLICABLE (research reports are not cataloged) |
+| Consumer artifact created   | FAIL — powershell-expert skill not yet created      |
+| Routing keywords wired      | FAIL — dependent on skill-creator completion        |
+| Agent assignment            | FAIL — dependent on skill-creator completion        |
 
 **Status:** Integration score 55% — downstream consumers (skill, catalog entry, routing keywords) not yet created. This is expected for a research-only phase; score will improve to 90%+ once skill-creator completes.
 
@@ -98,11 +98,11 @@
 
 ## Memory Curation Decisions
 
-| Item | Decision | Score | Rationale |
-|------|----------|-------|-----------|
-| Dual-source triangulation pattern | **Retain** | 0.85 | High reuse — applies to any research phase for skill creation; confirmed effective |
-| TaskUpdate recurrence (13th+) | **Compress** | 0.70 | Already documented in gotchas.json; this adds occurrence count only |
-| Research pipeline stall pattern | **Retain** | 0.80 | New variant: research completes but skill-creator not yet invoked — pipeline handoff gap |
+| Item                              | Decision     | Score | Rationale                                                                                |
+| --------------------------------- | ------------ | ----- | ---------------------------------------------------------------------------------------- |
+| Dual-source triangulation pattern | **Retain**   | 0.85  | High reuse — applies to any research phase for skill creation; confirmed effective       |
+| TaskUpdate recurrence (13th+)     | **Compress** | 0.70  | Already documented in gotchas.json; this adds occurrence count only                      |
+| Research pipeline stall pattern   | **Retain**   | 0.80  | New variant: research completes but skill-creator not yet invoked — pipeline handoff gap |
 
 ---
 

@@ -14,12 +14,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const SCHEMA_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'schemas',
-  'skill-definition.schema.json'
-);
+const SCHEMA_PATH = path.join(PROJECT_ROOT, '.claude', 'schemas', 'skill-definition.schema.json');
 const TEMPLATES_PATH = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -70,10 +65,15 @@ function consumeSubList(lines, startIdx, indent) {
   let consumed = 0;
   while (startIdx + consumed + 1 < lines.length) {
     const sub = lines[startIdx + consumed + 1];
-    if (/^ {2,}#/.test(sub)) { consumed++; continue; }
+    if (/^ {2,}#/.test(sub)) {
+      consumed++;
+      continue;
+    }
     const m = sub.match(pat);
-    if (m) { subList.push(m[1].trim()); consumed++; }
-    else break;
+    if (m) {
+      subList.push(m[1].trim());
+      consumed++;
+    } else break;
   }
   return { subList, consumed };
 }
@@ -91,10 +91,16 @@ function parseFrontmatter(content) {
 
   while (i < lines.length) {
     const line = lines[i];
-    if (/^\s*#/.test(line)) { i++; continue; } // skip comment lines
+    if (/^\s*#/.test(line)) {
+      i++;
+      continue;
+    } // skip comment lines
 
     const topMatch = line.match(/^([a-zA-Z_][a-zA-Z0-9_]*):\s*(.*)/);
-    if (!topMatch) { i++; continue; }
+    if (!topMatch) {
+      i++;
+      continue;
+    }
 
     const key = topMatch[1];
     const rawVal = topMatch[2].trim();
@@ -115,7 +121,10 @@ function parseFrontmatter(content) {
 
     while (i + 1 < lines.length) {
       const next = lines[i + 1];
-      if (/^ {2,}#/.test(next)) { i++; continue; }
+      if (/^ {2,}#/.test(next)) {
+        i++;
+        continue;
+      }
       const objMatch = next.match(/^ {2}([a-zA-Z_][a-zA-Z0-9_]*):\s*(.*)/);
       const listMatch = next.match(/^ {2}- (.*)/);
 
@@ -220,7 +229,11 @@ function validateAgainstSchema(frontmatterObj) {
 
     // output_schema_ref
     if (fm.output_schema_ref !== undefined) {
-      assert.equal(typeof fm.output_schema_ref, 'string', 'frontmatter.output_schema_ref must be a string');
+      assert.equal(
+        typeof fm.output_schema_ref,
+        'string',
+        'frontmatter.output_schema_ref must be a string'
+      );
     }
 
     // requires_skills

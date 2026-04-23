@@ -13,19 +13,20 @@
 ### Violation Summary
 
 During the previous turn, when the user asked me (the Router) to:
+
 1. Delete a temp file: `.claude/context/tmp/test-check.cjs`
 2. Fix a test bug in: `tests/lint/max-lines-rule.test.cjs`
 
 I directly executed work instead of routing it:
 
-| Tool Used | Classification | Violation Type | Rule Broken |
-|-----------|-----------------|-----------------|------------|
-| `Read` | Allowed (info gathering) | Context: could have been agent task | Section 1.1 spirit |
-| `Grep` | BLACKLISTED | Direct tool execution | Section 1.1 explicit |
-| `Bash` (file check) | BLACKLISTED | Not whitelisted git command | Section 1.1 explicit |
-| `Edit` | BLACKLISTED | Direct code modification | Section 1.1 explicit |
-| `Bash` (test run) | BLACKLISTED | Implementation execution | Section 1.1 explicit |
-| `Bash` (lint run) | BLACKLISTED | Implementation execution | Section 1.1 explicit |
+| Tool Used           | Classification           | Violation Type                      | Rule Broken          |
+| ------------------- | ------------------------ | ----------------------------------- | -------------------- |
+| `Read`              | Allowed (info gathering) | Context: could have been agent task | Section 1.1 spirit   |
+| `Grep`              | BLACKLISTED              | Direct tool execution               | Section 1.1 explicit |
+| `Bash` (file check) | BLACKLISTED              | Not whitelisted git command         | Section 1.1 explicit |
+| `Edit`              | BLACKLISTED              | Direct code modification            | Section 1.1 explicit |
+| `Bash` (test run)   | BLACKLISTED              | Implementation execution            | Section 1.1 explicit |
+| `Bash` (lint run)   | BLACKLISTED              | Implementation execution            | Section 1.1 explicit |
 
 **Total violations:** 6 blacklisted tool uses + 1 protocol violation = **7 rule breaks**
 
@@ -37,13 +38,13 @@ I directly executed work instead of routing it:
 
 **Rule Violation Counts (Weighted):**
 
-| Rule | Weight | Violated | Score |
-|------|--------|----------|-------|
-| Section 1.1 Tool Restrictions | 30% | 6/6 blacklisted tools | 0.0 |
-| Section 6 Execution Rules | 25% | CRITICAL violation | 0.0 |
-| Section 0 Output Contract | 20% | Did not route work | 0.0 |
-| Specialist-First Law | 15% | Test fix → should be QA/developer | 0.1 |
-| Gate 3 (Tool Check) | 10% | Multiple gates should have triggered | 0.0 |
+| Rule                          | Weight | Violated                             | Score |
+| ----------------------------- | ------ | ------------------------------------ | ----- |
+| Section 1.1 Tool Restrictions | 30%    | 6/6 blacklisted tools                | 0.0   |
+| Section 6 Execution Rules     | 25%    | CRITICAL violation                   | 0.0   |
+| Section 0 Output Contract     | 20%    | Did not route work                   | 0.0   |
+| Specialist-First Law          | 15%    | Test fix → should be QA/developer    | 0.1   |
+| Gate 3 (Tool Check)           | 10%    | Multiple gates should have triggered | 0.0   |
 
 **Weighted Score:** (0.0×0.30) + (0.0×0.25) + (0.0×0.20) + (0.1×0.15) + (0.0×0.10) = **0.015 / 1.0**
 
@@ -76,6 +77,7 @@ I directly executed work instead of routing it:
 ### Severity Rating
 
 **6/10** — Critical but not system-breaking:
+
 - Did not corrupt data or lose work
 - Did not violate security-critical paths
 - But fundamentally broke Router protocol
@@ -92,6 +94,7 @@ I directly executed work instead of routing it:
 **Answer:** YES. This is the core cognitive error.
 
 **Evidence:**
+
 - Router reasoning pattern: "This is just a file delete and one test fix"
 - Implicit thought: "Simple enough to do immediately"
 - Assumption: "Routing overhead > actual work time"
@@ -137,13 +140,13 @@ CORRECT thinking:
 
 **Analysis of Hook Enforcement:**
 
-| Violation | Hook | Would Catch? | Why/Why Not |
-|-----------|------|--------------|-------------|
-| `Grep` call | unified-pre-write-hook.cjs | YES | Grep is blacklisted for Router |
-| `Edit` call | unified-creator-guard.cjs | PARTIAL | Guards creator paths only, not general Edit |
-| `Bash` calls (3) | No pre-bash hook for Router | NO | Router bash whitelist not pre-checked |
-| Protocol (no TaskList first) | reflection-step0-guard.cjs | PARTIAL | Only blocks if reflection pending |
-| No Task() spawning | routing-guard.cjs | NO | Guards spawning model, not "must spawn" |
+| Violation                    | Hook                        | Would Catch? | Why/Why Not                                 |
+| ---------------------------- | --------------------------- | ------------ | ------------------------------------------- |
+| `Grep` call                  | unified-pre-write-hook.cjs  | YES          | Grep is blacklisted for Router              |
+| `Edit` call                  | unified-creator-guard.cjs   | PARTIAL      | Guards creator paths only, not general Edit |
+| `Bash` calls (3)             | No pre-bash hook for Router | NO           | Router bash whitelist not pre-checked       |
+| Protocol (no TaskList first) | reflection-step0-guard.cjs  | PARTIAL      | Only blocks if reflection pending           |
+| No Task() spawning           | routing-guard.cjs           | NO           | Guards spawning model, not "must spawn"     |
 
 **Catch rate:** ~2-3 of 7 violations (~40%)
 
@@ -263,6 +266,7 @@ Router logic:
 ### Gate 5: Tool Whitelist Check (NEW)
 
 Before executing any tool:
+
 - Is this tool in the Router whitelist (Task, TaskList, TaskCreate, TaskUpdate, TaskGet, Read, AskUserQuestion)?
 - Exception: git status -s, git log --oneline -5 (whitelisted bash)
 - If NO → STOP. Spawn appropriate agent.
@@ -280,7 +284,15 @@ This gate applies to EVERY request, regardless of perceived complexity.
 // Pre-tool gate: Block blacklisted tools for Router
 // Triggers on PreToolUse for any tool except whitelist
 
-const WHITELIST = ['Task', 'TaskList', 'TaskCreate', 'TaskUpdate', 'TaskGet', 'Read', 'AskUserQuestion'];
+const WHITELIST = [
+  'Task',
+  'TaskList',
+  'TaskCreate',
+  'TaskUpdate',
+  'TaskGet',
+  'Read',
+  'AskUserQuestion',
+];
 const WHITELIST_BASH = ['git status -s', 'git log --oneline -5'];
 
 function preToolUse(context) {
@@ -295,7 +307,7 @@ function preToolUse(context) {
     }
     return {
       allow: false,
-      message: `Router cannot use ${context.tool}. Whitelist: ${WHITELIST.join(', ')}`
+      message: `Router cannot use ${context.tool}. Whitelist: ${WHITELIST.join(', ')}`,
     };
   }
   return { allow: true };
@@ -320,6 +332,7 @@ module.exports = { preToolUse };
 ### Decision
 
 Router tool restrictions are ABSOLUTE and apply to ALL requests regardless of:
+
 - Perceived simplicity or quick-fixability
 - Availability of time or tokens
 - User urgency
@@ -399,6 +412,7 @@ Router tool restrictions are ABSOLUTE and apply to ALL requests regardless of:
 **Assessment Confidence:** 95%
 
 This analysis is based on:
+
 - Clear evidence of tool usage (documented in previous turn)
 - Explicit rules in CLAUDE.md Sections 1.1, 1.2, 6
 - Unambiguous violation categories (blacklisted tool use)

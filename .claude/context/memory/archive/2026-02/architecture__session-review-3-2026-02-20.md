@@ -6,20 +6,20 @@
 
 ### Commits (12 total, 00:05–09:41 EST)
 
-| Time  | Hash       | Summary                                                        |
-|-------|------------|----------------------------------------------------------------|
-| 00:05 | 6ec229a2   | fix(skills): improve skill-creator and skill-updater guidance  |
-| 01:25 | 484b06c2   | fix: pre-completion enforcement, agent template YAML, sanitizer, routing tables |
-| 01:33 | 9dc6807b   | fix: allowlist security-lint false positives                   |
-| 01:35 | cf38baee   | chore: add .cursor/settings.json                               |
-| 02:44 | 4c313587   | fix: resolve ESLint warnings and update changelog              |
-| 03:33 | e47ccd5e   | feat: add content-security-scan skill and external-content-guard hook |
-| 04:25 | 5c8e3938   | fix: enforce supply chain security controls (GAP-A/B/C/D)     |
-| 04:25 | c4022e7d   | chore: update skill catalog, memory, and content-security-scan |
-| 04:38 | 8427b51f   | docs: document atomic handshake protocol in reflection-agent   |
-| 04:38 | 3f71cd9d   | chore: update memory files from session reflection agents      |
-| 06:01 | 13c59138   | fix: enforce bypass audit, stale reflection pruning, TOCTOU    |
-| 09:41 | 5f1b98a8   | fix: add Write tool to code-reviewer agent for report persistence |
+| Time  | Hash     | Summary                                                                         |
+| ----- | -------- | ------------------------------------------------------------------------------- |
+| 00:05 | 6ec229a2 | fix(skills): improve skill-creator and skill-updater guidance                   |
+| 01:25 | 484b06c2 | fix: pre-completion enforcement, agent template YAML, sanitizer, routing tables |
+| 01:33 | 9dc6807b | fix: allowlist security-lint false positives                                    |
+| 01:35 | cf38baee | chore: add .cursor/settings.json                                                |
+| 02:44 | 4c313587 | fix: resolve ESLint warnings and update changelog                               |
+| 03:33 | e47ccd5e | feat: add content-security-scan skill and external-content-guard hook           |
+| 04:25 | 5c8e3938 | fix: enforce supply chain security controls (GAP-A/B/C/D)                       |
+| 04:25 | c4022e7d | chore: update skill catalog, memory, and content-security-scan                  |
+| 04:38 | 8427b51f | docs: document atomic handshake protocol in reflection-agent                    |
+| 04:38 | 3f71cd9d | chore: update memory files from session reflection agents                       |
+| 06:01 | 13c59138 | fix: enforce bypass audit, stale reflection pruning, TOCTOU                     |
+| 09:41 | 5f1b98a8 | fix: add Write tool to code-reviewer agent for report persistence               |
 
 ### Key Deliverables
 
@@ -40,40 +40,40 @@
 
 ### Error Summary
 
-| Category                      | Count | Severity | Notes                                     |
-|-------------------------------|-------|----------|-------------------------------------------|
-| MaxFileReadTokenExceededError  | 11    | LOW      | Large files exceeding read token limit     |
-| FileTooLargeError              | 17    | LOW      | Files exceeding size threshold             |
-| File does not exist            | 46    | LOW      | Agents attempting to read missing paths    |
-| EISDIR (read directory)        | 2     | LOW      | Agents using Read on directories           |
-| **Total ERROR events**         | **82**| --       | No CRITICAL errors detected                |
+| Category                      | Count  | Severity | Notes                                   |
+| ----------------------------- | ------ | -------- | --------------------------------------- |
+| MaxFileReadTokenExceededError | 11     | LOW      | Large files exceeding read token limit  |
+| FileTooLargeError             | 17     | LOW      | Files exceeding size threshold          |
+| File does not exist           | 46     | LOW      | Agents attempting to read missing paths |
+| EISDIR (read directory)       | 2      | LOW      | Agents using Read on directories        |
+| **Total ERROR events**        | **82** | --       | No CRITICAL errors detected             |
 
 ### Warning Summary
 
-| Category               | Count | Notes                                    |
-|------------------------|-------|------------------------------------------|
-| Streaming stalls       | 17    | Duration range: 32.9s–136.4s             |
-| Other warnings         | 18    | Miscellaneous non-critical warnings      |
-| **Total WARN events**  | **35**| --                                       |
+| Category              | Count  | Notes                               |
+| --------------------- | ------ | ----------------------------------- |
+| Streaming stalls      | 17     | Duration range: 32.9s–136.4s        |
+| Other warnings        | 18     | Miscellaneous non-critical warnings |
+| **Total WARN events** | **35** | --                                  |
 
 ### Hook Violation Summary
 
-| Violation Type         | Count  | Severity | Notes                                     |
-|------------------------|--------|----------|-------------------------------------------|
-| TASKLIST-FIRST         | 100    | HIGH     | Agents not calling TaskList() first        |
-| CREATOR_GUARD          | 27     | MEDIUM   | Direct writes to creator-protected paths   |
-| SECURITY_REVIEW        | 9      | MEDIUM   | Security-sensitive work without architect   |
-| SPECIALIST_ROUTING     | 6      | LOW      | Developer used instead of specialist       |
-| **Total violations**   | **142**| --       | --                                         |
+| Violation Type       | Count   | Severity | Notes                                     |
+| -------------------- | ------- | -------- | ----------------------------------------- |
+| TASKLIST-FIRST       | 100     | HIGH     | Agents not calling TaskList() first       |
+| CREATOR_GUARD        | 27      | MEDIUM   | Direct writes to creator-protected paths  |
+| SECURITY_REVIEW      | 9       | MEDIUM   | Security-sensitive work without architect |
+| SPECIALIST_ROUTING   | 6       | LOW      | Developer used instead of specialist      |
+| **Total violations** | **142** | --       | --                                        |
 
 ### Operational Metrics
 
-| Metric                  | Value  | Notes                                    |
-|-------------------------|--------|------------------------------------------|
-| bypassPermissions events| 1,117  | Entire session ran in bypass mode        |
-| TaskUpdate calls        | 788    | Total across all agents                  |
-| TaskUpdate (completed)  | 167    | 21.2% of all TaskUpdate calls            |
-| Streaming stalls        | 17     | Longest: 136.4s; median: ~50s            |
+| Metric                   | Value | Notes                             |
+| ------------------------ | ----- | --------------------------------- |
+| bypassPermissions events | 1,117 | Entire session ran in bypass mode |
+| TaskUpdate calls         | 788   | Total across all agents           |
+| TaskUpdate (completed)   | 167   | 21.2% of all TaskUpdate calls     |
+| Streaming stalls         | 17    | Longest: 136.4s; median: ~50s     |
 
 ---
 

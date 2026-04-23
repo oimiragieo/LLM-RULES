@@ -9,12 +9,7 @@ describe('skill-definition schema — frontmatter block (v3.1.0 dual-layer patte
   const { validateData } = require(
     path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
   );
-  const schemaPath = path.join(
-    PROJECT_ROOT,
-    '.claude',
-    'schemas',
-    'skill-definition.schema.json'
-  );
+  const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'skill-definition.schema.json');
 
   // Test 1: skill WITHOUT frontmatter block — validates (backward compat)
   test('skill without frontmatter block passes validation (backward compat)', () => {
@@ -54,11 +49,7 @@ describe('skill-definition schema — frontmatter block (v3.1.0 dual-layer patte
       },
     };
     const result = validateData(skill, schemaPath);
-    assert.strictEqual(
-      result.valid,
-      false,
-      'Non-string trigger items must fail validation'
-    );
+    assert.strictEqual(result.valid, false, 'Non-string trigger items must fail validation');
     assert.ok(Array.isArray(result.errors), 'Should have errors array');
     assert.ok(result.errors.length > 0, 'Should have at least one error');
   });
@@ -73,11 +64,7 @@ describe('skill-definition schema — frontmatter block (v3.1.0 dual-layer patte
       },
     };
     const result = validateData(skill, schemaPath);
-    assert.strictEqual(
-      result.valid,
-      false,
-      'token_budget below 1000 must fail validation'
-    );
+    assert.strictEqual(result.valid, false, 'token_budget below 1000 must fail validation');
     assert.ok(Array.isArray(result.errors), 'Should have errors array');
     assert.ok(result.errors.length > 0, 'Should have at least one error');
   });
@@ -93,11 +80,7 @@ describe('skill-definition schema — frontmatter block (v3.1.0 dual-layer patte
       },
     };
     const result = validateData(skill, schemaPath);
-    assert.strictEqual(
-      result.valid,
-      false,
-      'Unknown frontmatter property must fail validation'
-    );
+    assert.strictEqual(result.valid, false, 'Unknown frontmatter property must fail validation');
     assert.ok(Array.isArray(result.errors), 'Should have errors array');
     assert.ok(result.errors.length > 0, 'Should have at least one error');
   });

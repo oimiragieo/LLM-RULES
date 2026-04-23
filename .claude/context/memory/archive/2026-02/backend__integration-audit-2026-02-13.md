@@ -21,6 +21,7 @@ Processed 2 integration queue entries. Found 1 real gap (registry hook not in se
 **Queue Entry**: `.claude/skills/ripgrep/scripts/quick-search.mjs` — "NOT found in skill-catalog.md"
 
 **Verification**:
+
 - Artifact file: **EXISTS** at `.claude/skills/ripgrep/scripts/quick-search.mjs`
 - Catalog check: **FOUND** — `ripgrep` skill is listed in skill-catalog.md (line 51)
 - Status: **FALSE POSITIVE / STALE ENTRY**
@@ -37,6 +38,7 @@ The queue entry refers to a specific script within the ripgrep skill, but the sk
 **Queue Entry**: `.claude/hooks/safety/validators/registry.cjs` — "NOT found in settings.json"
 
 **Verification**:
+
 - Artifact file: **EXISTS** at `.claude/hooks/safety/validators/registry.cjs`
 - Settings check: **NOT REGISTERED** — Hook not found in `.claude/settings.json` PreToolUse/PostToolUse hooks
 - Status: **REAL INTEGRATION GAP**
@@ -45,11 +47,13 @@ The queue entry refers to a specific script within the ripgrep skill, but the sk
 The registry hook provides a central validator registry mapping commands to their validation functions (shell, database, filesystem, git, process, network). This is a supporting utility for command validation, likely used by bash-safety or other validators. The hook file exists but is not registered in the hook chain.
 
 **Root Cause**: The hook may be:
+
 1. A library utility (not intended to be a PreToolUse/PostToolUse hook)
 2. An optional validator that was created but not yet integrated into the hook chain
 3. A utility module for other hooks to import (not a standalone hook)
 
 **Action Taken**:
+
 - Checked hook structure: Uses `module.exports = { VALIDATOR_REGISTRY }` pattern
 - This appears to be a **library module**, not a standalone hook (no `preToolUse()` export)
 - Conclusion: Not missing from settings.json; it's a utility library for other validators
@@ -60,6 +64,7 @@ The registry hook provides a central validator registry mapping commands to thei
 ## Queue File Updates
 
 **Processed entries**:
+
 ```jsonl
 {"timestamp":"2026-02-13T06:54:12.094Z","artifactPath":".claude/skills/ripgrep/scripts/quick-search.mjs","artifactType":"skill","missingIntegration":"catalog","detail":"NOT found in skill-catalog.md","source":"creator-compliance-validator","processed":true,"resolution":"stale_entry_ripgrep_properly_catalogued"}
 {"timestamp":"2026-02-13T06:58:03.875Z","artifactPath":".claude/hooks/safety/validators/registry.cjs","artifactType":"hook","missingIntegration":"settings","detail":"NOT found in settings.json","source":"creator-compliance-validator","processed":true,"resolution":"library_module_not_hook_no_fix_needed"}
@@ -69,10 +74,10 @@ The registry hook provides a central validator registry mapping commands to thei
 
 ## Integration Status
 
-| Artifact                                      | Status        | Integration Gap? | Action                                  |
-| --------------------------------------------- | ------------- | ---------------- | --------------------------------------- |
-| `.claude/skills/ripgrep/scripts/quick-search.mjs` | Catalogued    | NO               | Queue entry marked processed (stale)    |
-| `.claude/hooks/safety/validators/registry.cjs`    | Exists        | NO               | Identified as library utility (working) |
+| Artifact                                          | Status     | Integration Gap? | Action                                  |
+| ------------------------------------------------- | ---------- | ---------------- | --------------------------------------- |
+| `.claude/skills/ripgrep/scripts/quick-search.mjs` | Catalogued | NO               | Queue entry marked processed (stale)    |
+| `.claude/hooks/safety/validators/registry.cjs`    | Exists     | NO               | Identified as library utility (working) |
 
 ---
 

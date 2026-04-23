@@ -91,6 +91,7 @@ graph TB
 ```
 
 **Legend:**
+
 - 🔴 Red boxes: NEW consolidated hooks
 - 🟢 Green boxes: NEW hooks (not consolidations)
 - White boxes: Unchanged hooks
@@ -100,6 +101,7 @@ graph TB
 **1. routing-consolidated.cjs (NEW)**
 
 Combines:
+
 - `routing-guard.cjs` (218 lines)
 - `pre-task-unified.cjs` (150 lines - routing portions only)
 - `spawn-prompt-validator.cjs` (120 lines)
@@ -130,7 +132,10 @@ module.exports = {
       const specialist = await checkSpecialistMatch(context.args.prompt);
       if (specialist && specialist !== context.args.subagent_type) {
         if (config.get('SPECIALIST_ROUTING_ENFORCEMENT') === 'block') {
-          return { allow: false, message: `Use ${specialist} instead of ${context.args.subagent_type}` };
+          return {
+            allow: false,
+            message: `Use ${specialist} instead of ${context.args.subagent_type}`,
+          };
         }
       }
     }
@@ -145,12 +150,15 @@ module.exports = {
     // Check 4: Security review gate (from routing-guard)
     if (isSecuritySensitive(context) && config.get('SECURITY_REVIEW_ENFORCEMENT') === 'block') {
       if (!context.securityArchitectSpawned) {
-        return { allow: false, message: 'Security-sensitive tasks require security-architect review' };
+        return {
+          allow: false,
+          message: 'Security-sensitive tasks require security-architect review',
+        };
       }
     }
 
     return { allow: true };
-  }
+  },
 };
 ```
 
@@ -159,6 +167,7 @@ module.exports = {
 **2. memory-index-unified.cjs (NEW)**
 
 Combines:
+
 - `sync-memory-index.cjs` (PostToolUse Edit/Write)
 - `code-index-updater.cjs` (PostToolUse Edit/Write)
 
@@ -176,12 +185,12 @@ module.exports = {
 
     // Parallel index updates (non-blocking)
     await Promise.all([
-      updateMemoryIndex(filePath),      // From sync-memory-index
-      updateCodeSearchIndex(filePath)   // From code-index-updater
+      updateMemoryIndex(filePath), // From sync-memory-index
+      updateCodeSearchIndex(filePath), // From code-index-updater
     ]);
 
     // No return value needed (informational only)
-  }
+  },
 };
 ```
 
@@ -206,11 +215,13 @@ module.exports = {
 
     // Warn if explicit model overrides config (may be intentional)
     if (explicitModel && configModel && explicitModel !== configModel) {
-      console.warn(`[config-validator] Explicit model ${explicitModel} overrides config ${configModel} for ${agentType}`);
+      console.warn(
+        `[config-validator] Explicit model ${explicitModel} overrides config ${configModel} for ${agentType}`
+      );
     }
 
     return { allow: true }; // Non-blocking (warn-only)
-  }
+  },
 };
 ```
 
@@ -259,23 +270,23 @@ class ConfigCache {
 
 **Target**: All hooks <100ms, critical path hooks <50ms.
 
-| Hook                           | Event Type           | Tools              | Budget | Current | Savings |
-| ------------------------------ | -------------------- | ------------------ | ------ | ------- | ------- |
-| routing-consolidated.cjs (NEW) | PreToolUse           | Task/Bash/Glob/Grep| <50ms  | 150ms   | -100ms  |
-| creator-guard.cjs              | PreToolUse           | Edit/Write         | <30ms  | 30ms    | 0ms     |
-| security-input-validator.cjs   | PreToolUse           | All                | <40ms  | 40ms    | 0ms     |
-| pre-tool-unified.cjs           | PreToolUse           | All                | <80ms  | 80ms    | 0ms     |
-| config-validator.cjs (NEW)     | PreToolUse           | Task               | <20ms  | N/A     | N/A     |
-| tool-scope-validator.cjs       | PreToolUse           | All                | <15ms  | 15ms    | 0ms     |
-| execution-limit-monitor.cjs    | PreToolUse           | All                | <10ms  | 10ms    | 0ms     |
-| reflection-step0-guard.cjs     | PreToolUse           | TaskList           | <25ms  | 25ms    | 0ms     |
-| **PreToolUse Total**           | -                    | -                  | <270ms | 350ms   | **-80ms**   |
-| post-tool-metrics-unified.cjs  | PostToolUse          | All                | <60ms  | 60ms    | 0ms     |
-| memory-index-unified.cjs (NEW) | PostToolUse          | Edit/Write         | <100ms | 160ms   | -60ms   |
-| unified-reflection-handler.cjs | PostToolUse          | Task/TaskUpdate    | <40ms  | 40ms    | 0ms     |
-| post-creation-integration.cjs  | PostToolUse          | TaskUpdate         | <50ms  | 50ms    | 0ms     |
-| **PostToolUse Total**          | -                    | -                  | <250ms | 310ms   | **-60ms**   |
-| **Grand Total (critical path)**| -                    | -                  | <520ms | 660ms   | **-140ms** |
+| Hook                            | Event Type  | Tools               | Budget | Current | Savings    |
+| ------------------------------- | ----------- | ------------------- | ------ | ------- | ---------- |
+| routing-consolidated.cjs (NEW)  | PreToolUse  | Task/Bash/Glob/Grep | <50ms  | 150ms   | -100ms     |
+| creator-guard.cjs               | PreToolUse  | Edit/Write          | <30ms  | 30ms    | 0ms        |
+| security-input-validator.cjs    | PreToolUse  | All                 | <40ms  | 40ms    | 0ms        |
+| pre-tool-unified.cjs            | PreToolUse  | All                 | <80ms  | 80ms    | 0ms        |
+| config-validator.cjs (NEW)      | PreToolUse  | Task                | <20ms  | N/A     | N/A        |
+| tool-scope-validator.cjs        | PreToolUse  | All                 | <15ms  | 15ms    | 0ms        |
+| execution-limit-monitor.cjs     | PreToolUse  | All                 | <10ms  | 10ms    | 0ms        |
+| reflection-step0-guard.cjs      | PreToolUse  | TaskList            | <25ms  | 25ms    | 0ms        |
+| **PreToolUse Total**            | -           | -                   | <270ms | 350ms   | **-80ms**  |
+| post-tool-metrics-unified.cjs   | PostToolUse | All                 | <60ms  | 60ms    | 0ms        |
+| memory-index-unified.cjs (NEW)  | PostToolUse | Edit/Write          | <100ms | 160ms   | -60ms      |
+| unified-reflection-handler.cjs  | PostToolUse | Task/TaskUpdate     | <40ms  | 40ms    | 0ms        |
+| post-creation-integration.cjs   | PostToolUse | TaskUpdate          | <50ms  | 50ms    | 0ms        |
+| **PostToolUse Total**           | -           | -                   | <250ms | 310ms   | **-60ms**  |
+| **Grand Total (critical path)** | -           | -                   | <520ms | 660ms   | **-140ms** |
 
 **Performance Improvement:** 21% latency reduction on critical path (Task invocation + Edit/Write).
 
@@ -324,6 +335,7 @@ class ConfigCache {
 6. `.claude/context/runtime/workflow-state.json` (workflow state)
 
 **Impact:**
+
 - Developer confusion: "Which config controls model selection?"
 - Inconsistent behavior: 5-layer precedence chain
 - Merge conflicts: 6 files touched per config change
@@ -382,6 +394,7 @@ graph TB
 3. Hardcoded defaults in ConfigCache (lowest priority)
 
 **Removed layers:**
+
 - Agent frontmatter model (duplicated config.yaml, inconsistency risk)
 - Complexity-based defaults (implicit magic, use explicit config.yaml)
 
@@ -392,7 +405,7 @@ graph TB
 ```yaml
 # .claude/config.yaml - Static configuration (checked into VCS)
 
-version: "2.0"
+version: '2.0'
 
 agents:
   planner:
@@ -461,8 +474,8 @@ quality_gates:
   mutation_score_threshold: 70
 
 tools:
-  cli_category_prefix: true  # Use pnpm <category>:<tool-name> pattern
-  auto_wire_new_tools: true  # Auto-add to package.json on tool creation
+  cli_category_prefix: true # Use pnpm <category>:<tool-name> pattern
+  auto_wire_new_tools: true # Auto-add to package.json on tool creation
 ```
 
 #### .env Structure
@@ -530,17 +543,18 @@ async function migrateConfig() {
   console.log('[migrate-config] ✅ .env.example created (copy to .env and customize)');
 
   // Step 5: Archive old files
-  archiveOldConfig([
-    '.claude/settings.json',
-    '.claude/lib/utils/environment.cjs'
-  ]);
-  console.log('[migrate-config] ✅ Old config files archived to .claude/_archive/config-migration-2026-02-13/');
+  archiveOldConfig(['.claude/settings.json', '.claude/lib/utils/environment.cjs']);
+  console.log(
+    '[migrate-config] ✅ Old config files archived to .claude/_archive/config-migration-2026-02-13/'
+  );
 
   // Step 6: Update 23 references
   updateConfigReferences();
   console.log('[migrate-config] ✅ Updated 23 references to use ConfigCache');
 
-  console.log('[migrate-config] Migration complete! Review .claude/config.yaml and create .env from .env.example');
+  console.log(
+    '[migrate-config] Migration complete! Review .claude/config.yaml and create .env from .env.example'
+  );
 }
 
 migrateConfig().catch(console.error);
@@ -577,11 +591,7 @@ migrateConfig().catch(console.error);
           "properties": {
             "model": {
               "type": "string",
-              "enum": [
-                "claude-opus-4-5-20251101",
-                "claude-sonnet-4-5",
-                "claude-haiku-4-5"
-              ]
+              "enum": ["claude-opus-4-5-20251101", "claude-sonnet-4-5", "claude-haiku-4-5"]
             },
             "extended_thinking": { "type": "boolean" },
             "skills": {
@@ -775,6 +785,7 @@ MemoryEventBus.getInstance().onExtraction(({ entities }) => {
 ```
 
 **Benefits:**
+
 - No circular imports (both depend on MemoryEventBus, not each other)
 - Loose coupling (modules don't know about each other)
 - Testable in isolation (mock event bus)
@@ -795,7 +806,7 @@ module.exports = {
   preToolUse(context) {
     const agent = routingTable.getAgent(context.intent); // Used in function
     return checkAgent(agent);
-  }
+  },
 };
 ```
 
@@ -812,11 +823,12 @@ module.exports = {
     }
     const agent = routingTable.getAgent(context.intent);
     return checkAgent(agent);
-  }
+  },
 };
 ```
 
 **Benefits:**
+
 - Breaks circular dependency (routing-table loads first, routing-guard loads lazily)
 - No performance penalty after first call (cached in `routingTable` variable)
 - Minimal code changes
@@ -843,7 +855,8 @@ function loadConfig() {
 
 ```javascript
 // config-reader.cjs
-function loadConfig(agentRegistryLoader = null) { // Accept optional dependency
+function loadConfig(agentRegistryLoader = null) {
+  // Accept optional dependency
   const agents = agentRegistryLoader ? agentRegistryLoader.load() : [];
   return { ...config, agents };
 }
@@ -854,6 +867,7 @@ const config = loadConfig(agentRegistry);
 ```
 
 **Benefits:**
+
 - Explicit dependencies (no hidden circular imports)
 - Testable (inject mock dependencies)
 - Flexible (can provide different implementations)
@@ -926,6 +940,7 @@ graph TB
 ```
 
 **Legend:**
+
 - 🔴 Red: Circular dependency (before)
 - 🟢 Green: No circular dependency (after)
 - 🟡 Yellow: Coordination/injection point
@@ -944,7 +959,11 @@ test('No circular dependencies in memory subsystem', async () => {
   const result = await madge('.claude/lib/memory/', { fileExtensions: ['cjs'] });
   const circular = result.circular();
 
-  assert.strictEqual(circular.length, 0, `Found ${circular.length} circular dependencies: ${JSON.stringify(circular)}`);
+  assert.strictEqual(
+    circular.length,
+    0,
+    `Found ${circular.length} circular dependencies: ${JSON.stringify(circular)}`
+  );
 });
 
 test('No circular dependencies in routing subsystem', async () => {
@@ -1023,27 +1042,27 @@ test('No circular dependencies in config subsystem', async () => {
 
 ## Skills (214 files)
 
-| File | Reason | References | Last Modified |
-|------|--------|------------|---------------|
-| tdd-assistant-basic.md | Duplicate of tdd.md | 0 | 2026-01-15 |
-| security-scan-helper.md | Consolidated into security-architect.md | 0 | 2026-01-10 |
-| ... | ... | ... | ... |
+| File                    | Reason                                  | References | Last Modified |
+| ----------------------- | --------------------------------------- | ---------- | ------------- |
+| tdd-assistant-basic.md  | Duplicate of tdd.md                     | 0          | 2026-01-15    |
+| security-scan-helper.md | Consolidated into security-architect.md | 0          | 2026-01-10    |
+| ...                     | ...                                     | ...        | ...           |
 
 ## Hooks (50+ files)
 
-| File | Reason | Consolidated Into | Last Modified |
-|------|--------|-------------------|---------------|
-| routing-validator.cjs | Merged into routing-consolidated.cjs | routing-consolidated.cjs | 2026-02-08 |
-| memory-sync.cjs | Merged into memory-index-unified.cjs | memory-index-unified.cjs | 2026-02-08 |
-| ... | ... | ... | ... |
+| File                  | Reason                               | Consolidated Into        | Last Modified |
+| --------------------- | ------------------------------------ | ------------------------ | ------------- |
+| routing-validator.cjs | Merged into routing-consolidated.cjs | routing-consolidated.cjs | 2026-02-08    |
+| memory-sync.cjs       | Merged into memory-index-unified.cjs | memory-index-unified.cjs | 2026-02-08    |
+| ...                   | ...                                  | ...                      | ...           |
 
 ## Lib Modules (25-30 files)
 
-| File | Reason | Replacement | Last Modified |
-|------|--------|-------------|---------------|
-| lib/memory/memory-constants.cjs | Merged into memory-storage.cjs | memory-storage.cjs | 2026-02-11 |
-| lib/routing/semantic-router.cjs | Merged into intelligent-router.cjs | intelligent-router.cjs | 2026-02-13 |
-| ... | ... | ... | ... |
+| File                            | Reason                             | Replacement            | Last Modified |
+| ------------------------------- | ---------------------------------- | ---------------------- | ------------- |
+| lib/memory/memory-constants.cjs | Merged into memory-storage.cjs     | memory-storage.cjs     | 2026-02-11    |
+| lib/routing/semantic-router.cjs | Merged into intelligent-router.cjs | intelligent-router.cjs | 2026-02-13    |
+| ...                             | ...                                | ...                    | ...           |
 ```
 
 ### 4.3 Module Consolidation Plan
@@ -1176,14 +1195,14 @@ class StateManager {
 
   constructor() {
     this.state = {
-      workflow: {},    // from workflow-state-manager
-      session: {},     // from session-state-manager
-      reflection: {},  // from reflection-state-manager
-      memory: {},      // from memory-state-manager
-      routing: {},     // from routing-state-manager
-      hooks: {},       // from hook-state-manager
-      tasks: {},       // from task-state-manager
-      loop: {},        // from loop-state-manager
+      workflow: {}, // from workflow-state-manager
+      session: {}, // from session-state-manager
+      reflection: {}, // from reflection-state-manager
+      memory: {}, // from memory-state-manager
+      routing: {}, // from routing-state-manager
+      hooks: {}, // from hook-state-manager
+      tasks: {}, // from task-state-manager
+      loop: {}, // from loop-state-manager
     };
   }
 
@@ -1209,7 +1228,7 @@ class StateManager {
   }
 
   async load() {
-    this.state = await readJSON('.claude/context/runtime/state.json') || {};
+    this.state = (await readJSON('.claude/context/runtime/state.json')) || {};
   }
 }
 
@@ -1350,8 +1369,12 @@ const creatorValidator = require('.claude/lib/validation/creator-path-validator.
 const fileSafety = require('.claude/lib/validation/file-safety-validator.cjs');
 // ... 4 more imports
 
-if (!creatorValidator.isValid(path)) { /* ... */ }
-if (!fileSafety.isValid(path)) { /* ... */ }
+if (!creatorValidator.isValid(path)) {
+  /* ... */
+}
+if (!fileSafety.isValid(path)) {
+  /* ... */
+}
 ```
 
 **Usage After (1 import):**
@@ -1360,8 +1383,12 @@ if (!fileSafety.isValid(path)) { /* ... */ }
 const { PathValidator } = require('.claude/lib/validation/path-validator.cjs');
 
 const validation = PathValidator.validate(path);
-if (!validation.creatorPath) { /* ... */ }
-if (!validation.fileSafety) { /* ... */ }
+if (!validation.creatorPath) {
+  /* ... */
+}
+if (!validation.fileSafety) {
+  /* ... */
+}
 ```
 
 **Complexity Reduction:** 6 modules → 1 module (83% reduction)
@@ -1412,8 +1439,8 @@ class ErrorSanitizer {
     // From log-sanitizer.cjs
     return message
       .replace(/sk-[a-zA-Z0-9]{48}/g, 'sk-***') // API keys
-      .replace(/password=\S+/g, 'password=***')  // Passwords
-      .replace(/token=\S+/g, 'token=***');       // Tokens
+      .replace(/password=\S+/g, 'password=***') // Passwords
+      .replace(/token=\S+/g, 'token=***'); // Tokens
   }
 
   // Unified sanitize method (all operations)
@@ -1435,14 +1462,14 @@ module.exports = { ErrorSanitizer };
 
 ### 4.4 Module Consolidation Summary
 
-| Subsystem       | Before | After | Reduction | Strategy        |
-| --------------- | ------ | ----- | --------- | --------------- |
-| Memory          | 15     | 5     | 67%       | Facade pattern  |
-| State Managers  | 8      | 1     | 88%       | Singleton       |
-| Config Readers  | 5      | 1     | 80%       | Singleton cache |
-| Path Validators | 6      | 1     | 83%       | Facade pattern  |
-| Error Sanitizers| 3      | 1     | 67%       | Singleton       |
-| **TOTAL**       | **37** | **9** | **76%**   | -               |
+| Subsystem        | Before | After | Reduction | Strategy        |
+| ---------------- | ------ | ----- | --------- | --------------- |
+| Memory           | 15     | 5     | 67%       | Facade pattern  |
+| State Managers   | 8      | 1     | 88%       | Singleton       |
+| Config Readers   | 5      | 1     | 80%       | Singleton cache |
+| Path Validators  | 6      | 1     | 83%       | Facade pattern  |
+| Error Sanitizers | 3      | 1     | 67%       | Singleton       |
+| **TOTAL**        | **37** | **9** | **76%**   | -               |
 
 **Overall Module Count Reduction:** 37 modules → 9 modules (76% reduction)
 
@@ -1537,14 +1564,16 @@ hooks:
     # OLD hooks (priority 90-99, disabled after migration)
     - name: routing-guard
       priority: 90
-      enabled: false  # Disabled after migration complete
+      enabled: false # Disabled after migration complete
 ```
 
 **Import Compatibility (Deprecated Exports):**
 
 ```javascript
 // .claude/lib/memory/memory-search.cjs (deprecated wrapper)
-console.warn('[DEPRECATED] memory-search.cjs is deprecated. Use require(".claude/lib/memory").searchMemory instead.');
+console.warn(
+  '[DEPRECATED] memory-search.cjs is deprecated. Use require(".claude/lib/memory").searchMemory instead.'
+);
 module.exports = require('./core/memory-query.cjs').MemoryQuery;
 ```
 
@@ -1575,26 +1604,29 @@ class ConfigCache {
 **If migration fails:**
 
 1. **Rollback config.yaml changes:**
+
    ```bash
    git checkout HEAD -- .claude/config.yaml
    cp .claude/_archive/config-migration-2026-02-13/settings.json .claude/settings.json
    ```
 
 2. **Disable new hooks:**
+
    ```yaml
    # config.yaml (or .env override)
    hooks:
      PreToolUse:
        - name: routing-consolidated
-         enabled: false  # Disable new hook
+         enabled: false # Disable new hook
    ```
 
 3. **Re-enable old hooks:**
+
    ```yaml
    hooks:
      PreToolUse:
        - name: routing-guard
-         enabled: true  # Re-enable old hook
+         enabled: true # Re-enable old hook
    ```
 
 4. **Restore old imports (manual):**
@@ -1617,36 +1649,36 @@ pnpm format
 
 ### 6.1 Detailed Task Breakdown
 
-| Phase                     | Tasks                                                          | Effort (hours) |
-| ------------------------- | -------------------------------------------------------------- | -------------- |
-| **Phase 1: Foundation**   |                                                                |                |
-| Hook consolidation        | Create routing-consolidated.cjs, memory-index-unified.cjs      | 12             |
-| Config unification        | Create ConfigCache singleton, config.yaml schema               | 8              |
-| State consolidation       | Create StateManager singleton                                  | 6              |
-| Memory facade             | Create lib/memory/core/ with 4 modules + facade                | 16             |
-| Path/error consolidation  | Create PathValidator, ErrorSanitizer facades                   | 8              |
-| Unit tests                | Tests for all new modules (80% coverage)                       | 20             |
-| Integration tests         | Hook pipeline, config loading tests                            | 8              |
-| **Phase 1 Total**         | -                                                              | **78**         |
-| **Phase 2: Migration**    |                                                                |                |
-| Migration script          | Automate config.yaml generation from settings.json             | 12             |
-| Import updates            | Automated script to update 100+ import statements              | 8              |
-| Hook registration         | Update config.yaml hook registration                           | 4              |
-| Manual review             | Review all changes, fix edge cases                             | 12             |
-| **Phase 2 Total**         | -                                                              | **36**         |
-| **Phase 3: Validation**   |                                                                |                |
-| Test execution            | Run full test suite, fix failures                              | 12             |
-| Performance benchmarks    | Measure hook latency, verify improvements                      | 8              |
-| Circular dependency check | Run madge, verify 0 circular imports                           | 4              |
-| Code review               | Peer review of all changes                                     | 8              |
-| **Phase 3 Total**         | -                                                              | **32**         |
-| **Phase 4: Deprecation**  |                                                                |                |
-| Archive old code          | Move 37 modules to _archive/, generate ARCHIVAL_LOG.md         | 8              |
-| Update documentation      | Update 5 @reference docs, README                               | 12             |
-| Remove deprecated code    | Delete old code after 30-day grace period                      | 4              |
-| Final QA                  | End-to-end testing, performance validation                     | 8              |
-| **Phase 4 Total**         | -                                                              | **32**         |
-| **GRAND TOTAL**           | -                                                              | **178 hours**  |
+| Phase                     | Tasks                                                     | Effort (hours) |
+| ------------------------- | --------------------------------------------------------- | -------------- |
+| **Phase 1: Foundation**   |                                                           |                |
+| Hook consolidation        | Create routing-consolidated.cjs, memory-index-unified.cjs | 12             |
+| Config unification        | Create ConfigCache singleton, config.yaml schema          | 8              |
+| State consolidation       | Create StateManager singleton                             | 6              |
+| Memory facade             | Create lib/memory/core/ with 4 modules + facade           | 16             |
+| Path/error consolidation  | Create PathValidator, ErrorSanitizer facades              | 8              |
+| Unit tests                | Tests for all new modules (80% coverage)                  | 20             |
+| Integration tests         | Hook pipeline, config loading tests                       | 8              |
+| **Phase 1 Total**         | -                                                         | **78**         |
+| **Phase 2: Migration**    |                                                           |                |
+| Migration script          | Automate config.yaml generation from settings.json        | 12             |
+| Import updates            | Automated script to update 100+ import statements         | 8              |
+| Hook registration         | Update config.yaml hook registration                      | 4              |
+| Manual review             | Review all changes, fix edge cases                        | 12             |
+| **Phase 2 Total**         | -                                                         | **36**         |
+| **Phase 3: Validation**   |                                                           |                |
+| Test execution            | Run full test suite, fix failures                         | 12             |
+| Performance benchmarks    | Measure hook latency, verify improvements                 | 8              |
+| Circular dependency check | Run madge, verify 0 circular imports                      | 4              |
+| Code review               | Peer review of all changes                                | 8              |
+| **Phase 3 Total**         | -                                                         | **32**         |
+| **Phase 4: Deprecation**  |                                                           |                |
+| Archive old code          | Move 37 modules to \_archive/, generate ARCHIVAL_LOG.md   | 8              |
+| Update documentation      | Update 5 @reference docs, README                          | 12             |
+| Remove deprecated code    | Delete old code after 30-day grace period                 | 4              |
+| Final QA                  | End-to-end testing, performance validation                | 8              |
+| **Phase 4 Total**         | -                                                         | **32**         |
+| **GRAND TOTAL**           | -                                                         | **178 hours**  |
 
 **Total Effort:** 178 hours = **4.5 weeks** (1 developer full-time, 40 hours/week)
 
@@ -1657,6 +1689,7 @@ pnpm format
 ### 6.2 Deliverables Checklist
 
 **Week 1: Foundation**
+
 - [ ] routing-consolidated.cjs created and tested
 - [ ] memory-index-unified.cjs created and tested
 - [ ] config-validator.cjs created and tested
@@ -1669,6 +1702,7 @@ pnpm format
 - [ ] Integration tests passing
 
 **Week 2: Migration**
+
 - [ ] migrate-config-consolidation.mjs script working
 - [ ] config.yaml generated and validated
 - [ ] .env.example created
@@ -1677,6 +1711,7 @@ pnpm format
 - [ ] All tests passing after migration
 
 **Week 3: Validation**
+
 - [ ] Full test suite passing (433/433 tests)
 - [ ] Lint: 0 errors
 - [ ] Format: no changes
@@ -1685,7 +1720,8 @@ pnpm format
 - [ ] Code review approved
 
 **Week 4: Deprecation**
-- [ ] 37 modules archived to _archive/deprecated-2026-02-13/
+
+- [ ] 37 modules archived to \_archive/deprecated-2026-02-13/
 - [ ] ARCHIVAL_LOG.md generated
 - [ ] 5 @reference docs updated
 - [ ] README.md updated with config.yaml instructions
@@ -1693,6 +1729,7 @@ pnpm format
 - [ ] Performance validation complete
 
 **Week 5-6: Buffer & Documentation**
+
 - [ ] Address any issues from QA
 - [ ] Write migration guide for future developers
 - [ ] Create architecture diagrams (Mermaid)
@@ -1705,21 +1742,22 @@ pnpm format
 
 ### 7.1 Quantitative Metrics
 
-| Metric                         | Before | Target | Measurement Method                          |
-| ------------------------------ | ------ | ------ | ------------------------------------------- |
-| **Hook Count**                 | 48     | ~20    | Count files in .claude/hooks/ (active only) |
-| **Hook Latency (critical path)**| 660ms | <520ms | Benchmark: pnpm benchmark:hooks             |
-| **Config Files**               | 6      | 2      | Count: config.yaml + .env                   |
-| **Module Count (lib/)**        | 37     | 9      | Count files in .claude/lib/                 |
-| **Circular Dependencies**      | 3      | 0      | Test: pnpm test:circular-deps               |
-| **Orphaned Files**             | 25-30  | 0      | Scan: pnpm detect:orphans                   |
-| **Test Pass Rate**             | 99.3%  | 100%   | pnpm test (433 tests)                       |
-| **Lint Errors**                | 0      | 0      | pnpm lint:fix                               |
-| **Architecture Health Score**  | 7.2/10 | 8.5/10 | Manual review + metrics composite           |
+| Metric                           | Before | Target | Measurement Method                          |
+| -------------------------------- | ------ | ------ | ------------------------------------------- |
+| **Hook Count**                   | 48     | ~20    | Count files in .claude/hooks/ (active only) |
+| **Hook Latency (critical path)** | 660ms  | <520ms | Benchmark: pnpm benchmark:hooks             |
+| **Config Files**                 | 6      | 2      | Count: config.yaml + .env                   |
+| **Module Count (lib/)**          | 37     | 9      | Count files in .claude/lib/                 |
+| **Circular Dependencies**        | 3      | 0      | Test: pnpm test:circular-deps               |
+| **Orphaned Files**               | 25-30  | 0      | Scan: pnpm detect:orphans                   |
+| **Test Pass Rate**               | 99.3%  | 100%   | pnpm test (433 tests)                       |
+| **Lint Errors**                  | 0      | 0      | pnpm lint:fix                               |
+| **Architecture Health Score**    | 7.2/10 | 8.5/10 | Manual review + metrics composite           |
 
 ### 7.2 Qualitative Goals
 
 **Developer Experience:**
+
 - [ ] Single import for memory operations: `require('.claude/lib/memory')`
 - [ ] Single import for state: `StateManager.getInstance()`
 - [ ] Single import for config: `ConfigCache.getInstance()`
@@ -1727,17 +1765,20 @@ pnpm format
 - [ ] No confusion about which config file to edit
 
 **Maintainability:**
+
 - [ ] No circular dependencies (verified by CI)
 - [ ] All modules have single responsibility
 - [ ] No code duplication across modules
 - [ ] Clear module ownership (documented in code)
 
 **Performance:**
+
 - [ ] Hook latency <520ms (21% improvement)
 - [ ] Config reads: 1 per session (vs 30+ previously)
 - [ ] No performance regressions in test suite
 
 **Documentation:**
+
 - [ ] Architecture diagrams up-to-date (Mermaid)
 - [ ] All @reference docs updated
 - [ ] Migration guide for future developers
@@ -1749,14 +1790,14 @@ pnpm format
 
 ### 8.1 Identified Risks
 
-| Risk                             | Probability | Impact | Mitigation                                          |
-| -------------------------------- | ----------- | ------ | --------------------------------------------------- |
-| **Circular deps not fully broken**| Medium      | High   | Add madge to CI, fail build on circular deps        |
-| **Import update script misses files**| Medium   | Medium | Manual review, grep for old import patterns         |
-| **Hook performance regression** | Low         | High   | Benchmark before/after, revert if >10% regression   |
-| **Config migration data loss**  | Low         | High   | Backup settings.json before migration, dry-run mode |
-| **Test failures after migration**| Medium     | Medium | Comprehensive integration tests, rollback plan      |
-| **Backward compat breaks**      | Low         | Medium | 30-day deprecation period, warn-only mode           |
+| Risk                                  | Probability | Impact | Mitigation                                          |
+| ------------------------------------- | ----------- | ------ | --------------------------------------------------- |
+| **Circular deps not fully broken**    | Medium      | High   | Add madge to CI, fail build on circular deps        |
+| **Import update script misses files** | Medium      | Medium | Manual review, grep for old import patterns         |
+| **Hook performance regression**       | Low         | High   | Benchmark before/after, revert if >10% regression   |
+| **Config migration data loss**        | Low         | High   | Backup settings.json before migration, dry-run mode |
+| **Test failures after migration**     | Medium      | Medium | Comprehensive integration tests, rollback plan      |
+| **Backward compat breaks**            | Low         | Medium | 30-day deprecation period, warn-only mode           |
 
 ### 8.2 Mitigation Strategies
 
@@ -1766,7 +1807,6 @@ pnpm format
 # .github/workflows/ci.yml
 - name: Check circular dependencies
   run: pnpm test:circular-deps
-
 # Fails build if any circular imports detected
 ```
 
@@ -1852,6 +1892,7 @@ This refactored architecture addresses four critical architectural debt areas:
 **Estimated Effort:** 4-6 weeks (1 developer full-time)
 
 **Success Criteria:**
+
 - Architecture health score: 7.2/10 → 8.5/10
 - Test pass rate: 99.3% → 100%
 - All quantitative targets met (see Section 7.1)

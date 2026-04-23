@@ -13,6 +13,7 @@
 The agent-studio framework contains **~98,000 lines of CJS code** and **~580,000 lines of Markdown** across **1,854 active files**, with an additional **1,627 archived files** (13,253 lines). The framework has grown organically and accumulated significant complexity that can be reduced without losing functionality.
 
 **Key findings:**
+
 - **48 workflow modules** (15,925 lines), of which **22+ are dead code** (never imported)
 - **32 memory modules** (12,309 lines), of which **5+ are dead code**
 - **3 separate keyword-to-agent mapping systems** doing overlapping work
@@ -33,30 +34,30 @@ The agent-studio framework contains **~98,000 lines of CJS code** and **~580,000
 
 **Dead modules (confirmed zero external imports):**
 
-| Module | Lines | Purpose |
-|--------|-------|---------|
-| `strangler-fig.cjs` | 331 | Strangler fig pattern |
-| `deployment-manager.cjs` | 344 | Deployment orchestration |
-| `brownfield-orchestrator.cjs` | 178 | Brownfield migration |
-| `migration-executor.cjs` | 239 | Migration execution |
-| `fan-out-fan-in.cjs` | 197 | Fan-out/fan-in pattern |
-| `result-streamer.cjs` | 167 | Result streaming |
-| `interface-mapper.cjs` | 341 | Interface mapping |
-| `version-registry.cjs` | 302 | Version tracking |
-| `workflow-versioner.cjs` | 247 | Workflow versioning |
-| `workflow-composer.cjs` | 325 | Workflow composition |
-| `domain-detector.cjs` | 243 | Domain detection |
-| `dynamic-task-generator.cjs` | 188 | Dynamic task generation |
-| `integration-impact.cjs` | 436 | Integration impact analysis |
-| `parallel-phase-executor.cjs` | 355 | Parallel phase execution |
-| `hybrid-executor.cjs` | 278 | Hybrid execution |
-| `adapter-registry.cjs` | 137 | Adapter registry |
-| `memory-budgeter.cjs` | 134 | Memory budgeting |
-| `legacy-adapter.cjs` | 128 | Legacy adaptation |
-| `loop-executor.cjs` | 219 | Loop execution |
-| `result-normalizer.cjs` | 309 | Result normalization |
-| `saga-coordinator.cjs` | 499 | Saga coordination (self-referential only) |
-| `workflow-cache.cjs` | 211 | Workflow caching |
+| Module                        | Lines | Purpose                                   |
+| ----------------------------- | ----- | ----------------------------------------- |
+| `strangler-fig.cjs`           | 331   | Strangler fig pattern                     |
+| `deployment-manager.cjs`      | 344   | Deployment orchestration                  |
+| `brownfield-orchestrator.cjs` | 178   | Brownfield migration                      |
+| `migration-executor.cjs`      | 239   | Migration execution                       |
+| `fan-out-fan-in.cjs`          | 197   | Fan-out/fan-in pattern                    |
+| `result-streamer.cjs`         | 167   | Result streaming                          |
+| `interface-mapper.cjs`        | 341   | Interface mapping                         |
+| `version-registry.cjs`        | 302   | Version tracking                          |
+| `workflow-versioner.cjs`      | 247   | Workflow versioning                       |
+| `workflow-composer.cjs`       | 325   | Workflow composition                      |
+| `domain-detector.cjs`         | 243   | Domain detection                          |
+| `dynamic-task-generator.cjs`  | 188   | Dynamic task generation                   |
+| `integration-impact.cjs`      | 436   | Integration impact analysis               |
+| `parallel-phase-executor.cjs` | 355   | Parallel phase execution                  |
+| `hybrid-executor.cjs`         | 278   | Hybrid execution                          |
+| `adapter-registry.cjs`        | 137   | Adapter registry                          |
+| `memory-budgeter.cjs`         | 134   | Memory budgeting                          |
+| `legacy-adapter.cjs`          | 128   | Legacy adaptation                         |
+| `loop-executor.cjs`           | 219   | Loop execution                            |
+| `result-normalizer.cjs`       | 309   | Result normalization                      |
+| `saga-coordinator.cjs`        | 499   | Saga coordination (self-referential only) |
+| `workflow-cache.cjs`          | 211   | Workflow caching                          |
 
 **Total dead code: ~5,258 lines (33% of workflow module)**
 
@@ -73,15 +74,15 @@ The agent-studio framework contains **~98,000 lines of CJS code** and **~580,000
 
 **Dead or near-dead modules:**
 
-| Module | Lines | Status |
-|--------|-------|--------|
-| `cold-storage.cjs` | 336 | Only imported by lancedb-client (not by any hook/tool) |
-| `semantic-archival.cjs` | 498 | Only imported by learnings-parser (circular chain, unused) |
-| `smart-pruner.cjs` | 736 | Zero external imports |
-| `memory-rotator.cjs` | 750 | Zero external imports |
-| `memory-consolidation.cjs` | 44 | Zero external imports |
-| `session-context-for-search.cjs` | 143 | Zero external imports (checked) |
-| `session-summary.cjs` | 141 | Zero external imports (checked) |
+| Module                           | Lines | Status                                                     |
+| -------------------------------- | ----- | ---------------------------------------------------------- |
+| `cold-storage.cjs`               | 336   | Only imported by lancedb-client (not by any hook/tool)     |
+| `semantic-archival.cjs`          | 498   | Only imported by learnings-parser (circular chain, unused) |
+| `smart-pruner.cjs`               | 736   | Zero external imports                                      |
+| `memory-rotator.cjs`             | 750   | Zero external imports                                      |
+| `memory-consolidation.cjs`       | 44    | Zero external imports                                      |
+| `session-context-for-search.cjs` | 143   | Zero external imports (checked)                            |
+| `session-summary.cjs`            | 141   | Zero external imports (checked)                            |
 
 **Total dead code: ~2,648 lines (21% of memory module)**
 
@@ -100,10 +101,7 @@ The agent-studio framework contains **~98,000 lines of CJS code** and **~580,000
 2. **`SPECIALIST_KEYWORD_MAP`** in `routing-guard.cjs` (23 agents, contextual phrases with word-boundary regex)
 3. **`DOMAIN_SPECIALIST_MAP`** in `phase-advance-reader.cjs` (33 keywords, substring matching)
 
-Plus additional structures in the same routing-table.cjs:
-4. **`ROUTING_PREFIX_PATTERNS`** (6 pattern entries, redundant with ROUTING_TABLE)
-5. **`ROUTING_PATTERNS`** (regex patterns with priorities)
-6. **`INTENT_KEYWORDS`** (500+ keywords across all agents)
+Plus additional structures in the same routing-table.cjs: 4. **`ROUTING_PREFIX_PATTERNS`** (6 pattern entries, redundant with ROUTING_TABLE) 5. **`ROUTING_PATTERNS`** (regex patterns with priorities) 6. **`INTENT_KEYWORDS`** (500+ keywords across all agents)
 
 **Problem:** Six overlapping mapping systems that must be kept in sync. When a new agent is added, keywords must be added to 3+ places. The routing-table.cjs alone is 2,042 lines -- a single file doing too many things.
 
@@ -135,11 +133,11 @@ This eliminates 3 of the 6 mapping structures and reduces the maintenance surfac
 
 **Current state:** Three JSON files track agent information:
 
-| File | Lines | Purpose |
-|------|-------|---------|
+| File                  | Lines | Purpose                                                    |
+| --------------------- | ----- | ---------------------------------------------------------- |
 | `agent-registry.json` | 4,375 | Full agent definitions with capabilities, skills, keywords |
-| `agent-catalog.json` | 1,296 | Simplified agent listing with categories |
-| `agent-config.json` | 851 | Runtime agent configuration with models |
+| `agent-catalog.json`  | 1,296 | Simplified agent listing with categories                   |
+| `agent-config.json`   | 851   | Runtime agent configuration with models                    |
 
 **Problem:** Same 49 agents described in 3 different JSON files (6,522 lines total), plus the routing-table.cjs maps. When agents change, all must be updated. High maintenance burden, frequent drift.
 
@@ -153,6 +151,7 @@ This eliminates 3 of the 6 mapping structures and reduces the maintenance surfac
 ### 1.5 Hook Execution Overhead (HIGH)
 
 **Current state:** `settings.json` registers **42 hook invocations** across events:
+
 - PreToolUse: 25 hooks
 - PostToolUse: 11 hooks
 - UserPromptSubmit: 3 hooks
@@ -207,6 +206,7 @@ For a single **Write** operation: **14 Node.js processes spawn** (9 Pre + 5 Post
 ### 2.3 Routing Table Bloat (2,042 lines)
 
 **Current state:** `routing-table.cjs` contains:
+
 - `ROUTING_TABLE` (172 entries) -- simple keyword-agent map
 - `ROUTING_PREFIX_PATTERNS` (6 entries) -- redundant with ROUTING_TABLE
 - `ROUTING_PATTERNS` (regex patterns) -- 8 agent patterns with priorities
@@ -216,6 +216,7 @@ For a single **Write** operation: **14 Node.js processes spawn** (9 Pre + 5 Post
 **Problem:** `INTENT_KEYWORDS` alone contains 500+ keywords with significant overlap with `ROUTING_TABLE`. The `ROUTING_PREFIX_PATTERNS` is entirely redundant (all patterns exist in `ROUTING_TABLE` already).
 
 **Proposed simplification:**
+
 1. Delete `ROUTING_PREFIX_PATTERNS` (redundant)
 2. Merge `ROUTING_PATTERNS` into `ROUTING_TABLE` with a `patterns` field
 3. Reduce `INTENT_KEYWORDS` to top-5 discriminating keywords per agent (500+ to ~245)
@@ -231,12 +232,14 @@ For a single **Write** operation: **14 Node.js processes spawn** (9 Pre + 5 Post
 **Current state:** `.claude/docs/` contains 24 files totaling 10,623 lines. `.claude/workflows/` contains 15,830 lines of workflow documentation. CLAUDE.md is 589 lines with heavy cross-referencing.
 
 **Specific issues:**
+
 - `MEMORY_SYSTEM.md` (1,117 lines) -- describes a memory system that is largely aspirational
 - `CODE_INDEXING_DESIGN.md` (1,114 lines) -- design doc for implemented feature, should be trimmed
 - `DEVELOPER_ONBOARDING.md` (995 lines) -- overlaps with `GETTING_STARTED.md` (398 lines)
 - Several `@` reference files duplicate content already in CLAUDE.md sections
 
 **Proposed simplification:**
+
 1. Merge `DEVELOPER_ONBOARDING.md` and `GETTING_STARTED.md` into a single onboarding guide
 2. Trim design docs (`MEMORY_SYSTEM.md`, `CODE_INDEXING_DESIGN.md`) to just architectural decisions (remove implementation details that are in the code)
 3. Remove `@` reference files that simply duplicate CLAUDE.md content (keep only those with additional detail)
@@ -250,25 +253,26 @@ For a single **Write** operation: **14 Node.js processes spawn** (9 Pre + 5 Post
 
 **Current state:** Configuration is spread across:
 
-| Source | Purpose |
-|--------|---------|
-| `config.yaml` | Agent models, features, monitoring thresholds |
-| `settings.json` | Hook registrations, RAG settings |
-| `settings.local.json` | Local overrides |
-| `.env` / `.env.example` | Environment variable overrides |
-| `agent-config.json` | Agent runtime config |
-| `config/presets.json` | Preset system config |
-| `config/phase-models.json` | Phase-to-model mapping |
-| `config/capability-routing.json` | Capability-based routing |
-| `config/routing-prototypes.json` | Routing prototypes |
-| `config/skill-index.json` | Skill indexing config |
-| `config/tool-manifest.json` | Tool manifest |
-| `config/code-index-config.json` | Code indexing config |
-| `config/intent-feedback.json` | Intent feedback data |
+| Source                           | Purpose                                       |
+| -------------------------------- | --------------------------------------------- |
+| `config.yaml`                    | Agent models, features, monitoring thresholds |
+| `settings.json`                  | Hook registrations, RAG settings              |
+| `settings.local.json`            | Local overrides                               |
+| `.env` / `.env.example`          | Environment variable overrides                |
+| `agent-config.json`              | Agent runtime config                          |
+| `config/presets.json`            | Preset system config                          |
+| `config/phase-models.json`       | Phase-to-model mapping                        |
+| `config/capability-routing.json` | Capability-based routing                      |
+| `config/routing-prototypes.json` | Routing prototypes                            |
+| `config/skill-index.json`        | Skill indexing config                         |
+| `config/tool-manifest.json`      | Tool manifest                                 |
+| `config/code-index-config.json`  | Code indexing config                          |
+| `config/intent-feedback.json`    | Intent feedback data                          |
 
 **13 configuration sources.** Agent model resolution alone follows a 5-level precedence chain: Task() override > agent frontmatter > config.yaml > complexity defaults > fallback.
 
 **Proposed simplification:**
+
 1. Merge `agent-config.json` into `config.yaml` agents section (already partially there)
 2. Merge `phase-models.json` into `config.yaml`
 3. Merge `capability-routing.json` and `routing-prototypes.json` into `routing-table.cjs`
@@ -284,6 +288,7 @@ For a single **Write** operation: **14 Node.js processes spawn** (9 Pre + 5 Post
 ### 2.6 Event Bus + Error Writer + Error Pattern Detector (Unused Infrastructure)
 
 **Current state:**
+
 - `.claude/lib/events/` (3 files: event-bus.cjs, event-bus-sink.cjs, event-types.cjs) -- event bus infrastructure
 - `.claude/lib/error-pattern-detector.cjs` (579 lines) -- only imported by an archived tool
 - `.claude/lib/error-writer.cjs` -- error writing utility
@@ -299,7 +304,7 @@ For a single **Write** operation: **14 Node.js processes spawn** (9 Pre + 5 Post
 
 ## 3. QUICK WINS
 
-### 3.1 Archive _archive Directories
+### 3.1 Archive \_archive Directories
 
 **Current state:** 1,627 files in various `_archive/` directories (13,253+ lines). These inflate directory listings, IDE indexing, and search results.
 
@@ -315,6 +320,7 @@ For a single **Write** operation: **14 Node.js processes spawn** (9 Pre + 5 Post
 **Current state:** Several hooks registered in `settings.json` may reference files that exist but are never actually triggered, or hooks exist on disk but are not registered.
 
 **Specific candidates:**
+
 - `hooks/session/state-reset.cjs` and `hooks/session/session-cleanup.cjs` -- verify these are actually doing meaningful work on every prompt/tool call
 - `hooks/safety/validate-skill-invocation.cjs` -- fires on every Read, check if actually validating anything useful
 
@@ -326,6 +332,7 @@ For a single **Write** operation: **14 Node.js processes spawn** (9 Pre + 5 Post
 ### 3.3 Consolidate Monitoring Hooks
 
 **Current state:** Three separate PostToolUse hooks fire on every tool invocation:
+
 - `metrics-collector-hook.cjs` (fires on ALL tools)
 - `error-tracker-hook.cjs` (fires on ALL tools)
 - `anomaly-detector.cjs` (fires on ALL tools)
@@ -344,6 +351,7 @@ That is 3 Node.js processes for monitoring on every single tool call.
 **Current state:** 230 SKILL.md files. Many "expert" skills (ai-ml-expert, android-expert, api-development-expert, etc.) are thin wrappers that contain only an identity block and a link to `source-skills.json`. They provide no executable logic.
 
 **Example pattern (18+ skills follow this):**
+
 ```
 <identity>
 You are an expert in X.
@@ -381,6 +389,7 @@ These could be consolidated into a single "domain-expert" skill with a parameter
 ### 4.1 Routing Module Consolidation
 
 **Current:** 7 files in `.claude/lib/routing/` (3,361 lines) + routing hooks
+
 - `routing-table.cjs` (2,042 lines) -- keyword maps, intent keywords, patterns
 - `router-state.cjs` (719 lines) -- router state management
 - `intent-classifier.cjs` (290 lines) -- intent classification
@@ -390,6 +399,7 @@ These could be consolidated into a single "domain-expert" skill with a parameter
 - `pattern-router.cjs` (28 lines) -- pattern routing
 
 **Proposed consolidation:**
+
 1. Merge `fuzzy-intent-matcher.cjs` (90 lines), `semantic-router.cjs` (79 lines), `pattern-router.cjs` (28 lines) into `intent-classifier.cjs` -- they are all routing strategies called by the classifier
 2. Trim `routing-table.cjs` as described in 2.3
 
@@ -404,6 +414,7 @@ These could be consolidated into a single "domain-expert" skill with a parameter
 **After archiving dead modules (Section 1.2):** ~25 files, ~9,661 lines
 
 **Further consolidation:**
+
 - Merge `memory-areas.cjs` (19 lines) and `memory-constants.cjs` (13 lines) into `memory-manager.cjs`
 - Merge `intent-analyzer.cjs` (110 lines) into `contextual-memory.cjs` (its only consumer)
 - Merge prompt template files (`prompts/consolidation.cjs` 20 lines, `prompts/dedup-decision.cjs` 66 lines) into their consumers
@@ -418,12 +429,12 @@ These could be consolidated into a single "domain-expert" skill with a parameter
 
 **Proposed consolidation map:**
 
-| Current Hooks | Merged Into | Hooks Eliminated |
-|--------------|-------------|-----------------|
-| session-cleanup + execution-limit-monitor + tool-scope-validator | `pre-tool-unified.cjs` | 2 |
-| metrics-collector-hook + error-tracker-hook + anomaly-detector | `post-tool-metrics-unified.cjs` | 2 |
-| evolution-state-guard + research-enforcement + quality-gate-validator | `evolution-guard-unified.cjs` | 2 |
-| reflection-step0-guard + force-step0-execution | `reflection-guard-unified.cjs` | 1 |
+| Current Hooks                                                         | Merged Into                     | Hooks Eliminated |
+| --------------------------------------------------------------------- | ------------------------------- | ---------------- |
+| session-cleanup + execution-limit-monitor + tool-scope-validator      | `pre-tool-unified.cjs`          | 2                |
+| metrics-collector-hook + error-tracker-hook + anomaly-detector        | `post-tool-metrics-unified.cjs` | 2                |
+| evolution-state-guard + research-enforcement + quality-gate-validator | `evolution-guard-unified.cjs`   | 2                |
+| reflection-step0-guard + force-step0-execution                        | `reflection-guard-unified.cjs`  | 1                |
 
 **Result:** 45 hooks to ~38 hooks, 7 fewer Node.js processes per operation cycle.
 
@@ -453,14 +464,14 @@ See Section 2.6.
 
 ### 5.6 Total Dead Code
 
-| Category | Modules | Lines |
-|----------|---------|-------|
-| Workflow | 22 | ~5,258 |
-| Memory | 7 | ~2,648 |
-| ML | 9 | 1,652 |
-| Self-Healing | 3 | ~1,372 |
-| Error Infrastructure | 2 | ~900 |
-| **Total** | **43** | **~11,830** |
+| Category             | Modules | Lines       |
+| -------------------- | ------- | ----------- |
+| Workflow             | 22      | ~5,258      |
+| Memory               | 7       | ~2,648      |
+| ML                   | 9       | 1,652       |
+| Self-Healing         | 3       | ~1,372      |
+| Error Infrastructure | 2       | ~900        |
+| **Total**            | **43**  | **~11,830** |
 
 **11,830 lines of dead code -- 12% of the total CJS codebase.**
 
@@ -470,30 +481,30 @@ See Section 2.6.
 
 ### 6.1 Lines of Code by Subsystem
 
-| Subsystem | Files | Lines | Dead % |
-|-----------|-------|-------|--------|
-| Workflow (lib) | 48 | 15,925 | 33% |
-| Memory (lib) | 32 | 12,309 | 21% |
-| Hooks | 45+ | 18,458 | ~5% |
-| Routing (lib) | 7 | 3,361 | 0% |
-| Self-Healing (lib) | 4 | 1,934 | 71% |
-| ML (lib) | 9 | 1,652 | 100% |
-| Code Indexing (lib) | 17 | ~8,000 | ~10% |
-| Docs | 24 | 10,623 | ~20% |
-| Workflow docs | 30+ | 15,830 | ~10% |
-| Skills (SKILL.md) | 230 | ~50,000 | ~20% |
-| Agent definitions | 49 | ~15,000 | ~5% |
+| Subsystem           | Files | Lines   | Dead % |
+| ------------------- | ----- | ------- | ------ |
+| Workflow (lib)      | 48    | 15,925  | 33%    |
+| Memory (lib)        | 32    | 12,309  | 21%    |
+| Hooks               | 45+   | 18,458  | ~5%    |
+| Routing (lib)       | 7     | 3,361   | 0%     |
+| Self-Healing (lib)  | 4     | 1,934   | 71%    |
+| ML (lib)            | 9     | 1,652   | 100%   |
+| Code Indexing (lib) | 17    | ~8,000  | ~10%   |
+| Docs                | 24    | 10,623  | ~20%   |
+| Workflow docs       | 30+   | 15,830  | ~10%   |
+| Skills (SKILL.md)   | 230   | ~50,000 | ~20%   |
+| Agent definitions   | 49    | ~15,000 | ~5%    |
 
 ### 6.2 Hook Execution Overhead
 
 | Tool Operation | Pre Hooks | Post Hooks | Total Processes |
-|---------------|-----------|------------|-----------------|
-| Write | 9 | 5 | 14 |
-| Edit | 8 | 5 | 13 |
-| Task | 8 | 5 | 13 |
-| Bash | 7 | 4 | 11 |
-| TaskUpdate | 6 | 6 | 12 |
-| Read | 4 | 3 | 7 |
+| -------------- | --------- | ---------- | --------------- |
+| Write          | 9         | 5          | 14              |
+| Edit           | 8         | 5          | 13              |
+| Task           | 8         | 5          | 13              |
+| Bash           | 7         | 4          | 11              |
+| TaskUpdate     | 6         | 6          | 12              |
+| Read           | 4         | 3          | 7               |
 
 ### 6.3 Configuration Sources
 
@@ -554,60 +565,67 @@ See Section 2.6.
 
 ## 8. RISK ASSESSMENT
 
-| Change | Risk | Mitigation |
-|--------|------|-----------|
-| Archive dead code | LOW | No consumers exist; searchable in git history |
-| Hook consolidation | MEDIUM | Comprehensive test suite; incremental merging |
-| Routing consolidation | MEDIUM | 95 existing tests; add integration tests |
-| Agent registry merge | MEDIUM | Generator script already produces primary source |
-| Skill rationalization | LOW | Skills are advisory, not executable code paths |
-| Documentation trimming | LOW | No code dependencies on doc content |
-| Config consolidation | MEDIUM | Must update all config readers; staged rollout |
+| Change                 | Risk   | Mitigation                                       |
+| ---------------------- | ------ | ------------------------------------------------ |
+| Archive dead code      | LOW    | No consumers exist; searchable in git history    |
+| Hook consolidation     | MEDIUM | Comprehensive test suite; incremental merging    |
+| Routing consolidation  | MEDIUM | 95 existing tests; add integration tests         |
+| Agent registry merge   | MEDIUM | Generator script already produces primary source |
+| Skill rationalization  | LOW    | Skills are advisory, not executable code paths   |
+| Documentation trimming | LOW    | No code dependencies on doc content              |
+| Config consolidation   | MEDIUM | Must update all config readers; staged rollout   |
 
 ---
 
 ## 9. SUMMARY TABLE
 
-| Category | Current | After Simplification | Reduction |
-|----------|---------|---------------------|-----------|
-| CJS Lines | ~98,000 | ~80,000 | -18% |
-| Workflow Modules | 48 | 26 | -46% |
-| Memory Modules | 32 | 18 | -44% |
-| Hook Process Spawns (per Write) | 14 | 8 | -43% |
-| Keyword Maps | 6 | 2 | -67% |
-| Agent Registries | 3 | 1 | -67% |
-| Config Sources | 13 | 8 | -38% |
-| Active Skills | 230 | ~120 | -48% |
-| Dead Code Lines | ~11,830 | 0 | -100% |
+| Category                        | Current | After Simplification | Reduction |
+| ------------------------------- | ------- | -------------------- | --------- |
+| CJS Lines                       | ~98,000 | ~80,000              | -18%      |
+| Workflow Modules                | 48      | 26                   | -46%      |
+| Memory Modules                  | 32      | 18                   | -44%      |
+| Hook Process Spawns (per Write) | 14      | 8                    | -43%      |
+| Keyword Maps                    | 6       | 2                    | -67%      |
+| Agent Registries                | 3       | 1                    | -67%      |
+| Config Sources                  | 13      | 8                    | -38%      |
+| Active Skills                   | 230     | ~120                 | -48%      |
+| Dead Code Lines                 | ~11,830 | 0                    | -100%     |
 
 ---
 
 ## Appendix A: Files Referenced
 
 ### Routing
+
 - `C:\dev\projects\agent-studio\.claude\lib\routing\routing-table.cjs` (2,042 lines)
 - `C:\dev\projects\agent-studio\.claude\hooks\routing\routing-guard.cjs` (1,448 lines)
 - `C:\dev\projects\agent-studio\.claude\lib\workflow\phase-advance-reader.cjs` (221 lines)
 
 ### Registries
+
 - `C:\dev\projects\agent-studio\.claude\context\agent-registry.json` (4,375 lines)
 - `C:\dev\projects\agent-studio\.claude\context\agent-catalog.json` (1,296 lines)
 - `C:\dev\projects\agent-studio\.claude\config\agent-config.json` (851 lines)
 
 ### Hooks
+
 - `C:\dev\projects\agent-studio\.claude\settings.json` (289 lines, 42 hook registrations)
 - `C:\dev\projects\agent-studio\.claude\hooks\routing\user-prompt-unified.cjs` (1,532 lines)
 
 ### Configuration
+
 - `C:\dev\projects\agent-studio\.claude\config.yaml` (126 lines)
 - `C:\dev\projects\agent-studio\.claude\settings.json` (289 lines)
 - 11 additional config files in `.claude/config/`
 
 ### Dead Code (Workflow)
+
 - 22 modules in `C:\dev\projects\agent-studio\.claude\lib\workflow\` (see Section 1.1)
 
 ### Dead Code (Memory)
+
 - 7 modules in `C:\dev\projects\agent-studio\.claude\lib\memory\` (see Section 1.2)
 
 ### Dead Code (ML)
+
 - 9 modules in `C:\dev\projects\agent-studio\.claude\lib\ml\` (see Section 2.1)

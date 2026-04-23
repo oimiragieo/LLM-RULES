@@ -33,13 +33,13 @@
 
 ## Rubric Scores
 
-| Dimension | Score | Rationale |
-|---|---|---|
-| **Completeness** | 0.82 | Phase 1 delivered all 4 specified fixes (when-to-use tables, developer.md update, skill-index alignment, SKILL_USAGE_GUIDE.md decision tree). Phase 2 delivered research report and gap report (gap report missing content per placeholder). Phase 3 delivered design doc, validate-skill-agent-consistency.mjs, reflection-agent Step 4.7, complexity fix. M12 QA gate passed (177 errors + 1242 warnings detected). Minor: plan doc unreachable. |
-| **Accuracy** | 0.90 | Validation tool correctly detects 177 errors + 1242 warnings in live codebase — proves functional detection. smart-debug when-to-use tables and escalation criteria are technically accurate and calibrated. Step 4.7 trigger conditions are correctly scoped to creator/updater tasks. |
-| **Clarity** | 0.80 | Decision tree in SKILL_USAGE_GUIDE.md, when-to-use comparison tables, and Step 4.7 template output format are all clearly expressed. Complexity fix (51→50) is precise. Minor: gap report content not verifiable due to placeholder. |
-| **Consistency** | 0.78 | Phase 1 fixes are internally consistent. Step 4.7 follows reflection-agent workflow conventions. validate-skill-agent-consistency.mjs follows kebab-case naming, provenance header, projectRoot walker pattern. Minor: skill-index agentPrimary verification not confirmed post-update (ADR-2026-02-21-003 found to apply but not verified as resolved). |
-| **Actionability** | 0.75 | `pnpm validate:skill-consistency` is immediately runnable. Step 4.7 is executable by the reflection-agent on next creator task. Issues filed in issues.md are actionable. Minor: artifact-graph.json gaps for debugging/smart-debug nodes remain open (P2) — not blocked, but not resolved. |
+| Dimension         | Score | Rationale                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ----------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Completeness**  | 0.82  | Phase 1 delivered all 4 specified fixes (when-to-use tables, developer.md update, skill-index alignment, SKILL_USAGE_GUIDE.md decision tree). Phase 2 delivered research report and gap report (gap report missing content per placeholder). Phase 3 delivered design doc, validate-skill-agent-consistency.mjs, reflection-agent Step 4.7, complexity fix. M12 QA gate passed (177 errors + 1242 warnings detected). Minor: plan doc unreachable. |
+| **Accuracy**      | 0.90  | Validation tool correctly detects 177 errors + 1242 warnings in live codebase — proves functional detection. smart-debug when-to-use tables and escalation criteria are technically accurate and calibrated. Step 4.7 trigger conditions are correctly scoped to creator/updater tasks.                                                                                                                                                            |
+| **Clarity**       | 0.80  | Decision tree in SKILL_USAGE_GUIDE.md, when-to-use comparison tables, and Step 4.7 template output format are all clearly expressed. Complexity fix (51→50) is precise. Minor: gap report content not verifiable due to placeholder.                                                                                                                                                                                                               |
+| **Consistency**   | 0.78  | Phase 1 fixes are internally consistent. Step 4.7 follows reflection-agent workflow conventions. validate-skill-agent-consistency.mjs follows kebab-case naming, provenance header, projectRoot walker pattern. Minor: skill-index agentPrimary verification not confirmed post-update (ADR-2026-02-21-003 found to apply but not verified as resolved).                                                                                           |
+| **Actionability** | 0.75  | `pnpm validate:skill-consistency` is immediately runnable. Step 4.7 is executable by the reflection-agent on next creator task. Issues filed in issues.md are actionable. Minor: artifact-graph.json gaps for debugging/smart-debug nodes remain open (P2) — not blocked, but not resolved.                                                                                                                                                        |
 
 **Weighted Score**: (0.25×0.82) + (0.25×0.90) + (0.15×0.80) + (0.15×0.78) + (0.20×0.75) = 0.205 + 0.225 + 0.12 + 0.117 + 0.15 = **0.817** → rounded to **0.82**
 
@@ -94,6 +94,7 @@ The smart-debug drift (CLAUSE.md ref missing, agentPrimary narrowed to only deve
 The dual-layer harness (CLI + reflection-agent Step 4.7) is effective under the following assessment:
 
 **CLI tool (validate-skill-agent-consistency.mjs)**:
+
 - Functional: confirmed by M12 QA gate (177 errors, 1242 warnings on real codebase)
 - Coverage: compares 3 authoritative sources (skill-catalog.md, skill-index.json, agent .md frontmatter)
 - CI-ready: exits non-zero on errors, supports --json output, --strict mode, --skill filter
@@ -101,6 +102,7 @@ The dual-layer harness (CLI + reflection-agent Step 4.7) is effective under the 
 - Gap: does not check artifact-graph.json nodes
 
 **reflection-agent Step 4.7**:
+
 - Well-scoped: trigger condition (creator/updater keywords) prevents false positives on non-creator tasks
 - Resilient: try/catch wrapping, graceful skips for missing metadata
 - Actionable: produces issues.md entries with specific files to fix and pnpm command to run
@@ -132,17 +134,20 @@ Based on the gap report context and available evidence, the following systemic g
 **Assessment**: Step 4.7 will catch approximately 60-70% of future creation-time drift, with the following coverage and blind spots:
 
 **Will catch**:
+
 - Missing catalog entry for a newly created skill
 - Index entry missing or empty agentPrimary after skill creation
 - No agent .md file listing the skill in its skills array (orphan detection)
 
 **Will NOT catch**:
+
 - Drift introduced by direct SKILL.md edits (non-creator workflow) — trigger condition is creator/updater keywords
 - CLAUDE.md Section 8.5 reference gaps (not in the 4 checks)
 - artifact-graph.json node gaps (not in the 4 checks)
 - Stale index (index exists but was generated before latest frontmatter update) — Step 4.7 reads current files, not diffs
 
 **Recommended additions to Step 4.7** (future enhancement):
+
 1. Add CLAUDE.md Section 8.5 check (grep for skill name in that section)
 2. Add artifact-graph.json node check (require node exists for newly created skill)
 3. Add a stale-index signal: compare agentPrimary in index against agents field in SKILL.md frontmatter
@@ -155,12 +160,12 @@ With these additions, coverage would increase to approximately 85-90% of creatio
 
 **Primary artifacts from this initiative**:
 
-| Artifact | Type | Integration Score (est.) | Notes |
-|---|---|---|---|
-| validate-skill-agent-consistency.mjs | CLI tool | ~65% | In tools/cli, package.json wired (pnpm validate:skill-consistency), but no artifact-graph.json node, no tool-catalog.md entry |
-| reflection-agent Step 4.7 | Agent definition update | ~80% | Agent definition updated, memory logged, but Step 4.7 not yet tested in a live creator task |
-| debugging/SKILL.md when-to-use table | Skill documentation | ~75% | SKILL.md updated, developer.md updated, catalog updated; rules file not updated, artifact-graph not updated |
-| smart-debug wiring fixes | Skill wiring | ~70% | Catalog/index/agent updated; CLAUDE.md Section 8.5 reference still missing; artifact-graph still missing |
+| Artifact                             | Type                    | Integration Score (est.) | Notes                                                                                                                         |
+| ------------------------------------ | ----------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| validate-skill-agent-consistency.mjs | CLI tool                | ~65%                     | In tools/cli, package.json wired (pnpm validate:skill-consistency), but no artifact-graph.json node, no tool-catalog.md entry |
+| reflection-agent Step 4.7            | Agent definition update | ~80%                     | Agent definition updated, memory logged, but Step 4.7 not yet tested in a live creator task                                   |
+| debugging/SKILL.md when-to-use table | Skill documentation     | ~75%                     | SKILL.md updated, developer.md updated, catalog updated; rules file not updated, artifact-graph not updated                   |
+| smart-debug wiring fixes             | Skill wiring            | ~70%                     | Catalog/index/agent updated; CLAUDE.md Section 8.5 reference still missing; artifact-graph still missing                      |
 
 **Overall initiative integration health**: ~73% (BUD classification — gaps present but artifacts are discoverable)
 
@@ -175,14 +180,14 @@ With these additions, coverage would increase to approximately 85-90% of creatio
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|---|---|---|
-| Root cause of skill drift (3 factors) | **Retain** | High reuse value — explains pattern systemically across all creator workflows |
-| Dual-layer harness effectiveness analysis | **Retain** | Calibrates expectations for Step 4.7 coverage, avoids over-reliance |
-| Step 4.7 blind spots + recommended additions | **Retain** | Directly actionable for future reflection-agent improvements |
+| Item                                                   | Decision     | Rationale                                                                                            |
+| ------------------------------------------------------ | ------------ | ---------------------------------------------------------------------------------------------------- |
+| Root cause of skill drift (3 factors)                  | **Retain**   | High reuse value — explains pattern systemically across all creator workflows                        |
+| Dual-layer harness effectiveness analysis              | **Retain**   | Calibrates expectations for Step 4.7 coverage, avoids over-reliance                                  |
+| Step 4.7 blind spots + recommended additions           | **Retain**   | Directly actionable for future reflection-agent improvements                                         |
 | Gap list for creator/updater post-creation enforcement | **Compress** | 5 gaps documented; top 3 (index regeneration, CLAUDE.md, agent-skill-matrix) are the actionable ones |
-| TaskUpdate metadata missing (Phase 1 tasks) | **Compress** | Already in gotchas.json as high-occurrence entry — increment count only |
-| Plan document missing/unreachable | **Archive** | One-time artifact; the pattern (check directory exists before writing plan) is the learnable fact |
+| TaskUpdate metadata missing (Phase 1 tasks)            | **Compress** | Already in gotchas.json as high-occurrence entry — increment count only                              |
+| Plan document missing/unreachable                      | **Archive**  | One-time artifact; the pattern (check directory exists before writing plan) is the learnable fact    |
 
 ---
 

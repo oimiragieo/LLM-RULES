@@ -26,16 +26,19 @@ The project has a **Hybrid Lazy Code Search** system that combines ripgrep (fast
 **Implementation**: `.claude/lib/code-indexing/hybrid-lazy-indexer.cjs`
 **CLI Tool**: `.claude/tools/cli/hybrid-search.cjs`
 **Package Scripts**:
+
 - `pnpm search:code "query"` - Hybrid text + semantic search
 - `pnpm search:structure` - Project structure analysis
 - `pnpm search:file path lineStart lineEnd` - Get file content with line numbers
 
 **Architecture**:
+
 1. **Ripgrep (text)**: Instant keyword search, 0.2-0.5s for 40k+ files
 2. **Embeddings (semantic)**: Optional background indexing with `@xenova/transformers`
 3. **Hybrid scoring**: Reciprocal Rank Fusion (RRF) combines both result sets
 
 **Performance**:
+
 - **Speed**: 0.2-0.5s for most queries (ripgrep baseline)
 - **No upfront indexing**: Lazy embedding generation in background
 - **Cross-platform**: Uses `@vscode/ripgrep` npm package (Windows/Linux/macOS)
@@ -46,35 +49,35 @@ The project has a **Hybrid Lazy Code Search** system that combines ripgrep (fast
 
 ### Agents Already Using Hybrid Search ✅
 
-| Agent | References | Status |
-|-------|-----------|--------|
-| **developer** | Lines 157-161 | ✅ Excellent - recommends `pnpm search:code` as primary |
-| **architect** | Lines 213-221 | ✅ Excellent - shows structure + code + file examples |
-| **performance.md** (rule) | Line 19 | ✅ Good - "Prefer pnpm search:code over manual grep" |
+| Agent                     | References    | Status                                                  |
+| ------------------------- | ------------- | ------------------------------------------------------- |
+| **developer**             | Lines 157-161 | ✅ Excellent - recommends `pnpm search:code` as primary |
+| **architect**             | Lines 213-221 | ✅ Excellent - shows structure + code + file examples   |
+| **performance.md** (rule) | Line 19       | ✅ Good - "Prefer pnpm search:code over manual grep"    |
 
 ### Skills Already Documenting Hybrid Search ✅
 
-| Skill | Status | Notes |
-|-------|--------|-------|
+| Skill       | Status     | Notes                                        |
+| ----------- | ---------- | -------------------------------------------- |
 | **ripgrep** | ⚠️ Partial | Has deprecation notice but could be stronger |
 
 ### Agents Using Raw Grep/Ripgrep Without Hybrid Mention ⚠️
 
-| Agent | Grep/Ripgrep Usage | Issue |
-|-------|-------------------|-------|
-| **code-reviewer** | Lines 76-109 (ripgrep skill) | No mention of `pnpm search:code` |
-| **security-architect** | Lines 209-214 (ripgrep skill) | No mention of hybrid search |
-| **qa** | Lines 126-131 (ripgrep skill) | No mention of hybrid search |
-| **reverse-engineer** | Lines 131-164 (ripgrep skill) | No mention of hybrid search |
-| **researcher** | Lines 79-112 (ripgrep skill) | No mention of hybrid search |
-| **planner** | Line 208 (Grep tool) | Uses Grep() directly, could use hybrid |
+| Agent                  | Grep/Ripgrep Usage            | Issue                                  |
+| ---------------------- | ----------------------------- | -------------------------------------- |
+| **code-reviewer**      | Lines 76-109 (ripgrep skill)  | No mention of `pnpm search:code`       |
+| **security-architect** | Lines 209-214 (ripgrep skill) | No mention of hybrid search            |
+| **qa**                 | Lines 126-131 (ripgrep skill) | No mention of hybrid search            |
+| **reverse-engineer**   | Lines 131-164 (ripgrep skill) | No mention of hybrid search            |
+| **researcher**         | Lines 79-112 (ripgrep skill)  | No mention of hybrid search            |
+| **planner**            | Line 208 (Grep tool)          | Uses Grep() directly, could use hybrid |
 
 ### Agents Using Grep Tool ⚠️
 
-| Agent | Line | Context |
-|-------|------|---------|
-| **planner** | 197-208 | Result limiting example - uses `Grep()` tool |
-| **evolution-orchestrator** | 125, 165-166 | Uses `Grep()` for pattern discovery |
+| Agent                      | Line         | Context                                      |
+| -------------------------- | ------------ | -------------------------------------------- |
+| **planner**                | 197-208      | Result limiting example - uses `Grep()` tool |
+| **evolution-orchestrator** | 125, 165-166 | Uses `Grep()` for pattern discovery          |
 
 ---
 
@@ -82,38 +85,43 @@ The project has a **Hybrid Lazy Code Search** system that combines ripgrep (fast
 
 ### Search Method Comparison
 
-| Method | Speed | Accuracy | Setup | Best For |
-|--------|-------|----------|-------|----------|
-| **pnpm search:code** | 0.2-0.5s | 85-95% | ✅ Zero | General code search |
-| **Skill ripgrep** | <10ms | 70% | ✅ Zero | Advanced PCRE2 regex |
-| **Grep tool** | <100ms | 70% | ✅ Zero | Simple pattern matching |
-| **code-semantic-search** | <150ms | 95% | ⚠️ Embeddings | Conceptual search |
-| **code-structural-search** | <50ms | 100% | ✅ Zero | Exact AST patterns |
+| Method                     | Speed    | Accuracy | Setup         | Best For                |
+| -------------------------- | -------- | -------- | ------------- | ----------------------- |
+| **pnpm search:code**       | 0.2-0.5s | 85-95%   | ✅ Zero       | General code search     |
+| **Skill ripgrep**          | <10ms    | 70%      | ✅ Zero       | Advanced PCRE2 regex    |
+| **Grep tool**              | <100ms   | 70%      | ✅ Zero       | Simple pattern matching |
+| **code-semantic-search**   | <150ms   | 95%      | ⚠️ Embeddings | Conceptual search       |
+| **code-structural-search** | <50ms    | 100%     | ✅ Zero       | Exact AST patterns      |
 
 ### When to Use Each Method
 
 **Primary: pnpm search:code (Hybrid)**
+
 - ✅ General code search
 - ✅ Finding implementations without knowing names
 - ✅ Multi-file pattern discovery
 - ✅ No setup required (lazy embeddings)
 
 **Secondary: Skill ripgrep**
+
 - ✅ Advanced PCRE2 regex (lookahead/lookbehind)
 - ✅ Custom file type filtering
 - ✅ Pipeline integration with other CLI tools
 
 **Tertiary: Grep tool**
+
 - ✅ Simple exact pattern matching
 - ✅ Quick one-off searches
 - ❌ NOT for comprehensive code discovery
 
 **Specialized: code-semantic-search skill**
+
 - ✅ "Find authentication logic" (no keywords)
 - ✅ Conceptual searches
 - ⚠️ Requires embedding index
 
 **Specialized: code-structural-search skill**
+
 - ✅ "Find functions with 3 arguments"
 - ✅ AST-based exact pattern matching
 - ✅ Refactoring use cases
@@ -131,7 +139,8 @@ The project has a **Hybrid Lazy Code Search** system that combines ripgrep (fast
 **Issue**: Code reviewer should use hybrid search for comprehensive pattern discovery
 
 **Recommendation**: Add section before ripgrep:
-```markdown
+
+````markdown
 ## Recommended: Hybrid Lazy Code Search
 
 For comprehensive code review, use the hybrid search system:
@@ -141,16 +150,20 @@ pnpm search:code "authentication logic"    # Find patterns across codebase
 pnpm search:structure                      # Understand project structure
 pnpm search:file src/auth.ts 1 50          # Review file content
 ```
+````
 
 **When to use hybrid search:**
+
 - Finding similar patterns across codebase
 - Discovering all implementations of a pattern
 - Understanding code structure before review
 
 **When to use ripgrep skill (below):**
+
 - Advanced PCRE2 regex patterns (lookahead/lookbehind)
 - Custom file type filtering not supported by search:code
-```
+
+````
 
 #### 2. `.claude/agents/specialized/security-architect.md`
 
@@ -166,8 +179,9 @@ pnpm search:file src/auth.ts 1 50          # Review file content
 pnpm search:code "eval("               # Find eval usage
 pnpm search:code "dangerouslySetInnerHTML"  # Find XSS risks
 pnpm search:code "execute.*sql"        # Find SQL execution
-```
-```
+````
+
+````
 
 #### 3. `.claude/agents/core/qa.md`
 
@@ -200,12 +214,13 @@ pnpm search:code "execute.*sql"        # Find SQL execution
 **Current text**:
 ```markdown
 NOTE: Prefer `pnpm search:code` for hybrid text+semantic search - it's faster and requires no setup.
-```
+````
 
 **Issue**: Deprecation notice is weak, appears after title
 
 **Recommendation**: Move deprecation to top, strengthen language:
-```markdown
+
+````markdown
 # Ripgrep Skill
 
 ⚠️ **RECOMMENDED: Use `pnpm search:code` instead for most searches**
@@ -217,12 +232,15 @@ pnpm search:code "authentication"      # General search (RECOMMENDED)
 pnpm search:structure                  # Project structure
 pnpm search:file src/auth.ts 1 50      # File content
 ```
+````
 
 **Only use raw ripgrep for:**
+
 - Advanced PCRE2 regex patterns (lookahead/lookbehind with -P flag)
 - Custom file type filtering not supported by search:code
 - Pipeline integration with other CLI tools (e.g., `rg ... | jq`)
-```
+
+````
 
 #### 7. `.claude/agents/core/planner.md`
 
@@ -321,22 +339,22 @@ pnpm search:file src/auth.ts 1 50      # File content
   "search:structure": "node .claude/tools/cli/hybrid-search.cjs --structure",
   "search:file": "node .claude/tools/cli/hybrid-search.cjs --file"
 }
-```
+````
 
 ### Implementation Files
 
-| File | Purpose |
-|------|---------|
-| `.claude/lib/code-indexing/hybrid-lazy-indexer.cjs` | Core indexer class |
-| `.claude/tools/cli/hybrid-search.cjs` | CLI wrapper |
-| `@vscode/ripgrep` (npm) | Cross-platform ripgrep binary |
-| `@xenova/transformers` (npm) | Semantic embeddings (optional) |
+| File                                                | Purpose                        |
+| --------------------------------------------------- | ------------------------------ |
+| `.claude/lib/code-indexing/hybrid-lazy-indexer.cjs` | Core indexer class             |
+| `.claude/tools/cli/hybrid-search.cjs`               | CLI wrapper                    |
+| `@vscode/ripgrep` (npm)                             | Cross-platform ripgrep binary  |
+| `@xenova/transformers` (npm)                        | Semantic embeddings (optional) |
 
 ### Environment Variables
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `HYBRID_EMBEDDINGS` | `on` | Enable/disable semantic search |
+| Variable            | Default | Purpose                        |
+| ------------------- | ------- | ------------------------------ |
+| `HYBRID_EMBEDDINGS` | `on`    | Enable/disable semantic search |
 
 ---
 

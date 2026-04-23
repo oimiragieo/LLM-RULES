@@ -8,26 +8,27 @@
 
 The framework has a three-layer enforcement architecture for creator process compliance:
 
-| Layer | Component | Location | Purpose |
-|-------|-----------|----------|---------|
-| **Layer 1: Documentation** | Gate 4 in CLAUDE.md | `.claude/CLAUDE.md` Section 1.2 | Instructs Router to never write directly to creator output paths |
-| **Layer 2: Routing Hook** | routing-guard.cjs (Check 5) | `.claude/hooks/routing/routing-guard.cjs` | Blocks Router from using Write/Edit directly (router mode only) |
-| **Layer 3: Creator Guard** | unified-creator-guard.cjs | `.claude/hooks/routing/unified-creator-guard.cjs` | Blocks Write/Edit to creator artifact paths unless creator skill is active |
+| Layer                      | Component                   | Location                                          | Purpose                                                                    |
+| -------------------------- | --------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------- |
+| **Layer 1: Documentation** | Gate 4 in CLAUDE.md         | `.claude/CLAUDE.md` Section 1.2                   | Instructs Router to never write directly to creator output paths           |
+| **Layer 2: Routing Hook**  | routing-guard.cjs (Check 5) | `.claude/hooks/routing/routing-guard.cjs`         | Blocks Router from using Write/Edit directly (router mode only)            |
+| **Layer 3: Creator Guard** | unified-creator-guard.cjs   | `.claude/hooks/routing/unified-creator-guard.cjs` | Blocks Write/Edit to creator artifact paths unless creator skill is active |
 
 Additionally:
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| Pre-execute hooks | `.claude/skills/*/hooks/pre-execute.cjs` | 6 creator skills set `active-creators.json` state |
-| State file | `.claude/context/runtime/active-creators.json` | Tracks which creators are currently active |
-| Post-creation integration | `.claude/hooks/workflow/post-creation-integration.cjs` | Detects creator completions, queues integration analysis |
-| Ecosystem creation workflow | `.claude/workflows/core/ecosystem-creation-workflow.md` | Documents 6-phase lifecycle |
+| Component                   | Location                                                | Purpose                                                  |
+| --------------------------- | ------------------------------------------------------- | -------------------------------------------------------- |
+| Pre-execute hooks           | `.claude/skills/*/hooks/pre-execute.cjs`                | 6 creator skills set `active-creators.json` state        |
+| State file                  | `.claude/context/runtime/active-creators.json`          | Tracks which creators are currently active               |
+| Post-creation integration   | `.claude/hooks/workflow/post-creation-integration.cjs`  | Detects creator completions, queues integration analysis |
+| Ecosystem creation workflow | `.claude/workflows/core/ecosystem-creation-workflow.md` | Documents 6-phase lifecycle                              |
 
 ### 1.2 How the Guard Currently Works
 
 **unified-creator-guard.cjs** (684 lines) implements a **state-file token approach**:
 
 1. When a creator skill is invoked (e.g., `Skill({ skill: "agent-creator" })`), its `pre-execute.cjs` hook writes a token to `active-creators.json`:
+
    ```json
    { "agent-creator": { "active": true, "invokedAt": "2026-02-09T...", "ttl": 180000 } }
    ```
@@ -59,11 +60,11 @@ For `Edit|Write|NotebookEdit` operations, the hook chain is:
 
 This is the fundamental architectural flaw. The guard's `findRequiredCreator()` function checks only the target file path against `CREATOR_CONFIGS` patterns. It does not check whether the file already exists on disk. This means:
 
-| Scenario | Expected Behavior | Actual Behavior |
-|----------|-------------------|-----------------|
-| Developer creates `.claude/agents/domain/new-agent.md` (NEW file) | **BLOCK** -- requires agent-creator | BLOCK (correct, if no creator token) |
-| Developer edits `.claude/agents/domain/existing-agent.md` (EXISTING file) | **ALLOW** -- legitimate edit | BLOCK (incorrect, unless agent-creator token exists) |
-| Developer adds search skills to 10 existing agents (batch edit) | **ALLOW** -- legitimate batch edit | BLOCK (incorrect, unless agent-creator token exists) |
+| Scenario                                                                  | Expected Behavior                   | Actual Behavior                                      |
+| ------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------- |
+| Developer creates `.claude/agents/domain/new-agent.md` (NEW file)         | **BLOCK** -- requires agent-creator | BLOCK (correct, if no creator token)                 |
+| Developer edits `.claude/agents/domain/existing-agent.md` (EXISTING file) | **ALLOW** -- legitimate edit        | BLOCK (incorrect, unless agent-creator token exists) |
+| Developer adds search skills to 10 existing agents (batch edit)           | **ALLOW** -- legitimate batch edit  | BLOCK (incorrect, unless agent-creator token exists) |
 
 **Consequences of this flaw:**
 
@@ -112,10 +113,10 @@ This distinction is available in the hook input but not leveraged.
 
 The enforcement system should distinguish two intents:
 
-| Intent | Detection | Enforcement |
-|--------|-----------|-------------|
-| **CREATE** (new artifact) | Write tool + file does NOT exist on disk | Require creator token (block without it) |
-| **EDIT** (existing artifact) | Edit tool, OR Write tool + file EXISTS on disk | Allow without creator token |
+| Intent                       | Detection                                      | Enforcement                              |
+| ---------------------------- | ---------------------------------------------- | ---------------------------------------- |
+| **CREATE** (new artifact)    | Write tool + file does NOT exist on disk       | Require creator token (block without it) |
+| **EDIT** (existing artifact) | Edit tool, OR Write tool + file EXISTS on disk | Allow without creator token              |
 
 ### 3.2 Recommended Pattern: File-Existence Check + Tool Distinction
 
@@ -143,12 +144,12 @@ IF tool === 'Write':
 
 ### 3.3 Rationale for File-Existence Check
 
-| Approach | Pros | Cons |
-|----------|------|------|
-| **File-existence check (RECOMMENDED)** | Simple, accurate, no false positives for edits, no state management overhead | Slightly permissive: allows overwriting existing artifact with Write (not Edit) without creator token |
-| Creator context token (current approach) | Explicit authorization for all writes | Blocks legitimate edits, requires TTL management, coarse granularity |
-| Routing-layer prevention | Prevents developer from being spawned for creation tasks | Does not protect against developer-within-orchestrator patterns |
-| Always allow Edit, block only Write | Zero false positives for edits | Does not catch Write-to-existing (minor risk) |
+| Approach                                 | Pros                                                                         | Cons                                                                                                  |
+| ---------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **File-existence check (RECOMMENDED)**   | Simple, accurate, no false positives for edits, no state management overhead | Slightly permissive: allows overwriting existing artifact with Write (not Edit) without creator token |
+| Creator context token (current approach) | Explicit authorization for all writes                                        | Blocks legitimate edits, requires TTL management, coarse granularity                                  |
+| Routing-layer prevention                 | Prevents developer from being spawned for creation tasks                     | Does not protect against developer-within-orchestrator patterns                                       |
+| Always allow Edit, block only Write      | Zero false positives for edits                                               | Does not catch Write-to-existing (minor risk)                                                         |
 
 **Why file-existence check is superior to the current approach:**
 
@@ -255,30 +256,30 @@ This is a heuristic, not a hard enforcement. The Router can still override for e
 
 ### 5.1 Strictness vs. Usability
 
-| Strictness Level | What Gets Blocked | False Positive Rate | Workaround Pressure |
-|------------------|-------------------|---------------------|---------------------|
-| **Current (block all writes)** | All writes to artifact paths without creator token | **HIGH** (edits blocked) | **HIGH** (CREATOR_GUARD=off) |
-| **Recommended (block new only)** | Only NEW file writes to artifact paths | **LOW** (only edge: Write overwrite without creator) | **LOW** (edits work naturally) |
-| **Warn-only** | Nothing blocked, all warned | **NONE** | **NONE** (but no enforcement) |
+| Strictness Level                 | What Gets Blocked                                  | False Positive Rate                                  | Workaround Pressure            |
+| -------------------------------- | -------------------------------------------------- | ---------------------------------------------------- | ------------------------------ |
+| **Current (block all writes)**   | All writes to artifact paths without creator token | **HIGH** (edits blocked)                             | **HIGH** (CREATOR_GUARD=off)   |
+| **Recommended (block new only)** | Only NEW file writes to artifact paths             | **LOW** (only edge: Write overwrite without creator) | **LOW** (edits work naturally) |
+| **Warn-only**                    | Nothing blocked, all warned                        | **NONE**                                             | **NONE** (but no enforcement)  |
 
 **Recommendation**: The "block new only" approach eliminates 90%+ of false positives while maintaining enforcement for the actual risk (invisible new artifacts).
 
 ### 5.2 Where to Enforce: Routing vs. Hooks
 
-| Layer | Catches | Misses | Latency |
-|-------|---------|--------|---------|
-| **Routing (Check 7)** | Misrouted developer spawns for creation tasks | Developer spawned for "implement feature" that happens to create an agent file | ~1ms |
-| **Hook (creator-guard)** | All writes to creator paths regardless of which agent | Nothing (but may have false positives) | ~10ms per write |
-| **Both (recommended)** | Routing catches intent mismatches, hook catches bypass | Minimal blind spots | ~11ms combined |
+| Layer                    | Catches                                                | Misses                                                                         | Latency         |
+| ------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------ | --------------- |
+| **Routing (Check 7)**    | Misrouted developer spawns for creation tasks          | Developer spawned for "implement feature" that happens to create an agent file | ~1ms            |
+| **Hook (creator-guard)** | All writes to creator paths regardless of which agent  | Nothing (but may have false positives)                                         | ~10ms per write |
+| **Both (recommended)**   | Routing catches intent mismatches, hook catches bypass | Minimal blind spots                                                            | ~11ms combined  |
 
 **Recommendation**: Use both layers. Routing is the "cheap" first line; hook is the "expensive" last line.
 
 ### 5.3 State File vs. File-Existence Check
 
-| Mechanism | Complexity | Reliability | Attack Surface |
-|-----------|-----------|-------------|----------------|
-| **State file token** (current) | High (TTL, state file I/O, pre-execute hooks) | Medium (TTL expiry, stale state, concurrent writes) | Medium (state file spoofing, TTL manipulation) |
-| **File-existence check** (recommended) | Low (single `fs.existsSync` call) | High (filesystem is source of truth) | Low (file existence is hard to spoof) |
+| Mechanism                              | Complexity                                    | Reliability                                         | Attack Surface                                 |
+| -------------------------------------- | --------------------------------------------- | --------------------------------------------------- | ---------------------------------------------- |
+| **State file token** (current)         | High (TTL, state file I/O, pre-execute hooks) | Medium (TTL expiry, stale state, concurrent writes) | Medium (state file spoofing, TTL manipulation) |
+| **File-existence check** (recommended) | Low (single `fs.existsSync` call)             | High (filesystem is source of truth)                | Low (file existence is hard to spoof)          |
 
 **Recommendation**: Replace state-file-based authorization with file-existence check as the PRIMARY mechanism. Retain state file as a SECONDARY signal for enhanced security in high-enforcement environments.
 
@@ -316,9 +317,7 @@ function validateCreatorWorkflow(toolName, toolInput) {
 
   // Write tool: check if file already exists on disk
   // If file exists, this is an overwrite (edit), not creation -> ALLOW
-  const absolutePath = path.isAbsolute(filePath)
-    ? filePath
-    : path.join(PROJECT_ROOT, filePath);
+  const absolutePath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
   if (fs.existsSync(absolutePath)) {
     return { pass: true }; // Editing existing artifact
   }
@@ -384,7 +383,7 @@ function checkBatchCreation(toolName, toolInput) {
       pass: true, // warn only
       result: 'warn',
       message: `[BATCH-CREATION] Detected request to create ${count} ${type}.
-Consider using master-orchestrator with iterative ${type.replace(/s$/, '')}-creator invocation.`
+Consider using master-orchestrator with iterative ${type.replace(/s$/, '')}-creator invocation.`,
     };
   }
   return { pass: true };
@@ -439,6 +438,7 @@ Consider using master-orchestrator with iterative ${type.replace(/s$/, '')}-crea
 **Decision:** Replace state-file-only authorization with a file-existence check as the primary enforcement mechanism. Edit tool operations and Write operations targeting existing files are allowed unconditionally. Only Write operations targeting new files (file does not exist) require a creator token.
 
 **Consequences:**
+
 - Eliminates false positives for legitimate edits (primary pain point)
 - Retains enforcement for new artifact creation (the actual risk)
 - Reduces dependency on state file coordination (simpler, more reliable)
@@ -456,6 +456,7 @@ The guard conflated "creating new artifacts" with "editing existing artifacts" b
 ### Solution
 
 Use file-existence as the primary distinguishing signal:
+
 - **New file** (does not exist on disk) + Write tool = **require creator token** (BLOCK without)
 - **Existing file** (exists on disk) OR Edit tool = **allow without creator token**
 
@@ -467,13 +468,13 @@ Use file-existence as the primary distinguishing signal:
 
 ### Key Metrics
 
-| Metric | Current | After Fix |
-|--------|---------|-----------|
-| False positive rate (edit blocks) | ~40% of all creator-guard violations | ~0% |
-| True positive rate (creation blocks) | 100% | 100% |
-| State file dependency | Critical (required for all writes) | Optional (only for new file writes) |
-| CREATOR_GUARD=off workaround pressure | High | Low |
-| Code change size | -- | ~35 lines modified, ~20 lines added |
+| Metric                                | Current                              | After Fix                           |
+| ------------------------------------- | ------------------------------------ | ----------------------------------- |
+| False positive rate (edit blocks)     | ~40% of all creator-guard violations | ~0%                                 |
+| True positive rate (creation blocks)  | 100%                                 | 100%                                |
+| State file dependency                 | Critical (required for all writes)   | Optional (only for new file writes) |
+| CREATOR_GUARD=off workaround pressure | High                                 | Low                                 |
+| Code change size                      | --                                   | ~35 lines modified, ~20 lines added |
 
 ---
 

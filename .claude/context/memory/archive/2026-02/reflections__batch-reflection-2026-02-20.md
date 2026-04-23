@@ -22,13 +22,13 @@ Two tasks reflecting the wave-executor skill registration audit (Task 1) and P2 
 
 ### Rubric Scores (agent_output weights: completeness 0.25, accuracy 0.30, clarity 0.15, consistency 0.15, actionability 0.15)
 
-| Dimension | Score | Evidence |
-|-----------|-------|---------|
-| Completeness | 0.85 | Covered SKILL.md, skill-catalog, skill-index.json, agent assignments, test coverage, schema gap — all 5 integration tiers examined |
-| Accuracy | 0.90 | Correct identification of agentPrimary=['developer'] vs expected ['router','master-orchestrator','planner']; correct identification of category/domain mismatch; agent-file assignment correctly confirmed |
-| Clarity | 0.85 | Structured bullet points; severity labels (HIGH gap, low-severity) help prioritization |
-| Consistency | 0.80 | Follows registration audit conventions; uses framework terminology correctly |
-| Actionability | 0.80 | High: specifically named which fields need changing in which files; severity-ranked findings |
+| Dimension     | Score | Evidence                                                                                                                                                                                                   |
+| ------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.85  | Covered SKILL.md, skill-catalog, skill-index.json, agent assignments, test coverage, schema gap — all 5 integration tiers examined                                                                         |
+| Accuracy      | 0.90  | Correct identification of agentPrimary=['developer'] vs expected ['router','master-orchestrator','planner']; correct identification of category/domain mismatch; agent-file assignment correctly confirmed |
+| Clarity       | 0.85  | Structured bullet points; severity labels (HIGH gap, low-severity) help prioritization                                                                                                                     |
+| Consistency   | 0.80  | Follows registration audit conventions; uses framework terminology correctly                                                                                                                               |
+| Actionability | 0.80  | High: specifically named which fields need changing in which files; severity-ranked findings                                                                                                               |
 
 **Weighted Score**: (0.85×0.25) + (0.90×0.30) + (0.85×0.15) + (0.80×0.15) + (0.80×0.15) = 0.2125 + 0.27 + 0.1275 + 0.12 + 0.12 = **0.85**
 **Threshold**: PASS (0.85 ≥ 0.70)
@@ -36,16 +36,19 @@ Two tasks reflecting the wave-executor skill registration audit (Task 1) and P2 
 ### RBT Diagnosis
 
 **Roses (Strengths)**
+
 - Comprehensive multi-tier coverage: SKILL.md quality, catalog, skill-index.json, agent files, test coverage, and schema gap all examined
 - Precise gap identification: named specific field values (agentPrimary=['developer'] → should be ['router','master-orchestrator','planner'])
 - Severity-ranked findings: distinguishes HIGH gap (skill-index.json) from low-severity (schema missing)
 - Test coverage validation: 9 tests verified for CLI pure functions
 
 **Buds (Growth Opportunities)**
+
 - Could have included the SKILL.md frontmatter `agents:` field in the audit scope (frontmatter agents array was the authoritative source for the fix)
 - No schema gap severity justification — why is a missing framework schema "low-severity"?
 
 **Thorns (Issues)**
+
 - None identified — audit data quality was full and accurate
 
 ### Integration Health (ADR-100)
@@ -86,13 +89,13 @@ Verified from file state at reflection time (2026-02-20 ~05:00 UTC):
 
 ### Rubric Scores (agent_output weights: completeness 0.25, accuracy 0.30, clarity 0.15, consistency 0.15, actionability 0.15)
 
-| Dimension | Score | Evidence |
-|-----------|-------|---------|
-| Completeness | 0.80 | 4 of 5 fixes confirmed complete; skill-index.json regeneration is a gap |
-| Accuracy | 0.70 | Most files correct; skill-index.json regeneration failure is an accuracy issue — the index does not reflect the SKILL.md changes |
-| Clarity | 0.75 | Confirmed via file inspection; changes are well-structured where applied |
-| Consistency | 0.80 | rust-expert.md follows project rules file format conventions; SKILL.md frontmatter follows schema |
-| Actionability | 0.65 | The outstanding gap (skill-index.json not reflecting SKILL.md changes) is not documented in any outstanding task |
+| Dimension     | Score | Evidence                                                                                                                         |
+| ------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Completeness  | 0.80  | 4 of 5 fixes confirmed complete; skill-index.json regeneration is a gap                                                          |
+| Accuracy      | 0.70  | Most files correct; skill-index.json regeneration failure is an accuracy issue — the index does not reflect the SKILL.md changes |
+| Clarity       | 0.75  | Confirmed via file inspection; changes are well-structured where applied                                                         |
+| Consistency   | 0.80  | rust-expert.md follows project rules file format conventions; SKILL.md frontmatter follows schema                                |
+| Actionability | 0.65  | The outstanding gap (skill-index.json not reflecting SKILL.md changes) is not documented in any outstanding task                 |
 
 **Weighted Score**: (0.80×0.25) + (0.70×0.30) + (0.75×0.15) + (0.80×0.15) + (0.65×0.15) = 0.20 + 0.21 + 0.1125 + 0.12 + 0.0975 = **0.74**
 **Threshold**: PASS (0.74 ≥ 0.70) — marginal pass due to skill-index.json regression
@@ -100,22 +103,26 @@ Verified from file state at reflection time (2026-02-20 ~05:00 UTC):
 ### RBT Diagnosis
 
 **Roses (Strengths)**
+
 - SKILL.md frontmatter correctly updated with agents/category/tags fields — addresses root cause of skill discovery failure
 - skill-catalog.md entries correct: wave-executor, ai-ml-expert, rust-expert all properly placed
 - rust-expert.md rules file created with substantive, non-generic content (ownership, borrowing, async, safety sections)
 - ai-ml-expert catalog primary agent corrected (ai-ml-pro → ai-ml-specialist)
 
 **Buds (Growth Opportunities)**
+
 - Task metadata (TaskUpdate summary/filesModified) was not populated — reflection scoring had to use proxy context
 - Missing schema file for wave-executor (identified in Task 1, not addressed in Task 2 per description — but it was classified as low-severity)
 
 **Thorns (Issues)**
+
 - **REGRESSION: skill-index.json wave-executor entry not updated**: Despite SKILL.md frontmatter being updated and `generatedAt: "2026-02-20T04:26:33.025Z"`, the skill-index.json still shows `agentPrimary: ["developer"]`, `category: "Other"`, `domain: "other"`. The generate-skill-index.cjs tool was either not run, or did not read the SKILL.md frontmatter `agents:` field when populating agentPrimary.
 - **Root cause hypothesis**: `generate-skill-index.cjs` likely reads agentPrimary from skill-catalog.md tables (not from SKILL.md frontmatter `agents:` field). If skill-catalog is correct but index is not, the generator logic has a mapping issue or the regeneration wasn't triggered.
 
 ### Integration Health (ADR-100)
 
 Artifact: `skill:wave-executor`
+
 - Catalog: PASS (correct agents, correct category)
 - SKILL.md frontmatter: PASS (agents/category/tags updated)
 - skill-index.json: FAIL (still shows wrong values despite post-task regeneration)
@@ -138,12 +145,12 @@ Artifact: `skill:wave-executor`
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
-| skill-index.json agentPrimary sourcing bug | **Retain** (new pattern) | High reuse value — any skill registration task may hit this; evidence quality strong (files verified) |
-| frontmatter-to-index pipeline silent failure | **Retain** (gotcha) | Prevents future silent integration regressions |
-| rules file as required integration artifact | **Retain** (pattern) | Applies to all language expert skills |
-| partial metadata proxy scoring technique | **Compress** | Already documented in gotchas.json as memory-as-reflection-fallback |
+| Item                                         | Decision                 | Rationale                                                                                             |
+| -------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| skill-index.json agentPrimary sourcing bug   | **Retain** (new pattern) | High reuse value — any skill registration task may hit this; evidence quality strong (files verified) |
+| frontmatter-to-index pipeline silent failure | **Retain** (gotcha)      | Prevents future silent integration regressions                                                        |
+| rules file as required integration artifact  | **Retain** (pattern)     | Applies to all language expert skills                                                                 |
+| partial metadata proxy scoring technique     | **Compress**             | Already documented in gotchas.json as memory-as-reflection-fallback                                   |
 
 ---
 

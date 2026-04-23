@@ -17,65 +17,65 @@
 
 ### 1.1 Security Fixes Verification (Steps 1-3)
 
-| Fix | Plan Requirement | Implementation | Status |
-|-----|-----------------|----------------|--------|
-| CRITICAL-002 | Protect settings.json | CREATOR_CONFIGS[0] matches .claude/settings.json, requires hook-creator | PASS |
-| CRITICAL-003 | Protect agent-registry.json | CREATOR_CONFIGS[1] matches .claude/context/agent-registry.json, requires agent-creator | PASS |
-| HIGH-002 | TTL bounds 30s-10min | MIN_TTL_MS=30000, MAX_TTL_MS=600000, IIFE with Number.isFinite guard | PASS |
-| Step 3 | Extend guard to rules/commands/tools | 3 new CREATOR_CONFIGS entries (indices 8-10) | PASS |
+| Fix          | Plan Requirement                     | Implementation                                                                         | Status |
+| ------------ | ------------------------------------ | -------------------------------------------------------------------------------------- | ------ |
+| CRITICAL-002 | Protect settings.json                | CREATOR_CONFIGS[0] matches .claude/settings.json, requires hook-creator                | PASS   |
+| CRITICAL-003 | Protect agent-registry.json          | CREATOR_CONFIGS[1] matches .claude/context/agent-registry.json, requires agent-creator | PASS   |
+| HIGH-002     | TTL bounds 30s-10min                 | MIN_TTL_MS=30000, MAX_TTL_MS=600000, IIFE with Number.isFinite guard                   | PASS   |
+| Step 3       | Extend guard to rules/commands/tools | 3 new CREATOR_CONFIGS entries (indices 8-10)                                           | PASS   |
 
 **Note on Step 3 deviation:** The plan specified a WARN_ONLY_CREATORS array for the 3 new types (rule-creator, command-creator, tool-creator) because those creators did not exist yet. The implementation skipped this intermediate state because all 3 creators were created in the same session (Steps 10-12). This is a justified deviation -- the warn-to-block promotion (Step 14) was unnecessary since creators already existed by the time the guard was deployed.
 
 ### 1.2 Infrastructure Verification (Steps 4-7)
 
-| Step | Deliverable | Implementation | Status |
-|------|-----------|----------------|--------|
-| 4 | creator-commons.cjs | 349 lines, 5 shared functions (validatePostCreation, updateCatalog, queueCrossCreatorReview, validateSchema, runIntegrationChecklist), SCHEMA_MAP, PROVENANCE_REGEX, safeParseJSON | PASS |
-| 5 | ecosystem-impact-graph.json | 9 artifact types with mustHave/shouldHave/niceToHave arrays, located in .claude/context/data/ (justified deviation from runtime/) | PASS |
-| 6 | ecosystem-impact-analyzer.cjs | 221 lines, analyzeImpact + checkMustHaveCompletion, loads graph from data/ | PASS |
-| 7 | post-creation-integration.cjs updates | New runEcosystemImpactAnalysis (lazy-load) + appendToQueueWithImpact functions added | PASS |
+| Step | Deliverable                           | Implementation                                                                                                                                                                     | Status |
+| ---- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| 4    | creator-commons.cjs                   | 349 lines, 5 shared functions (validatePostCreation, updateCatalog, queueCrossCreatorReview, validateSchema, runIntegrationChecklist), SCHEMA_MAP, PROVENANCE_REGEX, safeParseJSON | PASS   |
+| 5    | ecosystem-impact-graph.json           | 9 artifact types with mustHave/shouldHave/niceToHave arrays, located in .claude/context/data/ (justified deviation from runtime/)                                                  | PASS   |
+| 6    | ecosystem-impact-analyzer.cjs         | 221 lines, analyzeImpact + checkMustHaveCompletion, loads graph from data/                                                                                                         | PASS   |
+| 7    | post-creation-integration.cjs updates | New runEcosystemImpactAnalysis (lazy-load) + appendToQueueWithImpact functions added                                                                                               | PASS   |
 
 **Deviation (Step 5):** Graph placed in .claude/context/data/ instead of .claude/context/runtime/. This is a justified improvement -- the graph is static reference data, not runtime state. The runtime/ directory is for mutable state (workflow-state.json, spawn-log.jsonl).
 
 ### 1.3 Creator Skills Verification (Steps 8-12)
 
-| Step | Creator | Location | Post-Creation Section | Step 0 Check | Status |
-|------|---------|----------|----------------------|-------------|--------|
-| 8 | artifact-updater | .claude/skills/integration/artifact-updater/SKILL.md | N/A (is the updater) | N/A | PASS |
-| 9 | skill-creator update | .claude/skills/skill-creator/SKILL.md | Updated Step 0 to artifact-updater (line 732) | YES | PARTIAL |
-| 10 | command-creator (NEW) | .claude/skills/creators/command-creator/SKILL.md | YES | YES | PASS |
-| 11 | rule-creator (NEW) | .claude/skills/creators/rule-creator/SKILL.md | YES | YES | PASS |
-| 12 | tool-creator (NEW) | .claude/skills/creators/tool-creator/SKILL.md | YES | YES | PASS |
+| Step | Creator               | Location                                             | Post-Creation Section                         | Step 0 Check | Status  |
+| ---- | --------------------- | ---------------------------------------------------- | --------------------------------------------- | ------------ | ------- |
+| 8    | artifact-updater      | .claude/skills/integration/artifact-updater/SKILL.md | N/A (is the updater)                          | N/A          | PASS    |
+| 9    | skill-creator update  | .claude/skills/skill-creator/SKILL.md                | Updated Step 0 to artifact-updater (line 732) | YES          | PARTIAL |
+| 10   | command-creator (NEW) | .claude/skills/creators/command-creator/SKILL.md     | YES                                           | YES          | PASS    |
+| 11   | rule-creator (NEW)    | .claude/skills/creators/rule-creator/SKILL.md        | YES                                           | YES          | PASS    |
+| 12   | tool-creator (NEW)    | .claude/skills/creators/tool-creator/SKILL.md        | YES                                           | YES          | PASS    |
 
 **Step 9 PARTIAL:** skill-creator Step 0 updated to artifact-updater at line 732, but a ghost reference to "skill-updater workflow" remains at line 722.
 
 ### 1.4 Integration and Promotion (Steps 13-15)
 
-| Step | Deliverable | Implementation | Status |
-|------|-----------|----------------|--------|
-| 13 | Update existing creators (agent, hook, workflow, template, schema) | All updated with Post-Creation Integration sections and artifact-updater Step 0 | PASS |
-| 14 | Promote WARN_ONLY to blocking | Skipped (justified -- see Step 3 note) | N/A |
-| 15 | Remove ghost updater references | 3 ghost references remain (see below) | FAIL |
+| Step | Deliverable                                                        | Implementation                                                                  | Status |
+| ---- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------- | ------ |
+| 13   | Update existing creators (agent, hook, workflow, template, schema) | All updated with Post-Creation Integration sections and artifact-updater Step 0 | PASS   |
+| 14   | Promote WARN_ONLY to blocking                                      | Skipped (justified -- see Step 3 note)                                          | N/A    |
+| 15   | Remove ghost updater references                                    | 3 ghost references remain (see below)                                           | FAIL   |
 
 **Step 15 FAIL -- Ghost Updater References:**
 
-| File | Line | Ghost Reference |
-|------|------|----------------|
-| .claude/skills/skill-creator/SKILL.md | 722 | "skill-updater workflow" |
-| .claude/skills/workflow-creator/SKILL.md | 106, 110 | "workflow-updater" |
-| .claude/skills/schema-creator/SKILL.md | 142, 146 | "schema-updater" |
+| File                                     | Line     | Ghost Reference          |
+| ---------------------------------------- | -------- | ------------------------ |
+| .claude/skills/skill-creator/SKILL.md    | 722      | "skill-updater workflow" |
+| .claude/skills/workflow-creator/SKILL.md | 106, 110 | "workflow-updater"       |
+| .claude/skills/schema-creator/SKILL.md   | 142, 146 | "schema-updater"         |
 
 These references point to non-existent skills that were replaced by artifact-updater. They should be updated to reference artifact-updater instead.
 
 ### 1.5 Test Coverage (Step 15)
 
-| Test File | Tests | Status |
-|-----------|-------|--------|
-| tests/lib/creators/creator-commons.test.cjs | 17 tests | ALL PASS |
-| tests/lib/creators/ecosystem-impact-analyzer.test.cjs | 11 tests | ALL PASS |
-| tests/hooks/unified-creator-guard-schema-validation.test.cjs | 10 tests | ALL PASS |
-| tests/hooks/unified-creator-guard-protected-paths.test.cjs | 16 tests | ALL PASS |
-| **Total** | **54 tests** | **ALL PASS** |
+| Test File                                                    | Tests        | Status       |
+| ------------------------------------------------------------ | ------------ | ------------ |
+| tests/lib/creators/creator-commons.test.cjs                  | 17 tests     | ALL PASS     |
+| tests/lib/creators/ecosystem-impact-analyzer.test.cjs        | 11 tests     | ALL PASS     |
+| tests/hooks/unified-creator-guard-schema-validation.test.cjs | 10 tests     | ALL PASS     |
+| tests/hooks/unified-creator-guard-protected-paths.test.cjs   | 16 tests     | ALL PASS     |
+| **Total**                                                    | **54 tests** | **ALL PASS** |
 
 ### 1.6 Spec Compliance Summary
 
@@ -93,7 +93,8 @@ These references point to non-existent skills that were replaced by artifact-upd
 
 **S-001: Excellent shared infrastructure (creator-commons.cjs)**
 The creator-commons module centralizes 5 critical post-creation functions that all creators need. This eliminates the duplicated ad-hoc post-creation logic that previously existed in each creator skill. Key highlights:
-- safeParseJSON with prototype pollution prevention (filters __proto__, constructor, prototype keys)
+
+- safeParseJSON with prototype pollution prevention (filters **proto**, constructor, prototype keys)
 - PROVENANCE_REGEX for consistent header validation across all artifact types
 - SCHEMA_MAP for centralized schema path resolution
 - validatePostCreation with structured error/warning/pass results
@@ -119,24 +120,28 @@ None.
 #### Important (Should Fix)
 
 **I-001: Ghost updater references (3 files)**
+
 - **Files:** skill-creator/SKILL.md:722, workflow-creator/SKILL.md:106,110, schema-creator/SKILL.md:142,146
 - **What:** References to non-existent skill-updater, workflow-updater, and schema-updater skills remain in creator SKILL.md files
 - **Why it matters:** Agents following these instructions will attempt to invoke skills that do not exist, causing runtime errors or confusion. The artifact-updater was created specifically to replace these individual updaters.
 - **Fix:** Replace each ghost reference with "artifact-updater" (the unified replacement skill)
 
 **I-002: DRY violation -- safeParseJSON duplicated**
+
 - **Files:** .claude/lib/creators/creator-commons.cjs (lines 27-42), .claude/lib/creators/ecosystem-impact-analyzer.cjs (lines 32-49)
 - **What:** The safeParseJSON function is copy-pasted identically in both modules, including the same prototype pollution prevention logic
 - **Why it matters:** If a security fix is needed in safeParseJSON (e.g., new prototype pollution vector), it must be applied in both places. The creator-commons module was specifically created to centralize shared functions.
 - **Fix:** ecosystem-impact-analyzer.cjs should import safeParseJSON from creator-commons.cjs instead of duplicating it
 
 **I-003: DRY violation -- SCHEMA_MAP duplicated**
+
 - **Files:** .claude/lib/creators/creator-commons.cjs (lines 44-55), .claude/hooks/routing/unified-creator-guard.cjs (lines 370-390)
 - **What:** SCHEMA_MAP (mapping artifact types to schema file paths) is defined in both modules
 - **Why it matters:** Adding a new artifact type requires updating the map in two places. The creator-commons module exports SCHEMA_MAP for exactly this purpose.
 - **Fix:** unified-creator-guard.cjs should import SCHEMA_MAP from creator-commons.cjs
 
 **I-004: Non-atomic catalog writes in updateCatalog**
+
 - **Files:** .claude/lib/creators/creator-commons.cjs:138
 - **What:** updateCatalog uses fs.writeFileSync directly, which is non-atomic. If the process crashes mid-write, the catalog file could be corrupted.
 - **Why it matters:** Catalogs like skill-catalog.md and agent-registry.json are critical framework files. Corruption would require manual recovery.
@@ -145,28 +150,33 @@ None.
 #### Minor (Nice to Have)
 
 **M-001: New creators in inconsistent location**
+
 - **Files:** .claude/skills/creators/command-creator/, .claude/skills/creators/rule-creator/, .claude/skills/creators/tool-creator/
 - **What:** The 3 new creators are under .claude/skills/creators/ but existing creators (skill-creator, agent-creator, hook-creator, workflow-creator, template-creator, schema-creator) are at .claude/skills/{name}/ (top-level)
 - **Why it matters:** Inconsistent location makes discovery harder. Agents searching for creators might miss the nested ones.
 - **Fix:** Either move new creators to top-level .claude/skills/ or move all creators under .claude/skills/creators/ (a larger refactor)
 
 **M-002: post-creation-integration.cjs missing new creator type patterns**
+
 - **Files:** .claude/hooks/workflow/post-creation-integration.cjs
 - **What:** The processCreatorCompletion function detects creator types from task descriptions using regex patterns. The existing patterns cover skill-creator, agent-creator, hook-creator, workflow-creator, template-creator, schema-creator. The 3 new types (command-creator, rule-creator, tool-creator) are not in the detection patterns.
 - **Why it matters:** When these new creators complete, the hook will not auto-detect them for post-creation integration analysis. The ecosystem impact analysis will still run (via the general path), but the type-specific logic will be missed.
 - **Fix:** Add command-creator, rule-creator, and tool-creator to the creator type detection regex
 
 **M-003: ecosystem-impact-analyzer.cjs hardcodes graph path**
+
 - **Files:** .claude/lib/creators/ecosystem-impact-analyzer.cjs:15
 - **What:** The graph file path is hardcoded. If the file is moved, the module breaks silently (falls back to empty results).
 - **Fix:** Accept graph path as parameter or use a constants module
 
 **M-004: Missing JSDoc on creator-commons exports**
+
 - **Files:** .claude/lib/creators/creator-commons.cjs
 - **What:** The 5 exported functions lack JSDoc comments describing parameters, return types, and usage.
 - **Fix:** Add JSDoc headers for IDE support and documentation generation
 
 **M-005: Skill catalog entry formatting**
+
 - **Files:** .claude/context/artifacts/catalogs/skill-catalog.md:31
 - **What:** The 4 new catalog entries (artifact-updater, command-creator, rule-creator, tool-creator) were added but the formatting could be more consistent with existing entries.
 - **Fix:** Align columns and descriptions with the existing catalog style
@@ -191,15 +201,15 @@ None.
 
 Checked artifact-graph.json for integration status of new artifacts:
 
-| Artifact | Type | Catalog Entry | Consumer | Routing | Status |
-|----------|------|--------------|----------|---------|--------|
-| artifact-updater | skill | skill-catalog.md | All creator skills (Step 0) | N/A | INTEGRATED |
-| command-creator | skill | skill-catalog.md | Router (creator workflow) | N/A | INTEGRATED |
-| rule-creator | skill | skill-catalog.md | Router (creator workflow) | N/A | INTEGRATED |
-| tool-creator | skill | skill-catalog.md | Router (creator workflow) | N/A | INTEGRATED |
-| creator-commons.cjs | library | N/A (internal) | Creator skills, hooks | N/A | INTEGRATED |
-| ecosystem-impact-graph.json | data | N/A (internal) | ecosystem-impact-analyzer | N/A | INTEGRATED |
-| ecosystem-impact-analyzer.cjs | library | N/A (internal) | post-creation-integration hook | N/A | INTEGRATED |
+| Artifact                      | Type    | Catalog Entry    | Consumer                       | Routing | Status     |
+| ----------------------------- | ------- | ---------------- | ------------------------------ | ------- | ---------- |
+| artifact-updater              | skill   | skill-catalog.md | All creator skills (Step 0)    | N/A     | INTEGRATED |
+| command-creator               | skill   | skill-catalog.md | Router (creator workflow)      | N/A     | INTEGRATED |
+| rule-creator                  | skill   | skill-catalog.md | Router (creator workflow)      | N/A     | INTEGRATED |
+| tool-creator                  | skill   | skill-catalog.md | Router (creator workflow)      | N/A     | INTEGRATED |
+| creator-commons.cjs           | library | N/A (internal)   | Creator skills, hooks          | N/A     | INTEGRATED |
+| ecosystem-impact-graph.json   | data    | N/A (internal)   | ecosystem-impact-analyzer      | N/A     | INTEGRATED |
+| ecosystem-impact-analyzer.cjs | library | N/A (internal)   | post-creation-integration hook | N/A     | INTEGRATED |
 
 ### 3.2 Must-Have Integration Check
 
@@ -212,6 +222,7 @@ Checked artifact-graph.json for integration status of new artifacts:
 ### 3.3 Broken Edges
 
 3 broken edges detected (from ghost references):
+
 - skill-creator -> skill-updater (BROKEN: skill-updater does not exist)
 - workflow-creator -> workflow-updater (BROKEN: workflow-updater does not exist)
 - schema-creator -> schema-updater (BROKEN: schema-updater does not exist)
@@ -232,18 +243,18 @@ No systemic patterns requiring new artifacts were detected. The implementation c
 
 ### Issue Priority Matrix
 
-| ID | Severity | Effort | Fix Before Merge? |
-|----|----------|--------|------------------|
-| I-001 | Important | Low (find-replace in 3 files) | YES |
-| I-002 | Important | Low (3-line change) | Recommended |
-| I-003 | Important | Low (import + delete) | Recommended |
-| I-004 | Important | Medium (atomic write pattern) | No |
-| M-001 | Minor | Medium (directory restructure) | No |
-| M-002 | Minor | Low (regex update) | Recommended |
-| M-003 | Minor | Low (parameterize path) | No |
-| M-004 | Minor | Low (add JSDoc) | No |
-| M-005 | Minor | Low (formatting) | No |
+| ID    | Severity  | Effort                         | Fix Before Merge? |
+| ----- | --------- | ------------------------------ | ----------------- |
+| I-001 | Important | Low (find-replace in 3 files)  | YES               |
+| I-002 | Important | Low (3-line change)            | Recommended       |
+| I-003 | Important | Low (import + delete)          | Recommended       |
+| I-004 | Important | Medium (atomic write pattern)  | No                |
+| M-001 | Minor     | Medium (directory restructure) | No                |
+| M-002 | Minor     | Low (regex update)             | Recommended       |
+| M-003 | Minor     | Low (parameterize path)        | No                |
+| M-004 | Minor     | Low (add JSDoc)                | No                |
+| M-005 | Minor     | Low (formatting)               | No                |
 
 ---
 
-*End of review.*
+_End of review._

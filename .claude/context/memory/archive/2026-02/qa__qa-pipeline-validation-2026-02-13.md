@@ -45,6 +45,7 @@
 **Failed Test**: `should report error for files exceeding 500 lines (skipBlankLines, skipComments)`
 
 **Error**:
+
 ```
 ESLint should flag files over 500 lines with max-lines rule, got:
 ```
@@ -52,11 +53,13 @@ ESLint should flag files over 500 lines with max-lines rule, got:
 **Root Cause**: Test expects ESLint to exit with non-zero code when `max-lines` rule violations occur, but ESLint only exits non-zero for `error` severity, not `warn` severity.
 
 **Current Config** (eslint.config.js line 92):
+
 ```javascript
 'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }],
 ```
 
 **Test Expectation** (tests/lint/max-lines-rule.test.cjs lines 29-33):
+
 ```javascript
 try {
   execSync(`npx eslint "${tmpFile}"`, ...);
@@ -98,6 +101,7 @@ try {
 **Breakdown**:
 
 **Warnings (59 total)**: max-lines violations in test files
+
 - `memory-tiers.test.cjs`: 722 lines (exceeds 500)
 - `violation-tracker.test.cjs`: 576 lines
 - `routing-table-equivalence.test.mjs`: 575 lines
@@ -113,6 +117,7 @@ try {
 **Status**: ⚠️ **NON-BLOCKING** (warnings don't block deployment per learnings.md pattern)
 
 **Remediation Plan** (from TDD plan):
+
 - Steps 2-18 will progressively refactor oversized modules
 - Test files will be split during Phase 4 (Steps 13-15)
 - Rule escalation to `error` occurs after Phase 3 completion
@@ -126,6 +131,7 @@ try {
 **Result**: ✅ **CLEAN**
 
 **Output**:
+
 ```
 Formatted 3109 file(s) in 7 chunk(s).
 ```
@@ -141,6 +147,7 @@ Formatted 3109 file(s) in 7 chunk(s).
 **Result**: ⚠️ **10 UNCOMMITTED FILES**
 
 **Files Modified**:
+
 1. `.claude/context/data/memory.db` (binary, 274KB)
 2. `.claude/context/memory/codebase_map.json` (+4/-4 lines)
 3. `.claude/context/memory/decisions.md` (+33 lines)
@@ -189,13 +196,14 @@ Formatted 3109 file(s) in 7 chunk(s).
 **File**: `tests/lint/max-lines-rule.test.cjs`
 
 **Change** (lines 21-36):
+
 ```javascript
 try {
   // Run eslint and capture stdout (don't throw on exit code 1 from warnings)
-  const result = execSync(
-    `npx eslint "${tmpFile.replace(/\\/g, '/')}"`,
-    { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
-  );
+  const result = execSync(`npx eslint "${tmpFile.replace(/\\/g, '/')}"`, {
+    encoding: 'utf8',
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
   // If no output, rule didn't trigger
   assert.fail('ESLint should have reported max-lines warning for file with 501+ lines');
 } catch (err) {
@@ -209,6 +217,7 @@ try {
 ```
 
 **Rationale**:
+
 - Maintains `warn` severity as recommended by learnings.md
 - Allows 59 existing violations to be fixed incrementally
 - Test validates rule is active (warning appears in output)
@@ -225,6 +234,7 @@ After fixing test:
 3. **Re-run full suite**: `pnpm test`
    - Expected: Match baseline (check for new failures)
 4. **Commit changes**:
+
    ```bash
    git add tests/lint/max-lines-rule.test.cjs eslint.config.js
    git commit -m "fix(test): correct max-lines-rule test to check stdout not exit code
@@ -240,6 +250,7 @@ After fixing test:
 ### 6.3 Follow-Up (Non-Blocking)
 
 **Next Steps** (from TDD plan):
+
 - Step 2: Add shell: false validator hook (VUL-SHELL-001)
 - Step 3: Implement safeParseJSON() enforcement
 - Steps 4-18: Progressive module refactoring
@@ -251,6 +262,7 @@ After fixing test:
 ## 7. Memory Updates
 
 **Issues.md**: Document max-lines test bug
+
 ```markdown
 ## 2026-02-13: max-lines-rule.test.cjs Test Bug (BLOCKING)
 
@@ -266,8 +278,10 @@ After fixing test:
 ```
 
 **Learnings.md**: Add test validation pattern
+
 ```markdown
 **ESLint Severity vs Exit Code (2026-02-13):**
+
 - Pattern: ESLint exits non-zero ONLY on `error` severity, not `warn`
 - Test Impact: Tests checking exit codes must account for severity level
 - Application: When testing linter rules, check stdout/stderr for warnings, not just exit code
@@ -288,6 +302,7 @@ After fixing test:
 **Gate Status**: ⚠️ **BLOCKED BY TEST FAILURE**
 
 **Completion Criteria**:
+
 1. Fix max-lines-rule.test.cjs
 2. Verify 2/2 tests pass
 3. Run chaos tests
@@ -313,6 +328,7 @@ After fixing test:
 **Current State**: Step 1 implementation complete, test has bug
 
 **Recommendation**:
+
 - Fix test before claiming Step 1 complete
 - Follow TDD red-green cycle:
   1. Fix test to expect warning in stdout
@@ -320,6 +336,7 @@ After fixing test:
   3. Commit Step 1 complete
 
 **TDD Compliance**: ⚠️ **PARTIAL**
+
 - Rule implemented before test written (violates TDD)
 - Test written but has bug
 - Red-green cycle not validated
@@ -331,6 +348,7 @@ After fixing test:
 **Current**: 59 max-lines warnings in test files
 
 **Recommendation**: Follow TDD plan phasing
+
 - Keep at `warn` level through Phase 3 (Steps 1-12)
 - Split oversized test files in Phase 4 (Steps 13-15)
 - Escalate to `error` in Phase 5 (Steps 16-18)
@@ -344,17 +362,20 @@ After fixing test:
 **Overall Assessment**: ⚠️ **PARTIAL COMPLETION WITH BLOCKING BUG**
 
 **What Works**:
+
 - ✅ ESLint max-lines rule correctly configured (warn level, 500 line limit)
 - ✅ Format validation clean
 - ✅ Git diff shows only Step 1 changes
 - ✅ Incremental approach aligns with learnings.md guidance
 
 **What's Broken**:
+
 - ❌ max-lines-rule.test.cjs has incorrect expectations (exit code vs stdout)
 - ⚠️ TDD red-green cycle not validated
 - ⚠️ 59 existing max-lines violations (planned remediation)
 
 **Next Actions**:
+
 1. Fix max-lines-rule.test.cjs (Option A)
 2. Verify 2/2 tests pass
 3. Run chaos tests

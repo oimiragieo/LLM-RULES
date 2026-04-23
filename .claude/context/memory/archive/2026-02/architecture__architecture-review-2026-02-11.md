@@ -90,15 +90,15 @@ Archive rate: 57% (more than half built then abandoned)
 
 **Current Hook Distribution** (settings.json):
 
-| Event Type          | Hooks | Redundancy Risk |
-| ------------------- | ----- | --------------- |
-| PreToolUse          | 16    | HIGH            |
-| PostToolUse         | 8     | MEDIUM          |
-| PostToolUseFailure  | 2     | LOW             |
-| UserPromptSubmit    | 1     | LOW             |
-| SessionEnd          | 2     | LOW             |
-| Stop                | 2     | LOW             |
-| **TOTAL**           | **31**| **-**           |
+| Event Type         | Hooks  | Redundancy Risk |
+| ------------------ | ------ | --------------- |
+| PreToolUse         | 16     | HIGH            |
+| PostToolUse        | 8      | MEDIUM          |
+| PostToolUseFailure | 2      | LOW             |
+| UserPromptSubmit   | 1      | LOW             |
+| SessionEnd         | 2      | LOW             |
+| Stop               | 2      | LOW             |
+| **TOTAL**          | **31** | **-**           |
 
 **Redundancy Examples**:
 
@@ -167,11 +167,11 @@ Archive rate: 57% (more than half built then abandoned)
 
 **IMPLEMENT TIERED ARTIFACT CREATION** (from learnings.md pattern):
 
-| Tier       | Artifacts                              | Depth                                                    | Quality Gate                  |
-| ---------- | -------------------------------------- | -------------------------------------------------------- | ----------------------------- |
-| **Tier 1** | Complex (tdd, security, debugging)     | Full (SKILL.md + rule + schema + command + workflow)     | ADR + integration plan + test |
-| **Tier 2** | Domain (python-expert, typescript-pro) | Standard (SKILL.md + rule + lightweight schema)          | Integration checklist         |
-| **Tier 3** | Simple (helper skills)                 | Minimal (SKILL.md + rule only)                           | Catalog registration only     |
+| Tier       | Artifacts                              | Depth                                                | Quality Gate                  |
+| ---------- | -------------------------------------- | ---------------------------------------------------- | ----------------------------- |
+| **Tier 1** | Complex (tdd, security, debugging)     | Full (SKILL.md + rule + schema + command + workflow) | ADR + integration plan + test |
+| **Tier 2** | Domain (python-expert, typescript-pro) | Standard (SKILL.md + rule + lightweight schema)      | Integration checklist         |
+| **Tier 3** | Simple (helper skills)                 | Minimal (SKILL.md + rule only)                       | Catalog registration only     |
 
 **Action Items**:
 
@@ -439,6 +439,7 @@ git rm .claude/agents/router.md
 
 1. **Document**: `.claude/docs/SKILL_SELECTION_GUIDE.md`
 2. **Decision tree format**:
+
    ```
    Need to search code?
    ├─ Keyword search → ripgrep
@@ -450,6 +451,7 @@ git rm .claude/agents/router.md
    ├─ General OWASP/STRIDE → security-architect
    └─ Binary reverse engineering → binary-analysis-patterns
    ```
+
 3. **Integrate with agent prompts**: Include skill decision tree in agent spawn templates
 
 **Alternative**: **Consolidate overlapping skills** (e.g., merge 11 security skills → 3-4 core security skills)
@@ -605,20 +607,20 @@ pnpm test → All tests passing
 
 ## ARCHITECTURAL METRICS
 
-| Metric                       | Count | Health     |
-| ---------------------------- | ----- | ---------- |
-| **Agents**                   | 59    | ✅ Healthy |
-| **Skills (active)**          | 100   | ⚠️ High    |
-| **Skills (archived)**        | 214   | ❌ Bloat   |
-| **Hooks (active)**           | 39    | ⚠️ High    |
-| **Hooks (archived)**         | 50+   | ❌ Bloat   |
-| **Tools (active)**           | 66    | ✅ Healthy |
-| **Tools (archived)**         | 25    | ✅ Healthy |
-| **Workflows**                | 28    | ✅ Healthy |
-| **Lib modules**              | 100+  | ⚠️ High    |
-| **Configuration files**      | 6     | ❌ Sprawl  |
-| **Routing modules**          | 4     | ❌ Dup     |
-| **Memory modules**           | 15    | ❌ Complex |
+| Metric                       | Count | Health       |
+| ---------------------------- | ----- | ------------ |
+| **Agents**                   | 59    | ✅ Healthy   |
+| **Skills (active)**          | 100   | ⚠️ High      |
+| **Skills (archived)**        | 214   | ❌ Bloat     |
+| **Hooks (active)**           | 39    | ⚠️ High      |
+| **Hooks (archived)**         | 50+   | ❌ Bloat     |
+| **Tools (active)**           | 66    | ✅ Healthy   |
+| **Tools (archived)**         | 25    | ✅ Healthy   |
+| **Workflows**                | 28    | ✅ Healthy   |
+| **Lib modules**              | 100+  | ⚠️ High      |
+| **Configuration files**      | 6     | ❌ Sprawl    |
+| **Routing modules**          | 4     | ❌ Dup       |
+| **Memory modules**           | 15    | ❌ Complex   |
 | **Integration health score** | 98.2% | ✅ Excellent |
 
 ---

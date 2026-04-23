@@ -16,6 +16,7 @@
 - **Critical gaps:** Creator libraries, routing core, event system, monitoring
 
 **Key Findings:**
+
 1. **38 memory modules** vs **34 memory tests** - reasonable coverage but gaps in newer modules
 2. **8 routing modules** vs **7 routing tests** - `router-state.cjs` and `agent-registry-loader.cjs` have minimal coverage
 3. **3 creator libraries** with **0 dedicated unit tests** - only integration tests exist
@@ -30,18 +31,20 @@
 
 **Status:** ❌ NO UNIT TESTS
 
-| Module | Lines | Complexity | Risk | Tests |
-|--------|-------|------------|------|-------|
-| `.claude/lib/creators/companion-check.cjs` | ~150 | HIGH | CRITICAL | 0 |
-| `.claude/lib/creators/ecosystem-impact-analyzer.cjs` | ~200 | HIGH | CRITICAL | 0 |
-| `.claude/lib/creators/creator-commons.cjs` | ~100 | MEDIUM | HIGH | 1 (basic) |
+| Module                                               | Lines | Complexity | Risk     | Tests     |
+| ---------------------------------------------------- | ----- | ---------- | -------- | --------- |
+| `.claude/lib/creators/companion-check.cjs`           | ~150  | HIGH       | CRITICAL | 0         |
+| `.claude/lib/creators/ecosystem-impact-analyzer.cjs` | ~200  | HIGH       | CRITICAL | 0         |
+| `.claude/lib/creators/creator-commons.cjs`           | ~100  | MEDIUM     | HIGH     | 1 (basic) |
 
 **Impact:** Creator workflows are central to artifact creation. No unit tests means:
+
 - Companion detection logic untested
 - Ecosystem impact analysis unverified
 - Creator commons shared utilities unchecked
 
 **Recommendation:**
+
 ```bash
 # Priority 1: Add unit tests for companion-check.cjs
 tests/lib/creators/companion-check.test.cjs
@@ -65,16 +68,16 @@ tests/lib/creators/ecosystem-impact-analyzer.test.cjs
 
 **Status:** ⚠️ PARTIAL COVERAGE
 
-| Module | Tests | Coverage Estimate | Gaps |
-|--------|-------|-------------------|------|
-| `router-state.cjs` | 0 dedicated | 0% | State management untested |
-| `agent-registry-loader.cjs` | 0 dedicated | 0% | Registry loading untested |
-| `fuzzy-intent-matcher.cjs` | ✅ 1 | 80% | Good |
-| `intent-classifier.cjs` | ✅ 1 | 70% | Edge cases missing |
-| `pattern-router.cjs` | ✅ 1 | 75% | Good |
-| `semantic-router.cjs` | ✅ 1 | 70% | Good |
-| `routing-table.cjs` | ✅ Indirect | 60% | Tested via integration only |
-| `agent-registry-resolver.cjs` | ✅ 1 | 75% | Good |
+| Module                        | Tests       | Coverage Estimate | Gaps                        |
+| ----------------------------- | ----------- | ----------------- | --------------------------- |
+| `router-state.cjs`            | 0 dedicated | 0%                | State management untested   |
+| `agent-registry-loader.cjs`   | 0 dedicated | 0%                | Registry loading untested   |
+| `fuzzy-intent-matcher.cjs`    | ✅ 1        | 80%               | Good                        |
+| `intent-classifier.cjs`       | ✅ 1        | 70%               | Edge cases missing          |
+| `pattern-router.cjs`          | ✅ 1        | 75%               | Good                        |
+| `semantic-router.cjs`         | ✅ 1        | 70%               | Good                        |
+| `routing-table.cjs`           | ✅ Indirect | 60%               | Tested via integration only |
+| `agent-registry-resolver.cjs` | ✅ 1        | 75%               | Good                        |
 
 **Missing Tests:**
 
@@ -98,18 +101,20 @@ tests/lib/routing/agent-registry-loader.test.cjs
 
 **Status:** ⚠️ MINIMAL COVERAGE
 
-| Module | Tests | Coverage Estimate |
-|--------|-------|-------------------|
-| `.claude/lib/events/event-bus.cjs` | 0 | 0% |
-| `.claude/lib/events/event-bus-sink.cjs` | 0 | 0% |
-| `.claude/lib/events/event-types.cjs` | 0 | 0% |
+| Module                                  | Tests | Coverage Estimate |
+| --------------------------------------- | ----- | ----------------- |
+| `.claude/lib/events/event-bus.cjs`      | 0     | 0%                |
+| `.claude/lib/events/event-bus-sink.cjs` | 0     | 0%                |
+| `.claude/lib/events/event-types.cjs`    | 0     | 0%                |
 
 **Impact:** Event system is used for hook communication and metrics. Untested means:
+
 - Event emission failures invisible
 - Event handler registration bugs undetected
 - Memory leaks from unsubscribed handlers
 
 **Recommendation:**
+
 ```bash
 tests/lib/events/event-bus.test.cjs
 - Test event emission
@@ -127,12 +132,12 @@ tests/lib/events/event-bus-sink.test.cjs
 
 **Status:** ⚠️ PARTIAL COVERAGE
 
-| Module | Tests | Notes |
-|--------|-------|-------|
-| `metrics-reader.cjs` | 0 | Used by CLI tools |
-| `metrics-schema.cjs` | 0 | Schema validation untested |
-| `production-alerts.cjs` | 0 | Alert logic untested |
-| `violation-tracker.cjs` | 0 | Violation tracking untested |
+| Module                  | Tests | Notes                       |
+| ----------------------- | ----- | --------------------------- |
+| `metrics-reader.cjs`    | 0     | Used by CLI tools           |
+| `metrics-schema.cjs`    | 0     | Schema validation untested  |
+| `production-alerts.cjs` | 0     | Alert logic untested        |
+| `violation-tracker.cjs` | 0     | Violation tracking untested |
 
 **Lower priority** because these are primarily used by CLI tools which have integration tests.
 
@@ -156,6 +161,7 @@ const testFile = path.join(PROJECT_ROOT, 'tests', 'fixtures', 'test.js');
 ```
 
 **Affected Tests:**
+
 - Code-indexing tests (use temp directories but may have hardcoded fallbacks)
 - Memory tests (LanceDB paths)
 
@@ -174,11 +180,13 @@ const testFile = path.join(PROJECT_ROOT, 'tests', 'fixtures', 'test.js');
 ```
 
 **Impact:**
+
 - False confidence (tests pass but real code may fail)
 - Brittle tests (break when implementation changes even if behavior is correct)
 - Miss integration bugs
 
 **Recommendation:**
+
 - **Unit tests:** Mock only external dependencies (filesystem, network, LLM calls)
 - **Integration tests:** Use real components with test fixtures
 - **Rule:** If you mock more than 50% of the function's dependencies, write an integration test instead
@@ -206,6 +214,7 @@ test('processes memory extraction', async () => {
 ```
 
 **Audit Needed:** Review all tests for weak assertions like:
+
 - `assert.ok(result)` without content checks
 - `assert.strictEqual(typeof x, 'object')` without property checks
 - No assertions on error paths
@@ -229,6 +238,7 @@ if (routingGuard && routingGuard.invalidateCachedState) {
 **Impact:** Test order affects results (flaky tests).
 
 **Fix:**
+
 1. Add `beforeEach`/`afterEach` cleanup to all tests
 2. Use `delete require.cache[require.resolve('...')]` for modules with state
 3. Reset environment variables
@@ -258,6 +268,7 @@ test('async operation completes', async () => {
 ```
 
 **Likely Affected:**
+
 - Code indexing tests (file watching, background indexing)
 - Memory tests (background extraction)
 - Hook tests (event propagation)
@@ -286,6 +297,7 @@ test('loads codebase', async () => {
 ```
 
 **Affected:**
+
 - Code indexing tests (rely on actual repo files)
 - Memory tests (rely on actual memory files)
 
@@ -298,6 +310,7 @@ test('loads codebase', async () => {
 **Cause:** Shared state, module caching, file system state.
 
 **Evidence:**
+
 ```bash
 # Tests may pass individually but fail when run together
 pnpm test tests/memory/extraction.test.cjs # PASS
@@ -305,6 +318,7 @@ pnpm test tests/memory/ # FAIL (extraction.test.cjs fails)
 ```
 
 **Fix:**
+
 1. Add cleanup in `afterEach`
 2. Use unique temp directories per test
 3. Reset module state
@@ -315,14 +329,14 @@ pnpm test tests/memory/ # FAIL (extraction.test.cjs fails)
 
 ### 4.1 Critical Workflows Without E2E Tests
 
-| Workflow | Status | Priority |
-|----------|--------|----------|
-| Agent creation via creator skill | ⚠️ Partial | HIGH |
-| Skill creation via creator skill | ⚠️ Partial | HIGH |
-| Hook creation via creator skill | ❌ Missing | HIGH |
-| Memory extraction end-to-end | ⚠️ Partial | MEDIUM |
-| Code indexing incremental updates | ✅ Good | - |
-| Routing specialist-first logic | ✅ Good | - |
+| Workflow                          | Status     | Priority |
+| --------------------------------- | ---------- | -------- |
+| Agent creation via creator skill  | ⚠️ Partial | HIGH     |
+| Skill creation via creator skill  | ⚠️ Partial | HIGH     |
+| Hook creation via creator skill   | ❌ Missing | HIGH     |
+| Memory extraction end-to-end      | ⚠️ Partial | MEDIUM   |
+| Code indexing incremental updates | ✅ Good    | -        |
+| Routing specialist-first logic    | ✅ Good    | -        |
 
 **Recommendation:**
 
@@ -373,6 +387,7 @@ tests/integration/hook-execution-chains.test.cjs
 ```
 
 **Fix:** Standardize on:
+
 ```
 Source: .claude/{category}/{name}.cjs
 Test:   tests/{category}/{name}.test.cjs
@@ -383,11 +398,13 @@ Test:   tests/{category}/{name}.test.cjs
 **Issue:** Tests create ad-hoc fixtures inline instead of using shared fixtures.
 
 **Current State:**
+
 ```
 tests/fixtures/   # Directory exists but minimal content
 ```
 
 **Recommendation:**
+
 ```bash
 tests/fixtures/
   agents/           # Sample agent files
@@ -398,6 +415,7 @@ tests/fixtures/
 ```
 
 **Benefits:**
+
 - Consistent test data
 - Easier to maintain
 - Faster test execution (no repeated fixture creation)
@@ -411,11 +429,13 @@ tests/fixtures/
 **Coverage:** ✅ EXCELLENT (~90%+)
 
 Most hooks have dedicated tests. Well-tested hooks:
+
 - `routing-guard.cjs` - 7 test files (comprehensive, specialist override, enforcement, etc.)
 - `spawn-prompt-assembler.cjs` - 11 test files (constitution, context mode, presets, etc.)
 - `unified-creator-guard.cjs` - 7 test files (comprehensive, paths, schemas, templates, etc.)
 
 **Gaps:**
+
 - Some archived hooks may lack tests
 - Multi-hook integration scenarios
 
@@ -424,6 +444,7 @@ Most hooks have dedicated tests. Well-tested hooks:
 **Coverage:** ✅ GOOD (~85%)
 
 Well-tested modules:
+
 - `hybrid-search.cjs` ✅
 - `merkle-tree.cjs` ✅
 - `bm25-indexer.cjs` ✅ (via integration tests)
@@ -431,6 +452,7 @@ Well-tested modules:
 - `vector-store.cjs` ✅
 
 **Gaps:**
+
 - `parse-chunk-worker.cjs` - Worker pool logic
 - `parse-utils.cjs` - Utility functions
 
@@ -439,12 +461,14 @@ Well-tested modules:
 **Coverage:** ✅ GOOD (~85%)
 
 Well-tested:
+
 - Observational memory (`observations.cjs`)
 - LanceDB integration
 - Memory dashboard
 - Cold storage
 
 **Gaps:**
+
 - `entity-extractor.cjs` - Limited coverage
 - `memory-sanitizer.cjs` - No dedicated tests
 - `memory-scheduler.cjs` - Integration tests only
@@ -455,6 +479,7 @@ Well-tested:
 **Coverage:** ⚠️ FAIR (~70%)
 
 **Gaps (see Section 1.2):**
+
 - `router-state.cjs` - 0 tests
 - `agent-registry-loader.cjs` - 0 tests
 - `routing-table.cjs` - Indirect coverage only
@@ -498,22 +523,26 @@ Basic coverage exists.
 **Current:** Tests run with `--test-concurrency=1` to avoid conflicts.
 
 **Issue:** Some tests may not be safe for parallel execution:
+
 - Filesystem state modifications
 - Shared memory database
 - Module caching
 
 **Fix:** Either:
+
 1. Make tests parallel-safe (isolated temp dirs, unique DB files)
 2. Keep serial execution but document why
 
 ### 7.2 Test Performance
 
 **Observation:** Some tests are slow due to:
+
 - Real filesystem operations
 - LanceDB initialization
 - Code parsing/indexing
 
 **Recommendation:**
+
 - Profile slow tests: `NODE_OPTIONS='--cpu-prof' node --test <test-file>`
 - Add timeout guards: `test('...', { timeout: 5000 }, async () => ...)`
 - Consider splitting slow integration tests from fast unit tests
@@ -579,20 +608,20 @@ Basic coverage exists.
 
 ## 9. Test Coverage Metrics (Estimated)
 
-| Category | Files | Tests | Coverage | Status |
-|----------|-------|-------|----------|--------|
-| **Hooks** | 104 | 111 | ~90% | ✅ Excellent |
-| **Code Indexing** | 18 | 15 | ~85% | ✅ Good |
-| **Memory** | 38 | 34 | ~85% | ✅ Good |
-| **Routing** | 8 | 7 | ~70% | ⚠️ Fair |
-| **Spawn** | 3 | Many | ~80% | ✅ Good |
-| **QA/Plan** | 5 | Some | ~75% | ✅ Good |
-| **Creators** | 3 | 1 | ~20% | ❌ Poor |
-| **Events** | 3 | 0 | 0% | ❌ None |
-| **Monitoring** | 7 | 0 | ~40%* | ⚠️ Fair |
-| **Overall** | **221** | **~250** | **~65%** | ⚠️ Below Target |
+| Category          | Files   | Tests    | Coverage | Status          |
+| ----------------- | ------- | -------- | -------- | --------------- |
+| **Hooks**         | 104     | 111      | ~90%     | ✅ Excellent    |
+| **Code Indexing** | 18      | 15       | ~85%     | ✅ Good         |
+| **Memory**        | 38      | 34       | ~85%     | ✅ Good         |
+| **Routing**       | 8       | 7        | ~70%     | ⚠️ Fair         |
+| **Spawn**         | 3       | Many     | ~80%     | ✅ Good         |
+| **QA/Plan**       | 5       | Some     | ~75%     | ✅ Good         |
+| **Creators**      | 3       | 1        | ~20%     | ❌ Poor         |
+| **Events**        | 3       | 0        | 0%       | ❌ None         |
+| **Monitoring**    | 7       | 0        | ~40%\*   | ⚠️ Fair         |
+| **Overall**       | **221** | **~250** | **~65%** | ⚠️ Below Target |
 
-*Via integration tests in CLI tools
+\*Via integration tests in CLI tools
 
 **Target:** 80%+ coverage on critical paths
 
@@ -605,6 +634,7 @@ Basic coverage exists.
 ### 10.1 Existing Regression Tests
 
 **Good Examples:**
+
 - `reflection-deadlock-fix.test.cjs` - Tests specific deadlock fix
 - `routing-guard-specialist-override.test.cjs` - Tests specialist routing fix
 - `unified-creator-guard-*.test.cjs` - Tests creator guard edge cases
@@ -612,11 +642,13 @@ Basic coverage exists.
 ### 10.2 Missing Regression Tests
 
 **Known Bugs Without Tests:**
+
 - Memory extraction performance regression (if any)
 - Code indexing OOM issues (partially tested via BM25-only mode)
 - Hook execution order bugs
 
 **Recommendation:**
+
 - For every bug fix, add regression test BEFORE fixing (TDD)
 - Name tests after issue/PR: `bug-1234-creator-paths.test.cjs`
 
@@ -627,13 +659,14 @@ Basic coverage exists.
 ### 11.1 Testing Mock Behavior
 
 **Example:**
+
 ```javascript
 // tests/code-indexing/hybrid-search.test.cjs
 mockIndexManager = {
-  semanticSearch: async (query) => {
+  semanticSearch: async query => {
     if (query.includes('auth')) return mockResults;
     return [];
-  }
+  },
 };
 
 // Test just verifies mock returns what we told it to return
@@ -649,6 +682,7 @@ assert.strictEqual(results[0].filePath, 'src/auth/login.js');
 **Bad:** Creates untested code paths in production.
 
 **Fix:** Use dependency injection instead:
+
 ```javascript
 // BAD
 function doWork() {
@@ -664,6 +698,7 @@ function doWork(db = defaultDB) {
 ### 11.3 Overly Broad Assertions
 
 **Example:**
+
 ```javascript
 // BAD - Doesn't verify behavior
 assert.ok(result);
@@ -691,9 +726,11 @@ Before claiming testing audit complete:
 ### 12.2 Evidence Collection
 
 **Files Modified:**
+
 - This report: `.claude/context/reports/testing-audit-2026-02-12.md`
 
 **Commands to Verify Findings:**
+
 ```bash
 # Count modules vs tests
 find .claude/lib -type f \( -name "*.cjs" -o -name "*.mjs" \) | wc -l  # 221
@@ -722,6 +759,7 @@ pnpm test:memory:ci        # Memory tests
 4. **Ongoing:** Add regression test for every bug fix
 
 **Success Criteria:**
+
 - Coverage reaches 80%+ on critical paths
 - No flaky tests in CI
 - All new code has tests written first (TDD)
@@ -789,23 +827,28 @@ tests/lib/utils/*.test.cjs
 ## Appendix B: Untested Modules (Critical Subset)
 
 ### Creators (0 dedicated unit tests)
+
 - `.claude/lib/creators/companion-check.cjs`
 - `.claude/lib/creators/ecosystem-impact-analyzer.cjs`
 
 ### Routing (0 dedicated tests)
+
 - `.claude/lib/routing/router-state.cjs`
 - `.claude/lib/routing/agent-registry-loader.cjs`
 
 ### Events (0 tests)
+
 - `.claude/lib/events/event-bus.cjs`
 - `.claude/lib/events/event-bus-sink.cjs`
 - `.claude/lib/events/event-types.cjs`
 
 ### Memory (gaps)
+
 - `.claude/lib/memory/entity-extractor.cjs` (limited)
 - `.claude/lib/memory/memory-sanitizer.cjs`
 
 ### Monitoring (0 dedicated tests, but CLI integration covers)
+
 - `.claude/lib/monitoring/metrics-reader.cjs`
 - `.claude/lib/monitoring/metrics-schema.cjs`
 - `.claude/lib/monitoring/production-alerts.cjs`

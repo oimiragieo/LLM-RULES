@@ -13,10 +13,10 @@
 
 ### Error Categories
 
-| Category | Count | Change | Impact |
-|----------|-------|--------|--------|
-| Catalog-Index Mismatches | 37 | -140 (79% reduction) | Blocking skill discovery |
-| Agent Assignment Gaps | 1,178 | +1,178 (new) | Warnings only |
+| Category                 | Count | Change               | Impact                   |
+| ------------------------ | ----- | -------------------- | ------------------------ |
+| Catalog-Index Mismatches | 37    | -140 (79% reduction) | Blocking skill discovery |
+| Agent Assignment Gaps    | 1,178 | +1,178 (new)         | Warnings only            |
 
 ## Files Modified by Fix Agent
 
@@ -33,6 +33,7 @@
 **Pattern**: Skill catalog has agent name X, but index has agent name Y
 
 Examples:
+
 - `incident-runbook-templates`: catalog says `[devops]` vs index says `[incident-responder]`
 - `go-expert`: catalog says `[go-pro]` vs index says `[golang-pro]`
 - `creator skills` (9 skills): catalog says `[router]` vs index says `[evolution-orchestrator]`

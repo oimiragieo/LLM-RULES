@@ -20,14 +20,14 @@
 
 ### Evidence Assessment
 
-| Evidence Type | Status | Details |
-|---|---|---|
-| Task metadata | MISSING | TaskGet(taskId: "16") returned "Task not found" |
-| Summary | FALLBACK ONLY | "Task 16 completed without summary metadata" (system-generated) |
-| Files modified | MISSING | No metadata.filesModified provided |
-| Output artifacts | MISSING | No metadata.outputArtifacts provided |
-| Context | NULL | reflection-spawn-request.json shows context: null |
-| Agent type | UNKNOWN | Reflection queue entry does not specify agent |
+| Evidence Type    | Status        | Details                                                         |
+| ---------------- | ------------- | --------------------------------------------------------------- |
+| Task metadata    | MISSING       | TaskGet(taskId: "16") returned "Task not found"                 |
+| Summary          | FALLBACK ONLY | "Task 16 completed without summary metadata" (system-generated) |
+| Files modified   | MISSING       | No metadata.filesModified provided                              |
+| Output artifacts | MISSING       | No metadata.outputArtifacts provided                            |
+| Context          | NULL          | reflection-spawn-request.json shows context: null               |
+| Agent type       | UNKNOWN       | Reflection queue entry does not specify agent                   |
 
 ### Why Score is Withheld
 
@@ -36,6 +36,7 @@ According to the reflection-agent mandate (PHASE 0 Iron Law):
 > "Never produce a score when dataQuality is 'insufficient'. A withheld score is more useful than a fabricated one."
 
 Fabricating a score would:
+
 1. Create false confidence in work quality assessment
 2. Hide the underlying metadata governance failure
 3. Prevent proper pattern extraction and learning consolidation

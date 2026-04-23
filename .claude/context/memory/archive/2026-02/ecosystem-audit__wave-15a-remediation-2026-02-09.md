@@ -14,13 +14,14 @@ Successfully enhanced 6 rule files from minimal stubs (17-18 lines) to comprehen
 
 ### Files Enhanced
 
-| File | Original Score | Final Score | Lines Added | Key Sections Added |
-|------|---------------|-------------|-------------|-------------------|
-| readme.md | 4/10 | 10/10 | +112 | Core Principles, Standards, Anti-Patterns, Quality Checklist |
-| scientific-skills.md | 3/10 | 10/10 | +130 | Skill Categories, Workflows, Integration Points |
-| summarize-changes.md | 4/10 | 10/10 | +250 | Summary Structure, Examples, Workflow |
+| File                 | Original Score | Final Score | Lines Added | Key Sections Added                                           |
+| -------------------- | -------------- | ----------- | ----------- | ------------------------------------------------------------ |
+| readme.md            | 4/10           | 10/10       | +112        | Core Principles, Standards, Anti-Patterns, Quality Checklist |
+| scientific-skills.md | 3/10           | 10/10       | +130        | Skill Categories, Workflows, Integration Points              |
+| summarize-changes.md | 4/10           | 10/10       | +250        | Summary Structure, Examples, Workflow                        |
 
 **Scoring Breakdown** (each file now scores 10/10):
+
 - Core Principles: 2/2 pts
 - Standards/Patterns: 2/2 pts
 - Anti-Patterns: 2/2 pts
@@ -37,11 +38,11 @@ The c4-context agent already contains a comprehensive Memory Protocol section (l
 
 Reviewed `.claude/context/reports/wave-9-rules-audit-2026-02-09.md` and enhanced the 3 rules that scored below 7/10:
 
-| File | Wave 9 Score | Final Score | Lines Added | Key Enhancements |
-|------|-------------|-------------|-------------|------------------|
-| doc-generator.md | 4/10 | 10/10 | +212 | Documentation Types, Structure Template, OpenAPI Integration |
-| git-expert.md | 3/10 | 10/10 | +257 | Branching Strategies, Advanced Workflows, Safety Protocols |
-| memory-forensics.md | 3/10 | 10/10 | +232 | Volatility Framework, Analysis Workflow, Tool Integration |
+| File                | Wave 9 Score | Final Score | Lines Added | Key Enhancements                                             |
+| ------------------- | ------------ | ----------- | ----------- | ------------------------------------------------------------ |
+| doc-generator.md    | 4/10         | 10/10       | +212        | Documentation Types, Structure Template, OpenAPI Integration |
+| git-expert.md       | 3/10         | 10/10       | +257        | Branching Strategies, Advanced Workflows, Safety Protocols   |
+| memory-forensics.md | 3/10         | 10/10       | +232        | Volatility Framework, Analysis Workflow, Tool Integration    |
 
 ## Technical Details
 
@@ -56,36 +57,42 @@ Reviewed `.claude/context/reports/wave-9-rules-audit-2026-02-09.md` and enhanced
 ### Content Added
 
 **readme.md**:
+
 - README structure template with 8 components
 - 9 anti-patterns (no installation, outdated, vague descriptions)
 - Quality checklist with 10 items
 - Integration with technical-writer, project-onboarding
 
 **scientific-skills.md**:
+
 - 139 skills across 4 domains (biology, chemistry, medicine, data science)
 - 28+ database skills, 55+ Python analysis libraries
 - 3 workflow examples (literature review, drug discovery, single-cell)
 - Prerequisites and best practices
 
 **summarize-changes.md**:
+
 - Structured summary template with 10 sections
 - Conventional commit format (type/scope/description)
 - 2 complete examples (bug fix, feature) with metadata
 - Integration with git-expert, thinking-tools
 
 **doc-generator.md**:
+
 - 4 documentation types (API, Developer Guides, Architecture, User Manuals)
 - Complete structure template with headers/sections
 - Example quality standards (runnable, realistic, complete, tested)
 - OpenAPI/Swagger integration example
 
 **git-expert.md**:
+
 - 3 branching strategies (Gitflow, Trunk-Based, Feature Branches)
 - 5 advanced workflows (Interactive Rebase, Cherry-Pick, Stash, Bisect, Reflog)
 - Complete command examples for each workflow
 - Safety protocols for force operations
 
 **memory-forensics.md**:
+
 - Memory acquisition tools for Windows/Linux/macOS
 - 7-step analysis workflow with Volatility commands
 - 3 artifact tables (Process, Network, Malware)
@@ -94,6 +101,7 @@ Reviewed `.claude/context/reports/wave-9-rules-audit-2026-02-09.md` and enhanced
 ## Validation
 
 All enhanced files now include:
+
 - ✅ Core Principles section (2 pts)
 - ✅ Standards with examples (2 pts)
 - ✅ Anti-patterns table (2 pts)

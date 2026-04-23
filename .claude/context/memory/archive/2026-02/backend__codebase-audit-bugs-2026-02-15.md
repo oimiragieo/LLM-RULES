@@ -106,7 +106,7 @@ if (
   process.stderr &&
   typeof process.stderr.write === 'function'
 ) {
-  warnedSchemas.add(warnKey);  // ← NEVER CLEARED
+  warnedSchemas.add(warnKey); // ← NEVER CLEARED
   process.stderr.write(
     `[WARN] safe-json: No schema provided for JSON parsing. Using fallback with limited protection.\n`
   );
@@ -261,8 +261,8 @@ Grep search found **525 occurrences** of `readFileSync` / `writeFileSync` across
 ```javascript
 // .claude/hooks/routing/pre-task-unified-state.cjs
 // Lines 67, 88, 119, 140, 177, 198
-const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));  // BLOCKING
-fs.writeFileSync(stateFile, JSON.stringify(state, null, 2), 'utf8');  // BLOCKING
+const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8')); // BLOCKING
+fs.writeFileSync(stateFile, JSON.stringify(state, null, 2), 'utf8'); // BLOCKING
 ```
 
 **Impact:**
@@ -289,7 +289,7 @@ async function readState() {
 async function writeState(state) {
   const tmp = `${stateFile}.tmp`;
   await fs.writeFile(tmp, JSON.stringify(state, null, 2), 'utf8');
-  await fs.rename(tmp, stateFile);  // Atomic on most OSes
+  await fs.rename(tmp, stateFile); // Atomic on most OSes
 }
 ```
 
@@ -327,21 +327,20 @@ for (let i = 0; i < files.length; i++) {
   // ...
 
   while (inFlight.size >= concurrency) {
-    await Promise.race(Array.from(inFlight));  // ← NO LOCKING
+    await Promise.race(Array.from(inFlight)); // ← NO LOCKING
   }
 
   const task = runOne(filePath, globalIndex);
   inFlight.add(task);
 
-  task
-    .then(async result => {
-      filesProcessed++;  // ← RACE CONDITION (shared state)
-      fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
-      totalChunks += result.chunks.length;  // ← RACE CONDITION
-      totalEmbeddings += result.chunks.length;  // ← RACE CONDITION
-      // ...
-    })
+  task.then(async result => {
+    filesProcessed++; // ← RACE CONDITION (shared state)
+    fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
+    totalChunks += result.chunks.length; // ← RACE CONDITION
+    totalEmbeddings += result.chunks.length; // ← RACE CONDITION
     // ...
+  });
+  // ...
 }
 ```
 
@@ -369,7 +368,7 @@ const { Atomics } = require('worker_threads');
 const updates = [];
 
 task.then(async result => {
-  updates.push(result);  // Safe - array push is atomic
+  updates.push(result); // Safe - array push is atomic
   // Process updates sequentially in main loop
 });
 
@@ -443,15 +442,15 @@ File read failed due to sibling tool call error during investigation. File exist
 
 ## SUMMARY TABLE
 
-| ID       | File                              | Severity | Status   | Impact                     |
-| -------- | --------------------------------- | -------- | -------- | -------------------------- |
-| CRIT-001 | safe-json.cjs (L236-249)          | CRITICAL | VERIFIED | Silent data loss           |
-| CRIT-002 | safe-json.cjs (L24)               | CRITICAL | VERIFIED | Memory leak (unbounded)    |
-| HIGH-001 | memory-manager-core-impl.cjs      | HIGH     | VERIFIED | Race conditions (no locks) |
-| HIGH-002 | **230 files** (hooks/lib)         | HIGH     | VERIFIED | Blocking sync I/O          |
-| MED-001  | index-manager-operations.cjs      | MEDIUM   | VERIFIED | Race conditions (counters) |
-| FP-001   | error-tracker.cjs                 | N/A      | FALSE+   | File does not exist        |
-| INSPECT  | hook-input.cjs (L109-200)         | UNKNOWN  | PENDING  | Needs inspection           |
+| ID       | File                         | Severity | Status   | Impact                     |
+| -------- | ---------------------------- | -------- | -------- | -------------------------- |
+| CRIT-001 | safe-json.cjs (L236-249)     | CRITICAL | VERIFIED | Silent data loss           |
+| CRIT-002 | safe-json.cjs (L24)          | CRITICAL | VERIFIED | Memory leak (unbounded)    |
+| HIGH-001 | memory-manager-core-impl.cjs | HIGH     | VERIFIED | Race conditions (no locks) |
+| HIGH-002 | **230 files** (hooks/lib)    | HIGH     | VERIFIED | Blocking sync I/O          |
+| MED-001  | index-manager-operations.cjs | MEDIUM   | VERIFIED | Race conditions (counters) |
+| FP-001   | error-tracker.cjs            | N/A      | FALSE+   | File does not exist        |
+| INSPECT  | hook-input.cjs (L109-200)    | UNKNOWN  | PENDING  | Needs inspection           |
 
 ---
 

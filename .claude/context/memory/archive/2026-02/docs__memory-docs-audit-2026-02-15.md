@@ -15,6 +15,7 @@
 **Files**: `.claude/rules/memory-protocol.md`, `.claude/CLAUDE.md` Section 8
 **Documentation Claims**: HOT tier (active files), WARM tier (archive/), COLD tier (archive/YYYY/)
 **Implementation Reality**: `memory-tiers.cjs` defines:
+
 - `STM` (Short-Term Memory) — current session, path: `.claude/context/memory/stm/`
 - `MTM` (Mid-Term Memory) — last 10 sessions, path: `.claude/context/memory/mtm/`
 - `LTM` (Long-Term Memory) — permanent summaries, path: `.claude/context/memory/ltm/`
@@ -27,17 +28,21 @@ The HOT/WARM/COLD terminology does NOT exist in the codebase. Additionally, ther
 
 **File**: `.claude/rules/memory-protocol.md`
 **Documentation Claims**:
+
 ```javascript
 const { readMemory, writeMemory } = require('.claude/lib/memory/contextual-memory.cjs');
 ```
+
 **Implementation Reality**: `contextual-memory.cjs` exports `{ ContextualMemory }` (a class). The class has NO `readMemory`/`writeMemory`/`listMemories`/`deleteMemory` methods. Its API is: `search()`, `findEntities()`, `getRelated()`, `readFile()`, `loadContextSync()`, `close()`.
 
 The named memory API lives in `.claude/lib/memory/core/memory-storage.cjs` and is re-exported via:
+
 - `.claude/lib/memory/core/index.cjs`
 - `.claude/lib/memory/memory-manager-core-impl.cjs`
 - `.claude/lib/memory/memory-manager.cjs`
 
 Correct imports:
+
 ```javascript
 const memory = require('.claude/lib/memory/core');
 await memory.readMemory(name);
@@ -53,6 +58,7 @@ await manager.readMemory(name);
 **File**: `.claude/rules/memory-protocol.md`
 **Documentation Claims**: Lists `memory-consolidation.cjs` for "Duplicate detection and merging"
 **Implementation Reality**: File does NOT exist. Closest equivalents:
+
 - `memory-deduplicator.cjs` — deduplication logic
 - `smart-pruner.cjs` — pruning logic
 
@@ -81,6 +87,7 @@ await manager.readMemory(name);
 ### 6. Undocumented memory data stores
 
 The following files exist in `.claude/context/memory/` but are not documented anywhere:
+
 - `gotchas.json` — Gotcha records via `recordGotcha()` API
 - `patterns.json` — Pattern records via `recordPattern()` API
 - `access-stats.json` — Memory access statistics
@@ -94,6 +101,7 @@ The following files exist in `.claude/context/memory/` but are not documented an
 ### 7. Session-based storage undocumented
 
 The actual memory manager stores sessions in:
+
 - `stm/session_current.json` — current session
 - `mtm/session_*.json` — recent sessions (max 10)
 - `ltm/summary_*.json` — long-term summaries
@@ -144,18 +152,21 @@ None of this is documented in memory-protocol.md.
 ## REMEDIATION PLAN
 
 ### P0 — Critical (must fix)
+
 1. Rewrite `memory-protocol.md` tier section: replace HOT/WARM/COLD with STM/MTM/LTM, describe session-based lifecycle
 2. Fix named memory API import example in `memory-protocol.md`
 3. Replace `memory-consolidation.cjs` reference with `memory-deduplicator.cjs` and `smart-pruner.cjs`
 4. Update `CLAUDE.md` Section 8 to align tier names with implementation
 
 ### P1 — Should fix
+
 5. Document `gotchas.json`, `patterns.json`, and other data stores in `memory-protocol.md`
 6. Clarify file-rotation (rotator) vs session-tier lifecycle (STM/MTM/LTM) as distinct mechanisms
 7. Document session storage format (stm/mtm/ltm directories)
 8. Fix memory budget numbers or clarify archive vs rotation thresholds
 
 ### P2 — Nice to have
+
 9. Fix spawn-prompt-assembler path in auto-memory MEMORY.md
 10. Add note that memory injection is automatic via spawn-prompt-assembler
 11. Clarify observational vs session tier systems as distinct subsystems

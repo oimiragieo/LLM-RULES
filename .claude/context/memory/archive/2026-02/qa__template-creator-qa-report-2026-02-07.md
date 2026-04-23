@@ -34,6 +34,7 @@ node --test tests/hooks/unified-creator-guard-templates.test.cjs
 ```
 
 **Tests Covered:**
+
 - [x] SEC-TC-002: Spawn Templates (Critical)
 - [x] SEC-TC-002: Report Templates
 - [x] SEC-TC-002: Code-Styles Templates
@@ -154,11 +155,13 @@ All 11 gaps from ADR-086 have been addressed:
 **File:** `.claude/context/artifacts/catalogs/skill-catalog.md`
 
 **Line 299:**
+
 ```markdown
 | `template-creator` | Creates templates | Read, Write, Edit, Bash, Glob, Grep |
 ```
 
 **Verification:**
+
 ```bash
 grep "template-creator" .claude/context/artifacts/catalogs/skill-catalog.md
 # Returns: Line 299 entry found
@@ -179,11 +182,13 @@ grep "template-creator" .claude/context/artifacts/catalogs/skill-catalog.md
 **File:** `.claude/CLAUDE.md`
 
 **Line 100 (Gate 4):**
+
 ```markdown
 - `.claude/templates/**/*` → template-creator
 ```
 
 **Line 295:**
+
 ```markdown
 **CRITICAL:** Always invoke `research-synthesis` BEFORE any other creator skill
 (agent-creator, skill-creator, workflow-creator, hook-creator, template-creator, schema-creator).
@@ -196,6 +201,7 @@ grep "template-creator" .claude/context/artifacts/catalogs/skill-catalog.md
 **File:** `.claude/templates/README.md`
 
 **Line 1-100 Analysis:**
+
 - Spawn Templates section: Lines 65-78
 - Report Templates section: Lines 80-94
 - Code Style Templates section: Lines 96-100
@@ -219,15 +225,15 @@ grep "template-creator" .claude/context/artifacts/catalogs/skill-catalog.md
 
 ## Summary
 
-| Category            | Status    | Details               |
-| ------------------- | --------- | --------------------- |
-| Unit Tests          | ✅ PASS   | 8/8 passing           |
-| Regression Tests    | ✅ PASS   | 47/47 passing         |
-| SEC-TC-002          | ✅ PASS   | All checks pass       |
-| SKILL.md Structure  | ✅ PASS   | 16/16 checks pass     |
-| Gap Coverage        | ✅ PASS   | 11/11 addressed       |
-| Security Items      | ✅ PASS   | 4/4 embedded          |
-| Integration Wiring  | ⚠️ 4/5    | ADR-086 missing       |
+| Category           | Status  | Details           |
+| ------------------ | ------- | ----------------- |
+| Unit Tests         | ✅ PASS | 8/8 passing       |
+| Regression Tests   | ✅ PASS | 47/47 passing     |
+| SEC-TC-002         | ✅ PASS | All checks pass   |
+| SKILL.md Structure | ✅ PASS | 16/16 checks pass |
+| Gap Coverage       | ✅ PASS | 11/11 addressed   |
+| Security Items     | ✅ PASS | 4/4 embedded      |
+| Integration Wiring | ⚠️ 4/5  | ADR-086 missing   |
 
 ---
 
@@ -236,6 +242,7 @@ grep "template-creator" .claude/context/artifacts/catalogs/skill-catalog.md
 ### MINOR (Non-Blocking)
 
 **ISSUE-1: Missing ADR-086 File**
+
 - **Severity**: MINOR (documentation only)
 - **File**: `.claude/context/decisions/ADR-086-template-creator-overhaul.md`
 - **Problem**: SKILL.md references ADR-086 (line 604) but ADR file does not exist
@@ -254,6 +261,7 @@ grep "template-creator" .claude/context/artifacts/catalogs/skill-catalog.md
 **Reason**: All critical functionality verified and passing. The missing ADR-086 is a documentation gap only and does not affect runtime behavior.
 
 **Next Steps**:
+
 1. ✅ **Ready for commit** - All tests pass, integration complete
 2. ⚠️ **Post-commit**: Create ADR-086 documentation (non-blocking)
 3. ✅ **Ready for merge** - Production-ready implementation

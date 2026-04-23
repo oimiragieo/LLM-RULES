@@ -35,12 +35,13 @@ Security audit of the agent-studio codebase identified **4 CRITICAL**, **8 HIGH*
 ### Vulnerability Details
 
 #### Location 1: bash-pretool-bundle.cjs (Lines 25-32)
+
 ```javascript
 function tryParseJson(text) {
   const trimmed = String(text || '').trim();
   if (!trimmed || !trimmed.startsWith('{')) return null;
   try {
-    return JSON.parse(trimmed);  // VULNERABLE: No sanitization
+    return JSON.parse(trimmed); // VULNERABLE: No sanitization
   } catch (_err) {
     return null;
   }
@@ -48,42 +49,46 @@ function tryParseJson(text) {
 ```
 
 **Risk Vector:**
+
 - Malicious hook output containing prototype pollution payload: `{"__proto__":{"isAdmin":true}}`
 - `bash-pretool-bundle.cjs` line 36: `parent.tool_input = parsed.tool_input;`
 - Could corrupt global Object.prototype for all downstream operations
 
 **Impact:** CRITICAL
+
 - Affects hook chain behavior (security bypass)
 - Modifies tool input validation globally
 - Silent corruption (no exceptions raised)
 
 #### Location 2: Multiple Hook Files (Protected in most cases)
+
 ```javascript
 // sync-memory-index.cjs:14
-const parsed = JSON.parse(raw);  // Inside try-catch (safe)
+const parsed = JSON.parse(raw); // Inside try-catch (safe)
 
 // reflection-queue-processor.cjs:23
-const entry = JSON.parse(line);  // Inside try-catch (safe)
+const entry = JSON.parse(line); // Inside try-catch (safe)
 
 // user-prompt-unified.core.cjs:427
-const a = JSON.parse(raw);  // Inside try-catch (safe)
+const a = JSON.parse(raw); // Inside try-catch (safe)
 ```
 
 **Assessment:** These are wrapped in try-catch, reducing but not eliminating risk (no sanitization).
 
 ### Threat Model (STRIDE)
 
-| Threat | Attack Vector | Impact |
-|--------|---------------|--------|
-| **Tampering** | Modify hook stdout with `__proto__` payload | Corrupt auth checks, routing |
-| **Elevation** | Set `isAdmin:true` in parsed object | Bypass access control |
-| **Information Disclosure** | Extract sensitive object properties | Read secrets from memory |
+| Threat                     | Attack Vector                               | Impact                       |
+| -------------------------- | ------------------------------------------- | ---------------------------- |
+| **Tampering**              | Modify hook stdout with `__proto__` payload | Corrupt auth checks, routing |
+| **Elevation**              | Set `isAdmin:true` in parsed object         | Bypass access control        |
+| **Information Disclosure** | Extract sensitive object properties         | Read secrets from memory     |
 
 ### Remediation (P0 - Fix Week 1)
 
 **Strategy: Three-Phase Migration**
 
 **Phase 1: Add Fallback** (2 hours)
+
 ```javascript
 // bash-pretool-bundle.cjs - NEW
 function tryParseJsonSafe(text) {
@@ -105,8 +110,10 @@ function tryParseJsonSafe(text) {
 ```
 
 **Phase 2: Enforcement** (3 hours)
+
 - Add ESLint rule blocking raw `JSON.parse()` on untrusted input
 - Update `.eslintrc.cjs`:
+
 ```javascript
 'no-unsafe-json-parse': ['error', {
   allowList: ['trusted-config.json', 'package.json']
@@ -114,10 +121,12 @@ function tryParseJsonSafe(text) {
 ```
 
 **Phase 3: Migration** (8 hours)
+
 - Replace all 68 occurrences with `safeParseJSON()` utility
 - Test with malformed input (whitespace bombs, prototype pollution payloads)
 
 **Validation Commands:**
+
 ```bash
 grep -r "JSON\.parse(" .claude/ --include="*.cjs" | grep -v "safeParseJSON\|try.*catch"
 npm run lint:fix
@@ -137,6 +146,7 @@ npm test -- tests/hooks/json-safety.test.cjs
 ### Active Vulnerabilities
 
 #### Vulnerability 1: aws-cloud-ops/scripts/main.cjs (Line 66)
+
 ```javascript
 const child = spawn(
   'aws',
@@ -144,34 +154,37 @@ const child = spawn(
   {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: true,  // VULNERABLE
+    shell: true, // VULNERABLE
   }
 );
 ```
 
 **Attack Vector:**
 If `args` contains shell metacharacters (e.g., `; rm -rf /`), they will be interpreted by shell:
+
 ```bash
 node main.cjs "; rm -rf /"  # Would execute rm command
 ```
 
 **Why It's Dangerous:**
+
 - `args` comes from command line (user-controlled)
 - With `shell: true`, pipes, redirects, semicolons are interpreted
 - `&&`, `||`, `>`, `|`, `$(...)` all become active
 
 **Impact:** CRITICAL
+
 - Remote code execution if args unsanitized
 - Data exfiltration (redirect output to attacker server)
 - System compromise
 
 #### Similar Vulnerabilities
 
-| File | Line | Risk |
-|------|------|------|
-| gcloud-cli/scripts/main.cjs | ~66 | Same as aws-cloud-ops |
-| kubernetes-flux/scripts/main.cjs | ~66 | Same pattern |
-| _archive/.../github-ops/scripts/main.cjs | ~X | Archived, lower risk |
+| File                                      | Line | Risk                  |
+| ----------------------------------------- | ---- | --------------------- |
+| gcloud-cli/scripts/main.cjs               | ~66  | Same as aws-cloud-ops |
+| kubernetes-flux/scripts/main.cjs          | ~66  | Same pattern          |
+| \_archive/.../github-ops/scripts/main.cjs | ~X   | Archived, lower risk  |
 
 ### Remediation (P0 - Fix Week 1)
 
@@ -179,23 +192,33 @@ node main.cjs "; rm -rf /"  # Would execute rm command
 
 ```javascript
 // BEFORE
-spawn('aws', args.filter(a => a !== '--help'), { shell: true })
+spawn(
+  'aws',
+  args.filter(a => a !== '--help'),
+  { shell: true }
+);
 
 // AFTER
-spawn('aws', args.filter(a => a !== '--help'), {
-  shell: false,  // CRITICAL SECURITY FIX
-  stdio: 'inherit',
-  cwd: PROJECT_ROOT,
-  windowsHide: true,
-})
+spawn(
+  'aws',
+  args.filter(a => a !== '--help'),
+  {
+    shell: false, // CRITICAL SECURITY FIX
+    stdio: 'inherit',
+    cwd: PROJECT_ROOT,
+    windowsHide: true,
+  }
+);
 ```
 
 **Why This Works:**
+
 - `shell: false` = arguments passed directly (no shell parsing)
 - Metacharacters treated as literal strings
 - `; rm -rf /` becomes a single argument, not a command
 
 **Validation:**
+
 ```bash
 # Test that shell metacharacters are literal
 echo '{ "cmd": "aws", "args": ["; rm -rf /"] }' | node main.cjs
@@ -204,6 +227,7 @@ echo '{ "cmd": "aws", "args": ["; rm -rf /"] }' | node main.cjs
 ```
 
 **Files to Fix:**
+
 ```
 .claude/skills/aws-cloud-ops/scripts/main.cjs:66
 .claude/skills/gcloud-cli/scripts/main.cjs:66
@@ -221,16 +245,17 @@ Error handling patterns that default to **granting access** instead of **denying
 #### Pattern in Hook Chains
 
 File: `.claude/hooks/safety/bash-pretool-bundle.cjs` (Lines 35-48)
+
 ```javascript
 function applyHookOutput(currentInput, hookStdout) {
-  const parsed = tryParseJson(hookStdout);  // Malformed JSON = null
+  const parsed = tryParseJson(hookStdout); // Malformed JSON = null
   if (!parsed || !parsed.tool_input || typeof parsed.tool_input !== 'object') {
-    return currentInput;  // FAIL-OPEN: Returns unmodified input on error
+    return currentInput; // FAIL-OPEN: Returns unmodified input on error
   }
 
   const parent = tryParseJson(currentInput);
   if (!parent || typeof parent !== 'object') {
-    return currentInput;  // FAIL-OPEN: Again returns original
+    return currentInput; // FAIL-OPEN: Again returns original
   }
 
   parent.tool_input = parsed.tool_input;
@@ -239,6 +264,7 @@ function applyHookOutput(currentInput, hookStdout) {
 ```
 
 **Scenario:**
+
 1. Hook 1 (security validator) generates valid output: `{"allow": false}`
 2. Hook 2 (bash-pretool-bundle) crashes on malformed JSON from Hook 1
 3. `applyHookOutput` returns unmodified input (bypassing security check)
@@ -248,6 +274,7 @@ function applyHookOutput(currentInput, hookStdout) {
 ### Risk Assessment
 
 **Attack:**
+
 ```
 Attacker → Crafts malformed JSON in hook stdout
 Hook chain → Parser throws, `tryParseJson` returns null
@@ -256,6 +283,7 @@ Result → Security check bypass (OWASP ASI02: Tool Misuse)
 ```
 
 **Impact:** HIGH
+
 - Security validators can be bypassed
 - Tool invocation controls fail open
 - Routing decisions may be circumvented
@@ -263,6 +291,7 @@ Result → Security check bypass (OWASP ASI02: Tool Misuse)
 ### Remediation (P1 - Fix Week 1)
 
 **Fail-Secure Pattern:**
+
 ```javascript
 function applyHookOutput(currentInput, hookStdout) {
   const parsed = tryParseJson(hookStdout);
@@ -283,6 +312,7 @@ function applyHookOutput(currentInput, hookStdout) {
 ```
 
 **With Audit Logging:**
+
 ```javascript
 function applyHookOutput(currentInput, hookStdout) {
   try {
@@ -313,6 +343,7 @@ function applyHookOutput(currentInput, hookStdout) {
 ### Findings
 
 **Framework acknowledges** prototype pollution risk via comments:
+
 - `sync-memory-index.cjs`: "SEC-PROTO-001: Use safeParseJSON"
 - `memory-sanitizer.cjs`: Detects `__proto__`, `constructor.prototype`
 
@@ -320,17 +351,18 @@ function applyHookOutput(currentInput, hookStdout) {
 
 ### Unprotected Write Paths
 
-| Write Path | File | Line | Protected? |
-|-----------|------|------|-----------|
-| `writeMemory()` | memory-manager.cjs | 415 | ✓ Yes |
-| `archiveLearnings()` | memory-manager.cjs | ~X | ✗ No |
-| `writeMemoryArray()` | memory-manager.cjs | ~X | ✗ No |
-| `updateCodebaseMap()` | memory-manager.cjs | ~X | ✗ No |
-| Direct `fs.writeFileSync()` | hooks/reflection/ | ~X | ✗ No |
+| Write Path                  | File               | Line | Protected? |
+| --------------------------- | ------------------ | ---- | ---------- |
+| `writeMemory()`             | memory-manager.cjs | 415  | ✓ Yes      |
+| `archiveLearnings()`        | memory-manager.cjs | ~X   | ✗ No       |
+| `writeMemoryArray()`        | memory-manager.cjs | ~X   | ✗ No       |
+| `updateCodebaseMap()`       | memory-manager.cjs | ~X   | ✗ No       |
+| Direct `fs.writeFileSync()` | hooks/reflection/  | ~X   | ✗ No       |
 
 ### Attack Scenario
 
 **If agent writes malicious learnings:**
+
 ```json
 {
   "pattern": "test",
@@ -341,6 +373,7 @@ function applyHookOutput(currentInput, hookStdout) {
 ```
 
 **Result:**
+
 1. Stored in `.claude/context/memory/learnings.md`
 2. Read back by `memory-manager.cjs` (no sanitization)
 3. Object.prototype corrupted: all objects have `isAdmin=true`
@@ -349,6 +382,7 @@ function applyHookOutput(currentInput, hookStdout) {
 ### Remediation (P1 - Fix Sprint 2)
 
 **Phase 1: Sanitize All Read Paths** (6 hours)
+
 ```javascript
 // memory-manager.cjs - Add to ALL read operations
 function sanitizeMemoryContent(data) {
@@ -365,6 +399,7 @@ function readMemorySafe(filepath) {
 ```
 
 **Phase 2: Add Pre-Write Hook** (3 hours)
+
 ```javascript
 // Pre-write validation in memory-manager.cjs
 function validateBeforeWrite(data) {
@@ -387,21 +422,23 @@ function validateBeforeWrite(data) {
 Path validation is **present but inconsistently applied**:
 
 ### Protected Locations
+
 - `unified-creator-guard.cjs`: ✓ Validates artifact paths
 - `file-placement-guard.cjs`: ✓ Checks creator output paths
 - `code-indexing/`: ✓ Glob patterns exclude `..`
 
 ### Gaps
 
-| Location | Check | Status |
-|----------|-------|--------|
-| `memory-manager.cjs` | Memory file paths | ⚠️ Minimal |
-| Hook stdout handlers | User input to filepath | ✗ None |
-| `artifact-graph.json` loading | Symlink following | ✗ None |
+| Location                      | Check                  | Status     |
+| ----------------------------- | ---------------------- | ---------- |
+| `memory-manager.cjs`          | Memory file paths      | ⚠️ Minimal |
+| Hook stdout handlers          | User input to filepath | ✗ None     |
+| `artifact-graph.json` loading | Symlink following      | ✗ None     |
 
 ### Remediation (P2)
 
 **Add path validation utility:**
+
 ```javascript
 // lib/utils/safe-path.cjs
 function validatePath(userPath, baseDir) {
@@ -424,9 +461,10 @@ function validatePath(userPath, baseDir) {
 Hook input (stdin) parsed without schema validation:
 
 File: `.claude/hooks/routing/hook-input.cjs`
+
 ```javascript
-const json = JSON.parse(stdin);  // No schema validation
-const { tool, tool_input } = json;  // Assumes structure exists
+const json = JSON.parse(stdin); // No schema validation
+const { tool, tool_input } = json; // Assumes structure exists
 ```
 
 ### Risk
@@ -438,6 +476,7 @@ const { tool, tool_input } = json;  // Assumes structure exists
 ### Remediation
 
 **Add JSON schema validation:**
+
 ```javascript
 const ajv = new Ajv();
 const schema = require('../../schemas/hook-input.schema.json');
@@ -457,10 +496,11 @@ if (!validate(json)) {
 **No code injection found in active code**, but historical patterns exist:
 
 File: `.claude/lib/code-indexing/query-analyzer.cjs`
+
 ```javascript
 const queries = {
   javascript: {
-    eval: 'eval($$$)',  // Pattern definition (not execution)
+    eval: 'eval($$$)', // Pattern definition (not execution)
   },
   // Used for AST-grep pattern matching, NOT eval
 };
@@ -477,6 +517,7 @@ const queries = {
 Stack traces may leak internal paths:
 
 File: Multiple hooks
+
 ```javascript
 try { ... } catch (err) {
   console.error(err.stack);  // Leaks internal structure
@@ -492,6 +533,7 @@ try { ... } catch (err) {
 ### Remediation
 
 **Sanitize error output:**
+
 ```javascript
 function sanitizeError(err) {
   if (process.env.NODE_ENV === 'production') {
@@ -522,6 +564,7 @@ If Claude Code caches settings.json at session start, hook changes require sessi
 ### Remediation
 
 **Validation Step:** At session start, verify registered hooks exist:
+
 ```javascript
 // hooks/pre-task-unified.cjs
 const settingsHooks = config.settings.hooks?.map(h => h.path) || [];
@@ -537,34 +580,34 @@ if (missing.length > 0) {
 
 ## 10. Summary Table: Vulnerabilities
 
-| ID | Severity | Category | Status | Fix Time | Files |
-|----|----------|----------|--------|----------|-------|
-| CRIT-001 | CRITICAL | JSON Parsing | Open | 2h | 36+ |
-| CRIT-002 | CRITICAL | Shell Injection | Open | 1h | 3 |
-| HIGH-001 | HIGH | Fail-Open | Open | 2h | bash-pretool-bundle.cjs |
-| HIGH-002 | HIGH | Prototype Pollution | Partial | 6h | memory-manager.cjs |
-| HIGH-003 | HIGH | Input Validation | Open | 3h | hook-input.cjs |
-| MED-001 | MEDIUM | Path Traversal | Partial | 4h | Multiple |
-| MED-002 | MEDIUM | Code Injection | Clean | — | N/A |
-| MED-003 | MEDIUM | Error Disclosure | Open | 2h | Multiple hooks |
-| MED-004 | MEDIUM | Hook Registration | Documented | 1h | settings.json |
+| ID       | Severity | Category            | Status     | Fix Time | Files                   |
+| -------- | -------- | ------------------- | ---------- | -------- | ----------------------- |
+| CRIT-001 | CRITICAL | JSON Parsing        | Open       | 2h       | 36+                     |
+| CRIT-002 | CRITICAL | Shell Injection     | Open       | 1h       | 3                       |
+| HIGH-001 | HIGH     | Fail-Open           | Open       | 2h       | bash-pretool-bundle.cjs |
+| HIGH-002 | HIGH     | Prototype Pollution | Partial    | 6h       | memory-manager.cjs      |
+| HIGH-003 | HIGH     | Input Validation    | Open       | 3h       | hook-input.cjs          |
+| MED-001  | MEDIUM   | Path Traversal      | Partial    | 4h       | Multiple                |
+| MED-002  | MEDIUM   | Code Injection      | Clean      | —        | N/A                     |
+| MED-003  | MEDIUM   | Error Disclosure    | Open       | 2h       | Multiple hooks          |
+| MED-004  | MEDIUM   | Hook Registration   | Documented | 1h       | settings.json           |
 
 ---
 
 ## 11. OWASP Top 10 Mapping
 
-| OWASP | Findings | Risk |
-|-------|----------|------|
-| A01: Broken Access Control | Fail-open in hook chains | HIGH |
-| A02: Cryptographic Failures | No issues (auth uses proper libs) | LOW |
-| A03: Injection | Shell injection via `shell: true` | CRITICAL |
-| A04: Insecure Design | Architecture review needed | MEDIUM |
-| A05: Security Misconfiguration | Prototype pollution vectors | HIGH |
-| A06: Vulnerable Components | No known CVEs in deps | LOW |
-| A07: Authentication Failure | Not applicable (framework-level) | N/A |
-| A08: Data Integrity | Memory poisoning risk | HIGH |
-| A09: Logging Failures | Stack trace disclosure | MEDIUM |
-| A10: SSRF | No network calls in vulnerable paths | LOW |
+| OWASP                          | Findings                             | Risk     |
+| ------------------------------ | ------------------------------------ | -------- |
+| A01: Broken Access Control     | Fail-open in hook chains             | HIGH     |
+| A02: Cryptographic Failures    | No issues (auth uses proper libs)    | LOW      |
+| A03: Injection                 | Shell injection via `shell: true`    | CRITICAL |
+| A04: Insecure Design           | Architecture review needed           | MEDIUM   |
+| A05: Security Misconfiguration | Prototype pollution vectors          | HIGH     |
+| A06: Vulnerable Components     | No known CVEs in deps                | LOW      |
+| A07: Authentication Failure    | Not applicable (framework-level)     | N/A      |
+| A08: Data Integrity            | Memory poisoning risk                | HIGH     |
+| A09: Logging Failures          | Stack trace disclosure               | MEDIUM   |
+| A10: SSRF                      | No network calls in vulnerable paths | LOW      |
 
 ---
 
@@ -592,21 +635,22 @@ if (missing.length > 0) {
 
 ## 13. Compliance Mapping
 
-| Standard | Coverage | Notes |
-|----------|----------|-------|
-| **OWASP Top 10** | 8/10 covered | Injection (CRIT), Access Control (HIGH) |
-| **CWE-98** | Code Injection | Clean (patterns are static strings) |
-| **CWE-89** | SQL Injection | Not applicable (no SQL in framework) |
-| **CWE-79** | XSS | Not applicable (backend-only) |
-| **CWE-400** | Prototype Pollution | HIGH severity |
-| **CWE-78** | OS Command Injection | CRITICAL via `shell: true` |
-| **CWE-22** | Path Traversal | MEDIUM (partial protection) |
+| Standard         | Coverage             | Notes                                   |
+| ---------------- | -------------------- | --------------------------------------- |
+| **OWASP Top 10** | 8/10 covered         | Injection (CRIT), Access Control (HIGH) |
+| **CWE-98**       | Code Injection       | Clean (patterns are static strings)     |
+| **CWE-89**       | SQL Injection        | Not applicable (no SQL in framework)    |
+| **CWE-79**       | XSS                  | Not applicable (backend-only)           |
+| **CWE-400**      | Prototype Pollution  | HIGH severity                           |
+| **CWE-78**       | OS Command Injection | CRITICAL via `shell: true`              |
+| **CWE-22**       | Path Traversal       | MEDIUM (partial protection)             |
 
 ---
 
 ## 14. Test Evidence
 
 **Validation Command:**
+
 ```bash
 # Run security tests
 npm test -- tests/security/
@@ -666,4 +710,3 @@ grep -c "JSON\.parse" .claude/hooks/**/*.cjs | wc -l || echo "✓ JSON.parse usa
 
 echo "Fixes applied. Run: npm run lint:fix && npm test"
 ```
-

@@ -6,6 +6,7 @@
 **Reviewer**: nodejs-pro agent (Task #12)
 **Phase**: Sprint 1 (Remediation Pipeline - Developer Validation)
 **Inputs**:
+
 - refactoring-design-2026-02-13.md (architect's DI design)
 - code-simplifier-split-analysis-2026-02-13.md (function maps)
 - implementation-patterns-research-2026-02-13.md (DI research)
@@ -44,9 +45,9 @@ let _instance = null;
 function createMemoryContainer(overrides = {}) {
   // Lazy-require to break circular deps at module level
   const defaults = {
-    memoryUtils:   () => require('../memory/core/memory-utils.cjs'),
+    memoryUtils: () => require('../memory/core/memory-utils.cjs'),
     memoryManager: () => require('../memory/memory-manager.cjs'),
-    memoryQuery:   () => require('../memory/core/memory-query.cjs'),
+    memoryQuery: () => require('../memory/core/memory-query.cjs'),
     contextualMemory: () => require('../memory/contextual-memory.cjs'),
   };
 
@@ -131,6 +132,7 @@ const memoryQuery = container.get('memoryQuery');
 #### Chain 1: Memory Subsystem (3-4 files, CRITICAL)
 
 **Affected Files**:
+
 - `memory-utils.cjs`
 - `contextual-memory.cjs`
 - `memory-query.cjs`
@@ -145,11 +147,11 @@ let _instance = null;
 
 function createMemoryContainer(overrides = {}) {
   const defaults = {
-    memoryUtils:       () => require('../memory/core/memory-utils.cjs'),
-    memoryQuery:       () => require('../memory/core/memory-query.cjs'),
-    contextualMemory:  () => require('../memory/contextual-memory.cjs'),
-    memoryManager:     () => require('../memory/memory-manager.cjs'),
-    memoryRotator:     () => require('../memory/memory-rotator.cjs'),
+    memoryUtils: () => require('../memory/core/memory-utils.cjs'),
+    memoryQuery: () => require('../memory/core/memory-query.cjs'),
+    contextualMemory: () => require('../memory/contextual-memory.cjs'),
+    memoryManager: () => require('../memory/memory-manager.cjs'),
+    memoryRotator: () => require('../memory/memory-rotator.cjs'),
   };
 
   const factories = { ...defaults, ...overrides };
@@ -163,8 +165,12 @@ function createMemoryContainer(overrides = {}) {
       }
       return resolved[name];
     },
-    override(name, impl) { resolved[name] = impl; },
-    reset() { Object.keys(resolved).forEach(k => delete resolved[k]); },
+    override(name, impl) {
+      resolved[name] = impl;
+    },
+    reset() {
+      Object.keys(resolved).forEach(k => delete resolved[k]);
+    },
   };
 }
 
@@ -185,7 +191,7 @@ const memoryQuery = require('./core/memory-query.cjs');
 
 class MemoryManager {
   async read(key) {
-    const utils = memoryUtils;  // Direct coupling
+    const utils = memoryUtils; // Direct coupling
     return memoryQuery.search(key);
   }
 }
@@ -228,6 +234,7 @@ module.exports = { MemoryManager, createMemoryManager, default: createMemoryMana
 #### Chain 2: Routing Subsystem (RESOLVED BY routing-guard SPLIT)
 
 **Current Circular**:
+
 ```
 routing-guard.cjs --> router-state.cjs --> routing-table.cjs -.-> routing-guard.cjs (via events)
 ```
@@ -255,6 +262,7 @@ guard-*-policy.cjs --> guard-infra.cjs --> router-state.cjs
 #### Chain 3: Workflow Subsystem (5 files, MEDIUM)
 
 **Affected Files**:
+
 - `workflow-engine.cjs`
 - `workflow-resolver.cjs`
 - `workflow-validator.cjs`
@@ -270,10 +278,10 @@ let _instance = null;
 
 function createWorkflowContainer(overrides = {}) {
   const defaults = {
-    workflowEngine:    () => require('../workflow/workflow-engine.cjs'),
-    workflowResolver:  () => require('../workflow/workflow-resolver.cjs'),
+    workflowEngine: () => require('../workflow/workflow-engine.cjs'),
+    workflowResolver: () => require('../workflow/workflow-resolver.cjs'),
     workflowValidator: () => require('../workflow/workflow-validator.cjs'),
-    cycleDetector:     () => require('../workflow/cycle-detector.cjs'),
+    cycleDetector: () => require('../workflow/cycle-detector.cjs'),
   };
 
   const factories = { ...defaults, ...overrides };
@@ -287,8 +295,12 @@ function createWorkflowContainer(overrides = {}) {
       }
       return resolved[name];
     },
-    override(name, impl) { resolved[name] = impl; },
-    reset() { Object.keys(resolved).forEach(k => delete resolved[k]); },
+    override(name, impl) {
+      resolved[name] = impl;
+    },
+    reset() {
+      Object.keys(resolved).forEach(k => delete resolved[k]);
+    },
   };
 }
 
@@ -324,12 +336,13 @@ function getSchemaValidator() {
 **Pattern**: Event bus acts as mediator. Modules emit events; event bus calls listeners. As long as listeners do not `require()` emitters, no circular dep.
 
 **Example**:
+
 ```javascript
 // router-state.cjs (emitter)
 eventBus.emit('state:updated', state);
 
 // routing-guard.cjs (listener) — NO require() of router-state.cjs in listener function
-eventBus.on('state:updated', (state) => {
+eventBus.on('state:updated', state => {
   // Handle event without requiring router-state.cjs
 });
 ```
@@ -409,7 +422,13 @@ describe('Memory Subsystem Integration', () => {
 // routing-guard.cjs (slim hook entry point)
 'use strict';
 
-const { parseHookInputAsync, getToolName, getToolInput, formatResult, auditLog } = require('../../lib/utils/hook-input.cjs');
+const {
+  parseHookInputAsync,
+  getToolName,
+  getToolInput,
+  formatResult,
+  auditLog,
+} = require('../../lib/utils/hook-input.cjs');
 const { runAllChecks } = require('./guards/guard-core.cjs');
 const { invalidateCachedState } = require('./guards/guard-infra.cjs');
 const { ALL_WATCHED_TOOLS } = require('./guards/guard-router-policy.cjs');
@@ -446,14 +465,20 @@ module.exports = {
 1. **Spread operator on `require()` result**: CommonJS `module.exports` is a plain object. The spread operator (`...require()`) copies all properties from the imported module to the parent module's exports. This is standard JavaScript object spreading and works correctly in Node.js.
 
 2. **Backward compatibility with tests**: Existing tests import from `routing-guard.cjs`:
+
    ```javascript
-   const { checkPlannerFirst, checkSecurityReview } = require('.claude/hooks/routing/routing-guard.cjs');
+   const {
+     checkPlannerFirst,
+     checkSecurityReview,
+   } = require('.claude/hooks/routing/routing-guard.cjs');
    ```
+
    After split, these imports continue to work because `routing-guard.cjs` re-exports all functions from the guard modules.
 
 3. **Constant collision risk**: ⚠️ **MEDIUM RISK**
 
    **Problem**: Multiple guard modules export constants. If two modules export the same constant name, the last spread wins:
+
    ```javascript
    // guard-planner.cjs exports PLANNER_PATTERNS
    // guard-security.cjs exports SECURITY_PATTERNS
@@ -467,7 +492,6 @@ module.exports = {
    ```
 
    **MITIGATION**: Code-simplifier analysis (Section 1.3) shows **NO constant collisions** across the 6 proposed modules. All constants are unique:
-
    - `guard-router-policy`: `ALL_WATCHED_TOOLS`, `BLACKLISTED_TOOLS`, `WHITELISTED_TOOLS`, `WRITE_TOOLS`, `ROUTER_BASH_WHITELIST`, `ALWAYS_ALLOWED_WRITE_PATTERNS`
    - `guard-planner`: `PLANNER_PATTERNS`
    - `guard-security`: `SECURITY_PATTERNS`, `IMPLEMENTATION_AGENTS`
@@ -517,7 +541,7 @@ let memoryMonitor = null;
 function getMemoryMonitor() {
   if (memoryMonitor === null && MemoryMonitor === null) {
     try {
-      MemoryMonitor = require('../../../lib/utils/memory-monitor.cjs');  // Path updated
+      MemoryMonitor = require('../../../lib/utils/memory-monitor.cjs'); // Path updated
       memoryMonitor = MemoryMonitor.getGlobalMonitor();
     } catch (_err) {
       MemoryMonitor = false;
@@ -527,7 +551,7 @@ function getMemoryMonitor() {
   return memoryMonitor || null;
 }
 
-module.exports = { getMemoryMonitor, /* ... */ };
+module.exports = { getMemoryMonitor /* ... */ };
 ```
 
 **CRITICAL VALIDATION**: ✅ **PATH CHANGE REQUIRED**
@@ -564,7 +588,9 @@ const {
 
 describe('routing-guard', () => {
   it('should block Task without planner', () => {
-    const result = checkPlannerFirst('Task', { /* ... */ });
+    const result = checkPlannerFirst('Task', {
+      /* ... */
+    });
     assert.strictEqual(result.result, 'block');
   });
 });
@@ -576,9 +602,9 @@ describe('routing-guard', () => {
 // routing-guard.cjs re-exports checkPlannerFirst from guard-planner.cjs
 module.exports = {
   main,
-  ...require('./guards/guard-core.cjs'),      // runAllChecks
-  ...require('./guards/guard-planner.cjs'),   // checkPlannerFirst
-  ...require('./guards/guard-security.cjs'),  // checkSecurityReview
+  ...require('./guards/guard-core.cjs'), // runAllChecks
+  ...require('./guards/guard-planner.cjs'), // checkPlannerFirst
+  ...require('./guards/guard-security.cjs'), // checkSecurityReview
   ...require('./guards/guard-specialist.cjs'), // checkSpecialistOverride
   // ...
 };
@@ -594,11 +620,20 @@ describe('routing-guard re-exports', () => {
 
   it('should re-export all check functions', () => {
     const expectedExports = [
-      'checkPlannerFirst', 'checkTaskCreate', 'checkMemoryPressure',
-      'checkSecurityReview', 'checkSpecialistOverride', 'checkCreatorIntentGuard',
-      'checkIntentAgentMatch', 'checkRouterBash', 'checkRouterSelfCheck',
-      'checkRouterWrite', 'checkTaskListFirstGate', 'checkConfigModelValidator',
-      'runAllChecks', 'main',
+      'checkPlannerFirst',
+      'checkTaskCreate',
+      'checkMemoryPressure',
+      'checkSecurityReview',
+      'checkSpecialistOverride',
+      'checkCreatorIntentGuard',
+      'checkIntentAgentMatch',
+      'checkRouterBash',
+      'checkRouterSelfCheck',
+      'checkRouterWrite',
+      'checkTaskListFirstGate',
+      'checkConfigModelValidator',
+      'runAllChecks',
+      'main',
     ];
 
     expectedExports.forEach(name => {
@@ -654,9 +689,10 @@ const { isPathSafe } = require('../lib/security-utils.cjs');
 
 ```javascript
 // BAD: Local function shadows import
-const { isPathSafe } = require('./security-utils.cjs');  // Import
+const { isPathSafe } = require('./security-utils.cjs'); // Import
 
-function isPathSafe(filePath) {  // Local function shadows import
+function isPathSafe(filePath) {
+  // Local function shadows import
   // Different implementation — BUG!
 }
 ```
@@ -694,6 +730,7 @@ module.exports = {
 1. **Pure functions**: All template generation functions are stateless (input → output). No side effects (file I/O, network, state mutation).
 
 2. **Testing**: Pure functions are trivial to test (no mocks needed):
+
    ```javascript
    const { generateSkillContent } = require('./template-generator.cjs');
 
@@ -731,14 +768,17 @@ for (let i = 0; i < args.length; i++) {
 
 // Dispatch table
 const DISPATCH = {
-  help:              () => showHelp(),
-  validate:          (o) => process.exit(validation.validateSkill(o.validate) ? 0 : 1),
-  name:              (o) => lifecycle.createSkill(o),
+  help: () => showHelp(),
+  validate: o => process.exit(validation.validateSkill(o.validate) ? 0 : 1),
+  name: o => lifecycle.createSkill(o),
   // ...
 };
 
 for (const [flag, handler] of Object.entries(DISPATCH)) {
-  if (options[flag]) { handler(options, process.argv.slice(2)); process.exit(0); }
+  if (options[flag]) {
+    handler(options, process.argv.slice(2));
+    process.exit(0);
+  }
 }
 ```
 
@@ -795,7 +835,7 @@ const result = spawnSync('git', ['clone', repoUrl, tempDir], {
 const result = spawnSync('git', ['clone', repoUrl, tempDir], {
   cwd: PROJECT_ROOT,
   stdio: 'inherit',
-  windowsHide: true,  // ✅ Added
+  windowsHide: true, // ✅ Added
 });
 ```
 
@@ -833,7 +873,7 @@ node .claude/skills/ripgrep/scripts/search.mjs "shell.*true" -g ".claude/**/*.cj
 spawnSync('pnpm', ['format', filePath], { cwd: PROJECT_ROOT, windowsHide: true });
 
 // ❌ WRONG: String command, shell: true required
-spawnSync('pnpm format ' + filePath, { shell: true });  // Shell injection risk
+spawnSync('pnpm format ' + filePath, { shell: true }); // Shell injection risk
 ```
 
 **RECOMMENDATION**: ✅ **APPROVED** — design follows best practices.
@@ -854,34 +894,34 @@ module.exports = function transform(fileInfo, api) {
 
   let modified = false;
 
-  root.find(j.CallExpression, {
-    callee: {
-      object: { name: 'console' },
-      property: { name: 'log' }
-    }
-  }).forEach(path => {
-    const firstArg = path.node.arguments[0];
+  root
+    .find(j.CallExpression, {
+      callee: {
+        object: { name: 'console' },
+        property: { name: 'log' },
+      },
+    })
+    .forEach(path => {
+      const firstArg = path.node.arguments[0];
 
-    // SKIP: JSON.stringify (hook protocol)
-    if (firstArg?.type === 'CallExpression' &&
+      // SKIP: JSON.stringify (hook protocol)
+      if (
+        firstArg?.type === 'CallExpression' &&
         firstArg.callee?.object?.name === 'JSON' &&
-        firstArg.callee?.property?.name === 'stringify') {
-      return;
-    }
+        firstArg.callee?.property?.name === 'stringify'
+      ) {
+        return;
+      }
 
-    // SKIP: formatResult (hook protocol)
-    if (firstArg?.type === 'CallExpression' &&
-        firstArg.callee?.name === 'formatResult') {
-      return;
-    }
+      // SKIP: formatResult (hook protocol)
+      if (firstArg?.type === 'CallExpression' && firstArg.callee?.name === 'formatResult') {
+        return;
+      }
 
-    // Transform
-    path.node.callee = j.memberExpression(
-      j.identifier('logger'),
-      j.identifier('info')
-    );
-    modified = true;
-  });
+      // Transform
+      path.node.callee = j.memberExpression(j.identifier('logger'), j.identifier('info'));
+      modified = true;
+    });
 
   return modified ? root.toSource() : fileInfo.source;
 };
@@ -892,6 +932,7 @@ module.exports = function transform(fileInfo, api) {
 1. **Hook stdout protocol preservation**: The codemod correctly skips `console.log(JSON.stringify(...))` and `console.log(formatResult(...))` patterns. These are hook protocol outputs (must remain as `console.log`).
 
 2. **AST node manipulation**: `path.node.callee = j.memberExpression(...)` correctly replaces `console.log` with `logger.info`. The AST structure is:
+
    ```
    CallExpression {
      callee: MemberExpression {
@@ -948,9 +989,11 @@ Exception list (files that KEEP console.log):
 // jscodeshift transform
 function transform(fileInfo, api) {
   // Skip CLI files
-  if (fileInfo.path.includes('/tools/cli/') ||
-      fileInfo.path.includes('/skills/') && fileInfo.path.includes('/scripts/')) {
-    return fileInfo.source;  // No transformation
+  if (
+    fileInfo.path.includes('/tools/cli/') ||
+    (fileInfo.path.includes('/skills/') && fileInfo.path.includes('/scripts/'))
+  ) {
+    return fileInfo.source; // No transformation
   }
 
   // ... rest of transform
@@ -988,14 +1031,14 @@ function transform(fileInfo, api) {
 
 ### 6.2 Critical Risks and Mitigations
 
-| Risk | Impact | Likelihood | Mitigation |
-|------|--------|------------|------------|
-| **Constant collision in re-exports** | HIGH | LOW | Verified no collisions in Section 2.1 (all constants unique) |
-| **Lazy-loading path errors after split** | CRITICAL | MEDIUM | Update all relative paths (`../../` → `../../../`). Add path validation tests. |
-| **Duplicate function shadowing** | HIGH | HIGH | Delete duplicates (lines 909, 515, 915) **before** extraction. Enable ESLint no-shadow. |
-| **Hook protocol breakage** | CRITICAL | LOW | jscodeshift explicitly skips JSON.stringify/formatResult patterns (Section 5.1). |
-| **Logger import injection failure** | HIGH | MEDIUM | Post-codemod validation: `pnpm lint` + `node --check` (Section 5.1). |
-| **Test suite breakage** | HIGH | MEDIUM | Run `pnpm test` after every phase. Rollback on failure. |
+| Risk                                     | Impact   | Likelihood | Mitigation                                                                              |
+| ---------------------------------------- | -------- | ---------- | --------------------------------------------------------------------------------------- |
+| **Constant collision in re-exports**     | HIGH     | LOW        | Verified no collisions in Section 2.1 (all constants unique)                            |
+| **Lazy-loading path errors after split** | CRITICAL | MEDIUM     | Update all relative paths (`../../` → `../../../`). Add path validation tests.          |
+| **Duplicate function shadowing**         | HIGH     | HIGH       | Delete duplicates (lines 909, 515, 915) **before** extraction. Enable ESLint no-shadow. |
+| **Hook protocol breakage**               | CRITICAL | LOW        | jscodeshift explicitly skips JSON.stringify/formatResult patterns (Section 5.1).        |
+| **Logger import injection failure**      | HIGH     | MEDIUM     | Post-codemod validation: `pnpm lint` + `node --check` (Section 5.1).                    |
+| **Test suite breakage**                  | HIGH     | MEDIUM     | Run `pnpm test` after every phase. Rollback on failure.                                 |
 
 ### 6.3 Testing Checklist (Per Phase)
 
@@ -1126,23 +1169,27 @@ cp .claude/hooks/routing/_archive/routing-guard-pre-split-2026-02-13.cjs \
 ## Memory Update
 
 **New Pattern** (Manual DI for circular dependencies):
+
 - Manual factory pattern with lazy-require breaks circular deps at module initialization
 - Container pattern (`createContainer()` + `get()`) provides dependency resolution
 - Backward-compatible factory functions maintain existing API
 - Proportionate solution for 3 subsystems, 23 circular deps
 
 **New Pattern** (Re-export for backward compatibility):
+
 - `module.exports = { ...require('./module-a'), ...require('./module-b') }` is CJS-safe
 - Spread operator copies all properties from imported modules
 - Maintains test compatibility when splitting monolithic files
 - Risk: constant/function name collisions (verify uniqueness before applying)
 
 **New Issue** (Duplicate functions in monolithic files):
+
 - skill-creator/create.cjs has 3 duplicate functions (`isPathSafe`, `findProjectRoot`)
 - Must delete duplicates **before** extraction to prevent shadowing
 - Enable ESLint `no-shadow` rule to prevent regression
 
 **New Decision** (Execution order for refactoring):
+
 - Budget rules → console migration → routing-guard split → skill-creator split → circular deps
 - Rationale: routing-guard split breaks routing circular deps as side effect
 - Console migration easier on monolithic files than post-split

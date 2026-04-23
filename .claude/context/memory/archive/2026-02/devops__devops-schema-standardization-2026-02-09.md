@@ -42,10 +42,12 @@ a6ce6b67 feat: schema Phase 3 structure migration - all schemas to Structure B
 ### Change Scope
 
 **Total Changes (HEAD~3..HEAD)**:
+
 - **295 files changed**
 - **29,696 insertions, 1,484 deletions**
 
 **Breakdown**:
+
 - Commands: 89 new command files (`/command-name`)
 - Rules: 89 new rules files (skill documentation)
 - Schemas: 78 skill schemas standardized + 5 security schemas migrated
@@ -75,6 +77,7 @@ skill-variant-analysis-output.schema.json
 ### Deleted Files ✅ PASS
 
 ✅ 12 stub schemas deleted as planned (no accidental deletions):
+
 - swarm-coordination, consensus-voting, binary-analysis-patterns
 - memory-forensics, protocol-reverse-engineering, ai-ml-expert
 - scientific-skills, writing-skills, git-expert, doc-generator
@@ -134,6 +137,7 @@ C:\dev\projects\agent-studio\.claude\context\tmp\validate-schemas.cjs
 **Impact**: Blocks CI/CD pipeline
 
 **Fix Required**:
+
 - Fix `check-refs.cjs`: Replace `catch (e) {}` with `catch (_e) { /* ignored */ }`
 - Archive or delete temp scripts before deployment
 
@@ -161,6 +165,7 @@ Tests: 468+ passed, 0 failed
 ✅ **All tests passing** (468+ tests completed, no failures)
 
 **Note**: Test suite still running but showing strong green status across all test files:
+
 - lib/code-indexing tests
 - lib/memory tests (25 passed)
 - lib/named-memory tests
@@ -188,6 +193,7 @@ Schemas missing $id: 6
 ```
 
 **Missing $id schemas**:
+
 - `artifact-manifest.schema.json`
 - `plan.schema.json`
 - `product-requirements.schema.json`
@@ -198,11 +204,13 @@ Schemas missing $id: 6
 **Root Cause**: Phase 2 standardization only updated skill schemas (78), but 6 non-skill schemas were missed
 
 **Impact**:
+
 - SEC-SCHEMA-002 violation (all schemas must have $id)
 - Schema validation may fail
 - Breaks schema discoverability
 
 **Fix Required**: Add `$id` field to the 6 missing schemas:
+
 ```json
 {
   "$id": "https://agent-studio.dev/schemas/{filename}"
@@ -220,11 +228,13 @@ Schemas missing $id: 6
 ### ⚠️ CONDITIONAL - Blockers Must Be Resolved
 
 **BLOCKED BY**:
+
 1. **Linting failures** (2 errors in temp scripts) - MEDIUM PRIORITY
 2. **Format check failures** (82 files need formatting) - MEDIUM PRIORITY
 3. **Missing schema $id fields** (6 schemas) - **HIGH PRIORITY** (SEC-SCHEMA-002)
 
 **READY AFTER**:
+
 1. ✅ Fix 6 missing schema `$id` fields
 2. ✅ Run `pnpm format --write`
 3. ✅ Archive or delete temp migration scripts from `.claude/context/tmp/`
@@ -313,16 +323,16 @@ Schemas missing $id: 6
 
 ### CI/CD Gate Results
 
-| Gate         | Status        | Details                          |
-| ------------ | ------------- | -------------------------------- |
-| Lint         | ❌ FAIL       | 2 errors in temp scripts         |
-| Format       | ❌ FAIL       | 82 files need formatting         |
-| Test         | ✅ PASS       | 468+ tests passing, 0 failures   |
-| Schema Count | ✅ PASS       | 103 schemas (expected)           |
-| Schema $id   | ❌ FAIL       | 6 schemas missing $id (CRITICAL) |
-| Duplicates   | ✅ PASS       | No duplicate $id values          |
-| Backups      | ✅ PASS       | 5 A3 schemas backed up           |
-| Zero-Byte    | ✅ PASS       | No zero-byte files               |
+| Gate         | Status  | Details                          |
+| ------------ | ------- | -------------------------------- |
+| Lint         | ❌ FAIL | 2 errors in temp scripts         |
+| Format       | ❌ FAIL | 82 files need formatting         |
+| Test         | ✅ PASS | 468+ tests passing, 0 failures   |
+| Schema Count | ✅ PASS | 103 schemas (expected)           |
+| Schema $id   | ❌ FAIL | 6 schemas missing $id (CRITICAL) |
+| Duplicates   | ✅ PASS | No duplicate $id values          |
+| Backups      | ✅ PASS | 5 A3 schemas backed up           |
+| Zero-Byte    | ✅ PASS | No zero-byte files               |
 
 ---
 

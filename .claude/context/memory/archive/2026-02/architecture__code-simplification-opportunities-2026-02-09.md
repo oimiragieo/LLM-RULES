@@ -8,21 +8,21 @@ Comparative analysis of agent-studio vs pro-workflow-main reference implementati
 
 **Key Numbers:**
 
-| Metric | agent-studio | pro-workflow | Ratio |
-|--------|-------------|--------------|-------|
-| Hook files (active) | 43 | 8 scripts + 1 JSON | 5:1 |
-| Hook lines of code | 19,148 | ~800 | 24:1 |
-| Agent definitions | 59 | 3 | 20:1 |
-| Routing table lines | 2,472 | 0 (inline) | -- |
-| Reference docs (@files) | 14 files, 4,124 lines | 1 file, 52 lines | 14:1 |
-| CLAUDE.md lines | 632 (compressed) | 44 (template) | 14:1 |
-| Config sources | 5+ (CLAUDE.md, config.yaml, agent-config.json, routing-table.cjs, agent-registry.json) | 1 (config.json, 45 lines) | 5:1 |
-| Templates | 27 files | 5 files (1 dir) | 5:1 |
-| Workflow files | 28 files, 16,129 lines | 0 | -- |
-| Schema files | 53 | 0 | -- |
-| Catalog files | 7, 2,208 lines | 0 | -- |
-| Skill definitions | 448 | 1 | 448:1 |
-| Tools scripts | 44 | 0 | -- |
+| Metric                  | agent-studio                                                                           | pro-workflow              | Ratio |
+| ----------------------- | -------------------------------------------------------------------------------------- | ------------------------- | ----- |
+| Hook files (active)     | 43                                                                                     | 8 scripts + 1 JSON        | 5:1   |
+| Hook lines of code      | 19,148                                                                                 | ~800                      | 24:1  |
+| Agent definitions       | 59                                                                                     | 3                         | 20:1  |
+| Routing table lines     | 2,472                                                                                  | 0 (inline)                | --    |
+| Reference docs (@files) | 14 files, 4,124 lines                                                                  | 1 file, 52 lines          | 14:1  |
+| CLAUDE.md lines         | 632 (compressed)                                                                       | 44 (template)             | 14:1  |
+| Config sources          | 5+ (CLAUDE.md, config.yaml, agent-config.json, routing-table.cjs, agent-registry.json) | 1 (config.json, 45 lines) | 5:1   |
+| Templates               | 27 files                                                                               | 5 files (1 dir)           | 5:1   |
+| Workflow files          | 28 files, 16,129 lines                                                                 | 0                         | --    |
+| Schema files            | 53                                                                                     | 0                         | --    |
+| Catalog files           | 7, 2,208 lines                                                                         | 0                         | --    |
+| Skill definitions       | 448                                                                                    | 1                         | 448:1 |
+| Tools scripts           | 44                                                                                     | 0                         | --    |
 
 **Critical caveat:** Agent-studio is intentionally more capable (49 specialized agents, enforcement hooks, creator workflows, multi-phase orchestration). The question is not "should we be this complex?" but "are we doing 100 lines of work for 20 lines of result?"
 
@@ -65,9 +65,9 @@ const ROUTING_TABLE = {
 
 const DISAMBIGUATION = {
   // Only needed for genuinely ambiguous pairs
-  'llm': { architecture: 'llm-architect', training: 'ai-ml-specialist' },
-  'test': { tdd: 'developer', coverage: 'qa' },
-  'mobile': { expo: 'expo-mobile-developer', swift: 'ios-pro', kotlin: 'android-pro' },
+  llm: { architecture: 'llm-architect', training: 'ai-ml-specialist' },
+  test: { tdd: 'developer', coverage: 'qa' },
+  mobile: { expo: 'expo-mobile-developer', swift: 'ios-pro', kotlin: 'android-pro' },
 };
 ```
 
@@ -102,14 +102,14 @@ The reference implementation uses 8 simple scripts (total ~800 lines) and 1 hook
 
 **Observation:** We already did one round of hook consolidation (6 wildcard hooks into 2 unified hooks on 2026-02-08 per MEMORY.md). But many hooks remain that overlap in purpose:
 
-| Hook | Purpose | Overlap With |
-|------|---------|-------------|
-| `routing-guard.cjs` | 10 checks including planner-first, security review, specialist routing | `pre-task-unified.cjs` (also validates spawns) |
-| `config-model-validator.cjs` | Validates model matches config | `routing-guard.cjs` (could be a check) |
-| `intent-agent-match.cjs` | Matches intent to agent | `routing-guard.cjs` Check 7 |
-| `task-list-tracker.cjs` | Tracks task list calls | `pre-task-unified.cjs` |
-| `task-status-enforcement.cjs` | Enforces task status | `pre-completion-validation.cjs` |
-| `spawn-prompt-validator.cjs` | Validates spawn prompts | `spawn-prompt-assembler.cjs` |
+| Hook                          | Purpose                                                                | Overlap With                                   |
+| ----------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------- |
+| `routing-guard.cjs`           | 10 checks including planner-first, security review, specialist routing | `pre-task-unified.cjs` (also validates spawns) |
+| `config-model-validator.cjs`  | Validates model matches config                                         | `routing-guard.cjs` (could be a check)         |
+| `intent-agent-match.cjs`      | Matches intent to agent                                                | `routing-guard.cjs` Check 7                    |
+| `task-list-tracker.cjs`       | Tracks task list calls                                                 | `pre-task-unified.cjs`                         |
+| `task-status-enforcement.cjs` | Enforces task status                                                   | `pre-completion-validation.cjs`                |
+| `spawn-prompt-validator.cjs`  | Validates spawn prompts                                                | `spawn-prompt-assembler.cjs`                   |
 
 **The reference approach:** Hooks are lightweight reminders (stderr messages), not blocking enforcement. The `quality-gate.js` (124 lines) counts edits and reminds at thresholds. The `post-edit-check.js` (80 lines) scans for console.log and secrets. No hook does blocking enforcement.
 
@@ -118,6 +118,7 @@ The reference implementation uses 8 simple scripts (total ~800 lines) and 1 hook
 **Phase 1 -- Merge overlapping routing hooks (same result, fewer files):**
 
 Merge these into `routing-guard.cjs` as additional checks:
+
 - `config-model-validator.cjs` (becomes Check 11)
 - `intent-agent-match.cjs` (already overlaps with Check 7)
 - `task-list-tracker.cjs` (becomes a counter in pre-task-unified)
@@ -153,18 +154,19 @@ The 1,723-line routing-guard has 10+ checks. Several share boilerplate (read std
 
 Agent-studio has 5+ configuration sources that must stay synchronized:
 
-| Source | Purpose | Lines |
-|--------|---------|-------|
-| `CLAUDE.md` | Router instructions, routing table, model selection | 632 |
-| `config.yaml` | Agent model configuration | 135 |
-| `agent-config.json` (runtime) | Agent registry with 49 entries | ~500 |
-| `agent-registry.json` | Agent discovery registry | ~300 |
-| `routing-table.cjs` | Keyword-to-agent routing | 2,472 |
-| `capability-routing.json` | Capability-to-agent mapping | ~50 |
+| Source                        | Purpose                                             | Lines |
+| ----------------------------- | --------------------------------------------------- | ----- |
+| `CLAUDE.md`                   | Router instructions, routing table, model selection | 632   |
+| `config.yaml`                 | Agent model configuration                           | 135   |
+| `agent-config.json` (runtime) | Agent registry with 49 entries                      | ~500  |
+| `agent-registry.json`         | Agent discovery registry                            | ~300  |
+| `routing-table.cjs`           | Keyword-to-agent routing                            | 2,472 |
+| `capability-routing.json`     | Capability-to-agent mapping                         | ~50   |
 
 The reference uses a single `config.json` (45 lines) covering database, search, quality gates, model preferences, and parallel sessions.
 
 **Specific redundancy observed:**
+
 - The routing table in CLAUDE.md (Section 3) duplicates routing-table.cjs
 - agent-config.json and agent-registry.json serve overlapping discovery purposes
 - config.yaml model preferences could be inline in CLAUDE.md
@@ -196,22 +198,22 @@ Medium (3-4 hours). Mostly find-and-replace across consumers.
 
 These @reference files exist because CLAUDE.md was compressed to 632 lines by extracting details into separate files. However, this creates a lookup chain: CLAUDE.md references @file, agent reads @file, still needs to cross-reference other @files.
 
-| @File | Lines | Content |
-|-------|-------|---------|
-| @ENFORCEMENT_HOOKS.md | 1,134 | Hook enforcement details |
-| @DIRECTORY_STRUCTURE.md | 467 | Directory layout |
-| @TOOL_REFERENCE.md | 402 | Tool catalog |
-| @WORKFLOW_AGENT_MAP.md | 319 | Workflow-agent mapping |
-| @HOOK_AGENT_MAP.md | 302 | Hook-agent mapping |
-| @ENVIRONMENT_CONFIG.md | 265 | Environment variables |
-| @MODEL_SELECTION.md | 267 | Model selection guide |
-| @SKILL_USAGE_GUIDE.md | 243 | Skill selection decision tree |
-| @EVOLUTION_WORKFLOW.md | 199 | EVOLVE process |
-| @TASK_TRACKING_GUIDE.md | 145 | TaskUpdate best practices |
-| @AGENT_ROUTING_TABLE.md | 106 | Routing matrix |
-| @CREATOR_SKILLS_TABLE.md | 95 | Creator skill mapping |
-| @SKILL_CATALOG_TABLE.md | 92 | Skill catalog |
-| @ENTERPRISE_WORKFLOWS.md | 88 | Workflow paths |
+| @File                    | Lines | Content                       |
+| ------------------------ | ----- | ----------------------------- |
+| @ENFORCEMENT_HOOKS.md    | 1,134 | Hook enforcement details      |
+| @DIRECTORY_STRUCTURE.md  | 467   | Directory layout              |
+| @TOOL_REFERENCE.md       | 402   | Tool catalog                  |
+| @WORKFLOW_AGENT_MAP.md   | 319   | Workflow-agent mapping        |
+| @HOOK_AGENT_MAP.md       | 302   | Hook-agent mapping            |
+| @ENVIRONMENT_CONFIG.md   | 265   | Environment variables         |
+| @MODEL_SELECTION.md      | 267   | Model selection guide         |
+| @SKILL_USAGE_GUIDE.md    | 243   | Skill selection decision tree |
+| @EVOLUTION_WORKFLOW.md   | 199   | EVOLVE process                |
+| @TASK_TRACKING_GUIDE.md  | 145   | TaskUpdate best practices     |
+| @AGENT_ROUTING_TABLE.md  | 106   | Routing matrix                |
+| @CREATOR_SKILLS_TABLE.md | 95    | Creator skill mapping         |
+| @SKILL_CATALOG_TABLE.md  | 92    | Skill catalog                 |
+| @ENTERPRISE_WORKFLOWS.md | 88    | Workflow paths                |
 
 **The reference approach:** 1 reference file (`claude-code-resources.md`) linking to official docs. Rules are inline in `core-rules.md` (52 lines).
 
@@ -222,6 +224,7 @@ Additionally, the `.claude/context/artifacts/catalogs/` directory has 7 catalog 
 **Consolidate @files by audience:**
 
 Instead of 14 specialized @files, create 3:
+
 1. **@ROUTER-REFERENCE.md** -- Merges routing table, model selection, agent routing, task tracking (for router only)
 2. **@AGENT-REFERENCE.md** -- Merges tool reference, skill catalog, enforcement hooks, environment config (for spawned agents)
 3. **@ARCHITECTURE-REFERENCE.md** -- Merges directory structure, enterprise workflows, evolution workflow (for architects/planners)
@@ -229,6 +232,7 @@ Instead of 14 specialized @files, create 3:
 This reduces 14 files / 4,124 lines to 3 files / ~2,500 lines (with deduplication).
 
 **Remove catalog/reference overlap:**
+
 - skill-catalog.md overlaps with @SKILL_CATALOG_TABLE.md
 - tool-catalog.md overlaps with @TOOL_REFERENCE.md
 - Delete the catalog versions or the @file versions (keep one)
@@ -251,6 +255,7 @@ Medium (2-3 hours). Mostly copy-paste consolidation.
 **Directory:** `.claude/templates/` (27 files across agents, code-styles, reports, skills, spawn, workflows subdirectories)
 
 The spawn templates include:
+
 - `universal-agent-spawn.md` -- Standard agent spawn template
 - `orchestrator-spawn.md` -- Orchestrator spawn template
 - `agent-identity-integration.md` -- Identity overlay
@@ -289,6 +294,7 @@ Low-Medium (2-3 hours).
 **Workflows:** 28 files, 16,129 lines across `.claude/workflows/`
 
 Many workflows describe processes that are either:
+
 - Rarely triggered (e.g., `consensus-voting-skill-workflow.md`, `chrome-browser-skill-workflow.md`)
 - Already encoded in agent prompts (e.g., `code-review-workflow.md` duplicates code-reviewer.md instructions)
 - Too granular (e.g., separate workflows for `context-compressor`, `progressive-disclosure`, `database-architect`)
@@ -302,6 +308,7 @@ Most schemas validate agent frontmatter or artifact structure. The reference use
 ### Simpler Approach
 
 **Workflows:**
+
 1. **Tier 1 (keep as-is):** `router-decision.md`, `enterprise-workflow.md`, `evolution-workflow.md` -- these are core orchestration logic.
 2. **Tier 2 (merge into agent definitions):** Skill-specific workflows (12 files like `database-architect-skill-workflow.md`) should be sections within their agent's definition file. The workflow adds no value as a separate file when the agent already has the same instructions.
 3. **Tier 3 (archive):** Rarely-used workflows that have not been triggered in practice.
@@ -309,6 +316,7 @@ Most schemas validate agent frontmatter or artifact structure. The reference use
 This could reduce 28 workflow files to ~8 (the core orchestration ones).
 
 **Schemas:**
+
 - Keep schemas for runtime validation (hook input/output, task metadata).
 - Archive schemas that only validate agent frontmatter -- the LLM handles this.
 - Reduce from 53 to ~15 essential schemas.
@@ -326,24 +334,25 @@ Medium (4-6 hours for full audit and consolidation).
 
 ## Summary of Opportunities
 
-| # | Opportunity | Files Affected | Lines Saved | Risk | Effort |
-|---|-----------|----------------|-------------|------|--------|
-| 1 | Routing table consolidation | 1 file | ~2,200 | Low | Medium |
-| 2 | Hook consolidation (Phase 1) | 4 hooks merged | ~400 | Low | Low |
-| 2 | Hook consolidation (Phase 2) | 7 validators -> 2 | ~2,000 | Medium | Medium |
-| 2 | Hook consolidation (Phase 3) | routing-guard refactor | ~500 | Medium | Medium |
-| 3 | Configuration deduplication | 3 files merged | ~400 | Low | Medium |
-| 4 | @reference doc consolidation | 14 -> 3 files | ~1,600 | Low | Medium |
-| 5 | Spawn template reduction | 27 -> ~8 | ~500 | Low-Medium | Low-Medium |
-| 6 | Workflow consolidation | 28 -> ~8 | ~8,000 | Low-Medium | Medium |
-| 6 | Schema reduction | 53 -> ~15 | variable | Medium | Medium |
-| **Total** | | | **~15,600** | | |
+| #         | Opportunity                  | Files Affected         | Lines Saved | Risk       | Effort     |
+| --------- | ---------------------------- | ---------------------- | ----------- | ---------- | ---------- |
+| 1         | Routing table consolidation  | 1 file                 | ~2,200      | Low        | Medium     |
+| 2         | Hook consolidation (Phase 1) | 4 hooks merged         | ~400        | Low        | Low        |
+| 2         | Hook consolidation (Phase 2) | 7 validators -> 2      | ~2,000      | Medium     | Medium     |
+| 2         | Hook consolidation (Phase 3) | routing-guard refactor | ~500        | Medium     | Medium     |
+| 3         | Configuration deduplication  | 3 files merged         | ~400        | Low        | Medium     |
+| 4         | @reference doc consolidation | 14 -> 3 files          | ~1,600      | Low        | Medium     |
+| 5         | Spawn template reduction     | 27 -> ~8               | ~500        | Low-Medium | Low-Medium |
+| 6         | Workflow consolidation       | 28 -> ~8               | ~8,000      | Low-Medium | Medium     |
+| 6         | Schema reduction             | 53 -> ~15              | variable    | Medium     | Medium     |
+| **Total** |                              |                        | **~15,600** |            |            |
 
 ## Principles Applied
 
 This analysis follows the constraint: **"Overcomplicated" does NOT mean "remove features."**
 
 Every opportunity preserves the exact same functionality:
+
 - Same 49 agents are routable
 - Same enforcement hooks fire
 - Same creator guards protect artifact paths
@@ -351,6 +360,7 @@ Every opportunity preserves the exact same functionality:
 - Same multi-phase orchestration works
 
 The savings come from:
+
 - Eliminating duplicated data (routing table in 3 places)
 - Merging overlapping hooks (4 hooks doing variants of the same check)
 - Consolidating reference docs (14 files that could be 3)

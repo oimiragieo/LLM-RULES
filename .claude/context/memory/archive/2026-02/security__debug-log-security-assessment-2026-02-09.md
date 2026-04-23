@@ -19,16 +19,16 @@ Analysis of 8 Claude Code debug log files revealed **9 distinct security finding
 
 ## Files Analyzed
 
-| File | Size | Description |
-|------|------|-------------|
-| `30594d82-*.txt` | ~2 MB | Active session log with heavy hook enforcement activity |
+| File             | Size    | Description                                                |
+| ---------------- | ------- | ---------------------------------------------------------- |
+| `30594d82-*.txt` | ~2 MB   | Active session log with heavy hook enforcement activity    |
 | `3c003dec-*.txt` | ~8.7 MB | Largest log, most security pattern hits, .env.example leak |
-| `44791f95-*.txt` | ~38 KB | Session startup with YAML parse warnings |
-| `3b451fdf-*.txt` | ~41 KB | Session startup with YAML parse warnings |
-| `19ef359f-*.txt` | ~4.7 KB | Session startup, atomic file writes |
-| `08076f2f-*.txt` | ~301 B | MCP server startup (minimal) |
-| `124fd000-*.txt` | ~301 B | MCP server startup (minimal) |
-| `731453e1-*.txt` | ~301 B | MCP server startup (minimal) |
+| `44791f95-*.txt` | ~38 KB  | Session startup with YAML parse warnings                   |
+| `3b451fdf-*.txt` | ~41 KB  | Session startup with YAML parse warnings                   |
+| `19ef359f-*.txt` | ~4.7 KB | Session startup, atomic file writes                        |
+| `08076f2f-*.txt` | ~301 B  | MCP server startup (minimal)                               |
+| `124fd000-*.txt` | ~301 B  | MCP server startup (minimal)                               |
+| `731453e1-*.txt` | ~301 B  | MCP server startup (minimal)                               |
 
 ---
 
@@ -39,11 +39,13 @@ Analysis of 8 Claude Code debug log files revealed **9 distinct security finding
 **Severity:** CRITICAL
 
 **File(s):**
+
 - `3c003dec-eda7-4372-96db-017e22e86ef1.txt` (lines 8441-8446)
 
 **Pattern:** `ANTHROPIC_API_KEY|WEBHOOK_SECRET` in hook `tool_response` payloads
 
 **Sample:**
+
 ```
 [Line 8441-8446] PostToolUse Edit hook payload contains `originalFile` field
 with the complete contents of .env.example, including:
@@ -59,6 +61,7 @@ with the complete contents of .env.example, including:
 **OWASP Category:** A05:2021 - Security Misconfiguration
 
 **Recommended Fix:**
+
 1. Implement content redaction in PostToolUse hook payloads: strip or truncate `originalFile` and `newContent` fields from Edit/Write tool responses before logging
 2. Add a log sanitizer that masks patterns matching `(API_KEY|SECRET|TOKEN|PASSWORD|CREDENTIAL)\s*[=:]\s*\S+`
 3. Add `.tmp/*.txt` to `.gitignore` to prevent accidental commits of debug logs
@@ -71,12 +74,14 @@ with the complete contents of .env.example, including:
 **Severity:** HIGH
 
 **File(s):**
+
 - `3c003dec-eda7-4372-96db-017e22e86ef1.txt` (320 occurrences)
 - `30594d82-9f62-4b82-b7e0-4173bbfe5f23.txt` (63 occurrences)
 
 **Pattern:** `bypassPermissions` in hook JSON payloads
 
 **Sample:**
+
 ```json
 {
   "tool_input": { ... },
@@ -91,6 +96,7 @@ with the complete contents of .env.example, including:
 **Occurrences:** 383 total across 2 files
 
 **Risk:** The `bypassPermissions` flag reveals whether the Claude Code session is running in unrestricted mode. An attacker with access to these logs can determine:
+
 - Which sessions ran with elevated permissions
 - The timing and duration of elevated sessions
 - Correlation with specific operations performed during elevated mode
@@ -100,6 +106,7 @@ This is an information disclosure vulnerability that aids in privilege escalatio
 **OWASP Category:** A01:2021 - Broken Access Control
 
 **Recommended Fix:**
+
 1. Redact `bypassPermissions` and `session` metadata from debug log output
 2. If session context must be logged, log only a boolean `elevated: true/false` without the full session object
 3. Ensure debug log verbosity is configurable and defaults to minimal in production-like environments
@@ -111,6 +118,7 @@ This is an information disclosure vulnerability that aids in privilege escalatio
 **Severity:** HIGH
 
 **File(s):**
+
 - `30594d82-*.txt` (63 occurrences)
 - `3c003dec-*.txt` (320 occurrences)
 - `19ef359f-*.txt` (in atomic write paths)
@@ -118,6 +126,7 @@ This is an information disclosure vulnerability that aids in privilege escalatio
 **Pattern:** `C:\\Users\\oimir` in transcript paths, config paths, and session metadata
 
 **Sample:**
+
 ```
 C:\Users\oimir\.claude.json.tmp.3884.1770618566914
 C:\Users\oimir\.claude\projects\C--dev-projects-agent-studio\...
@@ -126,6 +135,7 @@ C:\Users\oimir\.claude\projects\C--dev-projects-agent-studio\...
 **Occurrences:** 383 total matches for user home path across 3 files; 384 matches for sessionId/conversationId patterns
 
 **Risk:** Debug logs reveal:
+
 - Windows username (`oimir`)
 - Full home directory path structure
 - Transcript file locations (which contain conversation history)
@@ -137,6 +147,7 @@ An attacker could use this information for targeted social engineering, or to lo
 **OWASP Category:** A01:2021 - Broken Access Control (information disclosure)
 
 **Recommended Fix:**
+
 1. Replace absolute user paths with relative paths or environment variable references (`%USERPROFILE%`) in log output
 2. Hash or truncate usernames in debug logs: `C:\Users\***\...`
 3. Never log full transcript paths -- log only session identifiers
@@ -148,6 +159,7 @@ An attacker could use this information for targeted social engineering, or to lo
 **Severity:** HIGH
 
 **File(s):**
+
 - `30594d82-*.txt` (15 occurrences)
 - `3c003dec-*.txt` (83 occurrences)
 
@@ -156,6 +168,7 @@ An attacker could use this information for targeted social engineering, or to lo
 **Occurrences:** 98 total instances where complete file contents were logged
 
 **Risk:** Every file modified through the Edit or Write tool has its ENTIRE contents captured in the PostToolUse hook payload as the `originalFile` field. This means:
+
 - Source code with embedded comments about security architecture is logged
 - Configuration files with secret patterns are logged (see Finding 1)
 - Agent definitions with routing logic are logged
@@ -166,6 +179,7 @@ This creates a comprehensive shadow copy of all edited files in debug logs, dram
 **OWASP Category:** A09:2021 - Security Logging and Monitoring Failures
 
 **Recommended Fix:**
+
 1. Truncate `originalFile` in hook payloads to first 200 characters with `[TRUNCATED]` suffix
 2. Implement a content classification filter that redacts file contents matching sensitive patterns
 3. Log only file path and diff hash, not full content
@@ -178,28 +192,33 @@ This creates a comprehensive shadow copy of all edited files in debug logs, dram
 **Severity:** MEDIUM
 
 **File(s):**
+
 - `30594d82-*.txt` (410 BLOCKED/VIOLATION entries)
 - `3c003dec-*.txt` (486 BLOCKED/VIOLATION entries)
 
 **Pattern:** `BLOCKED|VIOLATION` in enforcement hook responses
 
 **Sample:**
+
 ```json
 {"result":"block","message":"ROUTER BASH VIOLATION BLOCKED (ADR-030)...
   Command: ls tests/_archive/ 2>&1...
   Router may only use: git status -s, git log --oneline -5"}
 ```
+
 ```json
 {"result":"block","message":"[ROUTER SELF-CHECK VIOLATION] Router attempted
   to use blacklisted tool: Edit\nSpawn an agent via Task() tool to perform
   this operation."}
 ```
+
 ```json
 {"result":"block","message":"[ROUTER-WRITE-GUARD] Router cannot directly
   write files. Spawn an agent using Task tool."}
 ```
 
 **Breakdown:**
+
 - ROUTER BASH VIOLATION: 645 occurrences (most frequent)
 - ROUTER SELF-CHECK VIOLATION: 168 occurrences
 - ROUTER-WRITE-GUARD: 138 occurrences
@@ -208,6 +227,7 @@ This creates a comprehensive shadow copy of all edited files in debug logs, dram
 **Total:** 896 BLOCKED/VIOLATION entries across 2 files
 
 **Risk:** While these blocks demonstrate the enforcement system is working correctly, the verbose error messages reveal:
+
 - Exact ADR numbers governing security policy (ADR-030)
 - Complete list of whitelisted commands (`git status -s, git log --oneline -5`)
 - Internal tool architecture (Task tool, Router/Agent separation)
@@ -218,6 +238,7 @@ An attacker studying these logs could craft bypass strategies targeting the know
 **OWASP Category:** A05:2021 - Security Misconfiguration (information disclosure through verbose errors)
 
 **Recommended Fix:**
+
 1. In production/debug logs, use generic block messages: `[BLOCKED] Operation not permitted (code: RBV-030)`
 2. Keep detailed explanations only for the agent's response context, not in debug log output
 3. Log enforcement codes rather than full policy text
@@ -229,11 +250,13 @@ An attacker studying these logs could craft bypass strategies targeting the know
 **Severity:** MEDIUM
 
 **File(s):**
+
 - `08076f2f-*.txt`, `124fd000-*.txt`, `731453e1-*.txt`, `19ef359f-*.txt`, `3b451fdf-*.txt`, `3c003dec-*.txt`
 
 **Pattern:** `set_permission_mode` tool execution at MCP server startup
 
 **Sample:**
+
 ```
 [INFO] [Claude in Chrome] Executing tool: set_permission_mode
 [DEBUG] MCP server "claude-in-chrome": Calling MCP tool: set_permission_mode
@@ -243,6 +266,7 @@ An attacker studying these logs could craft bypass strategies targeting the know
 **Occurrences:** 9 total across 6 files (every session startup)
 
 **Risk:** The `set_permission_mode` MCP tool is called automatically at every session startup by the `claude-in-chrome` extension. The logs show:
+
 - Permission mode changes happen before any user interaction
 - The extension has the capability to modify permission states
 - No authentication or authorization check is logged before the permission change
@@ -252,6 +276,7 @@ If the Chrome extension were compromised (supply chain attack), it could silentl
 **OWASP Category:** A08:2021 - Software and Data Integrity Failures
 
 **Recommended Fix:**
+
 1. Log the actual permission mode being set (not just that the tool was called)
 2. Add an audit trail entry when permissions are modified, including the requestor
 3. Consider requiring user confirmation for permission mode changes
@@ -264,6 +289,7 @@ If the Chrome extension were compromised (supply chain attack), it could silentl
 **Severity:** LOW
 
 **File(s):**
+
 - `44791f95-*.txt` (2 warnings)
 - `3b451fdf-*.txt` (2 warnings)
 - `3c003dec-*.txt` (2 warnings)
@@ -271,6 +297,7 @@ If the Chrome extension were compromised (supply chain attack), it could silentl
 **Pattern:** `Failed to parse YAML frontmatter` warnings
 
 **Sample:**
+
 ```
 [WARN] Failed to parse YAML frontmatter in prompt-engineer.md: Map keys must be unique at line 56, column 1
 [WARN] Failed to parse YAML frontmatter in mcp-developer.md: Map keys must be unique at line 57, column 1
@@ -279,6 +306,7 @@ If the Chrome extension were compromised (supply chain attack), it could silentl
 **Occurrences:** 6 total across 3 files (2 agents x 3 sessions)
 
 **Risk:** Two agent definition files (`prompt-engineer.md`, `mcp-developer.md`) have duplicate YAML keys in their frontmatter. While this is a data integrity issue rather than a direct security vulnerability, malformed agent definitions could cause:
+
 - Unexpected model selection (if `model:` key is duplicated with different values)
 - Missing capability assignments (if `skills:` key is duplicated)
 - Routing failures if agent metadata is incomplete
@@ -288,6 +316,7 @@ The duplicate keys could mask a second, conflicting definition that silently ove
 **OWASP Category:** A05:2021 - Security Misconfiguration
 
 **Recommended Fix:**
+
 1. Fix duplicate YAML keys in `prompt-engineer.md` (line 56) and `mcp-developer.md` (line 57)
 2. Add a YAML frontmatter validator to the CI pipeline that rejects duplicate keys
 3. Add a schema validation hook that runs on agent file changes
@@ -299,12 +328,14 @@ The duplicate keys could mask a second, conflicting definition that silently ove
 **Severity:** INFO (positive)
 
 **File(s):**
+
 - `30594d82-*.txt` (6 occurrences)
 - `3c003dec-*.txt` (48 occurrences)
 
 **Pattern:** `LOOP PREVENTION` blocks
 
 **Sample:**
+
 ```json
 {"result":"block","message":"[LOOP PREVENTION] Pattern detected: \"spawn:qa\"
   repeated 3 times. Threshold is 3.\n\nThis is a safety mechanism to prevent
@@ -316,6 +347,7 @@ The duplicate keys could mask a second, conflicting definition that silently ove
 **Risk:** POSITIVE FINDING. The loop prevention mechanism is correctly detecting and blocking infinite agent spawn cycles. The threshold of 3 repetitions appears appropriate. The `spawn:qa` pattern was the most commonly triggered loop, suggesting the QA agent routing may need attention to prevent repeated spawn attempts.
 
 **Recommended Action:**
+
 1. Investigate why `spawn:qa` triggers loop prevention frequently -- may indicate a routing logic issue where the router repeatedly attempts to spawn QA without receiving completion signals
 2. Consider adding telemetry to track loop prevention triggers over time
 
@@ -326,6 +358,7 @@ The duplicate keys could mask a second, conflicting definition that silently ove
 **Severity:** INFO
 
 **File(s):**
+
 - `30594d82-*.txt` (1 occurrence)
 - `3c003dec-*.txt` (3 occurrences)
 
@@ -341,40 +374,40 @@ The duplicate keys could mask a second, conflicting definition that silently ove
 
 ## Summary Table
 
-| # | Finding | Severity | Occurrences | OWASP | Files |
-|---|---------|----------|-------------|-------|-------|
-| 1 | Config template content in hook payloads | CRITICAL | 3 (API_KEY) + 138 (.env refs) | A05 | 1 |
-| 2 | Session permission mode in plaintext | HIGH | 383 | A01 | 2 |
-| 3 | User identity/paths exposed | HIGH | 383+ | A01 | 3 |
-| 4 | Full file contents in hook payloads | HIGH | 98 | A09 | 2 |
-| 5 | Verbose error messages reveal architecture | MEDIUM | 896 | A05 | 2 |
-| 6 | MCP permission auto-configuration | MEDIUM | 9 | A08 | 6 |
-| 7 | Agent YAML frontmatter parse failures | LOW | 6 | A05 | 3 |
-| 8 | Loop prevention working correctly | INFO+ | 54 | -- | 2 |
-| 9 | Minimal permission denied events | INFO+ | 4 | -- | 2 |
+| #   | Finding                                    | Severity | Occurrences                   | OWASP | Files |
+| --- | ------------------------------------------ | -------- | ----------------------------- | ----- | ----- |
+| 1   | Config template content in hook payloads   | CRITICAL | 3 (API_KEY) + 138 (.env refs) | A05   | 1     |
+| 2   | Session permission mode in plaintext       | HIGH     | 383                           | A01   | 2     |
+| 3   | User identity/paths exposed                | HIGH     | 383+                          | A01   | 3     |
+| 4   | Full file contents in hook payloads        | HIGH     | 98                            | A09   | 2     |
+| 5   | Verbose error messages reveal architecture | MEDIUM   | 896                           | A05   | 2     |
+| 6   | MCP permission auto-configuration          | MEDIUM   | 9                             | A08   | 6     |
+| 7   | Agent YAML frontmatter parse failures      | LOW      | 6                             | A05   | 3     |
+| 8   | Loop prevention working correctly          | INFO+    | 54                            | --    | 2     |
+| 9   | Minimal permission denied events           | INFO+    | 4                             | --    | 2     |
 
 ---
 
 ## Quantitative Pattern Summary
 
-| Category | Total Matches | Files Affected |
-|----------|--------------|----------------|
-| BLOCKED/VIOLATION enforcement | 896 | 2 |
-| bypassPermissions exposure | 383 | 2 |
-| User path disclosure | 383 | 3 |
-| Path traversal patterns (`../`) | 171 | 2 |
-| .env/.env.example references | 138 | 2 |
-| Credential/secret/token refs | 3,281 | 4 |
-| eval/exec patterns | 125 | 2 |
-| Certificate/TLS references | 124 | 4 |
-| Rate limiting references | 118 | 3 |
-| Full file content logging | 98 | 2 |
-| Loop prevention triggers | 54 | 2 |
-| CORS/CSP/XSS patterns | 24 | 1 |
-| set_permission_mode calls | 9 | 6 |
-| YAML parse failures | 6 | 3 |
-| Permission denied events | 4 | 2 |
-| ANTHROPIC_API_KEY refs | 3 | 1 |
+| Category                        | Total Matches | Files Affected |
+| ------------------------------- | ------------- | -------------- |
+| BLOCKED/VIOLATION enforcement   | 896           | 2              |
+| bypassPermissions exposure      | 383           | 2              |
+| User path disclosure            | 383           | 3              |
+| Path traversal patterns (`../`) | 171           | 2              |
+| .env/.env.example references    | 138           | 2              |
+| Credential/secret/token refs    | 3,281         | 4              |
+| eval/exec patterns              | 125           | 2              |
+| Certificate/TLS references      | 124           | 4              |
+| Rate limiting references        | 118           | 3              |
+| Full file content logging       | 98            | 2              |
+| Loop prevention triggers        | 54            | 2              |
+| CORS/CSP/XSS patterns           | 24            | 1              |
+| set_permission_mode calls       | 9             | 6              |
+| YAML parse failures             | 6             | 3              |
+| Permission denied events        | 4             | 2              |
+| ANTHROPIC_API_KEY refs          | 3             | 1              |
 
 **Note on credential/token/eval/path-traversal counts:** The majority of these matches (3,281 credential refs, 171 path traversal, 125 eval/exec) are from documentation and memory context being included in agent spawn prompts. The hook payloads log the full spawn prompt text which contains CLAUDE.md, learnings.md, and security documentation that naturally references these terms. These are NOT actual credential leaks or attack attempts, but they do represent an information disclosure risk if logs are compromised since they reveal the complete security documentation and enforcement architecture.
 
@@ -382,18 +415,18 @@ The duplicate keys could mask a second, conflicting definition that silently ove
 
 ## Recommendations Priority Matrix
 
-| Priority | Action | Effort | Impact |
-|----------|--------|--------|--------|
-| P0 | Implement hook payload content redaction (strip `originalFile`, truncate `tool_input`) | Medium | Eliminates Findings 1, 2, 3, 4 |
-| P0 | Add `.tmp/*.txt` to `.gitignore` | Trivial | Prevents accidental log commits |
-| P1 | Add log sanitizer for secret patterns | Medium | Defense-in-depth for Finding 1 |
-| P1 | Implement `LOG_REDACTION_LEVEL` config | Medium | Configurable verbosity control |
-| P1 | Fix duplicate YAML keys in agent files | Trivial | Fixes Finding 7 |
-| P2 | Add YAML schema validation to CI | Low | Prevents future parse failures |
-| P2 | Implement log rotation/auto-purge | Medium | Reduces exposure window |
-| P2 | Investigate QA spawn loop triggers | Low | Addresses Finding 8 root cause |
-| P3 | Use generic block codes in logs | Low | Reduces architecture disclosure |
-| P3 | Add MCP permission change audit trail | Medium | Strengthens Finding 6 monitoring |
+| Priority | Action                                                                                 | Effort  | Impact                           |
+| -------- | -------------------------------------------------------------------------------------- | ------- | -------------------------------- |
+| P0       | Implement hook payload content redaction (strip `originalFile`, truncate `tool_input`) | Medium  | Eliminates Findings 1, 2, 3, 4   |
+| P0       | Add `.tmp/*.txt` to `.gitignore`                                                       | Trivial | Prevents accidental log commits  |
+| P1       | Add log sanitizer for secret patterns                                                  | Medium  | Defense-in-depth for Finding 1   |
+| P1       | Implement `LOG_REDACTION_LEVEL` config                                                 | Medium  | Configurable verbosity control   |
+| P1       | Fix duplicate YAML keys in agent files                                                 | Trivial | Fixes Finding 7                  |
+| P2       | Add YAML schema validation to CI                                                       | Low     | Prevents future parse failures   |
+| P2       | Implement log rotation/auto-purge                                                      | Medium  | Reduces exposure window          |
+| P2       | Investigate QA spawn loop triggers                                                     | Low     | Addresses Finding 8 root cause   |
+| P3       | Use generic block codes in logs                                                        | Low     | Reduces architecture disclosure  |
+| P3       | Add MCP permission change audit trail                                                  | Medium  | Strengthens Finding 6 monitoring |
 
 ---
 
@@ -413,15 +446,15 @@ The duplicate keys could mask a second, conflicting definition that silently ove
 
 ## Threat Model Context (STRIDE)
 
-| Threat | Applicable | Evidence |
-|--------|-----------|----------|
-| **S**poofing | Low | No authentication bypass attempts observed |
-| **T**ampering | Low | Atomic writes prevent file corruption; hook enforcement blocks unauthorized modifications |
-| **R**epudiation | Medium | Session IDs logged but no tamper-proof audit trail for permission changes |
-| **I**nformation Disclosure | HIGH | Findings 1-5 all involve information disclosure through verbose debug logging |
-| **D**enial of Service | Low | Loop prevention blocks infinite spawn cycles |
-| **E**levation of Privilege | Medium | bypassPermissions mode auto-set by MCP extension without logged authorization |
+| Threat                     | Applicable | Evidence                                                                                  |
+| -------------------------- | ---------- | ----------------------------------------------------------------------------------------- |
+| **S**poofing               | Low        | No authentication bypass attempts observed                                                |
+| **T**ampering              | Low        | Atomic writes prevent file corruption; hook enforcement blocks unauthorized modifications |
+| **R**epudiation            | Medium     | Session IDs logged but no tamper-proof audit trail for permission changes                 |
+| **I**nformation Disclosure | HIGH       | Findings 1-5 all involve information disclosure through verbose debug logging             |
+| **D**enial of Service      | Low        | Loop prevention blocks infinite spawn cycles                                              |
+| **E**levation of Privilege | Medium     | bypassPermissions mode auto-set by MCP extension without logged authorization             |
 
 ---
 
-*Report generated by Security Architect Agent. All findings based on static analysis of debug log files dated 2026-02-09.*
+_Report generated by Security Architect Agent. All findings based on static analysis of debug log files dated 2026-02-09._

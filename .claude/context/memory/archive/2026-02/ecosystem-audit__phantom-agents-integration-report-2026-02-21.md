@@ -12,11 +12,11 @@ Four agents were registered in routing metadata (CLAUDE.md, routing-table-intent
 
 ## Affected Agents
 
-| Agent | Expected Path | Status |
-|-------|---------------|--------|
-| `qa-guardian` | `.claude/agents/domain/qa-guardian.md` | File never created |
-| `contract-check` | `.claude/agents/domain/contract-check.md` | File never created |
-| `bool-action` | `.claude/agents/domain/bool-action.md` | File never created |
+| Agent            | Expected Path                                    | Status             |
+| ---------------- | ------------------------------------------------ | ------------------ |
+| `qa-guardian`    | `.claude/agents/domain/qa-guardian.md`           | File never created |
+| `contract-check` | `.claude/agents/domain/contract-check.md`        | File never created |
+| `bool-action`    | `.claude/agents/domain/bool-action.md`           | File never created |
 | `repo-onboarder` | `.claude/agents/orchestrators/repo-onboarder.md` | File never created |
 
 ## Root Cause
@@ -48,6 +48,7 @@ Memory entries in `learnings.md` show these agents were "created" on 2026-02-20 
 ## Verification
 
 After remediation:
+
 - No phantom agents remain in CLAUDE.md routing table
 - No phantom agents remain in routing-table intent files
 - Agent registry (`agent-registry.json`) was already clean (61 agents, none phantom)

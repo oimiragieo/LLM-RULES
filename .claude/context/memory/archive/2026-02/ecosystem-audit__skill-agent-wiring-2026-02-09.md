@@ -9,13 +9,13 @@
 
 ### Trail of Bits P0 Security Skills (5 new skills)
 
-| Skill                  | Assigned Agents                                              | Rationale                                            |
-| ---------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
-| `static-analysis`      | security-architect, code-reviewer, penetration-tester        | Core security analysis skill for vulnerability detection |
-| `variant-analysis`     | security-architect, code-reviewer, penetration-tester        | Pattern-based vulnerability discovery across codebase |
-| `differential-review`  | security-architect, code-reviewer                            | Security-focused code diff analysis for PRs          |
-| `semgrep-rule-creator` | security-architect, devops                                   | Custom security rule creation for project-specific checks |
-| `insecure-defaults`    | security-architect, code-reviewer, devops                    | Detect hardcoded credentials and misconfigurations   |
+| Skill                  | Assigned Agents                                       | Rationale                                                 |
+| ---------------------- | ----------------------------------------------------- | --------------------------------------------------------- |
+| `static-analysis`      | security-architect, code-reviewer, penetration-tester | Core security analysis skill for vulnerability detection  |
+| `variant-analysis`     | security-architect, code-reviewer, penetration-tester | Pattern-based vulnerability discovery across codebase     |
+| `differential-review`  | security-architect, code-reviewer                     | Security-focused code diff analysis for PRs               |
+| `semgrep-rule-creator` | security-architect, devops                            | Custom security rule creation for project-specific checks |
+| `insecure-defaults`    | security-architect, code-reviewer, devops             | Detect hardcoded credentials and misconfigurations        |
 
 **Assignment Logic:**
 
@@ -119,9 +119,11 @@ Based on comparison between filesystem (96 skills) and registry assignments (184
 ### Validation (Priority 3)
 
 6. **Run skill discovery audit**:
+
    ```bash
    node .claude/tools/analysis/skill-discovery-audit.mjs
    ```
+
    - Checks every skill has at least one agent assignment
    - Checks every agent skills array matches triggerPhrases
    - Reports inconsistencies
@@ -133,7 +135,7 @@ Based on comparison between filesystem (96 skills) and registry assignments (184
 
 ## Statistics
 
-- **Total skills in filesystem**: 96 (excluding _archive)
+- **Total skills in filesystem**: 96 (excluding \_archive)
 - **Trail of Bits skills added**: 5
 - **Agents updated**: 4 (security-architect, code-reviewer, penetration-tester, devops)
 - **Orphaned skills identified**: 30

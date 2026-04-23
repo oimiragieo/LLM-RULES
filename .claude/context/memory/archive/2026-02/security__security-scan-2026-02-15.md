@@ -25,6 +25,7 @@ The override logs a `security_override` JSON entry to stderr, but this is the on
 **Severity:** MEDIUM (requires env var control; defense-in-depth gap)
 
 **Remediation:**
+
 - Remove this override entirely or restrict it to a hardcoded list of additional safe commands.
 - If kept, log to the security audit file (not just stderr) and add a startup warning.
 
@@ -42,6 +43,7 @@ Similarly, `SHELL_INJECTION_VALIDATOR=off` (in `shell-injection-validator.cjs` l
 **Severity:** MEDIUM (requires env var control; documented as debug-only but no runtime guard)
 
 **Remediation:**
+
 - Gate these overrides behind an additional check (e.g., only allow in NODE_ENV=development or test).
 - Log all fail-open activations to the persistent security audit file.
 
@@ -72,6 +74,7 @@ If a corrupted or maliciously crafted JSON state file is read by any of these ho
 **Severity:** HIGH (crash = denial of service; prototype pollution = potential privilege escalation via state file poisoning)
 
 **Remediation:**
+
 - Replace all `JSON.parse()` calls in hook files with `safeParseJSON()` or `safeReadJSON()` from `.claude/lib/utils/safe-json.cjs`.
 - Add an ESLint rule to ban raw `JSON.parse()` in `.claude/hooks/` files.
 - Ensure all state file reads use schema-validated parsing.
@@ -84,6 +87,7 @@ If a corrupted or maliciously crafted JSON state file is read by any of these ho
 
 **Description:**
 The unified pre-write hook validates:
+
 - Protected directories (.git, node_modules, code-index)
 - Project root writes (allowlisted filenames only)
 - Creator guard paths (.claude/skills, .claude/agents, etc.)
@@ -97,13 +101,17 @@ The `file-placement-guard` (Check 2) only checks against a few regex patterns fo
 **Severity:** MEDIUM (Claude Code likely has its own sandboxing, but the hook layer provides no defense-in-depth)
 
 **Remediation:**
+
 - Add a project boundary check to `unified-pre-write-hook.cjs`:
   ```javascript
   const resolved = path.resolve(filePath);
   const normalizedResolved = resolved.replace(/\\/g, '/');
   if (!normalizedResolved.startsWith(normalizedRoot)) {
-    return { pass: false, result: 'block',
-      message: `Write target outside project boundary: ${filePath}` };
+    return {
+      pass: false,
+      result: 'block',
+      message: `Write target outside project boundary: ${filePath}`,
+    };
   }
   ```
 - Add symlink resolution (`fs.realpathSync`) to prevent symlink-based escapes.
@@ -133,6 +141,7 @@ The schema-validated path (lines 230-253) uses `JSON.parse(JSON.stringify(value)
 **Severity:** LOW (exploitation requires the nested polluted object to be later spread onto a prototyped object; `Object.create(null)` at the top level is a strong mitigation)
 
 **Remediation:**
+
 - Add recursive `__proto__`/`constructor`/`prototype` stripping in the no-schema fallback path.
 - Consider using `JSON.parse(JSON.stringify(parsed))` as an intermediate step (strips `__proto__` during round-trip).
 
@@ -150,6 +159,7 @@ Note: `eval` and `exec` were correctly removed from the allowlist (line 144 comm
 **Severity:** LOW (the shell-validators catch these in `-c` nested contexts, and Claude Code sandboxing limits file access; however, the allowlist is inconsistent with the security intent)
 
 **Remediation:**
+
 - Remove `source` and `.` from `SAFE_COMMANDS_ALLOWLIST`.
 - Add them to `VALIDATOR_REGISTRY` with a validator that checks the script path is within the project.
 
@@ -157,13 +167,13 @@ Note: `eval` and `exec` were correctly removed from the allowlist (line 144 comm
 
 ## Summary
 
-| # | Finding | Severity | Status |
-|---|---------|----------|--------|
-| 1 | `ALLOW_UNREGISTERED_COMMANDS` env var bypass | MEDIUM | Open |
-| 2 | `BASH_VALIDATOR_FAIL_OPEN` + similar env var bypasses | MEDIUM | Open |
-| 3 | 50+ raw `JSON.parse()` calls in hooks without try/catch or sanitization | HIGH | Open |
-| 4 | No project-boundary validation for Write/Edit paths | MEDIUM | Open |
-| 5 | `safeParseJSON` no-schema path only strips dangerous keys at top level | LOW | Open |
-| 6 | `source` and `.` on safe commands allowlist despite being code-execution vectors | LOW | Open |
+| #   | Finding                                                                          | Severity | Status |
+| --- | -------------------------------------------------------------------------------- | -------- | ------ |
+| 1   | `ALLOW_UNREGISTERED_COMMANDS` env var bypass                                     | MEDIUM   | Open   |
+| 2   | `BASH_VALIDATOR_FAIL_OPEN` + similar env var bypasses                            | MEDIUM   | Open   |
+| 3   | 50+ raw `JSON.parse()` calls in hooks without try/catch or sanitization          | HIGH     | Open   |
+| 4   | No project-boundary validation for Write/Edit paths                              | MEDIUM   | Open   |
+| 5   | `safeParseJSON` no-schema path only strips dangerous keys at top level           | LOW      | Open   |
+| 6   | `source` and `.` on safe commands allowlist despite being code-execution vectors | LOW      | Open   |
 
 **Overall Risk Assessment:** The hook system provides substantial defense-in-depth but has three systemic gaps: (1) environment variable overrides that can silently disable all security checks, (2) widespread use of raw `JSON.parse()` creating crash/DoS vectors, and (3) missing project-boundary enforcement for file writes. The most impactful fix would be migrating all hook JSON parsing to `safeParseJSON`/`safeReadJSON`.

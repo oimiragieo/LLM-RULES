@@ -5,6 +5,7 @@
 **Purpose:** Extract systemic patterns, root causes, and process improvements from 4 comprehensive audits (architecture, security, test coverage, architecture review)
 
 **Reports Analyzed:**
+
 - Architecture Audit (architect agent)
 - Security Audit (security-architect agent)
 - Test Coverage Audit (qa agent)
@@ -21,6 +22,7 @@
 **Root Cause:** Optimizing for **throughput over depth** during artifact creation, combined with **missing post-creation integration gates**.
 
 **Impact:**
+
 - 354 orphaned skills (454 created, 100 cataloged)
 - 50+ archived hooks (57% archive rate)
 - 214 archived skills (68% archive rate)
@@ -28,6 +30,7 @@
 - 12/28 critical hooks untested (43%)
 
 **Systemic Patterns Identified:**
+
 1. **Batch Creation Without Integration** (affects skills, hooks, schemas, workflows)
 2. **Configuration Sprawl** (6+ config locations, no single source of truth)
 3. **Validation Bypass** (created artifacts skip quality gates)
@@ -45,8 +48,8 @@ When creating multiple artifacts of the same type (e.g., "create 10 skills"), th
 
 **Evidence Across 4 Audits:**
 
-| Audit Type       | Finding                                                                 | Archive/Orphan Rate |
-| ---------------- | ----------------------------------------------------------------------- | ------------------- |
+| Audit Type       | Finding                                                                | Archive/Orphan Rate |
+| ---------------- | ---------------------------------------------------------------------- | ------------------- |
 | Architecture     | 454 skills found, catalog reports 100 (354 orphaned)                   | **78% orphan**      |
 | Architecture     | 50+ hooks archived, 39 active (archive rate)                           | **57% archive**     |
 | Architecture     | 214 skills archived (from 314 total created)                           | **68% archive**     |
@@ -60,6 +63,7 @@ When creating multiple artifacts of the same type (e.g., "create 10 skills"), th
 **Decision Point:** Agent-creator receives task "create 10 skills for X domain"
 
 **Path A (Current - Batch Mode):**
+
 1. Generate 10 SKILL.md files quickly
 2. Write to `.claude/skills/*/SKILL.md`
 3. Mark task complete
@@ -67,12 +71,14 @@ When creating multiple artifacts of the same type (e.g., "create 10 skills"), th
 5. **Result:** 10 "invisible artifacts" (framework can't discover them)
 
 **Path B (Desired - Depth Mode):**
+
 1. Create Skill 1 (SKILL.md + catalog entry + agent assignment + test + integration)
 2. Validate Skill 1 is discoverable and functional
 3. Repeat for Skill 2... Skill 10
 4. **Result:** 10 fully integrated skills
 
 **Why Path A is chosen:**
+
 - Faster completion (10 skills in 30 min vs 5 hours)
 - No blocking gates enforce Path B
 - Task completion metric rewards "10 skills created" not "10 skills integrated"
@@ -119,10 +125,12 @@ System configuration is fragmented across **6+ locations** with no single source
 **Evidence:**
 
 **From Architecture Audit (P0-001):**
+
 - config.yaml exists in `.claude/config.yaml` but documentation references root `config.yaml` (MISSING)
 - Model resolution has 5-layer precedence (explicit Task() param → frontmatter → config.yaml → complexity defaults → fallback)
 
 **From Architecture Review (Issue #1 - CRITICAL):**
+
 - 6 configuration files identified:
   1. `.claude/settings.json` (305 lines - hook registration, tool config)
   2. `.claude/config.yaml` (agent model assignments)
@@ -132,6 +140,7 @@ System configuration is fragmented across **6+ locations** with no single source
   6. `.claude/context/runtime/workflow-state.json` (workflow state)
 
 **Impact:**
+
 - Developer confusion: "Which config file controls model selection?"
 - Merge conflicts: 6 files touched per configuration change
 - Inconsistent behavior: env vars override config.yaml which overrides frontmatter
@@ -151,6 +160,7 @@ System configuration is fragmented across **6+ locations** with no single source
 ### Recommended Fix (From Architecture Review)
 
 **CONSOLIDATE to 2 files:**
+
 1. `.claude/config.yaml` → static config (agent models, hook registration, skill assignments)
 2. `.env` → runtime overrides (enforcement modes, feature flags)
 
@@ -168,22 +178,26 @@ Created artifacts bypass quality gates because gates default to **"warn" mode** 
 **Evidence:**
 
 **From Security Audit:**
+
 - `PLANNER_FIRST_ENFORCEMENT=warn` (default) allows high-complexity tasks without planner
 - `CREATOR_GUARD=warn` (default) allows direct artifact writes bypassing creator workflow
 - `SPECIALIST_ROUTING_ENFORCEMENT=warn` (default) allows developer to handle specialist tasks
 
 **From Test Coverage Audit:**
+
 - `routing-guard.cjs` has 12 enforcement checks but minimal test coverage
 - `unified-creator-guard.cjs` has NO tests (blocks Gate 4 violations but untested)
 - `user-prompt-orchestrator.cjs` has NO tests (orchestrates 4+ hooks but untested)
 
 **From Architecture Review:**
+
 - "Default enforcement modes too permissive" (LOW-003 finding)
 - "Several security hooks default to warn mode instead of block"
 
 ### Why Warn Mode is Used
 
 **Developer Experience Trade-off:**
+
 - **Block mode:** Prevents mistakes but requires perfect configuration (breaks legitimate workflows)
 - **Warn mode:** Allows work to continue but logs violations (easier to adopt)
 
@@ -205,6 +219,7 @@ Created artifacts bypass quality gates because gates default to **"warn" mode** 
 ### Recommended Fix
 
 **Phased Enforcement Graduation:**
+
 1. **Week 1-2:** Audit all warn-mode violations in logs
 2. **Week 3-4:** Fix false positives, refine gate logic
 3. **Week 5:** Graduate to block mode for new artifacts (grandfathered exceptions for existing)
@@ -222,16 +237,19 @@ Multiple modules implement overlapping functionality with no clear ownership or 
 **Evidence:**
 
 **Routing Logic Duplication (Architecture Review Issue #4):**
+
 - 4 modules: `routing-table.cjs`, `fuzzy-intent-matcher.cjs`, `semantic-router.cjs`, `routing-guard.cjs`
 - **Overlap:** All implement intent → agent mapping but with different approaches
 - **Impact:** Updating routing requires touching 2-4 files, no single source of truth
 
 **Memory Subsystem Complexity (Architecture Review Issue #5):**
+
 - 15 memory modules: `memory-search.cjs`, `entity-query.cjs`, `memory-extractor.cjs`, `memory-extraction-writer.cjs`, etc.
 - **Overlap:** memory-search + entity-query (both query memory), memory-extractor + memory-extraction-writer (extract vs write)
 - **Cognitive Load:** Unclear which module to use for "search memory for authentication patterns"
 
 **Hook Redundancy (Architecture Review Issue #2):**
+
 - **Routing validation** in 3 hooks: routing-guard, pre-task-unified, spawn-prompt-assembler
 - **Memory tracking** in 2 hooks: sync-memory-index, code-index-updater
 - **Reflection workflow** in 2 hooks: unified-reflection-handler, reflection-queue-processor
@@ -239,12 +257,14 @@ Multiple modules implement overlapping functionality with no clear ownership or 
 ### Why This Happens
 
 **Incremental Feature Addition:**
+
 1. Developer needs "fuzzy intent matching" → creates `fuzzy-intent-matcher.cjs`
 2. Later, different developer needs "semantic intent matching" → creates `semantic-router.cjs`
 3. No refactoring step to merge or deduplicate
 4. Both modules exist indefinitely with overlapping responsibilities
 
 **Lack of Ownership:**
+
 - No single owner responsible for "routing subsystem"
 - Each module added independently without subsystem review
 
@@ -301,6 +321,7 @@ Multiple HIGH-severity vulnerabilities stem from **unsanitized user/agent input*
 ### Common Anti-Pattern
 
 **Vulnerable Code Pattern (appears in 4+ locations):**
+
 ```javascript
 // UNSAFE: Accept user/agent input directly without sanitization
 function processInput(userContent) {
@@ -313,6 +334,7 @@ function processInput(userContent) {
 ```
 
 **Secure Pattern (should be everywhere):**
+
 ```javascript
 function processInput(userContent) {
   const sanitized = sanitizeInput(userContent, allowedPatterns);
@@ -335,6 +357,7 @@ function processInput(userContent) {
 ### Recommended Fix (From Security Audit)
 
 **Phase 1 (Week 1 - P0):**
+
 1. Update shell-validators.cjs dangerous patterns (block all $( and \v)
 2. Implement memory content sanitization (block "IGNORE PREVIOUS INSTRUCTIONS")
 3. Implement spawn prompt sanitization (escape injection markers)
@@ -351,11 +374,13 @@ function processInput(userContent) {
 **Pattern:** Quality issues emerge → gate added → gate set to "warn" to avoid breaking existing workflows → gate never upgraded to "block"
 
 **Examples:**
+
 - post-creation-integration.cjs (exists but warn-only)
 - routing-guard.cjs (12 checks, mostly warn-mode)
 - security hooks (default to warn instead of block)
 
 **Prevention:**
+
 - **New Rule:** All new quality gates default to "block" mode for NEW artifacts
 - Grandfather existing artifacts with documented exceptions
 - Monthly review to graduate warn → block
@@ -367,15 +392,18 @@ function processInput(userContent) {
 **Pattern:** Artifacts created but never measured for discoverability/usage
 
 **Current Metrics:**
+
 - ✅ Integration health score: 98.2% (from ecosystem audit)
-- ❌ **BUT:** Only measures *registered* artifacts (orphans excluded from denominator)
+- ❌ **BUT:** Only measures _registered_ artifacts (orphans excluded from denominator)
 
 **Missing Metrics:**
+
 - **Artifact Discovery Rate:** % of created artifacts discoverable by framework
 - **Artifact Usage Rate:** % of cataloged artifacts actually invoked
 - **Orphan Detection:** Automated scan for 0-reference artifacts
 
 **Prevention:**
+
 - **New Dashboard:** `.claude/tools/cli/artifact-health-dashboard.cjs`
 - Track: creation date, catalog date, first usage date, last usage date
 - Alert: Artifact created 7+ days ago but never cataloged → orphan detected
@@ -387,16 +415,19 @@ function processInput(userContent) {
 **Pattern:** Warnings logged but never acted upon → violations accumulate → system degrades
 
 **Evidence:**
+
 - 12 routing-guard warnings (specialist-first violations)
 - N memory-poisoning warnings (unsanitized writes)
 - Post-creation integration warnings (354 orphaned skills)
 
 **Why Warnings Are Ignored:**
+
 1. No dedicated "warning review" process
 2. Warnings buried in logs (no dashboard)
 3. No forcing function to address warnings before they compound
 
 **Prevention:**
+
 - **New Process:** Weekly warning review (automated report)
 - **Dashboard:** `.claude/tools/cli/warning-summary.cjs` (group by type, count, trend)
 - **Forcing Function:** Block new artifact creation if >50 unresolved warnings exist
@@ -408,17 +439,21 @@ function processInput(userContent) {
 **Pattern:** Batch creation optimizes for speed but creates technical debt
 
 **Learnings.md Quote (2026-02-09):**
+
 > "Batch creation quality issues: Schemas 39%, Skills 32%, Workflows unknown. Root cause: Batch creation optimizes throughput over depth."
 
 **Trade-off:**
+
 - **Batch Mode (Current):** 10 artifacts in 30 min, 60-70% archive rate
 - **Depth Mode (Proposed):** 10 artifacts in 5 hours, <10% archive rate
 
 **Which is better?** Depends on use case:
+
 - **Batch Mode:** OK for simple artifacts (commands, rules, catalogs)
 - **Depth Mode:** REQUIRED for complex artifacts (skills, workflows, schemas, hooks)
 
 **Prevention:**
+
 - **New Rule (Tiered Creation):** From Architecture Review Issue #3
   - **Tier 1 (Complex):** Full depth (SKILL.md + rule + schema + command + workflow + test)
   - **Tier 2 (Domain):** Standard (SKILL.md + rule + lightweight schema)
@@ -436,6 +471,7 @@ function processInput(userContent) {
 **Current State:** post-creation-integration.cjs exists but defaults to "warn"
 
 **Change:**
+
 1. **Upgrade to block mode:** `CREATOR_COMPLIANCE_ENFORCEMENT=block`
 2. **Blocking conditions:**
    - Artifact created but not cataloged within 10 minutes → block next creation
@@ -444,6 +480,7 @@ function processInput(userContent) {
 3. **Dashboard:** artifact-integrator skill runs every TaskUpdate(completed) for creator tasks
 
 **Enforcement:**
+
 - Modify `.claude/hooks/workflow/post-creation-integration.cjs`
 - Change default from `warn` to `block`
 - Add bypass flag `ALLOW_ORPHAN_ARTIFACTS=true` (for emergency use only)
@@ -455,6 +492,7 @@ function processInput(userContent) {
 **Problem:** 6 config files, no single source of truth, merge conflicts
 
 **Change:**
+
 1. **Consolidate to 2 files:**
    - `.claude/config.yaml` → static config (agents, hooks, skills)
    - `.env` → runtime overrides (enforcement modes, feature flags)
@@ -470,6 +508,7 @@ function processInput(userContent) {
 **Problem:** 4 routing modules, 15 memory modules, no clear ownership
 
 **Change:**
+
 1. **Assign subsystem owners:**
    - Routing subsystem → architect
    - Memory subsystem → architect
@@ -490,6 +529,7 @@ function processInput(userContent) {
 **Problem:** 4 HIGH-severity vulnerabilities from unsanitized inputs
 
 **Change:**
+
 1. **Mandatory sanitization layer:**
    - All user/agent input → `sanitizeInput(content, context)`
    - All memory writes → `sanitizeMemoryContent(content)`
@@ -507,6 +547,7 @@ function processInput(userContent) {
 **Problem:** Quality gates stuck in "warn" mode forever
 
 **Change:**
+
 1. **Enforcement graduation schedule:**
    - **Month 1:** Audit all warn-mode violations, fix false positives
    - **Month 2:** Graduate to "block" for NEW artifacts
@@ -523,6 +564,7 @@ function processInput(userContent) {
 **Problem:** Orphan artifacts invisible until manual audit
 
 **Change:**
+
 1. **New metrics:**
    - Artifact Discovery Rate (% cataloged within 24 hours)
    - Artifact Usage Rate (% invoked at least once)
@@ -530,7 +572,7 @@ function processInput(userContent) {
 2. **Dashboard:** `.claude/tools/cli/artifact-health-dashboard.cjs`
 3. **Alerts:**
    - Artifact created 7+ days ago but never cataloged → Slack alert
-   - >50 orphan artifacts detected → Block new creation until remediated
+   - > 50 orphan artifacts detected → Block new creation until remediated
 
 **Timeline:** 1 week (dashboard + alert integration)
 
@@ -541,6 +583,7 @@ function processInput(userContent) {
 **Problem:** Batch creation produces 60-70% archive rate for complex artifacts
 
 **Change:**
+
 1. **Document tiers:** (From Architecture Review Issue #3)
    - **Tier 1 (Complex):** tdd, security, debugging → Full depth required
    - **Tier 2 (Domain):** python-expert, typescript-pro → Standard depth
@@ -561,11 +604,13 @@ function processInput(userContent) {
 **Scenario:** User requests "create 10 skills for X"
 
 **Fast Response (30 min):**
+
 - Create 10 SKILL.md files
 - Skip catalog, skip agent assignment, skip integration
 - **Result:** 10 orphan artifacts (60-70% will be archived)
 
 **Complete Response (5 hours):**
+
 - Create Skill 1 fully (SKILL.md + catalog + assignment + test + integration)
 - Validate discoverable and functional
 - Repeat for remaining 9
@@ -586,6 +631,7 @@ function processInput(userContent) {
 **Lesson:** **Never move config without migration script + deprecation warnings**
 
 **Process:**
+
 1. Create new location
 2. Add deprecation warning in old location (log warning if read)
 3. Write migration script (automated file updates)
@@ -617,6 +663,7 @@ function processInput(userContent) {
 **Lesson:** **Make insecure option hard to use (or impossible)**
 
 **Enforcement:**
+
 1. Linter rule: Ban `JSON.parse`, require `safeParseJSON`
 2. Pre-commit hook: Block commits with banned patterns
 3. IDE integration: Auto-suggest safeParseJSON when typing JSON.parse
@@ -632,6 +679,7 @@ function processInput(userContent) {
 **Insight:** High archive rate = low-quality creation process
 
 **Thresholds:**
+
 - **<10% archive rate:** Healthy (only obsolete artifacts archived)
 - **10-30% archive rate:** Warning (some low-quality creation)
 - **>50% archive rate:** Crisis (systematic quality problem)
@@ -665,6 +713,7 @@ function processInput(userContent) {
 **Lesson:** **Subsystems need designated owners to enforce consolidation**
 
 **Owner Role:**
+
 - Approve all new modules in subsystem
 - Quarterly consolidation review (merge overlapping modules)
 - Maintain subsystem health metrics (module count, complexity)
@@ -758,6 +807,7 @@ The agent-studio framework demonstrates **excellent architectural foundations** 
 7. **Tiered creation policy** (batch for simple, depth for complex)
 
 **Success Criteria:**
+
 - Orphan rate: 60-70% → <10% (within 3 months)
 - Archive rate: 57-68% → <20% (within 6 months)
 - Configuration files: 6 → 2 (within 1 month)
@@ -767,6 +817,7 @@ The agent-studio framework demonstrates **excellent architectural foundations** 
 **Estimated Total Effort:** 4-6 weeks (1 developer full-time)
 
 **Risk if Not Addressed:**
+
 - Continued orphan artifact accumulation (compound at 50+ artifacts/month)
 - Security vulnerabilities exploited (HIGH-severity attack surface)
 - Developer productivity decline (configuration sprawl, unclear module ownership)
@@ -777,6 +828,7 @@ The agent-studio framework demonstrates **excellent architectural foundations** 
 ## Think About Whether You Are Done
 
 **Requirements Met:**
+
 - ✅ Systemic patterns extracted (5 major patterns identified)
 - ✅ Root causes identified (5 Whys analysis for each pattern)
 - ✅ Symptoms vs root causes distinguished (clear tables)
@@ -784,17 +836,20 @@ The agent-studio framework demonstrates **excellent architectural foundations** 
 - ✅ Learnings captured (7 learnings for future sessions)
 
 **Quality Checks:**
+
 - ✅ Cross-cutting analysis (patterns span all 4 reports)
 - ✅ Actionable recommendations (prioritized P0/P1/P2 with time estimates)
 - ✅ Measurable success criteria (orphan rate, archive rate, security issues)
 - ✅ Concrete examples (evidence from reports, not abstract)
 
 **Documentation:**
+
 - ✅ Provenance header included
 - ✅ Clear structure (executive summary → patterns → insights → recommendations)
 - ✅ Cross-references to source reports
 
 **Loose Ends:**
+
 - None - comprehensive reflection complete
 
 **Decision:** COMPLETE (ready to append learnings to learnings.md)

@@ -15,13 +15,13 @@
 
 ### Dimension Breakdown
 
-| Dimension | Score | Justification |
-|-----------|-------|---------------|
-| **Completeness** (25%) | 0.95 | All 3 tools identified and wired. Tool files verified to exist at correct paths. Package.json updated without omissions. Developer discoverability complete. |
-| **Accuracy** (25%) | 0.92 | Tool paths verified correct. Entry points accurately identified (archived/cli/analysis). Package.json syntax valid. Script names follow naming conventions. |
-| **Clarity** (15%) | 0.88 | Report clearly documents each tool's location, type, and usage. Before/after workflow explained. Minor: could include inline help text documentation. |
-| **Consistency** (15%) | 0.85 | Follows Wave 16B naming pattern. Script naming conventions consistent with tool-catalog.md patterns. Integration point identification follows ADR-100 methodology. |
-| **Actionability** (20%) | 0.80 | Developers can immediately run tools. Usage examples provided. Integration ready. Minor: no follow-up checklist for artifact-integrator. |
+| Dimension               | Score | Justification                                                                                                                                                      |
+| ----------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Completeness** (25%)  | 0.95  | All 3 tools identified and wired. Tool files verified to exist at correct paths. Package.json updated without omissions. Developer discoverability complete.       |
+| **Accuracy** (25%)      | 0.92  | Tool paths verified correct. Entry points accurately identified (archived/cli/analysis). Package.json syntax valid. Script names follow naming conventions.        |
+| **Clarity** (15%)       | 0.88  | Report clearly documents each tool's location, type, and usage. Before/after workflow explained. Minor: could include inline help text documentation.              |
+| **Consistency** (15%)   | 0.85  | Follows Wave 16B naming pattern. Script naming conventions consistent with tool-catalog.md patterns. Integration point identification follows ADR-100 methodology. |
+| **Actionability** (20%) | 0.80  | Developers can immediately run tools. Usage examples provided. Integration ready. Minor: no follow-up checklist for artifact-integrator.                           |
 
 ### Overall Score Calculation
 
@@ -105,6 +105,7 @@
 **Insight**: Tools can originate from multiple locations. Wiring process must verify each tool's existence and entry point type (ES module vs CommonJS). Mixed origins are valid as long as verification happens.
 
 **Application**: Future tool wiring tasks should follow the 3-step pattern:
+
 1. Identify tool file location
 2. Verify file exists at path
 3. Determine entry point type (mjs = ES Module with shebang, cjs = CommonJS with shebang, ts = TypeScript)
@@ -145,6 +146,7 @@
 ### Integration Score: 65%
 
 **Components Wired**:
+
 - ✅ Package.json scripts (entry points)
 - ❌ artifact-graph.json (missing)
 - ❌ tool-catalog.md (status not updated)
@@ -155,6 +157,7 @@
 **Classification**: **BUD** (Growth Opportunity)
 
 **Integration Gaps**:
+
 - [ ] Update tool-catalog.md with 3 tool wiring status
 - [ ] Add entries to artifact-graph.json for newly wired tools
 - [ ] Create Router keywords for each tool's purpose (e.g., "detect orphaned skills" → detect:orphans)
@@ -197,27 +200,29 @@
 
 ## Completion Metrics
 
-| Metric | Value |
-|--------|-------|
-| **Task Duration** | ~30 minutes (estimated from report) |
-| **Files Modified** | 1 (package.json) |
-| **Files Verified** | 3 (detect-orphans.mjs, git-notes-verify.cjs, assess-ecosystem.mjs) |
-| **Scripts Added** | 3 |
-| **Regressions** | 0 |
-| **Quality Score** | 0.89 |
-| **Integration Score** | 65% |
+| Metric                | Value                                                              |
+| --------------------- | ------------------------------------------------------------------ |
+| **Task Duration**     | ~30 minutes (estimated from report)                                |
+| **Files Modified**    | 1 (package.json)                                                   |
+| **Files Verified**    | 3 (detect-orphans.mjs, git-notes-verify.cjs, assess-ecosystem.mjs) |
+| **Scripts Added**     | 3                                                                  |
+| **Regressions**       | 0                                                                  |
+| **Quality Score**     | 0.89                                                               |
+| **Integration Score** | 65%                                                                |
 
 ---
 
 ## Related Task Context
 
 ### Previous Related Tasks
+
 - **Task #20 (Wave 14 Audit)**: Discovered tool wiring had 3 states (CLI/MCP/reference-only)
 - **Task #93-94**: Identified phantom scripts pattern
 - **Task #96**: Created tool-catalog.md for discoverability
 - **Task #99**: Implemented phantom-import-regression-testing
 
 ### Follow-up Tasks Recommended
+
 - **Artifact Integration Analysis** (artifact-integrator): Full integration health check per ADR-100
 - **Router Keywords Addition**: Add keyword mappings for each tool
 - **CI Validation Script**: Implement `pnpm validate:scripts` using pattern from Task #99
@@ -235,7 +240,11 @@
   "context": "Task #22 (Wave 16B) - 3 tools wired from different directory hierarchies",
   "description": "Tools can originate from _archive/, cli/, or analysis/ directories. Wiring process: (1) Identify tool file location, (2) Verify file exists, (3) Determine entry point type (mjs/cjs/ts), (4) Add package.json script with correct node invocation. Mixed origins are valid when verification happens.",
   "applicability": "Any package.json tool wiring task",
-  "benefits": ["Supports tool discovery via pnpm --list-scripts", "Prevents phantom scripts via verification", "Works across multiple tool locations"],
+  "benefits": [
+    "Supports tool discovery via pnpm --list-scripts",
+    "Prevents phantom scripts via verification",
+    "Works across multiple tool locations"
+  ],
   "extracted_from": "Task #22 Wave 16B CLI Tool Wiring",
   "date": "2026-02-10"
 }

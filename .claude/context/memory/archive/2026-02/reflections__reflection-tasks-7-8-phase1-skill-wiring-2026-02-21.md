@@ -34,13 +34,13 @@
 
 ## Rubric Scores
 
-| Dimension | Score | Rationale |
-|---|---|---|
-| Completeness | 0.85 | Both when-to-use tables added; bidirectional cross-references in place; developer.md skill array updated. Minor gap: debugging.md rules file not updated. |
-| Accuracy | 0.90 | Table content is correct and well-calibrated. Escalation criteria match actual skill capabilities. |
-| Clarity | 0.80 | Tables are scannable and actionable. "Rule of thumb" summary line is excellent. |
-| Consistency | 0.80 | Both skills consistently cross-reference each other. Matches framework pattern. |
-| Actionability | 0.75 | Agents can now determine skill selection from the table. developer.md assignment wires discovery. Minor: skill-index.json agentPrimary for debugging/smart-debug not verified. |
+| Dimension     | Score | Rationale                                                                                                                                                                      |
+| ------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Completeness  | 0.85  | Both when-to-use tables added; bidirectional cross-references in place; developer.md skill array updated. Minor gap: debugging.md rules file not updated.                      |
+| Accuracy      | 0.90  | Table content is correct and well-calibrated. Escalation criteria match actual skill capabilities.                                                                             |
+| Clarity       | 0.80  | Tables are scannable and actionable. "Rule of thumb" summary line is excellent.                                                                                                |
+| Consistency   | 0.80  | Both skills consistently cross-reference each other. Matches framework pattern.                                                                                                |
+| Actionability | 0.75  | Agents can now determine skill selection from the table. developer.md assignment wires discovery. Minor: skill-index.json agentPrimary for debugging/smart-debug not verified. |
 
 **Weighted Overall**: 0.82
 
@@ -100,11 +100,11 @@
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|---|---|---|
-| When-to-Use Table pattern | **Retain** | High reuse value — applies to all paired skill scenarios |
-| Parallel timestamp diagnostic | **Retain** | Established recovery procedure for metadata-absent parallel spawns |
-| Rules-file lag pattern | **Retain** | Novel gotcha, directly actionable, high future reuse |
+| Item                                           | Decision     | Rationale                                                                 |
+| ---------------------------------------------- | ------------ | ------------------------------------------------------------------------- |
+| When-to-Use Table pattern                      | **Retain**   | High reuse value — applies to all paired skill scenarios                  |
+| Parallel timestamp diagnostic                  | **Retain**   | Established recovery procedure for metadata-absent parallel spawns        |
+| Rules-file lag pattern                         | **Retain**   | Novel gotcha, directly actionable, high future reuse                      |
 | TaskUpdate metadata failure (13th+ occurrence) | **Compress** | Already well-documented in gotchas.json; add occurrence count update only |
 
 ---

@@ -49,11 +49,13 @@ This document provides detailed technical designs for all 5 P0 CRITICAL issues b
 ### Problem Statement
 
 **Current State:**
+
 - `.claude/context/runtime/integration-queue.jsonl` accumulates entries but is never auto-processed
 - Orphan rate: 70% (artifacts created but not catalogued/integrated)
 - Manual intervention required to discover/remediate orphaned artifacts
 
 **Impact:**
+
 - Invisible artifacts (skills/agents/hooks created but not discoverable)
 - 70% of created artifacts don't appear in catalogs/registries
 - Verification-before-completion blocked by missing artifacts
@@ -145,7 +147,7 @@ function detectArtifactCreation(taskArgs) {
     'hook-creator',
     'workflow-creator',
     'template-creator',
-    'schema-creator'
+    'schema-creator',
   ];
 
   return creatorSkills.some(skill => description.includes(skill));
@@ -170,7 +172,8 @@ async function processIntegrationQueue(options = {}) {
   }
 
   // 1. Read all queue entries
-  const entries = fs.readFileSync(queuePath, 'utf8')
+  const entries = fs
+    .readFileSync(queuePath, 'utf8')
     .split('\n')
     .filter(line => line.trim())
     .map(line => safeParseJSON(line, null))
@@ -201,8 +204,8 @@ async function processIntegrationQueue(options = {}) {
       plan: orphans.map(o => ({
         artifact: o.artifactPath,
         action: 'invoke artifact-integrator',
-        reason: 'Not in catalog after 24h'
-      }))
+        reason: 'Not in catalog after 24h',
+      })),
     };
   }
 
@@ -224,7 +227,7 @@ async function processIntegrationQueue(options = {}) {
   return {
     processed: orphans.length,
     successful: results.filter(r => r.success).length,
-    errors: results.filter(r => !r.success)
+    errors: results.filter(r => !r.success),
   };
 }
 ```
@@ -237,10 +240,10 @@ function checkArtifactIntegration(entry) {
 
   // Check catalog files
   const catalogMap = {
-    'skill': '.claude/context/artifacts/catalogs/skill-catalog.md',
-    'agent': '.claude/context/agent-registry.json',
-    'hook': '.claude/settings.json',
-    'workflow': '.claude/context/artifacts/catalogs/workflow-catalog.md'
+    skill: '.claude/context/artifacts/catalogs/skill-catalog.md',
+    agent: '.claude/context/agent-registry.json',
+    hook: '.claude/settings.json',
+    workflow: '.claude/context/artifacts/catalogs/workflow-catalog.md',
   };
 
   const catalogPath = catalogMap[artifactType];
@@ -309,14 +312,14 @@ function getOrphanCount() {
 
 #### 1.5 File Modifications
 
-| File | Change Type | Description |
-|------|-------------|-------------|
-| `.claude/hooks/post-tool-use/integration-queue-processor.cjs` | CREATE | New PostToolUse hook for queue processing |
-| `.claude/lib/integrations/queue-processor.cjs` | CREATE | Queue processing logic |
-| `.claude/tools/integrations/process-queue.mjs` | CREATE | CLI tool for manual queue processing |
-| `.claude/settings.json` | MODIFY | Register new hook |
-| `package.json` | MODIFY | Add integrate:queue scripts |
-| `.claude/tools/metrics/ci-metrics-gate.cjs` | MODIFY | Add orphan count metric |
+| File                                                          | Change Type | Description                               |
+| ------------------------------------------------------------- | ----------- | ----------------------------------------- |
+| `.claude/hooks/post-tool-use/integration-queue-processor.cjs` | CREATE      | New PostToolUse hook for queue processing |
+| `.claude/lib/integrations/queue-processor.cjs`                | CREATE      | Queue processing logic                    |
+| `.claude/tools/integrations/process-queue.mjs`                | CREATE      | CLI tool for manual queue processing      |
+| `.claude/settings.json`                                       | MODIFY      | Register new hook                         |
+| `package.json`                                                | MODIFY      | Add integrate:queue scripts               |
+| `.claude/tools/metrics/ci-metrics-gate.cjs`                   | MODIFY      | Add orphan count metric                   |
 
 ---
 
@@ -325,11 +328,13 @@ function getOrphanCount() {
 ### Problem Statement
 
 **Current State:**
+
 - 2 failing tests: `metrics-schema-contract.test.cjs`, `metrics-reader-rollups.test.cjs`
 - 2 incomplete test files (line 100: mid-function stub, missing assertions)
 - 99.94% pass rate but BLOCKED by incomplete tests
 
 **Impact:**
+
 - Verification-before-completion cannot run reliably
 - Test coverage gaps unknown
 - CI gate unreliable
@@ -408,7 +413,7 @@ test('should validate rollup data', () => {
 test('Bug #1: schema fields serialized correctly', () => {
   const schema = new MetricsSchema({
     version: 'v1',
-    fields: [{ name: 'count', type: 'number' }]
+    fields: [{ name: 'count', type: 'number' }],
   });
 
   const json = schema.toJSON();
@@ -443,14 +448,14 @@ pnpm test metrics-schema-contract.test.cjs
 
 #### 2.5 File Modifications
 
-| File | Change Type | Description |
-|------|-------------|-------------|
-| `metrics-schema-contract.test.cjs` | MODIFY | Debug failure, fix assertions, complete line 100+ |
-| `metrics-reader-rollups.test.cjs` | MODIFY | Debug failure, complete integration test |
-| `metrics-schema.cjs` | MODIFY | Fix bug causing schema test failure |
-| `metrics-reader.cjs` | MODIFY | Fix bug causing rollup test failure |
-| `metrics-schema-regression.test.cjs` | CREATE | Regression test for Bug #1 |
-| `metrics-reader-regression.test.cjs` | CREATE | Regression test for Bug #2 |
+| File                                 | Change Type | Description                                       |
+| ------------------------------------ | ----------- | ------------------------------------------------- |
+| `metrics-schema-contract.test.cjs`   | MODIFY      | Debug failure, fix assertions, complete line 100+ |
+| `metrics-reader-rollups.test.cjs`    | MODIFY      | Debug failure, complete integration test          |
+| `metrics-schema.cjs`                 | MODIFY      | Fix bug causing schema test failure               |
+| `metrics-reader.cjs`                 | MODIFY      | Fix bug causing rollup test failure               |
+| `metrics-schema-regression.test.cjs` | CREATE      | Regression test for Bug #1                        |
+| `metrics-reader-regression.test.cjs` | CREATE      | Regression test for Bug #2                        |
 
 ---
 
@@ -469,6 +474,7 @@ memory-query.cjs → contextual-memory.cjs (calls readMemory)
 ```
 
 **Impact:**
+
 - Refactoring either module breaks the other
 - Import order matters (brittle)
 - Unit testing difficult (can't isolate)
@@ -615,7 +621,7 @@ function deduplicateEntries(entries, threshold = 0.8) {
 module.exports = {
   buildSemanticContext,
   computeSimilarity,
-  deduplicateEntries
+  deduplicateEntries,
 };
 ```
 
@@ -655,12 +661,16 @@ const { buildSemanticContext } = require('./memory-utils.cjs');
 ```javascript
 const assert = require('assert');
 const { test } = require('node:test');
-const { buildSemanticContext, computeSimilarity, deduplicateEntries } = require('../../../.claude/lib/memory/memory-utils.cjs');
+const {
+  buildSemanticContext,
+  computeSimilarity,
+  deduplicateEntries,
+} = require('../../../.claude/lib/memory/memory-utils.cjs');
 
 test('buildSemanticContext creates formatted context', () => {
   const entries = [
     { content: 'Entry 1 text', timestamp: '2026-01-01' },
-    { content: 'Entry 2 text', timestamp: '2026-01-02' }
+    { content: 'Entry 2 text', timestamp: '2026-01-02' },
   ];
 
   const context = buildSemanticContext(entries, { maxChars: 1000, includeMetadata: true });
@@ -673,7 +683,7 @@ test('buildSemanticContext respects maxChars budget', () => {
   const entries = [
     { content: 'A'.repeat(500) },
     { content: 'B'.repeat(500) },
-    { content: 'C'.repeat(500) }
+    { content: 'C'.repeat(500) },
   ];
 
   const context = buildSemanticContext(entries, { maxChars: 800 });
@@ -699,14 +709,20 @@ test('deduplicateEntries removes near-duplicates', () => {
   const entries = [
     { content: 'Pattern: use TDD for all code' },
     { content: 'Pattern: use TDD for all code changes' }, // Similar
-    { content: 'Issue: memory leak in cache' } // Different
+    { content: 'Issue: memory leak in cache' }, // Different
   ];
 
   const unique = deduplicateEntries(entries, 0.8);
 
   assert.equal(unique.length, 2, 'Removes duplicate');
-  assert.ok(unique.some(e => e.content.includes('TDD')), 'Keeps one TDD entry');
-  assert.ok(unique.some(e => e.content.includes('memory leak')), 'Keeps different entry');
+  assert.ok(
+    unique.some(e => e.content.includes('TDD')),
+    'Keeps one TDD entry'
+  );
+  assert.ok(
+    unique.some(e => e.content.includes('memory leak')),
+    'Keeps different entry'
+  );
 });
 ```
 
@@ -718,28 +734,27 @@ test('deduplicateEntries removes near-duplicates', () => {
 #!/usr/bin/env node
 import madge from 'madge';
 
-madge('.claude/lib/memory/', { fileExtensions: ['cjs'] })
-  .then(res => {
-    const circular = res.circular();
-    if (circular.length > 0) {
-      console.error('Circular dependencies detected:');
-      console.error(JSON.stringify(circular, null, 2));
-      process.exit(1);
-    }
-    console.log('✓ No circular dependencies');
-  });
+madge('.claude/lib/memory/', { fileExtensions: ['cjs'] }).then(res => {
+  const circular = res.circular();
+  if (circular.length > 0) {
+    console.error('Circular dependencies detected:');
+    console.error(JSON.stringify(circular, null, 2));
+    process.exit(1);
+  }
+  console.log('✓ No circular dependencies');
+});
 ```
 
 #### 3.5 File Modifications
 
-| File | Change Type | Description |
-|------|-------------|-------------|
-| `.claude/lib/memory/memory-utils.cjs` | CREATE | Neutral module with shared functions |
-| `.claude/lib/memory/contextual-memory.cjs` | MODIFY | Import from memory-utils instead of memory-query |
-| `.claude/lib/memory/memory-query.cjs` | MODIFY | Import from memory-utils instead of contextual-memory |
-| `tests/lib/memory/memory-utils.test.cjs` | CREATE | Unit tests for shared functions |
-| `.claude/tools/cli/detect-circular-imports.mjs` | CREATE | CI check for circular imports |
-| `package.json` | MODIFY | Add "test:circular": "node .claude/tools/cli/detect-circular-imports.mjs" |
+| File                                            | Change Type | Description                                                               |
+| ----------------------------------------------- | ----------- | ------------------------------------------------------------------------- |
+| `.claude/lib/memory/memory-utils.cjs`           | CREATE      | Neutral module with shared functions                                      |
+| `.claude/lib/memory/contextual-memory.cjs`      | MODIFY      | Import from memory-utils instead of memory-query                          |
+| `.claude/lib/memory/memory-query.cjs`           | MODIFY      | Import from memory-utils instead of contextual-memory                     |
+| `tests/lib/memory/memory-utils.test.cjs`        | CREATE      | Unit tests for shared functions                                           |
+| `.claude/tools/cli/detect-circular-imports.mjs` | CREATE      | CI check for circular imports                                             |
+| `package.json`                                  | MODIFY      | Add "test:circular": "node .claude/tools/cli/detect-circular-imports.mjs" |
 
 ---
 
@@ -748,6 +763,7 @@ madge('.claude/lib/memory/', { fileExtensions: ['cjs'] })
 ### Problem Statement
 
 **Current State:**
+
 - `smart-pruner.cjs` returns inconsistent field names:
   - Sometimes: `pruneResult.removed`
   - Sometimes: `pruneResult.entriesRemoved`
@@ -755,6 +771,7 @@ madge('.claude/lib/memory/', { fileExtensions: ['cjs'] })
 - Callers in `contextual-memory.cjs` and `memory-rotator.cjs` fail silently
 
 **Impact:**
+
 - Memory pruning fails without error
 - Silent data corruption risk
 - Rotation doesn't detect failures
@@ -767,11 +784,12 @@ madge('.claude/lib/memory/', { fileExtensions: ['cjs'] })
 
 ```typescript
 interface PruneResult {
-  success: boolean;           // REQUIRED: operation succeeded
-  removed: Array<string>;     // REQUIRED: removed entry IDs/indices
-  entries: Array<Object>;     // REQUIRED: remaining entries
-  error?: string;             // OPTIONAL: error message if success = false
-  metadata?: {                // OPTIONAL: operation metadata
+  success: boolean; // REQUIRED: operation succeeded
+  removed: Array<string>; // REQUIRED: removed entry IDs/indices
+  entries: Array<Object>; // REQUIRED: remaining entries
+  error?: string; // OPTIONAL: error message if success = false
+  metadata?: {
+    // OPTIONAL: operation metadata
     duplicatesFound: number;
     entriesKept: number;
     bytesFreed: number;
@@ -788,16 +806,16 @@ function deduplicateFile(filePath, options = {}) {
   // ...
   return {
     duplicatesFound: 5,
-    duplicatesRemoved: 3,  // INCONSISTENT NAME
-    mergedEntries: []
+    duplicatesRemoved: 3, // INCONSISTENT NAME
+    mergedEntries: [],
   };
 }
 
 function pruneResolvedIssues(filePath, options = {}) {
   // ...
   return {
-    entriesRemoved: 2,  // DIFFERENT NAME
-    entries: remaining
+    entriesRemoved: 2, // DIFFERENT NAME
+    entries: remaining,
   };
 }
 ```
@@ -811,20 +829,20 @@ function deduplicateFile(filePath, options = {}) {
 
     return {
       success: true,
-      removed: removedEntryIds,      // STANDARD NAME
-      entries: remainingEntries,     // STANDARD NAME
+      removed: removedEntryIds, // STANDARD NAME
+      entries: remainingEntries, // STANDARD NAME
       metadata: {
         duplicatesFound: 5,
         entriesKept: remainingEntries.length,
-        bytesFreed: calculateBytes(removedEntries)
-      }
+        bytesFreed: calculateBytes(removedEntries),
+      },
     };
   } catch (error) {
     return {
       success: false,
       removed: [],
       entries: [],
-      error: error.message
+      error: error.message,
     };
   }
 }
@@ -835,19 +853,19 @@ function pruneResolvedIssues(filePath, options = {}) {
 
     return {
       success: true,
-      removed: removedIssueIds,      // STANDARD NAME
-      entries: remainingIssues,      // STANDARD NAME
+      removed: removedIssueIds, // STANDARD NAME
+      entries: remainingIssues, // STANDARD NAME
       metadata: {
         entriesRemoved: removedIssueIds.length,
-        entriesKept: remainingIssues.length
-      }
+        entriesKept: remainingIssues.length,
+      },
     };
   } catch (error) {
     return {
       success: false,
       removed: [],
       entries: [],
-      error: error.message
+      error: error.message,
     };
   }
 }
@@ -869,7 +887,7 @@ if (!pruneResult.success) {
   logger.error(`Deduplication failed: ${pruneResult.error}`);
   return;
 }
-const removed = pruneResult.removed.length;  // ALWAYS WORKS
+const removed = pruneResult.removed.length; // ALWAYS WORKS
 ```
 
 **memory-rotator.cjs:**
@@ -877,8 +895,8 @@ const removed = pruneResult.removed.length;  // ALWAYS WORKS
 ```javascript
 // BEFORE (silent failure)
 const pruneResult = pruneResolvedIssues(issuesPath);
-const archived = pruneResult.entriesRemoved || [];  // Could be undefined
-archiveEntries(archived);  // Silent failure if undefined
+const archived = pruneResult.entriesRemoved || []; // Could be undefined
+archiveEntries(archived); // Silent failure if undefined
 
 // AFTER (explicit error handling)
 const pruneResult = pruneResolvedIssues(issuesPath);
@@ -887,7 +905,7 @@ if (!pruneResult.success) {
   await recordIssue('Memory pruning failed', pruneResult.error);
   return;
 }
-const removed = pruneResult.removed;  // GUARANTEED ARRAY
+const removed = pruneResult.removed; // GUARANTEED ARRAY
 archiveEntries(removed);
 ```
 
@@ -921,7 +939,7 @@ test('pruning failure returns standardized error', () => {
   // Setup: Create unwritable file
   const filePath = path.join(TEST_DIR, 'readonly.md');
   fs.writeFileSync(filePath, 'content');
-  fs.chmodSync(filePath, 0o444);  // Read-only
+  fs.chmodSync(filePath, 0o444); // Read-only
 
   // Execute: Try to prune (will fail on write)
   const pruneResult = deduplicateFile(filePath);
@@ -936,13 +954,13 @@ test('pruning failure returns standardized error', () => {
 
 #### 4.5 File Modifications
 
-| File | Change Type | Description |
-|------|-------------|-------------|
-| `.claude/lib/memory/smart-pruner.cjs` | MODIFY | Standardize all return values to PruneResult schema |
-| `.claude/lib/memory/contextual-memory.cjs` | MODIFY | Update all pruneResult accesses to use .success, .removed, .entries |
-| `.claude/lib/memory/memory-rotator.cjs` | MODIFY | Add error handling for pruneResult.success = false |
-| `tests/lib/memory/memory-rotation.test.cjs` | CREATE | Integration test for rotation + pruning |
-| `.claude/schemas/prune-result.json` | CREATE | JSON schema for PruneResult (validation) |
+| File                                        | Change Type | Description                                                         |
+| ------------------------------------------- | ----------- | ------------------------------------------------------------------- |
+| `.claude/lib/memory/smart-pruner.cjs`       | MODIFY      | Standardize all return values to PruneResult schema                 |
+| `.claude/lib/memory/contextual-memory.cjs`  | MODIFY      | Update all pruneResult accesses to use .success, .removed, .entries |
+| `.claude/lib/memory/memory-rotator.cjs`     | MODIFY      | Add error handling for pruneResult.success = false                  |
+| `tests/lib/memory/memory-rotation.test.cjs` | CREATE      | Integration test for rotation + pruning                             |
+| `.claude/schemas/prune-result.json`         | CREATE      | JSON schema for PruneResult (validation)                            |
 
 ---
 
@@ -951,12 +969,14 @@ test('pruning failure returns standardized error', () => {
 ### Problem Statement
 
 **Current State:**
+
 - Memory files (learnings.md, decisions.md, issues.md) can contain arbitrary content
 - No sanitization before reads or writes
 - Malicious code patterns like `eval()`, `require('child_process')` can be injected
 - ASI06 Memory Poisoning attack vector open
 
 **Impact:**
+
 - If memory content is executed (eval, new Function, etc.), arbitrary code execution
 - Prototype pollution attacks via `__proto__` injection
 - Security audit failure (OWASP Agentic AI Top 10 - ASI06)
@@ -1041,10 +1061,10 @@ const DANGEROUS_PATTERNS = [
 
 // Whitelist patterns (legitimate usage in comments/docs)
 const WHITELIST_PATTERNS = [
-  /\/\/ .* eval\(/,           // Comments
-  /\/\* .* eval\(/,           // Block comments
-  /`.*eval\(.*`/,             // Code examples in backticks
-  /".*eval\(.*"/,             // Quoted examples
+  /\/\/ .* eval\(/, // Comments
+  /\/\* .* eval\(/, // Block comments
+  /`.*eval\(.*`/, // Code examples in backticks
+  /".*eval\(.*"/, // Quoted examples
 ];
 
 /**
@@ -1084,7 +1104,7 @@ function sanitizeMemoryEntry(content, options = {}) {
         } else if (action === 'escape') {
           // Escape pattern (make non-executable)
           sanitized = sanitized.replace(pattern, match => {
-            return match.replace(/[()]/g, '\\$&');  // Escape parens
+            return match.replace(/[()]/g, '\\$&'); // Escape parens
           });
         }
       }
@@ -1112,7 +1132,7 @@ function logSanitization(originalContent, blockedPatterns) {
     timestamp: new Date().toISOString(),
     blockedPatterns: blockedPatterns,
     contentPreview: originalContent.substring(0, 200),
-    severity: 'HIGH'
+    severity: 'HIGH',
   };
 
   try {
@@ -1136,7 +1156,7 @@ function sanitizeMemoryContent(content) {
 module.exports = {
   sanitizeMemoryEntry,
   sanitizeMemoryContent,
-  DANGEROUS_PATTERNS
+  DANGEROUS_PATTERNS,
 };
 ```
 
@@ -1157,11 +1177,9 @@ function writeMemory(area, key, value, options = {}) {
 
   // ... existing write logic ...
   const memoryFile = path.join(memoryDir, `${area}.json`);
-  const data = fs.existsSync(memoryFile)
-    ? JSON.parse(fs.readFileSync(memoryFile, 'utf8'))
-    : {};
+  const data = fs.existsSync(memoryFile) ? JSON.parse(fs.readFileSync(memoryFile, 'utf8')) : {};
 
-  data[key] = sanitizedValue;  // Write sanitized value
+  data[key] = sanitizedValue; // Write sanitized value
 
   atomicWriteJSONSync(memoryFile, data);
 
@@ -1196,7 +1214,10 @@ function readMemory(area, key, options = {}) {
 ```javascript
 const assert = require('assert');
 const { test } = require('node:test');
-const { sanitizeMemoryEntry, DANGEROUS_PATTERNS } = require('../../../.claude/lib/memory/memory-sanitizer.cjs');
+const {
+  sanitizeMemoryEntry,
+  DANGEROUS_PATTERNS,
+} = require('../../../.claude/lib/memory/memory-sanitizer.cjs');
 
 test('sanitizeMemoryEntry blocks eval()', () => {
   const malicious = 'Decision: Use eval("process.exit(1)") for config parsing';
@@ -1240,7 +1261,7 @@ test('sanitizeMemoryEntry handles all DANGEROUS_PATTERNS', () => {
     '__proto__.isAdmin = true',
     'constructor["prototype"]',
     'import("./malicious.js")',
-    'require("vm").runInNewContext("code")'
+    'require("vm").runInNewContext("code")',
   ];
 
   for (const payload of payloads) {
@@ -1264,19 +1285,25 @@ test('sanitizeMemoryEntry handles all DANGEROUS_PATTERNS', () => {
 **Attack Examples:**
 
 1. **Code Execution via eval:**
-   ```
-   Learning: Use eval(fs.readFileSync('/etc/passwd'))
-   ```
+```
+
+Learning: Use eval(fs.readFileSync('/etc/passwd'))
+
+```
 
 2. **Prototype Pollution:**
-   ```
-   Decision: Object.__proto__.isAdmin = true
-   ```
+```
+
+Decision: Object.**proto**.isAdmin = true
+
+```
 
 3. **Child Process Execution:**
-   ```
-   Pattern: require('child_process').exec('rm -rf /')
-   ```
+```
+
+Pattern: require('child_process').exec('rm -rf /')
+
+```
 
 ## Mitigation Strategy
 
@@ -1314,13 +1341,13 @@ test('sanitizeMemoryEntry handles all DANGEROUS_PATTERNS', () => {
 
 #### 5.5 File Modifications
 
-| File | Change Type | Description |
-|------|-------------|-------------|
-| `.claude/lib/memory/memory-sanitizer.cjs` | CREATE | Sanitization function with pattern blocking |
-| `.claude/lib/memory/memory-manager.cjs` | MODIFY | Integrate sanitization in readMemory/writeMemory |
-| `tests/lib/memory/memory-sanitizer.test.cjs` | CREATE | Unit tests for all attack patterns |
-| `.claude/context/memory/sanitization-log.jsonl` | CREATE | Audit log file (empty initially) |
-| `.claude/context/artifacts/security/memory-poisoning-prevention.md` | CREATE | Security documentation |
+| File                                                                | Change Type | Description                                      |
+| ------------------------------------------------------------------- | ----------- | ------------------------------------------------ |
+| `.claude/lib/memory/memory-sanitizer.cjs`                           | CREATE      | Sanitization function with pattern blocking      |
+| `.claude/lib/memory/memory-manager.cjs`                             | MODIFY      | Integrate sanitization in readMemory/writeMemory |
+| `tests/lib/memory/memory-sanitizer.test.cjs`                        | CREATE      | Unit tests for all attack patterns               |
+| `.claude/context/memory/sanitization-log.jsonl`                     | CREATE      | Audit log file (empty initially)                 |
+| `.claude/context/artifacts/security/memory-poisoning-prevention.md` | CREATE      | Security documentation                           |
 
 ---
 
@@ -1511,28 +1538,28 @@ echo 'eval("process.exit(1)")' | node -e "const {sanitizeMemoryEntry} = require(
 
 ### High-Risk Areas
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|-----------|
-| Queue processor removes valid entries | LOW | HIGH | Dry-run mode, manual review, rollback plan |
-| Memory rotation data loss | LOW | HIGH | Backup before rotation, checksum verification |
-| Circular dependency re-emerges | MEDIUM | MEDIUM | CI check, pre-commit hook |
-| Sanitization too aggressive | MEDIUM | LOW | Whitelist patterns, extensive testing |
-| Test failures reveal deeper bugs | LOW | HIGH | Red-green cycle verification, regression tests |
+| Risk                                  | Probability | Impact | Mitigation                                     |
+| ------------------------------------- | ----------- | ------ | ---------------------------------------------- |
+| Queue processor removes valid entries | LOW         | HIGH   | Dry-run mode, manual review, rollback plan     |
+| Memory rotation data loss             | LOW         | HIGH   | Backup before rotation, checksum verification  |
+| Circular dependency re-emerges        | MEDIUM      | MEDIUM | CI check, pre-commit hook                      |
+| Sanitization too aggressive           | MEDIUM      | LOW    | Whitelist patterns, extensive testing          |
+| Test failures reveal deeper bugs      | LOW         | HIGH   | Red-green cycle verification, regression tests |
 
 ### Medium-Risk Areas
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|-----------|
-| Hook performance impact | LOW | MEDIUM | <500ms execution time budget |
-| Memory sanitization bypassed | LOW | MEDIUM | Defense in depth (read + write sanitization) |
-| Field name standardization breaks callers | LOW | MEDIUM | Comprehensive search for all callers |
+| Risk                                      | Probability | Impact | Mitigation                                   |
+| ----------------------------------------- | ----------- | ------ | -------------------------------------------- |
+| Hook performance impact                   | LOW         | MEDIUM | <500ms execution time budget                 |
+| Memory sanitization bypassed              | LOW         | MEDIUM | Defense in depth (read + write sanitization) |
+| Field name standardization breaks callers | LOW         | MEDIUM | Comprehensive search for all callers         |
 
 ### Low-Risk Areas
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|-----------|
-| Test completion takes longer than estimated | MEDIUM | LOW | Allocate buffer time |
-| Documentation out of sync | LOW | LOW | Update docs as part of DoD |
+| Risk                                        | Probability | Impact | Mitigation                 |
+| ------------------------------------------- | ----------- | ------ | -------------------------- |
+| Test completion takes longer than estimated | MEDIUM      | LOW    | Allocate buffer time       |
+| Documentation out of sync                   | LOW         | LOW    | Update docs as part of DoD |
 
 ---
 
@@ -1674,4 +1701,3 @@ function sanitizeMemoryContent(content)
 - **Code Standards:** `.claude/rules/code-standards.md`
 - **TDD Skill:** `.claude/skills/tdd/SKILL.md`
 - **Verification Skill:** `.claude/skills/verification-before-completion/SKILL.md`
-

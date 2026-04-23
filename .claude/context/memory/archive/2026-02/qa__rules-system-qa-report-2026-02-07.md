@@ -9,16 +9,16 @@
 
 ## Summary
 
-| Category          | Status      | Details                          |
-|-------------------|-------------|----------------------------------|
-| Rule Count        | ✅ PASS     | 10/10 expected .md files         |
-| Deleted Files     | ✅ PASS     | coding-style.md, patterns.md gone |
-| Index Validation  | ✅ PASS     | 10/10 entries valid, 0 broken    |
-| memory-protocol   | ✅ PASS     | 7 directives (9 lines)           |
-| task-tracking     | ✅ PASS     | 6 directives (8 lines)           |
-| Path Conflicts    | ⚠️ PARTIAL  | 2 old paths remain in docs       |
-| Broken References | ❌ FAIL     | 5 references to deleted files    |
-| ADR-091           | ✅ PASS     | Exists in decisions.md           |
+| Category          | Status     | Details                           |
+| ----------------- | ---------- | --------------------------------- |
+| Rule Count        | ✅ PASS    | 10/10 expected .md files          |
+| Deleted Files     | ✅ PASS    | coding-style.md, patterns.md gone |
+| Index Validation  | ✅ PASS    | 10/10 entries valid, 0 broken     |
+| memory-protocol   | ✅ PASS    | 7 directives (9 lines)            |
+| task-tracking     | ✅ PASS    | 6 directives (8 lines)            |
+| Path Conflicts    | ⚠️ PARTIAL | 2 old paths remain in docs        |
+| Broken References | ❌ FAIL    | 5 references to deleted files     |
+| ADR-091           | ✅ PASS    | Exists in decisions.md            |
 
 **Overall Verdict**: **APPROVED WITH CONDITIONS** - Minor cleanup required
 
@@ -84,6 +84,7 @@ Summary:
 ```
 
 **Index Metadata**:
+
 - Version: 1.3.0 (updated from 1.2.0)
 - Total rules: 10
 - Master rules: 10
@@ -100,6 +101,7 @@ Summary:
 **Actual**: 7 directives (9 lines total)
 
 **Content**:
+
 ```markdown
 # Memory Protocol
 
@@ -122,6 +124,7 @@ Summary:
 **Actual**: 6 directives (8 lines total)
 
 **Content**:
+
 ```markdown
 # Task Tracking
 
@@ -145,8 +148,9 @@ Summary:
 **Found Issues**:
 
 1. **Line 395** (Table row):
+
    ```markdown
-   | Directly in `artifacts/`     | Must use category subdirectories             | `artifacts/plans/`, `reports/`, etc. |
+   | Directly in `artifacts/` | Must use category subdirectories | `artifacts/plans/`, `reports/`, etc. |
    ```
 
 2. **Line 449** (Example):
@@ -155,6 +159,7 @@ Summary:
    ```
 
 **Recommendation**: Update both references:
+
 - Line 395: Change to `.claude/context/plans/`, `.claude/context/reports/`
 - Line 449: Already labeled "Incorrect" but should reference ADR-078 clearly
 
@@ -170,22 +175,28 @@ Summary:
 **Broken References**:
 
 1. **@DIRECTORY_STRUCTURE.md** (Line 193, 196):
+
    ```markdown
    ├── coding-style.md
    ├── patterns.md
    ```
+
    **Fix**: Remove these 2 lines from the directory tree listing
 
 2. **templates/README.md** (Line 432):
+
    ```markdown
    **Deleted (not archived):** html-css.md, general.md (overlapped with `.claude/rules/coding-style.md`)
    ```
+
    **Fix**: Change reference to `code-standards.md` (the merged result)
 
-3. **templates/_archive/README.md** (Line 34):
+3. **templates/\_archive/README.md** (Line 34):
+
    ```markdown
    | `code-styles/general.md` | Overlap with `.claude/rules/coding-style.md` - deleted via `git rm` | 2026-02-07 |
    ```
+
    **Fix**: Update to reference `code-standards.md`
 
 4. **security report** (Lines 394-395):
@@ -205,6 +216,7 @@ Summary:
 **Actual**: Found at line 17
 
 **Snippet**:
+
 ```markdown
 ## ADR-091: Rules System Overhaul -- Expand Thin Rules, Fix Path Conflicts, Add Missing Protocol Rules
 ```
@@ -220,12 +232,14 @@ Summary:
 **Impact**: Documentation references non-existent files, causing confusion
 **Severity**: MAJOR
 **Files Affected**:
+
 - `.claude/docs/@DIRECTORY_STRUCTURE.md` (lines 193, 196)
 - `.claude/templates/README.md` (line 432)
 - `.claude/templates/_archive/README.md` (line 34)
 - `.claude/context/reports/security/rules-system-security-review-2026-02-07.md` (lines 394-395)
 
 **Required Fixes**:
+
 1. Remove `coding-style.md` and `patterns.md` from @DIRECTORY_STRUCTURE.md tree
 2. Update references to point to `code-standards.md` (the merged file)
 3. Add historical notes in archived docs explaining the merge
@@ -243,6 +257,7 @@ Summary:
 **Files Affected**: `.claude/docs/FILE_PLACEMENT_RULES.md` (lines 395, 449)
 
 **Required Fixes**:
+
 1. Line 395: Update example paths to `.claude/context/plans/`, `.claude/context/reports/`
 2. Line 449: Clarify this is an "incorrect example" (pre-ADR-078)
 
@@ -257,7 +272,7 @@ Summary:
 All updated rules now meet the 6+ directive threshold:
 
 | Rule                  | Lines | Quality                         |
-|-----------------------|-------|---------------------------------|
+| --------------------- | ----- | ------------------------------- |
 | agents.md             | 53    | ✅ Comprehensive routing guide  |
 | code-standards.md     | 44    | ✅ Merged coding-style+patterns |
 | git-workflow.md       | 34    | ✅ Expanded commit conventions  |
@@ -276,6 +291,7 @@ All 10 entries in rule-index.json point to existing files. Zero broken paths.
 ### ✅ Critical Protocol Coverage
 
 Rules now cover mandatory protocols previously only in CLAUDE.md:
+
 - Memory persistence (memory-protocol.md)
 - Task tracking (task-tracking.md)
 
@@ -302,16 +318,16 @@ This ensures all agents receive these requirements in the system prompt.
 
 ## Test Results Summary
 
-| Validation                  | Status  | Output                              |
-|-----------------------------|---------|-------------------------------------|
-| Rule count                  | ✅ PASS | 10/10 .md files                     |
-| File deletion               | ✅ PASS | Staged for git commit               |
-| Index validation            | ✅ PASS | 10/10 valid, 0 broken               |
-| Content depth (lines)       | ✅ PASS | All rules 8+ lines, 6+ directives   |
-| JSON validity               | ✅ PASS | Parses correctly, schema compliant  |
-| Path resolution             | ✅ PASS | All paths exist                     |
-| Broken reference scan       | ❌ FAIL | 5 references to deleted files found |
-| ADR documentation           | ✅ PASS | ADR-091 in decisions.md             |
+| Validation            | Status  | Output                              |
+| --------------------- | ------- | ----------------------------------- |
+| Rule count            | ✅ PASS | 10/10 .md files                     |
+| File deletion         | ✅ PASS | Staged for git commit               |
+| Index validation      | ✅ PASS | 10/10 valid, 0 broken               |
+| Content depth (lines) | ✅ PASS | All rules 8+ lines, 6+ directives   |
+| JSON validity         | ✅ PASS | Parses correctly, schema compliant  |
+| Path resolution       | ✅ PASS | All paths exist                     |
+| Broken reference scan | ❌ FAIL | 5 references to deleted files found |
+| ADR documentation     | ✅ PASS | ADR-091 in decisions.md             |
 
 ---
 
@@ -322,6 +338,7 @@ This ensures all agents receive these requirements in the system prompt.
 **Reason**: Core deliverables complete (Tasks #103, #104), but broken references block clean completion.
 
 **Next Steps**:
+
 1. Fix 5 broken references (ISSUE #1) — **MANDATORY**
 2. Fix 2 stale path examples (ISSUE #2) — Recommended
 3. Re-run QA validation (this checklist)

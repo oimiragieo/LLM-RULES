@@ -14,11 +14,13 @@ Investigation of "31 events failed to export (timeout)" error in Claude Code deb
 ## Evidence
 
 ### Debug Log Location
+
 - File: `C:\Users\oimir\.claude\debug\c073ed87-d7a0-4f60-baf6-8716a6ede83f.txt`
 - Line: ~3100
 - Timestamp: 2026-02-13T05:03:55.721Z
 
 ### Actual Error Messages
+
 ```
 2026-02-13T05:03:55.721Z [ERROR] Error: Error: 1P event logging: 31 events failed to export (code=ECONNABORTED, timeout of 10000ms exceeded)
     at df8.queueFailedEvents (file:///C:/Users/oimir/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2180:2315)
@@ -36,6 +38,7 @@ Investigation of "31 events failed to export (timeout)" error in Claude Code deb
 ## Investigation Steps Performed
 
 ### Step 1: Searched Agent-Studio Codebase
+
 ```bash
 # Search for telemetry/export/timeout patterns in framework
 grep -r "telemetry\|export\|timeout\|OTLP\|OpenTelemetry" .claude/lib/
@@ -45,11 +48,13 @@ grep -r "telemetry\|export\|timeout\|OTLP\|OpenTelemetry" .claude/hooks/
 **Result**: No matches for telemetry export code in agent-studio. Framework metrics use local JSONL files.
 
 ### Step 2: Analyzed Framework Metrics Collection
+
 - File: `.claude/hooks/metrics/post-tool-metrics-unified.cjs`
 - Behavior: Writes metrics to **local** `.claude/context/runtime/*.jsonl` files
 - No network calls, no remote export, no timeouts
 
 ### Step 3: Checked Environment Variables
+
 ```bash
 echo %ANTHROPIC_TELEMETRY_ENDPOINT% %ANTHROPIC_TELEMETRY_ENABLED% %ANTHROPIC_TELEMETRY_TIMEOUT%
 ```
@@ -57,7 +62,9 @@ echo %ANTHROPIC_TELEMETRY_ENDPOINT% %ANTHROPIC_TELEMETRY_ENABLED% %ANTHROPIC_TEL
 **Result**: No telemetry environment variables set in this environment.
 
 ### Step 4: Reviewed .env.example for Telemetry Config
+
 Searched `.env.example` for telemetry-related configuration:
+
 - **Found**: Only internal metrics (ML sessions, anomaly logs, event bus)
 - **Not Found**: No OTLP/telemetry export configuration
 
@@ -75,15 +82,18 @@ Searched `.env.example` for telemetry-related configuration:
 ## Impact Assessment
 
 **User Impact**: None
+
 - Telemetry is for Anthropic's internal product analytics
 - Does not affect agent-studio framework functionality
 - Does not affect task execution or user features
 
 **Framework Impact**: None
+
 - Agent-studio metrics collection is separate (local JSONL files)
 - No dependency on Claude Code's telemetry system
 
 **Performance Impact**: Negligible
+
 - Telemetry export is async/background
 - Timeout logged but doesn't block operations
 
@@ -94,6 +104,7 @@ Searched `.env.example` for telemetry-related configuration:
 **If telemetry timeout is annoying in logs:**
 
 1. **Disable Claude Code telemetry** (if Anthropic provides a flag):
+
    ```bash
    # Check Claude Code docs for telemetry disable flag
    # Example (hypothetical):
@@ -101,6 +112,7 @@ Searched `.env.example` for telemetry-related configuration:
    ```
 
 2. **Check network connectivity**:
+
    ```bash
    # Verify outbound HTTPS connectivity
    curl -I https://www.anthropic.com
@@ -122,12 +134,14 @@ Searched `.env.example` for telemetry-related configuration:
 ## Configuration Reference
 
 **Agent-Studio Metrics** (local, no export):
+
 - Config: `.env.example` lines 649-672
 - Files: `.claude/context/runtime/*.jsonl`
 - Collection: `post-tool-metrics-unified.cjs`
 - No network calls
 
 **Claude Code Telemetry** (remote export):
+
 - Managed by: `@anthropic-ai/claude-code` CLI
 - Endpoint: Anthropic-controlled (unknown URL)
 - Timeout: 10 seconds (hardcoded)
@@ -138,12 +152,14 @@ Searched `.env.example` for telemetry-related configuration:
 To confirm this is expected behavior:
 
 1. **Verify no framework code changes needed**:
+
    ```bash
    git status
    # Should show no modified files related to telemetry
    ```
 
 2. **Verify framework metrics still work**:
+
    ```bash
    ls -lh .claude/context/runtime/*.jsonl
    # Should show recent hook-metrics.jsonl, spawn-log.jsonl, etc.
@@ -167,6 +183,7 @@ To confirm this is expected behavior:
 **Action Taken**: None required. This is a benign network timeout in Claude Code's internal telemetry system.
 
 **User Communication**: If users ask about this error:
+
 > "This is Claude Code's internal telemetry (usage analytics) timing out trying to reach Anthropic's servers. It doesn't affect agent-studio functionality and can be safely ignored. If it bothers you, check your network/firewall settings or contact Anthropic for a telemetry disable flag."
 
 ---

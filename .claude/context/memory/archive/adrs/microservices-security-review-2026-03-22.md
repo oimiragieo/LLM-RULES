@@ -54,12 +54,12 @@ In a monolith, authentication and authorization are a single concern handled in 
 
 **Centralized AuthN implementation:**
 
-| Component | Technology | Purpose |
-|-----------|-----------|---------|
-| Identity Provider (IdP) | Keycloak, Auth0, Okta, or custom | User directory, MFA, session management |
-| Authorization Server | Same IdP or dedicated (Hydra) | OAuth 2.1 token issuance, PKCE enforcement |
-| API Gateway | Kong, Envoy, AWS API Gateway | Token validation, rate limiting, TLS termination |
-| Token Format | JWT (RS256 or ES256) | Stateless, verifiable, carries claims |
+| Component               | Technology                       | Purpose                                          |
+| ----------------------- | -------------------------------- | ------------------------------------------------ |
+| Identity Provider (IdP) | Keycloak, Auth0, Okta, or custom | User directory, MFA, session management          |
+| Authorization Server    | Same IdP or dedicated (Hydra)    | OAuth 2.1 token issuance, PKCE enforcement       |
+| API Gateway             | Kong, Envoy, AWS API Gateway     | Token validation, rate limiting, TLS termination |
+| Token Format            | JWT (RS256 or ES256)             | Stateless, verifiable, carries claims            |
 
 **OAuth 2.1 Compliance (MANDATORY -- see RFC draft-ietf-oauth-v2-1):**
 
@@ -72,7 +72,7 @@ In a monolith, authentication and authorization are a single concern handled in 
 
 ### 1.2 Service-to-Service Authentication (East-West Traffic)
 
-In a monolith, services communicate via in-process function calls. No authentication is needed because there is no network boundary. Microservices introduce N*(N-1)/2 potential network paths, each requiring authentication.
+In a monolith, services communicate via in-process function calls. No authentication is needed because there is no network boundary. Microservices introduce N\*(N-1)/2 potential network paths, each requiring authentication.
 
 **Pattern A: Mutual TLS (mTLS) -- RECOMMENDED BASELINE**
 
@@ -100,7 +100,7 @@ Service A                          Service B
 The API gateway validates the user's JWT and forwards it (or a derived internal token) to downstream services. Each service validates the JWT signature independently.
 
 - Pros: Carries user identity and claims through the call chain, enables user-context-aware authorization
-- Cons: Does not authenticate the *calling service* (only the user), token lifetime must be short (<=15 minutes), vulnerable to token replay between services
+- Cons: Does not authenticate the _calling service_ (only the user), token lifetime must be short (<=15 minutes), vulnerable to token replay between services
 - When: Layered ON TOP of mTLS when downstream services need user context for authorization decisions
 
 **Pattern C: SPIFFE/SPIRE (Recommended for Kubernetes)**
@@ -117,17 +117,17 @@ Provides workload identity via SVIDs (SPIFFE Verifiable Identity Documents). Eac
 
 The API gateway is the ONLY ingress from external clients. It MUST enforce:
 
-| Control | Implementation | Priority |
-|---------|---------------|----------|
-| Token validation | Verify JWT signature (RS256/ES256), expiry, audience, issuer | P0 -- CRITICAL |
-| PKCE enforcement | Reject authorization requests without `code_challenge` | P0 -- CRITICAL |
-| Rate limiting | Per-client, per-endpoint, sliding window | P0 -- CRITICAL |
-| TLS termination | TLS 1.3 preferred, TLS 1.2 minimum, HSTS enabled | P0 -- CRITICAL |
-| Input validation | Request size limits, content-type validation, schema validation | P1 -- HIGH |
-| CORS enforcement | Explicit origin allowlist, no wildcards | P1 -- HIGH |
-| Request logging | Structured audit log of all auth decisions | P1 -- HIGH |
-| IP allowlisting | For admin/internal endpoints | P2 -- MEDIUM |
-| WAF integration | OWASP CRS ruleset | P2 -- MEDIUM |
+| Control          | Implementation                                                  | Priority       |
+| ---------------- | --------------------------------------------------------------- | -------------- |
+| Token validation | Verify JWT signature (RS256/ES256), expiry, audience, issuer    | P0 -- CRITICAL |
+| PKCE enforcement | Reject authorization requests without `code_challenge`          | P0 -- CRITICAL |
+| Rate limiting    | Per-client, per-endpoint, sliding window                        | P0 -- CRITICAL |
+| TLS termination  | TLS 1.3 preferred, TLS 1.2 minimum, HSTS enabled                | P0 -- CRITICAL |
+| Input validation | Request size limits, content-type validation, schema validation | P1 -- HIGH     |
+| CORS enforcement | Explicit origin allowlist, no wildcards                         | P1 -- HIGH     |
+| Request logging  | Structured audit log of all auth decisions                      | P1 -- HIGH     |
+| IP allowlisting  | For admin/internal endpoints                                    | P2 -- MEDIUM   |
+| WAF integration  | OWASP CRS ruleset                                               | P2 -- MEDIUM   |
 
 **Anti-pattern:** Services behind the gateway that accept requests directly (bypassing the gateway). Every service MUST reject traffic that does not originate from the mesh or gateway. Enforce this with network policies.
 
@@ -169,12 +169,12 @@ Service-level enforcement:
 
 **Authorization architecture decision:**
 
-| Service Type | Model | Engine | Rationale |
-|-------------|-------|--------|-----------|
-| CRUD services | RBAC | In-process middleware | Simple role checks, low latency |
-| Multi-tenant | ABAC | OPA sidecar | Tenant isolation requires attribute evaluation |
-| Regulatory (PCI/HIPAA) | ABAC | OPA + audit log | Compliance requires fine-grained, auditable decisions |
-| Internal tooling | RBAC | JWT scope claims | Low complexity, internal users only |
+| Service Type           | Model | Engine                | Rationale                                             |
+| ---------------------- | ----- | --------------------- | ----------------------------------------------------- |
+| CRUD services          | RBAC  | In-process middleware | Simple role checks, low latency                       |
+| Multi-tenant           | ABAC  | OPA sidecar           | Tenant isolation requires attribute evaluation        |
+| Regulatory (PCI/HIPAA) | ABAC  | OPA + audit log       | Compliance requires fine-grained, auditable decisions |
+| Internal tooling       | RBAC  | JWT scope claims      | Low complexity, internal users only                   |
 
 ---
 
@@ -188,13 +188,13 @@ In a monolith, the network perimeter is the security boundary. Microservices eli
 
 **Zero-trust implementation layers:**
 
-| Layer | Control | Implementation |
-|-------|---------|---------------|
-| Identity | Every workload has a cryptographic identity | SPIFFE/SPIRE SVIDs |
-| Transport | All traffic encrypted and authenticated | mTLS via service mesh |
-| Authorization | Every request checked against policy | OPA/Envoy authorization filter |
-| Observability | All traffic logged and traced | Distributed tracing (Jaeger/Tempo) |
-| Network | Micro-segmentation, deny-by-default | Kubernetes NetworkPolicy + Calico/Cilium |
+| Layer         | Control                                     | Implementation                           |
+| ------------- | ------------------------------------------- | ---------------------------------------- |
+| Identity      | Every workload has a cryptographic identity | SPIFFE/SPIRE SVIDs                       |
+| Transport     | All traffic encrypted and authenticated     | mTLS via service mesh                    |
+| Authorization | Every request checked against policy        | OPA/Envoy authorization filter           |
+| Observability | All traffic logged and traced               | Distributed tracing (Jaeger/Tempo)       |
+| Network       | Micro-segmentation, deny-by-default         | Kubernetes NetworkPolicy + Calico/Cilium |
 
 **Zero-trust checklist:**
 
@@ -225,7 +225,7 @@ metadata:
   namespace: istio-system
 spec:
   mtls:
-    mode: STRICT  # NEVER use PERMISSIVE in production
+    mode: STRICT # NEVER use PERMISSIVE in production
 
 ---
 # Authorization: billing can only be called by order-service
@@ -239,13 +239,13 @@ spec:
     matchLabels:
       app: billing-service
   rules:
-  - from:
-    - source:
-        principals: ["cluster.local/ns/production/sa/order-service"]
-    to:
-    - operation:
-        methods: ["POST"]
-        paths: ["/api/v1/charges"]
+    - from:
+        - source:
+            principals: ['cluster.local/ns/production/sa/order-service']
+      to:
+        - operation:
+            methods: ['POST']
+            paths: ['/api/v1/charges']
 ```
 
 **CRITICAL:** Never use `PERMISSIVE` mTLS mode in production. It allows plaintext fallback, defeating the purpose of mTLS entirely.
@@ -278,8 +278,8 @@ metadata:
 spec:
   podSelector: {}
   policyTypes:
-  - Egress
-  egress: []  # No egress allowed
+    - Egress
+  egress: [] # No egress allowed
 
 ---
 # Allow specific egress for payment-service
@@ -293,27 +293,27 @@ spec:
     matchLabels:
       app: payment-service
   policyTypes:
-  - Egress
+    - Egress
   egress:
-  - to:
-    - ipBlock:
-        cidr: 54.230.0.0/16  # Stripe API IP range
-    ports:
-    - protocol: TCP
-      port: 443
+    - to:
+        - ipBlock:
+            cidr: 54.230.0.0/16 # Stripe API IP range
+      ports:
+        - protocol: TCP
+          port: 443
 ```
 
 ### 2.4 Network Segmentation Strategy
 
 **Segmentation tiers:**
 
-| Tier | Purpose | Services | Network Boundary |
-|------|---------|----------|-----------------|
-| DMZ | Public-facing | API Gateway, CDN origin | Separate VPC/subnet, WAF |
-| Application | Business logic | Order, User, Product, Billing | Private subnet, no direct internet |
-| Data | Persistent stores | PostgreSQL, Redis, Elasticsearch | Isolated subnet, no ingress except from Application tier |
-| Management | Platform services | Kubernetes API, CI/CD, monitoring | Separate VPC, VPN-only access |
-| Sensitive | PCI/HIPAA workloads | Payment processing, health records | Dedicated namespace, additional encryption, audit logging |
+| Tier        | Purpose             | Services                           | Network Boundary                                          |
+| ----------- | ------------------- | ---------------------------------- | --------------------------------------------------------- |
+| DMZ         | Public-facing       | API Gateway, CDN origin            | Separate VPC/subnet, WAF                                  |
+| Application | Business logic      | Order, User, Product, Billing      | Private subnet, no direct internet                        |
+| Data        | Persistent stores   | PostgreSQL, Redis, Elasticsearch   | Isolated subnet, no ingress except from Application tier  |
+| Management  | Platform services   | Kubernetes API, CI/CD, monitoring  | Separate VPC, VPN-only access                             |
+| Sensitive   | PCI/HIPAA workloads | Payment processing, health records | Dedicated namespace, additional encryption, audit logging |
 
 **Cross-tier rules:**
 
@@ -332,14 +332,14 @@ spec:
 
 **Requirement:** TLS EVERYWHERE. No exceptions. No plaintext traffic, not even between services in the same Kubernetes namespace.
 
-| Path | Encryption | Minimum Version | Certificate Source |
-|------|-----------|----------------|-------------------|
-| Client to Gateway | TLS 1.3 (preferred), TLS 1.2 | TLS 1.2 | Public CA (Let's Encrypt, commercial) |
-| Gateway to Service | mTLS | TLS 1.2 | Internal CA (SPIRE, Istio CA) |
-| Service to Service | mTLS | TLS 1.2 | Internal CA (SPIRE, Istio CA) |
-| Service to Database | TLS (server-verified) | TLS 1.2 | Internal CA |
-| Service to Cache | TLS | TLS 1.2 | Internal CA or cloud-managed |
-| Service to Message Queue | TLS | TLS 1.2 | Internal CA or cloud-managed |
+| Path                     | Encryption                   | Minimum Version | Certificate Source                    |
+| ------------------------ | ---------------------------- | --------------- | ------------------------------------- |
+| Client to Gateway        | TLS 1.3 (preferred), TLS 1.2 | TLS 1.2         | Public CA (Let's Encrypt, commercial) |
+| Gateway to Service       | mTLS                         | TLS 1.2         | Internal CA (SPIRE, Istio CA)         |
+| Service to Service       | mTLS                         | TLS 1.2         | Internal CA (SPIRE, Istio CA)         |
+| Service to Database      | TLS (server-verified)        | TLS 1.2         | Internal CA                           |
+| Service to Cache         | TLS                          | TLS 1.2         | Internal CA or cloud-managed          |
+| Service to Message Queue | TLS                          | TLS 1.2         | Internal CA or cloud-managed          |
 
 **Cipher suite restrictions:**
 
@@ -351,13 +351,13 @@ spec:
 
 Each microservice owns its database. Each database MUST encrypt data at rest independently.
 
-| Database Type | Encryption Method | Key Management |
-|-------------|------------------|---------------|
-| PostgreSQL | TDE (Transparent Data Encryption) or volume-level (LUKS, AWS EBS encryption) | Cloud KMS (AWS KMS, GCP Cloud KMS) |
-| MongoDB | Encrypted Storage Engine (WiredTiger) | Key vault integration |
-| Redis | Not natively encrypted -- use volume encryption + TLS for transport | Cloud-managed Redis with encryption enabled |
-| Elasticsearch | Encrypted-at-rest via searchable encryption or volume encryption | Cloud KMS |
-| Object Storage (S3) | SSE-S3 or SSE-KMS (server-side encryption) | AWS KMS with CMK |
+| Database Type       | Encryption Method                                                            | Key Management                              |
+| ------------------- | ---------------------------------------------------------------------------- | ------------------------------------------- |
+| PostgreSQL          | TDE (Transparent Data Encryption) or volume-level (LUKS, AWS EBS encryption) | Cloud KMS (AWS KMS, GCP Cloud KMS)          |
+| MongoDB             | Encrypted Storage Engine (WiredTiger)                                        | Key vault integration                       |
+| Redis               | Not natively encrypted -- use volume encryption + TLS for transport          | Cloud-managed Redis with encryption enabled |
+| Elasticsearch       | Encrypted-at-rest via searchable encryption or volume encryption             | Cloud KMS                                   |
+| Object Storage (S3) | SSE-S3 or SSE-KMS (server-side encryption)                                   | AWS KMS with CMK                            |
 
 **Envelope encryption pattern:**
 
@@ -396,14 +396,14 @@ Each microservice owns its database. Each database MUST encrypt data at rest ind
 
 **Secrets lifecycle:**
 
-| Phase | Control | Frequency |
-|-------|---------|-----------|
-| Generation | Cryptographically random, minimum 256 bits | On creation |
-| Storage | Encrypted in Vault, ACL-protected per service | Persistent |
-| Delivery | Vault Agent sidecar, Kubernetes CSI driver, or init container | On pod startup |
-| Rotation | Automatic rotation, zero-downtime (dual-read period) | Every 30-90 days |
-| Revocation | Immediate revocation via Vault lease system | On incident |
-| Audit | All access logged to SIEM | Continuous |
+| Phase      | Control                                                       | Frequency        |
+| ---------- | ------------------------------------------------------------- | ---------------- |
+| Generation | Cryptographically random, minimum 256 bits                    | On creation      |
+| Storage    | Encrypted in Vault, ACL-protected per service                 | Persistent       |
+| Delivery   | Vault Agent sidecar, Kubernetes CSI driver, or init container | On pod startup   |
+| Rotation   | Automatic rotation, zero-downtime (dual-read period)          | Every 30-90 days |
+| Revocation | Immediate revocation via Vault lease system                   | On incident      |
+| Audit      | All access logged to SIEM                                     | Continuous       |
 
 **Anti-patterns (NEVER):**
 
@@ -417,12 +417,12 @@ Each microservice owns its database. Each database MUST encrypt data at rest ind
 
 **Data classification:**
 
-| Classification | Examples | Handling Requirements |
-|---------------|---------|----------------------|
-| PUBLIC | Product names, prices, categories | No restrictions on transit or storage |
-| INTERNAL | Order IDs, employee names | Encrypted in transit, access-controlled |
-| CONFIDENTIAL | Email addresses, phone numbers, addresses | Encrypted at rest and in transit, access-logged, minimized |
-| RESTRICTED | SSN, credit card numbers, health records | Encrypted everywhere, tokenized, access requires justification, audit trail |
+| Classification | Examples                                  | Handling Requirements                                                       |
+| -------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| PUBLIC         | Product names, prices, categories         | No restrictions on transit or storage                                       |
+| INTERNAL       | Order IDs, employee names                 | Encrypted in transit, access-controlled                                     |
+| CONFIDENTIAL   | Email addresses, phone numbers, addresses | Encrypted at rest and in transit, access-logged, minimized                  |
+| RESTRICTED     | SSN, credit card numbers, health records  | Encrypted everywhere, tokenized, access requires justification, audit trail |
 
 **Cross-service PII rules:**
 
@@ -451,32 +451,32 @@ The API Gateway is the single enforcement point for all external API traffic.
 
 **Required controls:**
 
-| Control | Configuration | Rationale |
-|---------|-------------|-----------|
-| Rate limiting | 100 req/min per client (configurable per endpoint) | Prevent abuse, protect backend services |
-| Request size limit | 1 MB default, 10 MB for file uploads | Prevent resource exhaustion |
-| Timeout enforcement | 30s gateway timeout, 15s upstream timeout | Prevent slow-loris and connection exhaustion |
-| Input validation | JSON schema validation at gateway | Reject malformed requests before they reach services |
-| Content-type enforcement | Reject requests with unexpected Content-Type | Prevent content-type confusion attacks |
-| CORS policy | Explicit origin allowlist, no wildcards | Prevent cross-origin attacks |
-| WAF | OWASP Core Rule Set (CRS) v4 | Block known attack patterns (SQLi, XSS, LFI) |
-| Bot detection | Challenge-response for suspicious traffic patterns | Prevent automated abuse |
-| Request ID injection | X-Request-ID header for distributed tracing | Forensic correlation |
+| Control                  | Configuration                                      | Rationale                                            |
+| ------------------------ | -------------------------------------------------- | ---------------------------------------------------- |
+| Rate limiting            | 100 req/min per client (configurable per endpoint) | Prevent abuse, protect backend services              |
+| Request size limit       | 1 MB default, 10 MB for file uploads               | Prevent resource exhaustion                          |
+| Timeout enforcement      | 30s gateway timeout, 15s upstream timeout          | Prevent slow-loris and connection exhaustion         |
+| Input validation         | JSON schema validation at gateway                  | Reject malformed requests before they reach services |
+| Content-type enforcement | Reject requests with unexpected Content-Type       | Prevent content-type confusion attacks               |
+| CORS policy              | Explicit origin allowlist, no wildcards            | Prevent cross-origin attacks                         |
+| WAF                      | OWASP Core Rule Set (CRS) v4                       | Block known attack patterns (SQLi, XSS, LFI)         |
+| Bot detection            | Challenge-response for suspicious traffic patterns | Prevent automated abuse                              |
+| Request ID injection     | X-Request-ID header for distributed tracing        | Forensic correlation                                 |
 
 ### 4.2 OWASP API Security Top 10 Mitigations
 
-| # | Risk | Mitigation |
-|---|------|-----------|
-| API1 | Broken Object Level Authorization | Validate resource ownership on EVERY request. Never rely on client-supplied IDs without ownership check. |
-| API2 | Broken Authentication | OAuth 2.1 + PKCE, short-lived tokens (<=15 min), MFA for sensitive operations |
-| API3 | Broken Object Property Level Authorization | Response filtering -- never return fields the caller is not authorized to see. Use DTOs, not raw entities. |
-| API4 | Unrestricted Resource Consumption | Rate limiting, pagination limits, query complexity limits, request size limits |
-| API5 | Broken Function Level Authorization | Role-based endpoint access; admin endpoints on separate path with additional auth |
-| API6 | Unrestricted Access to Sensitive Business Flows | Business logic rate limiting (e.g., max 3 password reset requests per hour) |
-| API7 | Server Side Request Forgery (SSRF) | Validate/sanitize all URLs; use allowlists for outbound requests; block internal IP ranges |
-| API8 | Security Misconfiguration | Automated security headers, remove default credentials, disable unnecessary HTTP methods |
-| API9 | Improper Inventory Management | API registry/catalog, deprecation policy, version sunset enforcement |
-| API10 | Unsafe Consumption of APIs | Validate responses from third-party APIs; treat external data as untrusted input |
+| #     | Risk                                            | Mitigation                                                                                                 |
+| ----- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| API1  | Broken Object Level Authorization               | Validate resource ownership on EVERY request. Never rely on client-supplied IDs without ownership check.   |
+| API2  | Broken Authentication                           | OAuth 2.1 + PKCE, short-lived tokens (<=15 min), MFA for sensitive operations                              |
+| API3  | Broken Object Property Level Authorization      | Response filtering -- never return fields the caller is not authorized to see. Use DTOs, not raw entities. |
+| API4  | Unrestricted Resource Consumption               | Rate limiting, pagination limits, query complexity limits, request size limits                             |
+| API5  | Broken Function Level Authorization             | Role-based endpoint access; admin endpoints on separate path with additional auth                          |
+| API6  | Unrestricted Access to Sensitive Business Flows | Business logic rate limiting (e.g., max 3 password reset requests per hour)                                |
+| API7  | Server Side Request Forgery (SSRF)              | Validate/sanitize all URLs; use allowlists for outbound requests; block internal IP ranges                 |
+| API8  | Security Misconfiguration                       | Automated security headers, remove default credentials, disable unnecessary HTTP methods                   |
+| API9  | Improper Inventory Management                   | API registry/catalog, deprecation policy, version sunset enforcement                                       |
+| API10 | Unsafe Consumption of APIs                      | Validate responses from third-party APIs; treat external data as untrusted input                           |
 
 ### 4.3 API Versioning and Deprecation Security
 
@@ -494,35 +494,35 @@ The API Gateway is the single enforcement point for all external API traffic.
 
 **Policy:**
 
-| State | Security Updates | New Features | Timeline |
-|-------|-----------------|-------------|----------|
-| Active | YES | YES | Current |
-| Deprecated | Security-critical only | NO | 6 months after deprecation notice |
-| Sunset | NO | NO | Hard removal, 410 response |
+| State      | Security Updates       | New Features | Timeline                          |
+| ---------- | ---------------------- | ------------ | --------------------------------- |
+| Active     | YES                    | YES          | Current                           |
+| Deprecated | Security-critical only | NO           | 6 months after deprecation notice |
+| Sunset     | NO                     | NO           | Hard removal, 410 response        |
 
 ### 4.4 GraphQL/gRPC Security Considerations
 
 **GraphQL:**
 
-| Risk | Mitigation |
-|------|-----------|
-| Query depth attacks | Enforce maximum query depth (e.g., 10 levels) |
-| Query complexity abuse | Assign cost to each field; reject queries exceeding cost budget |
-| Introspection in production | DISABLE introspection in production (`introspection: false`) |
-| Batching attacks | Limit batch size; rate-limit by query count, not HTTP request count |
-| Authorization bypass | Field-level authorization, not just type-level |
-| Injection via variables | Validate all variable inputs against expected types |
+| Risk                        | Mitigation                                                          |
+| --------------------------- | ------------------------------------------------------------------- |
+| Query depth attacks         | Enforce maximum query depth (e.g., 10 levels)                       |
+| Query complexity abuse      | Assign cost to each field; reject queries exceeding cost budget     |
+| Introspection in production | DISABLE introspection in production (`introspection: false`)        |
+| Batching attacks            | Limit batch size; rate-limit by query count, not HTTP request count |
+| Authorization bypass        | Field-level authorization, not just type-level                      |
+| Injection via variables     | Validate all variable inputs against expected types                 |
 
 **gRPC:**
 
-| Risk | Mitigation |
-|------|-----------|
-| Message size attacks | Set `MaxRecvMsgSize` and `MaxSendMsgSize` (default 4 MB) |
-| Stream abuse | Limit concurrent streams per connection; enforce keepalive |
-| Reflection in production | Disable gRPC reflection service in production |
-| Missing TLS | Always use gRPC with TLS (`grpc.WithTransportCredentials`) |
-| Proto definition leaks | Do not expose .proto files publicly |
-| Interceptor bypass | Apply auth interceptors to ALL services, including health checks |
+| Risk                     | Mitigation                                                       |
+| ------------------------ | ---------------------------------------------------------------- |
+| Message size attacks     | Set `MaxRecvMsgSize` and `MaxSendMsgSize` (default 4 MB)         |
+| Stream abuse             | Limit concurrent streams per connection; enforce keepalive       |
+| Reflection in production | Disable gRPC reflection service in production                    |
+| Missing TLS              | Always use gRPC with TLS (`grpc.WithTransportCredentials`)       |
+| Proto definition leaks   | Do not expose .proto files publicly                              |
+| Interceptor bypass       | Apply auth interceptors to ALL services, including health checks |
 
 ---
 
@@ -547,14 +547,14 @@ Service D ---|                          +--------------------+      Elastic SIEM
 
 **Security events that MUST be logged:**
 
-| Event Category | Examples | Severity |
-|---------------|---------|----------|
-| Authentication | Login success/failure, token issuance, token refresh, MFA challenge | HIGH |
-| Authorization | Access denied, role change, permission escalation | HIGH |
-| Data access | PII read/write, bulk export, sensitive field access | MEDIUM-HIGH |
-| Configuration | Secret rotation, policy change, certificate renewal | MEDIUM |
-| Error | Unhandled exception, circuit breaker open, timeout | MEDIUM |
-| Network | Blocked connection, mTLS failure, unexpected source IP | HIGH |
+| Event Category | Examples                                                            | Severity    |
+| -------------- | ------------------------------------------------------------------- | ----------- |
+| Authentication | Login success/failure, token issuance, token refresh, MFA challenge | HIGH        |
+| Authorization  | Access denied, role change, permission escalation                   | HIGH        |
+| Data access    | PII read/write, bulk export, sensitive field access                 | MEDIUM-HIGH |
+| Configuration  | Secret rotation, policy change, certificate renewal                 | MEDIUM      |
+| Error          | Unhandled exception, circuit breaker open, timeout                  | MEDIUM      |
+| Network        | Blocked connection, mTLS failure, unexpected source IP              | HIGH        |
 
 **Log format (structured JSON, OpenTelemetry-compatible):**
 
@@ -626,15 +626,15 @@ Span attributes for security events:
 
 **Anomaly indicators:**
 
-| Indicator | Detection Method | Response |
-|-----------|-----------------|----------|
-| Unexpected service-to-service call | Service mesh policy violation (denied connections) | Alert + block |
-| Traffic volume spike (10x baseline) | Prometheus alert on rate metric | Alert + investigate |
-| New source IP for internal traffic | Istio access log analysis | Alert + investigate |
-| Elevated error rate (>5% 5xx) | SLO burn-rate alert | Alert + circuit breaker |
-| Unusual data access pattern | Database audit log correlation | Alert + flag for review |
-| Certificate validation failure | mTLS handshake failure metrics | Alert + block |
-| Lateral movement pattern | Graph analysis of service call chains | Alert + isolate |
+| Indicator                           | Detection Method                                   | Response                |
+| ----------------------------------- | -------------------------------------------------- | ----------------------- |
+| Unexpected service-to-service call  | Service mesh policy violation (denied connections) | Alert + block           |
+| Traffic volume spike (10x baseline) | Prometheus alert on rate metric                    | Alert + investigate     |
+| New source IP for internal traffic  | Istio access log analysis                          | Alert + investigate     |
+| Elevated error rate (>5% 5xx)       | SLO burn-rate alert                                | Alert + circuit breaker |
+| Unusual data access pattern         | Database audit log correlation                     | Alert + flag for review |
+| Certificate validation failure      | mTLS handshake failure metrics                     | Alert + block           |
+| Lateral movement pattern            | Graph analysis of service call chains              | Alert + isolate         |
 
 ### 5.4 Incident Response in a Microservices Environment
 
@@ -647,14 +647,14 @@ Span attributes for security events:
 
 **IR playbook outline:**
 
-| Phase | Actions | Tools |
-|-------|---------|-------|
-| **Detection** | Alert fires from SIEM/anomaly detection | Prometheus, Alertmanager, SIEM |
-| **Triage** | Determine affected services via trace analysis; classify severity | Jaeger/Tempo, service mesh dashboard |
-| **Containment** | Isolate compromised service (NetworkPolicy block, scale to 0, or circuit breaker) | kubectl, Istio AuthorizationPolicy |
-| **Eradication** | Rotate compromised credentials, patch vulnerability, rebuild container image | Vault, CI/CD pipeline, image registry |
-| **Recovery** | Redeploy clean image, verify mTLS, restore data from encrypted backup | ArgoCD/Flux, Vault, database restore |
-| **Post-incident** | Blameless post-mortem, update runbooks, improve detection rules | Confluence/Notion, Prometheus rules |
+| Phase             | Actions                                                                           | Tools                                 |
+| ----------------- | --------------------------------------------------------------------------------- | ------------------------------------- |
+| **Detection**     | Alert fires from SIEM/anomaly detection                                           | Prometheus, Alertmanager, SIEM        |
+| **Triage**        | Determine affected services via trace analysis; classify severity                 | Jaeger/Tempo, service mesh dashboard  |
+| **Containment**   | Isolate compromised service (NetworkPolicy block, scale to 0, or circuit breaker) | kubectl, Istio AuthorizationPolicy    |
+| **Eradication**   | Rotate compromised credentials, patch vulnerability, rebuild container image      | Vault, CI/CD pipeline, image registry |
+| **Recovery**      | Redeploy clean image, verify mTLS, restore data from encrypted backup             | ArgoCD/Flux, Vault, database restore  |
+| **Post-incident** | Blameless post-mortem, update runbooks, improve detection rules                   | Confluence/Notion, Prometheus rules   |
 
 **Containment patterns:**
 
@@ -671,7 +671,7 @@ spec:
       app: billing-service
   action: DENY
   rules:
-  - {}  # Deny ALL traffic to this service
+    - {} # Deny ALL traffic to this service
 ```
 
 ---
@@ -697,15 +697,15 @@ Developer --> Dockerfile --> Build --> Scan --> Sign --> Registry --> Deploy
 
 **Scanning requirements:**
 
-| Check | Tool | Blocking Threshold |
-|-------|------|-------------------|
-| OS-level CVEs | Trivy, Grype | Block on CRITICAL; warn on HIGH |
-| Application dependency CVEs | Trivy, Snyk | Block on CRITICAL; warn on HIGH |
-| Dockerfile best practices | Hadolint | Block on DL3000-level errors |
-| Secrets in image layers | TruffleHog, gitleaks | Block on any detection |
-| Base image currency | Custom policy | Block if base image > 30 days old |
-| Non-root user enforcement | Hadolint, OPA | Block if `USER` directive missing |
-| Image size sanity | Custom check | Warn if > 500 MB |
+| Check                       | Tool                 | Blocking Threshold                |
+| --------------------------- | -------------------- | --------------------------------- |
+| OS-level CVEs               | Trivy, Grype         | Block on CRITICAL; warn on HIGH   |
+| Application dependency CVEs | Trivy, Snyk          | Block on CRITICAL; warn on HIGH   |
+| Dockerfile best practices   | Hadolint             | Block on DL3000-level errors      |
+| Secrets in image layers     | TruffleHog, gitleaks | Block on any detection            |
+| Base image currency         | Custom policy        | Block if base image > 30 days old |
+| Non-root user enforcement   | Hadolint, OPA        | Block if `USER` directive missing |
+| Image size sanity           | Custom check         | Warn if > 500 MB                  |
 
 **Image signing (Cosign/Sigstore):**
 
@@ -728,13 +728,13 @@ cosign verify --key cosign.pub ghcr.io/myorg/order-service:v1.2.3
 
 **Runtime protection layers:**
 
-| Layer | Tool | Purpose |
-|-------|------|---------|
-| Syscall filtering | Falco, Seccomp profiles | Detect/block unexpected system calls |
-| File integrity | Falco, AIDE | Alert on unexpected file modifications in running containers |
-| Network monitoring | Cilium (eBPF), Falco | Detect unexpected network connections |
-| Process monitoring | Falco | Alert on unexpected process execution (e.g., shell in a web container) |
-| Memory protection | gVisor, Kata Containers | Kernel-level isolation for high-risk workloads |
+| Layer              | Tool                    | Purpose                                                                |
+| ------------------ | ----------------------- | ---------------------------------------------------------------------- |
+| Syscall filtering  | Falco, Seccomp profiles | Detect/block unexpected system calls                                   |
+| File integrity     | Falco, AIDE             | Alert on unexpected file modifications in running containers           |
+| Network monitoring | Cilium (eBPF), Falco    | Detect unexpected network connections                                  |
+| Process monitoring | Falco                   | Alert on unexpected process execution (e.g., shell in a web container) |
+| Memory protection  | gVisor, Kata Containers | Kernel-level isolation for high-risk workloads                         |
 
 **Falco rules (examples):**
 
@@ -746,7 +746,7 @@ cosign verify --key cosign.pub ghcr.io/myorg/order-service:v1.2.3
     spawned_process and
     proc.name in (bash, sh, zsh, csh, dash) and
     not container.image.repository in (allowed_debug_images)
-  output: "Shell spawned in container (user=%user.name container=%container.name image=%container.image.repository)"
+  output: 'Shell spawned in container (user=%user.name container=%container.name image=%container.image.repository)'
   priority: WARNING
 
 - rule: Unexpected outbound connection
@@ -756,7 +756,7 @@ cosign verify --key cosign.pub ghcr.io/myorg/order-service:v1.2.3
     outbound and
     not fd.sip.name in (expected_external_hosts) and
     not fd.sport in (53, 443)
-  output: "Unexpected outbound connection (container=%container.name dest=%fd.sip.name:%fd.sport)"
+  output: 'Unexpected outbound connection (container=%container.name dest=%fd.sip.name:%fd.sport)'
   priority: CRITICAL
 ```
 
@@ -766,13 +766,13 @@ cosign verify --key cosign.pub ghcr.io/myorg/order-service:v1.2.3
 
 **Management strategy:**
 
-| Activity | Frequency | Tool | Owner |
-|----------|----------|------|-------|
-| Dependency audit | Every CI build | `npm audit`, `pnpm audit`, Snyk, Socket.dev | CI pipeline |
-| CVE alerting | Continuous | Dependabot, Snyk | Security team |
-| Patch SLA | Critical: 24h, High: 7 days, Medium: 30 days | Jira/Linear integration | Service team |
-| License compliance | Weekly scan | FOSSA, Licensee | Legal + Engineering |
-| SBOM generation | Every release | Syft, CycloneDX | CI pipeline |
+| Activity           | Frequency                                    | Tool                                        | Owner               |
+| ------------------ | -------------------------------------------- | ------------------------------------------- | ------------------- |
+| Dependency audit   | Every CI build                               | `npm audit`, `pnpm audit`, Snyk, Socket.dev | CI pipeline         |
+| CVE alerting       | Continuous                                   | Dependabot, Snyk                            | Security team       |
+| Patch SLA          | Critical: 24h, High: 7 days, Medium: 30 days | Jira/Linear integration                     | Service team        |
+| License compliance | Weekly scan                                  | FOSSA, Licensee                             | Legal + Engineering |
+| SBOM generation    | Every release                                | Syft, CycloneDX                             | CI pipeline         |
 
 **Dependency confusion defense:**
 
@@ -785,12 +785,12 @@ cosign verify --key cosign.pub ghcr.io/myorg/order-service:v1.2.3
 
 **SLSA (Supply-chain Levels for Software Artifacts) compliance targets:**
 
-| SLSA Level | Requirements | Target |
-|-----------|-------------|--------|
-| L1 | Build process exists, documented | Baseline |
-| L2 | Version-controlled build, authenticated provenance | Minimum for production |
-| L3 | Hardened build platform, non-falsifiable provenance | Target for all services |
-| L4 | Two-party review, hermetic builds | Aspirational for critical services |
+| SLSA Level | Requirements                                        | Target                             |
+| ---------- | --------------------------------------------------- | ---------------------------------- |
+| L1         | Build process exists, documented                    | Baseline                           |
+| L2         | Version-controlled build, authenticated provenance  | Minimum for production             |
+| L3         | Hardened build platform, non-falsifiable provenance | Target for all services            |
+| L4         | Two-party review, hermetic builds                   | Aspirational for critical services |
 
 **Pipeline security controls:**
 
@@ -834,74 +834,74 @@ Developer --> PR --> Code Review (2 approvers) --> Merge to main
 
 #### Spoofing
 
-| Threat | Attack Vector | Affected Component | Severity | Mitigation |
-|--------|-------------|-------------------|----------|-----------|
-| S1: Service impersonation | Compromised container assumes identity of another service | Service mesh, inter-service calls | CRITICAL | mTLS with SPIFFE/SPIRE; every workload gets unique, short-lived identity certificate |
-| S2: User identity spoofing | Stolen or forged JWT | API Gateway, all services | CRITICAL | RS256/ES256 signatures (never HS256 with shared secret); short expiry (15 min); refresh token rotation with reuse detection |
-| S3: API gateway bypass | Direct access to service ports | Network layer | HIGH | Kubernetes NetworkPolicy denying all ingress except from mesh; service mesh `PeerAuthentication: STRICT` |
-| S4: Token replay | Intercepted JWT reused on different service | Inter-service communication | HIGH | DPoP (Demonstrating Proof-of-Possession) for sender-constrained tokens; mTLS binding |
+| Threat                     | Attack Vector                                             | Affected Component                | Severity | Mitigation                                                                                                                  |
+| -------------------------- | --------------------------------------------------------- | --------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| S1: Service impersonation  | Compromised container assumes identity of another service | Service mesh, inter-service calls | CRITICAL | mTLS with SPIFFE/SPIRE; every workload gets unique, short-lived identity certificate                                        |
+| S2: User identity spoofing | Stolen or forged JWT                                      | API Gateway, all services         | CRITICAL | RS256/ES256 signatures (never HS256 with shared secret); short expiry (15 min); refresh token rotation with reuse detection |
+| S3: API gateway bypass     | Direct access to service ports                            | Network layer                     | HIGH     | Kubernetes NetworkPolicy denying all ingress except from mesh; service mesh `PeerAuthentication: STRICT`                    |
+| S4: Token replay           | Intercepted JWT reused on different service               | Inter-service communication       | HIGH     | DPoP (Demonstrating Proof-of-Possession) for sender-constrained tokens; mTLS binding                                        |
 
 #### Tampering
 
-| Threat | Attack Vector | Affected Component | Severity | Mitigation |
-|--------|-------------|-------------------|----------|-----------|
-| T1: Request modification | Man-in-the-middle on east-west traffic | Inter-service communication | CRITICAL | mTLS provides integrity; all traffic encrypted and authenticated |
-| T2: Data tampering in transit | Modified messages between services | Message queues, event bus | HIGH | Message-level signing (JWS) for events; TLS for queue connections |
-| T3: Configuration tampering | Unauthorized modification of service config | ConfigMaps, environment variables | HIGH | Immutable ConfigMaps; GitOps with signed commits; OPA admission policies |
-| T4: Log tampering | Attacker modifies logs to cover tracks | Log pipeline | MEDIUM | Append-only log storage; hash chain verification; ship to immutable SIEM |
+| Threat                        | Attack Vector                               | Affected Component                | Severity | Mitigation                                                               |
+| ----------------------------- | ------------------------------------------- | --------------------------------- | -------- | ------------------------------------------------------------------------ |
+| T1: Request modification      | Man-in-the-middle on east-west traffic      | Inter-service communication       | CRITICAL | mTLS provides integrity; all traffic encrypted and authenticated         |
+| T2: Data tampering in transit | Modified messages between services          | Message queues, event bus         | HIGH     | Message-level signing (JWS) for events; TLS for queue connections        |
+| T3: Configuration tampering   | Unauthorized modification of service config | ConfigMaps, environment variables | HIGH     | Immutable ConfigMaps; GitOps with signed commits; OPA admission policies |
+| T4: Log tampering             | Attacker modifies logs to cover tracks      | Log pipeline                      | MEDIUM   | Append-only log storage; hash chain verification; ship to immutable SIEM |
 
 #### Repudiation
 
-| Threat | Attack Vector | Affected Component | Severity | Mitigation |
-|--------|-------------|-------------------|----------|-----------|
-| R1: Unattributed actions | Actions without user context in service-to-service calls | All services | HIGH | Propagate user context (JWT claims) through entire call chain; log user_id + trace_id on every action |
-| R2: Missing audit trail | Security events not logged | All services | HIGH | Mandatory audit logging for auth, authz, data access, config changes; log integrity verification |
-| R3: Timestamp manipulation | Clock skew across services | Distributed system | MEDIUM | NTP synchronization required; include service-local timestamp AND gateway timestamp; tolerate 30s clock skew in JWT validation |
+| Threat                     | Attack Vector                                            | Affected Component | Severity | Mitigation                                                                                                                     |
+| -------------------------- | -------------------------------------------------------- | ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| R1: Unattributed actions   | Actions without user context in service-to-service calls | All services       | HIGH     | Propagate user context (JWT claims) through entire call chain; log user_id + trace_id on every action                          |
+| R2: Missing audit trail    | Security events not logged                               | All services       | HIGH     | Mandatory audit logging for auth, authz, data access, config changes; log integrity verification                               |
+| R3: Timestamp manipulation | Clock skew across services                               | Distributed system | MEDIUM   | NTP synchronization required; include service-local timestamp AND gateway timestamp; tolerate 30s clock skew in JWT validation |
 
 #### Information Disclosure
 
-| Threat | Attack Vector | Affected Component | Severity | Mitigation |
-|--------|-------------|-------------------|----------|-----------|
-| I1: Secrets in container image | Hard-coded credentials in Dockerfile or image layers | Container registry | CRITICAL | Secret scanning in CI; Vault for runtime secret delivery; never bake secrets into images |
-| I2: Error message leakage | Stack traces or internal details in API responses | API responses | HIGH | Generic error messages to clients; detailed errors to logs only; custom error handler middleware |
-| I3: PII in logs | Personal data appearing in log output | Log pipeline | HIGH | Structured logging with PII sanitization; log review automation; never log request/response bodies containing PII |
-| I4: Side-channel data leak | Timing attacks on authorization checks | Auth middleware | MEDIUM | Constant-time comparison for secrets; avoid early returns that leak existence of resources |
-| I5: Database exposure | Unencrypted database accessible from compromised service | Data tier | CRITICAL | Encryption at rest; per-service database credentials with minimum privileges; network segmentation |
+| Threat                         | Attack Vector                                            | Affected Component | Severity | Mitigation                                                                                                        |
+| ------------------------------ | -------------------------------------------------------- | ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| I1: Secrets in container image | Hard-coded credentials in Dockerfile or image layers     | Container registry | CRITICAL | Secret scanning in CI; Vault for runtime secret delivery; never bake secrets into images                          |
+| I2: Error message leakage      | Stack traces or internal details in API responses        | API responses      | HIGH     | Generic error messages to clients; detailed errors to logs only; custom error handler middleware                  |
+| I3: PII in logs                | Personal data appearing in log output                    | Log pipeline       | HIGH     | Structured logging with PII sanitization; log review automation; never log request/response bodies containing PII |
+| I4: Side-channel data leak     | Timing attacks on authorization checks                   | Auth middleware    | MEDIUM   | Constant-time comparison for secrets; avoid early returns that leak existence of resources                        |
+| I5: Database exposure          | Unencrypted database accessible from compromised service | Data tier          | CRITICAL | Encryption at rest; per-service database credentials with minimum privileges; network segmentation                |
 
 #### Denial of Service
 
-| Threat | Attack Vector | Affected Component | Severity | Mitigation |
-|--------|-------------|-------------------|----------|-----------|
-| D1: Cascading failure | One service failure cascades through dependency chain | All services | CRITICAL | Circuit breakers (Istio/Envoy); bulkhead pattern (resource isolation); retry budgets (not unbounded retries) |
-| D2: Resource exhaustion | Malicious or buggy client sends excessive requests | API Gateway, individual services | HIGH | Rate limiting at gateway; per-service resource limits (CPU, memory, connection pool); request timeout enforcement |
-| D3: Slow loris attack | Slow HTTP connections exhaust connection pool | API Gateway | HIGH | Connection timeout at gateway; minimum data rate enforcement; HTTP/2 with stream limits |
-| D4: Queue flooding | Burst of messages overwhelms consumer | Message queue | MEDIUM | Queue depth limits; dead letter queues; consumer auto-scaling with backpressure |
+| Threat                  | Attack Vector                                         | Affected Component               | Severity | Mitigation                                                                                                        |
+| ----------------------- | ----------------------------------------------------- | -------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| D1: Cascading failure   | One service failure cascades through dependency chain | All services                     | CRITICAL | Circuit breakers (Istio/Envoy); bulkhead pattern (resource isolation); retry budgets (not unbounded retries)      |
+| D2: Resource exhaustion | Malicious or buggy client sends excessive requests    | API Gateway, individual services | HIGH     | Rate limiting at gateway; per-service resource limits (CPU, memory, connection pool); request timeout enforcement |
+| D3: Slow loris attack   | Slow HTTP connections exhaust connection pool         | API Gateway                      | HIGH     | Connection timeout at gateway; minimum data rate enforcement; HTTP/2 with stream limits                           |
+| D4: Queue flooding      | Burst of messages overwhelms consumer                 | Message queue                    | MEDIUM   | Queue depth limits; dead letter queues; consumer auto-scaling with backpressure                                   |
 
 #### Elevation of Privilege
 
-| Threat | Attack Vector | Affected Component | Severity | Mitigation |
-|--------|-------------|-------------------|----------|-----------|
-| E1: Container escape | Exploit kernel vulnerability to escape container | Container runtime | CRITICAL | Minimal base images (distroless); no root user; read-only filesystem; Seccomp profiles; consider gVisor for high-risk workloads |
-| E2: RBAC misconfiguration | Overly permissive Kubernetes RBAC | Kubernetes API | CRITICAL | Least-privilege RBAC; no cluster-admin for applications; regular RBAC audit; OPA Gatekeeper policies |
-| E3: Privilege escalation via service account | Service account token used to access Kubernetes API | Kubernetes | HIGH | Disable service account token automounting; use bound service account tokens; restrict API server access via RBAC |
-| E4: Cross-tenant data access | Multi-tenant service returns data from wrong tenant | Application layer | CRITICAL | Tenant ID in JWT claims; tenant filter applied at database query layer (not just application logic); integration tests for tenant isolation |
+| Threat                                       | Attack Vector                                       | Affected Component | Severity | Mitigation                                                                                                                                  |
+| -------------------------------------------- | --------------------------------------------------- | ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| E1: Container escape                         | Exploit kernel vulnerability to escape container    | Container runtime  | CRITICAL | Minimal base images (distroless); no root user; read-only filesystem; Seccomp profiles; consider gVisor for high-risk workloads             |
+| E2: RBAC misconfiguration                    | Overly permissive Kubernetes RBAC                   | Kubernetes API     | CRITICAL | Least-privilege RBAC; no cluster-admin for applications; regular RBAC audit; OPA Gatekeeper policies                                        |
+| E3: Privilege escalation via service account | Service account token used to access Kubernetes API | Kubernetes         | HIGH     | Disable service account token automounting; use bound service account tokens; restrict API server access via RBAC                           |
+| E4: Cross-tenant data access                 | Multi-tenant service returns data from wrong tenant | Application layer  | CRITICAL | Tenant ID in JWT claims; tenant filter applied at database query layer (not just application logic); integration tests for tenant isolation |
 
 ### 7.2 Attack Surface Comparison: Monolith vs Microservices
 
-| Dimension | Monolith | Microservices | Risk Direction |
-|-----------|---------|---------------|---------------|
-| **Network endpoints** | 1 external endpoint | 1 external + N internal endpoints | INCREASED -- each internal endpoint is an attack surface |
-| **Credential sets** | 1 DB password, 1 cache password | N DB passwords, N API keys, N certificates | INCREASED -- more secrets to manage and rotate |
-| **Container images** | 1 image | N images, each with own dependency tree | INCREASED -- N supply chains to monitor |
-| **Inter-process communication** | In-memory function calls (0 network) | N*(N-1)/2 potential network paths | INCREASED -- network-level attacks now possible between components |
-| **Authentication surface** | Session cookie at one boundary | JWT + mTLS at N boundaries | INCREASED -- more auth mechanisms to implement correctly |
-| **Authorization complexity** | Single middleware stack | N authorization implementations | INCREASED -- consistency and completeness harder to verify |
-| **Configuration surface** | 1 config file | N ConfigMaps, N env vars, N secrets | INCREASED -- more misconfiguration opportunities |
-| **Observability** | Single log stream | N log streams requiring aggregation | INCREASED -- forensics requires distributed tracing |
-| **Deployment surface** | 1 deployment artifact | N deployment artifacts, N pipelines | INCREASED -- more CI/CD pipelines to secure |
-| **Blast radius** | Full application | Single service (if properly isolated) | DECREASED -- proper segmentation limits blast radius |
-| **Horizontal scaling** | Entire application scales | Individual service scales | NEUTRAL -- security-irrelevant but operationally relevant |
-| **Technology diversity** | Single stack | Multiple stacks possible | MIXED -- polyglot brings diverse vulnerabilities but limits single-exploit blast |
+| Dimension                       | Monolith                             | Microservices                              | Risk Direction                                                                   |
+| ------------------------------- | ------------------------------------ | ------------------------------------------ | -------------------------------------------------------------------------------- |
+| **Network endpoints**           | 1 external endpoint                  | 1 external + N internal endpoints          | INCREASED -- each internal endpoint is an attack surface                         |
+| **Credential sets**             | 1 DB password, 1 cache password      | N DB passwords, N API keys, N certificates | INCREASED -- more secrets to manage and rotate                                   |
+| **Container images**            | 1 image                              | N images, each with own dependency tree    | INCREASED -- N supply chains to monitor                                          |
+| **Inter-process communication** | In-memory function calls (0 network) | N\*(N-1)/2 potential network paths         | INCREASED -- network-level attacks now possible between components               |
+| **Authentication surface**      | Session cookie at one boundary       | JWT + mTLS at N boundaries                 | INCREASED -- more auth mechanisms to implement correctly                         |
+| **Authorization complexity**    | Single middleware stack              | N authorization implementations            | INCREASED -- consistency and completeness harder to verify                       |
+| **Configuration surface**       | 1 config file                        | N ConfigMaps, N env vars, N secrets        | INCREASED -- more misconfiguration opportunities                                 |
+| **Observability**               | Single log stream                    | N log streams requiring aggregation        | INCREASED -- forensics requires distributed tracing                              |
+| **Deployment surface**          | 1 deployment artifact                | N deployment artifacts, N pipelines        | INCREASED -- more CI/CD pipelines to secure                                      |
+| **Blast radius**                | Full application                     | Single service (if properly isolated)      | DECREASED -- proper segmentation limits blast radius                             |
+| **Horizontal scaling**          | Entire application scales            | Individual service scales                  | NEUTRAL -- security-irrelevant but operationally relevant                        |
+| **Technology diversity**        | Single stack                         | Multiple stacks possible                   | MIXED -- polyglot brings diverse vulnerabilities but limits single-exploit blast |
 
 **Key insight:** Microservices dramatically INCREASE the attack surface but also ENABLE fine-grained containment. The security benefit of microservices is NOT a smaller attack surface -- it is a smaller blast radius per compromise, IF the segmentation and isolation controls are properly implemented.
 
@@ -916,6 +916,7 @@ The transition period -- when some functionality runs in the monolith and some i
 **Attack scenario:** Monolith session is valid but JWT is expired (or vice versa). Depending on routing, the request may be accepted by one backend but should have been rejected by the other.
 
 **Mitigation:**
+
 - Single source of truth for authentication (IdP issues both session tokens and JWTs during transition)
 - Gateway validates BOTH mechanisms during dual-run period
 - Audit logging compares auth decisions between old and new paths
@@ -928,6 +929,7 @@ The transition period -- when some functionality runs in the monolith and some i
 **Attack scenario:** User role revoked in new service, but monolith's cached role data still grants access.
 
 **Mitigation:**
+
 - Single source of truth for authorization data during transition
 - Event-driven synchronization with conflict detection
 - Read-your-writes consistency for authorization-critical data
@@ -940,6 +942,7 @@ The transition period -- when some functionality runs in the monolith and some i
 **Attack scenario:** New service deployed to production with TLS but without mTLS, without rate limiting, without audit logging. Attacker exploits the gap.
 
 **Mitigation:**
+
 - Security baseline checklist gated in CI/CD (no deploy without minimum controls)
 - Service mesh with STRICT mTLS deployed BEFORE first microservice
 - Minimum Viable Security (MVS): mTLS, auth, rate limit, logging required before any service goes live
@@ -952,6 +955,7 @@ The transition period -- when some functionality runs in the monolith and some i
 **Attack scenario:** Known CVE in monolith's framework is exploited because no one patched it -- attention is on the new services.
 
 **Mitigation:**
+
 - Monolith dependency updates included in sprint planning until full decommission
 - Automated vulnerability scanning on monolith CI pipeline (same standards as services)
 - Defined decommission timeline with accountability
@@ -964,6 +968,7 @@ The transition period -- when some functionality runs in the monolith and some i
 **Attack scenario:** New service deployed with database password in environment variable (monolith pattern) instead of Vault (new pattern). Password exposed via crash dump or process listing.
 
 **Mitigation:**
+
 - Vault or cloud KMS deployed BEFORE first microservice
 - Migration playbook includes "secrets migration" as a mandatory step
 - Automated scanning for secrets in environment variables, ConfigMaps, and image layers
@@ -973,33 +978,33 @@ The transition period -- when some functionality runs in the monolith and some i
 
 ## Appendix A: Security Controls Summary
 
-| Control ID | Control | Priority | OWASP | STRIDE |
-|-----------|---------|----------|-------|--------|
-| SEC-AUTH-01 | OAuth 2.1 + PKCE at API Gateway | P0 | A07 | S1, S2 |
-| SEC-AUTH-02 | mTLS for all east-west traffic | P0 | -- | S1, S3, T1 |
-| SEC-AUTH-03 | JWT RS256/ES256, max 15 min lifetime | P0 | A07 | S2, S4 |
-| SEC-AUTH-04 | Per-service RBAC/ABAC authorization | P0 | API1, API5 | E4 |
-| SEC-NET-01 | NetworkPolicy deny-all default | P0 | -- | S3, E2 |
-| SEC-NET-02 | Service mesh with STRICT mTLS | P0 | -- | S1, T1 |
-| SEC-NET-03 | Egress allowlist (deny-all default) | P1 | -- | I5 |
-| SEC-NET-04 | WAF with OWASP CRS v4 | P1 | A05 | T1 |
-| SEC-DATA-01 | TLS 1.2+ everywhere (no plaintext) | P0 | A04 | I4, I5, T1 |
-| SEC-DATA-02 | Encryption at rest per service database | P0 | A04 | I5 |
-| SEC-DATA-03 | Vault for all secrets management | P0 | A02 | I1, I5 |
-| SEC-DATA-04 | PII tokenization for RESTRICTED data | P1 | A01 | I3 |
-| SEC-DATA-05 | GDPR right-to-deletion per service | P1 | -- | R1 |
-| SEC-API-01 | Rate limiting at gateway | P0 | API4 | D2 |
-| SEC-API-02 | Input validation (schema) at gateway | P1 | A05 | T1 |
-| SEC-API-03 | GraphQL query depth/complexity limits | P1 | API4 | D2 |
-| SEC-OBS-01 | Structured audit logging (all services) | P0 | A09 | R1, R2 |
-| SEC-OBS-02 | Distributed tracing (OpenTelemetry) | P1 | A09 | R1 |
-| SEC-OBS-03 | Anomaly detection on east-west traffic | P2 | -- | S1, E2 |
-| SEC-SC-01 | Container image scanning in CI | P0 | A03 | I1, E1 |
-| SEC-SC-02 | Image signing (Cosign/Sigstore) | P1 | A03, A08 | T3 |
-| SEC-SC-03 | SBOM generation per release | P1 | A03 | -- |
-| SEC-SC-04 | Runtime security (Falco/eBPF) | P2 | -- | E1 |
-| SEC-SC-05 | SLSA L3 pipeline hardening | P2 | A08 | T3 |
-| SEC-SC-06 | Admission controller for unsigned images | P1 | A03 | T3 |
+| Control ID  | Control                                  | Priority | OWASP      | STRIDE     |
+| ----------- | ---------------------------------------- | -------- | ---------- | ---------- |
+| SEC-AUTH-01 | OAuth 2.1 + PKCE at API Gateway          | P0       | A07        | S1, S2     |
+| SEC-AUTH-02 | mTLS for all east-west traffic           | P0       | --         | S1, S3, T1 |
+| SEC-AUTH-03 | JWT RS256/ES256, max 15 min lifetime     | P0       | A07        | S2, S4     |
+| SEC-AUTH-04 | Per-service RBAC/ABAC authorization      | P0       | API1, API5 | E4         |
+| SEC-NET-01  | NetworkPolicy deny-all default           | P0       | --         | S3, E2     |
+| SEC-NET-02  | Service mesh with STRICT mTLS            | P0       | --         | S1, T1     |
+| SEC-NET-03  | Egress allowlist (deny-all default)      | P1       | --         | I5         |
+| SEC-NET-04  | WAF with OWASP CRS v4                    | P1       | A05        | T1         |
+| SEC-DATA-01 | TLS 1.2+ everywhere (no plaintext)       | P0       | A04        | I4, I5, T1 |
+| SEC-DATA-02 | Encryption at rest per service database  | P0       | A04        | I5         |
+| SEC-DATA-03 | Vault for all secrets management         | P0       | A02        | I1, I5     |
+| SEC-DATA-04 | PII tokenization for RESTRICTED data     | P1       | A01        | I3         |
+| SEC-DATA-05 | GDPR right-to-deletion per service       | P1       | --         | R1         |
+| SEC-API-01  | Rate limiting at gateway                 | P0       | API4       | D2         |
+| SEC-API-02  | Input validation (schema) at gateway     | P1       | A05        | T1         |
+| SEC-API-03  | GraphQL query depth/complexity limits    | P1       | API4       | D2         |
+| SEC-OBS-01  | Structured audit logging (all services)  | P0       | A09        | R1, R2     |
+| SEC-OBS-02  | Distributed tracing (OpenTelemetry)      | P1       | A09        | R1         |
+| SEC-OBS-03  | Anomaly detection on east-west traffic   | P2       | --         | S1, E2     |
+| SEC-SC-01   | Container image scanning in CI           | P0       | A03        | I1, E1     |
+| SEC-SC-02   | Image signing (Cosign/Sigstore)          | P1       | A03, A08   | T3         |
+| SEC-SC-03   | SBOM generation per release              | P1       | A03        | --         |
+| SEC-SC-04   | Runtime security (Falco/eBPF)            | P2       | --         | E1         |
+| SEC-SC-05   | SLSA L3 pipeline hardening               | P2       | A08        | T3         |
+| SEC-SC-06   | Admission controller for unsigned images | P1       | A03        | T3         |
 
 ---
 
@@ -1048,16 +1053,16 @@ The transition period -- when some functionality runs in the monolith and some i
 
 ## Appendix C: Compliance Mapping
 
-| Requirement | SOC 2 | GDPR | HIPAA | PCI-DSS | Control IDs |
-|------------|-------|------|-------|---------|-------------|
-| Encryption in transit | CC6.1 | Art. 32 | 164.312(e) | Req 4 | SEC-DATA-01 |
-| Encryption at rest | CC6.1 | Art. 32 | 164.312(a)(2)(iv) | Req 3 | SEC-DATA-02 |
-| Access control | CC6.1-6.3 | Art. 5(1)(f) | 164.312(a)(1) | Req 7 | SEC-AUTH-01-04 |
-| Audit logging | CC7.1-7.2 | Art. 30 | 164.312(b) | Req 10 | SEC-OBS-01-02 |
-| Secrets management | CC6.1 | Art. 32 | 164.312(a)(2)(iv) | Req 6 | SEC-DATA-03 |
-| Vulnerability management | CC7.1 | Art. 32 | 164.308(a)(5) | Req 6, 11 | SEC-SC-01-03 |
-| Incident response | CC7.3-7.5 | Art. 33-34 | 164.308(a)(6) | Req 12 | SEC-OBS-03 |
-| Data minimization | -- | Art. 5(1)(c) | 164.502(b) | Req 3 | SEC-DATA-04-05 |
+| Requirement              | SOC 2     | GDPR         | HIPAA             | PCI-DSS   | Control IDs    |
+| ------------------------ | --------- | ------------ | ----------------- | --------- | -------------- |
+| Encryption in transit    | CC6.1     | Art. 32      | 164.312(e)        | Req 4     | SEC-DATA-01    |
+| Encryption at rest       | CC6.1     | Art. 32      | 164.312(a)(2)(iv) | Req 3     | SEC-DATA-02    |
+| Access control           | CC6.1-6.3 | Art. 5(1)(f) | 164.312(a)(1)     | Req 7     | SEC-AUTH-01-04 |
+| Audit logging            | CC7.1-7.2 | Art. 30      | 164.312(b)        | Req 10    | SEC-OBS-01-02  |
+| Secrets management       | CC6.1     | Art. 32      | 164.312(a)(2)(iv) | Req 6     | SEC-DATA-03    |
+| Vulnerability management | CC7.1     | Art. 32      | 164.308(a)(5)     | Req 6, 11 | SEC-SC-01-03   |
+| Incident response        | CC7.3-7.5 | Art. 33-34   | 164.308(a)(6)     | Req 12    | SEC-OBS-03     |
+| Data minimization        | --        | Art. 5(1)(c) | 164.502(b)        | Req 3     | SEC-DATA-04-05 |
 
 ---
 

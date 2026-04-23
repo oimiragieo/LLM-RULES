@@ -27,14 +27,14 @@ Analysis of agent-studio codebase reveals **critical test coverage gaps** across
 
 ### Overall Metrics
 
-| Category | Total Files | Test Files | Coverage % | Status |
-|----------|-------------|------------|------------|--------|
-| Library (`.claude/lib`) | 223 | ~150 | 67% | ⚠️ Moderate |
-| Hooks (`.claude/hooks`) | 104 | 64 active | 38.5% | ❌ Critical Gap |
-| CLI Tools (`.claude/tools/cli`) | 66 | 11 | 16.7% | ❌ Critical Gap |
-| Memory Core | 5 | 1 | 20% | ❌ Critical Gap |
-| Routing | 8 | 7 | 87.5% | ✅ Good |
-| Code Indexing | 17 | 7 | 41.2% | ⚠️ Needs Work |
+| Category                        | Total Files | Test Files | Coverage % | Status          |
+| ------------------------------- | ----------- | ---------- | ---------- | --------------- |
+| Library (`.claude/lib`)         | 223         | ~150       | 67%        | ⚠️ Moderate     |
+| Hooks (`.claude/hooks`)         | 104         | 64 active  | 38.5%      | ❌ Critical Gap |
+| CLI Tools (`.claude/tools/cli`) | 66          | 11         | 16.7%      | ❌ Critical Gap |
+| Memory Core                     | 5           | 1          | 20%        | ❌ Critical Gap |
+| Routing                         | 8           | 7          | 87.5%      | ✅ Good         |
+| Code Indexing                   | 17          | 7          | 41.2%      | ⚠️ Needs Work   |
 
 ### Test Health Indicators
 
@@ -320,7 +320,7 @@ tests/lib/memory/
 
 - Normal archive rate: <10% (stable test suite)
 - 10-30%: Warning (moderate churn)
-- >30%: Crisis (this codebase) - indicates:
+- > 30%: Crisis (this codebase) - indicates:
   - Frequent refactoring without test updates
   - Tests written but not maintained
   - Code removed but tests not cleaned up
@@ -785,8 +785,7 @@ test('loads agent registry', async () => {
 });
 
 test('throws on missing registry file', async () => {
-  await expect(loadRegistry('nonexistent'))
-    .rejects.toThrow('Registry not found');
+  await expect(loadRegistry('nonexistent')).rejects.toThrow('Registry not found');
 });
 ```
 
@@ -797,12 +796,14 @@ test('throws on missing registry file', async () => {
 ### Immediate Actions (This Week)
 
 1. **Invoke TDD Skill**: Begin with RED phase for memory core facade
+
    ```javascript
    Skill({ skill: 'tdd' });
    Skill({ skill: 'test-generator' });
    ```
 
 2. **Run Test Coverage Analysis**:
+
    ```bash
    pnpm test:coverage
    c8 report --reporter=html
@@ -845,30 +846,30 @@ test('throws on missing registry file', async () => {
 
 ### Coverage Targets
 
-| Category | Current | Target (3 months) | Target (6 months) |
-|----------|---------|-------------------|-------------------|
-| Library | 67% | 80% | 90% |
-| Hooks | 38.5% | 70% | 85% |
-| CLI Tools | 16.7% | 50% | 70% |
-| Memory Core | 20% | 100% | 100% |
-| Code Indexing | 41.2% | 75% | 90% |
+| Category      | Current | Target (3 months) | Target (6 months) |
+| ------------- | ------- | ----------------- | ----------------- |
+| Library       | 67%     | 80%               | 90%               |
+| Hooks         | 38.5%   | 70%               | 85%               |
+| CLI Tools     | 16.7%   | 50%               | 70%               |
+| Memory Core   | 20%     | 100%              | 100%              |
+| Code Indexing | 41.2%   | 75%               | 90%               |
 
 ### Quality Targets
 
-| Metric | Current | Target (3 months) | Target (6 months) |
-|--------|---------|-------------------|-------------------|
-| Archive Rate | 30% | <20% | <10% |
-| Skipped Tests | 728 | <300 | <100 |
-| Test Pass Rate | 99.3% | 99.5% | 99.8% |
+| Metric         | Current | Target (3 months) | Target (6 months) |
+| -------------- | ------- | ----------------- | ----------------- |
+| Archive Rate   | 30%     | <20%              | <10%              |
+| Skipped Tests  | 728     | <300              | <100              |
+| Test Pass Rate | 99.3%   | 99.5%             | 99.8%             |
 
 ### Integration Targets
 
-| Area | Current | Target (3 months) |
-|------|---------|-------------------|
-| Enterprise Workflow | ❌ None | ✅ Full E2E test |
-| Memory Tier Lifecycle | ❌ None | ✅ Full E2E test |
-| Hybrid Search Daemon | ❌ None | ✅ Full E2E test |
-| Task Lifecycle + Hooks | ❌ None | ✅ Full E2E test |
+| Area                   | Current | Target (3 months) |
+| ---------------------- | ------- | ----------------- |
+| Enterprise Workflow    | ❌ None | ✅ Full E2E test  |
+| Memory Tier Lifecycle  | ❌ None | ✅ Full E2E test  |
+| Hybrid Search Daemon   | ❌ None | ✅ Full E2E test  |
+| Task Lifecycle + Hooks | ❌ None | ✅ Full E2E test  |
 
 ---
 

@@ -9,12 +9,14 @@ Batch reflection on Pipeline #14 hooks system audit (Tasks #118-120). The hooks 
 ## Task Summary
 
 ### Task #118a: Architecture Audit
+
 - **Type:** Hooks System Deep Dive (Architecture)
 - **Scope:** 36 registered hooks verified, 2 dead, 1 misplaced, 1 P1 stdin bug, 1 redundancy
 - **Health Score:** 82/100
 - **Output:** Architecture plan + audit findings
 
 ### Task #118b: Security Review
+
 - **Type:** Hooks System Security Assessment
 - **Scope:** 36 registered hooks evaluated against STRIDE model
 - **Security Score:** 52/100 (CONDITIONAL PASS)
@@ -22,6 +24,7 @@ Batch reflection on Pipeline #14 hooks system audit (Tasks #118-120). The hooks 
 - **Output:** Comprehensive security review report
 
 ### Task #119: Security Bug Fixes
+
 - **Type:** Critical Security Bug Resolution
 - **Fixes Applied:**
   1. Removed eval/exec from SAFE_COMMANDS_ALLOWLIST (validators/registry.cjs)
@@ -30,6 +33,7 @@ Batch reflection on Pipeline #14 hooks system audit (Tasks #118-120). The hooks 
 - **Quality Score:** 0.95/1.0 (EXCELLENT)
 
 ### Task #120: Documentation Expansion
+
 - **Type:** @ENFORCEMENT_HOOKS.md Expansion
 - **Coverage:** Expanded from 2 to 10 hooks documented
 - **Lines:** 150 → 700 lines (+5x expansion)
@@ -38,14 +42,14 @@ Batch reflection on Pipeline #14 hooks system audit (Tasks #118-120). The hooks 
 
 ## Overall Quality Assessment
 
-| Dimension     | Score | Assessment |
-|---------------|-------|------------|
-| Completeness  | 0.88  | 4 tasks fully completed with artifacts |
-| Accuracy      | 0.85  | Security findings verified, one stdin pattern missed initially |
-| Clarity       | 0.78  | Good documentation but dense technical content |
-| Consistency   | 0.82  | Follows patterns from Pipelines #11-12, minor path inconsistencies |
-| Actionability | 0.76  | Recommendations clear but P1 fixes require architectural decisions |
-| **Overall**   | **0.82** | **PASS** |
+| Dimension     | Score    | Assessment                                                         |
+| ------------- | -------- | ------------------------------------------------------------------ |
+| Completeness  | 0.88     | 4 tasks fully completed with artifacts                             |
+| Accuracy      | 0.85     | Security findings verified, one stdin pattern missed initially     |
+| Clarity       | 0.78     | Good documentation but dense technical content                     |
+| Consistency   | 0.82     | Follows patterns from Pipelines #11-12, minor path inconsistencies |
+| Actionability | 0.76     | Recommendations clear but P1 fixes require architectural decisions |
+| **Overall**   | **0.82** | **PASS**                                                           |
 
 **Threshold:** PASS (0.7+) with remediation required
 
@@ -105,6 +109,7 @@ Batch reflection on Pipeline #14 hooks system audit (Tasks #118-120). The hooks 
 
 **Pattern Description:**
 When auditing a hooks system:
+
 1. **Inventory phase:** Count registered hooks (settings.json), verify files exist on filesystem, check code references match
 2. **Architecture phase:** Document each hook's event type (PreToolUse/PostToolUse), enforcement mode (block/warn/off), location, purpose, dependencies
 3. **Security phase:** Evaluate each hook against STRIDE model:
@@ -124,6 +129,7 @@ Prior hook audits (Pipelines #3, #6, #7) found architectural issues but missed s
 Any system with enforcement hooks (routers, validators, monitors). Especially critical for systems that control code execution, file access, or agent authorization.
 
 **Evidence:**
+
 - Pipeline #14 Task #118a/b: Identified 3 CRITICAL findings (eval/exec, master kill switch, 21 overrides) that prior audits missed
 - Task #119 fixed eval/exec immediately (affects all Bash command validation)
 - ADR-097 documents complete audit methodology
@@ -140,12 +146,14 @@ Any system with enforcement hooks (routers, validators, monitors). Especially cr
 Hooks receive input via stdin in JSON format. The parsing strategy depends on the event type:
 
 **PreToolUse Hooks:**
+
 - stdin is available synchronously (blocking)
 - Use `parseHookInputSync()` (defined in hook-utils.cjs)
 - Example: routing-guard.cjs (blocks before tool execution)
 - Pattern: `const input = parseHookInputSync(); if (check fails) exit(2);`
 
 **PostToolUse Hooks:**
+
 - stdin arrives asynchronously (after tool execution completes)
 - MUST use `await parseHookInputAsync()` (async wrapper)
 - Example: error-tracker-hook.cjs, metrics-collector-hook.cjs (track after execution)
@@ -155,17 +163,20 @@ Hooks receive input via stdin in JSON format. The parsing strategy depends on th
 Using sync parser in PostToolUse context causes the parser to read empty stdin before tool output arrives. The hook silently receives no data and exits with code 0 (allow). Monitoring/tracking is completely lost but the tool executes successfully.
 
 **Detection Pattern:**
+
 - Search for `parseHookInputSync()` in hooks/ directory
 - Verify each hook's event type in settings.json
 - If PreToolUse hook: correct
 - If PostToolUse hook: likely a bug
 
 **Prevention:**
+
 1. Code template for PostToolUse hooks must include `await parseHookInputAsync()`
 2. Linter rule or pre-commit hook that validates event type matches parser type
 3. Test both sync and async hook paths in CI
 
 **Evidence:**
+
 - error-tracker-hook.cjs: using sync parser in PostToolUse context (BUG in Task #119)
 - metrics-collector-hook.cjs: same issue (BUG in Task #119)
 - Pattern documented in ADR-097 Section: Hook Implementation Guidelines
@@ -235,6 +246,7 @@ Using sync parser in PostToolUse context causes the parser to read empty stdin b
 ### Patterns (patterns.json)
 
 **Added:**
+
 1. **hooks-health-audit-stride-model** - Comprehensive audit using STRIDE threat model
 2. **hook-stdin-parsing-event-type** - PreToolUse (sync) vs PostToolUse (async) distinction
 
@@ -245,6 +257,7 @@ Using sync parser in PostToolUse context causes the parser to read empty stdin b
 ### Issues (issues.md)
 
 **Updated with Pipeline #14 findings:**
+
 - SEC-HOOK-001: HOOK_FAIL_OPEN master kill switch
 - SEC-HOOK-002: eval/exec in SAFE_COMMANDS_ALLOWLIST (FIXED in Task #119)
 - SEC-HOOK-003: 21 environment variable overrides
@@ -253,6 +266,7 @@ Using sync parser in PostToolUse context causes the parser to read empty stdin b
 ### Decisions (decisions.md)
 
 **Added:**
+
 - ADR-097: Hooks Security Hardening (status: Proposed → Implementing)
 - Rationale: Why eval/exec was removed, why consolidation strategy chosen, consequences of remediation
 
@@ -265,6 +279,7 @@ Using sync parser in PostToolUse context causes the parser to read empty stdin b
 ## Quality Gate Validation
 
 ### Completeness Check
+
 - ✅ All 4 tasks reflected (118a, 118b, 119, 120)
 - ✅ Architecture audit documented
 - ✅ Security findings comprehensive (3 CRITICAL, 5 HIGH, 9 MEDIUM/LOW)
@@ -273,24 +288,28 @@ Using sync parser in PostToolUse context causes the parser to read empty stdin b
 - ✅ ADR recorded (ADR-097)
 
 ### Accuracy Check
+
 - ✅ Security scores validated against STRIDE model
 - ✅ Hook count accurate (36 registered, 2 dead, 34 active)
 - ✅ P1 issues identified and fixed
 - ✅ File paths verified (eval/exec in validators/registry.cjs confirmed)
 
 ### Clarity Check
+
 - ✅ RBT diagnosis clear (7 roses, 5 buds, 5 thorns)
 - ✅ Recommendations prioritized (P1/P2/P3)
 - ✅ Patterns extracted with context and applicability
 - ✅ Technical concepts explained (PreToolUse vs PostToolUse, STRIDE model)
 
 ### Consistency Check
+
 - ✅ Follows reflection report structure from Pipelines #11-13
 - ✅ Scores align with rubric weights (completeness 25%, accuracy 25%, clarity 15%, consistency 15%, actionability 20%)
 - ✅ Memory updates use consistent JSON/MD formats
 - ✅ Cross-references to issues.md and decisions.md correct
 
 ### Actionability Check
+
 - ✅ Recommendations include effort estimates (4-6 hours, etc.)
 - ✅ P1 issues include specific code changes (remove eval/exec, replace HOOK_FAIL_OPEN)
 - ✅ Patterns include implementation guidance (detection patterns, prevention strategies)
@@ -303,6 +322,7 @@ Using sync parser in PostToolUse context causes the parser to read empty stdin b
 Pipeline #14 hooks system audit reveals a complex orchestration layer with solid architecture (82/100 health) but significant security vulnerabilities (52/100 security score). The critical issues (eval/exec, master kill switch, 21 env overrides, string matching detection) are design-level problems that require ADR-backed remediation, not quick fixes.
 
 The batch is strong overall because:
+
 1. **Systematic approach:** STRIDE model covers all threat dimensions, not just obvious ones
 2. **Immediate action:** P1 bugs (eval/exec) fixed same day in Task #119
 3. **Complete documentation:** All findings, decisions, and alternatives recorded in ADR-097

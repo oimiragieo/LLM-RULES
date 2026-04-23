@@ -22,13 +22,13 @@ All feasibility gates pass. Creation is approved to proceed to Task #5 (skill-cr
 
 ### Evidence
 
-| Check | Result | Evidence |
-|-------|--------|----------|
-| Existence / Duplicate check | PASS — No duplicate found | `Glob("**/*powershell*")` → 0 results; `Glob("**/*pwsh*")` → 0 results in `.claude/skills/` |
-| Skill catalog scan | PASS — Not present | Searched all 109 active skills in `.claude/context/artifacts/catalogs/skill-catalog.md`; no PowerShell entry in any category |
-| Stack compatibility | PASS | SKILL.md format is established; skill-creator workflow in place; catalog append process defined |
-| Integration readiness | PASS | Routing table keywords can be added; agent assignment target identified (see Section 5) |
-| Security / creator boundary | PASS | No creator guard issues; skill creation follows Gate 4 path via `skill-creator` |
+| Check                       | Result                    | Evidence                                                                                                                     |
+| --------------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Existence / Duplicate check | PASS — No duplicate found | `Glob("**/*powershell*")` → 0 results; `Glob("**/*pwsh*")` → 0 results in `.claude/skills/`                                  |
+| Skill catalog scan          | PASS — Not present        | Searched all 109 active skills in `.claude/context/artifacts/catalogs/skill-catalog.md`; no PowerShell entry in any category |
+| Stack compatibility         | PASS                      | SKILL.md format is established; skill-creator workflow in place; catalog append process defined                              |
+| Integration readiness       | PASS                      | Routing table keywords can be added; agent assignment target identified (see Section 5)                                      |
+| Security / creator boundary | PASS                      | No creator guard issues; skill creation follows Gate 4 path via `skill-creator`                                              |
 
 ### Blockers
 
@@ -55,12 +55,12 @@ None.
 
 ### Required Mitigations
 
-| Mitigation | Owner | Required Before |
-|------------|-------|-----------------|
-| Invoke `research-synthesis` first | skill-creator agent (Task #5) | `skill-creator` invocation |
-| Write SKILL.md via `skill-creator` only | skill-creator agent (Task #5) | Any direct Write to creator path |
-| Add catalog entry after creation | artifact-integrator (post Task #5) | Task completion |
-| Assign skill to at least one agent | artifact-integrator (post Task #5) | Task completion |
+| Mitigation                              | Owner                              | Required Before                  |
+| --------------------------------------- | ---------------------------------- | -------------------------------- |
+| Invoke `research-synthesis` first       | skill-creator agent (Task #5)      | `skill-creator` invocation       |
+| Write SKILL.md via `skill-creator` only | skill-creator agent (Task #5)      | Any direct Write to creator path |
+| Add catalog entry after creation        | artifact-integrator (post Task #5) | Task completion                  |
+| Assign skill to at least one agent      | artifact-integrator (post Task #5) | Task completion                  |
 
 ---
 
@@ -70,12 +70,12 @@ None.
 
 ### Searches Executed
 
-| Search Pattern | Scope | Result |
-|----------------|-------|--------|
-| `**/*powershell*` | `.claude/skills/` | 0 files |
-| `**/*pwsh*` | `.claude/skills/` | 0 files |
-| `**/*ps-*` | `.claude/skills/` | 5 files (gitops, cloud-devops — unrelated) |
-| Skill catalog scan for "PowerShell", "pwsh", "ps" | `skill-catalog.md` | 0 matches |
+| Search Pattern                                    | Scope              | Result                                     |
+| ------------------------------------------------- | ------------------ | ------------------------------------------ |
+| `**/*powershell*`                                 | `.claude/skills/`  | 0 files                                    |
+| `**/*pwsh*`                                       | `.claude/skills/`  | 0 files                                    |
+| `**/*ps-*`                                        | `.claude/skills/`  | 5 files (gitops, cloud-devops — unrelated) |
+| Skill catalog scan for "PowerShell", "pwsh", "ps" | `skill-catalog.md` | 0 matches                                  |
 
 No existing PowerShell skill exists anywhere in the skill ecosystem. The `php-expert` skill (closest analog in the `Other` category) is unrelated to PowerShell.
 
@@ -89,15 +89,15 @@ No existing PowerShell skill exists anywhere in the skill ecosystem. The `php-ex
 
 The existing `Languages` category in the skill catalog contains language-specific expert skills:
 
-| Existing Skill | Language Coverage |
-|----------------|-------------------|
+| Existing Skill          | Language Coverage               |
+| ----------------------- | ------------------------------- |
 | `python-backend-expert` | Python (Django, FastAPI, Flask) |
-| `typescript-expert` | TypeScript |
-| `go-expert` | Go (APIs, gRPC, concurrency) |
-| `nodejs-expert` | Node.js, Express, NestJS |
-| `java-expert` | Java, Spring Boot |
-| `php-expert` | PHP, Laravel, WordPress |
-| `web3-expert` | Solidity, Ethereum |
+| `typescript-expert`     | TypeScript                      |
+| `go-expert`             | Go (APIs, gRPC, concurrency)    |
+| `nodejs-expert`         | Node.js, Express, NestJS        |
+| `java-expert`           | Java, Spring Boot               |
+| `php-expert`            | PHP, Laravel, WordPress         |
+| `web3-expert`           | Solidity, Ethereum              |
 
 PowerShell is a scripting language with cross-platform support (PS 7+) and its own ecosystem (Pester testing, PSGallery modules, DSC). It fits the `Languages` category pattern precisely.
 
@@ -111,22 +111,22 @@ PowerShell is a scripting language with cross-platform support (PS 7+) and its o
 
 The `powershell-expert` skill should be assigned to these agents in their frontmatter `skills:` array:
 
-| Agent | Justification | Priority |
-|-------|---------------|----------|
-| `devops` | `.claude/agents/specialized/devops.md` — Primary consumer; PowerShell is core to Windows/hybrid DevOps workflows | **Must-Have** |
-| `devops-troubleshooter` | `.claude/agents/specialized/devops-troubleshooter.md` — Incident response on Windows/hybrid stacks often requires PS remoting | **Must-Have** |
-| `developer` | `.claude/agents/core/developer.md` — General PowerShell scripting tasks | **Should-Have** |
-| `qa` | `.claude/agents/core/qa.md` — Pester testing framework expertise | **Should-Have** |
+| Agent                   | Justification                                                                                                                 | Priority        |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| `devops`                | `.claude/agents/specialized/devops.md` — Primary consumer; PowerShell is core to Windows/hybrid DevOps workflows              | **Must-Have**   |
+| `devops-troubleshooter` | `.claude/agents/specialized/devops-troubleshooter.md` — Incident response on Windows/hybrid stacks often requires PS remoting | **Must-Have**   |
+| `developer`             | `.claude/agents/core/developer.md` — General PowerShell scripting tasks                                                       | **Should-Have** |
+| `qa`                    | `.claude/agents/core/qa.md` — Pester testing framework expertise                                                              | **Should-Have** |
 
 ### Related Skills (Cross-Reference)
 
-| Skill | Relationship |
-|-------|-------------|
-| `docker-compose` | PowerShell can orchestrate Docker workflows on Windows |
-| `terraform-infra` | PS Azure/AWS CLI integration complements Terraform |
-| `k8s-manifest-generator` | kubectl often scripted via PowerShell on Windows |
-| `ripgrep` | Search across PS scripts |
-| `verification-before-completion` | Quality gate for PS module validation |
+| Skill                            | Relationship                                           |
+| -------------------------------- | ------------------------------------------------------ |
+| `docker-compose`                 | PowerShell can orchestrate Docker workflows on Windows |
+| `terraform-infra`                | PS Azure/AWS CLI integration complements Terraform     |
+| `k8s-manifest-generator`         | kubectl often scripted via PowerShell on Windows       |
+| `ripgrep`                        | Search across PS scripts                               |
+| `verification-before-completion` | Quality gate for PS module validation                  |
 
 ### Routing Keywords (Must Add to Routing Table)
 
@@ -165,12 +165,13 @@ The skill-creator agent for Task #5 must follow this chain:
 5. After creation, trigger artifact-integrator for catalog and routing integration
 
 **Creator skill chain:**
+
 ```javascript
-Skill({ skill: 'research-synthesis' });  // FIRST
-Skill({ skill: 'skill-creator' });       // SECOND
+Skill({ skill: 'research-synthesis' }); // FIRST
+Skill({ skill: 'skill-creator' }); // SECOND
 Skill({ skill: 'artifact-integrator' }); // THIRD (post-creation)
 ```
 
 ---
 
-*Report generated by planner agent | Task #4 | 2026-02-17*
+_Report generated by planner agent | Task #4 | 2026-02-17_

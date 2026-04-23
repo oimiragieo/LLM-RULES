@@ -25,6 +25,7 @@ User prompt -> Claude Code (with SKILL.md loaded) -> Direct execution or manual 
 ### agent-studio: Multi-Layer Router
 
 agent-studio has a formal Router (CLAUDE.md, ~700 lines of routing logic) that:
+
 1. Classifies intent (complexity, domain, risk)
 2. Matches against a 26-row routing table
 3. Resolves model from config.yaml
@@ -38,13 +39,13 @@ User prompt -> Router (CLAUDE.md) -> Gate checks -> Routing table lookup -> Task
 
 ### Assessment
 
-| Criterion | pro-workflow | agent-studio |
-|-----------|-------------|--------------|
-| **Complexity ratio** | 0 LOC (no router) | ~2,000 LOC (CLAUDE.md + routing-guard + routing-table) |
-| **Maintenance burden** | Zero (nothing to maintain) | High (routing table, gate checks, enforcement hooks) |
-| **Failure modes** | User picks wrong approach manually | Router misroutes; hooks block valid work; orphaned tasks |
-| **Scalability** | Breaks at 5+ agents (manual selection) | Handles 59 agents with automated routing |
-| **Correctness** | Depends entirely on user/LLM judgment | Enforced: planner-first, security-review, specialist-first |
+| Criterion              | pro-workflow                           | agent-studio                                               |
+| ---------------------- | -------------------------------------- | ---------------------------------------------------------- |
+| **Complexity ratio**   | 0 LOC (no router)                      | ~2,000 LOC (CLAUDE.md + routing-guard + routing-table)     |
+| **Maintenance burden** | Zero (nothing to maintain)             | High (routing table, gate checks, enforcement hooks)       |
+| **Failure modes**      | User picks wrong approach manually     | Router misroutes; hooks block valid work; orphaned tasks   |
+| **Scalability**        | Breaks at 5+ agents (manual selection) | Handles 59 agents with automated routing                   |
+| **Correctness**        | Depends entirely on user/LLM judgment  | Enforced: planner-first, security-review, specialist-first |
 
 **Verdict:** pro-workflow's lack of router is appropriate for 3 agents. agent-studio's router is necessary for 59 agents. Neither approach is wrong -- they serve different scales. However, agent-studio's routing overhead (4 gates, 7 enforcement checks, 10+ hook evaluations per spawn) could benefit from pro-workflow's simplicity for TRIVIAL/LOW complexity tasks where the routing overhead exceeds the task complexity.
 
@@ -60,7 +61,7 @@ User prompt -> Router (CLAUDE.md) -> Gate checks -> Routing table lookup -> Task
 ---
 name: planner
 description: Specialized agent for breaking down complex tasks
-tools: ["Read", "Glob", "Grep"]
+tools: ['Read', 'Glob', 'Grep']
 model: opus
 ---
 ```
@@ -72,12 +73,14 @@ Agents are self-contained -- one file defines the entire agent. No spawn templat
 ### agent-studio: Template-Based Spawning System
 
 59 agents with 4 spawn templates:
+
 - `universal-agent-spawn.md` (standard agents)
 - `orchestrator-spawn.md` (agents that spawn other agents)
 - `agent-identity-integration.md` (agents with personality)
 - `subordinate-once.md` (one-shot agents)
 
 Every spawn includes:
+
 - 70-line TaskUpdate warning box
 - Agent file reference
 - Task ID injection
@@ -89,13 +92,13 @@ A single spawn prompt can be 200-500 tokens after template expansion.
 
 ### Assessment
 
-| Criterion | pro-workflow | agent-studio |
-|-----------|-------------|--------------|
-| **Complexity ratio** | ~150 LOC total (3 agents) | ~15,000 LOC (59 agents + 4 templates + spawn assembler) |
-| **Maintenance burden** | Trivial (edit one .md file) | High (template changes affect all 59 agents) |
-| **Failure modes** | Agent forgets its role (no enforcement) | Template load failure; TaskUpdate forgotten despite warnings |
-| **Scalability** | Manual addition of new agents | Formal creator workflow with catalog integration |
-| **Task tracking** | None (no TaskUpdate protocol) | Mandatory (enforced by hooks, but still ~20% forget rate) |
+| Criterion              | pro-workflow                            | agent-studio                                                 |
+| ---------------------- | --------------------------------------- | ------------------------------------------------------------ |
+| **Complexity ratio**   | ~150 LOC total (3 agents)               | ~15,000 LOC (59 agents + 4 templates + spawn assembler)      |
+| **Maintenance burden** | Trivial (edit one .md file)             | High (template changes affect all 59 agents)                 |
+| **Failure modes**      | Agent forgets its role (no enforcement) | Template load failure; TaskUpdate forgotten despite warnings |
+| **Scalability**        | Manual addition of new agents           | Formal creator workflow with catalog integration             |
+| **Task tracking**      | None (no TaskUpdate protocol)           | Mandatory (enforced by hooks, but still ~20% forget rate)    |
 
 **Verdict:** pro-workflow's simplicity is elegant but fragile. There is zero traceability -- if an agent completes work, no record exists. agent-studio's template system adds significant overhead but solves real problems (task tracking, memory persistence, spawn traceability). The TaskUpdate enforcement is necessary -- without it, the multi-agent system becomes opaque.
 
@@ -109,19 +112,19 @@ A single spawn prompt can be 200-500 tokens after template expansion.
 
 8 hook registrations in `hooks.json`, all **non-blocking** (exit 0 always):
 
-| Hook | Event | Purpose |
-|------|-------|---------|
-| quality-gate.js | PreToolUse (Edit/Write) | Track edit count, remind at thresholds |
-| pre-commit reminder | PreToolUse (git commit) | Remind to run quality gates |
-| pre-push reminder | PreToolUse (git push) | Remind about /wrap-up |
-| post-edit-check.js | PostToolUse (Edit) | Check for console.log, TODOs, secrets |
-| test-failure suggest | PostToolUse (Bash test) | Suggest [LEARN] from failures |
-| session-check.js | Stop | Periodic wrap-up/compact reminders |
-| session-start.js | SessionStart | Load learnings from database |
-| session-end.js | SessionEnd | Save session stats to database |
-| prompt-submit.js | UserPromptSubmit | Track prompts, detect correction patterns |
-| drift-detector.js | UserPromptSubmit | Warn when straying from original intent |
-| pre-compact.js | PreCompact | Save state before compaction |
+| Hook                 | Event                   | Purpose                                   |
+| -------------------- | ----------------------- | ----------------------------------------- |
+| quality-gate.js      | PreToolUse (Edit/Write) | Track edit count, remind at thresholds    |
+| pre-commit reminder  | PreToolUse (git commit) | Remind to run quality gates               |
+| pre-push reminder    | PreToolUse (git push)   | Remind about /wrap-up                     |
+| post-edit-check.js   | PostToolUse (Edit)      | Check for console.log, TODOs, secrets     |
+| test-failure suggest | PostToolUse (Bash test) | Suggest [LEARN] from failures             |
+| session-check.js     | Stop                    | Periodic wrap-up/compact reminders        |
+| session-start.js     | SessionStart            | Load learnings from database              |
+| session-end.js       | SessionEnd              | Save session stats to database            |
+| prompt-submit.js     | UserPromptSubmit        | Track prompts, detect correction patterns |
+| drift-detector.js    | UserPromptSubmit        | Warn when straying from original intent   |
+| pre-compact.js       | PreCompact              | Save state before compaction              |
 
 **Philosophy:** "Non-blocking -- hooks remind, don't block (except dangerous ops)." This is explicitly stated in their SKILL.md.
 
@@ -131,32 +134,33 @@ A single spawn prompt can be 200-500 tokens after template expansion.
 
 45 hooks organized across 8 categories, with **blocking as default**:
 
-| Category | Hooks | Mode |
-|----------|-------|------|
-| routing/ | routing-guard.cjs (10 checks) | block |
-| safety/ | unified-creator-guard.cjs, unified-pre-write-hook.cjs, etc. | block |
-| validation/ | spawn-prompt-validator.cjs, config-model-validator.cjs, etc. | warn |
-| reflection/ | reflection-step0-guard.cjs | block |
-| workflow/ | post-completion-chain.cjs | warn |
-| git/ | commit-validator.cjs | warn |
-| memory/ | sync-memory-index.cjs | passthrough |
-| session/ | user-prompt-unified.cjs | passthrough |
+| Category    | Hooks                                                        | Mode        |
+| ----------- | ------------------------------------------------------------ | ----------- |
+| routing/    | routing-guard.cjs (10 checks)                                | block       |
+| safety/     | unified-creator-guard.cjs, unified-pre-write-hook.cjs, etc.  | block       |
+| validation/ | spawn-prompt-validator.cjs, config-model-validator.cjs, etc. | warn        |
+| reflection/ | reflection-step0-guard.cjs                                   | block       |
+| workflow/   | post-completion-chain.cjs                                    | warn        |
+| git/        | commit-validator.cjs                                         | warn        |
+| memory/     | sync-memory-index.cjs                                        | passthrough |
+| session/    | user-prompt-unified.cjs                                      | passthrough |
 
 **Total hook code:** ~8,000+ lines across 45 hooks.
 
 ### Assessment
 
-| Criterion | pro-workflow | agent-studio |
-|-----------|-------------|--------------|
-| **Complexity ratio** | ~600 LOC / 8 hooks | ~8,000+ LOC / 45 hooks |
-| **Maintenance burden** | Low (each hook is independent, ~75 lines avg) | High (hooks depend on shared libs, state files, config) |
-| **Failure modes** | Reminders ignored (no enforcement) | Hooks block valid operations (false positives ~40% for creator guard); state file corruption |
-| **Scalability** | Works for any project size | Requires restart for hook registration changes; hooks add latency per tool call |
-| **Effectiveness** | Depends on user discipline | Provably prevents orphaned artifacts (0% vs 70% before) |
+| Criterion              | pro-workflow                                  | agent-studio                                                                                 |
+| ---------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Complexity ratio**   | ~600 LOC / 8 hooks                            | ~8,000+ LOC / 45 hooks                                                                       |
+| **Maintenance burden** | Low (each hook is independent, ~75 lines avg) | High (hooks depend on shared libs, state files, config)                                      |
+| **Failure modes**      | Reminders ignored (no enforcement)            | Hooks block valid operations (false positives ~40% for creator guard); state file corruption |
+| **Scalability**        | Works for any project size                    | Requires restart for hook registration changes; hooks add latency per tool call              |
+| **Effectiveness**      | Depends on user discipline                    | Provably prevents orphaned artifacts (0% vs 70% before)                                      |
 
 **Verdict:** This is the most instructive comparison. pro-workflow's advisory approach is lower friction but has no teeth. agent-studio's blocking approach is higher friction but provably effective. The critical insight is that **enforcement exists in agent-studio because advisory approaches failed** -- the 70% orphan rate before enforcement proves that "reminders" alone are insufficient for multi-agent systems where the agents themselves need guardrails.
 
 However, pro-workflow's **adaptive quality gates** are a genuinely novel pattern. The quality-gate.js script adjusts edit thresholds based on historical correction rate:
+
 - High correction rate (>25%) -> tighter gates (every 3 edits)
 - Low correction rate (<5%) -> relaxed gates (every 10 edits)
 
@@ -171,12 +175,14 @@ This adaptive pattern does not exist in agent-studio. Our quality gates are stat
 ### pro-workflow: Dual-Layer Persistence
 
 **Layer 1: SQLite Database** (`~/.pro-workflow/data.db`)
+
 - `learnings` table: category, rule, mistake, correction, times_applied
 - `sessions` table: edit_count, corrections_count, prompts_count
 - `learnings_fts` virtual table: FTS5 full-text search with BM25 ranking
 - Auto-sync triggers for FTS index maintenance
 
 **Layer 2: Temp Files** (fallback when SQLite unavailable)
+
 - `os.tmpdir()/pro-workflow/edit-count-{sessionId}`
 - `os.tmpdir()/pro-workflow/intent-{sessionId}`
 - `os.tmpdir()/pro-workflow/response-count-{sessionId}`
@@ -186,12 +192,14 @@ This adaptive pattern does not exist in agent-studio. Our quality gates are stat
 ### agent-studio: Multi-File State System
 
 **Layer 1: Markdown Memory** (persistent across sessions)
+
 - `learnings.md`: Patterns and solutions (append-only, ~80KB)
 - `decisions.md`: Architecture Decision Records (~20KB)
 - `issues.md`: Blockers and workarounds (~53KB)
 - `active_context.md`: Scratchpad for current session
 
 **Layer 2: JSON Runtime State** (ephemeral per session)
+
 - `workflow-state.json`: Current phase, agent assignments
 - `router-state.json`: Creator intent flags, routing context
 - `active-creators.json`: Creator token TTLs
@@ -199,6 +207,7 @@ This adaptive pattern does not exist in agent-studio. Our quality gates are stat
 - `integration-queue.jsonl`: Post-creation integration tasks
 
 **Layer 3: JSONL Metrics** (append-only logs)
+
 - `spawn-log.jsonl`: Agent spawn traceability
 - `hook-metrics.jsonl`: Hook execution timing
 - `error-metrics.jsonl`: Error tracking
@@ -206,15 +215,16 @@ This adaptive pattern does not exist in agent-studio. Our quality gates are stat
 
 ### Assessment
 
-| Criterion | pro-workflow | agent-studio |
-|-----------|-------------|--------------|
-| **Complexity ratio** | ~400 LOC (schema + store + fts) | ~2,000+ LOC (memory manager + scheduler + rotator + pruner) |
-| **Maintenance burden** | Low (SQLite is self-maintaining) | High (markdown files grow unbounded; rotation/pruning needed; 82KB active memory) |
-| **Failure modes** | DB corruption (mitigated by SQLite ACID); temp file race conditions | Markdown parsing errors; state file staleness; context budget exhaustion (40%) |
-| **Scalability** | Excellent (SQLite handles millions of rows; FTS5 scales logarithmically) | Poor (markdown files are O(n) to parse; no indexing; context budget constrains) |
-| **Query capability** | Full SQL + FTS5 BM25 search | Grep-based text search; no structured queries |
+| Criterion              | pro-workflow                                                             | agent-studio                                                                      |
+| ---------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| **Complexity ratio**   | ~400 LOC (schema + store + fts)                                          | ~2,000+ LOC (memory manager + scheduler + rotator + pruner)                       |
+| **Maintenance burden** | Low (SQLite is self-maintaining)                                         | High (markdown files grow unbounded; rotation/pruning needed; 82KB active memory) |
+| **Failure modes**      | DB corruption (mitigated by SQLite ACID); temp file race conditions      | Markdown parsing errors; state file staleness; context budget exhaustion (40%)    |
+| **Scalability**        | Excellent (SQLite handles millions of rows; FTS5 scales logarithmically) | Poor (markdown files are O(n) to parse; no indexing; context budget constrains)   |
+| **Query capability**   | Full SQL + FTS5 BM25 search                                              | Grep-based text search; no structured queries                                     |
 
 **Verdict:** pro-workflow's SQLite-backed state management is architecturally superior for learnings persistence. Structured data in a relational database with FTS5 full-text search is fundamentally better than appending to markdown files for:
+
 - Search: BM25 ranking vs grep
 - Growth management: SQL DELETE vs markdown rotation
 - Analytics: SQL aggregation vs manual parsing
@@ -266,13 +276,13 @@ pro-workflow/           (53 files total)
 
 ### Assessment
 
-| Criterion | pro-workflow | agent-studio |
-|-----------|-------------|--------------|
-| **Complexity ratio** | 53 files / 53 files = 1.0 (no overhead) | ~2,254 files / ~200 functional files = 11:1 (significant overhead) |
-| **Maintenance burden** | Trivial (add file, done) | High (add file + catalog + registry + routing + hooks + tests) |
-| **Failure modes** | Missing file = feature absent (simple) | Missing catalog entry = invisible artifact (70% orphan rate before enforcement) |
-| **Scalability** | Breaks at ~20 agents (flat dir unmanageable) | Handles 59 agents with categorization |
-| **Discoverability** | Scan 10 dirs manually | Catalogs + registries + routing table |
+| Criterion              | pro-workflow                                 | agent-studio                                                                    |
+| ---------------------- | -------------------------------------------- | ------------------------------------------------------------------------------- |
+| **Complexity ratio**   | 53 files / 53 files = 1.0 (no overhead)      | ~2,254 files / ~200 functional files = 11:1 (significant overhead)              |
+| **Maintenance burden** | Trivial (add file, done)                     | High (add file + catalog + registry + routing + hooks + tests)                  |
+| **Failure modes**      | Missing file = feature absent (simple)       | Missing catalog entry = invisible artifact (70% orphan rate before enforcement) |
+| **Scalability**        | Breaks at ~20 agents (flat dir unmanageable) | Handles 59 agents with categorization                                           |
+| **Discoverability**    | Scan 10 dirs manually                        | Catalogs + registries + routing table                                           |
 
 **Verdict:** pro-workflow's flat structure is appropriate for a plugin with 53 files. agent-studio's deep hierarchy is necessary for 2,254 files but creates a "catalog tax" where every new artifact requires 3-5 integration steps. The 11:1 overhead ratio suggests that significant portions of agent-studio are meta-infrastructure (catalogs about catalogs, hooks about hooks, schemas about schemas).
 
@@ -308,12 +318,12 @@ All configuration in one place. No environment variables, no override hierarchy,
 
 ### Assessment
 
-| Criterion | pro-workflow | agent-studio |
-|-----------|-------------|--------------|
-| **Complexity ratio** | 45 LOC (1 file) | ~500+ LOC (6+ config sources) |
-| **Maintenance burden** | Trivial (edit one file) | High (changes may need updates in 3+ places) |
-| **Failure modes** | Missing config = defaults work | Config precedence confusion; stale settings.json cache |
-| **Scalability** | Limited (single file becomes unwieldy at 100+ settings) | Good (layered config handles complex scenarios) |
+| Criterion              | pro-workflow                                            | agent-studio                                           |
+| ---------------------- | ------------------------------------------------------- | ------------------------------------------------------ |
+| **Complexity ratio**   | 45 LOC (1 file)                                         | ~500+ LOC (6+ config sources)                          |
+| **Maintenance burden** | Trivial (edit one file)                                 | High (changes may need updates in 3+ places)           |
+| **Failure modes**      | Missing config = defaults work                          | Config precedence confusion; stale settings.json cache |
+| **Scalability**        | Limited (single file becomes unwieldy at 100+ settings) | Good (layered config handles complex scenarios)        |
 
 **Verdict:** pro-workflow's single config is cleaner for its scope. agent-studio's multi-layer configuration is overengineered for many use cases but necessary for fine-grained control of 59 agents with different model/tool requirements. The **settings.json caching issue** (hooks require restart after registration changes) is a pain point that pro-workflow avoids entirely.
 
@@ -331,6 +341,7 @@ Future sessions search DB for relevant rules -> Rules surfaced before similar ta
 ```
 
 Features:
+
 - `/learn` captures corrections as structured records (category, rule, mistake, correction)
 - `/search` performs FTS5 BM25-ranked search across all learnings
 - `/replay` proactively surfaces relevant learnings before starting a task
@@ -350,6 +361,7 @@ Agent starts -> Read learnings.md -> Do work -> Append findings to learnings.md/
 ```
 
 Features:
+
 - `learnings.md`: Unstructured text patterns/solutions
 - `decisions.md`: Architecture Decision Records (formal ADRs)
 - `issues.md`: Blockers and workarounds
@@ -362,14 +374,14 @@ Features:
 
 ### Assessment
 
-| Criterion | pro-workflow | agent-studio |
-|-----------|-------------|--------------|
-| **Complexity ratio** | ~400 LOC (DB + search + commands) | ~1,500+ LOC (memory manager + rotator + pruner + cold storage + scheduler) |
-| **Maintenance burden** | Low (SQLite self-manages; FTS auto-syncs via triggers) | High (rotation thresholds, pruning algorithms, archive management) |
-| **Failure modes** | DB corruption (rare, SQLite is battle-tested) | Unbounded growth (82KB consuming 40% context); duplicate entries; rotation edge cases |
-| **Scalability** | Excellent (SQLite + FTS5 handles millions of entries) | Poor (grows until rotation triggers; grep-based search is O(n)) |
-| **Query quality** | BM25-ranked search with snippets | Grep text match (no ranking, no relevance scoring) |
-| **Analytics** | Correction rates, heatmaps, trends, stale detection | None (no analytics on memory usage or effectiveness) |
+| Criterion              | pro-workflow                                           | agent-studio                                                                          |
+| ---------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| **Complexity ratio**   | ~400 LOC (DB + search + commands)                      | ~1,500+ LOC (memory manager + rotator + pruner + cold storage + scheduler)            |
+| **Maintenance burden** | Low (SQLite self-manages; FTS auto-syncs via triggers) | High (rotation thresholds, pruning algorithms, archive management)                    |
+| **Failure modes**      | DB corruption (rare, SQLite is battle-tested)          | Unbounded growth (82KB consuming 40% context); duplicate entries; rotation edge cases |
+| **Scalability**        | Excellent (SQLite + FTS5 handles millions of entries)  | Poor (grows until rotation triggers; grep-based search is O(n))                       |
+| **Query quality**      | BM25-ranked search with snippets                       | Grep text match (no ranking, no relevance scoring)                                    |
+| **Analytics**          | Correction rates, heatmaps, trends, stale detection    | None (no analytics on memory usage or effectiveness)                                  |
 
 **Verdict:** pro-workflow's database-backed memory is architecturally superior for the learning/correction loop. agent-studio's markdown memory is simpler to author but harder to maintain and query at scale.
 
@@ -379,18 +391,18 @@ However, agent-studio's ADR system (formal Architecture Decision Records with St
 
 ## Quantitative Summary
 
-| Dimension | pro-workflow | agent-studio | Ratio |
-|-----------|-------------|--------------|-------|
-| Total files | 53 | 2,254 | 1:43 |
-| Agents | 3 | 59 | 1:20 |
-| Skills | 1 | 448 | 1:448 |
-| Hooks (active) | 8 | 45 | 1:6 |
-| Hook LOC | ~600 | ~8,000+ | 1:13 |
-| Config sources | 1 | 6+ | 1:6 |
-| Commands | 10 | 15+ | 1:1.5 |
-| Dependencies | 1 (better-sqlite3) | 5+ (various) | 1:5 |
-| Enforcement mode | Advisory | Blocking | N/A |
-| Memory storage | SQLite + FTS5 | Markdown files | Structured vs flat |
+| Dimension        | pro-workflow       | agent-studio   | Ratio              |
+| ---------------- | ------------------ | -------------- | ------------------ |
+| Total files      | 53                 | 2,254          | 1:43               |
+| Agents           | 3                  | 59             | 1:20               |
+| Skills           | 1                  | 448            | 1:448              |
+| Hooks (active)   | 8                  | 45             | 1:6                |
+| Hook LOC         | ~600               | ~8,000+        | 1:13               |
+| Config sources   | 1                  | 6+             | 1:6                |
+| Commands         | 10                 | 15+            | 1:1.5              |
+| Dependencies     | 1 (better-sqlite3) | 5+ (various)   | 1:5                |
+| Enforcement mode | Advisory           | Blocking       | N/A                |
+| Memory storage   | SQLite + FTS5      | Markdown files | Structured vs flat |
 
 ---
 
@@ -490,4 +502,4 @@ These are not contradictory goals. The ideal system would have pro-workflow's le
 
 ---
 
-*Analysis based on pro-workflow v1.2.0 (53 files) and agent-studio v2.2.1 (2,254 files). Last updated: 2026-02-09.*
+_Analysis based on pro-workflow v1.2.0 (53 files) and agent-studio v2.2.1 (2,254 files). Last updated: 2026-02-09._

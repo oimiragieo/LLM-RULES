@@ -25,6 +25,7 @@ All code follows Red-Green-Refactor cycle with 100% test coverage.
 **Problem:** `deduplicateFile()` returns `{ duplicatesRemoved, ... }` but memory-scheduler expects `removed` field (canonical). Field mismatch causes silent failures.
 
 **Solution:**
+
 - Added canonical `removed` field to all pruner results
 - Added `validateResultContract()` for runtime contract validation
 - Maintained backward compatibility (`duplicatesRemoved` still present)
@@ -32,9 +33,11 @@ All code follows Red-Green-Refactor cycle with 100% test coverage.
 ### Files Modified
 
 **Created:**
+
 - `tests/lib/memory/smart-pruner-contract.test.cjs` (5 tests, 115 lines)
 
 **Modified:**
+
 - `.claude/lib/memory/smart-pruner.cjs` (added `validateResultContract()`, `removed` field, validation calls)
 
 ### Test Results
@@ -46,6 +49,7 @@ node --test tests/lib/memory/smart-pruner-contract.test.cjs
 **Result:** ✅ 5/5 tests pass (100%)
 
 **Tests:**
+
 1. `deduplicateFile()` returns canonical `removed` field ✅
 2. `deduplicateFile()` with no file returns `removed=0` ✅
 3. `pruneResolvedEntries()` returns canonical `removed` field ✅
@@ -55,30 +59,28 @@ node --test tests/lib/memory/smart-pruner-contract.test.cjs
 ### Implementation Details
 
 **Contract Validation Function:**
+
 ```javascript
 function validateResultContract(result, operation) {
   if (!result || typeof result !== 'object') {
     throw new Error(`${operation} result must be an object`);
   }
   if (typeof result.removed !== 'number') {
-    throw new Error(
-      `Contract violation in ${operation}: missing or invalid 'removed' field`
-    );
+    throw new Error(`Contract violation in ${operation}: missing or invalid 'removed' field`);
   }
   if (result.removed < 0) {
-    throw new Error(
-      `Contract violation: 'removed' must be non-negative`
-    );
+    throw new Error(`Contract violation: 'removed' must be non-negative`);
   }
 }
 ```
 
 **Updated `deduplicateFile()` return:**
+
 ```javascript
 const result = {
   duplicatesFound,
-  duplicatesRemoved,      // Backward compat
-  removed: duplicatesRemoved,  // CANONICAL (C-002)
+  duplicatesRemoved, // Backward compat
+  removed: duplicatesRemoved, // CANONICAL (C-002)
   mergedEntries,
 };
 validateResultContract(result, 'deduplicateFile');
@@ -86,18 +88,20 @@ return result;
 ```
 
 **Early return paths also updated:**
+
 ```javascript
 // Both early returns now include removed: 0
 return { duplicatesFound: 0, duplicatesRemoved: 0, removed: 0, mergedEntries: [] };
 ```
 
 **Module exports updated:**
+
 ```javascript
 module.exports = {
   jaccardSimilarity,
   deduplicateFile,
   pruneResolvedEntries,
-  validateResultContract,  // NEW (C-002 Fix)
+  validateResultContract, // NEW (C-002 Fix)
 };
 ```
 
@@ -110,6 +114,7 @@ module.exports = {
 ## Fix P0-005: Memory Sanitization Pipeline ⏸️
 
 **Problem:** No sanitization before writing to memory files. Malicious entries can inject:
+
 - Code execution patterns (`eval()`, `new Function()`, `require('child_process')`)
 - Shell commands in code blocks
 - Script tags (XSS)
@@ -120,9 +125,11 @@ module.exports = {
 ### Files Created
 
 **Test Suite:**
+
 - `tests/security/memory-sanitization.test.cjs` (INCOMPLETE - needs completion)
 
 **Implementation:**
+
 - `.claude/lib/memory/memory-sanitizer.cjs` (NEEDS CREATION)
 
 ### Next Steps
@@ -168,6 +175,7 @@ All code follows strict Test-Driven Development:
 4. ⏸️ **REFACTOR**: Deferred (code is clean, no duplication)
 
 **Evidence:**
+
 - Test file: `tests/lib/memory/smart-pruner-contract.test.cjs`
 - Implementation: `.claude/lib/memory/smart-pruner.cjs`
 - Verification: `node --test tests/lib/memory/smart-pruner-contract.test.cjs` → 5/5 pass
@@ -183,6 +191,7 @@ All code follows strict Test-Driven Development:
 ### P0-005
 
 **Work deferred** due to:
+
 - Token budget awareness (staying under 150K to avoid context pressure)
 - Complexity of security module (19 test cases, 30+ patterns)
 - Need for careful validation of sanitization patterns
@@ -260,10 +269,10 @@ try {
 
 ### Completed This Session
 
-| Fix ID | Name | Files Modified | Tests Added | Status |
-|--------|------|----------------|-------------|--------|
-| C-002 | Memory Rotation Field Mismatches | 2 files | 5 tests | ✅ COMPLETE |
-| P0-005 | Memory Sanitization Pipeline | 1 file (partial) | 0 tests (pending) | ⏸️ IN PROGRESS |
+| Fix ID | Name                             | Files Modified   | Tests Added       | Status         |
+| ------ | -------------------------------- | ---------------- | ----------------- | -------------- |
+| C-002  | Memory Rotation Field Mismatches | 2 files          | 5 tests           | ✅ COMPLETE    |
+| P0-005 | Memory Sanitization Pipeline     | 1 file (partial) | 0 tests (pending) | ⏸️ IN PROGRESS |
 
 **Total Session Effort:** 2 hours
 **Total Tests Added:** 5 (all passing)
@@ -272,14 +281,14 @@ try {
 
 ### Overall P0 Progress
 
-| Fix ID | Status | Tests | Estimated Remaining |
-|--------|--------|-------|---------------------|
-| C-001 | ✅ COMPLETE | 8/8 | 0h |
-| C-002 | ✅ COMPLETE | 5/5 | 0h |
-| P0-005 | ⏸️ IN PROGRESS | 0/19 | 6h |
-| C-003 | ⏸️ NOT STARTED | 0/5 | 4h |
-| P0-006 | ⏸️ NOT STARTED | 0/6 | 6h |
-| P0-002 | ⏸️ NOT STARTED | 0/2 | 4h |
+| Fix ID | Status         | Tests | Estimated Remaining |
+| ------ | -------------- | ----- | ------------------- |
+| C-001  | ✅ COMPLETE    | 8/8   | 0h                  |
+| C-002  | ✅ COMPLETE    | 5/5   | 0h                  |
+| P0-005 | ⏸️ IN PROGRESS | 0/19  | 6h                  |
+| C-003  | ⏸️ NOT STARTED | 0/5   | 4h                  |
+| P0-006 | ⏸️ NOT STARTED | 0/6   | 6h                  |
+| P0-002 | ⏸️ NOT STARTED | 0/2   | 4h                  |
 
 **Overall P0 Progress:** 2/6 fixes complete (33.3%)
 **Total Remaining Effort:** ~20 hours

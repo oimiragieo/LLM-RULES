@@ -12,14 +12,15 @@
 
 The agent-studio codebase has **356 test files** covering critical components, but significant gaps exist:
 
-| Category | Total | Tested | Untested | % Coverage |
-|----------|-------|--------|----------|-----------|
-| Library Modules (.claude/lib) | 220 | ~95 | **125** | 43% |
-| Hooks (.claude/hooks) | 79 | 49 | **30** | 62% |
-| Tools (.claude/tools) | 377 | 42 | **335** | 11% |
-| **Total** | **676** | **186** | **490** | **27%** |
+| Category                      | Total   | Tested  | Untested | % Coverage |
+| ----------------------------- | ------- | ------- | -------- | ---------- |
+| Library Modules (.claude/lib) | 220     | ~95     | **125**  | 43%        |
+| Hooks (.claude/hooks)         | 79      | 49      | **30**   | 62%        |
+| Tools (.claude/tools)         | 377     | 42      | **335**  | 11%        |
+| **Total**                     | **676** | **186** | **490**  | **27%**    |
 
 **Critical Findings:**
+
 1. **127+ lib modules** with zero test coverage (code-indexing, memory, config, etc.)
 2. **30 active hooks** untested (reflection, evolution, metrics, routing helpers)
 3. **335 tools** mostly untested (infrastructure, analysis, utilities)
@@ -36,6 +37,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Total: 125 untested modules (57% of lib directory)**
 
 #### 1.1 Code Indexing (23 untested)
+
 - `embedding-generator.cjs` - GPU embeddings, no test file
 - `hybrid-lazy-indexer*.cjs` (4 files) - Core search infrastructure
 - `index-manager*.cjs` (3 files) - File operations, concurrency handling
@@ -47,6 +49,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Risk:** Production search failures, data corruption, performance issues
 
 #### 1.2 Memory System (18 untested)
+
 - `cold-storage.cjs` - Archive rotation
 - `contextual-memory.cjs` - Multi-tier memory access
 - `entity-extractor.cjs` - Entity recognition
@@ -59,6 +62,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Risk:** Memory corruption, lost learnings, query failures
 
 #### 1.3 Routing System (12 untested)
+
 - `agent-registry-resolver.cjs` - No validation tests
 - `semantic-router.cjs` - Semantic classification
 - `pattern-router.cjs` - Pattern matching
@@ -67,6 +71,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Risk:** Tasks routed to wrong agents, missed intent
 
 #### 1.4 Configuration (6 untested)
+
 - `context-mode-loader.cjs` - Mode switching
 - `resolve-runtime-context.cjs` - Context assembly
 - `host-config-generator.cjs` - Host configuration
@@ -74,6 +79,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Risk:** Configuration parsing errors, environment issues
 
 #### 1.5 Other Critical Gaps (15 untested)
+
 - `error-pattern-detector.cjs` - Error classification
 - `error-writer.cjs` - Error logging
 - `evolution-state-sync.cjs` - State synchronization
@@ -89,6 +95,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Active hooks without tests: 30/79 (38%)**
 
 #### 2.1 Reflection System (6 untested)
+
 - `reflection-step0-guard.cjs` - Reflection enforcement
 - `reflection-queue-processor.cjs` - Queue management
 - `force-step0-execution.cjs` - State forcing
@@ -97,6 +104,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Risk:** Reflection workflow breaks silently
 
 #### 2.2 Evolution System (4 untested)
+
 - `conflict-detector.cjs` - Evolution conflict detection
 - `evolution-state-guard.cjs` - State validation
 - `quality-gate-validator.cjs` - Quality enforcement
@@ -105,6 +113,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Risk:** Artifact conflicts, quality gate bypass
 
 #### 2.3 Metrics & Monitoring (3 untested)
+
 - `post-tool-metrics-unified.cjs` - Metrics collection
 - `metrics-collector.cjs` - Data aggregation
 - `error-tracker.cjs` - Error tracking
@@ -112,6 +121,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Risk:** No observability into failures
 
 #### 2.4 Routing Helpers (8 untested)
+
 - `code-index-updater.cjs` - Index synchronization
 - `post-task-unified*.cjs` (3 files) - Task completion
 - `pre-task-unified*.cjs` (4 files) - Task prep
@@ -119,6 +129,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Risk:** Task workflow incomplete/broken
 
 #### 2.5 Memory Sync (1 untested)
+
 - `sync-memory-index.cjs` - Memory index update
 
 **Risk:** Memory index corruption/drift
@@ -144,6 +155,7 @@ The agent-studio codebase has **356 test files** covering critical components, b
 **Pattern:** Tests focus on happy paths, skip edge cases.
 
 Files with NO edge case testing:
+
 - `context-reset.test.cjs` - No null/undefined/empty inputs
 - `file-locker.test.cjs` - No concurrent lock scenarios
 - `logger.test.cjs` - No error/overflow conditions
@@ -157,6 +169,7 @@ Files with NO edge case testing:
 **Finding:** 1,448+ instances of timing-based assertions
 
 Problematic patterns:
+
 ```javascript
 // FLAKY: Tests that depend on timing
 setTimeout(() => {...}, 100);
@@ -165,6 +178,7 @@ assert(Date.now() > startTime); // Timing-dependent
 ```
 
 **Risk Files:**
+
 - `progressive-disclosure-adaptive.test.cjs` - Timing assertions
 - Multiple code-indexing tests - Async timing
 - Memory tests - State timing
@@ -182,6 +196,7 @@ While 183 files have Windows path patterns, coverage is incomplete:
 - Symlink handling
 
 **Affected Modules:**
+
 - `platform.cjs` - Good coverage (7 cases)
 - Most file I/O modules - Weak coverage
 
@@ -190,12 +205,14 @@ While 183 files have Windows path patterns, coverage is incomplete:
 **Finding:** File I/O modules without concurrent access tests
 
 Untested scenarios:
+
 - Multiple agents writing same file simultaneously
 - LanceDB vector store concurrent access
 - Merkle tree concurrent updates
 - Hook state concurrent modification
 
 **Critical Files Needing Concurrency Tests:**
+
 - `.claude/lib/code-indexing/index-manager-operations.cjs`
 - `.claude/lib/code-indexing/vector-store.cjs`
 - `.claude/lib/memory/memory-deduplicator.cjs`
@@ -204,6 +221,7 @@ Untested scenarios:
 #### 4.5 Integration Test Gaps
 
 **Missing Integration Tests:**
+
 1. **Hook Chain Execution** - Multiple hooks running in sequence
 2. **Multi-Phase Workflows** - Planner → Developer → QA → Reviewer
 3. **State Synchronization** - Memory <-> Router State <-> Runtime State
@@ -223,6 +241,7 @@ Untested scenarios:
 **Status:** Using Node.js `--test` runner (good)
 
 **Issues Found:**
+
 1. No code coverage reporting configured
 2. No coverage thresholds enforced
 3. No parallel test execution (single-threaded)
@@ -231,6 +250,7 @@ Untested scenarios:
 #### 5.2 Test Utilities & Fixtures
 
 **What's Missing:**
+
 - No mock factory for common objects
 - No test data generators
 - No shared fixtures for file I/O tests
@@ -242,6 +262,7 @@ Untested scenarios:
 **Status:** `pnpm test` configured but incomplete
 
 **Issues:**
+
 - No pre-commit hook validation
 - No coverage gate in CI
 - No performance regression detection
@@ -256,6 +277,7 @@ Untested scenarios:
 Identified archived hooks with potentially dead tests:
 
 Example: `tests/hooks/routing-guard.test.cjs`
+
 - Tests consolidated hook (good)
 - But references 5 original hooks that are now archived
 - May be testing removed code paths
@@ -358,16 +380,19 @@ Before marking any work complete:
 ## Risk Assessment
 
 ### High Risk Areas
+
 1. **Memory system** - 18 untested modules controlling learnings/decisions (CRITICAL)
 2. **Search indexing** - 23 untested modules for code retrieval (HIGH)
 3. **Concurrency** - File I/O modules without race condition tests (HIGH)
 
 ### Medium Risk Areas
+
 4. **Routing** - 12 untested modules for task assignment (MEDIUM)
 5. **Hooks** - 30 untested hooks in critical workflows (MEDIUM)
 6. **Flaky tests** - 1,448 timing-based assertions (MEDIUM)
 
 ### Coverage Goals by End of Q1 2026
+
 - **Unit Tests:** 60% code coverage (currently ~27%)
 - **Integration Tests:** 5+ workflows end-to-end
 - **Hook Tests:** 80% hook coverage (currently 62%)

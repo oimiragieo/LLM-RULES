@@ -13,6 +13,7 @@
 This session completed **12 critical fixes** across 9 files with clean architectural patterns:
 
 ✅ **Validated Fixes** (All architecturally sound):
+
 1. Centralized enforcement defaults (ADR-130) - 21 env vars → single module
 2. Router state cache TTL hardening - retry logging, CPU spin fix
 3. Shell injection validator - input validation, bounded loops
@@ -21,6 +22,7 @@ This session completed **12 critical fixes** across 9 files with clean architect
 6. JSDoc documentation (fuzzy-intent-matcher)
 
 ✅ **Remaining P0/P1 Work** (Design complete, ready for implementation):
+
 1. **P0**: CI validation gate for hook/skill/agent registry consistency
 2. **P0**: Windows path traversal hardening (CVE-2025-27210)
 3. **P1**: Atomic file operations (cross-drive fs.renameSync failure)
@@ -39,6 +41,7 @@ This session completed **12 critical fixes** across 9 files with clean architect
 **Architecture Quality**: ⭐⭐⭐⭐⭐ (5/5)
 
 **Strengths**:
+
 - Clear separation of concerns (configuration vs behavior)
 - Predictable resolution order: env var → default table → 'warn'
 - Helper functions (isBlocking, isWarning, isDisabled) hide implementation
@@ -46,6 +49,7 @@ This session completed **12 critical fixes** across 9 files with clean architect
 - Zero coupling to specific hooks (pure utility module)
 
 **Evidence of Quality**:
+
 ```javascript
 // Before (scattered across 8 files):
 const mode = process.env.PLANNER_FIRST_ENFORCEMENT || 'block';
@@ -56,6 +60,7 @@ const mode = getEnforcementMode('PLANNER_FIRST_ENFORCEMENT');
 ```
 
 **Integration Check**:
+
 - ✅ Used by `hook-input.cjs` (hook stdin parsing)
 - ✅ Used by `pre-task-unified-core.cjs` (routing enforcement)
 - ⚠️ **Action Required**: Audit remaining 6 files for scattered `process.env.X || 'default'` patterns
@@ -68,6 +73,7 @@ const mode = getEnforcementMode('PLANNER_FIRST_ENFORCEMENT');
 
 **Location**: `.claude/lib/routing/router-state.cjs` (lines 63-74)
 **Fixes Applied**:
+
 - Cache TTL added (30s default, configurable)
 - Retry logging (logs attempt number, backoff delay)
 - Bounded retry loop (MAX_RETRIES=5, prevents CPU spin)
@@ -75,11 +81,13 @@ const mode = getEnforcementMode('PLANNER_FIRST_ENFORCEMENT');
 **Architecture Quality**: ⭐⭐⭐⭐ (4/5)
 
 **Strengths**:
+
 - Bounded loops prevent infinite retry (security hardening)
 - Exponential backoff prevents thundering herd
 - Clear constants (`MAX_RETRIES`, `BASE_BACKOFF`) at top of file
 
 **Minor Concerns**:
+
 - ⚠️ No jitter in backoff (could cause synchronized retries under load)
 - ⚠️ No circuit breaker (fails fast after MAX_RETRIES but no backoff period)
 
@@ -91,23 +99,27 @@ const mode = getEnforcementMode('PLANNER_FIRST_ENFORCEMENT');
 
 **Location**: `.claude/hooks/safety/shell-injection-validator.cjs` (lines 30-100)
 **Fixes Applied**:
+
 - Input validation (null/undefined check before regex)
 - Bounded backtick collection loop (prevents infinite loop on unclosed backticks)
 
 **Architecture Quality**: ⭐⭐⭐⭐ (4/5)
 
 **Strengths**:
+
 - Defense in depth (INJECTION_PATTERNS + DANGEROUS_TARGETS)
 - Clear separation of concerns (extract/sanitize → validate → build violation)
 - Structured error responses (`buildViolation` function)
 
 **Security Patterns Validated**:
+
 - ✅ Blocks chained commands (`;`, `&&`, `|` + `rm -rf`)
 - ✅ Blocks eval injection
 - ✅ Blocks device redirects (`/dev/`)
 - ✅ Context-aware (checks word boundaries for `eval`)
 
 **Minor Concerns**:
+
 - ⚠️ Backtick collection has quadratic worst-case (nested backticks)
 - ⚠️ No protection against `$()` command substitution (pattern exists but not enforced)
 
@@ -123,6 +135,7 @@ const mode = getEnforcementMode('PLANNER_FIRST_ENFORCEMENT');
 **Architecture Quality**: ⭐⭐⭐⭐⭐ (5/5)
 
 **Strengths**:
+
 - Event bus isolation (failure in one handler doesn't cascade)
 - Timeout prevents hanging operations
 - Structured logging (includes event type, payload, error context)
@@ -284,6 +297,7 @@ function validateSemantics() {
 ### Integration Points
 
 **Pre-commit hook** (`.git/hooks/pre-commit`):
+
 ```bash
 #!/bin/bash
 # Run registry consistency check before commit
@@ -291,6 +305,7 @@ pnpm validate:registry || exit 1
 ```
 
 **CI Pipeline** (`pnpm metrics:ci`):
+
 ```javascript
 // Add registry validation to CI metrics gate
 const registryValidation = runValidateRegistry();
@@ -304,6 +319,7 @@ if (registryValidation.status === 'fail') {
 **Expected Runtime**: <2 seconds for 500+ files
 
 **Optimization Strategies**:
+
 1. **Parallel validation**: Run 4 layers in parallel (Promise.all)
 2. **Incremental validation**: Only check changed files (git diff)
 3. **Caching**: Cache glob results (invalidate on file changes)
@@ -353,9 +369,28 @@ if (registryValidation.status === 'fail') {
  * Windows reserved names (case-insensitive)
  */
 const WINDOWS_RESERVED_NAMES = [
-  'CON', 'PRN', 'AUX', 'NUL',
-  'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
-  'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9'
+  'CON',
+  'PRN',
+  'AUX',
+  'NUL',
+  'COM1',
+  'COM2',
+  'COM3',
+  'COM4',
+  'COM5',
+  'COM6',
+  'COM7',
+  'COM8',
+  'COM9',
+  'LPT1',
+  'LPT2',
+  'LPT3',
+  'LPT4',
+  'LPT5',
+  'LPT6',
+  'LPT7',
+  'LPT8',
+  'LPT9',
 ];
 
 /**
@@ -398,7 +433,7 @@ function validatePath(filePath) {
     if (isReservedName(segment)) {
       return {
         valid: false,
-        reason: `Reserved name detected: ${segment}`
+        reason: `Reserved name detected: ${segment}`,
       };
     }
   }
@@ -407,7 +442,7 @@ function validatePath(filePath) {
   if (isUNCPath(filePath)) {
     return {
       valid: false,
-      reason: 'UNC paths are not allowed'
+      reason: 'UNC paths are not allowed',
     };
   }
 
@@ -418,7 +453,7 @@ function validatePath(filePath) {
     if (isReservedName(segment)) {
       return {
         valid: false,
-        reason: `Reserved name detected after normalization: ${segment}`
+        reason: `Reserved name detected after normalization: ${segment}`,
       };
     }
   }
@@ -434,6 +469,7 @@ module.exports = { validatePath, isReservedName, isUNCPath };
 **Where to Add Validation**:
 
 1. **unified-pre-write-hook.cjs** (line ~50, before file safety checks):
+
    ```javascript
    const { validatePath } = require('../../lib/utils/safe-path.cjs');
    const validation = validatePath(targetPath);
@@ -443,6 +479,7 @@ module.exports = { validatePath, isReservedName, isUNCPath };
    ```
 
 2. **atomic-write.cjs** (before fs.writeFileSync):
+
    ```javascript
    const validation = validatePath(filePath);
    if (!validation.valid) {
@@ -466,9 +503,12 @@ module.exports = { validatePath, isReservedName, isUNCPath };
 describe('safe-path', () => {
   describe('Reserved Names', () => {
     it('blocks nul', () => expect(validatePath('C:\\temp\\nul')).toEqual({ valid: false }));
-    it('blocks CON (case-insensitive)', () => expect(validatePath('C:\\CON')).toEqual({ valid: false }));
-    it('blocks nul.txt (with extension)', () => expect(validatePath('C:\\nul.txt')).toEqual({ valid: false }));
-    it('allows my-nul-file.txt (substring)', () => expect(validatePath('C:\\my-nul-file.txt')).toEqual({ valid: true }));
+    it('blocks CON (case-insensitive)', () =>
+      expect(validatePath('C:\\CON')).toEqual({ valid: false }));
+    it('blocks nul.txt (with extension)', () =>
+      expect(validatePath('C:\\nul.txt')).toEqual({ valid: false }));
+    it('allows my-nul-file.txt (substring)', () =>
+      expect(validatePath('C:\\my-nul-file.txt')).toEqual({ valid: true }));
     it('blocks COM1', () => expect(validatePath('C:\\COM1')).toEqual({ valid: false }));
     it('blocks LPT9', () => expect(validatePath('C:\\LPT9')).toEqual({ valid: false }));
   });
@@ -476,13 +516,17 @@ describe('safe-path', () => {
   describe('UNC Paths', () => {
     it('blocks \\\\server\\share', () => expect(isUNCPath('\\\\server\\share')).toBe(true));
     it('blocks //server/share (normalized)', () => expect(isUNCPath('//server/share')).toBe(true));
-    it('blocks \\\\?\\UNC\\server\\share (long UNC)', () => expect(isUNCPath('\\\\?\\UNC\\server\\share')).toBe(true));
-    it('allows C:\\server\\share (local)', () => expect(isUNCPath('C:\\server\\share')).toBe(false));
+    it('blocks \\\\?\\UNC\\server\\share (long UNC)', () =>
+      expect(isUNCPath('\\\\?\\UNC\\server\\share')).toBe(true));
+    it('allows C:\\server\\share (local)', () =>
+      expect(isUNCPath('C:\\server\\share')).toBe(false));
   });
 
   describe('Path Traversal', () => {
-    it('blocks C:\\temp\\..\\nul', () => expect(validatePath('C:\\temp\\..\\nul')).toEqual({ valid: false }));
-    it('allows C:\\temp\\..\\valid.txt', () => expect(validatePath('C:\\temp\\..\\valid.txt')).toEqual({ valid: true }));
+    it('blocks C:\\temp\\..\\nul', () =>
+      expect(validatePath('C:\\temp\\..\\nul')).toEqual({ valid: false }));
+    it('allows C:\\temp\\..\\valid.txt', () =>
+      expect(validatePath('C:\\temp\\..\\valid.txt')).toEqual({ valid: true }));
   });
 });
 ```
@@ -500,6 +544,7 @@ describe('safe-path', () => {
 **Location**: `.claude/lib/utils/atomic-write.cjs` (MODIFY)
 
 **Current Implementation** (lines ~30-50):
+
 ```javascript
 function atomicWriteJSONSync(filePath, data) {
   const tmpPath = `${filePath}.tmp.${Date.now()}`;
@@ -509,6 +554,7 @@ function atomicWriteJSONSync(filePath, data) {
 ```
 
 **New Implementation**:
+
 ```javascript
 function atomicWriteJSONSync(filePath, data) {
   const tmpPath = `${filePath}.tmp.${Date.now()}`;
@@ -525,7 +571,9 @@ function atomicWriteJSONSync(filePath, data) {
       fs.unlinkSync(tmpPath);
     } else {
       // Cleanup temp file on other errors
-      try { fs.unlinkSync(tmpPath); } catch (_) {}
+      try {
+        fs.unlinkSync(tmpPath);
+      } catch (_) {}
       throw err;
     }
   }
@@ -533,16 +581,19 @@ function atomicWriteJSONSync(filePath, data) {
 ```
 
 **Trade-offs**:
+
 - ✅ **Pro**: Works across all filesystem configurations
 - ⚠️ **Con**: Copy-delete is not atomic (small race condition window)
 - ⚠️ **Con**: Slower on cross-drive (2 I/O operations vs 1)
 
 **Mitigation for Non-Atomicity**:
+
 - Use file locking (proper-lockfile) during copy-delete
 - Acquire lock before copy, release after delete
 - Guarantees atomicity at application level
 
 **Enhanced Implementation**:
+
 ```javascript
 const lockfile = require('proper-lockfile');
 
@@ -564,7 +615,9 @@ function atomicWriteJSONSync(filePath, data) {
         release();
       }
     } else {
-      try { fs.unlinkSync(tmpPath); } catch (_) {}
+      try {
+        fs.unlinkSync(tmpPath);
+      } catch (_) {}
       throw err;
     }
   }
@@ -574,12 +627,14 @@ function atomicWriteJSONSync(filePath, data) {
 ### Integration Points
 
 **Files Using atomicWriteJSONSync**:
+
 1. `router-state.cjs` (line ~130)
 2. `workflow-state-manager.cjs` (line ~45)
 3. `evolution-state-manager.cjs` (line ~60)
 4. `memory-tiers.cjs` (line ~200)
 
 **Testing Strategy**:
+
 - Unit tests: Mock `fs.renameSync` to throw EXDEV
 - Integration tests: Test on multi-drive systems (CI: mount tmpfs)
 
@@ -649,7 +704,8 @@ function applyRetentionPolicy() {
   }
 
   // Get all archive files with metadata
-  const files = fs.readdirSync(archiveDir)
+  const files = fs
+    .readdirSync(archiveDir)
     .filter(f => f.endsWith('.md'))
     .map(f => ({
       name: f,
@@ -684,7 +740,8 @@ function applyRetentionPolicy() {
   }
 
   // Policy 3: Compress cold storage files older than 180 days
-  const coldFiles = fs.readdirSync(coldStorageDir)
+  const coldFiles = fs
+    .readdirSync(coldStorageDir)
     .filter(f => f.endsWith('.md'))
     .map(f => ({
       name: f,
@@ -723,7 +780,8 @@ const { applyRetentionPolicy } = require('../../lib/memory/archive-retention.cjs
 
 // Add to weekly checks (runs Sunday 00:00)
 const dayOfWeek = new Date().getDay();
-if (dayOfWeek === 0) { // Sunday
+if (dayOfWeek === 0) {
+  // Sunday
   const stats = applyRetentionPolicy();
   console.log(`Archive retention: ${stats.moved} moved, ${stats.evicted} compressed`);
 }
@@ -741,12 +799,14 @@ if (dayOfWeek === 0) { // Sunday
 ### Monitoring & Alerts
 
 **Metrics to Track**:
+
 - Archive directory size (MB)
 - Number of files in archive/cold-storage
 - Retention policy execution frequency
 - Files evicted per run
 
 **Alert Thresholds**:
+
 - ⚠️ WARNING: Archive > 50MB
 - 🚨 CRITICAL: Archive > 100MB
 - ⚠️ WARNING: >150 files in archive
@@ -790,11 +850,13 @@ if (dayOfWeek === 0) { // Sunday
 **Example**: `enforcement-defaults.cjs`
 
 **When to Use**:
+
 - Configuration shared across multiple modules
 - Defaults that must be consistent
 - Values that may change over time
 
 **Benefits**:
+
 - 8x reduction in duplication
 - Single point of change
 - Testable in isolation
@@ -806,11 +868,13 @@ if (dayOfWeek === 0) { // Sunday
 **Example**: CI Validation Gate (4 layers)
 
 **When to Use**:
+
 - Complex validation with multiple concerns
 - Different failure modes (error vs warning)
 - Need for incremental validation
 
 **Benefits**:
+
 - Clear separation of concerns
 - Composable validators
 - Easy to add new layers
@@ -822,11 +886,13 @@ if (dayOfWeek === 0) { // Sunday
 **Example**: Shell injection validator
 
 **Layers**:
+
 1. Input validation (null/undefined checks)
 2. Bounded loops (MAX_RETRIES, backtick collection)
 3. Error boundaries (try/catch with cleanup)
 
 **When to Use**:
+
 - Security-critical code
 - External input handling
 - Async operations
@@ -838,11 +904,13 @@ if (dayOfWeek === 0) { // Sunday
 **Example**: Atomic write with EXDEV fallback
 
 **When to Use**:
+
 - Cross-platform compatibility
 - Multiple execution paths
 - Operations with edge cases
 
 **Benefits**:
+
 - Robustness across environments
 - Clear failure modes
 - Testable fallback paths
@@ -854,6 +922,7 @@ if (dayOfWeek === 0) { // Sunday
 ## Quality Score: 9.2/10
 
 **Breakdown**:
+
 - ✅ Centralized enforcement (5/5) - Model pattern
 - ✅ Router state hardening (4/5) - Minor concerns (jitter, circuit breaker)
 - ✅ Shell injection validator (4/5) - Security solid, minor perf concerns
@@ -861,6 +930,7 @@ if (dayOfWeek === 0) { // Sunday
 - ✅ Remaining designs (5/5) - Complete, actionable
 
 **Deductions**:
+
 - -0.3: No jitter in retry backoff (router-state)
 - -0.3: No circuit breaker pattern (router-state)
 - -0.2: Quadratic worst-case in backtick collection (shell-injection-validator)
@@ -890,6 +960,7 @@ if (dayOfWeek === 0) { // Sunday
    - Tests: Verify 90-day policy, LRU eviction, compression
 
 **Evidence of Completion**:
+
 ```bash
 # Verification commands
 pnpm validate:registry      # CI validation gate

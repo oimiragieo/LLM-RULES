@@ -41,6 +41,7 @@ The agent-studio framework has accrued significant structural debt across 4 prim
 **Location:** `.claude/hooks/routing/user-prompt-unified.core.cjs`
 
 **Issue:** Monolithic module handling:
+
 - User prompt parsing
 - Reflection step 0 logic
 - Router dispatch
@@ -51,14 +52,14 @@ The agent-studio framework has accrued significant structural debt across 4 prim
 **Current Size:** 1,893 lines
 **Recommended Decomposition:**
 
-| Module | Lines | Responsibility |
-|--------|-------|-----------------|
-| user-prompt-unified.core.cjs | 400 | Entry point + orchestration |
-| user-prompt.parser.cjs | 300 | Parse user input, extract intent |
-| reflection.coordinator.cjs | 250 | Step 0 reflection handling |
-| router.dispatcher.cjs | 350 | Intent→Agent routing logic |
-| compression.manager.cjs | 200 | Compression reminder logic |
-| integration.queue.processor.cjs | 250 | Integration queue validation |
+| Module                          | Lines | Responsibility                   |
+| ------------------------------- | ----- | -------------------------------- |
+| user-prompt-unified.core.cjs    | 400   | Entry point + orchestration      |
+| user-prompt.parser.cjs          | 300   | Parse user input, extract intent |
+| reflection.coordinator.cjs      | 250   | Step 0 reflection handling       |
+| router.dispatcher.cjs           | 350   | Intent→Agent routing logic       |
+| compression.manager.cjs         | 200   | Compression reminder logic       |
+| integration.queue.processor.cjs | 250   | Integration queue validation     |
 
 **Benefit:** Each module testable in isolation, easier to extend routing logic without touching reflection.
 
@@ -81,18 +82,19 @@ routing-guard-core.policy.cjs        (452 lines) - Policy enforcement
 ```
 
 **Problem:** Circular module dependencies (inferred from shared requires):
+
 - Each `checks-*.cjs` imports from `intent-model.cjs` and `policy.cjs`
 - `impl.cjs` imports from all of them
 - Changes to policy require updates across 4 modules
 
 **Recommended Refactor:**
 
-| Module | Lines | Responsibility |
-|--------|-------|-----------------|
-| routing-guard-core.cjs | 300 | Entry point, gate orchestration |
-| guard.checks.cjs | 450 | All 3 gate types (complexity, security, tool) |
-| guard.policy.cjs | 400 | Policy rules engine |
-| guard.intent.cjs | 200 | Intent classification only |
+| Module                 | Lines | Responsibility                                |
+| ---------------------- | ----- | --------------------------------------------- |
+| routing-guard-core.cjs | 300   | Entry point, gate orchestration               |
+| guard.checks.cjs       | 450   | All 3 gate types (complexity, security, tool) |
+| guard.policy.cjs       | 400   | Policy rules engine                           |
+| guard.intent.cjs       | 200   | Intent classification only                    |
 
 **Benefit:** Remove circular imports, single policy change updates one file.
 
@@ -116,11 +118,13 @@ spawn-prompt-assembler.helpers.cjs       (3 lines)
 ```
 
 **Problem:**
+
 - Each file ~350-530 lines (approaching SRP violation threshold)
 - `task-tools` and `runtime` may overlap on tool resolution
 - No clear module contracts
 
 **Action:** Review for consolidation into 3 modules:
+
 1. `spawn-prompt-assembler.core.cjs` - Entry point + orchestration
 2. `spawn-prompt-assembler.tools.cjs` - Task tool resolution (consolidated from task-tools + runtime)
 3. `spawn-prompt-assembler.context.cjs` - Memory + runtime support (consolidated from memory + runtime-support)
@@ -145,19 +149,20 @@ pre-tool-unified.cjs                   (146 lines) - Entry point
 ```
 
 **Problem:**
+
 - `read-safety.cjs` at 638 lines violates SRP (handles path validation, Windows compatibility, both)
 - Entry point at 146 lines suggests orchestration may be thin
 
 **Recommended Decomposition:**
 
-| Module | Current | Recommended | Responsibility |
-|--------|---------|-------------|-----------------|
-| pre-tool-unified.cjs | 146 | 200 | Entry + orchestration |
-| read-safety.path.cjs | 638 → | 350 | Path validation, normalization |
-| read-safety.windows.cjs | ↓ | 250 | Windows-specific safety checks |
-| taskupdate-handling.cjs | 458 | 450 | TaskUpdate contract validation |
-| guardrails.cjs | 415 | 400 | General tool guardrails |
-| execution-limits.cjs | 388 | 380 | Timeout + resource limits |
+| Module                  | Current | Recommended | Responsibility                 |
+| ----------------------- | ------- | ----------- | ------------------------------ |
+| pre-tool-unified.cjs    | 146     | 200         | Entry + orchestration          |
+| read-safety.path.cjs    | 638 →   | 350         | Path validation, normalization |
+| read-safety.windows.cjs | ↓       | 250         | Windows-specific safety checks |
+| taskupdate-handling.cjs | 458     | 450         | TaskUpdate contract validation |
+| guardrails.cjs          | 415     | 400         | General tool guardrails        |
+| execution-limits.cjs    | 388     | 380         | Timeout + resource limits      |
 
 **Benefit:** Each safety check independently testable, easier to add new safety rules.
 
@@ -178,10 +183,12 @@ post-task-unified-completion.helpers.cjs (268 lines)
 ```
 
 **Problem:**
+
 - `helpers` files (343 + 268 lines) violate module naming convention (helpers should be <100 lines)
 - Entry point at 270 lines suggests routing logic in main file
 
 **Action:** Rename and consolidate:
+
 1. `post-task-unified.cjs` (150 lines) - Entry + task status routing
 2. `post-task-metrics.cjs` (200 lines) - Consolidated from helpers
 3. `post-task-completion.cjs` (220 lines) - From completion helpers
@@ -217,6 +224,7 @@ consolidated-audit-findings-2026-02-12.md  11 KB  (stale, should archive)
 **IMMEDIATE (P0):**
 
 1. **Archive audit debris:**
+
    ```bash
    mkdir -p .claude/context/memory/archive/2026-02-12
    mv audit-issues-2026-02-12.md \
@@ -264,11 +272,13 @@ consolidated-audit-findings-2026-02-12.md  11 KB  (stale, should archive)
 **Status:** Hook file **does not exist** (archived or deleted)
 
 **Impact:**
+
 - Hook registration silently fails (no startup error)
 - Post-creation artifact integration skipped
 - Artifacts not linked to agent registries
 
 **Action:**
+
 1. Verify hook status: `ls -la .claude/hooks/workflow/post-creation-integration.cjs`
 2. If archived, restore from git or recreate
 3. If intentionally removed, update settings.json
@@ -306,6 +316,7 @@ consolidated-audit-findings-2026-02-12.md  11 KB  (stale, should archive)
 **Issue:** 40+ architecture reports spanning 2026-01-27 to 2026-02-15
 
 **Sample (dated 2026-01-27 through 2026-02-08):**
+
 ```
 architecture-review-2026-01-27.md
 architecture-review-2026-02-14.md
@@ -316,6 +327,7 @@ claude-md-rules-audit-2026-02-13.md
 ```
 
 **Recommendation:**
+
 1. Archive reports older than 1 month: `mv *-2026-01-*.md archive/`
 2. Create symbolic link to latest: `ln -s architecture-review-2026-02-15.md architecture-review-latest.md`
 3. Document retention policy: "Keep 3 most recent reports per type, archive rest"
@@ -327,6 +339,7 @@ claude-md-rules-audit-2026-02-13.md
 **Issue:** 20+ analysis documents, many incomplete or superseded
 
 **Sample:**
+
 ```
 duplicate-skills-report.md (superceded by skill catalog)
 gap-analysis-conductor-vs-agent-studio.md (outdated)
@@ -334,6 +347,7 @@ marketplace-analysis.md (research artifact, should move to research-reports/)
 ```
 
 **Recommendation:**
+
 1. Move research artifacts to `.claude/context/artifacts/research-reports/`
 2. Delete superseded analysis (duplicate-skills-report, etc.)
 3. Move architecture analysis to `.claude/context/reports/architecture/` (not artifacts/)
@@ -346,12 +360,12 @@ marketplace-analysis.md (research artifact, should move to research-reports/)
 
 **Files with potential circular imports:**
 
-| Module A | Module B | Type | Priority |
-|----------|----------|------|----------|
-| routing-guard-core.impl.cjs | routing-guard-core.checks-router.cjs | Via shared intent-model | P1 |
-| routing-guard-core.checks-*.cjs | routing-guard-core.policy.cjs | All 3 checks import policy | P1 |
-| spawn-prompt-assembler.runtime.cjs | spawn-prompt-assembler.task-tools.cjs | Tool resolution overlap | P1 |
-| pre-tool-unified.read-safety.cjs | pre-tool-unified.guardrails.cjs | Path validation overlap | P2 |
+| Module A                           | Module B                              | Type                       | Priority |
+| ---------------------------------- | ------------------------------------- | -------------------------- | -------- |
+| routing-guard-core.impl.cjs        | routing-guard-core.checks-router.cjs  | Via shared intent-model    | P1       |
+| routing-guard-core.checks-\*.cjs   | routing-guard-core.policy.cjs         | All 3 checks import policy | P1       |
+| spawn-prompt-assembler.runtime.cjs | spawn-prompt-assembler.task-tools.cjs | Tool resolution overlap    | P1       |
+| pre-tool-unified.read-safety.cjs   | pre-tool-unified.guardrails.cjs       | Path validation overlap    | P2       |
 
 **Recommendation:** Run `node --input-type=module .claude/lib/utils/detect-circular-deps.cjs` (if exists) to audit all hook imports.
 
@@ -407,29 +421,32 @@ marketplace-analysis.md (research artifact, should move to research-reports/)
 
 ## Risk Assessment
 
-| Action | Risk | Mitigation |
-|--------|------|-----------|
+| Action                        | Risk                             | Mitigation                                                                  |
+| ----------------------------- | -------------------------------- | --------------------------------------------------------------------------- |
 | Decompose user-prompt-unified | Routing changes break spawn flow | Comprehensive test coverage required, manual test of routing decision paths |
-| Remove circular imports | Dependencies break | Use import graph tool to validate before/after |
-| Archive old reports | Loss of historical reference | Keep git history, verify archive before deletion |
+| Remove circular imports       | Dependencies break               | Use import graph tool to validate before/after                              |
+| Archive old reports           | Loss of historical reference     | Keep git history, verify archive before deletion                            |
 
 ---
 
 ## Metrics
 
 **Before Refactoring:**
+
 - Hook module complexity: 12,228 LOC across 30 files (avg 407 LOC/file)
 - Largest single file: 1,893 lines
 - Memory bloat: 76 KB (60 KB over budget)
 - Stale artifacts: 40+ reports (not rotated)
 
 **After Refactoring (Target):**
+
 - Hook module complexity: ~11,500 LOC across 40 files (avg 287 LOC/file) ← better distribution
 - Largest single file: <500 lines (architectural limit)
 - Memory bloat: 36 KB (0 KB over budget)
 - Stale artifacts: Rotated monthly, <10 current reports
 
 **Expected Improvements:**
+
 - -35% cognitive load on hook reading
 - -100% memory budget violations
 - -50% stale artifact clutter

@@ -154,9 +154,7 @@
         "tool.companion": false,
         "workflow.skill": true
       },
-      "missing": [
-        "tool.companion"
-      ],
+      "missing": ["tool.companion"],
       "archived": false
     },
     {
@@ -409,10 +407,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -1678,9 +1673,7 @@
         "tool.companion": false,
         "workflow.skill": true
       },
-      "missing": [
-        "tool.companion"
-      ],
+      "missing": ["tool.companion"],
       "archived": false
     },
     {
@@ -1978,10 +1971,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -2769,9 +2759,7 @@
         "tool.companion": false,
         "workflow.skill": true
       },
-      "missing": [
-        "tool.companion"
-      ],
+      "missing": ["tool.companion"],
       "archived": false
     },
     {
@@ -3307,11 +3295,7 @@
         "tool.companion": true,
         "workflow.skill": true
       },
-      "missing": [
-        "rules.primary",
-        "commands.primary",
-        "references.research"
-      ],
+      "missing": ["rules.primary", "commands.primary", "references.research"],
       "archived": false
     },
     {
@@ -3697,10 +3681,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -7022,10 +7003,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -8035,10 +8013,7 @@
         "tool.companion": false,
         "workflow.skill": false
       },
-      "missing": [
-        "tool.companion",
-        "workflow.skill"
-      ],
+      "missing": ["tool.companion", "workflow.skill"],
       "archived": false
     },
     {
@@ -8222,9 +8197,7 @@
         "tool.companion": false,
         "workflow.skill": true
       },
-      "missing": [
-        "tool.companion"
-      ],
+      "missing": ["tool.companion"],
       "archived": false
     },
     {

@@ -24,17 +24,17 @@
 
 ### Coverage by Module (tests/lib/)
 
-| Module Category        | Lib Files | Test Files | Coverage Status | Risk    |
-| ---------------------- | --------- | ---------- | --------------- | ------- |
-| **Routing**            | 17        | 8          | 47% ✅          | MEDIUM  |
-| **Memory**             | 20+       | 10+        | 50% ✅          | MEDIUM  |
-| **Code Indexing**      | 26        | 22         | 85% ✅          | LOW     |
-| **QA**                 | 2         | 2          | 100% ✅         | LOW     |
-| **Planning**           | 2         | 2          | 100% ✅         | LOW     |
-| **Workflow**           | 15+       | 10+        | 67% ✅          | MEDIUM  |
-| **Tools**              | 10+       | 5          | 50% ⚠️          | MEDIUM  |
-| **Utils**              | 25+       | 12         | 48% ⚠️          | MEDIUM  |
-| **Spawn/Orchestration**| 10+       | 4          | 40% 🔴          | HIGH    |
+| Module Category         | Lib Files | Test Files | Coverage Status | Risk   |
+| ----------------------- | --------- | ---------- | --------------- | ------ |
+| **Routing**             | 17        | 8          | 47% ✅          | MEDIUM |
+| **Memory**              | 20+       | 10+        | 50% ✅          | MEDIUM |
+| **Code Indexing**       | 26        | 22         | 85% ✅          | LOW    |
+| **QA**                  | 2         | 2          | 100% ✅         | LOW    |
+| **Planning**            | 2         | 2          | 100% ✅         | LOW    |
+| **Workflow**            | 15+       | 10+        | 67% ✅          | MEDIUM |
+| **Tools**               | 10+       | 5          | 50% ⚠️          | MEDIUM |
+| **Utils**               | 25+       | 12         | 48% ⚠️          | MEDIUM |
+| **Spawn/Orchestration** | 10+       | 4          | 40% 🔴          | HIGH   |
 
 ### Critical Modules WITHOUT Tests
 
@@ -66,14 +66,14 @@
    - Impact: Duplicate task claims, lost ownership
    - Gap: No concurrent claim tests
 
-6. **spawn-prompt-assembler.*.cjs** (memory injection, task tools)
+6. **spawn-prompt-assembler.\*.cjs** (memory injection, task tools)
    - Risk: Memory context injection, constitution/behaviour loading
    - Impact: Agents missing critical context, inconsistent behavior
    - Gap: Constitution integration tests exist, but no memory mode validation tests
 
 #### ⚠️ P1 (High Priority) - Medium Risk, High Impact
 
-7. **routing-table-*.cjs** (intent-keywords, intent-agents, disambiguation)
+7. **routing-table-\*.cjs** (intent-keywords, intent-agents, disambiguation)
    - Risk: Intent classification → agent selection logic
    - Impact: Specialist misrouting (developer instead of technical-writer)
    - Gap: No disambiguation tests, no keyword-to-agent mapping tests

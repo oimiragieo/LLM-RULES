@@ -33,6 +33,7 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
 ### PHASE 1: REFLECT (Data Ingestion)
 
 **Task Sequence:**
+
 1. **Task #98** (Architect): Architecture audit of 35 scripts, identified 7 gaps
    - Duration: Architecture phase
    - Deliverable: ADR-090 (comprehensive), disposition matrix, gap analysis
@@ -50,11 +51,13 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
    - Deliverable: ADR-090 accepted, memory updates, commit push
 
 **Tool Usage Observed:**
+
 - File exploration: Read scripts, package.json
 - Git operations: git diff (verified changes)
 - Testing: npm test, security-lint, import validation
 
 **Context Windows:**
+
 - Task #98: Architecture/design (high-level analysis)
 - Task #99: Code changes (2 scripts fixed, 2 archived, 1 test created)
 - Task #100: Configuration (3 npm entries), security fix (install.mjs), documentation (comment block)
@@ -69,6 +72,7 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
 #### Completeness (0.95/1.0)
 
 **Checkpoints:**
+
 - ✅ All 6 gaps addressed (GAP-1 through GAP-6)
 - ✅ Critical gap (GAP-1 phantom import) fixed immediately in Task #99
 - ✅ TDD regression tests created for gap fixes
@@ -76,6 +80,7 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
 - ⚠️ Architecture plan document referenced but not found (minor completeness gap)
 
 **Evidence:**
+
 - Task #99: `validate-index.mjs` import fixed, `validate-all-references.mjs` updated, dead script archived, validators merged
 - Task #100: `package.json` updated with 3 new scripts, `install.mjs` security fix, `validate-sync.sh` documentation
 
@@ -84,6 +89,7 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
 #### Accuracy (1.0/1.0)
 
 **Checkpoints:**
+
 - ✅ All import paths verified and corrected
 - ✅ Security fix validated with 4/4 passing tests
 - ✅ Package.json entries all functional and discoverable
@@ -91,6 +97,7 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
 - ✅ Test results accurate (no false positives)
 
 **Evidence:**
+
 - `tests/scripts/script-imports.test.cjs` validates 2 fixed scripts
 - `tests/scripts/install-security.test.cjs` validates path traversal fix with 4 test cases
 - CI chain verified: `pnpm validate:full` now passes step 5 (`pnpm validate:index`)
@@ -100,12 +107,14 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
 #### Clarity (0.95/1.0)
 
 **Checkpoints:**
+
 - ✅ Learnings.md entries clear and well-structured
 - ✅ ADR-090 comprehensively documented (14 consequences)
 - ✅ Evidence sections complete with file paths and test counts
 - ⚠️ Windows compatibility note could be more comprehensive (17 lines added, but cross-platform solution not created)
 
 **Evidence:**
+
 - Task #99 learnings: Clear explanation of 4 fixes + TDD pattern
 - Task #100 learnings: Three distinct fixes documented separately (wiring, security, documentation)
 - ADR-090: 8 phases with clear rationale for each decision
@@ -115,6 +124,7 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
 #### Consistency (0.95/1.0)
 
 **Checkpoints:**
+
 - ✅ TDD pattern (RED-GREEN) used consistently (both Task #99 and Task #100)
 - ✅ Wrapper-shim delegation pattern followed (no new wrapper scripts created)
 - ✅ Script naming conventions consistent (`verb:noun` format in package.json)
@@ -122,6 +132,7 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
 - ⚠️ One test file (decision-handler-security.test.cjs from Task #95) lacks provenance header
 
 **Evidence:**
+
 - Task #99: `script-imports.test.cjs` follows TDD structure (RED showing 4 phantom imports, GREEN after fixes)
 - Task #100: `install-security.test.cjs` follows TDD with 4 test cases
 - All new npm scripts follow `verb:noun` convention: `verify:deps`, `test:count`, `verify:hooks`
@@ -131,12 +142,14 @@ The CRITICAL phantom import in validate-index.mjs was identified in the architec
 #### Actionability (0.95/1.0)
 
 **Checkpoints:**
+
 - ✅ All immediate gaps resolved (6/6)
 - ✅ Security vulnerability mitigated
 - ✅ Future enhancements documented (cross-platform validation script)
 - ⚠️ Scripts/ vs .claude/scripts/ boundary identified but not formally documented
 
 **Evidence:**
+
 - All 6 gaps have clear resolution steps in Task #99-100
 - Recommendations recorded: create validate-sync.mjs, document boundary, add provenance to security test file
 - Next steps clear: implement recommendations in future pipeline
@@ -218,12 +231,14 @@ TOTAL SCORE:                  0.94 / 1.0
 #### Learnings Extracted
 
 **Pattern 1: Script Phantom Import Regression Testing** (NEW)
+
 - Two-layer validation: (1) package.json scripts check, (2) import/require path resolution check
 - Test structure: extract paths, verify files exist, assert zero phantom references
 - Applicability: Any project with 20+ executable scripts where package.json is the discovery interface
 - Proven implementation: `tests/scripts/script-imports.test.cjs` (test in Task #99)
 
 **Pattern 2: TDD for Security Vulnerability Fixes** (NEW)
+
 - RED phase: write test demonstrating vulnerability exists
 - GREEN phase: implement fix, verify test passes
 - VERIFY phase: full test suite passes
@@ -231,6 +246,7 @@ TOTAL SCORE:                  0.94 / 1.0
 - Applicability: Any security vulnerability (injection, traversal, exposure, overflow)
 
 **Pattern 3: Script Import Regression Prevention** (EXTENSION)
+
 - Extends phantom-scripts pattern from Tools Overhaul (Tasks #93-94)
 - Now covers both entry points: (1) package.json scripts, (2) static imports in code
 - Three test files support this pattern: phantom-scripts.test.cjs, script-imports.test.cjs (new), install-security.test.cjs (new)
@@ -238,18 +254,21 @@ TOTAL SCORE:                  0.94 / 1.0
 #### Gotchas Recorded
 
 **Gotcha 1: Consumer Discovery Misses Dynamic Requires** (NEW)
+
 - Cause: Grep patterns for static `require('literal-path')` miss dynamic requires
 - Example: validate-index.mjs phantom import missed despite Phase C grep
 - Prevention: (1) grep filename alone, (2) grep old directory path, (3) test affected npm scripts, (4) run full test suite
 - Impact: Phase C had "45+ imports updated" but 2 scripts missed, requiring Task #97 post-QA fixes
 
 **Gotcha 2: Architecture Plan Document Missing** (NEW)
+
 - Cause: ADR references artifact that was not created during implementation
 - Example: scripts-overhaul-architecture-2026-02-07.md referenced but not found
 - Prevention: Checklist verification that all artifacts referenced in ADRs exist
 - Impact: MINOR (work complete, only documentation artifact missing)
 
 **Gotcha 3: Windows Compatibility Partial Resolution** (NEW)
+
 - Cause: Adding documentation without creating full cross-platform equivalent
 - Example: validate-sync.sh Windows incompatibility documented with workarounds, but Node.js equivalent not created
 - Assessment: Acceptable for non-critical utilities; full solution would require ~2-4 hours
@@ -258,11 +277,13 @@ TOTAL SCORE:                  0.94 / 1.0
 #### Memory Files Updated
 
 **patterns.json:** Added 3 new patterns
+
 1. script-phantom-import-regression-pattern
 2. tdd-security-fix-pattern
 3. (Extended consumer-discovery-pattern-relocations from Task #95)
 
 **gotchas.json:** Added 3 new gotchas
+
 1. consumer-discovery-misses-dynamic-requires
 2. architecture-plan-document-missing
 3. windows-compatibility-partial-resolution
@@ -275,14 +296,14 @@ TOTAL SCORE:                  0.94 / 1.0
 
 ### Scoring Summary
 
-| Dimension | Score | Weight | Weighted | Notes |
-|-----------|-------|--------|----------|-------|
-| Completeness | 0.95 | 25% | 0.238 | 6/6 gaps fixed; plan doc missing |
-| Accuracy | 1.00 | 25% | 0.250 | All verifiable facts correct |
-| Clarity | 0.95 | 15% | 0.143 | Documentation excellent; slight gaps |
-| Consistency | 0.95 | 15% | 0.143 | Pattern adherence strong |
-| Actionability | 0.95 | 20% | 0.190 | Clear next steps identified |
-| **TOTAL** | **0.94** | **100%** | **0.94** | **EXCELLENT** |
+| Dimension     | Score    | Weight   | Weighted | Notes                                |
+| ------------- | -------- | -------- | -------- | ------------------------------------ |
+| Completeness  | 0.95     | 25%      | 0.238    | 6/6 gaps fixed; plan doc missing     |
+| Accuracy      | 1.00     | 25%      | 0.250    | All verifiable facts correct         |
+| Clarity       | 0.95     | 15%      | 0.143    | Documentation excellent; slight gaps |
+| Consistency   | 0.95     | 15%      | 0.143    | Pattern adherence strong             |
+| Actionability | 0.95     | 20%      | 0.190    | Clear next steps identified          |
+| **TOTAL**     | **0.94** | **100%** | **0.94** | **EXCELLENT**                        |
 
 ### Threshold Classification
 
@@ -290,6 +311,7 @@ TOTAL SCORE:                  0.94 / 1.0
 **Threshold:** EXCELLENT (0.9+)
 
 **Comparison to Quality Standards:**
+
 - Excellent (0.9+): Pipeline #8 achieves this ✅
 - Pass (0.7+): Well above minimum
 - Warning (0.4-0.7): Not applicable
@@ -314,6 +336,7 @@ Every fix in this pipeline included a regression test that will prevent recurren
 ### 3. Consumer Discovery Pattern Needs Refinement
 
 Phase C (Task #95) had comprehensive consumer discovery ("45+ imports"), but 2 scripts were missed. Pattern needs enhancement to catch:
+
 - Dynamic requires (require(var))
 - Template-string imports (require(`path/${dir}`))
 - References in specific directories (scripts/, tools/)
@@ -400,6 +423,7 @@ This batch reflection covers the final pipeline for the enterprise framework's s
 - **Pipeline #8 (Scripts):** Tasks #98-101 — Scripts system (ADR-090) ✅ [THIS REPORT]
 
 The three pipelines share patterns:
+
 - Architecture-first approach (Task #1 = architect)
 - Disposition matrix for gap identification
 - TDD regression testing for fixes
@@ -413,6 +437,7 @@ The three pipelines share patterns:
 **Overall Assessment: EXCELLENT (0.94/1.0)**
 
 Pipeline #8 successfully completed the Scripts System Overhaul with:
+
 - All 6 identified gaps resolved (100%)
 - 1 security vulnerability fixed with test coverage (MEDIUM-001)
 - 4 TDD regression tests created to prevent recurrence

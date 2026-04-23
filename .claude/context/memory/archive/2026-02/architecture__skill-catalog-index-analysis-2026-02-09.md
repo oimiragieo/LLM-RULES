@@ -64,11 +64,14 @@ Comprehensive analysis of skill coverage across filesystem, skill-index.json, an
    - Expected result: 91-92 skills instead of 199
 
 2. **Add 4 missing skills to catalog**:
+
    ```markdown
    ## Languages
+
    | `api-development-expert` | REST API, OpenAPI, and API design patterns | api-designer |
-   
+
    ## Other
+
    | `creators` | Special directory with command-creator, rule-creator, tool-creator sub-skills | N/A |
    | `integration` | Integration artifact templates and patterns | N/A |
    | `workflow-patterns` | Common workflow patterns (conditionals, loops, error handling) | N/A |
@@ -114,6 +117,7 @@ Comprehensive analysis of skill coverage across filesystem, skill-index.json, an
 **Pattern**: Skill catalogs must be bidirectionally validated (filesystem ↔ index ↔ catalog). Automated generators can produce false positives if they process archived directories.
 
 **Takeaway**: When archiving skills, ensure:
+
 1. Move to `_archive/` directory
 2. Remove from catalog manually
 3. Verify generator excludes archived paths

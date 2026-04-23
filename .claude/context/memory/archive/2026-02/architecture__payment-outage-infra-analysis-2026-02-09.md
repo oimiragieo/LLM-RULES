@@ -23,17 +23,17 @@ This finding is consistent with prior learnings recorded in `.claude/context/mem
 
 ### What Was Found
 
-| Category | Status | Details |
-|----------|--------|---------|
-| **Dockerfiles** | None in active project | 53+ Dockerfiles exist only in `.claude.archive/.tmp/` (third-party reviewed repos: autogen, claude-flow, openclaw, etc.) |
-| **docker-compose** | None in active project | 22 docker-compose files exist only in archived third-party repos |
-| **Kubernetes manifests** | Template only | K8s deployment/service/configmap templates in `.claude/skills/k8s-manifest-generator/assets/` (generic skill templates, not project-specific) |
-| **Terraform/IaC** | None in active project | 4 `.tf` files found only in archived third-party repos (`serena/test/resources/`) |
-| **CI/CD pipelines** | 2 GitHub Actions workflows | `cuj-smoke-test.yml` (CUJ validation) and `skill-build-validate.yml` (skill compilation) |
-| **Jenkinsfile** | None | Not found |
-| **GitLab CI** | None | Not found |
-| **Load balancers** | None | No ALB/NLB/ingress configurations found |
-| **Service mesh** | None (template skill only) | Istio/Knative guidance exists as a skill (`container-expert`) but no active mesh config |
+| Category                 | Status                     | Details                                                                                                                                       |
+| ------------------------ | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Dockerfiles**          | None in active project     | 53+ Dockerfiles exist only in `.claude.archive/.tmp/` (third-party reviewed repos: autogen, claude-flow, openclaw, etc.)                      |
+| **docker-compose**       | None in active project     | 22 docker-compose files exist only in archived third-party repos                                                                              |
+| **Kubernetes manifests** | Template only              | K8s deployment/service/configmap templates in `.claude/skills/k8s-manifest-generator/assets/` (generic skill templates, not project-specific) |
+| **Terraform/IaC**        | None in active project     | 4 `.tf` files found only in archived third-party repos (`serena/test/resources/`)                                                             |
+| **CI/CD pipelines**      | 2 GitHub Actions workflows | `cuj-smoke-test.yml` (CUJ validation) and `skill-build-validate.yml` (skill compilation)                                                      |
+| **Jenkinsfile**          | None                       | Not found                                                                                                                                     |
+| **GitLab CI**            | None                       | Not found                                                                                                                                     |
+| **Load balancers**       | None                       | No ALB/NLB/ingress configurations found                                                                                                       |
+| **Service mesh**         | None (template skill only) | Istio/Knative guidance exists as a skill (`container-expert`) but no active mesh config                                                       |
 
 ### Active CI/CD Pipelines
 
@@ -60,6 +60,7 @@ agent-studio (v2.0.0)
 ```
 
 This is a **local development framework** that runs within Claude Code sessions. It has no:
+
 - HTTP servers or API endpoints
 - Database connections
 - External API integrations (no Stripe, PayPal, or payment gateway SDKs)
@@ -73,30 +74,30 @@ This is a **local development framework** that runs within Claude Code sessions.
 
 ### Runtime Dependencies (from package.json)
 
-| Dependency | Purpose | Payment-Related? |
-|------------|---------|-----------------|
-| `@lancedb/lancedb` | Vector database for code search | No |
-| `@xenova/transformers` | Local ML embeddings | No |
-| `@ast-grep/cli` | AST-based code search | No |
-| `ajv` / `ajv-formats` | JSON schema validation | No |
-| `fastembed` | Fast embedding generation | No |
-| `js-yaml` | YAML parsing (config files) | No |
-| `piscina` | Worker thread pool | No |
-| `sharp` | Image processing (for embeddings) | No |
-| `tree-sitter-*` | Code parsing (JS/TS/Python/Rust/Go) | No |
-| `commander` | CLI argument parsing | No |
-| `chalk` | Terminal coloring | No |
+| Dependency             | Purpose                             | Payment-Related? |
+| ---------------------- | ----------------------------------- | ---------------- |
+| `@lancedb/lancedb`     | Vector database for code search     | No               |
+| `@xenova/transformers` | Local ML embeddings                 | No               |
+| `@ast-grep/cli`        | AST-based code search               | No               |
+| `ajv` / `ajv-formats`  | JSON schema validation              | No               |
+| `fastembed`            | Fast embedding generation           | No               |
+| `js-yaml`              | YAML parsing (config files)         | No               |
+| `piscina`              | Worker thread pool                  | No               |
+| `sharp`                | Image processing (for embeddings)   | No               |
+| `tree-sitter-*`        | Code parsing (JS/TS/Python/Rust/Go) | No               |
+| `commander`            | CLI argument parsing                | No               |
+| `chalk`                | Terminal coloring                   | No               |
 
 **No payment SDKs, HTTP frameworks, or database drivers are present.**
 
 ### External Integrations (from .env.example)
 
-| Variable | Purpose | Status |
-|----------|---------|--------|
-| `ANTHROPIC_API_KEY` | LLM API calls (memory extraction) | Optional, not payment-related |
-| `WEBHOOK_SECRET` | Webhook auth (generic) | Optional, not configured |
-| `API_URL` | External API endpoint | Default: `localhost:3000`, not configured |
-| `SENTRY_AUTH_TOKEN` | Error tracking | Referenced in skill, not configured |
+| Variable            | Purpose                           | Status                                    |
+| ------------------- | --------------------------------- | ----------------------------------------- |
+| `ANTHROPIC_API_KEY` | LLM API calls (memory extraction) | Optional, not payment-related             |
+| `WEBHOOK_SECRET`    | Webhook auth (generic)            | Optional, not configured                  |
+| `API_URL`           | External API endpoint             | Default: `localhost:3000`, not configured |
+| `SENTRY_AUTH_TOKEN` | Error tracking                    | Referenced in skill, not configured       |
 
 **No payment gateway credentials, database connection strings, or service mesh configurations exist.**
 
@@ -106,17 +107,17 @@ This is a **local development framework** that runs within Claude Code sessions.
 
 Last 20 commits (from `git log --oneline -20`):
 
-| Commit | Type | Risk Level |
-|--------|------|-----------|
-| `bfce1498` | test: remove obsolete test | None |
-| `393373bc` | chore: cleanup session artifacts | None |
-| `3bb88ebb` | feat: Batch 4 framework modernization | Low (agent/workflow definitions) |
-| `4bfaedcd` | feat: Batch 3 framework modernization | Low (commands/skills/package.json) |
-| `0a08fcaa` | feat: Batch 2 framework modernization | Low (lib/tools/docs/templates) |
-| `32636d93` | docs: security lint false positive | None |
-| `2dcef445` | feat: Batch 1 framework modernization | Low (schemas/config/rules) |
-| `182e4739` | chore: archive 90+ obsolete test files | None |
-| `57f22cdf` | merge: pro-workflow adoption | Medium (hook consolidation) |
+| Commit     | Type                                   | Risk Level                         |
+| ---------- | -------------------------------------- | ---------------------------------- |
+| `bfce1498` | test: remove obsolete test             | None                               |
+| `393373bc` | chore: cleanup session artifacts       | None                               |
+| `3bb88ebb` | feat: Batch 4 framework modernization  | Low (agent/workflow definitions)   |
+| `4bfaedcd` | feat: Batch 3 framework modernization  | Low (commands/skills/package.json) |
+| `0a08fcaa` | feat: Batch 2 framework modernization  | Low (lib/tools/docs/templates)     |
+| `32636d93` | docs: security lint false positive     | None                               |
+| `2dcef445` | feat: Batch 1 framework modernization  | Low (schemas/config/rules)         |
+| `182e4739` | chore: archive 90+ obsolete test files | None                               |
+| `57f22cdf` | merge: pro-workflow adoption           | Medium (hook consolidation)        |
 
 All recent changes are framework-internal (agent definitions, skills, hooks, tests). **No deployment-related changes, infrastructure modifications, or service configuration changes were found.**
 
@@ -149,14 +150,14 @@ Since no payment processing service exists in this codebase, there are no infras
 
 The agent-studio framework includes relevant skills and templates for production incident response:
 
-| Resource | Path | Purpose |
-|----------|------|---------|
-| Incident runbook templates | `.claude/skills/incident-runbook-templates/` | Production-ready incident response procedures |
-| Postmortem writing | `.claude/skills/postmortem-writing/` | Blameless postmortem documentation |
-| K8s manifest generator | `.claude/skills/k8s-manifest-generator/` | Kubernetes deployment templates with health checks |
-| Container expert | `.claude/skills/container-expert/` | Docker/K8s/Istio/Knative guidance |
-| Sentry monitoring | `.claude/skills/sentry-monitoring/` | Error tracking and APM integration |
-| Debugging skill | `.claude/skills/debugging/` | Systematic 4-phase debugging methodology |
+| Resource                   | Path                                         | Purpose                                            |
+| -------------------------- | -------------------------------------------- | -------------------------------------------------- |
+| Incident runbook templates | `.claude/skills/incident-runbook-templates/` | Production-ready incident response procedures      |
+| Postmortem writing         | `.claude/skills/postmortem-writing/`         | Blameless postmortem documentation                 |
+| K8s manifest generator     | `.claude/skills/k8s-manifest-generator/`     | Kubernetes deployment templates with health checks |
+| Container expert           | `.claude/skills/container-expert/`           | Docker/K8s/Istio/Knative guidance                  |
+| Sentry monitoring          | `.claude/skills/sentry-monitoring/`          | Error tracking and APM integration                 |
+| Debugging skill            | `.claude/skills/debugging/`                  | Systematic 4-phase debugging methodology           |
 
 ### General Payment Service Architecture Recommendations
 

@@ -1,4 +1,5 @@
 <!-- Agent: technical-writer | Task: #10 | Session: 2026-02-21 -->
+
 # Self-Healing Protocol — Documentation Update
 
 ## Changes Made
@@ -33,11 +34,13 @@ The rationale note explains the historical pattern: router observed underdeliver
 ## Verification
 
 Read-back of CLAUDE.md lines 430-494 confirmed:
+
 - Section 6.1 is placed between the `---` separator after Section 6 and `## 7) SKILL INVOCATION PROTOCOL`
 - No content deleted; existing Section 6 and Section 7 content intact
 - Failure signals table, Self-Healing Response, Task Metadata Convention, and Hook Backstop subsections all present
 
 Read-back of router-decision.md lines 1198-1235 confirmed:
+
 - Step 9.7 is inserted after Step 9.5 and before Step 9.6
 - Step 9.6 heading and content unchanged
 - Formatting consistent with surrounding workflow steps (### heading, numbered list, bold rationale note)

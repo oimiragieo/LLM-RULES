@@ -11,6 +11,7 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 ## Validation Criteria (from python-pro.md)
 
 ### Must-Have Sections
+
 - [ ] Response Approach (8 numbered steps)
 - [ ] Behavioral Traits (10+ domain-specific traits)
 - [ ] Example Interactions (8+ examples)
@@ -23,6 +24,7 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 - [ ] Task Progress Protocol section
 
 ### Required Frontmatter Fields
+
 - name (kebab-case)
 - description (single line, includes trigger conditions)
 - model (sonnet, opus, or haiku — NOT dated versions)
@@ -35,18 +37,18 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 
 ## Detailed Compliance Matrix
 
-| Agent                    | Frontmatter | Response Approach | Behavioral Traits | Example Interactions | Enforcement Hooks | Related Workflows | Skill Protocol | Overall |
-| ------------------------ | ----------- | ----------------- | ----------------- | -------------------- | ----------------- | ----------------- | -------------- | ------- |
-| llm-architect            | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
-| prompt-engineer          | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
-| mcp-developer            | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
-| api-designer             | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
-| microservices-architect  | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
-| sre-engineer             | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
-| performance-engineer     | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
-| penetration-tester       | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
-| accessibility-tester     | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
-| chaos-engineer           | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| Agent                   | Frontmatter | Response Approach | Behavioral Traits | Example Interactions | Enforcement Hooks | Related Workflows | Skill Protocol | Overall    |
+| ----------------------- | ----------- | ----------------- | ----------------- | -------------------- | ----------------- | ----------------- | -------------- | ---------- |
+| llm-architect           | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| prompt-engineer         | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| mcp-developer           | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| api-designer            | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| microservices-architect | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| sre-engineer            | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| performance-engineer    | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| penetration-tester      | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| accessibility-tester    | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
+| chaos-engineer          | ✅ PASS     | ❌ MISSING        | ❌ MISSING        | ❌ MISSING           | ✅ PASS           | ✅ PASS           | ✅ PASS        | ⚠️ PARTIAL |
 
 ---
 
@@ -57,6 +59,7 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - name: ✅ llm-architect (kebab-case)
 - description: ✅ Single line with role description
 - model: ✅ opus
@@ -67,6 +70,7 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 - identity: ✅ Has agent identity block
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section (python-pro has 1-8)
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits (python-pro has 10)
 - ❌ **Example Interactions**: No 8+ user query examples (python-pro has 8)
@@ -82,10 +86,12 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - model: ✅ sonnet
 - All required fields present
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits
 - ❌ **Example Interactions**: No 8+ user query examples
@@ -101,10 +107,12 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - model: ✅ sonnet
 - All required fields present
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits
 - ❌ **Example Interactions**: No 8+ user query examples
@@ -120,10 +128,12 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - model: ✅ sonnet
 - All required fields present
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits
 - ❌ **Example Interactions**: No 8+ user query examples
@@ -139,11 +149,13 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - model: ✅ opus
 - extended_thinking: ✅ true
 - All required fields present
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits
 - ❌ **Example Interactions**: No 8+ user query examples
@@ -159,10 +171,12 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - model: ✅ sonnet
 - All required fields present
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits
 - ❌ **Example Interactions**: No 8+ user query examples
@@ -178,10 +192,12 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - model: ✅ sonnet
 - All required fields present
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits
 - ❌ **Example Interactions**: No 8+ user query examples
@@ -197,12 +213,14 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - model: ✅ opus
 - version: 2.0.0 (good)
 - extended_thinking: ✅ true
 - All required fields present
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits
 - ❌ **Example Interactions**: No 8+ user query examples
@@ -218,11 +236,13 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - model: ✅ sonnet
 - version: 2.0.0 (good)
 - All required fields present
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits
 - ❌ **Example Interactions**: No 8+ user query examples
@@ -238,11 +258,13 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 **Status**: ⚠️ PARTIAL PASS
 
 **Frontmatter**: ✅ PASS
+
 - model: ✅ sonnet
 - version: 2.0.0 (good)
 - All required fields present
 
 **Missing Sections**:
+
 - ❌ **Response Approach**: No 8-step numbered section
 - ❌ **Behavioral Traits**: No bulleted list of 10+ traits
 - ❌ **Example Interactions**: No 8+ user query examples
@@ -256,6 +278,7 @@ Validated 10 newly created agents against python-pro.md reference structure and 
 ## Companion Check Results
 
 **Note**: Could not run companion-check.cjs due to path resolution issue. Manual review shows all agents have:
+
 - ✅ Enforcement Hooks table populated
 - ✅ Related Workflows table populated
 - ✅ Skill Invocation Protocol with Automatic and Contextual tables
@@ -288,6 +311,7 @@ Each agent needs:
 3. **Example Interactions** section with 8+ user query examples (after Behavioral Traits)
 
 **Placement (from python-pro.md)**:
+
 ```
 ## Core Persona
 ...
@@ -324,6 +348,7 @@ Checking `.claude/context/data/agent-config.json` for all 10 agents...
 **Manual check required** — companion-check.cjs could not be executed due to module path issue.
 
 **Verification tasks for task #72**:
+
 1. Verify all 10 agents exist in agent-config.json
 2. Verify all 10 agents have catalog entries
 3. Verify all 10 agents have routing keywords in CLAUDE.md

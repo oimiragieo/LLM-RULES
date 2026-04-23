@@ -10,11 +10,11 @@
 **Output Type:** code_output (Task #15); unknown (Task #16)
 **Agent:** developer (inferred for both)
 
-| Task | Score | Threshold |
-|------|-------|-----------|
-| #15 (Satellite Assessment) | 0.72 | PASS |
-| #16 (No metadata) | 0.43 | WARNING |
-| Combined Average | 0.575 | WARNING |
+| Task                       | Score | Threshold |
+| -------------------------- | ----- | --------- |
+| #15 (Satellite Assessment) | 0.72  | PASS      |
+| #16 (No metadata)          | 0.43  | WARNING   |
+| Combined Average           | 0.575 | WARNING   |
 
 ---
 
@@ -26,16 +26,17 @@ Using `code_output` weights: completeness 0.20, accuracy 0.35, clarity 0.15, con
 
 **Summary**: Assessed all 3 satellite modules — merge not possible without exceeding 500-line core limit. Files remain as-is; no changes made.
 
-| Dimension | Score | Weight | Weighted |
-|-----------|-------|--------|---------|
-| Completeness | 0.75 | 0.20 | 0.150 |
-| Accuracy | 0.80 | 0.35 | 0.280 |
-| Clarity | 0.80 | 0.15 | 0.120 |
-| Consistency | 0.80 | 0.20 | 0.160 |
-| Actionability | 0.65 | 0.10 | 0.065 |
-| **Weighted Total** | | | **0.775** |
+| Dimension          | Score | Weight | Weighted  |
+| ------------------ | ----- | ------ | --------- |
+| Completeness       | 0.75  | 0.20   | 0.150     |
+| Accuracy           | 0.80  | 0.35   | 0.280     |
+| Clarity            | 0.80  | 0.15   | 0.120     |
+| Consistency        | 0.80  | 0.20   | 0.160     |
+| Actionability      | 0.65  | 0.10   | 0.065     |
+| **Weighted Total** |       |        | **0.775** |
 
 **Scoring rationale:**
+
 - Completeness (0.75): Task scope was assessment + decision — correctly executed. However, no explicit LOC analysis figures provided (how many lines each satellite module would add).
 - Accuracy (0.80): Decision to leave files as-is is correct given ESLint 500-line enforcement. Consistent with Phase 2 learnings.
 - Clarity (0.80): Clear outcome statement ("merge not possible"). No ambiguity about result.
@@ -46,16 +47,17 @@ Using `code_output` weights: completeness 0.20, accuracy 0.35, clarity 0.15, con
 
 ### Task #16 — Unknown (No Metadata)
 
-| Dimension | Score | Weight | Weighted |
-|-----------|-------|--------|---------|
-| Completeness | 0.30 | 0.20 | 0.060 |
-| Accuracy | 0.50 | 0.35 | 0.175 |
-| Clarity | 0.40 | 0.15 | 0.060 |
-| Consistency | 0.45 | 0.20 | 0.090 |
-| Actionability | 0.40 | 0.10 | 0.040 |
-| **Weighted Total** | | | **0.425** |
+| Dimension          | Score | Weight | Weighted  |
+| ------------------ | ----- | ------ | --------- |
+| Completeness       | 0.30  | 0.20   | 0.060     |
+| Accuracy           | 0.50  | 0.35   | 0.175     |
+| Clarity            | 0.40  | 0.15   | 0.060     |
+| Consistency        | 0.45  | 0.20   | 0.090     |
+| Actionability      | 0.40  | 0.10   | 0.040     |
+| **Weighted Total** |       |        | **0.425** |
 
 **Scoring rationale:**
+
 - Completeness (0.30): No summary, no filesModified, no verification evidence. Assessment blocked.
 - Accuracy (0.50): Cannot evaluate — no information about what was done.
 - Clarity (0.40): "Task 16 completed without summary metadata" is the only signal — no clarity about what was accomplished.
@@ -69,27 +71,32 @@ Using `code_output` weights: completeness 0.20, accuracy 0.35, clarity 0.15, con
 ### Roses (Strengths)
 
 **Task #15:**
+
 - Correct constraint-bounded assessment — agent applied ESLint 500-line rule proactively and made a clear go/no-go decision without requiring a failed attempt
 - No unnecessary changes — "no changes made" is the right outcome when a merge would violate architecture constraints
 - Task completed and unblocked pipeline continuation without scope creep
 
 **Task #16:**
+
 - Task completion itself is confirmed (no permanent stall requiring manual router intervention)
 - Atomic handshake functioning — reflection was triggered despite absent metadata
 
 ### Buds (Growth Opportunities)
 
 **Task #15:**
+
 - Missing quantitative justification — stating "merge not possible" is correct but omitting the LOC figures (how many lines each module would add) leaves the rationale undocumented for future reviewers
 - No explicit recommendation for Phase 4 — if merging satellites is blocked, what is the alternative path to simplify the chain further? Should be stated
 - Satellite module names not enumerated in available context — reduces audit traceability
 
 **Task #16:**
+
 - Minimal TaskUpdate metadata is sufficient — even `summary: "Reviewed/fixed X in file Y.cjs"` enables reflection scoring. The absence of even one line is the failure.
 
 ### Thorns (Issues)
 
 **Task #16 — RECURRING (8th+ Occurrence):**
+
 - Missing TaskUpdate summary metadata — this is the 8th or later confirmed occurrence across: Tasks #5, #6, #7, #8 (2026-02-17), Tasks #32, #33 (2026-02-17 earlier session), Task #14 (same batch context), and now Task #16.
 - Training-based enforcement has failed every instance. Hook-based enforcement (pre-completion-validation.cjs) is the only viable mitigation.
 - Cannot score Task #16 above WARNING threshold regardless of actual work quality.
@@ -114,10 +121,10 @@ Integration health check skipped — no new artifacts created. Tasks #15 and #16
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
-| Constraint-bounded assessment gotcha | **Retain** | Medium reuse value — agents need to know "blocked assessment = valid output with LOC evidence required" |
-| Forward-path omission from no-op assessments | **Retain** | High reuse value — recurs whenever feasibility gates block a planned merge or implementation |
+| Item                                         | Decision              | Rationale                                                                                               |
+| -------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------- |
+| Constraint-bounded assessment gotcha         | **Retain**            | Medium reuse value — agents need to know "blocked assessment = valid output with LOC evidence required" |
+| Forward-path omission from no-op assessments | **Retain**            | High reuse value — recurs whenever feasibility gates block a planned merge or implementation            |
 | TaskUpdate missing metadata — 8th occurrence | **Retain + Escalate** | Critical systemic issue; 8 occurrences = definitive training failure; must escalate to hook enforcement |
 
 ---

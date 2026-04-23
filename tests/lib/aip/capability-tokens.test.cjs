@@ -15,8 +15,7 @@ const assert = require('node:assert/strict');
 let issueToken, verifyToken;
 
 try {
-  ({ issueToken, verifyToken } =
-    require('../../../.claude/lib/aip/capability-tokens.cjs'));
+  ({ issueToken, verifyToken } = require('../../../.claude/lib/aip/capability-tokens.cjs'));
 } catch (_) {
   // Module does not exist yet — tests will fail at invocation (RED phase)
 }
@@ -49,7 +48,10 @@ describe('AIP capability-tokens — Test 1: issueToken produces signed token', (
     assert.deepEqual(payload.cap, ['Task'], 'cap claim must be capabilities array');
     assert.ok(typeof payload.exp === 'number', 'exp claim must be a number (unix timestamp)');
     assert.ok(typeof payload.iat === 'number', 'iat claim must be a number (unix timestamp)');
-    assert.ok(typeof payload.jti === 'string' && payload.jti.length > 0, 'jti must be a non-empty string');
+    assert.ok(
+      typeof payload.jti === 'string' && payload.jti.length > 0,
+      'jti must be a non-empty string'
+    );
   });
 });
 
@@ -131,7 +133,14 @@ describe('AIP capability-tokens — Test 5: invalid signature fails', () => {
     const parts = token.split('.');
     // Tamper the payload: change dst to 'attacker'
     const tamperedPayload = Buffer.from(
-      JSON.stringify({ src: 'router', dst: 'attacker', cap: ['Read'], exp: Math.floor(Date.now() / 1000) + 3600, iat: Math.floor(Date.now() / 1000), jti: 'tampered' })
+      JSON.stringify({
+        src: 'router',
+        dst: 'attacker',
+        cap: ['Read'],
+        exp: Math.floor(Date.now() / 1000) + 3600,
+        iat: Math.floor(Date.now() / 1000),
+        jti: 'tampered',
+      })
     ).toString('base64url');
     const tamperedToken = `${parts[0]}.${tamperedPayload}.${parts[2]}`;
     const result = verifyToken(tamperedToken, 'attacker', 'Read');
@@ -170,16 +179,25 @@ describe('AIP capability-tokens — Test 6: AIP_TOKENS=off bypass', () => {
   });
 
   it('verifyToken returns true for ANY token (including invalid) when AIP_TOKENS=off', () => {
-    assert.equal(verifyToken('garbage.token.here', 'developer', 'Bash'), true,
-      'AIP_TOKENS=off must bypass ALL verification');
-    assert.equal(verifyToken('', 'anyone', 'anything'), true,
-      'AIP_TOKENS=off must bypass empty token');
+    assert.equal(
+      verifyToken('garbage.token.here', 'developer', 'Bash'),
+      true,
+      'AIP_TOKENS=off must bypass ALL verification'
+    );
+    assert.equal(
+      verifyToken('', 'anyone', 'anything'),
+      true,
+      'AIP_TOKENS=off must bypass empty token'
+    );
   });
 
   it('verifyToken returns true for expired token when AIP_TOKENS=off', () => {
     const expired = issueToken('router', 'developer', ['Read'], -100);
-    assert.equal(verifyToken(expired, 'developer', 'Read'), true,
-      'AIP_TOKENS=off must bypass expiry check');
+    assert.equal(
+      verifyToken(expired, 'developer', 'Read'),
+      true,
+      'AIP_TOKENS=off must bypass expiry check'
+    );
   });
 });
 
@@ -212,9 +230,7 @@ describe('AIP capability-tokens — Test 7: overhead benchmark < 5ms', () => {
     const elapsed = Date.now() - start;
     const avgMs = elapsed / ITERATIONS;
     // Report but don't fail — this is a stretch goal
-    process.stderr.write(
-      `[BENCH] issueToken avg: ${avgMs.toFixed(3)}ms (paper baseline 2.35ms)\n`
-    );
+    process.stderr.write(`[BENCH] issueToken avg: ${avgMs.toFixed(3)}ms (paper baseline 2.35ms)\n`);
     // Hard limit: < 3ms average (allowing for Windows timer resolution)
     assert.ok(avgMs < 3, `issueToken avg ${avgMs.toFixed(2)}ms exceeds 3ms hard limit`);
   });

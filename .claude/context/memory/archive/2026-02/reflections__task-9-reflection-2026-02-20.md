@@ -14,14 +14,14 @@
 
 ## Rubric Scores
 
-| Dimension | Score | Weight | Weighted |
-|---|---|---|---|
-| Completeness | 0.82 | 0.25 | 0.205 |
-| Accuracy | 0.88 | 0.25 | 0.220 |
-| Clarity | 0.90 | 0.15 | 0.135 |
-| Consistency | 0.80 | 0.15 | 0.120 |
-| Actionability | 0.88 | 0.20 | 0.176 |
-| **Overall** | **0.856** | | |
+| Dimension     | Score     | Weight | Weighted |
+| ------------- | --------- | ------ | -------- |
+| Completeness  | 0.82      | 0.25   | 0.205    |
+| Accuracy      | 0.88      | 0.25   | 0.220    |
+| Clarity       | 0.90      | 0.15   | 0.135    |
+| Consistency   | 0.80      | 0.15   | 0.120    |
+| Actionability | 0.88      | 0.20   | 0.176    |
+| **Overall**   | **0.856** |        |          |
 
 ---
 
@@ -78,15 +78,15 @@ Task #9 implemented automated supply-chain security enforcement artifacts in res
 
 ### Integration Dimensions
 
-| Dimension | Status |
-|---|---|
-| SKILL.md present | PASS |
-| Agent frontmatter assignment | PASS (7 agents assigned) |
-| Hook registered in settings.json | PASS (external-content-guard) |
-| Skill catalog entry | MISSING (P1) |
-| artifact-graph.json node | MISSING (P1) |
-| CLAUDE.md routing reference | MISSING (P2) |
-| Command delegator | MISSING (P2) |
+| Dimension                          | Status                                         |
+| ---------------------------------- | ---------------------------------------------- |
+| SKILL.md present                   | PASS                                           |
+| Agent frontmatter assignment       | PASS (7 agents assigned)                       |
+| Hook registered in settings.json   | PASS (external-content-guard)                  |
+| Skill catalog entry                | MISSING (P1)                                   |
+| artifact-graph.json node           | MISSING (P1)                                   |
+| CLAUDE.md routing reference        | MISSING (P2)                                   |
+| Command delegator                  | MISSING (P2)                                   |
 | skill-index.json category accuracy | DEGRADED (category: Other, should be Security) |
 
 ### Integration Gaps
@@ -111,10 +111,10 @@ Task #9 implemented automated supply-chain security enforcement artifacts in res
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|---|---|---|
-| Two-task security hardening pattern | Retain | High reuse value; pattern applies to any security protocol → implementation pipeline |
-| skill-index category fallback gotcha | Retain | Recurring issue; affects discoverability of all security skills |
+| Item                                   | Decision                    | Rationale                                                                              |
+| -------------------------------------- | --------------------------- | -------------------------------------------------------------------------------------- |
+| Two-task security hardening pattern    | Retain                      | High reuse value; pattern applies to any security protocol → implementation pipeline   |
+| skill-index category fallback gotcha   | Retain                      | Recurring issue; affects discoverability of all security skills                        |
 | Missing TaskUpdate metadata occurrence | Retain (already in gotchas) | Already documented as `missing-taskupdate-metadata-recurring`; update occurrence count |
 
 ---

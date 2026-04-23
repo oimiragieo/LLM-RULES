@@ -108,14 +108,22 @@ describe('Skill Provenance Validation', () => {
     for (const src of VALID_SOURCES) {
       const good = { ...validFrontmatter, source: src };
       const r = validateSkillProvenance(good, 'test-skill/SKILL.md');
-      assert.strictEqual(r.valid, true, `Expected valid for source="${src}", got errors: ${JSON.stringify(r.errors)}`);
+      assert.strictEqual(
+        r.valid,
+        true,
+        `Expected valid for source="${src}", got errors: ${JSON.stringify(r.errors)}`
+      );
     }
   });
 
   test('Test 6: happy path — all fields present and valid passes', () => {
     const result = validateSkillProvenance(validFrontmatter, 'test-skill/SKILL.md');
 
-    assert.strictEqual(result.valid, true, `Expected validation to pass, got errors: ${JSON.stringify(result.errors)}`);
+    assert.strictEqual(
+      result.valid,
+      true,
+      `Expected validation to pass, got errors: ${JSON.stringify(result.errors)}`
+    );
     assert.deepStrictEqual(result.errors, [], 'Expected zero errors on valid frontmatter');
   });
 });

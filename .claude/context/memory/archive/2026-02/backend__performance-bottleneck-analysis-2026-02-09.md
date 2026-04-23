@@ -23,6 +23,7 @@ Identified **7 critical performance bottlenecks** adding **~15 seconds per start
 #### Evidence
 
 Session 1 (06:28):
+
 ```
 MCP server "sequential-thinking": 8692ms
 MCP server "filesystem": 8797ms
@@ -33,6 +34,7 @@ MCP server "shadcn": 9832ms (HTTP)
 ```
 
 Session 2 (13:17):
+
 ```
 MCP server "sequential-thinking": 10277ms
 MCP server "filesystem": 10371ms
@@ -51,16 +53,16 @@ MCP server "chrome-devtools": 10730ms
 
 ```javascript
 // BEFORE (sequential):
-await connectServer('sequential-thinking');  // 10s
-await connectServer('filesystem');           // 10s
-await connectServer('chrome-devtools');      // 10s
+await connectServer('sequential-thinking'); // 10s
+await connectServer('filesystem'); // 10s
+await connectServer('chrome-devtools'); // 10s
 // Total: 30s
 
 // AFTER (parallel):
 await Promise.all([
   connectServer('sequential-thinking'),
   connectServer('filesystem'),
-  connectServer('chrome-devtools')
+  connectServer('chrome-devtools'),
 ]);
 // Total: ~10s (limited by slowest)
 ```
@@ -81,6 +83,7 @@ await Promise.all([
 #### Evidence
 
 From 3c003dec-eda7-4372-96db-017e22e86ef1.txt:
+
 ```
 61: Writing to temp file: C:\Users\oimir\.claude.json.tmp.31592.1770626300337
 63: Temp file written successfully, size: 23022 bytes
@@ -110,13 +113,13 @@ From 3c003dec-eda7-4372-96db-017e22e86ef1.txt:
 ```javascript
 // BEFORE:
 function saveConfig(config) {
-  atomicWrite('.claude.json', config);  // Immediate
+  atomicWrite('.claude.json', config); // Immediate
 }
 
 // AFTER:
 const debouncedSave = debounce(atomicWrite, 10000, { maxWait: 10000 });
 function saveConfig(config) {
-  debouncedSave('.claude.json', config);  // Batched
+  debouncedSave('.claude.json', config); // Batched
 }
 ```
 
@@ -136,6 +139,7 @@ function saveConfig(config) {
 #### Evidence
 
 From 30594d82-9f62-4b82-b7e0-4173bbfe5f23.txt:
+
 ```
 Line 20-33:
 executePreToolHooks called for tool: Bash
@@ -164,7 +168,7 @@ Total: ~267ms overhead
 const hookMatcherCache = new Map();
 function getMatchingHooks(tool) {
   if (hookMatcherCache.has(tool)) return hookMatcherCache.get(tool);
-  const matches = findMatches(tool);  // Expensive regex matching
+  const matches = findMatches(tool); // Expensive regex matching
   hookMatcherCache.set(tool, matches);
   return matches;
 }
@@ -180,7 +184,7 @@ const blocked = results.find(r => r.result === 'block');
 // AFTER:
 for (const hook of hooks) {
   const result = await executeHook(hook);
-  if (result.result === 'block') return result;  // Short-circuit
+  if (result.result === 'block') return result; // Short-circuit
 }
 ```
 
@@ -202,6 +206,7 @@ for (const hook of hooks) {
 #### Evidence
 
 From 30594d82-9f62-4b82-b7e0-4173bbfe5f23.txt:
+
 ```
 Line 1909-1912:
 06:50:33.724 Stream started - received first chunk
@@ -252,6 +257,7 @@ const stall Monitor = setInterval(() => {
 #### Evidence
 
 From 30594d82-9f62-4b82-b7e0-4173bbfe5f23.txt:
+
 ```
 Line 4831:
 07:51:07.195 Stream started - received first chunk
@@ -267,6 +273,7 @@ Line 4831:
 **Not a Router performance issue** — Router was correctly blocked from running tests (ADR-030 routing guard working as intended). However, the test suite itself is slow.
 
 **Test suite optimization** (separate investigation needed):
+
 1. Parallelize test execution (`node --test --test-concurrency=<cores>`)
 2. Identify slowest tests (use `--test-reporter=tap` with timing)
 3. Mock I/O-heavy operations
@@ -288,6 +295,7 @@ Line 4831:
 #### Evidence
 
 From logs (hundreds of occurrences):
+
 ```
 Hook output does not start with {, treating as plain text
 Hook output does not start with {, treating as plain text
@@ -311,6 +319,7 @@ Hook output does not start with {, treating as plain text
 ```
 
 **Parser optimization**:
+
 ```javascript
 // BEFORE:
 if (output.startsWith'{')) {
@@ -342,6 +351,7 @@ if (metadata.contentType === 'text/plain') {
 #### Evidence
 
 From 3c003dec-eda7-4372-96db-017e22e86ef1.txt:
+
 ```
 Line 23-36:
 [WARN] Failed to parse YAML frontmatter in mcp-developer.md: Map keys must be unique at line 57
@@ -361,6 +371,7 @@ Failed to parse agent from prompt-engineer.md: Missing required "name" field
 **Fix agent frontmatter** — Remove duplicate YAML keys in agent files.
 
 **Files to fix**:
+
 - `.claude/agents/domain/mcp-developer.md` (line 57: duplicate key)
 - `.claude/agents/domain/prompt-engineer.md` (line 56: duplicate key)
 
@@ -374,15 +385,15 @@ Failed to parse agent from prompt-engineer.md: Missing required "name" field
 
 Based on this analysis, establish these budgets:
 
-| Operation                | Current     | Target    | Budget    |
-| ------------------------ | ----------- | --------- | --------- |
-| Startup (total)          | ~15s        | 3-5s      | <5s       |
-| MCP initialization       | 8-10s       | 2-4s      | <5s       |
-| Config writes (session)  | 1.3s (130×) | <100ms    | <200ms    |
-| Hook execution per tool  | 200-400ms   | 50ms      | <100ms    |
-| Test suite execution     | 111s        | 30-40s    | <60s      |
-| API streaming (no stall) | <2s         | <2s       | <5s       |
-| JSON parsing overhead    | 5s          | 0s        | 0s        |
+| Operation                | Current     | Target | Budget |
+| ------------------------ | ----------- | ------ | ------ |
+| Startup (total)          | ~15s        | 3-5s   | <5s    |
+| MCP initialization       | 8-10s       | 2-4s   | <5s    |
+| Config writes (session)  | 1.3s (130×) | <100ms | <200ms |
+| Hook execution per tool  | 200-400ms   | 50ms   | <100ms |
+| Test suite execution     | 111s        | 30-40s | <60s   |
+| API streaming (no stall) | <2s         | <2s    | <5s    |
+| JSON parsing overhead    | 5s          | 0s     | 0s     |
 
 ## Implementation Priority
 
@@ -397,6 +408,7 @@ Based on this analysis, establish these budgets:
 ## Regression Prevention
 
 **Performance tests** (add to CI):
+
 ```javascript
 // test/performance/startup.test.js
 test('Startup completes in <5s', async () => {
@@ -416,6 +428,7 @@ test('Hook execution <100ms per tool', async () => {
 ```
 
 **Monitoring alerts**:
+
 - Startup time > 5s
 - MCP initialization > 5s total
 - Hook execution > 100ms per tool
@@ -426,6 +439,7 @@ test('Hook execution <100ms per tool', async () => {
 ## Appendix: Methodology
 
 **Profiling approach**:
+
 1. Grep for timing patterns: `(took|elapsed|duration|ms\b|\d+ms)`
 2. Grep for MCP initialization: `Successfully connected.*in \d+ms`
 3. Grep for file I/O: `Writing to temp file|\.claude\.json`
@@ -433,6 +447,7 @@ test('Hook execution <100ms per tool', async () => {
 5. Read representative sections of largest files for context
 
 **Tools used**:
+
 - Grep tool (Claude Code)
 - Read tool (Claude Code)
 - Manual log analysis

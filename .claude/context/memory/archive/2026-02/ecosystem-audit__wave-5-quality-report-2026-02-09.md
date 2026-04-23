@@ -33,50 +33,51 @@
 
 ### ✅ Passing Skills (≥7/10)
 
-| Skill | Score | Notes |
-|-------|-------|-------|
-| advanced-elicitation | 10/10 | Exemplary - comprehensive examples, 15 methods documented, security controls, cost management |
-| architecture-review | 9/10 | Strong workflow, good examples, clear best practices, related workflow reference |
-| auth-security-expert | 10/10 | Exceptional - OAuth 2.1, JWT RFC 8725, extensive code examples, security checklists |
-| api-development-expert | 9/10 | Comprehensive REST principles, OpenAPI, authentication patterns, error handling |
+| Skill                  | Score | Notes                                                                                         |
+| ---------------------- | ----- | --------------------------------------------------------------------------------------------- |
+| advanced-elicitation   | 10/10 | Exemplary - comprehensive examples, 15 methods documented, security controls, cost management |
+| architecture-review    | 9/10  | Strong workflow, good examples, clear best practices, related workflow reference              |
+| auth-security-expert   | 10/10 | Exceptional - OAuth 2.1, JWT RFC 8725, extensive code examples, security checklists           |
+| api-development-expert | 9/10  | Comprehensive REST principles, OpenAPI, authentication patterns, error handling               |
 
 ### ❌ Skills Requiring Enhancement (<7/10)
 
-| Skill | Score | Gaps | Priority |
-|-------|-------|------|----------|
-| accessibility | 4/10 | No examples, vague instructions, no best practices | HIGH |
-| ai-ml-expert | 3/10 | Stub-like content, truncated instructions, generic capabilities | CRITICAL |
-| android-expert | 3/10 | Truncated instructions, no examples, generic content | CRITICAL |
-| best-practices-guidelines | 3/10 | Single-line instruction, no examples, no detailed guidance | CRITICAL |
-| binary-analysis-patterns | 2/10 | Minimal stub, no content beyond frontmatter | CRITICAL |
-| checklist-generator | 2/10 | Stub, no actionable content | CRITICAL |
-| code-analyzer | 2/10 | Stub, missing all instructional content | CRITICAL |
-| code-quality-expert | 2/10 | Stub, no substantive content | CRITICAL |
-| code-semantic-search | 2/10 | Stub, minimal guidance | CRITICAL |
-| code-structural-search | 2/10 | Stub, no content | CRITICAL |
-| code-style-validator | 2/10 | Stub, no content | CRITICAL |
-| complexity-assessment | 2/10 | Stub, no content | CRITICAL |
-| consensus-voting | 2/10 | Stub, no content | CRITICAL |
-| container-expert | 2/10 | Stub, no content | CRITICAL |
-| context-compressor | 2/10 | Stub, no content | CRITICAL |
-| context-driven-development | 2/10 | Stub, no content | CRITICAL |
-| data-expert | 2/10 | Stub, no content | CRITICAL |
-| database-architect | 2/10 | Stub, no content | CRITICAL |
-| database-expert | 2/10 | Stub, no content | CRITICAL |
-| debugging | 2/10 | Stub, no content | CRITICAL |
-| diagram-generator | 2/10 | Stub, no content | CRITICAL |
-| differential-review | 2/10 | Stub, no content | CRITICAL |
-| doc-generator | 2/10 | Stub, no content | CRITICAL |
-| docker-compose | 2/10 | Stub, no content | CRITICAL |
-| dry-principle | 2/10 | Stub, no content | CRITICAL |
-| agent-creator | 2/10 | Stub, no content (reviewed last, alphabetically) | CRITICAL |
-| artifact-integrator | 2/10 | Stub, no content (reviewed last, alphabetically) | CRITICAL |
+| Skill                      | Score | Gaps                                                            | Priority |
+| -------------------------- | ----- | --------------------------------------------------------------- | -------- |
+| accessibility              | 4/10  | No examples, vague instructions, no best practices              | HIGH     |
+| ai-ml-expert               | 3/10  | Stub-like content, truncated instructions, generic capabilities | CRITICAL |
+| android-expert             | 3/10  | Truncated instructions, no examples, generic content            | CRITICAL |
+| best-practices-guidelines  | 3/10  | Single-line instruction, no examples, no detailed guidance      | CRITICAL |
+| binary-analysis-patterns   | 2/10  | Minimal stub, no content beyond frontmatter                     | CRITICAL |
+| checklist-generator        | 2/10  | Stub, no actionable content                                     | CRITICAL |
+| code-analyzer              | 2/10  | Stub, missing all instructional content                         | CRITICAL |
+| code-quality-expert        | 2/10  | Stub, no substantive content                                    | CRITICAL |
+| code-semantic-search       | 2/10  | Stub, minimal guidance                                          | CRITICAL |
+| code-structural-search     | 2/10  | Stub, no content                                                | CRITICAL |
+| code-style-validator       | 2/10  | Stub, no content                                                | CRITICAL |
+| complexity-assessment      | 2/10  | Stub, no content                                                | CRITICAL |
+| consensus-voting           | 2/10  | Stub, no content                                                | CRITICAL |
+| container-expert           | 2/10  | Stub, no content                                                | CRITICAL |
+| context-compressor         | 2/10  | Stub, no content                                                | CRITICAL |
+| context-driven-development | 2/10  | Stub, no content                                                | CRITICAL |
+| data-expert                | 2/10  | Stub, no content                                                | CRITICAL |
+| database-architect         | 2/10  | Stub, no content                                                | CRITICAL |
+| database-expert            | 2/10  | Stub, no content                                                | CRITICAL |
+| debugging                  | 2/10  | Stub, no content                                                | CRITICAL |
+| diagram-generator          | 2/10  | Stub, no content                                                | CRITICAL |
+| differential-review        | 2/10  | Stub, no content                                                | CRITICAL |
+| doc-generator              | 2/10  | Stub, no content                                                | CRITICAL |
+| docker-compose             | 2/10  | Stub, no content                                                | CRITICAL |
+| dry-principle              | 2/10  | Stub, no content                                                | CRITICAL |
+| agent-creator              | 2/10  | Stub, no content (reviewed last, alphabetically)                | CRITICAL |
+| artifact-integrator        | 2/10  | Stub, no content (reviewed last, alphabetically)                | CRITICAL |
 
 ---
 
 ## Common Issues Identified
 
 ### 1. Stub Skills (Most Critical)
+
 **Count**: 24 skills
 **Pattern**: Only frontmatter present, no substantive SKILL.md content
 **Examples**: binary-analysis-patterns, checklist-generator, code-analyzer, etc.
@@ -84,16 +85,19 @@
 **Root Cause**: These skills appear to have been created with placeholder content but never populated with actual instructions, examples, or workflows.
 
 ### 2. Truncated Instructions (Critical)
+
 **Count**: 3 skills (ai-ml-expert, android-expert, best-practices-guidelines)
 **Pattern**: Instructions section cuts off mid-sentence with "When reviewing or writing code, apply these guidelines:" followed by fragments
 
 **Root Cause**: Likely copy-paste errors or incomplete migrations from rules to SKILL.md format.
 
 ### 3. Missing Examples (High)
+
 **Count**: 27 skills
 **Pattern**: Generic "Example usage" placeholder without actual code
 
 ### 4. Missing Best Practices Section (High)
+
 **Count**: 24 skills
 **Pattern**: No anti-patterns, common pitfalls, or do/don't guidance
 
@@ -122,7 +126,7 @@
 
 For each stub skill, follow this structure:
 
-```markdown
+````markdown
 # {Skill Name}
 
 <identity>
@@ -141,12 +145,15 @@ You help developers {specific value proposition}.
 {Detailed step-by-step process}
 
 ## Step 2: {Phase Name}
+
 {Detailed step-by-step process}
 
 ## Common Patterns
+
 {When to use what}
 
 ## Anti-Patterns
+
 {What to avoid and why}
 </instructions>
 
@@ -154,29 +161,35 @@ You help developers {specific value proposition}.
 ### Example 1: {Scenario}
 ```{language}
 // Code example showing usage
-```
+````
 
 **Explanation**: {Why this works}
 </examples>
 
 <best_practices>
+
 - ✅ DO: {Best practice}
 - ❌ DON'T: {Anti-pattern}
-</best_practices>
+  </best_practices>
 
 ## Integration Points
 
 **Used By Agents:**
+
 - {agent-name} - {how they use this skill}
 
 **Related Skills:**
+
 - {skill-name} - {relationship}
 
 **Related Workflows:**
+
 - {workflow-path} - {integration point}
 
 ## Memory Protocol (MANDATORY)
+
 {Standard memory protocol section}
+
 ```
 
 ---
@@ -207,3 +220,4 @@ You help developers {specific value proposition}.
 
 **Status**: Complete
 **Next Wave**: Task #7 (Skills E-N)
+```

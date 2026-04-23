@@ -12,12 +12,12 @@
 
 ### Gate Check
 
-| Check | Result | Finding |
-| ----- | ------ | -------- |
-| `metadata.summary` provided | FAIL | No non-fallback summary available |
-| `metadata.filesModified` provided | FAIL | No file modification list |
-| `metadata.outputArtifacts` provided | FAIL | No output artifact paths |
-| Session gap log exists | FAIL | `.claude/context/runtime/session-gap-log.jsonl` missing |
+| Check                               | Result | Finding                                                 |
+| ----------------------------------- | ------ | ------------------------------------------------------- |
+| `metadata.summary` provided         | FAIL   | No non-fallback summary available                       |
+| `metadata.filesModified` provided   | FAIL   | No file modification list                               |
+| `metadata.outputArtifacts` provided | FAIL   | No output artifact paths                                |
+| Session gap log exists              | FAIL   | `.claude/context/runtime/session-gap-log.jsonl` missing |
 
 ### Outcome
 
@@ -36,6 +36,7 @@ The reflection protocol requires:
 3. **Output artifacts** (array) — reports/deliverables created
 
 **Without this data:**
+
 - Patterns cannot be extracted (no evidence of approach)
 - Quality cannot be assessed (no work to evaluate)
 - Memory cannot be updated (no learnings to record)
@@ -81,6 +82,7 @@ Because Phase 0 gate failed, I cannot proceed to:
 ## Atomic Handshake Status
 
 **Task IDs processed**:
+
 - `task_completion:2026-02-22T01:04:37.357Z:21`
 - `task_completion:2026-02-22T01:09:35.514Z:22`
 - `task_completion:2026-02-22T01:09:35.914Z:14`
@@ -88,6 +90,7 @@ Because Phase 0 gate failed, I cannot proceed to:
 **Status**: Ready for atomic completion handshake once metadata is provided.
 
 **Expected Router action**:
+
 ```javascript
 // 1. Router retrieves full task metadata
 TaskGet({ taskId: '21' });

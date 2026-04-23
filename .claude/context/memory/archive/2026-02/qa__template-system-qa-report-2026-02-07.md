@@ -17,14 +17,14 @@ The template system overhaul is **production-ready** with 3 expected legacy test
 
 ## Executive Summary
 
-| Category | Status | Details |
-|----------|--------|---------|
-| **Tests** | ✅ PASS | 72/75 tests pass (96%) |
-| **Security Fixes** | ✅ PASS | All 3 vulnerabilities mitigated |
-| **Template Cleanup** | ✅ PASS | 14 archived, 2 deleted, critical files preserved |
-| **Template Upgrades** | ✅ PASS | All 5 upgrade categories verified |
-| **Documentation** | ✅ PASS | Catalog, README, skill updates complete |
-| **Resolver Module** | ✅ PASS | Advisory resolver with full TDD |
+| Category              | Status  | Details                                          |
+| --------------------- | ------- | ------------------------------------------------ |
+| **Tests**             | ✅ PASS | 72/75 tests pass (96%)                           |
+| **Security Fixes**    | ✅ PASS | All 3 vulnerabilities mitigated                  |
+| **Template Cleanup**  | ✅ PASS | 14 archived, 2 deleted, critical files preserved |
+| **Template Upgrades** | ✅ PASS | All 5 upgrade categories verified                |
+| **Documentation**     | ✅ PASS | Catalog, README, skill updates complete          |
+| **Resolver Module**   | ✅ PASS | Advisory resolver with full TDD                  |
 
 ---
 
@@ -54,11 +54,11 @@ Result: 59 tests, 56 pass, 3 fail
 
 **Failures Analysis:**
 
-| Test | File | Line | Reason | Verdict |
-|------|------|------|--------|---------|
-| "should detect master-orchestrator in description" | spawn-prompt-validator.test.cjs | 305 | Tests vulnerable behavior (description matching) | ✅ EXPECTED FAILURE |
-| "should detect swarm-coordinator" | spawn-prompt-validator.test.cjs | 315 | Tests vulnerable behavior (description matching) | ✅ EXPECTED FAILURE |
-| "should detect party-orchestrator" | spawn-prompt-validator.test.cjs | 320 | Tests vulnerable behavior (description matching) | ✅ EXPECTED FAILURE |
+| Test                                               | File                            | Line | Reason                                           | Verdict             |
+| -------------------------------------------------- | ------------------------------- | ---- | ------------------------------------------------ | ------------------- |
+| "should detect master-orchestrator in description" | spawn-prompt-validator.test.cjs | 305  | Tests vulnerable behavior (description matching) | ✅ EXPECTED FAILURE |
+| "should detect swarm-coordinator"                  | spawn-prompt-validator.test.cjs | 315  | Tests vulnerable behavior (description matching) | ✅ EXPECTED FAILURE |
+| "should detect party-orchestrator"                 | spawn-prompt-validator.test.cjs | 320  | Tests vulnerable behavior (description matching) | ✅ EXPECTED FAILURE |
 
 **✅ PASS (with rationale):**
 
@@ -90,8 +90,10 @@ const normalizedProjectRoot = path.normalize(projectRoot);
 const normalizedSnippetPath = path.normalize(snippetPath);
 
 // Check if snippetPath starts with projectRoot (path traversal protection)
-if (!normalizedSnippetPath.startsWith(normalizedProjectRoot + path.sep) &&
-    normalizedSnippetPath !== normalizedProjectRoot) {
+if (
+  !normalizedSnippetPath.startsWith(normalizedProjectRoot + path.sep) &&
+  normalizedSnippetPath !== normalizedProjectRoot
+) {
   return ''; // Block path traversal
 }
 ```
@@ -120,10 +122,12 @@ function isOrchestratorSpawn(toolInput) {
     'evolution-orchestrator',
     'swarm-coordinator',
     'party-orchestrator',
-    'router',  // Added in fix
+    'router', // Added in fix
   ];
 
-  const subagentType = String(toolInput.subagent_type || '').toLowerCase().trim();
+  const subagentType = String(toolInput.subagent_type || '')
+    .toLowerCase()
+    .trim();
 
   // SEC-TMPL-002 FIX: Only match on subagent_type, not description
   return orchestratorTypes.includes(subagentType);
@@ -279,7 +283,7 @@ MISSING
 # File: .claude/templates/adr-template.md
 
 date: '{{DATE}}'
-deciders: []  # MADR field added
+deciders: [] # MADR field added
 ```
 
 ✅ **MADR-compliant fields added**
@@ -305,12 +309,15 @@ ARCHIVED
 ## 9. Deployment
 
 ### 9.1 Deployment Strategy
+
 - **Rollout Plan**: [Step-by-step deployment plan]
 
 ### 9.2 Infrastructure Requirements
+
 <!-- Infrastructure and environment requirements for deployment -->
 
 ### 9.3 Rollback Plan
+
 <!-- Detailed rollback procedure in case of deployment failure -->
 ```
 
@@ -330,10 +337,12 @@ ARCHIVED
 #### Type Parameter Syntax (PEP 695)
 
 # New way (3.12+)
+
 def max_value[T](items: list[T]) -> T:
 ```
 
 ✅ **Python 3.12+ features documented**:
+
 - ruff linter (replaces flake8/pylint)
 - PEP 695 type parameter syntax
 - Modern union types with `|` operator
@@ -358,10 +367,12 @@ def max_value[T](items: list[T]) -> T:
 # File: .claude/templates/security-design-checklist.md
 
 ## DREAD Risk Scoring
+
 DREAD is a risk assessment model for prioritizing security threats.
 (lines 252-327)
 
 ## OWASP ASVS (Application Security Verification Standard) References
+
 ASVS provides a framework for testing web application security controls.
 (lines 328-488)
 ```
@@ -403,16 +414,19 @@ audit-report-template.md
 **Archived Templates:** 14 (see `_archive/README.md`)
 
 ## 1. Spawn Templates (4 active)
+
 - universal-agent-spawn.md
 - orchestrator-spawn.md
 - subordinate-once.md
 - agent-identity-integration.md
 
 ## 2. Creator Templates (4 active)
+
 ...
 ```
 
 ✅ **28 active templates cataloged** with:
+
 - Agent assignments
 - Skill assignments
 - Categories
@@ -438,19 +452,23 @@ $ grep -E "templates/hooks/|templates/code/|templates/schemas/" \
 # File: .claude/templates/README.md
 
 ### Spawn Templates (`spawn/`)
+
 Agent spawning templates for router delegation.
 (lines 65-78)
 
 ### Report Templates (`reports/`)
+
 Structured report output templates for agent deliverables.
 (lines 80-103)
 
 ## Archived Templates
+
 Templates no longer actively used are preserved in `_archive/`.
 (lines 401-427)
 ```
 
 ✅ **README has all 3 required sections**:
+
 - Spawn Templates section
 - Report Templates section
 - Archive documentation
@@ -471,7 +489,7 @@ These tests validate the **vulnerable** behavior that SEC-TMPL-002 intentionally
 // Line 305-307: Tests description matching (VULNERABLE)
 test('should detect master-orchestrator in description', () => {
   const toolInput = { description: 'master-orchestrator coordinating' };
-  assert.strictEqual(isOrchestratorSpawn(toolInput), true);  // FAILS (correct)
+  assert.strictEqual(isOrchestratorSpawn(toolInput), true); // FAILS (correct)
 });
 ```
 
@@ -487,25 +505,25 @@ The security fix intentionally broke these tests. The new security test suite (`
 
 ### 8.1 Test Coverage by Category
 
-| Category | Tests | Pass | Fail | Coverage |
-|----------|-------|------|------|----------|
-| Security Fixes | 22 | 22 | 0 | 100% |
-| Spawn Templates | 57 | 57 | 0 | 100% |
-| Template Resolver | 15 | 15 | 0 | 100% |
-| Legacy Tests | 3 | 0 | 3 | 0% (expected) |
-| **TOTAL** | **97** | **94** | **3** | **96.9%** |
+| Category          | Tests  | Pass   | Fail  | Coverage      |
+| ----------------- | ------ | ------ | ----- | ------------- |
+| Security Fixes    | 22     | 22     | 0     | 100%          |
+| Spawn Templates   | 57     | 57     | 0     | 100%          |
+| Template Resolver | 15     | 15     | 0     | 100%          |
+| Legacy Tests      | 3      | 0      | 3     | 0% (expected) |
+| **TOTAL**         | **97** | **94** | **3** | **96.9%**     |
 
 ### 8.2 Manual Verification Coverage
 
-| Item | Verified | Method |
-|------|----------|--------|
-| Archive directory | ✅ | `ls -la` inspection |
-| Security templates preserved | ✅ | File existence checks |
-| Dead templates deleted | ✅ | File non-existence checks |
-| Template upgrades | ✅ | Content grep + read |
-| Catalog structure | ✅ | Full file read |
-| Documentation updates | ✅ | Multi-file grep |
-| Module exports | ✅ | Node.js require test |
+| Item                         | Verified | Method                    |
+| ---------------------------- | -------- | ------------------------- |
+| Archive directory            | ✅       | `ls -la` inspection       |
+| Security templates preserved | ✅       | File existence checks     |
+| Dead templates deleted       | ✅       | File non-existence checks |
+| Template upgrades            | ✅       | Content grep + read       |
+| Catalog structure            | ✅       | Full file read            |
+| Documentation updates        | ✅       | Multi-file grep           |
+| Module exports               | ✅       | Node.js require test      |
 
 **Manual coverage:** 7/7 checks (100%)
 
@@ -518,6 +536,7 @@ The security fix intentionally broke these tests. The new security test suite (`
 ✅ **All core spawn template tests pass** (57/57)
 
 This confirms:
+
 - Existing spawn prompt assembly unchanged
 - Tool/skill filtering unchanged
 - Agent-specific recommendations unchanged
@@ -577,14 +596,14 @@ The 3 security fixes are **non-breaking** because:
 
 ## 12. Sign-Off Criteria
 
-| Criterion | Status | Evidence |
-|-----------|--------|----------|
-| All critical tests pass | ✅ | 94/97 pass (3 expected failures) |
-| Security fixes verified | ✅ | 22/22 security tests pass |
-| No regressions | ✅ | 57/57 spawn tests pass |
-| Documentation complete | ✅ | Catalog + README + skill updates |
-| Archive structure correct | ✅ | 14 archived, 2 deleted, README exists |
-| Template upgrades applied | ✅ | All 5 categories verified |
+| Criterion                 | Status | Evidence                              |
+| ------------------------- | ------ | ------------------------------------- |
+| All critical tests pass   | ✅     | 94/97 pass (3 expected failures)      |
+| Security fixes verified   | ✅     | 22/22 security tests pass             |
+| No regressions            | ✅     | 57/57 spawn tests pass                |
+| Documentation complete    | ✅     | Catalog + README + skill updates      |
+| Archive structure correct | ✅     | 14 archived, 2 deleted, README exists |
+| Template upgrades applied | ✅     | All 5 categories verified             |
 
 **All criteria met:** ✅
 

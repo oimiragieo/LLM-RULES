@@ -30,6 +30,7 @@ async function main() {
 **Problem:** Hooks run as short-lived subprocesses. The `setTimeout` in `scheduleDebouncedUpdate()` (line 331) never fires because `process.exit(0)` terminates the process immediately after setting the timer.
 
 **Evidence of dead code:**
+
 - Lines 156-318: `triggerIndexUpdate()` function is **never called** by any code path
 - Lines 324-337: `scheduleDebouncedUpdate()` sets a timer that never executes
 - Line 323: `debounceTimer` variable is written but never actually used
@@ -41,6 +42,7 @@ async function main() {
 **Constraint:** Hooks must exit quickly (&lt;100ms) to avoid blocking the tool pipeline.
 
 **Incompatibility:**
+
 1. Hook subprocess spawned
 2. `setTimeout` registered (debounce timer = 5000ms)
 3. Hook must exit immediately to unblock file operation
@@ -60,14 +62,16 @@ Replace in-process timer with file-based debounce using timestamp checks.
 **Debounce marker file:** `.claude/context/code-index/.debounce-marker`
 
 **Content:**
+
 ```json
 {
-  "lastTrigger": 1739581234567,  // timestamp in ms
+  "lastTrigger": 1739581234567, // timestamp in ms
   "filePath": "src/auth.ts"
 }
 ```
 
 **Algorithm:**
+
 1. Hook invoked for file change
 2. Read debounce marker (if exists)
 3. Check `Date.now() - lastTrigger`
@@ -77,6 +81,7 @@ Replace in-process timer with file-based debounce using timestamp checks.
 7. Exit
 
 **Benefits:**
+
 - Works across hook invocations
 - Survives process boundaries
 - Simple timestamp comparison (fast)
@@ -115,10 +120,7 @@ Replace in-process timer with file-based debounce using timestamp checks.
 /**
  * Debounce marker file for cross-process coordination
  */
-const DEBOUNCE_MARKER = path.join(
-  process.cwd(),
-  '.claude/context/code-index/.debounce-marker'
-);
+const DEBOUNCE_MARKER = path.join(process.cwd(), '.claude/context/code-index/.debounce-marker');
 
 /**
  * Check if debounce window is active (file-based)
@@ -241,13 +243,13 @@ module.exports = {
 
 ## Why This Works
 
-| Aspect | In-Process Timer (Broken) | File-Based Debounce (Fixed) |
-|--------|---------------------------|----------------------------|
-| **Survives process exit?** | ❌ No - timer dies with process | ✅ Yes - marker persists on disk |
+| Aspect                        | In-Process Timer (Broken)        | File-Based Debounce (Fixed)              |
+| ----------------------------- | -------------------------------- | ---------------------------------------- |
+| **Survives process exit?**    | ❌ No - timer dies with process  | ✅ Yes - marker persists on disk         |
 | **Works across invocations?** | ❌ No - each hook is new process | ✅ Yes - timestamp checked on every hook |
-| **Hook performance budget?** | ✅ Fast (but never fires!) | ✅ Fast (&lt;1ms timestamp check) |
-| **Fail-open safety?** | ✅ Yes (but dead code) | ✅ Yes (missing marker = allow) |
-| **Debounce accuracy?** | N/A (never runs) | ✅ Within ±file write latency (~1-5ms) |
+| **Hook performance budget?**  | ✅ Fast (but never fires!)       | ✅ Fast (&lt;1ms timestamp check)        |
+| **Fail-open safety?**         | ✅ Yes (but dead code)           | ✅ Yes (missing marker = allow)          |
+| **Debounce accuracy?**        | N/A (never runs)                 | ✅ Within ±file write latency (~1-5ms)   |
 
 ---
 
@@ -264,15 +266,18 @@ module.exports = {
 ## Performance Impact
 
 **Before (broken):**
+
 - Hook exit: ~1ms (fast, but indexing never happens)
 - Index updates: **0 (dead code)**
 
 **After (fixed):**
+
 - Hook exit when debounced: ~1ms (timestamp check only)
 - Hook exit when indexing: ~50-200ms (actual indexing work)
 - Index updates: **Working as designed**
 
 **Trade-off:** Hooks that trigger indexing will block ~50-200ms. This is acceptable because:
+
 1. Only happens once per 5-second window (debounced)
 2. Incremental updates are fast (Merkle tree optimization)
 3. Hook performance budget is &lt;100ms for fast path (skip case), not indexing case
@@ -319,6 +324,7 @@ echo "// After debounce" >> src/test.ts
 **Idea:** Hook writes to queue, separate long-lived worker processes queue
 
 **Why rejected:**
+
 - Adds complexity (worker lifecycle, queue durability)
 - Overkill for simple debouncing
 - File-based debounce is simpler and sufficient
@@ -328,6 +334,7 @@ echo "// After debounce" >> src/test.ts
 **Idea:** Reuse existing `.indexing.lock` file for debounce
 
 **Why rejected:**
+
 - Lock file purpose is mutual exclusion, not debouncing
 - Mixing concerns reduces clarity
 - Lock timeout (10s) doesn't match debounce window (5s)
@@ -337,6 +344,7 @@ echo "// After debounce" >> src/test.ts
 **Idea:** Don't call `process.exit(0)`, let timer fire
 
 **Why rejected:**
+
 - Hook would block file operations for 5 seconds (unacceptable)
 - Violates hook performance budget
 - Breaks fail-open guarantee (hanging hooks block tools)
@@ -346,6 +354,7 @@ echo "// After debounce" >> src/test.ts
 ## Migration Path
 
 **No migration needed:**
+
 - New code replaces dead code (no existing state to preserve)
 - Debounce marker is created on first indexing trigger
 - Backward compatible (old behavior was non-functional)

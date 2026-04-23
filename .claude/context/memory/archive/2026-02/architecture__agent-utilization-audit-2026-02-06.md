@@ -20,90 +20,90 @@ The routing infrastructure (routing-table.cjs, INTENT_KEYWORDS, DISAMBIGUATION_R
 
 ### 1.1 Core Agents (9)
 
-| # | Agent ID | File Path | Preferred Model | Spawn Count | Utilization |
-|---|----------|-----------|-----------------|-------------|-------------|
-| 1 | architect | core/architect.md | opus | 1* | B - Rarely |
-| 2 | context-compressor | core/context-compressor.md | haiku | 0 | C - Never |
-| 3 | developer | core/developer.md | sonnet | 37+ | A - Frequent |
-| 4 | planner | core/planner.md | opus | 0 | C - Never |
-| 5 | pm | core/pm.md | sonnet | 0 | C - Never |
-| 6 | qa | core/qa.md | opus | 0 | C - Never |
-| 7 | reflection-agent | core/reflection-agent.md | sonnet | 0 | C - Never |
-| 8 | router | core/router.md | haiku | N/A | Meta-agent |
-| 9 | technical-writer | core/technical-writer.md | sonnet | 0 | C - Never |
+| #   | Agent ID           | File Path                  | Preferred Model | Spawn Count | Utilization  |
+| --- | ------------------ | -------------------------- | --------------- | ----------- | ------------ |
+| 1   | architect          | core/architect.md          | opus            | 1\*         | B - Rarely   |
+| 2   | context-compressor | core/context-compressor.md | haiku           | 0           | C - Never    |
+| 3   | developer          | core/developer.md          | sonnet          | 37+         | A - Frequent |
+| 4   | planner            | core/planner.md            | opus            | 0           | C - Never    |
+| 5   | pm                 | core/pm.md                 | sonnet          | 0           | C - Never    |
+| 6   | qa                 | core/qa.md                 | opus            | 0           | C - Never    |
+| 7   | reflection-agent   | core/reflection-agent.md   | sonnet          | 0           | C - Never    |
+| 8   | router             | core/router.md             | haiku           | N/A         | Meta-agent   |
+| 9   | technical-writer   | core/technical-writer.md   | sonnet          | 0           | C - Never    |
 
-*Spawned only during this audit session (2026-02-06 22:12 UTC).
+\*Spawned only during this audit session (2026-02-06 22:12 UTC).
 
 ### 1.2 Specialized Agents (13)
 
-| # | Agent ID | File Path | Spawn Count | Utilization |
-|---|----------|-----------|-------------|-------------|
-| 10 | c4-code | specialized/c4-code.md | 0 | C - Never |
-| 11 | c4-component | specialized/c4-component.md | 0 | C - Never |
-| 12 | c4-container | specialized/c4-container.md | 0 | C - Never |
-| 13 | c4-context | specialized/c4-context.md | 0 | C - Never |
-| 14 | code-reviewer | specialized/code-reviewer.md | 0 | C - Never |
-| 15 | code-simplifier | specialized/code-simplifier.md | 0 | C - Never |
-| 16 | conductor-validator | specialized/conductor-validator.md | 0 | C - Never |
-| 17 | database-architect | specialized/database-architect.md | 0 | C - Never |
-| 18 | devops | specialized/devops.md | 0 | C - Never |
-| 19 | devops-troubleshooter | specialized/devops-troubleshooter.md | 0 | C - Never |
-| 20 | incident-responder | specialized/incident-responder.md | 0 | C - Never |
-| 21 | researcher | specialized/researcher.md | 1* | B - Rarely |
-| 22 | reverse-engineer | specialized/reverse-engineer.md | 0 | C - Never |
-| 23 | security-architect | specialized/security-architect.md | 0 | C - Never |
+| #   | Agent ID              | File Path                            | Spawn Count | Utilization |
+| --- | --------------------- | ------------------------------------ | ----------- | ----------- |
+| 10  | c4-code               | specialized/c4-code.md               | 0           | C - Never   |
+| 11  | c4-component          | specialized/c4-component.md          | 0           | C - Never   |
+| 12  | c4-container          | specialized/c4-container.md          | 0           | C - Never   |
+| 13  | c4-context            | specialized/c4-context.md            | 0           | C - Never   |
+| 14  | code-reviewer         | specialized/code-reviewer.md         | 0           | C - Never   |
+| 15  | code-simplifier       | specialized/code-simplifier.md       | 0           | C - Never   |
+| 16  | conductor-validator   | specialized/conductor-validator.md   | 0           | C - Never   |
+| 17  | database-architect    | specialized/database-architect.md    | 0           | C - Never   |
+| 18  | devops                | specialized/devops.md                | 0           | C - Never   |
+| 19  | devops-troubleshooter | specialized/devops-troubleshooter.md | 0           | C - Never   |
+| 20  | incident-responder    | specialized/incident-responder.md    | 0           | C - Never   |
+| 21  | researcher            | specialized/researcher.md            | 1\*         | B - Rarely  |
+| 22  | reverse-engineer      | specialized/reverse-engineer.md      | 0           | C - Never   |
+| 23  | security-architect    | specialized/security-architect.md    | 0           | C - Never   |
 
-*Spawned only during this audit session.
+\*Spawned only during this audit session.
 
 ### 1.3 Domain Agents (23)
 
-| # | Agent ID | File Path | Spawn Count | Utilization |
-|---|----------|-----------|-------------|-------------|
-| 24 | ai-ml-specialist | domain/ai-ml-specialist.md | 0 | C - Never |
-| 25 | android-pro | domain/android-pro.md | 0 | C - Never |
-| 26 | data-engineer | domain/data-engineer.md | 0 | C - Never |
-| 27 | expo-mobile-developer | domain/expo-mobile-developer.md | 0 | C - Never |
-| 28 | fastapi-pro | domain/fastapi-pro.md | 0 | C - Never |
-| 29 | frontend-pro | domain/frontend-pro.md | 0 | C - Never |
-| 30 | gamedev-pro | domain/gamedev-pro.md | 0 | C - Never |
-| 31 | golang-pro | domain/golang-pro.md | 0 | C - Never |
-| 32 | graphql-pro | domain/graphql-pro.md | 0 | C - Never |
-| 33 | ios-pro | domain/ios-pro.md | 0 | C - Never |
-| 34 | java-pro | domain/java-pro.md | 0 | C - Never |
-| 35 | mobile-ux-reviewer | domain/mobile-ux-reviewer.md | 0 | C - Never |
-| 36 | nextjs-pro | domain/nextjs-pro.md | 0 | C - Never |
-| 37 | nodejs-pro | domain/nodejs-pro.md | 0 | C - Never |
-| 38 | php-pro | domain/php-pro.md | 0 | C - Never |
-| 39 | python-pro | domain/python-pro.md | 0 | C - Never |
-| 40 | rust-pro | domain/rust-pro.md | 0 | C - Never |
-| 41 | scientific-research-expert | domain/scientific-research-expert.md | 0 | C - Never |
-| 42 | sveltekit-expert | domain/sveltekit-expert.md | 0 | C - Never |
-| 43 | tauri-desktop-developer | domain/tauri-desktop-developer.md | 0 | C - Never |
-| 44 | typescript-pro | domain/typescript-pro.md | 0 | C - Never |
-| 45 | web3-blockchain-expert | domain/web3-blockchain-expert.md | 0 | C - Never |
+| #   | Agent ID                   | File Path                            | Spawn Count | Utilization |
+| --- | -------------------------- | ------------------------------------ | ----------- | ----------- |
+| 24  | ai-ml-specialist           | domain/ai-ml-specialist.md           | 0           | C - Never   |
+| 25  | android-pro                | domain/android-pro.md                | 0           | C - Never   |
+| 26  | data-engineer              | domain/data-engineer.md              | 0           | C - Never   |
+| 27  | expo-mobile-developer      | domain/expo-mobile-developer.md      | 0           | C - Never   |
+| 28  | fastapi-pro                | domain/fastapi-pro.md                | 0           | C - Never   |
+| 29  | frontend-pro               | domain/frontend-pro.md               | 0           | C - Never   |
+| 30  | gamedev-pro                | domain/gamedev-pro.md                | 0           | C - Never   |
+| 31  | golang-pro                 | domain/golang-pro.md                 | 0           | C - Never   |
+| 32  | graphql-pro                | domain/graphql-pro.md                | 0           | C - Never   |
+| 33  | ios-pro                    | domain/ios-pro.md                    | 0           | C - Never   |
+| 34  | java-pro                   | domain/java-pro.md                   | 0           | C - Never   |
+| 35  | mobile-ux-reviewer         | domain/mobile-ux-reviewer.md         | 0           | C - Never   |
+| 36  | nextjs-pro                 | domain/nextjs-pro.md                 | 0           | C - Never   |
+| 37  | nodejs-pro                 | domain/nodejs-pro.md                 | 0           | C - Never   |
+| 38  | php-pro                    | domain/php-pro.md                    | 0           | C - Never   |
+| 39  | python-pro                 | domain/python-pro.md                 | 0           | C - Never   |
+| 40  | rust-pro                   | domain/rust-pro.md                   | 0           | C - Never   |
+| 41  | scientific-research-expert | domain/scientific-research-expert.md | 0           | C - Never   |
+| 42  | sveltekit-expert           | domain/sveltekit-expert.md           | 0           | C - Never   |
+| 43  | tauri-desktop-developer    | domain/tauri-desktop-developer.md    | 0           | C - Never   |
+| 44  | typescript-pro             | domain/typescript-pro.md             | 0           | C - Never   |
+| 45  | web3-blockchain-expert     | domain/web3-blockchain-expert.md     | 0           | C - Never   |
 
 ### 1.4 Orchestrator Agents (4)
 
-| # | Agent ID | File Path | Spawn Count | Utilization |
-|---|----------|-----------|-------------|-------------|
-| 46 | evolution-orchestrator | orchestrators/evolution-orchestrator.md | 0 | C - Never |
-| 47 | master-orchestrator | orchestrators/master-orchestrator.md | 0 | C - Never |
-| 48 | party-orchestrator | orchestrators/party-orchestrator.md | 0 | C - Never |
-| 49 | swarm-coordinator | orchestrators/swarm-coordinator.md | 0 | C - Never |
+| #   | Agent ID               | File Path                               | Spawn Count | Utilization |
+| --- | ---------------------- | --------------------------------------- | ----------- | ----------- |
+| 46  | evolution-orchestrator | orchestrators/evolution-orchestrator.md | 0           | C - Never   |
+| 47  | master-orchestrator    | orchestrators/master-orchestrator.md    | 0           | C - Never   |
+| 48  | party-orchestrator     | orchestrators/party-orchestrator.md     | 0           | C - Never   |
+| 49  | swarm-coordinator      | orchestrators/swarm-coordinator.md      | 0           | C - Never   |
 
 ---
 
 ## 2. Utilization Summary
 
-| Category | Total | Frequently Used | Rarely Used | Never Used |
-|----------|-------|----------------|-------------|------------|
-| Core | 9 | 1 (developer) | 1 (architect*) | 6 |
-| Specialized | 13 | 0 | 1 (researcher*) | 12 |
-| Domain | 23 | 0 | 0 | 23 |
-| Orchestrators | 4 | 0 | 0 | 4 |
-| **TOTAL** | **49** | **1 (2%)** | **2 (4%)** | **45 (92%)** |
+| Category      | Total  | Frequently Used | Rarely Used      | Never Used   |
+| ------------- | ------ | --------------- | ---------------- | ------------ |
+| Core          | 9      | 1 (developer)   | 1 (architect\*)  | 6            |
+| Specialized   | 13     | 0               | 1 (researcher\*) | 12           |
+| Domain        | 23     | 0               | 0                | 23           |
+| Orchestrators | 4      | 0               | 0                | 4            |
+| **TOTAL**     | **49** | **1 (2%)**      | **2 (4%)**       | **45 (92%)** |
 
-*Only spawned during this current audit session. Prior to this audit, the count was **1 frequently used, 0 rarely used, 47 never used (96% unused)**.
+\*Only spawned during this current audit session. Prior to this audit, the count was **1 frequently used, 0 rarely used, 47 never used (96% unused)**.
 
 ---
 
@@ -317,6 +317,7 @@ Developer: TaskUpdate({ status: "completed" })
 ### R1: Switch enforcement hooks from `warn` to `block` (CRITICAL)
 
 Change default enforcement modes:
+
 - `PLANNER_FIRST_ENFORCEMENT=block` (enforce planner-first for complex tasks)
 - `SECURITY_REVIEW_ENFORCEMENT=block` (enforce security review for auth/security changes)
 - `CREATOR_GUARD=block` (already block by default; keep it)
@@ -342,6 +343,7 @@ post-completion-hook.cjs:
 ### R3: Fix the reflection deadlock (HIGH)
 
 The Step 0 reflection check blocks TaskList when reflections are pending, but the Router never spawns reflection-agent. Options:
+
 - A) The Router MUST spawn reflection-agent before proceeding (enforce in Step 0)
 - B) Remove the blocking behavior and make reflections asynchronous
 - C) Auto-spawn reflection-agent via a timer/hook outside the Router
@@ -349,6 +351,7 @@ The Step 0 reflection check blocks TaskList when reflections are pending, but th
 ### R4: Implement a workflow state machine (HIGH)
 
 Create a persistent state file (`.claude/context/runtime/workflow-state.json`) that tracks:
+
 - Current workflow phase (Explore / Plan / Review / Implement / Verify)
 - Required agents for each phase
 - Completion status per phase
@@ -359,12 +362,14 @@ The Router reads this state file and spawns the next agent in sequence rather th
 ### R5: Add Router intent-to-agent enforcement (MEDIUM)
 
 After Step 2 classification, add a validation step that prevents the Router from spawning `developer` when the classified intent maps to a different agent. For example:
+
 - Intent classified as "architecture" but Router is about to spawn developer = VIOLATION
 - Intent classified as "security" but no security-architect spawned = VIOLATION
 
 ### R6: Create explicit post-change triggers (MEDIUM)
 
 Define in the routing table which changes require follow-up:
+
 - `.claude/agents/**` modified -> spawn code-reviewer + qa
 - `*.test.*` files modified -> spawn qa
 - Security-related paths modified -> spawn security-architect
@@ -377,6 +382,7 @@ Domain agents (python-pro, rust-pro, etc.) are designed for external projects th
 ### R8: Establish orchestrator activation patterns (LOW)
 
 Document specific user request patterns that MUST trigger orchestrators:
+
 - "Run a full project review" -> master-orchestrator
 - "Get multiple perspectives on this design" -> party-orchestrator
 - "Improve the framework itself" -> evolution-orchestrator
@@ -386,16 +392,16 @@ Document specific user request patterns that MUST trigger orchestrators:
 
 ## 8. Prioritized Action Items
 
-| Priority | Item | Impact | Effort |
-|----------|------|--------|--------|
-| P0 | R1: Switch enforcement to `block` mode | Immediate: planner + security-architect spawning | 15 min (env vars) |
-| P0 | R2: Post-completion workflow chain hook | Unlocks: code-reviewer, qa, technical-writer, reflection | 2-4 hours |
-| P1 | R3: Fix reflection deadlock | Unlocks: reflection-agent, learning extraction | 1-2 hours |
-| P1 | R4: Workflow state machine | Unlocks: multi-phase orchestration | 4-8 hours |
-| P2 | R5: Intent-to-agent enforcement | Prevents: developer collapse | 2-4 hours |
-| P2 | R6: Post-change trigger rules | Automates: follow-up reviews | 2-4 hours |
-| P3 | R7: Domain agent routing for external projects | Enables: language-specific expertise | 4-8 hours |
-| P3 | R8: Orchestrator activation patterns | Enables: multi-agent patterns | 2-4 hours |
+| Priority | Item                                           | Impact                                                   | Effort            |
+| -------- | ---------------------------------------------- | -------------------------------------------------------- | ----------------- |
+| P0       | R1: Switch enforcement to `block` mode         | Immediate: planner + security-architect spawning         | 15 min (env vars) |
+| P0       | R2: Post-completion workflow chain hook        | Unlocks: code-reviewer, qa, technical-writer, reflection | 2-4 hours         |
+| P1       | R3: Fix reflection deadlock                    | Unlocks: reflection-agent, learning extraction           | 1-2 hours         |
+| P1       | R4: Workflow state machine                     | Unlocks: multi-phase orchestration                       | 4-8 hours         |
+| P2       | R5: Intent-to-agent enforcement                | Prevents: developer collapse                             | 2-4 hours         |
+| P2       | R6: Post-change trigger rules                  | Automates: follow-up reviews                             | 2-4 hours         |
+| P3       | R7: Domain agent routing for external projects | Enables: language-specific expertise                     | 4-8 hours         |
+| P3       | R8: Orchestrator activation patterns           | Enables: multi-agent patterns                            | 2-4 hours         |
 
 ---
 
@@ -459,4 +465,4 @@ Fixing R1 (enforcement modes) and R2 (post-completion chain) would immediately a
 
 ---
 
-*Report generated by architect agent. All data sourced from spawn-log.jsonl, spawn-size-audit.jsonl, routing-table.cjs, agent-registry.json, and router-decision.md.*
+_Report generated by architect agent. All data sourced from spawn-log.jsonl, spawn-size-audit.jsonl, routing-table.cjs, agent-registry.json, and router-decision.md._

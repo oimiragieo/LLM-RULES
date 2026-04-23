@@ -48,6 +48,7 @@ The attack surface for critical vulnerabilities (command injection, prototype po
 #### M-001: Shell: true in Test and Legacy Code
 
 **Location**:
+
 - `tests/evals/subagent-memory-rag-live.eval.cjs:103, 126`
 - `tests/integration/routing-cli-test.cjs:113`
 - `scripts/testing/test-version-validation.mjs:28`
@@ -57,6 +58,7 @@ The attack surface for critical vulnerabilities (command injection, prototype po
 **Risk**: Command injection in test scenarios if untrusted input flows to these spawn calls. Lower risk since test code is not production-exposed.
 
 **Evidence**:
+
 ```javascript
 // tests/integration/routing-cli-test.cjs:113
 spawnSync(command, args, {
@@ -67,6 +69,7 @@ spawnSync(command, args, {
 ```
 
 **Recommendation**:
+
 1. **Refactor** to use `shell: false` with explicit PATH resolution:
    ```javascript
    const which = require('which');
@@ -89,6 +92,7 @@ spawnSync(command, args, {
 **Risk**: If user-controlled input (e.g., file paths from agent responses) flows to these operations, path traversal (`../../../etc/passwd`) could occur.
 
 **Examples**:
+
 ```javascript
 // .claude/lib/error-writer.cjs
 const filePath = path.join(dir, fileName); // fileName could contain ../
@@ -96,6 +100,7 @@ fs.writeFileSync(filePath, content);
 ```
 
 **Recommendation**:
+
 1. **Validate** all resolved paths remain within expected base directories:
    ```javascript
    const resolvedPath = path.resolve(baseDir, userInput);
@@ -120,11 +125,13 @@ fs.writeFileSync(filePath, content);
 **Issue**: Reading arbitrary-sized files synchronously can cause denial-of-service (memory exhaustion, blocking event loop).
 
 **Evidence**: `fs.readFileSync()` calls without size validation in:
+
 - `.claude/hooks/session/adaptive-quality-gate.cjs`
 - `.claude/hooks/session/drift-detector.cjs`
 - Multiple other hooks
 
 **Recommendation**:
+
 1. **Limit** file sizes before reading:
    ```javascript
    const stats = fs.statSync(filePath);
@@ -146,11 +153,13 @@ fs.writeFileSync(filePath, content);
 **Issue**: Archived code does not use `safeParseJSON()` wrapper, creating potential prototype pollution risk if reactivated.
 
 **Evidence**:
+
 - `.claude/hooks/_archive/statusline.cjs`
 - `.claude/hooks/_archive/task-status-enforcement.cjs`
 - Multiple other archived files
 
 **Recommendation**:
+
 1. **Archived code** should remain disabled (not registered in `settings.json`).
 2. If reactivating any archived hook, **refactor** to use `safeParseJSON()` before production use.
 3. Add deprecation notice to archived files.
@@ -166,6 +175,7 @@ fs.writeFileSync(filePath, content);
 **Issue**: Malformed stdin input could cause unexpected behavior if hooks don't validate input structure.
 
 **Examples**:
+
 ```javascript
 // .claude/hooks/session/drift-detector.cjs
 data = fs.readFileSync(0, 'utf-8');
@@ -173,6 +183,7 @@ input = safeParseJSON(data, null); // Good: using safeParseJSON
 ```
 
 **Recommendation**:
+
 1. **All** stdin reads should use `safeParseJSON()` with appropriate schema (already done in most cases).
 2. Add explicit error handling for empty/malformed stdin.
 3. Validate required fields exist before processing.
@@ -188,6 +199,7 @@ input = safeParseJSON(data, null); // Good: using safeParseJSON
 **Implementation**: `.claude/lib/utils/safe-json.cjs`
 
 The `safeParseJSON()` utility provides **defense-in-depth**:
+
 - ✅ Strips `__proto__`, `constructor`, `prototype` recursively
 - ✅ Uses `Object.create(null)` to prevent prototype inheritance
 - ✅ Schema validation with defaults
@@ -197,6 +209,7 @@ The `safeParseJSON()` utility provides **defense-in-depth**:
 **Adoption**: Extensively used across **45+ files** in hooks, lib, and tools.
 
 **Evidence**:
+
 ```javascript
 // Safe pattern (widespread adoption)
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
@@ -212,12 +225,14 @@ const state = safeParseJSON(content, 'router-state');
 **Pattern**: `spawnSync()` with `shell: false` and array arguments.
 
 **Adoption**: Systematically applied across all production code:
+
 - `.claude/lib/code-indexing/hybrid-lazy-indexer-methods-a.cjs`
 - `.claude/lib/code-indexing/hybrid-lazy-indexer-methods-b.cjs`
 - `.claude/tools/chrome-browser/chrome-browser.cjs`
 - Multiple other modules
 
 **Evidence**:
+
 ```javascript
 // Secure pattern (no shell interpretation)
 const result = spawnSync(rgPath, searchArgs, {
@@ -236,6 +251,7 @@ const result = spawnSync(rgPath, searchArgs, {
 **Finding**: No hardcoded credentials, API keys, or tokens found in scanned code.
 
 **Verification**:
+
 ```bash
 # Pattern searches returned zero matches in production code:
 rg "API_KEY|SECRET|TOKEN|PASSWORD)\s*[=:]\s*['\"][^'\"]{8,}"
@@ -252,6 +268,7 @@ rg "BEGIN.*PRIVATE KEY"  # Private keys
 **Pattern**: Hooks return safe defaults on error instead of failing open.
 
 **Example**:
+
 ```javascript
 // .claude/hooks/routing/pre-tool-unified.execution.cjs
 try {
@@ -271,18 +288,18 @@ try {
 
 ## OWASP Top 10 Coverage
 
-| Category                              | Status  | Notes                                 |
-| ------------------------------------- | ------- | ------------------------------------- |
-| A01: Broken Access Control            | ✅ N/A  | Framework-level, not user-facing      |
-| A02: Cryptographic Failures           | ✅ Good | No secrets hardcoded, env vars used   |
-| A03: Injection (SQL, Command, XSS)    | ✅ Good | Command injection fully mitigated     |
-| A04: Insecure Design                  | ✅ Good | Defense-in-depth, schema validation   |
-| A05: Security Misconfiguration        | ✅ Good | No insecure defaults detected         |
-| A06: Vulnerable Components            | ⚠️ N/A  | Outside scan scope (dependency audit) |
-| A07: Authentication Failures          | ✅ N/A  | No auth layer in framework            |
-| A08: Software/Data Integrity          | ✅ Good | Git integrity, structured logging     |
-| A09: Logging Failures                 | ✅ Good | Structured JSONL logging              |
-| A10: SSRF                             | ✅ N/A  | No external HTTP requests in scope    |
+| Category                               | Status  | Notes                                 |
+| -------------------------------------- | ------- | ------------------------------------- |
+| A01: Broken Access Control             | ✅ N/A  | Framework-level, not user-facing      |
+| A02: Cryptographic Failures            | ✅ Good | No secrets hardcoded, env vars used   |
+| A03: Injection (SQL, Command, XSS)     | ✅ Good | Command injection fully mitigated     |
+| A04: Insecure Design                   | ✅ Good | Defense-in-depth, schema validation   |
+| A05: Security Misconfiguration         | ✅ Good | No insecure defaults detected         |
+| A06: Vulnerable Components             | ⚠️ N/A  | Outside scan scope (dependency audit) |
+| A07: Authentication Failures           | ✅ N/A  | No auth layer in framework            |
+| A08: Software/Data Integrity           | ✅ Good | Git integrity, structured logging     |
+| A09: Logging Failures                  | ✅ Good | Structured JSONL logging              |
+| A10: SSRF                              | ✅ N/A  | No external HTTP requests in scope    |
 | **Prototype Pollution (OWASP Extras)** | ✅ Good | Comprehensive `safeParseJSON` defense |
 
 ---
@@ -298,6 +315,7 @@ try {
 | L-003   | Low      | None   | P4       | N/A      |
 
 **Recommended Order**:
+
 1. **M-002** (Path traversal validation) - Add centralized path validation utility
 2. **M-001** (Shell: true in tests) - Refactor test spawn calls
 3. **L-001** (File size limits) - Add size checks to file reads

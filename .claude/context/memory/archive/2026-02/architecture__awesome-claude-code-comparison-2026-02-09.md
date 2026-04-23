@@ -88,15 +88,15 @@ These are architecturally complementary, not competitive. ACCS optimizes for **b
 
 ### 2.1 Agent Definition Format
 
-| Dimension | ACCS | AS |
-|-----------|------|-----|
-| **Format** | YAML frontmatter + markdown body | YAML frontmatter + markdown body |
-| **Frontmatter fields** | `name`, `description`, `tools`, `model` | `name`, `description`, `tools`, `model`, `identity` (role, goal, backstory, motto, personality), `skills` |
-| **Body structure** | Free-form with suggested sections: Communication Protocol, Development Workflow | Structured with Memory Protocol, Skill Invocation, Task Tracking sections |
-| **Tool specification** | Explicit per-agent (e.g., `Read, Grep, Glob` for read-only) | Defined per-agent with role-based restrictions enforced by hooks |
-| **Model specification** | `opus`/`sonnet`/`haiku` per agent frontmatter | Config.yaml precedence chain: config.yaml > frontmatter > complexity default > sonnet |
-| **Length** | 200-290 lines typical | 100-400 lines typical, plus separate skill files |
-| **Inter-agent references** | "Integration with other agents" section listing collaborators | Formal routing table + keyword matching + skill assignments |
+| Dimension                  | ACCS                                                                            | AS                                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Format**                 | YAML frontmatter + markdown body                                                | YAML frontmatter + markdown body                                                                          |
+| **Frontmatter fields**     | `name`, `description`, `tools`, `model`                                         | `name`, `description`, `tools`, `model`, `identity` (role, goal, backstory, motto, personality), `skills` |
+| **Body structure**         | Free-form with suggested sections: Communication Protocol, Development Workflow | Structured with Memory Protocol, Skill Invocation, Task Tracking sections                                 |
+| **Tool specification**     | Explicit per-agent (e.g., `Read, Grep, Glob` for read-only)                     | Defined per-agent with role-based restrictions enforced by hooks                                          |
+| **Model specification**    | `opus`/`sonnet`/`haiku` per agent frontmatter                                   | Config.yaml precedence chain: config.yaml > frontmatter > complexity default > sonnet                     |
+| **Length**                 | 200-290 lines typical                                                           | 100-400 lines typical, plus separate skill files                                                          |
+| **Inter-agent references** | "Integration with other agents" section listing collaborators                   | Formal routing table + keyword matching + skill assignments                                               |
 
 **Analysis:** Both use the same foundational format (YAML frontmatter + markdown), which is the Claude Code native agent format. ACCS agents are more self-contained -- each includes comprehensive domain knowledge in the body. AS agents are more modular -- domain knowledge is externalized into skills that can be shared across agents.
 
@@ -106,14 +106,14 @@ These are architecturally complementary, not competitive. ACCS optimizes for **b
 
 ### 2.2 Routing and Orchestration
 
-| Dimension | ACCS | AS |
-|-----------|------|-----|
-| **Routing mechanism** | None -- Claude Code auto-selects based on `description` field | Dedicated router agent with routing table, keyword matching, complexity gates |
-| **Orchestration** | Conceptual only (agents reference each other textually) | Router spawns via Task() tool with TaskUpdate tracking |
-| **Multi-agent coordination** | Described in agent prompts but not implemented | Implemented via Task(), TaskList(), spawn templates, orchestrator agents |
-| **Task tracking** | JSON status blocks in agent prompts (aspirational) | Mandatory TaskUpdate protocol with in_progress/completed states |
-| **Enforcement** | None | 20+ hooks: routing-guard, creator-guard, spawn-validator, etc. |
-| **Quality gates** | None | Complexity classification, planner-first enforcement, security review gates |
+| Dimension                    | ACCS                                                          | AS                                                                            |
+| ---------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **Routing mechanism**        | None -- Claude Code auto-selects based on `description` field | Dedicated router agent with routing table, keyword matching, complexity gates |
+| **Orchestration**            | Conceptual only (agents reference each other textually)       | Router spawns via Task() tool with TaskUpdate tracking                        |
+| **Multi-agent coordination** | Described in agent prompts but not implemented                | Implemented via Task(), TaskList(), spawn templates, orchestrator agents      |
+| **Task tracking**            | JSON status blocks in agent prompts (aspirational)            | Mandatory TaskUpdate protocol with in_progress/completed states               |
+| **Enforcement**              | None                                                          | 20+ hooks: routing-guard, creator-guard, spawn-validator, etc.                |
+| **Quality gates**            | None                                                          | Complexity classification, planner-first enforcement, security review gates   |
 
 **Analysis:** This is the largest architectural divergence. ACCS has **zero runtime orchestration** -- it relies entirely on Claude Code's built-in agent auto-selection based on the `description` field. When ACCS agents mention "Query context manager for system architecture" or show JSON status blocks, these are aspirational patterns written into the prompt, not actual system capabilities.
 
@@ -125,13 +125,13 @@ AS has a full orchestration layer: the router classifies requests, checks gates,
 
 ### 2.3 Memory and Persistence
 
-| Dimension | ACCS | AS |
-|-----------|------|-----|
-| **Session memory** | None | `learnings.md`, `decisions.md`, `issues.md` |
-| **Cross-session persistence** | None | File-based memory in `.claude/context/memory/` |
-| **Named memory** | None | Named memory API in `.claude/context/memory/named/` |
-| **Active context** | None | `active_context.md` as scratchpad for long tasks |
-| **Context compression** | Mentioned in `context-manager` agent prompt | Implemented via `context-compressor` skill with runtime triggers |
+| Dimension                     | ACCS                                        | AS                                                               |
+| ----------------------------- | ------------------------------------------- | ---------------------------------------------------------------- |
+| **Session memory**            | None                                        | `learnings.md`, `decisions.md`, `issues.md`                      |
+| **Cross-session persistence** | None                                        | File-based memory in `.claude/context/memory/`                   |
+| **Named memory**              | None                                        | Named memory API in `.claude/context/memory/named/`              |
+| **Active context**            | None                                        | `active_context.md` as scratchpad for long tasks                 |
+| **Context compression**       | Mentioned in `context-manager` agent prompt | Implemented via `context-compressor` skill with runtime triggers |
 
 **Analysis:** ACCS has no memory system whatsoever. Each agent invocation starts fresh. AS mandates a memory protocol: read learnings before starting, write learnings after completing. This is a significant architectural advantage for AS in enterprise settings where accumulated knowledge reduces rework.
 
@@ -139,13 +139,13 @@ AS has a full orchestration layer: the router classifies requests, checks gates,
 
 ### 2.4 Skill System
 
-| Dimension | ACCS | AS |
-|-----------|------|-----|
-| **Skill abstraction** | None -- agent prompts embed all knowledge | Separate `SKILL.md` files invoked via `Skill()` tool |
-| **Skill sharing** | N/A (knowledge duplicated per agent) | Skills assigned to multiple agents, shared across the system |
-| **Skill catalog** | N/A | `skill-catalog.md` with 40+ skills |
-| **Skill lifecycle** | N/A | Creator workflow: research-synthesis -> skill-creator -> integration |
-| **Slash commands** | `/subagent-catalog:search`, `:fetch`, `:list`, `:invalidate` | `/brainstorm`, `/tdd`, `/debug`, `/verify`, `/security-review`, `/code-review` |
+| Dimension             | ACCS                                                         | AS                                                                             |
+| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| **Skill abstraction** | None -- agent prompts embed all knowledge                    | Separate `SKILL.md` files invoked via `Skill()` tool                           |
+| **Skill sharing**     | N/A (knowledge duplicated per agent)                         | Skills assigned to multiple agents, shared across the system                   |
+| **Skill catalog**     | N/A                                                          | `skill-catalog.md` with 40+ skills                                             |
+| **Skill lifecycle**   | N/A                                                          | Creator workflow: research-synthesis -> skill-creator -> integration           |
+| **Slash commands**    | `/subagent-catalog:search`, `:fetch`, `:list`, `:invalidate` | `/brainstorm`, `/tdd`, `/debug`, `/verify`, `/security-review`, `/code-review` |
 
 **Analysis:** ACCS has no skill abstraction. Each agent is entirely self-contained, which means domain knowledge is duplicated across agents. For example, security best practices appear in `security-auditor`, `security-engineer`, `penetration-tester`, and `backend-developer` separately. AS externalizes shared knowledge into skills that multiple agents invoke.
 
@@ -155,32 +155,32 @@ AS has a full orchestration layer: the router classifies requests, checks gates,
 
 ### 2.5 Quality Gates and Enforcement
 
-| Dimension | ACCS | AS |
-|-----------|------|-----|
-| **Pre-tool hooks** | None | `routing-guard.cjs`, `unified-creator-guard.cjs`, `bash-command-validator.cjs`, etc. |
-| **Post-tool hooks** | None | `post-completion-chain.cjs`, `sync-memory-index.cjs`, etc. |
-| **Enforcement modes** | None | `block`, `warn`, `off` per hook |
-| **Security gates** | None | Mandatory security-architect review for auth/credential changes |
-| **Creator gates** | None | Creator guard blocks direct writes to artifact paths |
-| **Complexity gates** | None | Planner-first enforcement for HIGH/EPIC tasks |
+| Dimension             | ACCS | AS                                                                                   |
+| --------------------- | ---- | ------------------------------------------------------------------------------------ |
+| **Pre-tool hooks**    | None | `routing-guard.cjs`, `unified-creator-guard.cjs`, `bash-command-validator.cjs`, etc. |
+| **Post-tool hooks**   | None | `post-completion-chain.cjs`, `sync-memory-index.cjs`, etc.                           |
+| **Enforcement modes** | None | `block`, `warn`, `off` per hook                                                      |
+| **Security gates**    | None | Mandatory security-architect review for auth/credential changes                      |
+| **Creator gates**     | None | Creator guard blocks direct writes to artifact paths                                 |
+| **Complexity gates**  | None | Planner-first enforcement for HIGH/EPIC tasks                                        |
 
 **Analysis:** ACCS has zero enforcement. Any agent can do anything. AS has a comprehensive enforcement layer that prevents common failure modes (misrouting, missing security review, orphaned artifacts, dangerous commands).
 
 ### 2.6 Agent Coverage
 
-| Category | ACCS Count | AS Count | Gap Analysis |
-|----------|-----------|---------|--------------|
-| Core Development | 11 | 8 | ACCS has more specialized core devs (electron-pro, websocket-engineer, ui-designer) |
-| Language Specialists | 26 | 12 | ACCS has 14 additional language specialists (angular, cpp, csharp, django, dotnet, elixir, flutter, kotlin, laravel, powershell, rails, react, spring-boot, vue) |
-| Infrastructure | 14 | 3 | ACCS has cloud-architect, deployment-engineer, incident-responder, kubernetes-specialist, network-engineer, platform-engineer, security-engineer, sre-engineer, terraform-engineer, windows-infra-admin, azure-infra-engineer |
-| Quality & Security | 14 | 3 | ACCS has accessibility-tester, chaos-engineer, compliance-auditor, debugger, error-detective, penetration-tester, performance-engineer, test-automator |
-| Data & AI | 12 | 2 | ACCS has ai-engineer, data-analyst, data-engineer, data-scientist, database-optimizer, llm-architect, ml-engineer, mlops-engineer, nlp-engineer, postgres-pro, prompt-engineer |
-| Developer Experience | 13 | 0 | Entire category missing from AS: build-engineer, cli-developer, dependency-manager, dx-optimizer, git-workflow-manager, legacy-modernizer, mcp-developer, refactoring-specialist, tooling-engineer |
-| Specialized Domains | 12 | 3 | ACCS has blockchain-developer, embedded-systems, fintech-engineer, game-developer, iot-engineer, mobile-app-developer, payment-integration, quant-analyst, risk-manager, seo-specialist |
-| Business & Product | 10 | 1 | ACCS has business-analyst, content-marketer, customer-success-manager, legal-advisor, product-manager, project-manager, sales-engineer, scrum-master, ux-researcher |
-| Meta & Orchestration | 11 | 4 | ACCS has agent-installer, agent-organizer, context-manager, error-coordinator, it-ops-orchestrator, knowledge-synthesizer, performance-monitor, task-distributor |
-| Research & Analysis | 6 | 1 | ACCS has competitive-analyst, data-researcher, market-researcher, search-specialist, trend-analyst |
-| **Total** | **128** | **49** | **79 agent gap** |
+| Category             | ACCS Count | AS Count | Gap Analysis                                                                                                                                                                                                                  |
+| -------------------- | ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Core Development     | 11         | 8        | ACCS has more specialized core devs (electron-pro, websocket-engineer, ui-designer)                                                                                                                                           |
+| Language Specialists | 26         | 12       | ACCS has 14 additional language specialists (angular, cpp, csharp, django, dotnet, elixir, flutter, kotlin, laravel, powershell, rails, react, spring-boot, vue)                                                              |
+| Infrastructure       | 14         | 3        | ACCS has cloud-architect, deployment-engineer, incident-responder, kubernetes-specialist, network-engineer, platform-engineer, security-engineer, sre-engineer, terraform-engineer, windows-infra-admin, azure-infra-engineer |
+| Quality & Security   | 14         | 3        | ACCS has accessibility-tester, chaos-engineer, compliance-auditor, debugger, error-detective, penetration-tester, performance-engineer, test-automator                                                                        |
+| Data & AI            | 12         | 2        | ACCS has ai-engineer, data-analyst, data-engineer, data-scientist, database-optimizer, llm-architect, ml-engineer, mlops-engineer, nlp-engineer, postgres-pro, prompt-engineer                                                |
+| Developer Experience | 13         | 0        | Entire category missing from AS: build-engineer, cli-developer, dependency-manager, dx-optimizer, git-workflow-manager, legacy-modernizer, mcp-developer, refactoring-specialist, tooling-engineer                            |
+| Specialized Domains  | 12         | 3        | ACCS has blockchain-developer, embedded-systems, fintech-engineer, game-developer, iot-engineer, mobile-app-developer, payment-integration, quant-analyst, risk-manager, seo-specialist                                       |
+| Business & Product   | 10         | 1        | ACCS has business-analyst, content-marketer, customer-success-manager, legal-advisor, product-manager, project-manager, sales-engineer, scrum-master, ux-researcher                                                           |
+| Meta & Orchestration | 11         | 4        | ACCS has agent-installer, agent-organizer, context-manager, error-coordinator, it-ops-orchestrator, knowledge-synthesizer, performance-monitor, task-distributor                                                              |
+| Research & Analysis  | 6          | 1        | ACCS has competitive-analyst, data-researcher, market-researcher, search-specialist, trend-analyst                                                                                                                            |
+| **Total**            | **128**    | **49**   | **79 agent gap**                                                                                                                                                                                                              |
 
 **Analysis:** ACCS has 2.6x more agents than AS. However, quantity does not equal quality. ACCS agents are self-contained prompts without enforcement, memory, or skill integration. Many ACCS agents describe elaborate capabilities in their prompts that are not actually implemented (context managers that manage "2.3M contexts", performance monitors that achieve "99.99% availability").
 
@@ -188,14 +188,14 @@ AS agents are integrated into an orchestration system with real enforcement, mem
 
 ### 2.7 Distribution and Installation
 
-| Dimension | ACCS | AS |
-|-----------|------|-----|
-| **Distribution model** | GitHub repo + plugin marketplace + interactive installer | Monorepo (part of project) |
-| **Plugin system** | `.claude-plugin/marketplace.json` with 10 plugin packages | None |
-| **Installation** | Copy to `~/.claude/agents/` or `.claude/agents/` | Part of project checkout |
-| **CLI installer** | `install-agents.sh` (interactive, category-based selection) | None |
-| **Agent installer agent** | `agent-installer.md` (meta-agent that installs other agents) | None |
-| **Remote fetching** | GitHub API integration for browsing/installing | None |
+| Dimension                 | ACCS                                                         | AS                         |
+| ------------------------- | ------------------------------------------------------------ | -------------------------- |
+| **Distribution model**    | GitHub repo + plugin marketplace + interactive installer     | Monorepo (part of project) |
+| **Plugin system**         | `.claude-plugin/marketplace.json` with 10 plugin packages    | None                       |
+| **Installation**          | Copy to `~/.claude/agents/` or `.claude/agents/`             | Part of project checkout   |
+| **CLI installer**         | `install-agents.sh` (interactive, category-based selection)  | None                       |
+| **Agent installer agent** | `agent-installer.md` (meta-agent that installs other agents) | None                       |
+| **Remote fetching**       | GitHub API integration for browsing/installing               | None                       |
 
 **Analysis:** ACCS has a significantly more mature distribution model. The plugin marketplace, interactive installer, and agent-installer meta-agent are well-designed patterns for community distribution. AS has no equivalent -- agents are bundled with the project.
 
@@ -203,12 +203,12 @@ AS agents are integrated into an orchestration system with real enforcement, mem
 
 ### 2.8 Communication Protocol
 
-| Dimension | ACCS | AS |
-|-----------|------|-----|
-| **Inter-agent protocol** | JSON-based message format in prompts (aspirational) | TaskUpdate metadata + spawn prompt handoff |
-| **Context passing** | "Query context manager" pattern (not implemented) | File-based context in `.claude/context/` |
-| **Status reporting** | JSON progress blocks in prompts (cosmetic) | TaskUpdate with structured metadata (functional) |
-| **Handoff** | "Integration with other agents" sections | Spawn templates with task ID traceability |
+| Dimension                | ACCS                                                | AS                                               |
+| ------------------------ | --------------------------------------------------- | ------------------------------------------------ |
+| **Inter-agent protocol** | JSON-based message format in prompts (aspirational) | TaskUpdate metadata + spawn prompt handoff       |
+| **Context passing**      | "Query context manager" pattern (not implemented)   | File-based context in `.claude/context/`         |
+| **Status reporting**     | JSON progress blocks in prompts (cosmetic)          | TaskUpdate with structured metadata (functional) |
+| **Handoff**              | "Integration with other agents" sections            | Spawn templates with task ID traceability        |
 
 **Analysis:** ACCS agents include a "Communication Protocol" section with JSON message formats, but these are prompt suggestions, not actual protocols. No infrastructure exists to route these messages between agents. AS uses TaskUpdate as the actual inter-agent communication mechanism, with spawn templates providing structured context handoff.
 
@@ -223,6 +223,7 @@ AS agents are integrated into an orchestration system with real enforcement, mem
 **What it solves:** Agent distribution and modular adoption.
 
 **Integration feasibility:** Moderate
+
 - Create `.claude-plugin/marketplace.json` for AS agent packages
 - Package agents by domain (core, security, domain-specialists, orchestrators)
 - Enable `claude plugin install agent-studio-core` workflow
@@ -238,6 +239,7 @@ AS agents are integrated into an orchestration system with real enforcement, mem
 **What it solves:** Agent discovery for users who do not know which 49 agents exist or what they do.
 
 **Integration feasibility:** Trivial
+
 - Create `.claude/commands/agent-catalog/` with search, list, fetch commands
 - Leverage existing `agent-registry.json` as data source
 - Add skill-catalog equivalent for skill discovery
@@ -252,6 +254,7 @@ AS agents are integrated into an orchestration system with real enforcement, mem
 **What it solves:** User navigation when browsing agents. The "If you need to... Use this subagent" tables are immediately actionable.
 
 **Integration feasibility:** Trivial
+
 - AS already has `core/`, `domain/`, `specialized/`, `orchestrators/` directories
 - Add category README.md files with Quick Selection Guide tables
 - Add "Common Combinations" section for multi-agent workflows
@@ -263,27 +266,27 @@ AS agents are integrated into an orchestration system with real enforcement, mem
 
 **Agents from ACCS that fill genuine gaps in AS:**
 
-| Agent | Category | Why Valuable | Integration Effort |
-|-------|----------|-------------|-------------------|
-| `chaos-engineer` | Quality | Resilience testing not covered by any AS agent | Moderate (new agent + hook support) |
-| `accessibility-tester` | Quality | A11y compliance not covered | Low (new agent, no infrastructure) |
-| `performance-engineer` | Quality | Distinct from devops; focused on perf optimization | Low |
-| `llm-architect` | Data/AI | LLM system design, RAG, fine-tuning -- highly relevant to AS itself | Moderate |
-| `legacy-modernizer` | DX | Code modernization distinct from code-simplifier | Low |
-| `mcp-developer` | DX | MCP server development guidance | Low |
-| `compliance-auditor` | Quality | Regulatory compliance (SOC2, HIPAA, GDPR) distinct from security | Low |
+| Agent                  | Category | Why Valuable                                                        | Integration Effort                  |
+| ---------------------- | -------- | ------------------------------------------------------------------- | ----------------------------------- |
+| `chaos-engineer`       | Quality  | Resilience testing not covered by any AS agent                      | Moderate (new agent + hook support) |
+| `accessibility-tester` | Quality  | A11y compliance not covered                                         | Low (new agent, no infrastructure)  |
+| `performance-engineer` | Quality  | Distinct from devops; focused on perf optimization                  | Low                                 |
+| `llm-architect`        | Data/AI  | LLM system design, RAG, fine-tuning -- highly relevant to AS itself | Moderate                            |
+| `legacy-modernizer`    | DX       | Code modernization distinct from code-simplifier                    | Low                                 |
+| `mcp-developer`        | DX       | MCP server development guidance                                     | Low                                 |
+| `compliance-auditor`   | Quality  | Regulatory compliance (SOC2, HIPAA, GDPR) distinct from security    | Low                                 |
 
 **Agents NOT worth adopting (redundant or aspirational):**
 
-| Agent | Reason to Skip |
-|-------|---------------|
-| `context-manager` | Describes fictional capabilities; AS has real memory system |
-| `agent-organizer` | Duplicates AS router functionality |
-| `multi-agent-coordinator` | Duplicates AS master-orchestrator |
-| `task-distributor` | Duplicates AS planner |
-| `performance-monitor` | Aspirational; AS has real monitoring hooks |
-| `error-coordinator` | AS has self-healing hooks that actually work |
-| `knowledge-synthesizer` | AS has research-synthesis skill |
+| Agent                     | Reason to Skip                                              |
+| ------------------------- | ----------------------------------------------------------- |
+| `context-manager`         | Describes fictional capabilities; AS has real memory system |
+| `agent-organizer`         | Duplicates AS router functionality                          |
+| `multi-agent-coordinator` | Duplicates AS master-orchestrator                           |
+| `task-distributor`        | Duplicates AS planner                                       |
+| `performance-monitor`     | Aspirational; AS has real monitoring hooks                  |
+| `error-coordinator`       | AS has self-healing hooks that actually work                |
+| `knowledge-synthesizer`   | AS has research-synthesis skill                             |
 
 ### 3.5 Model Routing Simplicity (Priority: P3)
 
@@ -298,6 +301,7 @@ AS agents are integrated into an orchestration system with real enforcement, mem
 ### 3.6 Tool Assignment Philosophy (Priority: P2)
 
 **Pattern:** ACCS explicitly categorizes tool assignments by role type:
+
 - **Read-only** (reviewers, auditors): `Read, Grep, Glob`
 - **Research** (analysts): `Read, Grep, Glob, WebFetch, WebSearch`
 - **Code writers** (developers): `Read, Write, Edit, Bash, Glob, Grep`
@@ -359,6 +363,7 @@ Without a skill system, ACCS duplicates domain knowledge across agents. Security
 ### 5.1 Simplicity of Adoption
 
 An ACCS user can install an agent in 30 seconds:
+
 ```bash
 cp categories/02-language-specialists/python-pro.md ~/.claude/agents/
 ```
@@ -376,6 +381,7 @@ An AS user must understand the router, spawn templates, task tracking, memory pr
 ### 5.3 Category Documentation
 
 Each ACCS category has a README.md with:
+
 - "When to Use" guidance
 - "Quick Selection Guide" decision tables
 - "Common Combinations" multi-agent recipes
@@ -395,15 +401,15 @@ The `agent-installer` meta-agent is a clever self-referential pattern: an agent 
 
 ## 6. Integration Feasibility Summary
 
-| Innovation | Effort | Breaking Changes | Risk | Priority |
-|-----------|--------|-----------------|------|----------|
-| Agent catalog slash commands | Trivial | No | Low | P1 |
-| Category README documentation | Trivial | No | Low | P1 |
-| Tool assignment philosophy docs | Trivial | No | Low | P2 |
-| New agents (7 identified) | Moderate | No | Low | P2 |
-| Plugin marketplace metadata | Moderate | No | Low | P2 |
-| Agent marketplace skill | Significant | No | Medium | P3 |
-| Model routing docs simplification | Trivial | No | Low | P3 |
+| Innovation                        | Effort      | Breaking Changes | Risk   | Priority |
+| --------------------------------- | ----------- | ---------------- | ------ | -------- |
+| Agent catalog slash commands      | Trivial     | No               | Low    | P1       |
+| Category README documentation     | Trivial     | No               | Low    | P1       |
+| Tool assignment philosophy docs   | Trivial     | No               | Low    | P2       |
+| New agents (7 identified)         | Moderate    | No               | Low    | P2       |
+| Plugin marketplace metadata       | Moderate    | No               | Low    | P2       |
+| Agent marketplace skill           | Significant | No               | Medium | P3       |
+| Model routing docs simplification | Trivial     | No               | Low    | P3       |
 
 ---
 

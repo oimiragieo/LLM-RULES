@@ -6,6 +6,7 @@
 **Date:** 2026-02-07
 **Status:** Post-hoc review (code already implemented without prior architect review)
 **Files Reviewed:**
+
 - `.claude/hooks/routing/routing-guard.cjs` (lines 196-930, Check 7)
 - `tests/hooks/routing-guard-specialist-override.test.cjs` (10 tests)
 - `.claude/CLAUDE.md` (SPECIALIST-FIRST ROUTING LAW section)
@@ -46,16 +47,16 @@ Check 7 (`checkSpecialistOverride`) adds a specialist-first routing enforcement 
 **The Problem:**
 The current matching logic uses `combined.includes(keyword)`, which is pure substring matching. This creates several problematic scenarios:
 
-| Prompt Text | Keyword Matched | Flagged Specialist | Actually Correct? |
-|---|---|---|---|
-| "deploy the fix to staging" | "deploy" | devops | **Maybe** -- could be developer deploying their own fix via script |
-| "investigate why the test fails" | "investigate" | researcher | **No** -- developer debugging test failure |
-| "document what the function does in a JSDoc comment" | "document" | technical-writer | **No** -- developer writing inline code comments |
-| "clean up the error message text" | "clean up" | code-simplifier | **No** -- developer fixing a string literal |
-| "fix the migration script" | "migration" | database-architect | **No** -- developer fixing a bug in existing migration |
-| "update the coverage threshold in config" | "coverage" | qa | **No** -- developer modifying a config value |
-| "refactor the variable name" | "refactor" | code-simplifier | **Borderline** -- single variable rename is developer work |
-| "add Docker support check to health endpoint" | "docker" | devops | **No** -- developer adding a health check for Docker readiness |
+| Prompt Text                                          | Keyword Matched | Flagged Specialist | Actually Correct?                                                  |
+| ---------------------------------------------------- | --------------- | ------------------ | ------------------------------------------------------------------ |
+| "deploy the fix to staging"                          | "deploy"        | devops             | **Maybe** -- could be developer deploying their own fix via script |
+| "investigate why the test fails"                     | "investigate"   | researcher         | **No** -- developer debugging test failure                         |
+| "document what the function does in a JSDoc comment" | "document"      | technical-writer   | **No** -- developer writing inline code comments                   |
+| "clean up the error message text"                    | "clean up"      | code-simplifier    | **No** -- developer fixing a string literal                        |
+| "fix the migration script"                           | "migration"     | database-architect | **No** -- developer fixing a bug in existing migration             |
+| "update the coverage threshold in config"            | "coverage"      | qa                 | **No** -- developer modifying a config value                       |
+| "refactor the variable name"                         | "refactor"      | code-simplifier    | **Borderline** -- single variable rename is developer work         |
+| "add Docker support check to health endpoint"        | "docker"        | devops             | **No** -- developer adding a health check for Docker readiness     |
 
 **Impact:** At warn-default, these are noise that erodes trust in the system. At block-default, they would actively prevent legitimate developer work.
 
@@ -81,7 +82,7 @@ The loop iterates over `Object.entries(SPECIALIST_KEYWORD_MAP)`, and the first k
 7. researcher
 8. devops-troubleshooter
 
-For a prompt like "refactor the test suite and update docs", this will always suggest `technical-writer` (because "document"/"docs" appears in the first specialist's keywords). But the most relevant specialist depends on which keyword is the *primary intent*, not which specialist appears first in the map.
+For a prompt like "refactor the test suite and update docs", this will always suggest `technical-writer` (because "document"/"docs" appears in the first specialist's keywords). But the most relevant specialist depends on which keyword is the _primary intent_, not which specialist appears first in the map.
 
 **Impact:** The suggested specialist may not be the best match. However, since the check is advisory (warn mode), the Router still makes the final decision.
 
@@ -101,7 +102,7 @@ Consider these two prompts:
 
 Both contain "test" keywords. Prompt A is correctly flagged. Prompt B is a false positive -- "run tests" is a verification step within developer work, not a testing task.
 
-The current implementation treats all keyword occurrences equally, regardless of whether the keyword appears as the *primary task* or as a *secondary action* within a developer task.
+The current implementation treats all keyword occurrences equally, regardless of whether the keyword appears as the _primary task_ or as a _secondary action_ within a developer task.
 
 **Impact:** Moderate. At warn-default, the developer/Router can ignore the warning. At block-default, this would prevent developers from mentioning testing in their verification steps.
 
@@ -118,14 +119,14 @@ SPECIALIST_KEYWORD_MAP is hardcoded at lines 196-233 of routing-guard.cjs. The t
 
 **Analysis:**
 
-| Factor | Hardcoded | Externalized (JSON) |
-|---|---|---|
-| Discoverability | In the hook code | Requires knowing the config file path |
-| Edit friction | Requires code change + test run | Just edit JSON (but still needs test run) |
-| Type safety | JavaScript constant, IDE completion | JSON file, no type checking |
-| Hot-reload | Requires process restart | Could support hot-reload, but the hook is invoked per-tool-use anyway |
-| Version control | Changes tracked in hook file | Changes tracked in config file (same git flow) |
-| Coupling | Map is co-located with the matching logic | Map separated from matching logic (potential drift) |
+| Factor          | Hardcoded                                 | Externalized (JSON)                                                   |
+| --------------- | ----------------------------------------- | --------------------------------------------------------------------- |
+| Discoverability | In the hook code                          | Requires knowing the config file path                                 |
+| Edit friction   | Requires code change + test run           | Just edit JSON (but still needs test run)                             |
+| Type safety     | JavaScript constant, IDE completion       | JSON file, no type checking                                           |
+| Hot-reload      | Requires process restart                  | Could support hot-reload, but the hook is invoked per-tool-use anyway |
+| Version control | Changes tracked in hook file              | Changes tracked in config file (same git flow)                        |
+| Coupling        | Map is co-located with the matching logic | Map separated from matching logic (potential drift)                   |
 
 **Recommendation:** Keep hardcoded for now. The keyword map is tightly coupled to the matching logic (substring vs regex vs phrase matching). Externalizing the data without externalizing the matching strategy creates a leaky abstraction. When the matching strategy stabilizes (after addressing 3.1), reconsider externalization.
 
@@ -133,8 +134,8 @@ SPECIALIST_KEYWORD_MAP is hardcoded at lines 196-233 of routing-guard.cjs. The t
 
 ## 4. Check Ordering Analysis
 
-**Current order:**
-0. Router Bash check
+**Current order:** 0. Router Bash check
+
 1. Router Self-Check (blacklisted tools)
 2. Planner-First Guard
 3. TaskCreate Guard
@@ -166,7 +167,7 @@ Check 7 is correctly placed as the last check. It is a quality-improvement conce
 
 **Analysis:** This is actually the correct approach. Here is why:
 
-1. **Planner annotations flow through the Router's decision logic (Step 6.6), not through the hook.** The Router reads `Target Agent:` from the task and should use that to select the correct agent *before* spawning. Check 7 is a safety net for when the Router *ignores* the planner's recommendation.
+1. **Planner annotations flow through the Router's decision logic (Step 6.6), not through the hook.** The Router reads `Target Agent:` from the task and should use that to select the correct agent _before_ spawning. Check 7 is a safety net for when the Router _ignores_ the planner's recommendation.
 
 2. **If the Router follows Step 6.6 and uses the planner's recommended specialist,** then Check 7 never fires (because the spawn is not a developer spawn).
 
@@ -194,6 +195,7 @@ The task asks what criteria should trigger escalation from warn-default to block
 4. **Escape hatch documented:** The `SPECIALIST_ROUTING_ENFORCEMENT=off` override is documented in the environment config reference and tested in CI.
 
 **Recommended escalation timeline:**
+
 - **Now:** warn-default (current)
 - **After keyword refinement (3.1 addressed):** warn-default, begin tracking false positive rate
 - **After 30-day data collection:** Evaluate metrics against criteria above
@@ -205,13 +207,13 @@ The task asks what criteria should trigger escalation from warn-default to block
 
 The 10 existing tests cover the core paths well. Missing test scenarios:
 
-| Scenario | Priority | Description |
-|---|---|---|
-| Substring false positive | HIGH | Test that "document" in "JSDoc document comment" fires (demonstrates the 3.1 issue) |
-| Multi-specialist scoring | MEDIUM | Test that the first-match-wins behavior is deterministic |
-| Empty prompt/description | LOW | Test with undefined/null/empty prompt and description |
-| Very long prompt | LOW | Test with a 10K+ character prompt (performance) |
-| Keyword case sensitivity | LOW | Test that keywords are matched case-insensitively (already implied by toLowerCase()) |
+| Scenario                 | Priority | Description                                                                          |
+| ------------------------ | -------- | ------------------------------------------------------------------------------------ |
+| Substring false positive | HIGH     | Test that "document" in "JSDoc document comment" fires (demonstrates the 3.1 issue)  |
+| Multi-specialist scoring | MEDIUM   | Test that the first-match-wins behavior is deterministic                             |
+| Empty prompt/description | LOW      | Test with undefined/null/empty prompt and description                                |
+| Very long prompt         | LOW      | Test with a 10K+ character prompt (performance)                                      |
+| Keyword case sensitivity | LOW      | Test that keywords are matched case-insensitively (already implied by toLowerCase()) |
 
 ---
 
@@ -238,14 +240,14 @@ The 10 existing tests cover the core paths well. Missing test scenarios:
 
 ## 9. Recommendations Summary
 
-| # | Priority | Finding | Action |
-|---|---|---|---|
-| R1 | HIGH | Substring matching false positives | Implement word-boundary matching (Option A) + contextual phrases for high-risk keywords (Option B) |
-| R2 | MEDIUM | First-match-wins non-determinism | Document as known limitation; implement scoring system in next iteration |
-| R3 | MEDIUM | No distinction between primary/incidental keywords | Add position-weighted scoring or exclusion patterns for verification contexts |
-| R4 | LOW | Hardcoded keyword map | Keep hardcoded until matching strategy stabilizes |
-| R5 | LOW | Missing edge-case tests | Add tests for substring false positives and empty inputs |
-| R6 | INFO | Warning message improvement | Add "check planner Target Agent annotation" hint to warning message |
+| #   | Priority | Finding                                            | Action                                                                                             |
+| --- | -------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| R1  | HIGH     | Substring matching false positives                 | Implement word-boundary matching (Option A) + contextual phrases for high-risk keywords (Option B) |
+| R2  | MEDIUM   | First-match-wins non-determinism                   | Document as known limitation; implement scoring system in next iteration                           |
+| R3  | MEDIUM   | No distinction between primary/incidental keywords | Add position-weighted scoring or exclusion patterns for verification contexts                      |
+| R4  | LOW      | Hardcoded keyword map                              | Keep hardcoded until matching strategy stabilizes                                                  |
+| R5  | LOW      | Missing edge-case tests                            | Add tests for substring false positives and empty inputs                                           |
+| R6  | INFO     | Warning message improvement                        | Add "check planner Target Agent annotation" hint to warning message                                |
 
 ---
 
@@ -258,11 +260,13 @@ The 10 existing tests cover the core paths well. Missing test scenarios:
 **Context:** Check 7 was implemented via TDD without prior architect review. This review is a remediation.
 
 **Decision:** The design is approved with the following conditions:
+
 1. Check 7 MUST remain at warn-default until R1 (keyword precision) is addressed.
 2. Escalation to block-default requires meeting the 4 criteria in Section 6.
 3. R1 (word-boundary + contextual phrases) is a prerequisite for block-mode consideration.
 
 **Consequences:**
+
 - Positive: Runtime enforcement of specialist-first routing (previously documentary only)
 - Positive: Violation tracking enables data-driven escalation decisions
 - Negative: Warn-mode does not prevent misrouting; it only logs it

@@ -24,19 +24,20 @@ Analyzed hook system health across 137 hook files, 36 registered hooks, and ~30 
 **File Path:** Multiple
 **Description:** 9+ enforcement mode environment variables allow silent security/quality gate bypass
 
-| Variable | Default | Risk | Impact |
-|----------|---------|------|--------|
-| `PLANNER_FIRST_ENFORCEMENT` | block | Can be set to `warn\|off` | Routes multi-step work directly without planning |
-| `CREATOR_GUARD` | block | Can be set to `warn\|off` | Bypasses creator workflow enforcement |
-| `SECURITY_REVIEW_ENFORCEMENT` | block | Can be set to `off` | Skips mandatory security reviews |
-| `SPECIALIST_ROUTING_ENFORCEMENT` | warn | Can be set to `block\|off` | Developer misrouting |
-| `CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT` | block | Can be set to `off` | High-risk operations without design review |
-| `REFLECTION_STEP0_ENFORCEMENT` | block | Can be set to `warn\|off` | Skips reflection gate |
-| `QUALITY_GATE_ENFORCEMENT` | (default varies) | Can be set to `off` | Quality checks bypassed |
-| `RESEARCH_ENFORCEMENT` | (default varies) | Can be set to `off` | Evolution workflow skipped |
-| `CREATOR_COMPLIANCE_ENFORCEMENT` | warn | Can be set to `off` | Post-creation validation skipped |
+| Variable                                | Default          | Risk                       | Impact                                           |
+| --------------------------------------- | ---------------- | -------------------------- | ------------------------------------------------ |
+| `PLANNER_FIRST_ENFORCEMENT`             | block            | Can be set to `warn\|off`  | Routes multi-step work directly without planning |
+| `CREATOR_GUARD`                         | block            | Can be set to `warn\|off`  | Bypasses creator workflow enforcement            |
+| `SECURITY_REVIEW_ENFORCEMENT`           | block            | Can be set to `off`        | Skips mandatory security reviews                 |
+| `SPECIALIST_ROUTING_ENFORCEMENT`        | warn             | Can be set to `block\|off` | Developer misrouting                             |
+| `CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT` | block            | Can be set to `off`        | High-risk operations without design review       |
+| `REFLECTION_STEP0_ENFORCEMENT`          | block            | Can be set to `warn\|off`  | Skips reflection gate                            |
+| `QUALITY_GATE_ENFORCEMENT`              | (default varies) | Can be set to `off`        | Quality checks bypassed                          |
+| `RESEARCH_ENFORCEMENT`                  | (default varies) | Can be set to `off`        | Evolution workflow skipped                       |
+| `CREATOR_COMPLIANCE_ENFORCEMENT`        | warn             | Can be set to `off`        | Post-creation validation skipped                 |
 
 **Evidence:**
+
 ```
 hooks/routing/routing-guard.cjs (line 15-23):
   getEnforcementMode('PLANNER_FIRST_ENFORCEMENT', 'block')
@@ -53,6 +54,7 @@ hooks/reflection/reflection-step0-guard.cjs:
 **Root Cause:** No centralized enforcement policy document. Each hook defines its own overrides independently.
 
 **Recommended Fix:**
+
 - Create `.claude/docs/ENFORCEMENT_POLICY.md` documenting all env var overrides
 - Add CI gate preventing setting critical enforcement vars to `off` in non-dev environments
 - Document which env vars require team/security approval before modification
@@ -68,6 +70,7 @@ hooks/reflection/reflection-step0-guard.cjs:
 **Description:** Chains 4 bash validation hooks sequentially instead of parallel
 
 **Code Location (lines 8-13):**
+
 ```javascript
 const HOOKS = [
   path.join(..., 'bash-command-validator.cjs'),      // ~50ms
@@ -78,12 +81,14 @@ const HOOKS = [
 ```
 
 **Analysis:**
+
 - Sequential execution: ~200ms total
 - Could be 150-200ms (120ms from parallel execution + 30-50ms overhead)
 - Happens on EVERY Bash tool invocation
 - Impact: Minor (Bash is not heavily used in router)
 
 **Current Implementation (lines 58-74):**
+
 ```javascript
 for (const hookPath of HOOKS) {
   const res = runHook(hookPath, currentInput);
@@ -102,12 +107,14 @@ for (const hookPath of HOOKS) {
 ```
 
 **Why Sequential is Correct Here:**
+
 - Each hook CAN transform input for the next hook (line 73)
 - Shell injection validation must run BEFORE command validation can trust input
 - Windows null-sanitizer must run BEFORE routing decisions
 - **Sequential is architecturally correct**
 
 **Recommendation:** Add performance optimization flag for parallel-safe hooks only
+
 - `bash-command-validator` and `shell-injection-validator` could run parallel
 - `windows-null-sanitizer` must run before routing-guard
 - Estimated savings: 30-40ms per Bash call
@@ -122,6 +129,7 @@ for (const hookPath of HOOKS) {
 **Description:** 8+ hooks exist on disk but aren't registered in settings.json
 
 **Unregistered Hooks Found:**
+
 ```
 hooks/reflection/error-summary-extractor.cjs (loaded dynamically by unified-reflection-handler)
 hooks/reflection/unified-reflection-actions.cjs (loaded dynamically)
@@ -144,12 +152,14 @@ hooks/monitoring/error-tracker.cjs (library, required by post-tool-metrics-unifi
 ```
 
 **Analysis:**
+
 - These are all **helper modules** or **dynamically loaded libraries**
 - NOT standalone hooks - correctly NOT in settings.json
 - Part of consolidation strategy (e.g., 6 utilities required by `pre-tool-unified.cjs`)
 - This is **correct architecture**, not a bug
 
 **Evidence:**
+
 ```
 pre-tool-unified.cjs (lines 12-17):
   const { libRequire } = require('./pre-tool-unified.shared.cjs');
@@ -172,6 +182,7 @@ pre-tool-unified.cjs (lines 12-17):
 **Examples:**
 
 **unified-reflection-handler.cjs (lines 35-47):**
+
 ```javascript
 let errorSummaryExtractor = null;
 try {
@@ -189,6 +200,7 @@ try {
 ```
 
 **post-tool-metrics-unified.cjs (lines 77-82):**
+
 ```javascript
 } catch (err) {
   if (process.env.DEBUG_HOOKS) {
@@ -210,6 +222,7 @@ try {
 **Critical Paths:**
 
 1. **UserPromptSubmit (5 hooks):**
+
    ```
    force-step0-execution.cjs → state-reset.cjs → drift-detector.cjs
    → user-prompt-unified.cjs → user-prompt-orchestrator.cjs
@@ -217,6 +230,7 @@ try {
    ```
 
 2. **PreToolUse (Edit/Write): 8 hooks sequentially**
+
    ```
    routing-guard.cjs → unified-creator-guard.cjs → agent-template-validator
    → unified-pre-write-hook.cjs → evolution-state-guard.cjs → research-enforcement.cjs
@@ -234,12 +248,14 @@ try {
 **Evidence:** From code inspection, no explicit delay measurement hooks found
 
 **Recommendation:** Add optional performance profiling hook
+
 ```javascript
 // hooks/metrics/hook-execution-profiler.cjs
 const start = Date.now();
 // ... main hook logic ...
 const duration = Date.now() - start;
-if (duration > 500) {  // Log slow hooks
+if (duration > 500) {
+  // Log slow hooks
   auditLog(`[SLOW_HOOK] ${hookName}: ${duration}ms`);
 }
 ```
@@ -254,6 +270,7 @@ if (duration > 500) {  // Log slow hooks
 **Description:** `tryParseJson()` patterns used correctly throughout but some hooks lack input validation
 
 **Good Pattern (bash-pretool-bundle.cjs lines 25-32):**
+
 ```javascript
 function tryParseJson(text) {
   const trimmed = String(text || '').trim();
@@ -271,9 +288,10 @@ function tryParseJson(text) {
 **Example:** routing-guard.cjs might not gracefully handle missing `tool_name` field
 
 **Recommendation:** Audit all hooks to ensure they validate hookInput shape before accessing:
+
 ```javascript
 if (!hookInput || typeof hookInput !== 'object') {
-  process.exit(0);  // Fail safely
+  process.exit(0); // Fail safely
 }
 ```
 
@@ -287,6 +305,7 @@ if (!hookInput || typeof hookInput !== 'object') {
 **Description:** No circular dependencies found in hook require chains
 
 **Verified Dependency Trees:**
+
 - `pre-tool-unified.cjs` → 6 utility files → shared utilities ✅
 - `post-tool-metrics-unified.cjs` → monitoring libraries ✅
 - `bash-pretool-bundle.cjs` → 4 sub-hooks (no backreferences) ✅
@@ -298,21 +317,22 @@ if (!hookInput || typeof hookInput !== 'object') {
 
 ## Summary Table
 
-| Issue | Severity | Type | Files Affected | Action Required |
-|-------|----------|------|-----------------|-----------------|
-| Configuration Drift (Env Vars) | MEDIUM | Design | 9+ hooks | Document enforcement policy |
-| Sequential Hook Chain | LOW | Performance | bash-pretool-bundle.cjs | Add parallel optimization option |
-| Unregistered Helper Hooks | LOW | Info Only | 19 files | None (correct design) |
-| Graceful Degradation | LOW | Positive | 5+ hooks | Continue practice |
-| Hook Execution Performance | LOW | Info | Settings.json | Add profiling hook |
-| JSON Parse Robustness | LOW | Code Quality | 6+ hooks | Add input validation |
-| Circular Dependencies | LOW | Info Only | N/A | None found |
+| Issue                          | Severity | Type         | Files Affected          | Action Required                  |
+| ------------------------------ | -------- | ------------ | ----------------------- | -------------------------------- |
+| Configuration Drift (Env Vars) | MEDIUM   | Design       | 9+ hooks                | Document enforcement policy      |
+| Sequential Hook Chain          | LOW      | Performance  | bash-pretool-bundle.cjs | Add parallel optimization option |
+| Unregistered Helper Hooks      | LOW      | Info Only    | 19 files                | None (correct design)            |
+| Graceful Degradation           | LOW      | Positive     | 5+ hooks                | Continue practice                |
+| Hook Execution Performance     | LOW      | Info         | Settings.json           | Add profiling hook               |
+| JSON Parse Robustness          | LOW      | Code Quality | 6+ hooks                | Add input validation             |
+| Circular Dependencies          | LOW      | Info Only    | N/A                     | None found                       |
 
 ---
 
 ## Recommendations (Priority Order)
 
 ### Priority 1 (Do First)
+
 1. **Create enforcement policy document** (`.claude/docs/ENFORCEMENT_POLICY.md`)
    - List all 9+ environment variable overrides
    - Document default values and restrictions
@@ -320,6 +340,7 @@ if (!hookInput || typeof hookInput !== 'object') {
    - Add CI/CD gate preventing `=off` in production
 
 ### Priority 2 (High Value)
+
 2. **Add hook execution profiler** (optional performance hook)
    - Logs hooks exceeding 500ms threshold
    - Helps identify future performance issues
@@ -329,6 +350,7 @@ if (!hookInput || typeof hookInput !== 'object') {
    - Add defensive checks for missing fields
 
 ### Priority 3 (Nice to Have)
+
 4. **Optimize bash-pretool-bundle** (if Bash usage increases)
    - Parallelize independent validation hooks
    - Measure latency impact first
@@ -369,4 +391,3 @@ pnpm test:hooks
 - `.claude/docs/@HOOK_AGENT_MAP.md` - Hook-agent mapping
 - `.claude/settings.json` - Hook registrations
 - `.claude/hooks/` - Hook implementations
-

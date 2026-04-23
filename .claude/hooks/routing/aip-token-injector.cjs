@@ -28,11 +28,30 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 // Based on CLAUDE.md agent roles and minimal-privilege principle.
 // ---------------------------------------------------------------------------
 
-const DEFAULT_CAPABILITIES = ['Read', 'Write', 'Edit', 'Bash', 'Task', 'TaskUpdate', 'TaskCreate', 'TaskList', 'TaskGet'];
+const DEFAULT_CAPABILITIES = [
+  'Read',
+  'Write',
+  'Edit',
+  'Bash',
+  'Task',
+  'TaskUpdate',
+  'TaskCreate',
+  'TaskList',
+  'TaskGet',
+];
 
 const AGENT_CAPABILITY_MAP = {
   // Core agents
-  router: ['Task', 'TaskList', 'TaskCreate', 'TaskUpdate', 'TaskGet', 'Read', 'AskUserQuestion', 'Bash'],
+  router: [
+    'Task',
+    'TaskList',
+    'TaskCreate',
+    'TaskUpdate',
+    'TaskGet',
+    'Read',
+    'AskUserQuestion',
+    'Bash',
+  ],
   planner: [...DEFAULT_CAPABILITIES, 'Glob', 'Grep', 'WebSearch'],
   architect: [...DEFAULT_CAPABILITIES, 'Glob', 'Grep', 'WebSearch'],
   developer: DEFAULT_CAPABILITIES,
@@ -45,14 +64,10 @@ const AGENT_CAPABILITY_MAP = {
   'memory-manager': ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate'],
   'master-orchestrator': [...DEFAULT_CAPABILITIES, 'Glob', 'Grep'],
   'artifact-integrator': DEFAULT_CAPABILITIES,
-  'devops': [...DEFAULT_CAPABILITIES, 'Glob', 'Grep'],
+  devops: [...DEFAULT_CAPABILITIES, 'Glob', 'Grep'],
 };
 
-const WILDCARD_AGENTS = new Set([
-  'master-orchestrator',
-  'evolution-orchestrator',
-  'router',
-]);
+const WILDCARD_AGENTS = new Set(['master-orchestrator', 'evolution-orchestrator', 'router']);
 
 // Default TTL: 1 hour (3600s). Override via AIP_TOKEN_TTL env var.
 const TOKEN_TTL = parseInt(process.env.AIP_TOKEN_TTL || '3600', 10) || 3600;

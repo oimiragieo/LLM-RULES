@@ -70,15 +70,15 @@ The `runtime.cjs::main()` function executes the following sequence for every spa
 
 Tier A memory context is loaded via `loadMemoryForContext()` in `prompt-assembler-memory.cjs`. This pathway creates a `ContextualMemory` instance and calls `memory.loadContextSync()`, which loads data from:
 
-| Source | Data Type | Fallback Behavior |
-|--------|-----------|-------------------|
-| **SQLite entity DB** (`memory.db`) | Patterns, issues (as gotchas), decisions | Fallback to JSON files if DB unavailable |
-| **gotchas.json** | Structured gotcha records with access stats | Used when DB didn't load gotchas |
-| **patterns.json** | Structured pattern records with access stats | Used when DB didn't load patterns |
-| **codebase_map.json** | `discovered_files` → discoveries | None (graceful degradation) |
-| **MTM sessions** | Recent session summaries (last 10 sessions) | None (graceful degradation) |
-| **LTM summaries** | Compressed historical summaries (`summary_*.json`) | None (graceful degradation) |
-| **learnings.md** (legacy) | Raw markdown, tail-truncated to maxChars.legacy | None (read-only archive) |
+| Source                             | Data Type                                          | Fallback Behavior                        |
+| ---------------------------------- | -------------------------------------------------- | ---------------------------------------- |
+| **SQLite entity DB** (`memory.db`) | Patterns, issues (as gotchas), decisions           | Fallback to JSON files if DB unavailable |
+| **gotchas.json**                   | Structured gotcha records with access stats        | Used when DB didn't load gotchas         |
+| **patterns.json**                  | Structured pattern records with access stats       | Used when DB didn't load patterns        |
+| **codebase_map.json**              | `discovered_files` → discoveries                   | None (graceful degradation)              |
+| **MTM sessions**                   | Recent session summaries (last 10 sessions)        | None (graceful degradation)              |
+| **LTM summaries**                  | Compressed historical summaries (`summary_*.json`) | None (graceful degradation)              |
+| **learnings.md** (legacy)          | Raw markdown, tail-truncated to maxChars.legacy    | None (read-only archive)                 |
 
 ### 2.2 Injection Format
 
@@ -88,18 +88,23 @@ The `formatMemorySection()` function generates a structured memory context secti
 ## Memory Context (Auto-Loaded)
 
 ### Gotchas (Pitfalls to Avoid)
+
 - [mem:xxxxxxxx] <gotcha text, max 220 chars>
 
 ### Patterns (Reusable Solutions)
+
 - [mem:xxxxxxxx] <pattern text, max 220 chars>
 
 ### Decisions (ADRs)
+
 - [mem:xxxxxxxx] <decision text, max 220 chars>
 
 ### Recent Discoveries
+
 - <path>: <description>
 
 ### Recent Sessions
+
 - Session <N>: <summary>
 ```
 
@@ -166,9 +171,11 @@ Tier B is ONLY applied when:
 
 ```markdown
 ### Semantic Matches (ContextualMemory)
+
 - <snippet, max 180 chars> (similarity: XX%)
 
 ### Relevant Memories (Query)
+
 - <snippet, max 180 chars>
 ```
 
@@ -191,12 +198,15 @@ Tier B is ONLY applied when:
 ### Entity Graph (SQLite)
 
 **Decisions** (max 3, 140 char content)
+
 - <decision text>
 
 **Issues** (max 3, 140 char content)
+
 - <issue text>
 
 **Related** (max 4 entities, with relationship type)
+
 - <entity> → <relationship> → <entity>
 ```
 
@@ -229,6 +239,7 @@ Tier B is ONLY applied when:
 
 ```markdown
 ### Task-Relevant Memory (RAG)
+
 - [rag:xxxxxxxx] <snippet> (similarity: XX%)
 ```
 
@@ -297,16 +308,16 @@ Templates in `.claude/templates/spawn/` define placeholders:
 
 Current `.env` settings controlling memory and RAG injection:
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `MEMORY_SEMANTIC_SEARCH` | `on` | Master switch for LanceDB semantic search |
-| `SPAWN_PROMPT_SEMANTIC_MEMORY` | `on` | Tier B semantic matches injection |
-| `SPAWN_PROMPT_ENTITY_GRAPH` | `on` | Tier B entity graph injection |
-| `MEMORY_INTENT_ANALYSIS` | `off` | LLM-based intent analysis (OFF) |
-| `SPAWN_PROMPT_MEMORY_QUERY` | `off` | Additional memory query section (OFF) |
-| `RAG_AT_SPAWN` | `on` | RAG-at-spawn via assembleSpawnPromptAsync |
-| `MEMORY_MODE` | `hybrid` | Memory mode (hybrid/observational) |
-| `OBSERVATIONAL_MEMORY_ENABLED` | `on` | Kill switch for observational mode |
+| Variable                       | Default  | Purpose                                   |
+| ------------------------------ | -------- | ----------------------------------------- |
+| `MEMORY_SEMANTIC_SEARCH`       | `on`     | Master switch for LanceDB semantic search |
+| `SPAWN_PROMPT_SEMANTIC_MEMORY` | `on`     | Tier B semantic matches injection         |
+| `SPAWN_PROMPT_ENTITY_GRAPH`    | `on`     | Tier B entity graph injection             |
+| `MEMORY_INTENT_ANALYSIS`       | `off`    | LLM-based intent analysis (OFF)           |
+| `SPAWN_PROMPT_MEMORY_QUERY`    | `off`    | Additional memory query section (OFF)     |
+| `RAG_AT_SPAWN`                 | `on`     | RAG-at-spawn via assembleSpawnPromptAsync |
+| `MEMORY_MODE`                  | `hybrid` | Memory mode (hybrid/observational)        |
+| `OBSERVATIONAL_MEMORY_ENABLED` | `on`     | Kill switch for observational mode        |
 
 ---
 
@@ -386,7 +397,7 @@ Current `.env` settings controlling memory and RAG injection:
 
 ### GAP 4: TIER B GATED BEHIND LANCEDB AVAILABILITY 🟡 MEDIUM
 
-**Location:** `contextual-memory.cjs:113-146` (_getVectorStore)
+**Location:** `contextual-memory.cjs:113-146` (\_getVectorStore)
 
 **Impact:** If LanceDB isn't initialized (no embeddings, init failure, `LANCEDB_EMBEDDING_MODE=off`), semantic search falls back to keyword search (`_keywordSearch`). This keyword search is basic ripgrep/grep over memory files — it may return low-quality results compared to semantic matching.
 
@@ -433,7 +444,7 @@ Current `.env` settings controlling memory and RAG injection:
 
 ### GAP 6: ENTITY GRAPH DB MAY NOT EXIST 🟢 LOW
 
-**Location:** `contextual-memory.cjs` — _getEntityQuery() method
+**Location:** `contextual-memory.cjs` — \_getEntityQuery() method
 
 **Impact:** If `memory.db` doesn't exist or has no `entities` table, entity graph injection silently returns empty. The `loadContextSync` in context-loader also catches DB errors.
 
@@ -546,6 +557,7 @@ Current `.env` settings controlling memory and RAG injection:
 **Risk:** If enabled without understanding the latency implications, every `Task()` call would incur an LLM round-trip before the agent even starts.
 
 **Recommendation:**
+
 - Keep disabled by default
 - If enabling, measure latency impact and add timeout
 - Consider caching intent analysis results for similar queries
@@ -563,6 +575,7 @@ Current `.env` settings controlling memory and RAG injection:
 **Mitigation:** Access stats updates use `setImmediate()` (deferred write), and `atomicWriteSync` is used for learnings archive. However, gotchas/patterns JSON writes from other agents are NOT atomic.
 
 **Recommendation:**
+
 - Use `atomicWriteSync` for all JSON memory file writes
 - OR accept the risk and document that concurrent memory reads may see stale data
 
@@ -572,20 +585,20 @@ Current `.env` settings controlling memory and RAG injection:
 
 ## 10. Summary of Gaps
 
-| Gap # | Title | Severity | Impact | Recommendation Priority |
-|-------|-------|----------|--------|------------------------|
-| 1 | Missing `session-context-for-search.cjs` | 🔴 HIGH | Blocks intent analysis feature | **P0 — Fix or remove** |
-| 2 | Duplicate behaviour loading | 🟡 MEDIUM | Wastes tokens, potential confusion | **P1 — Deduplicate** |
-| 3 | Memory section caps too aggressive | 🟡 MEDIUM | Limits agent effectiveness | **P1 — Relevance scoring** |
-| 4 | Tier B gated behind LanceDB | 🟡 MEDIUM | Quality degradation on non-embedding systems | **P2 — Document + improve fallback** |
-| 5 | RAG-at-spawn and Tier B redundant | 🟡 LOW-MED | Token waste, duplicate results | **P2 — Deduplicate** |
-| 6 | Entity graph DB may not exist | 🟢 LOW | Poor visibility | **P3 — Add telemetry** |
-| 7 | No hybrid code search injection | 🟡 MEDIUM | Policy-reality gap, latency | **P2 — Add search-before-spawn** |
-| 8 | Observational mode mutual exclusion | 🟢 LOW | Risk when switching modes | **P3 — Document tradeoff** |
-| 9 | Cache key doesn't include memory state | 🟢 LOW | Potential staleness | **P3 — Add memory hash** |
-| 10 | STM never injected | 🟡 MEDIUM | Coordination gap, duplicate work | **P1 — Include STM** |
-| 11 | Intent analysis requires LLM call | 🟡 MEDIUM | Latent latency risk | **P3 — Document + timeout** |
-| 12 | Race conditions in memory loading | 🟢 LOW | Eventually consistent reads | **P3 — Atomic writes** |
+| Gap # | Title                                    | Severity   | Impact                                       | Recommendation Priority              |
+| ----- | ---------------------------------------- | ---------- | -------------------------------------------- | ------------------------------------ |
+| 1     | Missing `session-context-for-search.cjs` | 🔴 HIGH    | Blocks intent analysis feature               | **P0 — Fix or remove**               |
+| 2     | Duplicate behaviour loading              | 🟡 MEDIUM  | Wastes tokens, potential confusion           | **P1 — Deduplicate**                 |
+| 3     | Memory section caps too aggressive       | 🟡 MEDIUM  | Limits agent effectiveness                   | **P1 — Relevance scoring**           |
+| 4     | Tier B gated behind LanceDB              | 🟡 MEDIUM  | Quality degradation on non-embedding systems | **P2 — Document + improve fallback** |
+| 5     | RAG-at-spawn and Tier B redundant        | 🟡 LOW-MED | Token waste, duplicate results               | **P2 — Deduplicate**                 |
+| 6     | Entity graph DB may not exist            | 🟢 LOW     | Poor visibility                              | **P3 — Add telemetry**               |
+| 7     | No hybrid code search injection          | 🟡 MEDIUM  | Policy-reality gap, latency                  | **P2 — Add search-before-spawn**     |
+| 8     | Observational mode mutual exclusion      | 🟢 LOW     | Risk when switching modes                    | **P3 — Document tradeoff**           |
+| 9     | Cache key doesn't include memory state   | 🟢 LOW     | Potential staleness                          | **P3 — Add memory hash**             |
+| 10    | STM never injected                       | 🟡 MEDIUM  | Coordination gap, duplicate work             | **P1 — Include STM**                 |
+| 11    | Intent analysis requires LLM call        | 🟡 MEDIUM  | Latent latency risk                          | **P3 — Document + timeout**          |
+| 12    | Race conditions in memory loading        | 🟢 LOW     | Eventually consistent reads                  | **P3 — Atomic writes**               |
 
 ---
 
@@ -723,36 +736,36 @@ Spawned Subagent Execution
 
 ## Appendix B: Memory Tier Budget Table
 
-| Section | Max Items | Max Chars/Item | Total Cap | Evidence Format |
-|---------|-----------|----------------|-----------|-----------------|
-| Gotchas | 3 | 220 | — | `[mem:xxxxxxxx]` |
-| Patterns | 3 | 220 | — | `[mem:xxxxxxxx]` |
-| Decisions | 3 | 220 | — | `[mem:xxxxxxxx]` |
-| Recent Discoveries | 3 | — | — | Plain text |
-| Recent Sessions | 3 | — | — | Plain text |
-| **Total Tier A** | — | — | **3500 chars** | — |
-| Semantic Matches (Tier B) | 3 | 180 | 400 tokens | `[mem:xxxxxxxx]` |
-| Entity Graph (Tier B) | 7 total | 140 | 400 tokens | Plain text |
-| RAG-at-Spawn | 5 | — | 1800 chars | `[rag:xxxxxxxx]` |
-| Open Findings | 3 | — | — | Plain text |
+| Section                   | Max Items | Max Chars/Item | Total Cap      | Evidence Format  |
+| ------------------------- | --------- | -------------- | -------------- | ---------------- |
+| Gotchas                   | 3         | 220            | —              | `[mem:xxxxxxxx]` |
+| Patterns                  | 3         | 220            | —              | `[mem:xxxxxxxx]` |
+| Decisions                 | 3         | 220            | —              | `[mem:xxxxxxxx]` |
+| Recent Discoveries        | 3         | —              | —              | Plain text       |
+| Recent Sessions           | 3         | —              | —              | Plain text       |
+| **Total Tier A**          | —         | —              | **3500 chars** | —                |
+| Semantic Matches (Tier B) | 3         | 180            | 400 tokens     | `[mem:xxxxxxxx]` |
+| Entity Graph (Tier B)     | 7 total   | 140            | 400 tokens     | Plain text       |
+| RAG-at-Spawn              | 5         | —              | 1800 chars     | `[rag:xxxxxxxx]` |
+| Open Findings             | 3         | —              | —              | Plain text       |
 
 ---
 
 ## Appendix C: Environment Variable Quick Reference
 
-| Variable | Default | Purpose | Impact |
-|----------|---------|---------|--------|
-| `MEMORY_SEMANTIC_SEARCH` | `on` | Master switch for LanceDB | Disables all vector operations |
-| `SPAWN_PROMPT_SEMANTIC_MEMORY` | `on` | Tier B semantic matches | Disables semantic search in Tier B |
-| `SPAWN_PROMPT_ENTITY_GRAPH` | `on` | Tier B entity graph | Disables entity graph in Tier B |
-| `MEMORY_INTENT_ANALYSIS` | `off` | LLM-based intent analysis | Enables intent-driven query planning |
-| `SPAWN_PROMPT_MEMORY_QUERY` | `off` | Additional memory query | Adds extra query section |
-| `RAG_AT_SPAWN` | `on` | RAG-at-spawn execution | Disables task-specific RAG |
-| `RAG_AT_SPAWN_LIMIT` | `5` | Max RAG results | Controls RAG result count |
-| `RAG_AT_SPAWN_MAX_ITEMS` | `5` | Max RAG items in section | Controls RAG section size |
-| `RAG_AT_SPAWN_MAX_CHARS` | `1800` | Max RAG chars | Controls RAG token budget |
-| `MEMORY_MODE` | `hybrid` | Memory mode | `hybrid` or `observational` |
-| `OBSERVATIONAL_MEMORY_ENABLED` | `on` | Observational kill switch | Disables observational mode |
+| Variable                       | Default  | Purpose                   | Impact                               |
+| ------------------------------ | -------- | ------------------------- | ------------------------------------ |
+| `MEMORY_SEMANTIC_SEARCH`       | `on`     | Master switch for LanceDB | Disables all vector operations       |
+| `SPAWN_PROMPT_SEMANTIC_MEMORY` | `on`     | Tier B semantic matches   | Disables semantic search in Tier B   |
+| `SPAWN_PROMPT_ENTITY_GRAPH`    | `on`     | Tier B entity graph       | Disables entity graph in Tier B      |
+| `MEMORY_INTENT_ANALYSIS`       | `off`    | LLM-based intent analysis | Enables intent-driven query planning |
+| `SPAWN_PROMPT_MEMORY_QUERY`    | `off`    | Additional memory query   | Adds extra query section             |
+| `RAG_AT_SPAWN`                 | `on`     | RAG-at-spawn execution    | Disables task-specific RAG           |
+| `RAG_AT_SPAWN_LIMIT`           | `5`      | Max RAG results           | Controls RAG result count            |
+| `RAG_AT_SPAWN_MAX_ITEMS`       | `5`      | Max RAG items in section  | Controls RAG section size            |
+| `RAG_AT_SPAWN_MAX_CHARS`       | `1800`   | Max RAG chars             | Controls RAG token budget            |
+| `MEMORY_MODE`                  | `hybrid` | Memory mode               | `hybrid` or `observational`          |
+| `OBSERVATIONAL_MEMORY_ENABLED` | `on`     | Observational kill switch | Disables observational mode          |
 
 ---
 

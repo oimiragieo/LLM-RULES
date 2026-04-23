@@ -10,14 +10,14 @@
 
 ## Summary
 
-| Category            | Status | Details                   |
-|---------------------|--------|---------------------------|
+| Category            | Status     | Details                    |
+| ------------------- | ---------- | -------------------------- |
 | Unit Tests          | ⚠️ PARTIAL | 48/53 passing (5 failures) |
-| E2E Tests           | ✅ PASS | Both features working     |
-| Manual Verification | ✅ PASS | APIs functional           |
-| Security Review     | ✅ PASS | Secret scrubbing working  |
-| Integration Tests   | ✅ PASS | Module loading works      |
-| Real-World Test     | ⚠️ ISSUE | Found 1 broken require    |
+| E2E Tests           | ✅ PASS    | Both features working      |
+| Manual Verification | ✅ PASS    | APIs functional            |
+| Security Review     | ✅ PASS    | Secret scrubbing working   |
+| Integration Tests   | ✅ PASS    | Module loading works       |
+| Real-World Test     | ⚠️ ISSUE   | Found 1 broken require     |
 
 ---
 
@@ -26,6 +26,7 @@
 ### 1. Unit Test Suites
 
 #### ✅ require-analyzer.test.cjs (14/14 PASS)
+
 ```
 # tests 14
 # suites 2
@@ -34,6 +35,7 @@
 ```
 
 **Coverage:**
+
 - extractRequires: All patterns tested (simple, multi-line, path.join, whitespace, comments)
 - resolveRequirePath: Path resolution and security validation (SEC-CI-002)
 - Handles malformed input gracefully
@@ -45,6 +47,7 @@
 #### ⚠️ verify-hook-modules.test.cjs (9/14 PASS, 5 FAIL)
 
 **Passing (9):**
+
 - JSON output mode (2/2)
 - Broken require detection
 - settings.json cross-reference (1 test)
@@ -52,6 +55,7 @@
 - verifyHooks exported function
 
 **Failing (5):**
+
 1. ❌ `scans .claude/hooks/ for .cjs files`
 2. ❌ `excludes _archive/ directory from scanning`
 3. ❌ `reports PASS for hooks with valid requires`
@@ -75,6 +79,7 @@
 ```
 
 **Coverage:**
+
 - recordViolation: JSONL writing, directory creation, append, error handling
 - Security: SEC-MON-001 (validation, truncation), SEC-MON-002 (secret scrubbing)
 - Rotation: File trimming at 2000 lines, VIOLATION_METRICS_MAX_LINES override
@@ -82,6 +87,7 @@
 - Statistics: getViolationStats filtering, checkThreshold logic
 
 **Notable:**
+
 - Tests take ~81 seconds due to rate limiting test (expected)
 - All security controls verified
 
@@ -99,6 +105,7 @@
 ```
 
 **Coverage:**
+
 - error-tracker.cjs: Loads without MODULE_NOT_FOUND, exports functions
 - metrics-collector.cjs: Loads without error, all exports present
 - user-prompt-unified.cjs: router-state import works
@@ -114,17 +121,20 @@
 **Command**: `node .claude/scripts/verify-hook-modules.cjs`
 
 **Results**:
+
 ```
 Summary: 44 passed, 1 failed, 45 total
 ```
 
 **Failure Detected** (expected - real issue):
+
 ```
 [FAIL] .claude/hooks/reflection/unified-reflection-handler.cjs
   -> ./error-summary-extractor.cjs (MISSING) [line 57]
 ```
 
 **Analysis**:
+
 - CI checker correctly identified a missing module
 - While code has graceful fallback (`try-catch`), static analysis correctly flags broken require
 - This validates CI checker is working as designed
@@ -139,6 +149,7 @@ Summary: 44 passed, 1 failed, 45 total
 **Command**: `node .claude/scripts/verify-hook-modules.cjs --json`
 
 **Results**:
+
 ```json
 {
   "timestamp": "2026-02-07T04:00:44.042Z",
@@ -166,6 +177,7 @@ Summary: 44 passed, 1 failed, 45 total
 ```
 
 **Validation**:
+
 - ✅ Valid JSON output
 - ✅ Correct schema structure
 - ✅ Accurate file/line reporting
@@ -180,14 +192,22 @@ Summary: 44 passed, 1 failed, 45 total
 #### ✅ Violation Tracker API
 
 **Test Command**:
+
 ```javascript
 const vt = require('./.claude/lib/monitoring/violation-tracker.cjs');
-vt.recordViolation({ tool: 'Glob', action: 'blocked', checkName: 'router-blacklist', routerMode: 'router', sessionId: 'test-qa' });
+vt.recordViolation({
+  tool: 'Glob',
+  action: 'blocked',
+  checkName: 'router-blacklist',
+  routerMode: 'router',
+  sessionId: 'test-qa',
+});
 const stats = vt.getViolationStats({ since: new Date(Date.now() - 60000).toISOString() });
 const threshold = vt.checkThreshold({ threshold: 5, windowMs: 60000 });
 ```
 
 **Results**:
+
 ```
 Record: OK
 Stats: {"total":1,"count":1,"byTool":{"Glob":1},"byAction":{"blocked":1},...}
@@ -195,6 +215,7 @@ Threshold: {"exceeded":false,"count":1,"threshold":5,"windowMs":60000}
 ```
 
 **Validation**:
+
 - ✅ `recordViolation()` writes JSONL entry
 - ✅ `getViolationStats()` returns structured data
 - ✅ `checkThreshold()` returns correct status
@@ -209,6 +230,7 @@ Threshold: {"exceeded":false,"count":1,"threshold":5,"windowMs":60000}
 #### ✅ Secret Scrubbing (SEC-MON-002)
 
 **Test Command**:
+
 ```javascript
 vt.recordViolation({
   tool: 'Bash',
@@ -216,17 +238,19 @@ vt.recordViolation({
   checkName: 'test',
   routerMode: 'router',
   sessionId: 'test',
-  command: 'curl -H Bearer sk-secret123 ghp_token123'
+  command: 'curl -H Bearer sk-secret123 ghp_token123',
 });
 ```
 
 **Results**:
+
 ```
 Command field: curl -H Bearer [REDACTED] [REDACTED]
 Secrets scrubbed: YES (PASS)
 ```
 
 **Validation**:
+
 - ✅ `sk-*` API keys redacted
 - ✅ `ghp_*` GitHub tokens redacted
 - ✅ No secrets leaked to metrics file
@@ -266,6 +290,7 @@ Secrets scrubbed: YES (PASS)
 **Problem**: 5 test cases failing due to `assert.throws()` expectations not matching actual behavior
 
 **Impact**:
+
 - E2E tests prove implementation works correctly
 - Test assertions need adjustment to match actual script behavior
 - Does NOT block production deployment
@@ -283,11 +308,13 @@ Secrets scrubbed: YES (PASS)
 **Problem**: References `./error-summary-extractor.cjs` which does not exist
 
 **Impact**:
+
 - Code has graceful fallback (try-catch)
 - No runtime errors
 - CI checker correctly flags this as a broken require
 
 **Recommendation**: Either:
+
 1. Create `error-summary-extractor.cjs` module
 2. Remove the require if feature not needed
 3. Add to known exceptions list
@@ -321,6 +348,7 @@ Secrets scrubbed: YES (PASS)
    - Proves tool is working as designed ✅
 
 **Minor Issues** (non-blocking):
+
 - Test assertion failures (5 tests): Fix in follow-up
 - Missing error-summary-extractor.cjs: Has graceful fallback
 
@@ -329,9 +357,11 @@ Secrets scrubbed: YES (PASS)
 ## Next Steps
 
 ### Immediate (Blocking for Merge)
+
 - None - ready for commit and merge
 
 ### Follow-Up (Non-Blocking)
+
 1. Fix test assertions in `verify-hook-modules.test.cjs` (5 failing tests)
 2. Decide on `error-summary-extractor.cjs`: create, remove, or document as expected missing
 
@@ -339,14 +369,14 @@ Secrets scrubbed: YES (PASS)
 
 ## Test Coverage Summary
 
-| Component                     | Coverage | Status |
-|-------------------------------|----------|--------|
-| require-analyzer.cjs          | 100%     | ✅     |
-| verify-hook-modules.cjs       | 90%      | ⚠️     |
-| violation-tracker.cjs         | 100%     | ✅     |
-| Module loading fixes          | 100%     | ✅     |
-| E2E workflows                 | 100%     | ✅     |
-| Security controls             | 100%     | ✅     |
+| Component               | Coverage | Status |
+| ----------------------- | -------- | ------ |
+| require-analyzer.cjs    | 100%     | ✅     |
+| verify-hook-modules.cjs | 90%      | ⚠️     |
+| violation-tracker.cjs   | 100%     | ✅     |
+| Module loading fixes    | 100%     | ✅     |
+| E2E workflows           | 100%     | ✅     |
+| Security controls       | 100%     | ✅     |
 
 **Overall**: 48/53 tests passing (90.6%)
 
@@ -357,6 +387,7 @@ Secrets scrubbed: YES (PASS)
 **QA Validation**: APPROVED ✅
 
 **Evidence**:
+
 - ✅ 48/53 unit tests passing (failures are test assertions, not implementation)
 - ✅ All E2E tests passing
 - ✅ All security controls verified
@@ -364,6 +395,7 @@ Secrets scrubbed: YES (PASS)
 - ✅ Real-world validation (found 1 issue as expected)
 
 **Ready for**:
+
 - ✅ Commit and push
 - ✅ Merge to main
 - ✅ Production deployment

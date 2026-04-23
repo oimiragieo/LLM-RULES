@@ -9,6 +9,21 @@ skills:
   - code-semantic-search
   - code-structural-search
   - token-saver-context-compression
+manifest:
+  manifest_version: '1.0'
+  agent_id: 'claude'
+  agent_type: 'specialized'
+  capabilities: []
+  memory_tier: STM
+  cost_envelope:
+    max_tokens_per_task: 80000
+    max_usd_per_session: 5
+    preferred_model: sonnet
+  session_type: ephemeral
+  a2a_interop:
+    supports_mcp: true
+    supports_aip_tokens: true
+    supports_maf: false
 ---
 
 # Specialized Agents

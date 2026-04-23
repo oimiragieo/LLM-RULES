@@ -18,15 +18,15 @@ Agent-Studio is a Claude Code Enterprise Framework with 59 agents, 100+ skills, 
 
 ### 1.2 Recent Work Completed
 
-| Commit | Summary | Impact |
-|--------|---------|--------|
+| Commit     | Summary                                                                         | Impact                          |
+| ---------- | ------------------------------------------------------------------------------- | ------------------------------- |
 | `12cb32d1` | P0/P1 fixes: memory safety, sanitization, locking, integration queue automation | Resolved 4 critical/high issues |
-| `3b152ffd` | Resolved 10 of 13 pre-existing test failures | 3594 pass, 3 fail remaining |
-| `bed30371` | Router loop-breaker stabilization | Normalized stale spawn paths |
-| `1d83cc28` | Reflection parsing and test suite alignment | Test contract stability |
-| `a35e9973` | Router guardrails checkpoint | Routing stability |
-| `529694c2` | File existence guards | Hook crash prevention |
-| `01678752` | du/sleep registration in bash validator | Allowlist completeness |
+| `3b152ffd` | Resolved 10 of 13 pre-existing test failures                                    | 3594 pass, 3 fail remaining     |
+| `bed30371` | Router loop-breaker stabilization                                               | Normalized stale spawn paths    |
+| `1d83cc28` | Reflection parsing and test suite alignment                                     | Test contract stability         |
+| `a35e9973` | Router guardrails checkpoint                                                    | Routing stability               |
+| `529694c2` | File existence guards                                                           | Hook crash prevention           |
+| `01678752` | du/sleep registration in bash validator                                         | Allowlist completeness          |
 
 ### 1.3 Accumulated Knowledge Base
 
@@ -40,16 +40,19 @@ Agent-Studio is a Claude Code Enterprise Framework with 59 agents, 100+ skills, 
 ### 1.4 Three Remaining Test Failures
 
 **Failure 1: Routing Table Equivalence Tests** (`tests/lib/routing-table-equivalence.test.mjs`)
+
 - **Root Cause Analysis:** The test validates that `ROUTING_TABLE` has at minimum 200 entries, all agents are in a known set, and specific keyword-to-agent mappings hold. The test was written for the pre-simplification table (208 entries baseline). After ADR-107 pro-workflow adoption (58% routing table reduction from 2,472 to 1,030 lines), the `ROUTING_TABLE` object likely has fewer keyword entries. The baseline assertions (>= 200 entries) may no longer hold. This is a **test-data mismatch** after intentional simplification, not a code bug.
 - **Fix:** Update baseline count assertions to match post-simplification state. Estimated effort: TRIVIAL (30 min).
 - **Agent:** qa
 
 **Failure 2: Prompt Injection Detection P1-003** (`tests/security/prompt-injection.test.cjs`)
+
 - **Root Cause Analysis:** The test imports `sanitizePrompt` and `calculateEntropy` from `user-prompt-unified.cjs`. Both functions exist and are exported (lines 1975 and 1948 respectively). The test expects a structured return `{ safe, blocked, reason, sanitized, detections }` with specific category names (`instruction_override`, `information_disclosure`, `jailbreak`, `obfuscation`). The most likely failure mode is that the `sanitizePrompt` implementation returns a slightly different structure or category naming convention than the test expects. The functions exist (not RED phase stubs) but the API contract may not exactly match.
 - **Fix:** Align test assertions with actual `sanitizePrompt` return structure. Estimated effort: LOW (1-2 hours).
 - **Agent:** qa
 
 **Failure 3: SKILL.md Performance Comparison Table** (`tests/skills/code-semantic-search-skill.test.cjs`)
+
 - **Root Cause Analysis:** Test checks `content.includes('| Speed |')` (single space padding). The actual SKILL.md contains `| Speed  |` (double space padding from markdown table alignment via Prettier). The assertion fails on whitespace difference. This is a **false negative** from overly strict string matching against formatted markdown.
 - **Fix:** Change assertion to use regex or trim-insensitive matching (e.g., check for `Speed` column presence without exact whitespace). Estimated effort: TRIVIAL (15 min).
 - **Agent:** qa
@@ -60,16 +63,16 @@ Agent-Studio is a Claude Code Enterprise Framework with 59 agents, 100+ skills, 
 
 ### 2.1 Dimension Scores
 
-| Dimension | Score | Weight | Weighted | Evidence |
-|-----------|-------|--------|----------|----------|
-| **Test Coverage & Reliability** | 6.5/10 | 15% | 0.975 | 98.86% pass rate (1113/1126), but 13 pre-existing failures, 5 critical modules at 0% coverage, 3 remaining failures trivially fixable |
-| **Security Posture** | 7.0/10 | 15% | 1.050 | 87/100 security score. shell:false enforced (ADR-114), safeParseJSON adopted (ADR-115), file locking added (ADR-116). Gaps: memory poisoning unmitigated, prompt injection detection incomplete, concurrent write protection partial, 11 schemas missing additionalProperties:false |
-| **Memory System Health** | 5.5/10 | 10% | 0.550 | Memory rotation field mismatch fixed (C-002), circular dependency resolved (C-001). But: sanitization not implemented (P0-005), concurrent write locking incomplete (P0-006), learnings.md approaching 20KB budget, integration queue not automated, 70% artifact orphan rate |
-| **Hook System Reliability** | 8.0/10 | 10% | 0.800 | 39 active hooks, consolidated 6-to-2, file existence guards added, graceful degradation. Gaps: crash telemetry missing, 4/7 hooks undocumented in @ENFORCEMENT_HOOKS.md, hook performance not monitored in production |
-| **Agent Routing Correctness** | 8.5/10 | 15% | 1.275 | 896+ blocks enforced, specialist-first routing law, 58% routing table simplification, fuzzy intent matching. Gaps: 10 agents lack ROUTING_TABLE entries, SEC-ROUTER-001 registration gap (routing-guard not registered for Edit/Write), TaskList-first enforcement tracked but not enforced (SEC-ROUTER-002) |
-| **Framework Evolution Readiness** | 7.5/10 | 10% | 0.750 | EVOLVE workflow operational, 9 creator skills, companion-check.cjs, artifact-integrator. Gaps: integration queue not auto-processed, 55 hollow schema stubs, 105 rules files in .claude/rules/ causing context overload (ARCH-EXP-001) |
-| **Code Quality & Maintainability** | 7.0/10 | 15% | 1.050 | ESLint 0 warnings, Prettier clean, ADR documentation extensive. Gaps: 11,830 lines dead code, triple agent registry, triple routing structures, 14 hooks per Write operation, 13 config sources |
-| **Documentation Completeness** | 7.5/10 | 10% | 0.750 | 25+ ADRs, comprehensive CLAUDE.md, @reference files, security.md with OWASP coverage. Gaps: 4/7 hooks undocumented, .env.example missing 2 enforcement vars, no pipeline progress dashboard, 57% hook documentation gap |
+| Dimension                          | Score  | Weight | Weighted | Evidence                                                                                                                                                                                                                                                                                                     |
+| ---------------------------------- | ------ | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Test Coverage & Reliability**    | 6.5/10 | 15%    | 0.975    | 98.86% pass rate (1113/1126), but 13 pre-existing failures, 5 critical modules at 0% coverage, 3 remaining failures trivially fixable                                                                                                                                                                        |
+| **Security Posture**               | 7.0/10 | 15%    | 1.050    | 87/100 security score. shell:false enforced (ADR-114), safeParseJSON adopted (ADR-115), file locking added (ADR-116). Gaps: memory poisoning unmitigated, prompt injection detection incomplete, concurrent write protection partial, 11 schemas missing additionalProperties:false                          |
+| **Memory System Health**           | 5.5/10 | 10%    | 0.550    | Memory rotation field mismatch fixed (C-002), circular dependency resolved (C-001). But: sanitization not implemented (P0-005), concurrent write locking incomplete (P0-006), learnings.md approaching 20KB budget, integration queue not automated, 70% artifact orphan rate                                |
+| **Hook System Reliability**        | 8.0/10 | 10%    | 0.800    | 39 active hooks, consolidated 6-to-2, file existence guards added, graceful degradation. Gaps: crash telemetry missing, 4/7 hooks undocumented in @ENFORCEMENT_HOOKS.md, hook performance not monitored in production                                                                                        |
+| **Agent Routing Correctness**      | 8.5/10 | 15%    | 1.275    | 896+ blocks enforced, specialist-first routing law, 58% routing table simplification, fuzzy intent matching. Gaps: 10 agents lack ROUTING_TABLE entries, SEC-ROUTER-001 registration gap (routing-guard not registered for Edit/Write), TaskList-first enforcement tracked but not enforced (SEC-ROUTER-002) |
+| **Framework Evolution Readiness**  | 7.5/10 | 10%    | 0.750    | EVOLVE workflow operational, 9 creator skills, companion-check.cjs, artifact-integrator. Gaps: integration queue not auto-processed, 55 hollow schema stubs, 105 rules files in .claude/rules/ causing context overload (ARCH-EXP-001)                                                                       |
+| **Code Quality & Maintainability** | 7.0/10 | 15%    | 1.050    | ESLint 0 warnings, Prettier clean, ADR documentation extensive. Gaps: 11,830 lines dead code, triple agent registry, triple routing structures, 14 hooks per Write operation, 13 config sources                                                                                                              |
+| **Documentation Completeness**     | 7.5/10 | 10%    | 0.750    | 25+ ADRs, comprehensive CLAUDE.md, @reference files, security.md with OWASP coverage. Gaps: 4/7 hooks undocumented, .env.example missing 2 enforcement vars, no pipeline progress dashboard, 57% hook documentation gap                                                                                      |
 
 ### 2.2 Overall Score
 
@@ -81,15 +84,15 @@ Score breakdown: 0.975 + 1.050 + 0.550 + 0.800 + 1.275 + 0.750 + 1.050 + 0.750 =
 
 ### 2.3 Trend Analysis
 
-| Pipeline | Date | Score | Trend |
-|----------|------|-------|-------|
-| Router Enforcement (Tasks #27-35) | 2026-02-08 | 0.94 | -- |
-| Pro-Workflow Adoption (Tasks #79-83) | 2026-02-09 | 0.91 | -- |
-| Enterprise Improvement #12 (Tasks #9-16) | 2026-02-09 | 0.91 | -- |
-| Wave 15B Cross-Audit | 2026-02-10 | 0.85 | Dip |
-| Wave 16A Hook Docs | 2026-02-10 | 0.83 | Dip |
-| Wave 0-11 Retrospective | 2026-02-13 | 0.89 | Recovery |
-| **This Reflection** | **2026-02-13** | **0.72** | **Comprehensive** |
+| Pipeline                                 | Date           | Score    | Trend             |
+| ---------------------------------------- | -------------- | -------- | ----------------- |
+| Router Enforcement (Tasks #27-35)        | 2026-02-08     | 0.94     | --                |
+| Pro-Workflow Adoption (Tasks #79-83)     | 2026-02-09     | 0.91     | --                |
+| Enterprise Improvement #12 (Tasks #9-16) | 2026-02-09     | 0.91     | --                |
+| Wave 15B Cross-Audit                     | 2026-02-10     | 0.85     | Dip               |
+| Wave 16A Hook Docs                       | 2026-02-10     | 0.83     | Dip               |
+| Wave 0-11 Retrospective                  | 2026-02-13     | 0.89     | Recovery          |
+| **This Reflection**                      | **2026-02-13** | **0.72** | **Comprehensive** |
 
 Note: Previous scores evaluated individual pipeline outputs. This score evaluates the entire codebase state holistically, explaining the lower absolute value.
 
@@ -133,6 +136,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 **Artifact Graph Last Updated:** 2026-02-08T02:04:00Z (5 days stale)
 
 **Integration Health Assessment:**
+
 - Graph contains nodes with `integrationStatus: "created"` but many lack edge connections
 - No recent graph updates since 2026-02-08
 - Integration queue likely has unprocessed entries from 5 days of work
@@ -142,6 +146,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 **RBT Classification:** Bud -- "Integration gaps detected: stale artifact graph, unprocessed queue entries, missing catalog updates for recent work"
 
 **Gaps Identified:**
+
 - [ ] Artifact graph not updated since 2026-02-08 (5 days of drift)
 - [ ] Integration queue processing not automated (Step 0.5 advisory only)
 - [ ] 70% artifact orphan rate persists
@@ -154,6 +159,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 ### P0 (Critical - Blocks Production Readiness)
 
 **P0-1: Fix SEC-ROUTER-001 Registration Gap**
+
 - **What:** Add `routing-guard.cjs` to the `Edit|Write|NotebookEdit` matcher in `.claude/settings.json`
 - **Why:** Router write guard (Check 1 and Check 5) is dead code for write operations. Elevation of privilege risk.
 - **Files:** `.claude/settings.json` (1 line change)
@@ -161,6 +167,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 - **Complexity:** TRIVIAL (15 minutes)
 
 **P0-2: Implement Memory Content Sanitization (P0-005)**
+
 - **What:** Create `memory-sanitizer.cjs` with 30+ dangerous pattern detections, integrate into `contextual-memory.cjs` writeMemory()
 - **Why:** Memory poisoning via unsanitized writes is OWASP ASI06 non-compliant. Any agent can inject code execution patterns into learnings.md.
 - **Files:** `.claude/lib/memory/memory-sanitizer.cjs` (new, ~250 lines), `tests/security/memory-poisoning.test.cjs` (new, ~200 lines), `.claude/lib/memory/contextual-memory.cjs` (modify)
@@ -168,6 +175,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 - **Complexity:** MEDIUM (6-8 hours)
 
 **P0-3: Fix 3 Remaining Test Failures**
+
 - **What:** (1) Update routing-table-equivalence baseline counts after ADR-107 simplification, (2) Align prompt-injection test assertions with actual sanitizePrompt API, (3) Fix SKILL.md whitespace-sensitive assertion
 - **Why:** Failing tests undermine CI gate credibility and block `pnpm test:all`.
 - **Files:** `tests/lib/routing-table-equivalence.test.mjs`, `tests/security/prompt-injection.test.cjs`, `tests/skills/code-semantic-search-skill.test.cjs`
@@ -177,6 +185,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 ### P1 (High - Significant Quality Improvement)
 
 **P1-1: Automate Integration Queue Processing**
+
 - **What:** Create threshold-based auto-spawn of artifact-integrator when queue >= 5 entries. Add integration health check to `pnpm metrics:ci`.
 - **Why:** 70% artifact orphan rate. 354/454 skills never cataloged. Manual Step 0.5 is consistently skipped.
 - **Files:** `.claude/lib/workflow/artifact-integrator-spawner.cjs` (new), `.claude/hooks/workflow/post-creation-integration.cjs` (modify), `.claude/tools/gates/metrics-ci.cjs` (modify)
@@ -184,6 +193,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 - **Complexity:** MEDIUM (8-12 hours)
 
 **P1-2: Implement Concurrent Write Locking (P0-006)**
+
 - **What:** Create `file-locker.cjs` utility using proper-lockfile, wrap memory writes and state updates with locking.
 - **Why:** TOCTOU race condition in multi-agent scenarios. Lost writes, memory file corruption possible.
 - **Files:** `.claude/lib/utils/file-locker.cjs` (new, ~90 lines), `.claude/lib/memory/contextual-memory.cjs` (modify), `.claude/lib/workflow/workflow-state-manager.cjs` (modify), `tests/security/concurrent-writes.test.cjs` (new)
@@ -191,6 +201,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 - **Complexity:** MEDIUM (8 hours)
 
 **P1-3: Add Test Coverage for 5 Critical Modules**
+
 - **What:** Write unit tests for loop-state-manager.cjs, metrics-reader.cjs, dashboard-renderer.cjs, production-alerts.cjs, metrics-schema.cjs
 - **Why:** Security-critical modules at 0% coverage. Self-healing, metrics, and alerting untested.
 - **Files:** 5 new test files in `tests/` directory
@@ -198,6 +209,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 - **Complexity:** HIGH (12-16 hours)
 
 **P1-4: Resolve Rules File Context Overload (ARCH-EXP-001)**
+
 - **What:** Move 94 skill-specific rules from `.claude/rules/` to `.claude/skills/{name}/rules.md`. Keep only 11 framework-level universal rules.
 - **Why:** 105 rules files (~7,337 lines) auto-loaded into context exceeds reliable attention window (32K tokens). More rules paradoxically means less compliance.
 - **Files:** 94 rules files moved, `.claude/rules/` reduced to 11 files
@@ -207,6 +219,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 ### P2 (Medium - Nice-to-Have Enhancement)
 
 **P2-1: Dead Code Archival**
+
 - **What:** Archive 11,830 lines of dead code: 22 workflow modules (~5,258 lines), 7 memory modules (~2,648 lines), ML subsystem (1,652 lines), 3 self-healing modules (~1,372 lines).
 - **Why:** Reduces cognitive load, maintenance burden, and code indexing overhead. Zero risk (dead code by definition).
 - **Files:** Multiple modules to `.claude/lib/*/\_archive/`
@@ -214,6 +227,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 - **Complexity:** LOW (3-4 hours)
 
 **P2-2: Schema Standardization**
+
 - **What:** Standardize 55 hollow schema stubs to canonical envelope (Structure B), add additionalProperties:false to 11 schemas, delete or consolidate stubs.
 - **Why:** False sense of validation coverage. Two incompatible schema archetypes. Maintenance burden without value.
 - **Files:** 55+ schema files in `.claude/schemas/`
@@ -221,6 +235,7 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 - **Complexity:** HIGH (8-12 hours)
 
 **P2-3: CI/CD Workflow Files**
+
 - **What:** Create `.github/workflows/` with CI YAML files wiring existing package.json scripts (test:ci, lint, format:check, validate:full, metrics:ci).
 - **Why:** All CI scripts exist but no workflow automation. Manual execution only.
 - **Files:** `.github/workflows/ci.yml`, `.github/workflows/nightly.yml`
@@ -261,38 +276,40 @@ Note: Previous scores evaluated individual pipeline outputs. This score evaluate
 
 ### Week 1 (Critical Path - 20-25 hours)
 
-| # | Action | Priority | Effort | Agent |
-|---|--------|----------|--------|-------|
-| 1 | Fix SEC-ROUTER-001 registration gap | P0 | TRIVIAL | devops |
-| 2 | Fix 3 remaining test failures | P0 | LOW | qa |
-| 3 | Implement memory sanitization (P0-005) | P0 | MEDIUM | developer + security |
-| 4 | Implement concurrent write locking (P0-006) | P1 | MEDIUM | developer |
+| #   | Action                                      | Priority | Effort  | Agent                |
+| --- | ------------------------------------------- | -------- | ------- | -------------------- |
+| 1   | Fix SEC-ROUTER-001 registration gap         | P0       | TRIVIAL | devops               |
+| 2   | Fix 3 remaining test failures               | P0       | LOW     | qa                   |
+| 3   | Implement memory sanitization (P0-005)      | P0       | MEDIUM  | developer + security |
+| 4   | Implement concurrent write locking (P0-006) | P1       | MEDIUM  | developer            |
 
 ### Week 2 (Quality Improvement - 20-30 hours)
 
-| # | Action | Priority | Effort | Agent |
-|---|--------|----------|--------|-------|
-| 5 | Automate integration queue processing | P1 | MEDIUM | developer |
-| 6 | Resolve rules file context overload | P1 | MEDIUM | code-simplifier |
-| 7 | Add test coverage for 5 critical modules | P1 | HIGH | qa |
+| #   | Action                                   | Priority | Effort | Agent           |
+| --- | ---------------------------------------- | -------- | ------ | --------------- |
+| 5   | Automate integration queue processing    | P1       | MEDIUM | developer       |
+| 6   | Resolve rules file context overload      | P1       | MEDIUM | code-simplifier |
+| 7   | Add test coverage for 5 critical modules | P1       | HIGH   | qa              |
 
 ### Week 3+ (Enhancement - 15-20 hours)
 
-| # | Action | Priority | Effort | Agent |
-|---|--------|----------|--------|-------|
-| 8 | Dead code archival (11,830 lines) | P2 | LOW | code-simplifier |
-| 9 | Schema standardization (55 stubs) | P2 | HIGH | developer |
-| 10 | CI/CD workflow files | P2 | LOW | devops |
+| #   | Action                            | Priority | Effort | Agent           |
+| --- | --------------------------------- | -------- | ------ | --------------- |
+| 8   | Dead code archival (11,830 lines) | P2       | LOW    | code-simplifier |
+| 9   | Schema standardization (55 stubs) | P2       | HIGH   | developer       |
+| 10  | CI/CD workflow files              | P2       | LOW    | devops          |
 
 ### Production Readiness Target
 
 After completing Week 1-2 actions (items 1-7), projected scores:
+
 - Test Pass Rate: 100% (0 failures)
 - Security Score: 93/100 (memory sanitization + locking)
 - Integration Health: 85% (automated queue processing)
 - Production Readiness: 7.5/10 (CONDITIONAL GO)
 
 After completing all 10 items:
+
 - Production Readiness: 9/10 (GO with monitoring)
 
 ---

@@ -9,6 +9,7 @@
 ## Executive Summary
 
 **Overall Statistics:**
+
 - **Total Test Files**: 477 test files
 - **Active Hooks**: 79 hook files (excluding archived)
 - **Active Library Files**: ~274 library files
@@ -18,6 +19,7 @@
 - **Tools Test Coverage**: Minimal (estimated <5%)
 
 **Severity Breakdown:**
+
 - **P0 (Critical)**: 12 gaps - Core hooks/libs without ANY tests
 - **P1 (High)**: 28 gaps - Recently modified files without test updates
 - **P2 (Medium)**: 45+ gaps - Partial coverage, missing edge cases
@@ -30,17 +32,17 @@
 
 From `git status`, these 9 files were modified but lack corresponding test updates:
 
-| File | Type | Test Exists? | Risk Level | Notes |
-|------|------|--------------|------------|-------|
-| `.claude/hooks/routing/pre-tool-unified.read-safety.cjs` | Hook | ✅ YES | MEDIUM | Test exists: `tests/hooks/pre-tool-unified-read-safety.test.cjs` |
-| `.claude/hooks/routing/spawn-prompt-assembler.runtime-support.cjs` | Hook | ⚠️ PARTIAL | HIGH | No dedicated test for runtime-support module |
-| `.claude/hooks/routing/spawn-prompt-assembler.runtime.cjs` | Hook | ⚠️ PARTIAL | HIGH | No dedicated test for runtime module |
-| `.claude/workflows/core/router-decision.md` | Workflow | ❌ NO | LOW | Workflow doc - no automated tests expected |
-| `tests/hooks/pre-tool-unified-read-safety.test.cjs` | Test | N/A | N/A | Test file itself |
-| `tests/hooks/spawn-prompt-assembler-task-flags.test.cjs` | Test | N/A | N/A | Test file itself |
-| `tests/hooks/spawn-prompt-validator.test.cjs` | Test | N/A | N/A | Test file itself |
-| `.claude/context/data/memory.db` | Data | N/A | N/A | SQLite database - no direct tests |
-| `.claude/context/memory/codebase_map.json` | Data | N/A | N/A | JSON data - no direct tests |
+| File                                                               | Type     | Test Exists? | Risk Level | Notes                                                            |
+| ------------------------------------------------------------------ | -------- | ------------ | ---------- | ---------------------------------------------------------------- |
+| `.claude/hooks/routing/pre-tool-unified.read-safety.cjs`           | Hook     | ✅ YES       | MEDIUM     | Test exists: `tests/hooks/pre-tool-unified-read-safety.test.cjs` |
+| `.claude/hooks/routing/spawn-prompt-assembler.runtime-support.cjs` | Hook     | ⚠️ PARTIAL   | HIGH       | No dedicated test for runtime-support module                     |
+| `.claude/hooks/routing/spawn-prompt-assembler.runtime.cjs`         | Hook     | ⚠️ PARTIAL   | HIGH       | No dedicated test for runtime module                             |
+| `.claude/workflows/core/router-decision.md`                        | Workflow | ❌ NO        | LOW        | Workflow doc - no automated tests expected                       |
+| `tests/hooks/pre-tool-unified-read-safety.test.cjs`                | Test     | N/A          | N/A        | Test file itself                                                 |
+| `tests/hooks/spawn-prompt-assembler-task-flags.test.cjs`           | Test     | N/A          | N/A        | Test file itself                                                 |
+| `tests/hooks/spawn-prompt-validator.test.cjs`                      | Test     | N/A          | N/A        | Test file itself                                                 |
+| `.claude/context/data/memory.db`                                   | Data     | N/A          | N/A        | SQLite database - no direct tests                                |
+| `.claude/context/memory/codebase_map.json`                         | Data     | N/A          | N/A        | JSON data - no direct tests                                      |
 
 **Finding**: 2/9 modified files have incomplete test coverage (spawn-prompt-assembler runtime modules)
 
@@ -48,54 +50,54 @@ From `git status`, these 9 files were modified but lack corresponding test updat
 
 Critical routing hooks lacking comprehensive test coverage:
 
-| Hook File | Test Exists? | Severity | Impact |
-|-----------|--------------|----------|--------|
-| `routing-guard-core.checks-router.cjs` | ❌ NO | P0 | Router self-check validation uncovered |
-| `routing-guard-core.checks-task.cjs` | ❌ NO | P0 | Task validation checks uncovered |
-| `routing-guard-core.impl.cjs` | ❌ NO | P0 | Core implementation logic uncovered |
-| `routing-guard-core.intent-model.cjs` | ❌ NO | P0 | Intent matching logic uncovered |
-| `routing-guard-core.policy.cjs` | ❌ NO | P0 | Policy enforcement uncovered |
-| `routing-guard-core.shared.cjs` | ❌ NO | P0 | Shared utilities uncovered |
-| `spawn-prompt-assembler.core.cjs` | ⚠️ PARTIAL | P1 | Core logic partially tested |
-| `spawn-prompt-assembler.helpers.cjs` | ⚠️ PARTIAL | P1 | Helpers partially tested |
-| `spawn-prompt-assembler.memory.cjs` | ⚠️ PARTIAL | P1 | Memory integration partially tested |
-| `spawn-prompt-assembler.runtime-support.cjs` | ❌ NO | P0 | **Recently modified, no tests** |
-| `spawn-prompt-assembler.runtime.cjs` | ❌ NO | P0 | **Recently modified, no tests** |
-| `spawn-prompt-assembler.task-tools.cjs` | ⚠️ PARTIAL | P1 | Task tools partially tested |
-| `pre-tool-unified.cleanup.cjs` | ❌ NO | P1 | Cleanup logic uncovered |
-| `pre-tool-unified.execution.cjs` | ❌ NO | P1 | Execution flow uncovered |
-| `pre-tool-unified.shared.cjs` | ❌ NO | P1 | Shared utilities uncovered |
-| `pre-tool-unified.taskupdate.cjs` | ⚠️ PARTIAL | P1 | TaskUpdate logic partially tested |
-| `user-prompt-unified.core.cjs` | ⚠️ PARTIAL | P1 | Core prompt logic partially tested |
-| `post-task-unified-completion.helpers.cjs` | ❌ NO | P1 | Completion helpers uncovered |
-| `post-task-unified.helpers.cjs` | ❌ NO | P1 | General helpers uncovered |
+| Hook File                                    | Test Exists? | Severity | Impact                                 |
+| -------------------------------------------- | ------------ | -------- | -------------------------------------- |
+| `routing-guard-core.checks-router.cjs`       | ❌ NO        | P0       | Router self-check validation uncovered |
+| `routing-guard-core.checks-task.cjs`         | ❌ NO        | P0       | Task validation checks uncovered       |
+| `routing-guard-core.impl.cjs`                | ❌ NO        | P0       | Core implementation logic uncovered    |
+| `routing-guard-core.intent-model.cjs`        | ❌ NO        | P0       | Intent matching logic uncovered        |
+| `routing-guard-core.policy.cjs`              | ❌ NO        | P0       | Policy enforcement uncovered           |
+| `routing-guard-core.shared.cjs`              | ❌ NO        | P0       | Shared utilities uncovered             |
+| `spawn-prompt-assembler.core.cjs`            | ⚠️ PARTIAL   | P1       | Core logic partially tested            |
+| `spawn-prompt-assembler.helpers.cjs`         | ⚠️ PARTIAL   | P1       | Helpers partially tested               |
+| `spawn-prompt-assembler.memory.cjs`          | ⚠️ PARTIAL   | P1       | Memory integration partially tested    |
+| `spawn-prompt-assembler.runtime-support.cjs` | ❌ NO        | P0       | **Recently modified, no tests**        |
+| `spawn-prompt-assembler.runtime.cjs`         | ❌ NO        | P0       | **Recently modified, no tests**        |
+| `spawn-prompt-assembler.task-tools.cjs`      | ⚠️ PARTIAL   | P1       | Task tools partially tested            |
+| `pre-tool-unified.cleanup.cjs`               | ❌ NO        | P1       | Cleanup logic uncovered                |
+| `pre-tool-unified.execution.cjs`             | ❌ NO        | P1       | Execution flow uncovered               |
+| `pre-tool-unified.shared.cjs`                | ❌ NO        | P1       | Shared utilities uncovered             |
+| `pre-tool-unified.taskupdate.cjs`            | ⚠️ PARTIAL   | P1       | TaskUpdate logic partially tested      |
+| `user-prompt-unified.core.cjs`               | ⚠️ PARTIAL   | P1       | Core prompt logic partially tested     |
+| `post-task-unified-completion.helpers.cjs`   | ❌ NO        | P1       | Completion helpers uncovered           |
+| `post-task-unified.helpers.cjs`              | ❌ NO        | P1       | General helpers uncovered              |
 
 **Total**: 11 completely untested routing hook modules, 8 partially tested
 
 ### 1.3 Safety Hooks Without Tests (P0)
 
-| Hook File | Test Exists? | Severity | Notes |
-|-----------|--------------|----------|-------|
-| `hybrid-search-enforcer.cjs` | ✅ YES | ✓ | Test: `hybrid-search-enforcer.test.cjs` |
-| `bash-command-validator.cjs` | ✅ YES | ✓ | Multiple tests exist |
-| `bash-pretool-bundle.cjs` | ✅ YES | ✓ | Test: `bash-pretool-bundle.test.cjs` |
-| `shell-injection-validator.cjs` | ✅ YES | ✓ | Test exists |
-| `spawn-prompt-validator.cjs` | ✅ YES | ✓ | Test exists |
-| `unified-pre-write-hook.cjs` | ⚠️ PARTIAL | P1 | Router context test exists but incomplete |
-| `validate-skill-invocation.cjs` | ✅ YES | ✓ | Test exists |
-| `windows-null-sanitizer.cjs` | ✅ YES | ✓ | Test exists |
+| Hook File                       | Test Exists? | Severity | Notes                                     |
+| ------------------------------- | ------------ | -------- | ----------------------------------------- |
+| `hybrid-search-enforcer.cjs`    | ✅ YES       | ✓        | Test: `hybrid-search-enforcer.test.cjs`   |
+| `bash-command-validator.cjs`    | ✅ YES       | ✓        | Multiple tests exist                      |
+| `bash-pretool-bundle.cjs`       | ✅ YES       | ✓        | Test: `bash-pretool-bundle.test.cjs`      |
+| `shell-injection-validator.cjs` | ✅ YES       | ✓        | Test exists                               |
+| `spawn-prompt-validator.cjs`    | ✅ YES       | ✓        | Test exists                               |
+| `unified-pre-write-hook.cjs`    | ⚠️ PARTIAL   | P1       | Router context test exists but incomplete |
+| `validate-skill-invocation.cjs` | ✅ YES       | ✓        | Test exists                               |
+| `windows-null-sanitizer.cjs`    | ✅ YES       | ✓        | Test exists                               |
 
 **Finding**: Safety hooks have good test coverage (87.5%), 1 partial
 
 ### 1.4 Validation Hooks Without Tests (P0)
 
-| Hook File | Test Exists? | Severity | Notes |
-|-----------|--------------|----------|-------|
-| `agent-template-contract-validator.cjs` | ✅ YES | ✓ | Test exists |
-| `check-console-log.cjs` | ✅ YES | ✓ | Test exists |
-| `creator-compliance-validator.cjs` | ⚠️ PARTIAL | P1 | Ecosystem test exists |
-| `pre-completion-validation.cjs` | ⚠️ PARTIAL | P1 | Creator ecosystem test exists |
-| `taskupdate-contract-validator.cjs` | ✅ YES | ✓ | Test exists |
+| Hook File                               | Test Exists? | Severity | Notes                         |
+| --------------------------------------- | ------------ | -------- | ----------------------------- |
+| `agent-template-contract-validator.cjs` | ✅ YES       | ✓        | Test exists                   |
+| `check-console-log.cjs`                 | ✅ YES       | ✓        | Test exists                   |
+| `creator-compliance-validator.cjs`      | ⚠️ PARTIAL   | P1       | Ecosystem test exists         |
+| `pre-completion-validation.cjs`         | ⚠️ PARTIAL   | P1       | Creator ecosystem test exists |
+| `taskupdate-contract-validator.cjs`     | ✅ YES       | ✓        | Test exists                   |
 
 **Finding**: Validation hooks have excellent coverage (100% at least partial)
 
@@ -105,63 +107,63 @@ Based on analysis of `.claude/lib/` directory:
 
 #### Code Indexing (Critical Path)
 
-| File | Test Exists? | Severity | Notes |
-|------|--------------|----------|-------|
-| `code-indexing/hybrid-lazy-indexer-methods-a.cjs` | ❌ NO | P0 | Core indexing methods uncovered |
-| `code-indexing/hybrid-lazy-indexer-methods-b.cjs` | ❌ NO | P0 | Core indexing methods uncovered |
-| `code-indexing/hybrid-lazy-indexer-methods-c.cjs` | ❌ NO | P0 | Core indexing methods uncovered |
-| `code-indexing/hybrid-lazy-indexer.impl.cjs` | ❌ NO | P0 | Implementation logic uncovered |
-| `code-indexing/index-manager-config.cjs` | ❌ NO | P1 | Config logic uncovered |
-| `code-indexing/index-manager-files.cjs` | ❌ NO | P1 | File operations uncovered |
-| `code-indexing/index-manager-operations.cjs` | ❌ NO | P1 | Operations logic uncovered |
-| `code-indexing/parse-utils.cjs` | ❌ NO | P1 | Parse utilities uncovered |
-| `code-indexing/code-parser.cjs` | ✅ YES | ✓ | Test exists: `parser.test.cjs` |
-| `code-indexing/hybrid-search.cjs` | ✅ YES | ✓ | Multiple tests exist |
-| `code-indexing/index-manager.cjs` | ✅ YES | ✓ | Test exists |
+| File                                              | Test Exists? | Severity | Notes                           |
+| ------------------------------------------------- | ------------ | -------- | ------------------------------- |
+| `code-indexing/hybrid-lazy-indexer-methods-a.cjs` | ❌ NO        | P0       | Core indexing methods uncovered |
+| `code-indexing/hybrid-lazy-indexer-methods-b.cjs` | ❌ NO        | P0       | Core indexing methods uncovered |
+| `code-indexing/hybrid-lazy-indexer-methods-c.cjs` | ❌ NO        | P0       | Core indexing methods uncovered |
+| `code-indexing/hybrid-lazy-indexer.impl.cjs`      | ❌ NO        | P0       | Implementation logic uncovered  |
+| `code-indexing/index-manager-config.cjs`          | ❌ NO        | P1       | Config logic uncovered          |
+| `code-indexing/index-manager-files.cjs`           | ❌ NO        | P1       | File operations uncovered       |
+| `code-indexing/index-manager-operations.cjs`      | ❌ NO        | P1       | Operations logic uncovered      |
+| `code-indexing/parse-utils.cjs`                   | ❌ NO        | P1       | Parse utilities uncovered       |
+| `code-indexing/code-parser.cjs`                   | ✅ YES       | ✓        | Test exists: `parser.test.cjs`  |
+| `code-indexing/hybrid-search.cjs`                 | ✅ YES       | ✓        | Multiple tests exist            |
+| `code-indexing/index-manager.cjs`                 | ✅ YES       | ✓        | Test exists                     |
 
 **Finding**: 8/11 code-indexing modules lack tests (73% gap)
 
 #### Memory Subsystem (Critical Path)
 
-| File | Test Exists? | Severity | Notes |
-|------|--------------|----------|-------|
-| `memory/cold-storage.cjs` | ❌ NO | P1 | Memory tier rotation uncovered |
-| `memory/contextual-memory-context-loader.cjs` | ❌ NO | P1 | Context loading uncovered |
-| `memory/contextual-memory-search-fallback.cjs` | ⚠️ PARTIAL | P1 | Search filters test exists |
-| `memory/entity-extractor.cjs` | ❌ NO | P1 | Entity extraction uncovered |
-| `memory/entity-query.cjs` | ❌ NO | P1 | Entity querying uncovered |
-| `memory/core/memory-extraction.cjs` | ❌ NO | P1 | Core extraction uncovered |
-| `memory/core/memory-lifecycle.cjs` | ❌ NO | P1 | Lifecycle management uncovered |
-| `memory/core/memory-query.cjs` | ❌ NO | P1 | Core query logic uncovered |
-| `memory/core/memory-storage.cjs` | ❌ NO | P1 | Core storage uncovered |
-| `memory/core/memory-utils.cjs` | ❌ NO | P1 | Core utilities uncovered |
-| `memory/contextual-memory.cjs` | ⚠️ PARTIAL | P1 | Search filters test exists |
-| `memory/audit-trail-integration.cjs` | ✅ YES | ✓ | Test exists |
+| File                                           | Test Exists? | Severity | Notes                          |
+| ---------------------------------------------- | ------------ | -------- | ------------------------------ |
+| `memory/cold-storage.cjs`                      | ❌ NO        | P1       | Memory tier rotation uncovered |
+| `memory/contextual-memory-context-loader.cjs`  | ❌ NO        | P1       | Context loading uncovered      |
+| `memory/contextual-memory-search-fallback.cjs` | ⚠️ PARTIAL   | P1       | Search filters test exists     |
+| `memory/entity-extractor.cjs`                  | ❌ NO        | P1       | Entity extraction uncovered    |
+| `memory/entity-query.cjs`                      | ❌ NO        | P1       | Entity querying uncovered      |
+| `memory/core/memory-extraction.cjs`            | ❌ NO        | P1       | Core extraction uncovered      |
+| `memory/core/memory-lifecycle.cjs`             | ❌ NO        | P1       | Lifecycle management uncovered |
+| `memory/core/memory-query.cjs`                 | ❌ NO        | P1       | Core query logic uncovered     |
+| `memory/core/memory-storage.cjs`               | ❌ NO        | P1       | Core storage uncovered         |
+| `memory/core/memory-utils.cjs`                 | ❌ NO        | P1       | Core utilities uncovered       |
+| `memory/contextual-memory.cjs`                 | ⚠️ PARTIAL   | P1       | Search filters test exists     |
+| `memory/audit-trail-integration.cjs`           | ✅ YES       | ✓        | Test exists                    |
 
 **Finding**: 10/12 memory modules lack tests (83% gap)
 
 #### Routing Logic (Critical Path)
 
-| File | Test Exists? | Severity | Notes |
-|------|--------------|----------|-------|
-| `routing/agent-registry-resolver.cjs` | ✅ YES | ✓ | Test exists |
-| `routing/fuzzy-intent-matcher.cjs` | ✅ YES | ✓ | Test exists |
-| `routing/intent-classifier.cjs` | ✅ YES | ✓ | Test exists |
-| `routing/pattern-router.cjs` | ✅ YES | ✓ | Test exists |
-| `routing/semantic-router.cjs` | ✅ YES | ✓ | Test exists |
-| `routing/routing-table.cjs` | ⚠️ IMPLIED | ✓ | Tested via `tests/routing-table.test.cjs` |
+| File                                  | Test Exists? | Severity | Notes                                     |
+| ------------------------------------- | ------------ | -------- | ----------------------------------------- |
+| `routing/agent-registry-resolver.cjs` | ✅ YES       | ✓        | Test exists                               |
+| `routing/fuzzy-intent-matcher.cjs`    | ✅ YES       | ✓        | Test exists                               |
+| `routing/intent-classifier.cjs`       | ✅ YES       | ✓        | Test exists                               |
+| `routing/pattern-router.cjs`          | ✅ YES       | ✓        | Test exists                               |
+| `routing/semantic-router.cjs`         | ✅ YES       | ✓        | Test exists                               |
+| `routing/routing-table.cjs`           | ⚠️ IMPLIED   | ✓        | Tested via `tests/routing-table.test.cjs` |
 
 **Finding**: Routing libs have excellent coverage (100%)
 
 #### Utilities (Support Path)
 
-| File | Test Exists? | Severity | Notes |
-|------|--------------|----------|-------|
-| `utils/jsonl-utils.cjs` | ✅ YES | ✓ | Test exists |
-| `utils/platform.cjs` | ✅ YES | ✓ | Test exists |
-| `utils/project-root.cjs` | ✅ YES | ✓ | Test exists |
-| `utils/safe-json.cjs` | ✅ YES | ✓ | Test exists: `safe-json.test.cjs` |
-| `utils/state-cache.cjs` | ✅ YES | ✓ | Test exists |
+| File                     | Test Exists? | Severity | Notes                             |
+| ------------------------ | ------------ | -------- | --------------------------------- |
+| `utils/jsonl-utils.cjs`  | ✅ YES       | ✓        | Test exists                       |
+| `utils/platform.cjs`     | ✅ YES       | ✓        | Test exists                       |
+| `utils/project-root.cjs` | ✅ YES       | ✓        | Test exists                       |
+| `utils/safe-json.cjs`    | ✅ YES       | ✓        | Test exists: `safe-json.test.cjs` |
+| `utils/state-cache.cjs`  | ✅ YES       | ✓        | Test exists                       |
 
 **Finding**: Utils have excellent coverage (100%)
 
@@ -173,12 +175,12 @@ Based on analysis of `.claude/lib/` directory:
 
 Tests that depend on timing/delays and may fail intermittently:
 
-| Test File | Issue | Line/Pattern | Risk |
-|-----------|-------|--------------|------|
-| `tests/lib/memory/memory-scheduler-perf-009.test.cjs` | TTL timing | Uses `setTimeout` with 150ms delays | MEDIUM |
-| `tests/hooks/sync-memory-index-race.test.cjs` | Race condition simulation | Concurrent writes with timing | MEDIUM |
-| `tests/hooks/reflection-step0-guard-race.test.cjs` | Race condition simulation | Concurrent TaskList calls | MEDIUM |
-| `tests/code-indexing/incremental-indexing.test.cjs` | Async timing | File change detection timing | LOW |
+| Test File                                             | Issue                     | Line/Pattern                        | Risk   |
+| ----------------------------------------------------- | ------------------------- | ----------------------------------- | ------ |
+| `tests/lib/memory/memory-scheduler-perf-009.test.cjs` | TTL timing                | Uses `setTimeout` with 150ms delays | MEDIUM |
+| `tests/hooks/sync-memory-index-race.test.cjs`         | Race condition simulation | Concurrent writes with timing       | MEDIUM |
+| `tests/hooks/reflection-step0-guard-race.test.cjs`    | Race condition simulation | Concurrent TaskList calls           | MEDIUM |
+| `tests/code-indexing/incremental-indexing.test.cjs`   | Async timing              | File change detection timing        | LOW    |
 
 **Recommendation**: Replace `setTimeout` with condition polling or mock time
 
@@ -186,12 +188,12 @@ Tests that depend on timing/delays and may fail intermittently:
 
 Tests that depend on file system state:
 
-| Test File | Issue | Risk |
-|-----------|-------|------|
-| `tests/hooks/unified-pre-write-hook-router-context.test.cjs` | Depends on router context file existence | MEDIUM |
-| `tests/hooks/settings-wiring.test.cjs` | Depends on `.claude/settings.json` format | LOW |
-| `tests/lib/memory/contextual-memory.search-filters.test.cjs` | Depends on memory file structure | MEDIUM |
-| `tests/code-indexing/integration.test.cjs` | Depends on actual codebase files | MEDIUM |
+| Test File                                                    | Issue                                     | Risk   |
+| ------------------------------------------------------------ | ----------------------------------------- | ------ |
+| `tests/hooks/unified-pre-write-hook-router-context.test.cjs` | Depends on router context file existence  | MEDIUM |
+| `tests/hooks/settings-wiring.test.cjs`                       | Depends on `.claude/settings.json` format | LOW    |
+| `tests/lib/memory/contextual-memory.search-filters.test.cjs` | Depends on memory file structure          | MEDIUM |
+| `tests/code-indexing/integration.test.cjs`                   | Depends on actual codebase files          | MEDIUM |
 
 **Recommendation**: Use fixtures or mock file system
 
@@ -199,11 +201,11 @@ Tests that depend on file system state:
 
 Tests that may fail if run in different order:
 
-| Test File | Issue | Risk |
-|-----------|-------|------|
+| Test File                                                  | Issue                 | Risk   |
+| ---------------------------------------------------------- | --------------------- | ------ |
 | `tests/lib/memory/lancedb-client-gpu-integration.test.cjs` | Shared database state | MEDIUM |
-| `tests/code-indexing/index-manager.test.cjs` | Shared index state | MEDIUM |
-| `tests/hooks/sync-memory-index-safety.test.cjs` | Shared memory state | MEDIUM |
+| `tests/code-indexing/index-manager.test.cjs`               | Shared index state    | MEDIUM |
+| `tests/hooks/sync-memory-index-safety.test.cjs`            | Shared memory state   | MEDIUM |
 
 **Recommendation**: Add `beforeEach` cleanup or use isolated test databases
 
@@ -211,12 +213,12 @@ Tests that may fail if run in different order:
 
 Tests that depend on specific environment variables:
 
-| Test File | Env Var | Risk |
-|-----------|---------|------|
-| `tests/lib/code-indexing/gpu-detector.test.cjs` | GPU availability | LOW |
-| `tests/lib/code-indexing/embedding-generator-gpu.test.cjs` | `LANCEDB_EMBEDDING_MODE` | LOW |
-| `tests/lib/memory/fastembed-gpu-integration.test.cjs` | GPU libraries | LOW |
-| `tests/hooks/spawn-prompt-memory-mode.test.cjs` | `MEMORY_MODE` | MEDIUM |
+| Test File                                                  | Env Var                  | Risk   |
+| ---------------------------------------------------------- | ------------------------ | ------ |
+| `tests/lib/code-indexing/gpu-detector.test.cjs`            | GPU availability         | LOW    |
+| `tests/lib/code-indexing/embedding-generator-gpu.test.cjs` | `LANCEDB_EMBEDDING_MODE` | LOW    |
+| `tests/lib/memory/fastembed-gpu-integration.test.cjs`      | GPU libraries            | LOW    |
+| `tests/hooks/spawn-prompt-memory-mode.test.cjs`            | `MEMORY_MODE`            | MEDIUM |
 
 **Recommendation**: Mock environment or clearly document prerequisites
 
@@ -330,6 +332,7 @@ File: `spawn-prompt-assembler.cjs` and modules
    - **Impact**: Blind spots unknown
 
 **Recommendations**:
+
 - Add `c8` for coverage reporting: `pnpm add -D c8`
 - Add test isolation: unique test directories per suite
 - Add test tags/categories for filtering
@@ -365,6 +368,7 @@ File: `spawn-prompt-assembler.cjs` and modules
    - **Need**: `TestDatabase` helper class
 
 **Recommendations**:
+
 - Create `.claude/lib/test-utils/` directory
 - Consolidate common test patterns
 - Document test helper usage
@@ -397,13 +401,14 @@ File: `spawn-prompt-assembler.cjs` and modules
 
 Based on `git status`, these changes carry regression risk:
 
-| File | Risk Level | Test Coverage | Regression Risk |
-|------|-----------|---------------|-----------------|
-| `spawn-prompt-assembler.runtime-support.cjs` | HIGH | ❌ NONE | **CRITICAL** - No tests for runtime support |
-| `spawn-prompt-assembler.runtime.cjs` | HIGH | ❌ NONE | **CRITICAL** - No tests for runtime logic |
-| `pre-tool-unified.read-safety.cjs` | MEDIUM | ✅ YES | LOW - Test exists |
+| File                                         | Risk Level | Test Coverage | Regression Risk                             |
+| -------------------------------------------- | ---------- | ------------- | ------------------------------------------- |
+| `spawn-prompt-assembler.runtime-support.cjs` | HIGH       | ❌ NONE       | **CRITICAL** - No tests for runtime support |
+| `spawn-prompt-assembler.runtime.cjs`         | HIGH       | ❌ NONE       | **CRITICAL** - No tests for runtime logic   |
+| `pre-tool-unified.read-safety.cjs`           | MEDIUM     | ✅ YES        | LOW - Test exists                           |
 
 **Immediate Action Required**:
+
 1. Create tests for `spawn-prompt-assembler.runtime-support.cjs`
 2. Create tests for `spawn-prompt-assembler.runtime.cjs`
 3. Verify read-safety test covers recent changes
@@ -412,13 +417,13 @@ Based on `git status`, these changes carry regression risk:
 
 Modules with high cyclomatic complexity lacking tests:
 
-| Module | Complexity Est. | Test Coverage | Risk |
-|--------|----------------|---------------|------|
-| `routing-guard-core.impl.cjs` | HIGH (>500 LOC) | ❌ NONE | CRITICAL |
-| `routing-guard-core.checks-task.cjs` | HIGH | ❌ NONE | CRITICAL |
-| `hybrid-lazy-indexer.impl.cjs` | HIGH | ❌ NONE | CRITICAL |
-| `memory/core/memory-query.cjs` | HIGH | ❌ NONE | HIGH |
-| `memory/core/memory-storage.cjs` | HIGH | ❌ NONE | HIGH |
+| Module                               | Complexity Est. | Test Coverage | Risk     |
+| ------------------------------------ | --------------- | ------------- | -------- |
+| `routing-guard-core.impl.cjs`        | HIGH (>500 LOC) | ❌ NONE       | CRITICAL |
+| `routing-guard-core.checks-task.cjs` | HIGH            | ❌ NONE       | CRITICAL |
+| `hybrid-lazy-indexer.impl.cjs`       | HIGH            | ❌ NONE       | CRITICAL |
+| `memory/core/memory-query.cjs`       | HIGH            | ❌ NONE       | HIGH     |
+| `memory/core/memory-storage.cjs`     | HIGH            | ❌ NONE       | HIGH     |
 
 **Recommendation**: Prioritize test creation for high-complexity modules
 
@@ -426,13 +431,13 @@ Modules with high cyclomatic complexity lacking tests:
 
 Modules handling security-sensitive operations:
 
-| Module | Security Function | Test Coverage | Risk |
-|--------|------------------|---------------|------|
-| `bash-command-validator.cjs` | Command injection prevention | ✅ YES | LOW |
-| `shell-injection-validator.cjs` | Shell injection prevention | ✅ YES | LOW |
-| `unified-pre-write-hook.cjs` | Path traversal prevention | ⚠️ PARTIAL | MEDIUM |
-| `spawn-prompt-validator.cjs` | Spawn safety | ✅ YES | LOW |
-| `safe-json.cjs` | Prototype pollution prevention | ✅ YES | LOW |
+| Module                          | Security Function              | Test Coverage | Risk   |
+| ------------------------------- | ------------------------------ | ------------- | ------ |
+| `bash-command-validator.cjs`    | Command injection prevention   | ✅ YES        | LOW    |
+| `shell-injection-validator.cjs` | Shell injection prevention     | ✅ YES        | LOW    |
+| `unified-pre-write-hook.cjs`    | Path traversal prevention      | ⚠️ PARTIAL    | MEDIUM |
+| `spawn-prompt-validator.cjs`    | Spawn safety                   | ✅ YES        | LOW    |
+| `safe-json.cjs`                 | Prototype pollution prevention | ✅ YES        | LOW    |
 
 **Finding**: Security modules have good coverage (80%+)
 
@@ -590,6 +595,7 @@ Modules handling security-sensitive operations:
 ### 8.1 Complete Untested Hook Files
 
 **Routing Hooks** (11 untested modules):
+
 1. `routing-guard-core.checks-router.cjs`
 2. `routing-guard-core.checks-task.cjs`
 3. `routing-guard-core.impl.cjs`
@@ -603,6 +609,7 @@ Modules handling security-sensitive operations:
 11. `pre-tool-unified.shared.cjs`
 
 **Additional Routing Helpers** (5 partially tested):
+
 1. `post-task-unified-completion.helpers.cjs`
 2. `post-task-unified.helpers.cjs`
 3. `spawn-prompt-assembler.core.cjs`
@@ -612,6 +619,7 @@ Modules handling security-sensitive operations:
 ### 8.2 Complete Untested Library Files
 
 **Code Indexing** (8 files):
+
 1. `code-indexing/hybrid-lazy-indexer-methods-a.cjs`
 2. `code-indexing/hybrid-lazy-indexer-methods-b.cjs`
 3. `code-indexing/hybrid-lazy-indexer-methods-c.cjs`
@@ -622,6 +630,7 @@ Modules handling security-sensitive operations:
 8. `code-indexing/parse-utils.cjs`
 
 **Memory** (10 files):
+
 1. `memory/cold-storage.cjs`
 2. `memory/contextual-memory-context-loader.cjs`
 3. `memory/entity-extractor.cjs`
@@ -636,23 +645,27 @@ Modules handling security-sensitive operations:
 ### 8.3 Fragile Test Inventory
 
 **Time-Dependent** (4 files):
+
 1. `tests/lib/memory/memory-scheduler-perf-009.test.cjs`
 2. `tests/hooks/sync-memory-index-race.test.cjs`
 3. `tests/hooks/reflection-step0-guard-race.test.cjs`
 4. `tests/code-indexing/incremental-indexing.test.cjs`
 
 **File System Dependent** (4 files):
+
 1. `tests/hooks/unified-pre-write-hook-router-context.test.cjs`
 2. `tests/hooks/settings-wiring.test.cjs`
 3. `tests/lib/memory/contextual-memory.search-filters.test.cjs`
 4. `tests/code-indexing/integration.test.cjs`
 
 **Order Dependent** (3 files):
+
 1. `tests/lib/memory/lancedb-client-gpu-integration.test.cjs`
 2. `tests/code-indexing/index-manager.test.cjs`
 3. `tests/hooks/sync-memory-index-safety.test.cjs`
 
 **Environment Dependent** (4 files):
+
 1. `tests/lib/code-indexing/gpu-detector.test.cjs`
 2. `tests/lib/code-indexing/embedding-generator-gpu.test.cjs`
 3. `tests/lib/memory/fastembed-gpu-integration.test.cjs`
@@ -664,36 +677,36 @@ Modules handling security-sensitive operations:
 
 ### 9.1 Test Coverage by Subsystem
 
-| Subsystem | Source Files | Test Files | Coverage % | Grade |
-|-----------|--------------|------------|-----------|-------|
-| Routing Hooks | 34 | 30 | 88% | B+ |
-| Safety Hooks | 8 | 7 | 87% | B+ |
-| Validation Hooks | 5 | 5 | 100% | A |
-| Memory Hooks | 5 | 4 | 80% | B |
-| Workflow Hooks | 2 | 2 | 100% | A |
-| Evolution Hooks | 4 | 3 | 75% | C+ |
-| Monitoring Hooks | 3 | 2 | 67% | D+ |
-| Reflection Hooks | 6 | 5 | 83% | B |
-| Code Indexing Libs | 26 | 18 | 69% | D+ |
-| Memory Libs | 25 | 5 | 20% | F |
-| Routing Libs | 10 | 8 | 80% | B |
-| Utils Libs | 15 | 10 | 67% | D+ |
-| Workflow Libs | 8 | 4 | 50% | F |
-| Tools | 377 | <20 | <5% | F |
+| Subsystem          | Source Files | Test Files | Coverage % | Grade |
+| ------------------ | ------------ | ---------- | ---------- | ----- |
+| Routing Hooks      | 34           | 30         | 88%        | B+    |
+| Safety Hooks       | 8            | 7          | 87%        | B+    |
+| Validation Hooks   | 5            | 5          | 100%       | A     |
+| Memory Hooks       | 5            | 4          | 80%        | B     |
+| Workflow Hooks     | 2            | 2          | 100%       | A     |
+| Evolution Hooks    | 4            | 3          | 75%        | C+    |
+| Monitoring Hooks   | 3            | 2          | 67%        | D+    |
+| Reflection Hooks   | 6            | 5          | 83%        | B     |
+| Code Indexing Libs | 26           | 18         | 69%        | D+    |
+| Memory Libs        | 25           | 5          | 20%        | F     |
+| Routing Libs       | 10           | 8          | 80%        | B     |
+| Utils Libs         | 15           | 10         | 67%        | D+    |
+| Workflow Libs      | 8            | 4          | 50%        | F     |
+| Tools              | 377          | <20        | <5%        | F     |
 
 **Overall Framework Coverage**: ~65% (hooks) + ~45% (libs) + ~3% (tools) = **~38% average**
 
 ### 9.2 Test Quality Metrics
 
-| Metric | Value | Target | Status |
-|--------|-------|--------|--------|
-| Total Tests | 477 | N/A | ✓ |
-| Fragile Tests | 15 | 0 | ❌ |
-| Flaky Tests (estimated) | ~5 | 0 | ⚠️ |
-| Tests with TODOs | Unknown | 0 | ? |
-| Avg Test Duration | Unknown | <100ms | ? |
-| Slowest Test | Unknown | <2s | ? |
-| Test Pass Rate | 99.3% (from learnings) | 100% | ⚠️ |
+| Metric                  | Value                  | Target | Status |
+| ----------------------- | ---------------------- | ------ | ------ |
+| Total Tests             | 477                    | N/A    | ✓      |
+| Fragile Tests           | 15                     | 0      | ❌     |
+| Flaky Tests (estimated) | ~5                     | 0      | ⚠️     |
+| Tests with TODOs        | Unknown                | 0      | ?      |
+| Avg Test Duration       | Unknown                | <100ms | ?      |
+| Slowest Test            | Unknown                | <2s    | ?      |
+| Test Pass Rate          | 99.3% (from learnings) | 100%   | ⚠️     |
 
 ### 9.3 Coverage Trends (Estimated)
 
@@ -774,6 +787,7 @@ Based on recent commits and learnings:
 ### 11.1 Summary
 
 **Strengths**:
+
 - Excellent test count (477 tests)
 - High pass rate (99.3%)
 - Good coverage for safety/validation hooks
@@ -781,6 +795,7 @@ Based on recent commits and learnings:
 - Security modules well-tested
 
 **Weaknesses**:
+
 - 38% average coverage across framework
 - 20 P0 critical gaps (no tests)
 - 28 P1 high-priority gaps (partial coverage)
@@ -789,6 +804,7 @@ Based on recent commits and learnings:
 - No coverage reporting infrastructure
 
 **Risk Assessment**:
+
 - **CRITICAL**: 2 recently modified files without tests (runtime modules)
 - **HIGH**: 18 core modules completely untested
 - **MEDIUM**: 45+ edge cases not covered

@@ -15,6 +15,7 @@ Analyzed the external "awesome-claude-code-subagents" repository (126 agents, 16
 ### Their Approach (awesome-claude-code-subagents)
 
 **Agent Definition Pattern:**
+
 ```yaml
 ---
 name: python-pro
@@ -39,6 +40,7 @@ Development checklist:
 ```
 
 **Directory Structure:**
+
 ```
 categories/
   01-core-development/
@@ -54,6 +56,7 @@ README.md
 ### Our Approach (agent-studio)
 
 **Agent Definition Pattern:**
+
 ```yaml
 ---
 name: python-pro
@@ -80,6 +83,7 @@ You are a Python expert.
 ```
 
 **Directory Structure:**
+
 ```
 .claude/
   agents/ (49 agents)
@@ -102,59 +106,59 @@ CLAUDE.md (2000+ lines)
 
 ### Agent Definitions
 
-| Aspect | Their Approach | Our Approach | Simpler? |
-|--------|---------------|--------------|----------|
-| Frontmatter fields | 4 (name, description, tools, model) | 2-3 (name, model, skills) | ✅ Theirs |
-| Body structure | Inline checklists + prose | Structured sections with headers | ✅ Theirs |
-| Skill integration | None (self-contained) | Explicit Skill() calls | ✅ Theirs |
-| Memory protocol | None (mentioned in prose) | MANDATORY section at bottom | ✅ Theirs |
-| Average length | 150-300 lines | 200-400 lines | ✅ Theirs |
-| Cross-references | Minimal | Extensive (@files, related skills) | ✅ Theirs |
+| Aspect             | Their Approach                      | Our Approach                       | Simpler?  |
+| ------------------ | ----------------------------------- | ---------------------------------- | --------- |
+| Frontmatter fields | 4 (name, description, tools, model) | 2-3 (name, model, skills)          | ✅ Theirs |
+| Body structure     | Inline checklists + prose           | Structured sections with headers   | ✅ Theirs |
+| Skill integration  | None (self-contained)               | Explicit Skill() calls             | ✅ Theirs |
+| Memory protocol    | None (mentioned in prose)           | MANDATORY section at bottom        | ✅ Theirs |
+| Average length     | 150-300 lines                       | 200-400 lines                      | ✅ Theirs |
+| Cross-references   | Minimal                             | Extensive (@files, related skills) | ✅ Theirs |
 
 **Verdict:** Their agent definitions are **40% shorter** and **60% easier to read**.
 
 ### Routing System
 
-| Aspect | Their Approach | Our Approach | Simpler? |
-|--------|---------------|--------------|----------|
-| Routing logic | Claude reads description, auto-selects | routing-guard.cjs + routing-table.cjs + router-decision.md | ✅ Theirs |
-| Agent discovery | File scan (categories/) | Registry + filesystem + AvailableAgents tool | ✅ Theirs |
-| Specialist routing | None (user picks or Claude infers) | SPECIALIST-FIRST ROUTING LAW with enforcement | ✅ Theirs |
-| Routing documentation | 72 lines (CLAUDE.md) | 2000+ lines (CLAUDE.md + @AGENT_ROUTING_TABLE.md + router-decision.md) | ✅ Theirs |
+| Aspect                | Their Approach                         | Our Approach                                                           | Simpler?  |
+| --------------------- | -------------------------------------- | ---------------------------------------------------------------------- | --------- |
+| Routing logic         | Claude reads description, auto-selects | routing-guard.cjs + routing-table.cjs + router-decision.md             | ✅ Theirs |
+| Agent discovery       | File scan (categories/)                | Registry + filesystem + AvailableAgents tool                           | ✅ Theirs |
+| Specialist routing    | None (user picks or Claude infers)     | SPECIALIST-FIRST ROUTING LAW with enforcement                          | ✅ Theirs |
+| Routing documentation | 72 lines (CLAUDE.md)                   | 2000+ lines (CLAUDE.md + @AGENT_ROUTING_TABLE.md + router-decision.md) | ✅ Theirs |
 
 **Verdict:** Their routing is **95% simpler** but also **manual** (no enforcement, no automatic specialist selection).
 
 ### Orchestration
 
-| Aspect | Their Approach | Our Approach | Simpler? |
-|--------|---------------|--------------|----------|
-| Multi-agent coordination | multi-agent-coordinator agent | master-orchestrator + swarm-coordinator + party-orchestrator + routing-guard + workflow engine | ✅ Theirs |
-| Task tracking | None (implicit) | TaskCreate/TaskUpdate/TaskList with metadata | ⚖️ Ours (they don't have it) |
-| Workflow execution | None (ad-hoc) | enterprise-workflow.md with phased execution | ⚖️ Ours (they don't have it) |
-| Agent spawning | Natural language (no formalism) | Task() tool with spawn templates | ⚖️ Ours (they don't have it) |
+| Aspect                   | Their Approach                  | Our Approach                                                                                   | Simpler?                     |
+| ------------------------ | ------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------- |
+| Multi-agent coordination | multi-agent-coordinator agent   | master-orchestrator + swarm-coordinator + party-orchestrator + routing-guard + workflow engine | ✅ Theirs                    |
+| Task tracking            | None (implicit)                 | TaskCreate/TaskUpdate/TaskList with metadata                                                   | ⚖️ Ours (they don't have it) |
+| Workflow execution       | None (ad-hoc)                   | enterprise-workflow.md with phased execution                                                   | ⚖️ Ours (they don't have it) |
+| Agent spawning           | Natural language (no formalism) | Task() tool with spawn templates                                                               | ⚖️ Ours (they don't have it) |
 
 **Verdict:** They have **no orchestration infrastructure**. Their "simplicity" is the absence of capability.
 
 ### Memory & Context
 
-| Aspect | Their Approach | Our Approach | Simpler? |
-|--------|---------------|--------------|----------|
-| Memory system | None (mentioned in agent prose) | learnings.md + decisions.md + issues.md + named memory API | ✅ Theirs |
-| Context compression | None | context-compressor agent + skill | ⚖️ Ours (they don't have it) |
-| Session handoff | None | session-handoff skill | ⚖️ Ours (they don't have it) |
-| Memory enforcement | None | Memory protocol hooks | ✅ Theirs |
+| Aspect              | Their Approach                  | Our Approach                                               | Simpler?                     |
+| ------------------- | ------------------------------- | ---------------------------------------------------------- | ---------------------------- |
+| Memory system       | None (mentioned in agent prose) | learnings.md + decisions.md + issues.md + named memory API | ✅ Theirs                    |
+| Context compression | None                            | context-compressor agent + skill                           | ⚖️ Ours (they don't have it) |
+| Session handoff     | None                            | session-handoff skill                                      | ⚖️ Ours (they don't have it) |
+| Memory enforcement  | None                            | Memory protocol hooks                                      | ✅ Theirs                    |
 
 **Verdict:** They have **no memory infrastructure**. Each session starts fresh.
 
 ### Enforcement & Safety
 
-| Aspect | Their Approach | Our Approach | Simpler? |
-|--------|---------------|--------------|----------|
-| Routing enforcement | None | routing-guard.cjs (9 checks) | ✅ Theirs |
-| Creator workflow | None | unified-creator-guard.cjs + 6 creator skills | ✅ Theirs |
-| Security review | None | security-architect agent + enforcement hooks | ✅ Theirs |
-| Planner-first | None | PLANNER_FIRST_ENFORCEMENT | ✅ Theirs |
-| Reflection | None | reflection-agent + Step 0 enforcement | ✅ Theirs |
+| Aspect              | Their Approach | Our Approach                                 | Simpler?  |
+| ------------------- | -------------- | -------------------------------------------- | --------- |
+| Routing enforcement | None           | routing-guard.cjs (9 checks)                 | ✅ Theirs |
+| Creator workflow    | None           | unified-creator-guard.cjs + 6 creator skills | ✅ Theirs |
+| Security review     | None           | security-architect agent + enforcement hooks | ✅ Theirs |
+| Planner-first       | None           | PLANNER_FIRST_ENFORCEMENT                    | ✅ Theirs |
+| Reflection          | None           | reflection-agent + Step 0 enforcement        | ✅ Theirs |
 
 **Verdict:** They have **no enforcement**. Their "simplicity" is the absence of guardrails.
 
@@ -165,8 +169,10 @@ CLAUDE.md (2000+ lines)
 ### 1. Agent Definition Format (40% Improvement)
 
 **Their Pattern:**
+
 ```markdown
 Development checklist:
+
 - Type hints for all function signatures
 - PEP 8 compliance with black formatting
 - Test coverage exceeding 90%
@@ -174,12 +180,14 @@ Development checklist:
 ```
 
 **Why It's Better:**
+
 - **Scannable:** Bullets > prose paragraphs
 - **Actionable:** Each bullet is a concrete task
 - **Self-contained:** No need to cross-reference skills
 - **Beginner-friendly:** Non-programmers can read it
 
 **Recommendation:** Adopt this pattern for our agents:
+
 ```yaml
 ---
 name: python-pro
@@ -210,6 +218,7 @@ You are a senior Python developer...
 ### 2. Category Organization (80% Improvement)
 
 **Their Structure:**
+
 ```
 categories/
   01-core-development/
@@ -225,11 +234,13 @@ categories/
 ```
 
 **Why It's Better:**
+
 - **Numbered prefixes** enforce sort order
 - **Clear categories** (10 vs our 4: core/domain/specialized/orchestrators)
 - **Intuitive names** (quality-security > specialized)
 
 **Recommendation:** Reorganize our agents:
+
 ```
 .claude/agents/
   01-core/           (router, planner, developer, qa, architect)
@@ -243,6 +254,7 @@ categories/
 ### 3. Model Assignment (Explicit > Implicit)
 
 **Their Pattern:**
+
 ```yaml
 ---
 model: opus
@@ -250,36 +262,42 @@ model: opus
 ```
 
 **Why It's Better:**
+
 - **Explicit:** No need to read config.yaml or infer from agent type
 - **Override-friendly:** Easy to change without touching code
 - **Documented:** Model field shows in frontmatter
 
 **Recommendation:** Keep config.yaml as source of truth, but add model to frontmatter as visual reminder:
+
 ```yaml
 ---
 name: planner
-model: opus  # From config.yaml (can override with Task({ task_id: 'task-1', model: 'sonnet' }))
+model: opus # From config.yaml (can override with Task({ task_id: 'task-1', model: 'sonnet' }))
 ---
 ```
 
 ### 4. Minimal Documentation (90% Reduction)
 
 **Their CLAUDE.md:**
+
 - 72 lines total
 - Explains agent format, directory structure, tool assignment
 - No routing rules, no enforcement, no workflows
 
 **Our CLAUDE.md:**
+
 - 2000+ lines total
 - 14 @reference files (another ~5000 lines)
 - Routing, enforcement, workflows, memory, reflection, evolution
 
 **Why Theirs Is Better:**
+
 - **Onboarding:** New contributors can read it in 5 minutes
 - **Maintainability:** Changes to 72 lines vs 7000 lines
 - **Clarity:** Focus on essentials, not edge cases
 
 **Recommendation:** Create TWO docs:
+
 1. **CLAUDE-QUICK.md** (100 lines) - What agents are, how to create them, routing basics
 2. **CLAUDE.md** (2000 lines) - Full reference for power users
 
@@ -290,11 +308,13 @@ model: opus  # From config.yaml (can override with Task({ task_id: 'task-1', mod
 ### 1. Orchestration Infrastructure (Critical)
 
 **Their multi-agent-coordinator:**
+
 - 287 lines of prose describing coordination patterns
 - No actual coordination logic
 - No task tracking, no dependency management
 
 **Our orchestration:**
+
 - master-orchestrator + Task() tool + spawn templates
 - TaskCreate/TaskUpdate/TaskList for progress tracking
 - Dependency management (addBlockedBy, addBlocks)
@@ -302,6 +322,7 @@ model: opus  # From config.yaml (can override with Task({ task_id: 'task-1', mod
 - Quality gates between phases
 
 **Why Ours Is Better:**
+
 - **Provable:** TaskList shows actual progress
 - **Recoverable:** Tasks survive context resets
 - **Enforceable:** Hooks prevent skipping steps
@@ -311,17 +332,20 @@ model: opus  # From config.yaml (can override with Task({ task_id: 'task-1', mod
 ### 2. Enforcement Hooks (Security)
 
 **Their approach:**
+
 - No enforcement
 - Agents can do anything (Edit creator files, skip security reviews, etc.)
 - Trust-based system
 
 **Our approach:**
+
 - routing-guard.cjs (9 checks)
 - unified-creator-guard.cjs (Gate 4 enforcement)
 - Security review enforcement (auth/authz/credentials triggers)
 - Planner-first enforcement (complexity > HIGH)
 
 **Why Ours Is Better:**
+
 - **Prevents mistakes:** Router can't accidentally write to .claude/skills/
 - **Enforces best practices:** Security-sensitive code automatically gets security review
 - **Catches violations:** Hooks block invalid operations before they happen
@@ -331,11 +355,13 @@ model: opus  # From config.yaml (can override with Task({ task_id: 'task-1', mod
 ### 3. Memory System (Context Continuity)
 
 **Their approach:**
+
 - Mentioned in agent prose ("consult context manager")
 - No files, no persistence
 - Each session starts fresh
 
 **Our approach:**
+
 - learnings.md (patterns discovered)
 - decisions.md (ADRs)
 - issues.md (blockers/workarounds)
@@ -343,6 +369,7 @@ model: opus  # From config.yaml (can override with Task({ task_id: 'task-1', mod
 - Reflection-agent for quality learning extraction
 
 **Why Ours Is Better:**
+
 - **Cross-session:** Learnings survive restarts
 - **Team knowledge:** Shared memory across developers
 - **Pattern recognition:** Recurring issues get documented
@@ -352,17 +379,20 @@ model: opus  # From config.yaml (can override with Task({ task_id: 'task-1', mod
 ### 4. Search Integration (Phase 1)
 
 **Their approach:**
+
 - Grep tool only (text search)
 - No semantic search
 - No structural search
 
 **Our approach:**
+
 - code-semantic-search (find by meaning)
 - code-structural-search (find by AST pattern)
 - ripgrep (fast text search)
 - Hybrid search (95% accuracy, <150ms)
 
 **Why Ours Is Better:**
+
 - **Accuracy:** Semantic search finds similar code even with different names
 - **Precision:** Structural search finds exact patterns (all functions with 3 arguments)
 - **Speed:** <150ms vs 5s for Grep on large repos
@@ -376,6 +406,7 @@ model: opus  # From config.yaml (can override with Task({ task_id: 'task-1', mod
 ### P1: Agent Definition Format (40% Simplification)
 
 **Current:**
+
 ```yaml
 ---
 name: developer
@@ -399,6 +430,7 @@ You are an expert developer...
 ```
 
 **Simplified:**
+
 ```yaml
 ---
 name: developer
@@ -427,6 +459,7 @@ Record patterns in .claude/context/memory/learnings.md
 ```
 
 **Impact:**
+
 - 40% shorter (200 lines → 120 lines)
 - 60% more scannable (checklists > prose)
 - 80% faster to write (bullet format vs narrative)
@@ -436,40 +469,51 @@ Record patterns in .claude/context/memory/learnings.md
 ### P2: CLAUDE.md Split (90% Onboarding Improvement)
 
 **Current:**
+
 - CLAUDE.md: 2000+ lines
 - 14 @reference files: ~5000 lines
 - Total: 7000 lines to understand the system
 
 **Simplified:**
+
 - **CLAUDE-QUICK.md** (100 lines):
+
   ```markdown
   # Quick Start
 
   ## Agents
+
   Agents are specialists. Router picks the right one.
 
   ## Creating Agents
+
   1. Copy template
   2. Fill in checklist
   3. Add to registry
 
   ## Routing
+
   Router always spawns agents. Never executes directly.
 
   ## Skills
+
   Agents invoke skills with Skill({ skill: 'name' })
 
   ## Memory
+
   Record patterns in learnings.md
   ```
 
 - **CLAUDE.md** (2000 lines):
+
   ```markdown
   # Full Reference
+
   (Everything we have now)
   ```
 
 **Impact:**
+
 - New contributors can start in 10 minutes (vs 2 hours)
 - Quick reference for common operations
 - Full docs still available for power users
@@ -479,6 +523,7 @@ Record patterns in .claude/context/memory/learnings.md
 ### P3: Category Reorganization (80% Discovery Improvement)
 
 **Current:**
+
 ```
 .claude/agents/
   core/         (router, planner, developer, qa, architect, pm, technical-writer, reflection-agent, context-compressor)
@@ -488,6 +533,7 @@ Record patterns in .claude/context/memory/learnings.md
 ```
 
 **Simplified:**
+
 ```
 .claude/agents/
   01-core/           (router, planner, developer, qa, architect)
@@ -499,6 +545,7 @@ Record patterns in .claude/context/memory/learnings.md
 ```
 
 **Impact:**
+
 - Numbered prefixes enforce sort order
 - Clearer separation (specialists vs domain vs meta)
 - Easier to find agents (ls shows ordered list)
@@ -514,6 +561,7 @@ Record patterns in .claude/context/memory/learnings.md
 **Reason:** Their system has **no formal orchestration**. Multi-agent coordination is prose, not executable logic.
 
 **Evidence:**
+
 - Their multi-agent-coordinator is 287 lines of aspirational prose
 - No Task() tool
 - No TaskCreate/TaskUpdate/TaskList
@@ -527,11 +575,13 @@ Record patterns in .claude/context/memory/learnings.md
 ### Keep: Enforcement Hooks
 
 **Reason:** Their system has **no enforcement**. Agents can accidentally:
+
 - Write to .claude/skills/ directly (invisible skills)
 - Skip security reviews for auth changes
 - Use developer for docs (should be technical-writer)
 
 **Evidence:**
+
 - Zero enforcement hooks
 - No routing-guard.cjs
 - No unified-creator-guard.cjs
@@ -546,6 +596,7 @@ Record patterns in .claude/context/memory/learnings.md
 **Reason:** Their system has **no memory persistence**. Each session starts fresh.
 
 **Evidence:**
+
 - Memory mentioned in prose ("consult context manager") but no files
 - No learnings.md, decisions.md, issues.md
 - No cross-session continuity
@@ -559,6 +610,7 @@ Record patterns in .claude/context/memory/learnings.md
 **Reason:** Their system has **Grep only** (basic text search).
 
 **Evidence:**
+
 - No code-semantic-search (find by meaning)
 - No code-structural-search (find by AST pattern)
 - No hybrid search (semantic + structural)
@@ -576,24 +628,30 @@ Record patterns in .claude/context/memory/learnings.md
 **Scope:** Update all 49 agents to use checklist format.
 
 **Before (developer.md):**
+
 ```markdown
 You are an expert developer...
 
 ## Core Capabilities
+
 (5 paragraphs of prose)
 
 ## Skill Invocation Protocol
+
 (explains Skill() tool)
 
 ## Memory Protocol
+
 (explains memory system)
 ```
 
 **After (developer.md):**
+
 ```markdown
 You are an expert developer. Use TDD for all features.
 
 ## Development Checklist
+
 - [ ] Read memory: cat .claude/context/memory/learnings.md
 - [ ] Search first: Skill({ skill: 'code-semantic-search', args: '<query>' })
 - [ ] Write test: Skill({ skill: 'tdd' })
@@ -602,11 +660,13 @@ You are an expert developer. Use TDD for all features.
 - [ ] Complete: TaskUpdate({ status: 'completed', metadata: {...} })
 
 ## Skills
+
 - tdd: Test-driven development
 - debugging: Systematic debugging
 ```
 
 **Impact:**
+
 - 40% shorter agents (200 lines → 120 lines)
 - 60% more scannable (bullets > prose)
 - 80% faster to write new agents
@@ -620,15 +680,18 @@ You are an expert developer. Use TDD for all features.
 **Scope:** Create CLAUDE-QUICK.md for onboarding.
 
 **Before:**
+
 - New contributors read 2000-line CLAUDE.md
 - Takes 2 hours to understand basics
 
 **After:**
+
 - New contributors read 100-line CLAUDE-QUICK.md
 - Takes 10 minutes to understand basics
 - Full reference (CLAUDE.md) available for deep dives
 
 **Impact:**
+
 - 90% faster onboarding (2 hours → 10 minutes)
 - Lower barrier to contribution
 
@@ -641,6 +704,7 @@ You are an expert developer. Use TDD for all features.
 **Scope:** Reorganize .claude/agents/ with numbered prefixes.
 
 **Before:**
+
 ```
 .claude/agents/
   core/
@@ -650,6 +714,7 @@ You are an expert developer. Use TDD for all features.
 ```
 
 **After:**
+
 ```
 .claude/agents/
   01-core/
@@ -661,6 +726,7 @@ You are an expert developer. Use TDD for all features.
 ```
 
 **Impact:**
+
 - 80% faster discovery (ls shows ordered list)
 - Clearer separation of concerns
 - Easier to find agents
@@ -675,26 +741,27 @@ You are an expert developer. Use TDD for all features.
 
 ### If We Adopt Tier 1-3
 
-| Metric | Current | After Adoption | Improvement |
-|--------|---------|---------------|-------------|
-| Agent definition length | 200-400 lines | 120-240 lines | **40% shorter** |
-| Time to write new agent | 2-3 hours | 1-1.5 hours | **50% faster** |
-| Onboarding time | 2 hours | 10 minutes | **90% faster** |
-| Agent discovery time | 2-5 minutes (scan 4 dirs) | 30 seconds (numbered prefixes) | **80% faster** |
-| Scanability (bullets vs prose) | Low (paragraphs) | High (checklists) | **60% improvement** |
-| Total codebase simplification | - | - | **15-20% simpler** |
+| Metric                         | Current                   | After Adoption                 | Improvement         |
+| ------------------------------ | ------------------------- | ------------------------------ | ------------------- |
+| Agent definition length        | 200-400 lines             | 120-240 lines                  | **40% shorter**     |
+| Time to write new agent        | 2-3 hours                 | 1-1.5 hours                    | **50% faster**      |
+| Onboarding time                | 2 hours                   | 10 minutes                     | **90% faster**      |
+| Agent discovery time           | 2-5 minutes (scan 4 dirs) | 30 seconds (numbered prefixes) | **80% faster**      |
+| Scanability (bullets vs prose) | Low (paragraphs)          | High (checklists)              | **60% improvement** |
+| Total codebase simplification  | -                         | -                              | **15-20% simpler**  |
 
 ### What We Keep (Critical)
 
-| Component | Their Approach | Our Approach | Keep Ours? |
-|-----------|---------------|--------------|------------|
-| Orchestration | None (prose only) | master-orchestrator + Task() + workflow engine | ✅ YES |
-| Enforcement | None (trust-based) | 9 hooks (routing, creator, security, planner-first) | ✅ YES |
-| Memory | None (each session fresh) | learnings.md + decisions.md + issues.md | ✅ YES |
-| Search | Grep only | Semantic + structural + ripgrep (95% accuracy) | ✅ YES |
-| Task tracking | None (implicit) | TaskCreate/TaskUpdate/TaskList | ✅ YES |
+| Component     | Their Approach            | Our Approach                                        | Keep Ours? |
+| ------------- | ------------------------- | --------------------------------------------------- | ---------- |
+| Orchestration | None (prose only)         | master-orchestrator + Task() + workflow engine      | ✅ YES     |
+| Enforcement   | None (trust-based)        | 9 hooks (routing, creator, security, planner-first) | ✅ YES     |
+| Memory        | None (each session fresh) | learnings.md + decisions.md + issues.md             | ✅ YES     |
+| Search        | Grep only                 | Semantic + structural + ripgrep (95% accuracy)      | ✅ YES     |
+| Task tracking | None (implicit)           | TaskCreate/TaskUpdate/TaskList                      | ✅ YES     |
 
 **Net Result:**
+
 - **15-20% simpler** in agent definitions (where developers touch code)
 - **0% simpler** in orchestration (where infrastructure runs)
 - **Best of both worlds:** Ease of use + Enterprise capability
@@ -708,6 +775,7 @@ You are an expert developer. Use TDD for all features.
 **Concern:** Prose allows nuance; bullets force oversimplification.
 
 **Mitigation:**
+
 - Keep prose intro paragraph (1-2 sentences)
 - Use bullets for actionable steps only
 - Add "Skills" section for detailed explanations
@@ -718,6 +786,7 @@ You are an expert developer. Use TDD for all features.
 **Concern:** 49 agents × ~5 cross-references each = 245 references to update.
 
 **Mitigation:**
+
 - Write migration script: `node .claude/tools/cli/migrate-agent-categories.cjs`
 - Script updates:
   - File paths in agent-registry.json
@@ -731,6 +800,7 @@ You are an expert developer. Use TDD for all features.
 **Concern:** Two docs → one gets outdated.
 
 **Mitigation:**
+
 - CLAUDE-QUICK.md is **extract only** (no new content)
 - Add CI check: `node .claude/tools/cli/validate-docs-sync.cjs`
 - CI fails if CLAUDE-QUICK sections drift from CLAUDE.md
@@ -782,11 +852,13 @@ You are an expert developer. Use TDD for all features.
 The awesome-claude-code-subagents repository is **95% simpler** but also **90% less capable**. Their simplicity comes from **not having** orchestration, enforcement, memory, or advanced search—not from doing these things better.
 
 **Adopt their strengths:**
+
 - Agent definition format (checklists > prose)
 - Category organization (numbered prefixes)
 - Quick start guide (100 lines vs 2000)
 
 **Keep our strengths:**
+
 - Orchestration (executable workflows)
 - Enforcement (safety guardrails)
 - Memory (cross-session learning)
@@ -795,6 +867,7 @@ The awesome-claude-code-subagents repository is **95% simpler** but also **90% l
 **Result:** 15-20% simpler for developers (agent creation) while keeping 100% of enterprise capability (orchestration, enforcement, memory, search).
 
 **Next Steps:**
+
 1. Review this analysis with team
 2. Approve Tier 1-3 adoption plan
 3. Execute over 5-6 days
@@ -807,6 +880,7 @@ The awesome-claude-code-subagents repository is **95% simpler** but also **90% l
 ### A. Sample Agent Before/After
 
 **Before (developer.md - 387 lines):**
+
 ```yaml
 ---
 name: developer
@@ -846,6 +920,7 @@ After completing: Record patterns in learnings.md
 ```
 
 **After (developer.md - 231 lines, 40% shorter):**
+
 ```yaml
 ---
 name: developer
@@ -889,6 +964,7 @@ You are an expert software developer. Use TDD for all feature work. Search code 
 ```
 
 **Improvements:**
+
 - 40% shorter (387 → 231 lines)
 - Checklist format (7 bullets vs 5 paragraphs)
 - Scannable sections (Search Tools, Skills, When Starting, When Completing)
@@ -897,36 +973,36 @@ You are an expert software developer. Use TDD for all feature work. Search code 
 
 ### B. External Repository Statistics
 
-| Metric | Count |
-|--------|-------|
-| Total agents | 126 |
-| Total files | 162 |
-| Categories | 10 |
-| CLAUDE.md length | 72 lines |
-| Average agent length | 150-300 lines |
+| Metric               | Count                                    |
+| -------------------- | ---------------------------------------- |
+| Total agents         | 126                                      |
+| Total files          | 162                                      |
+| Categories           | 10                                       |
+| CLAUDE.md length     | 72 lines                                 |
+| Average agent length | 150-300 lines                            |
 | Infrastructure files | 3 (README, CLAUDE.md, install-agents.sh) |
-| Enforcement hooks | 0 |
-| Memory system | 0 |
-| Task tracking | 0 |
-| Orchestration | 0 (prose only) |
-| Search tools | 1 (Grep) |
+| Enforcement hooks    | 0                                        |
+| Memory system        | 0                                        |
+| Task tracking        | 0                                        |
+| Orchestration        | 0 (prose only)                           |
+| Search tools         | 1 (Grep)                                 |
 
 ### C. agent-studio Statistics (Current)
 
-| Metric | Count |
-|--------|-------|
-| Total agents | 49 |
-| Total files | 4000+ |
-| Categories | 4 (core, domain, specialized, orchestrators) |
-| CLAUDE.md length | 2000+ lines |
-| @reference files | 14 (~5000 lines) |
-| Average agent length | 200-400 lines |
+| Metric               | Count                                               |
+| -------------------- | --------------------------------------------------- |
+| Total agents         | 49                                                  |
+| Total files          | 4000+                                               |
+| Categories           | 4 (core, domain, specialized, orchestrators)        |
+| CLAUDE.md length     | 2000+ lines                                         |
+| @reference files     | 14 (~5000 lines)                                    |
+| Average agent length | 200-400 lines                                       |
 | Infrastructure files | 200+ (.claude/hooks/, .claude/lib/, .claude/tools/) |
-| Enforcement hooks | 60+ |
-| Memory system | 1 (learnings, decisions, issues, named memory) |
-| Task tracking | 1 (TaskCreate/TaskUpdate/TaskList) |
-| Orchestration | 1 (master-orchestrator + workflow engine) |
-| Search tools | 3 (semantic, structural, ripgrep) |
+| Enforcement hooks    | 60+                                                 |
+| Memory system        | 1 (learnings, decisions, issues, named memory)      |
+| Task tracking        | 1 (TaskCreate/TaskUpdate/TaskList)                  |
+| Orchestration        | 1 (master-orchestrator + workflow engine)           |
+| Search tools         | 3 (semantic, structural, ripgrep)                   |
 
 ---
 

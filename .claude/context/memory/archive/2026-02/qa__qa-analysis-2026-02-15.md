@@ -21,6 +21,7 @@
 ### Test Coverage Status
 
 **Strengths:**
+
 - ✅ 366 test files covering agents, hooks, lib modules, and integration tests
 - ✅ IEEE 1028 quality checklist patterns verified (planner.test.cjs)
 - ✅ Scoring tests (completeness, quality, consistency) all passing
@@ -28,6 +29,7 @@
 - ✅ Comprehensive adaptive learning test suite (70+ tests)
 
 **Gaps Identified:**
+
 1. **Hook Coverage Gap (29.9% untested)**
    - 137 production hooks vs 96 test files
    - **41 hooks missing test coverage**
@@ -53,15 +55,18 @@
 **Finding:** Multiple unsafe `JSON.parse()` calls without error handling
 
 **Evidence from learnings.md:**
+
 - "76% unprotected JSON.parse calls (68 occurrences, 36 files)"
 - "3 CRITICAL security findings; nested prototype pollution in safe-json.cjs"
 
 **Risk:**
+
 - Malformed JSON crashes entire hook/process
 - Prototype pollution vectors (`__proto__`, `constructor`, `prototype`)
 - Privilege escalation attacks possible
 
 **Test Gap:**
+
 ```javascript
 // UNTESTED: Malicious JSON payloads
 const maliciousPayloads = [
@@ -74,11 +79,13 @@ const maliciousPayloads = [
 ```
 
 **Remediation (from learnings.md):**
+
 - Migrate to `safeParseJSON()` utility (`.claude/lib/utils/safe-json.cjs`)
 - Add ESLint rule blocking raw `JSON.parse()` in production code
 - 3-phase migration: fallback → strict enforcement → lint prevention
 
 **Missing Tests:**
+
 - ❌ Malicious JSON payload test suite
 - ❌ Prototype pollution prevention tests
 - ❌ Hook crash recovery tests (invalid JSON in stdin)
@@ -90,11 +97,13 @@ const maliciousPayloads = [
 **Finding:** `path.relative()` returns backslashes on Windows, breaks glob patterns
 
 **Evidence from learnings.md:**
+
 - "`path.relative()` returns backslash paths on Windows (`node_modules\foo`)"
 - "Glob patterns use forward slashes (`**/node_modules/**`)"
 - "`[^/]*` in regex won't block `\` - either normalize paths or use `[^/\\]*`"
 
 **Code Review:**
+
 ```javascript
 // .claude/lib/utils/platform.cjs has normalization
 function bashPath(windowsPath) {
@@ -103,12 +112,14 @@ function bashPath(windowsPath) {
 ```
 
 **Test Gap:**
+
 - ✅ Unit test for `bashPath()` likely exists
 - ❌ Integration test missing: actual Windows file operations with backslashes
 - ❌ Glob pattern matching with Windows paths not tested
 - ❌ Hook stdin path handling on Windows not tested
 
 **Reproduction Scenario (untested):**
+
 ```javascript
 // Scenario: Hook receives Windows path via stdin
 // Input: { path: "C:\\dev\\projects\\agent-studio\\file.js" }
@@ -117,6 +128,7 @@ function bashPath(windowsPath) {
 ```
 
 **Missing Tests:**
+
 - ❌ Windows path normalization end-to-end tests
 - ❌ Hook stdin path handling cross-platform tests
 - ❌ Glob pattern matching with backslash paths
@@ -128,10 +140,12 @@ function bashPath(windowsPath) {
 **Finding:** Production code has insufficient error boundary testing
 
 **Evidence from search:**
+
 - Error handling patterns found in hooks: error-tracker.cjs, bash-command-validator.cjs
 - But systematic error boundary testing not present
 
 **Gaps:**
+
 1. **Hook stdin parsing failures**
    - No tests for malformed hook stdin JSON
    - No tests for missing required fields in hook input
@@ -148,6 +162,7 @@ function bashPath(windowsPath) {
    - No tests for stdout/stderr buffer overflow
 
 **Missing Test Patterns:**
+
 ```javascript
 // EXAMPLE: Untested error scenarios
 
@@ -181,11 +196,13 @@ describe('File system error boundaries', () => {
 **Pattern Analysis from search results:**
 
 **Good:**
+
 - `run-workflow-tests.cjs` has comprehensive test framework
 - `failure-scenarios.cjs` exists for negative testing
 - `integration-test-suite.cjs` covers multi-component interactions
 
 **Gaps:**
+
 1. **Boundary value testing insufficient**
    - Large file handling (>1MB, >10MB) not tested
    - Long path handling (>260 chars on Windows) not tested
@@ -206,6 +223,7 @@ describe('File system error boundaries', () => {
 ### 3.2 Stale/Dead Tests (POTENTIAL)
 
 **Detection Method:**
+
 ```bash
 # Tests that reference removed files/functions
 # Run after code refactors to find orphaned tests
@@ -213,11 +231,13 @@ pnpm search:code "test.*import.*from.*deprecated"
 ```
 
 **Red Flags to Investigate:**
+
 1. Tests in `tests/_archive/` - are these still run?
 2. Tests referencing `ml` module (archived per learnings.md)
 3. Tests for removed hooks (10 active hooks unregistered per learnings.md)
 
 **Validation Needed:**
+
 - ❌ Verify all test imports resolve to existing modules
 - ❌ Check if archived tests are excluded from `pnpm test`
 - ❌ Validate test assertions reference current behavior (not legacy)
@@ -231,9 +251,11 @@ pnpm search:code "test.*import.*from.*deprecated"
 ### 4.1 Reserved Name Handling
 
 **Production Code (from learnings.md):**
+
 - Forbidden locations include reserved names: `nul`, `con`, `prn`, `aux`, `com1`-`com9`, `lpt1`-`lpt9`
 
 **Test Gap:**
+
 ```javascript
 // UNTESTED: Windows reserved name creation
 describe('Windows reserved names', () => {
@@ -248,6 +270,7 @@ describe('Windows reserved names', () => {
 ```
 
 **Risk:**
+
 - Creating `nul` file on Windows → silent data loss (writes to null device)
 - Creating `con` file → hangs waiting for console input
 - No automated tests verify hook guards prevent this
@@ -257,12 +280,14 @@ describe('Windows reserved names', () => {
 ### 4.2 Backslash Escape Handling
 
 **Production Code:**
+
 ```javascript
 // platform.cjs has backslash conversion
 // But Git Bash escape handling not tested
 ```
 
 **Test Gap:**
+
 ```javascript
 // UNTESTED: Git Bash backslash escaping
 describe('Git Bash path handling', () => {
@@ -281,10 +306,12 @@ describe('Git Bash path handling', () => {
 ### 4.3 WindowsHide Compliance
 
 **Production Code (from learnings.md):**
+
 - "Added `windowsHide: true` to 18+ spawn/spawnSync calls"
 - "Windows security requirement - prevents console windows from flashing"
 
 **Test Gap:**
+
 ```javascript
 // PARTIAL: windows-hide-compliance.test.cjs exists
 // But no runtime verification tests
@@ -312,6 +339,7 @@ describe('WindowsHide runtime behavior', () => {
 **Coverage Gap: 41 hooks untested (29.9%)**
 
 **High-Risk Untested Hooks (estimated):**
+
 1. **Routing Guards** (security-critical)
    - routing-guard.cjs (2599 lines, complex logic)
    - unified-creator-guard.cjs (creator workflow enforcement)
@@ -328,6 +356,7 @@ describe('WindowsHide runtime behavior', () => {
    - artifact-scoring-ledger-hook.cjs (scoring/remediation automation)
 
 **Recommendation:**
+
 ```bash
 # Generate hook coverage report
 for hook in .claude/hooks/**/*.cjs; do
@@ -347,11 +376,13 @@ done
 **Test Coverage:** Partial (need accurate count)
 
 **Known Gaps (from search results):**
+
 1. `.claude/lib/utils/platform.cjs` - partial coverage (unit tests exist, integration missing)
 2. `.claude/lib/memory/` modules - memory subsystem undertested
 3. `.claude/lib/routing/` modules - routing logic complex but test coverage unknown
 
 **High-Priority Untested Modules:**
+
 1. **Memory Subsystem**
    - memory-manager.cjs (hierarchical tier management)
    - memory-rotator.cjs (HOT/WARM/COLD rotation logic)
@@ -381,6 +412,7 @@ pnpm lint
 ```
 
 **ESLint Configuration:**
+
 - Max warnings: 0 (strict enforcement)
 - Extensions: .js, .cjs, .mjs
 
@@ -393,6 +425,7 @@ pnpm lint
 **Status:** ⏳ **PENDING** (background task b6baeed)
 
 **Expected Behavior:**
+
 ```bash
 pnpm format
 # Should output: (empty) if no changes needed
@@ -402,6 +435,7 @@ pnpm format
 **Quality Gate:** ⚠️ **BLOCKING** - must verify before completion
 
 **Action Required:**
+
 ```bash
 # Check background task result
 cat C:\Users\oimir\AppData\Local\Temp\claude\C--dev-projects-agent-studio\tasks\b6baeed.output
@@ -414,6 +448,7 @@ cat C:\Users\oimir\AppData\Local\Temp\claude\C--dev-projects-agent-studio\tasks\
 ### 7.1 Recent Changes (from learnings.md)
 
 **High-Risk Recent Work:**
+
 1. **Routing Guard Refactor** (2026-02-14)
    - Module decomposition planned: routing-guard.cjs (2599L) → <1000L per file
    - Chain-of-responsibility pattern refactor
@@ -430,6 +465,7 @@ cat C:\Users\oimir\AppData\Local\Temp\claude\C--dev-projects-agent-studio\tasks\
    - Risk: Rotation logic bugs cause memory loss
 
 **Regression Test Requirements:**
+
 ```javascript
 // RED-GREEN cycle for each migration
 
@@ -465,6 +501,7 @@ describe('Memory rotation regression', () => {
 ### 7.2 Fragile Tests (Potential Flakiness)
 
 **Indicators of Flaky Tests:**
+
 1. **Time-dependent tests**
    - TTL timing tests (mentioned in learnings.md as non-blocking failures)
    - Timeout tests (async race conditions)
@@ -478,11 +515,13 @@ describe('Memory rotation regression', () => {
    - Process spawning (timing-dependent)
 
 **Learnings from learnings.md:**
+
 - "98 new tests, 3 failures (non-blocking workflow enforcement)"
 - "99.3% pass rate is deployment-ready, perfect is enemy of good"
 - "QA correctly classified failures as non-blocking (workflow enforcement, TTL timing)"
 
 **Recommendation:**
+
 - Keep 99.3%+ pass rate as deployment threshold
 - Document known flaky tests in `.claude/context/memory/issues.md`
 - Add retry logic for timing-sensitive tests
@@ -518,6 +557,7 @@ describe('Memory rotation regression', () => {
 **Boundary Conditions:**
 
 1. **Large File Handling**
+
    ```javascript
    describe('Large file operations', () => {
      it('should handle files >1MB', () => {});
@@ -527,6 +567,7 @@ describe('Memory rotation regression', () => {
    ```
 
 2. **Long Path Handling (Windows)**
+
    ```javascript
    describe('Long path handling', () => {
      it('should handle paths >260 chars on Windows', () => {});
@@ -549,6 +590,7 @@ describe('Memory rotation regression', () => {
 **Error Injection:**
 
 1. **File System Errors**
+
    ```javascript
    describe('File system error injection', () => {
      it('should handle ENOENT gracefully', () => {});
@@ -559,6 +601,7 @@ describe('Memory rotation regression', () => {
    ```
 
 2. **Network Errors** (if applicable)
+
    ```javascript
    describe('Network error injection', () => {
      it('should handle ECONNREFUSED', () => {});
@@ -585,7 +628,9 @@ describe('Memory rotation regression', () => {
 **Current Gap:** No Windows-specific CI pipeline detected
 
 **Requirements:**
+
 1. **GitHub Actions Windows Runner**
+
    ```yaml
    # .github/workflows/test-windows.yml
    jobs:
@@ -599,6 +644,7 @@ describe('Memory rotation regression', () => {
    ```
 
 2. **Platform-Specific Test Suite**
+
    ```bash
    # Run only on Windows
    pnpm test:windows
@@ -617,6 +663,7 @@ describe('Memory rotation regression', () => {
 **Required Test Coverage:**
 
 1. **Path Normalization**
+
    ```javascript
    describe('Windows path normalization (Windows only)', () => {
      before(function () {
@@ -630,6 +677,7 @@ describe('Memory rotation regression', () => {
    ```
 
 2. **Reserved Name Blocking**
+
    ```javascript
    describe('Windows reserved names (Windows only)', () => {
      before(function () {
@@ -644,6 +692,7 @@ describe('Memory rotation regression', () => {
    ```
 
 3. **WindowsHide Behavior**
+
    ```javascript
    describe('WindowsHide subprocess behavior (Windows only)', () => {
      before(function () {
@@ -662,6 +711,7 @@ describe('Memory rotation regression', () => {
 ### 10.1 Immediate Actions (P0 - Week 1)
 
 1. **Run Format Check**
+
    ```bash
    cat C:\Users\oimir\AppData\Local\Temp\claude\C--dev-projects-agent-studio\tasks\b6baeed.output
    pnpm format
@@ -669,6 +719,7 @@ describe('Memory rotation regression', () => {
    ```
 
 2. **Hook Coverage Gap**
+
    ```bash
    # Generate hook coverage report
    node .claude/tools/analysis/hook-coverage-report.cjs
@@ -689,6 +740,7 @@ describe('Memory rotation regression', () => {
 ### 10.2 Short-Term Actions (P1 - Week 2-3)
 
 1. **Windows Path Testing**
+
    ```bash
    # Create Windows-specific test suite
    node .claude/tools/cli/create-test-suite.cjs --platform windows
@@ -696,6 +748,7 @@ describe('Memory rotation regression', () => {
    ```
 
 2. **Lib Module Coverage**
+
    ```bash
    # Generate lib coverage report
    node .claude/tools/analysis/lib-coverage-report.cjs
@@ -735,29 +788,29 @@ describe('Memory rotation regression', () => {
 
 ### 11.1 Current Metrics
 
-| Metric                      | Value     | Target | Status |
-| --------------------------- | --------- | ------ | ------ |
-| Test Pass Rate              | ~99.3%    | 99%+   | ✅      |
-| Lint Errors                 | 0         | 0      | ✅      |
-| Lint Warnings               | 0         | 0      | ✅      |
-| Hook Test Coverage          | ~70.1%    | 90%+   | ⚠️      |
-| Lib Test Coverage           | Unknown   | 80%+   | ⚠️      |
-| Windows-Specific Tests      | Partial   | Full   | ❌      |
-| JSON.parse Safety           | 24%       | 100%   | ❌      |
-| Error Boundary Tests        | Partial   | Full   | ⚠️      |
+| Metric                 | Value   | Target | Status |
+| ---------------------- | ------- | ------ | ------ |
+| Test Pass Rate         | ~99.3%  | 99%+   | ✅     |
+| Lint Errors            | 0       | 0      | ✅     |
+| Lint Warnings          | 0       | 0      | ✅     |
+| Hook Test Coverage     | ~70.1%  | 90%+   | ⚠️     |
+| Lib Test Coverage      | Unknown | 80%+   | ⚠️     |
+| Windows-Specific Tests | Partial | Full   | ❌     |
+| JSON.parse Safety      | 24%     | 100%   | ❌     |
+| Error Boundary Tests   | Partial | Full   | ⚠️     |
 
 ---
 
 ### 11.2 Target Metrics (Post-Remediation)
 
-| Metric                      | Current | Target | Timeline |
-| --------------------------- | ------- | ------ | -------- |
-| Test Pass Rate              | 99.3%   | 99.5%+ | Week 1   |
-| Hook Test Coverage          | 70.1%   | 90%+   | Week 3   |
-| Lib Test Coverage           | Unknown | 80%+   | Week 4   |
-| Windows-Specific Tests      | Partial | Full   | Week 2   |
-| JSON.parse Safety           | 24%     | 100%   | Week 1   |
-| Error Boundary Tests        | Partial | 80%+   | Week 3   |
+| Metric                 | Current | Target | Timeline |
+| ---------------------- | ------- | ------ | -------- |
+| Test Pass Rate         | 99.3%   | 99.5%+ | Week 1   |
+| Hook Test Coverage     | 70.1%   | 90%+   | Week 3   |
+| Lib Test Coverage      | Unknown | 80%+   | Week 4   |
+| Windows-Specific Tests | Partial | Full   | Week 2   |
+| JSON.parse Safety      | 24%     | 100%   | Week 1   |
+| Error Boundary Tests   | Partial | 80%+   | Week 3   |
 
 ---
 
@@ -817,6 +870,7 @@ describe('Memory rotation regression', () => {
 **Overall Assessment: 7.8/10 (Good - Production Ready with Minor Gaps)**
 
 **Strengths:**
+
 - ✅ Excellent test pass rate (99.3%+)
 - ✅ Clean lint status (0 errors, 0 warnings)
 - ✅ Comprehensive test infrastructure (366 test files)
@@ -824,6 +878,7 @@ describe('Memory rotation regression', () => {
 - ✅ Historical quality improvements evident (learnings.md shows continuous improvement)
 
 **Weaknesses:**
+
 - ❌ Hook coverage gap (29.9% untested)
 - ❌ JSON.parse vulnerability (76% unprotected)
 - ❌ Windows-specific testing incomplete
@@ -831,11 +886,13 @@ describe('Memory rotation regression', () => {
 - ❌ Lib module coverage unknown
 
 **Deployment Readiness:**
+
 - **Current State:** Ready for deployment with risk acknowledgment
 - **Recommended State:** Fix P0 issues before deployment
 - **Timeline:** 1 week to address P0, 3-4 weeks for P1
 
 **Next Steps:**
+
 1. Verify format check (background task b6baeed)
 2. Run full test suite: `pnpm test`
 3. Generate hook coverage report
@@ -849,6 +906,7 @@ describe('Memory rotation regression', () => {
 **Total Test Files:** 366
 
 **Distribution:**
+
 - `tests/agents/` - Agent tests
 - `tests/hooks/` - Hook tests (96 files)
 - `tests/lib/` - Lib module tests
@@ -858,6 +916,7 @@ describe('Memory rotation regression', () => {
 - `tests/_archive/` - Archived tests (verify exclusion)
 
 **Production Files:**
+
 - `.claude/hooks/` - 137 hook files
 - `.claude/lib/` - Estimated 150+ module files
 - `.claude/agents/` - 59 agents (per CLAUDE.md)
@@ -892,18 +951,21 @@ describe('Memory rotation regression', () => {
 ## Appendix C: Memory Update Summary
 
 **Learnings Added:**
+
 - QA analysis pattern: systematic test gap identification
 - Hook coverage gap quantification (29.9% untested)
 - Windows path testing requirements
 - JSON.parse vulnerability remediation pattern
 
 **Issues Added:**
+
 - 41 untested hooks (security risk)
 - JSON.parse vulnerability (76% unprotected)
 - Windows path integration tests missing
 - Format check pending (blocking gate)
 
 **Decisions Recorded:**
+
 - Target metrics: 90%+ hook coverage, 80%+ lib coverage
 - Platform-specific testing required (Windows CI runner)
 - Quality gate enforcement: lint + format + tests all blocking

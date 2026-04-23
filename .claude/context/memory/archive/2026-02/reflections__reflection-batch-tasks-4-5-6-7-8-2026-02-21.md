@@ -8,6 +8,7 @@
 **Partial Score**: Task 6 (07:38:33 entry) — 0.83 (PASS, partial data)
 **Data Quality**: INSUFFICIENT for tasks 4, 5, 6 (07:39:06), 7, 8 — all fallback summaries
 **Batch Timestamps**:
+
 - Task 4: 2026-02-21T07:19:41.642Z
 - Task 5: 2026-02-21T07:34:47.799Z
 - Task 6: 2026-02-21T07:39:06.040Z (parallel group A)
@@ -100,12 +101,12 @@ The inferred process-tightening work touches spawn templates and hooks (not cata
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|------|----------|-----------|
+| Item                                            | Decision         | Rationale                                                                                             |
+| ----------------------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------- |
 | Parallel spawn metadata loss (3rd confirmation) | RETAIN as gotcha | High evidence quality, recurring pattern, pre-completion-validation fix is unblocked by this evidence |
-| Process tightening pipeline patterns | RETAIN | High reuse value for future debug-log-driven planning sessions |
-| Commit checkpoint at 9-file threshold | RETAIN | ADR-2026-02-21-010 is already accepted; this confirms the 9-file numeric trigger |
-| Score withheld for all 5 tasks | RETAIN | Pattern evidence for P1 metadata issue |
+| Process tightening pipeline patterns            | RETAIN           | High reuse value for future debug-log-driven planning sessions                                        |
+| Commit checkpoint at 9-file threshold           | RETAIN           | ADR-2026-02-21-010 is already accepted; this confirms the 9-file numeric trigger                      |
+| Score withheld for all 5 tasks                  | RETAIN           | Pattern evidence for P1 metadata issue                                                                |
 
 **Compress**: None
 **Archive**: None
@@ -127,6 +128,7 @@ The inferred process-tightening work touches spawn templates and hooks (not cata
 ## REFLECTION RESULT: INSUFFICIENT_DATA
 
 For all 5 pending reflections (tasks 4, 5, 6, 7, 8 at 07:19-07:39 UTC):
+
 - Summary: fallback string only
 - filesModified: not provided
 - outputArtifacts: not provided

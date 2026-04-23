@@ -14,13 +14,13 @@
 
 ## Rubric Scores
 
-| Dimension | Score | Notes |
-|---|---|---|
-| Completeness | 0.92 | All hook files examined (routing-guard chain + pre-task-unified), gap analysis table, companion-check coverage, risk assessment, recommendations |
-| Accuracy | 0.95 | Concrete line numbers cited (pre-task-unified-core.cjs:299-306), exact function names, zero speculation — code-grounded |
-| Clarity | 0.88 | Clear headers, gap analysis table, verdict section; well-structured for decision-making |
-| Consistency | 0.90 | Follows existing audit report conventions; matches issues.md format already in use |
-| Actionability | 0.90 | Recommendations ranked immediate/enhancement/verification; P1→P2 downgrade with clear rationale |
+| Dimension     | Score | Notes                                                                                                                                            |
+| ------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Completeness  | 0.92  | All hook files examined (routing-guard chain + pre-task-unified), gap analysis table, companion-check coverage, risk assessment, recommendations |
+| Accuracy      | 0.95  | Concrete line numbers cited (pre-task-unified-core.cjs:299-306), exact function names, zero speculation — code-grounded                          |
+| Clarity       | 0.88  | Clear headers, gap analysis table, verdict section; well-structured for decision-making                                                          |
+| Consistency   | 0.90  | Follows existing audit report conventions; matches issues.md format already in use                                                               |
+| Actionability | 0.90  | Recommendations ranked immediate/enhancement/verification; P1→P2 downgrade with clear rationale                                                  |
 
 **Weighted Score**: 0.25×0.92 + 0.25×0.95 + 0.15×0.88 + 0.15×0.90 + 0.20×0.90 = **0.914 (EXCELLENT)**
 
@@ -41,7 +41,7 @@
 
 - Recommendations section could include a concrete test command to verify the depth enforcement works (e.g., "Set LOOP_DEPTH_LIMIT=2, spawn nested agents, verify block fires at depth 2")
 - The "distributed TaskGet-based mechanism" enhancement (Recommendation #3) could have estimated complexity/LOC to help with prioritization
-- No mention of whether spawn-trace-*.jsonl files were checked — confirms absence from documented design but does not confirm they were never written
+- No mention of whether spawn-trace-\*.jsonl files were checked — confirms absence from documented design but does not confirm they were never written
 
 ### Thorns (Issues)
 
@@ -53,7 +53,7 @@
 
 This task produced an audit report artifact (`.claude/context/reports/reflections/spawn-depth-audit-2026-02-21.md`). The artifact is a documentation artifact not tracked in artifact-graph.json (reports are not schema-tracked). Integration health check is not applicable for report artifacts.
 
-The *finding* in the report (SEC-ICE-002 downgraded to P2) is already reflected in issues.md. Integration complete.
+The _finding_ in the report (SEC-ICE-002 downgraded to P2) is already reflected in issues.md. Integration complete.
 
 **Integration Score**: N/A (report artifact, not in artifact-graph scope)
 
@@ -71,7 +71,7 @@ Subject: "routing-guard.cjs spawnDepth verified/fixed" — no creator/updater ke
 ### Pattern: Hook Documentation Accuracy as Security Control Property
 
 **Context**: SEC-ICE-002 audit (Task #3, 2026-02-21) — spawnDepth enforcement found in wrong hook
-**Pattern**: When a security control is documented as living in hook A but actually lives in hook B, the control's *existence* is confirmed but its *discoverability* is impaired. Future maintainers who read documentation will look for enforcement in routing-guard.cjs and find nothing, leading to false "paper control" conclusions. Documentation accuracy is itself a security property.
+**Pattern**: When a security control is documented as living in hook A but actually lives in hook B, the control's _existence_ is confirmed but its _discoverability_ is impaired. Future maintainers who read documentation will look for enforcement in routing-guard.cjs and find nothing, leading to false "paper control" conclusions. Documentation accuracy is itself a security property.
 **Evidence**: routing-guard.cjs audit found 0 spawnDepth references; pre-task-unified-core.cjs has full enforcement at lines 299-306.
 **Application**: After any hook refactor or module relocation, update all documentation references that name the hook as an enforcement location. Security ADRs, workflow documents, and @ENFORCEMENT_HOOKS.md must all agree with the actual file.
 **Anti-pattern**: Accepting "enforcement exists somewhere" as sufficient — discoverability and documentation accuracy matter for audit trails.
@@ -86,12 +86,12 @@ Subject: "routing-guard.cjs spawnDepth verified/fixed" — no creator/updater ke
 
 ## Memory Curation Decisions
 
-| Item | Decision | Rationale |
-|---|---|---|
-| "Hook documentation accuracy as security property" pattern | **Retain** | Novel framing, high reuse value — applicable to every hook relocation/refactor in the future |
-| "File-based vs distributed trace context for depth enforcement" pattern | **Retain** | Architectural decision criteria, directly applicable to future orchestration design work |
-| Spawn-depth-audit-2026-02-21.md full report | **Retain in reports/** | Already in correct location; high evidence quality for future compliance audits |
-| SEC-ICE-002 issues.md entry (P2 doc fix) | **Retain** | Already written correctly; P2 priority appropriate |
+| Item                                                                    | Decision               | Rationale                                                                                    |
+| ----------------------------------------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------- |
+| "Hook documentation accuracy as security property" pattern              | **Retain**             | Novel framing, high reuse value — applicable to every hook relocation/refactor in the future |
+| "File-based vs distributed trace context for depth enforcement" pattern | **Retain**             | Architectural decision criteria, directly applicable to future orchestration design work     |
+| Spawn-depth-audit-2026-02-21.md full report                             | **Retain in reports/** | Already in correct location; high evidence quality for future compliance audits              |
+| SEC-ICE-002 issues.md entry (P2 doc fix)                                | **Retain**             | Already written correctly; P2 priority appropriate                                           |
 
 ---
 

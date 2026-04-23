@@ -12,12 +12,8 @@ const path = require('path');
 
 const hook = require('../../.claude/hooks/validation/pre-completion-validation.cjs');
 
-const {
-  validatePlanSectionOrder,
-  isPlanFile,
-  enforcePlanSectionOrder,
-  CANONICAL_PLAN_SECTIONS,
-} = hook;
+const { validatePlanSectionOrder, isPlanFile, enforcePlanSectionOrder, CANONICAL_PLAN_SECTIONS } =
+  hook;
 
 // ---------------------------------------------------------------------------
 // Helpers

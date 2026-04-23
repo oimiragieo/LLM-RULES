@@ -38,7 +38,7 @@
 
 2. **Max-Lines Linting Violation (MEDIUM)**
    - **Spec**: ESLint config enforces max 500 lines per file
-   - **Implementation**: 
+   - **Implementation**:
      - `.claude/hooks/routing/pre-task-unified-core.cjs`: 581 lines (81 over limit)
      - `tests/hooks/pre-tool-unified-read-safety.test.cjs`: 562 lines (62 over limit)
    - **Risk**: Code maintainability degradation; violates consistency standards
@@ -74,24 +74,26 @@
 - **File**: `.claude/hooks/routing/pre-tool-unified.read-safety.cjs`
 - **Lines**: 111, 209
 - **Issue**: Raw `JSON.parse()` used instead of `safeParseJSON()` from pre-tool-unified.shared.cjs
-- **Why it matters**: 
+- **Why it matters**:
   - Malformed JSON crashes hook, blocking all Tool execution for session
   - `__proto__` attacks can escalate privileges (OWASP ASI06)
   - Violates established pattern used in 4+ other hooks
 - **Remediation**:
+
   ```javascript
   // Line 111 — BEFORE:
   const parsed = JSON.parse(fs.readFileSync(TOOL_GOVERNANCE_STATE_PATH, 'utf8'));
-  
+
   // Line 111 — AFTER:
   const { safeParseJSON } = require('./pre-tool-unified.shared.cjs');
   const parsed = safeParseJSON(fs.readFileSync(TOOL_GOVERNANCE_STATE_PATH, 'utf8'), null);
   if (!parsed || typeof parsed !== 'object') {
     return { sessions: {} };
   }
-  
+
   // Repeat for line 209 (TOKEN_SLO_STATE_PATH)
   ```
+
 - **Impact**: Blocks merge; security policy violation
 
 **[CR-002] Logical Correctness: Core Memory Read Window Can False-Positive Block**
@@ -114,7 +116,7 @@
 
 **[CR-003] Max-Lines Linting Violations**
 
-- **Files**: 
+- **Files**:
   - `.claude/hooks/routing/pre-task-unified-core.cjs` (581 lines, 81 over)
   - `tests/hooks/pre-tool-unified-read-safety.test.cjs` (562 lines, 62 over)
 - **Impact**: ESLint fails in CI; violates consistency standard (max 500 lines)
@@ -133,12 +135,12 @@
 
 ### Artifacts Created/Modified
 
-| Artifact | Type | Status | Integration |
-|----------|------|--------|-------------|
-| pre-task-unified-core.cjs | Hook | 🟡 | Registered ✓; Testing ✓; **Critical fix needed** ✗ |
-| pre-tool-unified.guardrails.cjs | Hook | ✅ | Safe parsing ✓; Tests ✓ |
-| pre-tool-unified.read-safety.cjs | Hook | 🔴 | **Raw JSON.parse violation** ✗ |
-| memory-protocol.md | Docs | ✅ | Formatting only ✓ |
+| Artifact                         | Type | Status | Integration                                        |
+| -------------------------------- | ---- | ------ | -------------------------------------------------- |
+| pre-task-unified-core.cjs        | Hook | 🟡     | Registered ✓; Testing ✓; **Critical fix needed** ✗ |
+| pre-tool-unified.guardrails.cjs  | Hook | ✅     | Safe parsing ✓; Tests ✓                            |
+| pre-tool-unified.read-safety.cjs | Hook | 🔴     | **Raw JSON.parse violation** ✗                     |
+| memory-protocol.md               | Docs | ✅     | Formatting only ✓                                  |
 
 ---
 
@@ -149,9 +151,8 @@
 **Reasoning**: Raw JSON.parse() in production hooks creates prototype pollution vulnerability (OWASP ASI06). Violates established pattern (safeParseJSON in 4+ other hooks). Fix is trivial (2-line change, 5-min effort) but must be applied before merge.
 
 **Blocking Issues**:
+
 1. CR-001 (Prototype Pollution) — CRITICAL, must fix
 2. CR-003 (Max-Lines) — MEDIUM, fails linting gate
 
-**Non-Blocking**:
-3. CR-002 (Logical Correctness) — MEDIUM, recommend fixing before deploy
-4. CR-004 (Silent Errors) — MINOR, nice-to-have
+**Non-Blocking**: 3. CR-002 (Logical Correctness) — MEDIUM, recommend fixing before deploy 4. CR-004 (Silent Errors) — MINOR, nice-to-have

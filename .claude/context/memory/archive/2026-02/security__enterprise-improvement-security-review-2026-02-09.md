@@ -16,14 +16,14 @@ The design proposes 6 phases of purely additive changes: config toggles, documen
 
 **STRIDE Summary (all threats map to NEGLIGIBLE):**
 
-| Threat | Applicability | Rationale |
-|--------|--------------|-----------|
-| Spoofing | N/A | No auth changes |
-| Tampering | N/A | No data persistence or input handling changes |
-| Repudiation | N/A | No audit log changes |
-| Information Disclosure | N/A | No secrets, PII, or sensitive data involved |
-| Denial of Service | NEGLIGIBLE | Hooks are non-blocking, exit 0 always |
-| Elevation of Privilege | N/A | No access control changes |
+| Threat                 | Applicability | Rationale                                     |
+| ---------------------- | ------------- | --------------------------------------------- |
+| Spoofing               | N/A           | No auth changes                               |
+| Tampering              | N/A           | No data persistence or input handling changes |
+| Repudiation            | N/A           | No audit log changes                          |
+| Information Disclosure | N/A           | No secrets, PII, or sensitive data involved   |
+| Denial of Service      | NEGLIGIBLE    | Hooks are non-blocking, exit 0 always         |
+| Elevation of Privilege | N/A           | No access control changes                     |
 
 ---
 
@@ -44,11 +44,13 @@ The design correctly specifies using the `skill-creator` workflow (not direct fi
 Two new hooks are proposed:
 
 **6A: `hybrid-search-advisor.cjs`** (PreToolUse Grep, non-blocking)
+
 - Exit 0 always, stderr-only output -- correct protocol
 - No file writes, no state mutation -- safe
 - Config-gated via `SEARCH_ADVISOR_HOOK=warn|off` -- proper feature flag
 
 **6B: `compression-reminder-check.cjs`** (PreToolUse broad, non-blocking)
+
 - Exit 0 always -- correct protocol
 - Writes `compression-reminder.txt` to runtime directory -- acceptable
 - Uses existing `auto_compression` config -- no new config surface
@@ -64,18 +66,18 @@ Two new hooks are proposed:
 
 ## 3. Security Checklist (IEEE 1028 Base + Contextual)
 
-| # | Item | Status | Notes |
-|---|------|--------|-------|
-| 1 | No hardcoded secrets or credentials | PASS | All changes are documentation/config |
-| 2 | No SQL injection risk | N/A | No database interaction |
-| 3 | No XSS risk | N/A | No web rendering |
-| 4 | No external data handling | PASS | No network calls introduced |
-| 5 | Input validation on hooks | PASS | Hooks read stdin JSON, existing protocol |
-| 6 | OWASP Top 10 review | PASS | No applicable vectors |
-| 7 | [AI-GENERATED] Hook protocol compliance | CONDITIONAL | Must verify exit 0 + fail-open in implementation |
-| 8 | [AI-GENERATED] Path traversal in PRD output | PASS | Covered by unified-pre-write-hook.cjs |
-| 9 | [AI-GENERATED] Config toggle safety | PASS | Activates existing tested code path |
-| 10 | [AI-GENERATED] Settings.json cache behavior | PASS | Documented; hooks require restart |
+| #   | Item                                        | Status      | Notes                                            |
+| --- | ------------------------------------------- | ----------- | ------------------------------------------------ |
+| 1   | No hardcoded secrets or credentials         | PASS        | All changes are documentation/config             |
+| 2   | No SQL injection risk                       | N/A         | No database interaction                          |
+| 3   | No XSS risk                                 | N/A         | No web rendering                                 |
+| 4   | No external data handling                   | PASS        | No network calls introduced                      |
+| 5   | Input validation on hooks                   | PASS        | Hooks read stdin JSON, existing protocol         |
+| 6   | OWASP Top 10 review                         | PASS        | No applicable vectors                            |
+| 7   | [AI-GENERATED] Hook protocol compliance     | CONDITIONAL | Must verify exit 0 + fail-open in implementation |
+| 8   | [AI-GENERATED] Path traversal in PRD output | PASS        | Covered by unified-pre-write-hook.cjs            |
+| 9   | [AI-GENERATED] Config toggle safety         | PASS        | Activates existing tested code path              |
+| 10  | [AI-GENERATED] Settings.json cache behavior | PASS        | Documented; hooks require restart                |
 
 ---
 

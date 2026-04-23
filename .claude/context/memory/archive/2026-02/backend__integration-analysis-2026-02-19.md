@@ -28,21 +28,23 @@ were identified and are documented below.
 
 ### Integration Status
 
-| Check | Status | Details |
-|-------|--------|---------|
-| Catalog entry | PASS | Entry exists in "Data & Database" section |
-| Agent assignment | PASS | `ai-ml-specialist` (domain), `developer`, `researcher`, `architect`, `security-architect` all assigned |
-| Rules file | PASS | `.claude/rules/ai-ml-expert.md` exists |
-| Artifact graph node | UPDATED | Node updated with `integrationStatus: "integrated"`, version 2.0.0, agent list |
+| Check               | Status  | Details                                                                                                |
+| ------------------- | ------- | ------------------------------------------------------------------------------------------------------ |
+| Catalog entry       | PASS    | Entry exists in "Data & Database" section                                                              |
+| Agent assignment    | PASS    | `ai-ml-specialist` (domain), `developer`, `researcher`, `architect`, `security-architect` all assigned |
+| Rules file          | PASS    | `.claude/rules/ai-ml-expert.md` exists                                                                 |
+| Artifact graph node | UPDATED | Node updated with `integrationStatus: "integrated"`, version 2.0.0, agent list                         |
 
 ### Gaps Found
 
 **P2 — Should-Have: Catalog primary agent mismatch**
 
 The skill catalog entry under "Data & Database" lists `ai-ml-pro` as the primary agent:
+
 ```
 | `ai-ml-expert` | PyTorch, LangChain, LLM integration | ai-ml-pro |
 ```
+
 However, no `ai-ml-pro.md` agent exists in `.claude/agents/`. The actual consumer agent is
 `ai-ml-specialist` (`.claude/agents/domain/ai-ml-specialist.md`). This mismatch will cause
 confusion for routing discovery.
@@ -53,15 +55,18 @@ instead of `ai-ml-pro` as the primary agent.
 ### Companion Matrix Analysis
 
 **Required Companions (PRESENT):**
+
 - [x] agent:ai-ml-specialist (domain agent consumer)
 - [x] rules file (.claude/rules/ai-ml-expert.md)
 - [x] catalog entry
 
 **Recommended Companions (PRESENT):**
+
 - [x] Related skill: `python-backend-expert` (cross-referenced in SKILL.md)
 - [x] Related skill: `debugging` (cross-referenced in SKILL.md)
 
 **Optional Companions (MISSING — noted only):**
+
 - [ ] Workflow reference in a domain-specific ML workflow file
 
 ---
@@ -74,12 +79,12 @@ instead of `ai-ml-pro` as the primary agent.
 
 ### Integration Status
 
-| Check | Status | Details |
-|-------|--------|---------|
-| Catalog entry | PASS | Entry exists in "Restored Compatibility Skills" section |
-| Agent assignment | PASS | `rust-pro` (domain agent, skills list includes `rust-expert`), plus `developer`, `code-reviewer`, `qa` |
-| Rules file | GAP | No `.claude/rules/rust-expert.md` exists |
-| Artifact graph node | CREATED | Node added (was missing from graph) with `integrationStatus: "integrated"` |
+| Check               | Status  | Details                                                                                                |
+| ------------------- | ------- | ------------------------------------------------------------------------------------------------------ |
+| Catalog entry       | PASS    | Entry exists in "Restored Compatibility Skills" section                                                |
+| Agent assignment    | PASS    | `rust-pro` (domain agent, skills list includes `rust-expert`), plus `developer`, `code-reviewer`, `qa` |
+| Rules file          | GAP     | No `.claude/rules/rust-expert.md` exists                                                               |
+| Artifact graph node | CREATED | Node added (was missing from graph) with `integrationStatus: "integrated"`                             |
 
 ### Gaps Found
 
@@ -99,6 +104,7 @@ primary "Languages" table. Agents and routing discovery that scan the Languages 
 find `rust-expert` there.
 
 **Recommendation:** Add a `rust-expert` row to the primary "Languages" table:
+
 ```
 | `rust-expert` | Rust ownership, async Tokio, error handling, performance | rust-pro |
 ```
@@ -106,13 +112,16 @@ find `rust-expert` there.
 ### Companion Matrix Analysis
 
 **Required Companions (PRESENT):**
+
 - [x] agent:rust-pro (domain agent consumer, skills list confirmed)
 - [x] catalog entry (secondary section)
 
 **Required Companions (MISSING):**
+
 - [ ] `.claude/rules/rust-expert.md` — should-have for runtime injection (P2)
 
 **Recommended Companions (PRESENT):**
+
 - [x] Related skills: `tdd`, `debugging`, `code-quality-expert`, `build-tools-expert` all in rust-pro's skill list
 
 ---
@@ -125,21 +134,23 @@ find `rust-expert` there.
 
 ### Integration Status
 
-| Check | Status | Details |
-|-------|--------|---------|
-| Catalog entry | PASS | Entry exists in primary "Mobile" section |
-| Agent assignment | PASS | `android-pro` (domain agent, skills list includes `android-expert`), `developer`, `code-reviewer`, `architect`, `qa` |
-| Rules file | PASS | `.claude/rules/android-expert.md` exists |
-| Artifact graph node | UPDATED | Node updated with `integrationStatus: "integrated"`, version 2.0.0, agent list |
+| Check               | Status  | Details                                                                                                              |
+| ------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| Catalog entry       | PASS    | Entry exists in primary "Mobile" section                                                                             |
+| Agent assignment    | PASS    | `android-pro` (domain agent, skills list includes `android-expert`), `developer`, `code-reviewer`, `architect`, `qa` |
+| Rules file          | PASS    | `.claude/rules/android-expert.md` exists                                                                             |
+| Artifact graph node | UPDATED | Node updated with `integrationStatus: "integrated"`, version 2.0.0, agent list                                       |
 
 ### Gaps Found
 
 **P3 — Nice-to-Have: Stale related skill reference**
 
 The SKILL.md `## Integration Points` section references `kotlin-expert` as a related skill:
+
 ```
 - Related skills: `kotlin-expert`, `mobile-app-patterns`, `accessibility-tester`, `security-architect`
 ```
+
 No `kotlin-expert` skill exists in the catalog (it was likely archived or never created).
 This is a documentation inconsistency but does not affect runtime behavior.
 
@@ -150,11 +161,13 @@ reference an existing skill (e.g., `typescript-expert` for cross-platform awaren
 ### Companion Matrix Analysis
 
 **Required Companions (PRESENT):**
+
 - [x] agent:android-pro (domain agent consumer)
 - [x] rules file (.claude/rules/android-expert.md)
 - [x] catalog entry (primary Mobile section)
 
 **Recommended Companions (PRESENT):**
+
 - [x] Related skill: `mobile-first-design-rules` (in android-pro's skills list)
 - [x] Related skill: `accessibility` (cross-referenced domain)
 
@@ -202,11 +215,11 @@ patterns were identified across the analyzed artifacts.
 
 ## Queue Processing Summary
 
-| Queue Entry ID | Artifact | Processed | Gaps |
-|----------------|----------|-----------|------|
-| skill-write:ai-ml-expert:1771491965583 | skill:ai-ml-expert | YES | 1 P2 |
-| skill-write:rust-expert:1771492132076 | skill:rust-expert | YES | 2 P2 |
-| skill-write:android-expert:1771492173424 | skill:android-expert | YES | 1 P3 (noted) |
+| Queue Entry ID                           | Artifact             | Processed | Gaps         |
+| ---------------------------------------- | -------------------- | --------- | ------------ |
+| skill-write:ai-ml-expert:1771491965583   | skill:ai-ml-expert   | YES       | 1 P2         |
+| skill-write:rust-expert:1771492132076    | skill:rust-expert    | YES       | 2 P2         |
+| skill-write:android-expert:1771492173424 | skill:android-expert | YES       | 1 P3 (noted) |
 
 All 3 entries marked `processed: true` in integration-queue.jsonl.
 Artifact graph nodes updated/created with `integrationStatus: "integrated"`.

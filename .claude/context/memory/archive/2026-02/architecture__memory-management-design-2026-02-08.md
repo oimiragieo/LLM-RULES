@@ -15,13 +15,13 @@ Memory files (`learnings.md`, `decisions.md`, `issues.md`) grow unbounded, consu
 
 ### Current State (2026-02-08 Measurements)
 
-| File | Current Size | Token Estimate | Status |
-|------|-------------|----------------|--------|
-| `learnings.md` | 6 KB | ~1.6K tokens | Recently archived (was much larger) |
-| `decisions.md` | 23 KB | ~6.1K tokens | Growing, needs rotation |
-| `issues.md` | 53 KB | ~14K tokens | CRITICAL - largest file |
-| `archive/learnings-2026-02.md` | 463 KB | ~123K tokens | Archived, not managed |
-| `archive/decisions-2026-02.md` | 21 KB | ~5.6K tokens | Archived, not managed |
+| File                           | Current Size | Token Estimate | Status                              |
+| ------------------------------ | ------------ | -------------- | ----------------------------------- |
+| `learnings.md`                 | 6 KB         | ~1.6K tokens   | Recently archived (was much larger) |
+| `decisions.md`                 | 23 KB        | ~6.1K tokens   | Growing, needs rotation             |
+| `issues.md`                    | 53 KB        | ~14K tokens    | CRITICAL - largest file             |
+| `archive/learnings-2026-02.md` | 463 KB       | ~123K tokens   | Archived, not managed               |
+| `archive/decisions-2026-02.md` | 21 KB        | ~5.6K tokens   | Archived, not managed               |
 
 **Total active memory footprint:** ~82 KB (~22K tokens)
 **Total with archives:** ~566 KB (~150K tokens)
@@ -33,6 +33,7 @@ Memory files (`learnings.md`, `decisions.md`, `issues.md`) grow unbounded, consu
 3. **cold-storage.cjs** (archived): 200+ lines, gzip compression + LanceDB indexing, too complex for the file-based memory model
 
 All three modules had valid ideas but were:
+
 - Too complex individually (combined ~900 lines)
 - Not integrated with `memory-scheduler.cjs` (scheduler has stubs that return "disabled")
 - Not triggered by the `sync-memory-index.cjs` PostToolUse hook
@@ -188,6 +189,7 @@ module.exports = { rotateIfNeeded, parseSections, searchArchives };
 ```
 
 **Section Parsing Rules:**
+
 - Sections delimited by `---` (horizontal rule) or `## ` (H2 heading)
 - Date extracted from `**Date:** YYYY-MM-DD` pattern within section
 - `[PERMANENT]` tag prevents archival
@@ -195,6 +197,7 @@ module.exports = { rotateIfNeeded, parseSections, searchArchives };
 - For `decisions.md`: `**Status:** Accepted` marks as stable (archivable after age threshold)
 
 **Archive Naming:**
+
 - `archive/learnings-YYYY-MM.md` (appended to existing month file)
 - `archive/decisions-YYYY-MM.md`
 - `archive/issues-YYYY-MM.md`
@@ -245,6 +248,7 @@ module.exports = { deduplicateFile, jaccardSimilarity, pruneResolvedEntries };
 ```
 
 **Deduplication Algorithm:**
+
 1. Parse file into sections (reuse `parseSections` from rotator)
 2. For each pair of sections, compute Jaccard word similarity
 3. If similarity >= threshold (default 0.5), mark the shorter section as duplicate
@@ -253,6 +257,7 @@ module.exports = { deduplicateFile, jaccardSimilarity, pruneResolvedEntries };
 6. Write back with duplicates removed
 
 **Jaccard Similarity:**
+
 - Tokenize: split on whitespace, lowercase, strip non-alphanumeric
 - Intersection / Union of word sets
 - Threshold 0.5 = 50% word overlap (conservative, avoids false merges)
@@ -302,11 +307,11 @@ module.exports = { archiveWarmToCold, searchCold, getStorageStats };
 
 **Tier Definitions:**
 
-| Tier | Location | Age | Format | Searchable |
-|------|----------|-----|--------|------------|
-| HOT | `memory/*.md` | Last 48h (active) | Markdown | Direct read |
-| WARM | `memory/archive/*.md` | 7-30 days | Markdown | `searchArchives()` |
-| COLD | `memory/archive/cold/*.jsonl` | 30+ days | JSONL (plain text) | `searchCold()` |
+| Tier | Location                      | Age               | Format             | Searchable         |
+| ---- | ----------------------------- | ----------------- | ------------------ | ------------------ |
+| HOT  | `memory/*.md`                 | Last 48h (active) | Markdown           | Direct read        |
+| WARM | `memory/archive/*.md`         | 7-30 days         | Markdown           | `searchArchives()` |
+| COLD | `memory/archive/cold/*.jsonl` | 30+ days          | JSONL (plain text) | `searchCold()`     |
 
 **Cold Format:** Plain JSONL (no gzip) for simplicity and Windows compatibility.
 
@@ -323,20 +328,20 @@ module.exports = { archiveWarmToCold, searchCold, getStorageStats };
 
 ### 5.1 Files to Create (3 new files)
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `.claude/lib/memory/memory-rotator.cjs` | ~120 | Section-based file rotation |
-| `.claude/lib/memory/smart-pruner.cjs` | ~100 | Deduplication and pruning |
-| `.claude/lib/memory/cold-storage.cjs` | ~80 | Warm-to-cold archival + search |
+| File                                    | Lines | Purpose                        |
+| --------------------------------------- | ----- | ------------------------------ |
+| `.claude/lib/memory/memory-rotator.cjs` | ~120  | Section-based file rotation    |
+| `.claude/lib/memory/smart-pruner.cjs`   | ~100  | Deduplication and pruning      |
+| `.claude/lib/memory/cold-storage.cjs`   | ~80   | Warm-to-cold archival + search |
 
 ### 5.2 Files to Modify (4 existing files)
 
-| File | Change | Risk |
-|------|--------|------|
-| `.claude/lib/memory/memory-scheduler.cjs` | Wire rotator into `runPruning()`, replace disabled `runDeduplication()` stub, wire cold storage into `runArchiveOldLTM()` | LOW - replacing stubs with real implementations |
-| `.claude/hooks/memory/sync-memory-index.cjs` | Add post-write size check that calls `rotateIfNeeded()` | LOW - additive, non-blocking |
-| `.claude/config.yaml` | Add `memory.rotation` config section | NONE - additive only |
-| `.claude/lib/memory/memory-manager.cjs` | Update `checkAndArchiveLearnings()` to delegate to rotator for all files (not just learnings) | LOW - extending existing function |
+| File                                         | Change                                                                                                                    | Risk                                            |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `.claude/lib/memory/memory-scheduler.cjs`    | Wire rotator into `runPruning()`, replace disabled `runDeduplication()` stub, wire cold storage into `runArchiveOldLTM()` | LOW - replacing stubs with real implementations |
+| `.claude/hooks/memory/sync-memory-index.cjs` | Add post-write size check that calls `rotateIfNeeded()`                                                                   | LOW - additive, non-blocking                    |
+| `.claude/config.yaml`                        | Add `memory.rotation` config section                                                                                      | NONE - additive only                            |
+| `.claude/lib/memory/memory-manager.cjs`      | Update `checkAndArchiveLearnings()` to delegate to rotator for all files (not just learnings)                             | LOW - extending existing function               |
 
 ### 5.3 Integration with memory-scheduler.cjs
 
@@ -361,7 +366,8 @@ The hook already fires on PostToolUse for Edit/Write to memory files. Add a ligh
 // After existing sync logic, add:
 const { rotateIfNeeded } = require('../../lib/memory/memory-rotator.cjs');
 const stats = fs.statSync(absPath);
-if (stats.size > 20 * 1024) { // 20KB threshold
+if (stats.size > 20 * 1024) {
+  // 20KB threshold
   rotateIfNeeded(absPath);
 }
 ```
@@ -381,40 +387,40 @@ memory_management:
   # Memory file rotation (NEW)
   rotation:
     enabled: true
-    threshold_kb: 20          # Rotate files larger than this
-    keep_sections: 10         # Keep N most recent sections in active file
-    archive_dir: archive      # Relative to .claude/context/memory/
+    threshold_kb: 20 # Rotate files larger than this
+    keep_sections: 10 # Keep N most recent sections in active file
+    archive_dir: archive # Relative to .claude/context/memory/
 
   # Deduplication (NEW)
   deduplication:
     enabled: true
-    similarity_threshold: 0.5  # Jaccard word overlap threshold (0-1)
-    skip_permanent: true       # Never touch [PERMANENT] entries
+    similarity_threshold: 0.5 # Jaccard word overlap threshold (0-1)
+    skip_permanent: true # Never touch [PERMANENT] entries
 
   # Cold storage (NEW)
   cold_storage:
     enabled: true
-    warm_max_age_days: 30      # Move warm archives to cold after N days
-    cold_dir: archive/cold     # Relative to .claude/context/memory/
-    format: jsonl              # jsonl (plain text, no compression)
+    warm_max_age_days: 30 # Move warm archives to cold after N days
+    cold_dir: archive/cold # Relative to .claude/context/memory/
+    format: jsonl # jsonl (plain text, no compression)
 
   # Pruning (NEW - extends existing)
   pruning:
-    resolved_max_age_days: 30  # Remove resolved issues older than N days
-    preserve_permanent: true   # Never remove [PERMANENT] entries
+    resolved_max_age_days: 30 # Remove resolved issues older than N days
+    preserve_permanent: true # Never remove [PERMANENT] entries
 ```
 
 **Environment Variable Overrides:**
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `MEMORY_ROTATION_ENABLED` | `true` | Enable/disable rotation |
-| `MEMORY_ROTATION_THRESHOLD_KB` | `20` | File size threshold |
-| `MEMORY_ROTATION_KEEP_SECTIONS` | `10` | Sections to keep |
-| `MEMORY_DEDUP_ENABLED` | `true` | Enable/disable deduplication |
-| `MEMORY_DEDUP_THRESHOLD` | `0.5` | Similarity threshold |
-| `MEMORY_COLD_ENABLED` | `true` | Enable/disable cold storage |
-| `MEMORY_COLD_MAX_AGE_DAYS` | `30` | Warm-to-cold age threshold |
+| Variable                        | Default | Purpose                      |
+| ------------------------------- | ------- | ---------------------------- |
+| `MEMORY_ROTATION_ENABLED`       | `true`  | Enable/disable rotation      |
+| `MEMORY_ROTATION_THRESHOLD_KB`  | `20`    | File size threshold          |
+| `MEMORY_ROTATION_KEEP_SECTIONS` | `10`    | Sections to keep             |
+| `MEMORY_DEDUP_ENABLED`          | `true`  | Enable/disable deduplication |
+| `MEMORY_DEDUP_THRESHOLD`        | `0.5`   | Similarity threshold         |
+| `MEMORY_COLD_ENABLED`           | `true`  | Enable/disable cold storage  |
+| `MEMORY_COLD_MAX_AGE_DAYS`      | `30`    | Warm-to-cold age threshold   |
 
 ---
 
@@ -429,19 +435,20 @@ memory_management:
 
 ### Error Scenarios
 
-| Scenario | Handling | Recovery |
-|----------|----------|----------|
-| Archive directory does not exist | Create with `mkdirSync({recursive: true})` | Auto-recovery |
-| Archive write fails (disk full, permissions) | Catch error, log warning, leave active file untouched | Manual retry via CLI |
-| File locked by another process | `proper-lockfile` retries with backoff (3 retries, 500ms) | Automatic retry |
-| Malformed section in memory file | Skip unparseable section, log warning, process remaining | Partial processing |
-| Cold storage JSONL write fails | Leave warm archives in place | Manual retry |
-| Concurrent rotation attempts | File lock prevents double-rotation | Lock-based mutual exclusion |
-| Path traversal attempt | `validatePathWithinProject()` rejects | Hard error |
+| Scenario                                     | Handling                                                  | Recovery                    |
+| -------------------------------------------- | --------------------------------------------------------- | --------------------------- |
+| Archive directory does not exist             | Create with `mkdirSync({recursive: true})`                | Auto-recovery               |
+| Archive write fails (disk full, permissions) | Catch error, log warning, leave active file untouched     | Manual retry via CLI        |
+| File locked by another process               | `proper-lockfile` retries with backoff (3 retries, 500ms) | Automatic retry             |
+| Malformed section in memory file             | Skip unparseable section, log warning, process remaining  | Partial processing          |
+| Cold storage JSONL write fails               | Leave warm archives in place                              | Manual retry                |
+| Concurrent rotation attempts                 | File lock prevents double-rotation                        | Lock-based mutual exclusion |
+| Path traversal attempt                       | `validatePathWithinProject()` rejects                     | Hard error                  |
 
 ### Logging
 
 All modules use `createLogger()` from `../utils/logger.cjs`:
+
 - `logger.info()` for successful operations (rotation count, bytes archived)
 - `logger.warn()` for recoverable errors (parse failures, lock contention)
 - `logger.error()` for unrecoverable errors (permission denied, path traversal)
@@ -454,11 +461,11 @@ No `console.log()` in production code (enforced by `check-console-log.cjs` hook)
 
 ### 8.1 Unit Tests
 
-| Test File | Module | Key Tests |
-|-----------|--------|-----------|
+| Test File                                  | Module         | Key Tests                                                                                             |
+| ------------------------------------------ | -------------- | ----------------------------------------------------------------------------------------------------- |
 | `tests/lib/memory/memory-rotator.test.cjs` | memory-rotator | parseSections, rotateIfNeeded (idempotent), archive naming, [PERMANENT] preservation, date extraction |
-| `tests/lib/memory/smart-pruner.test.cjs` | smart-pruner | jaccardSimilarity edge cases, deduplication with threshold, [PERMANENT] skip, pruneResolvedEntries |
-| `tests/lib/memory/cold-storage.test.cjs` | cold-storage | archiveWarmToCold, searchCold, getStorageStats |
+| `tests/lib/memory/smart-pruner.test.cjs`   | smart-pruner   | jaccardSimilarity edge cases, deduplication with threshold, [PERMANENT] skip, pruneResolvedEntries    |
+| `tests/lib/memory/cold-storage.test.cjs`   | cold-storage   | archiveWarmToCold, searchCold, getStorageStats                                                        |
 
 ### 8.2 Test Approach (TDD)
 
@@ -472,16 +479,17 @@ Each module should be developed using the TDD Red-Green-Refactor cycle:
 
 ### 8.3 Integration Tests
 
-| Test | Validates |
-|------|-----------|
-| Scheduler + Rotator | `runPruning()` triggers rotation for all memory files |
-| Scheduler + Pruner | `runDeduplication()` calls deduplicateFile for each file |
-| Scheduler + Cold Storage | `runArchiveOldLTM()` archives old warm files |
-| Hook + Rotator | `sync-memory-index.cjs` triggers rotation on large writes |
+| Test                     | Validates                                                 |
+| ------------------------ | --------------------------------------------------------- |
+| Scheduler + Rotator      | `runPruning()` triggers rotation for all memory files     |
+| Scheduler + Pruner       | `runDeduplication()` calls deduplicateFile for each file  |
+| Scheduler + Cold Storage | `runArchiveOldLTM()` archives old warm files              |
+| Hook + Rotator           | `sync-memory-index.cjs` triggers rotation on large writes |
 
 ### 8.4 Test Fixtures
 
 Create test fixtures in `tests/fixtures/memory-management/`:
+
 - `sample-learnings.md` (small, under threshold)
 - `large-learnings.md` (over 20KB, needs rotation)
 - `duplicate-issues.md` (contains near-identical entries)
@@ -498,14 +506,14 @@ Create test fixtures in `tests/fixtures/memory-management/`:
 
 ## 9. Constraints Compliance
 
-| Constraint | Compliance |
-|-----------|------------|
-| Each module under 150 lines | YES: rotator ~120, pruner ~100, cold-storage ~80 |
-| No external dependencies | YES: uses only `fs`, `path`, existing `atomic-write.cjs`, `project-root.cjs`, `proper-lockfile` (already installed) |
-| Windows compatible | YES: path normalization via `path.join()`, Windows NTFS atomic write handling from `atomic-write.cjs` |
-| Atomic file operations | YES: all writes via `atomicWriteSync()` |
-| Concurrent access safety | YES: `proper-lockfile` used via `atomic-write.cjs` |
-| Idempotent | YES: size-check guard at entry point; re-running after rotation is a no-op |
+| Constraint                  | Compliance                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Each module under 150 lines | YES: rotator ~120, pruner ~100, cold-storage ~80                                                                    |
+| No external dependencies    | YES: uses only `fs`, `path`, existing `atomic-write.cjs`, `project-root.cjs`, `proper-lockfile` (already installed) |
+| Windows compatible          | YES: path normalization via `path.join()`, Windows NTFS atomic write handling from `atomic-write.cjs`               |
+| Atomic file operations      | YES: all writes via `atomicWriteSync()`                                                                             |
+| Concurrent access safety    | YES: `proper-lockfile` used via `atomic-write.cjs`                                                                  |
+| Idempotent                  | YES: size-check guard at entry point; re-running after rotation is a no-op                                          |
 
 ---
 
@@ -513,38 +521,38 @@ Create test fixtures in `tests/fixtures/memory-management/`:
 
 ### Decision 1: Plain JSONL vs Gzip for Cold Storage
 
-| Option | Pros | Cons |
-|--------|------|------|
-| **Plain JSONL (chosen)** | Debuggable, grep-able, Windows-safe, simple | ~3-5x larger than compressed |
-| Gzip JSONL | Smaller files, bandwidth savings | Requires decompress for search, zlib complexity, harder to debug |
+| Option                   | Pros                                        | Cons                                                             |
+| ------------------------ | ------------------------------------------- | ---------------------------------------------------------------- |
+| **Plain JSONL (chosen)** | Debuggable, grep-able, Windows-safe, simple | ~3-5x larger than compressed                                     |
+| Gzip JSONL               | Smaller files, bandwidth savings            | Requires decompress for search, zlib complexity, harder to debug |
 
 **Rationale:** Memory archives are text (markdown sections). At current growth rates (~500KB/month), cold storage will be <6MB/year. The simplicity benefit far outweighs the space cost.
 
 ### Decision 2: Section-Based vs Line-Based Rotation
 
-| Option | Pros | Cons |
-|--------|------|------|
-| **Section-based (chosen)** | Preserves semantic units (ADRs, issues), respects [PERMANENT] tags | Slightly more complex parsing |
-| Line-based | Simple implementation, predictable output size | Cuts entries mid-section, loses context |
+| Option                     | Pros                                                               | Cons                                    |
+| -------------------------- | ------------------------------------------------------------------ | --------------------------------------- |
+| **Section-based (chosen)** | Preserves semantic units (ADRs, issues), respects [PERMANENT] tags | Slightly more complex parsing           |
+| Line-based                 | Simple implementation, predictable output size                     | Cuts entries mid-section, loses context |
 
 **Rationale:** Memory files have semantic structure (ADRs with dates, issues with status). Line-based rotation would split entries, making archives unusable. Section-based rotation preserves complete entries.
 
 ### Decision 3: Hook-Triggered vs Schedule-Only Rotation
 
-| Option | Pros | Cons |
-|--------|------|------|
-| **Both (chosen)** | Catches growth immediately + scheduled maintenance | Two trigger paths to test |
-| Hook-only | Immediate response | Misses growth from non-hook writes |
-| Schedule-only | Simpler integration | Files can grow unchecked between runs |
+| Option            | Pros                                               | Cons                                  |
+| ----------------- | -------------------------------------------------- | ------------------------------------- |
+| **Both (chosen)** | Catches growth immediately + scheduled maintenance | Two trigger paths to test             |
+| Hook-only         | Immediate response                                 | Misses growth from non-hook writes    |
+| Schedule-only     | Simpler integration                                | Files can grow unchecked between runs |
 
 **Rationale:** The hook trigger handles the common case (agent writes exceed threshold). The scheduler handles edge cases and batch operations (deduplication, cold archival).
 
 ### Decision 4: Deduplication by Jaccard vs Embedding Similarity
 
-| Option | Pros | Cons |
-|--------|------|------|
+| Option                            | Pros                                           | Cons                                                     |
+| --------------------------------- | ---------------------------------------------- | -------------------------------------------------------- |
 | **Jaccard word overlap (chosen)** | Zero dependencies, fast (<10ms), deterministic | Cannot detect semantic duplicates with different wording |
-| Embedding similarity | Catches semantic duplicates | Requires LanceDB/embeddings, slow, non-deterministic |
+| Embedding similarity              | Catches semantic duplicates                    | Requires LanceDB/embeddings, slow, non-deterministic     |
 
 **Rationale:** Memory entries are typically added by agents that copy-paste or paraphrase. Word overlap catches 90%+ of actual duplicates in this codebase. Embedding-based dedup can be added later if Jaccard proves insufficient.
 
@@ -553,23 +561,27 @@ Create test fixtures in `tests/fixtures/memory-management/`:
 ## 11. Migration Plan
 
 ### Phase 1: Implement (Developer Agent)
+
 1. Create 3 new modules (TDD)
 2. Create test fixtures
 3. Run all tests green
 
 ### Phase 2: Wire (Developer Agent)
+
 1. Update `memory-scheduler.cjs` to use new modules
 2. Update `sync-memory-index.cjs` hook for rotation trigger
 3. Add config.yaml section
 4. Run integration tests
 
 ### Phase 3: Verify (QA Agent)
+
 1. Run full test suite
 2. Manual test: write large content to learnings.md, verify rotation triggers
 3. Manual test: run scheduler weekly, verify dedup and cold archival
 4. Measure memory file sizes before/after
 
 ### Phase 4: Document (Technical Writer)
+
 1. Update `@DIRECTORY_STRUCTURE.md` with cold storage directory
 2. Update `@ENVIRONMENT_CONFIG.md` with new env variables
 3. Record ADR in `decisions.md`
@@ -579,6 +591,7 @@ Create test fixtures in `tests/fixtures/memory-management/`:
 ## 12. Estimated Impact
 
 ### Before (Current State)
+
 - `issues.md`: 53 KB, growing unchecked
 - `decisions.md`: 23 KB, growing unchecked
 - `learnings.md`: 6 KB (recently manually archived)
@@ -586,12 +599,14 @@ Create test fixtures in `tests/fixtures/memory-management/`:
 - Archives: unmanaged, growing without bound
 
 ### After (With Memory Management)
+
 - Active files: each under 20 KB (max ~60 KB total, ~16K tokens, 8% of context budget)
 - Warm archives: organized by month, searchable
 - Cold storage: JSONL files, compressed history, still searchable
 - Automatic maintenance: no manual archival needed
 
 ### Token Budget Savings
+
 - **Before:** 22K tokens (active) + archives loaded ad-hoc
 - **After:** ~16K tokens (active), archives on-demand only
 - **Savings:** ~6K tokens per session (27% reduction in memory overhead)
@@ -633,11 +648,13 @@ Create test fixtures in `tests/fixtures/memory-management/`:
 ## Appendix B: Relationship to Existing memory-manager.cjs
 
 The `memory-manager.cjs` module (1505 lines) already has:
+
 - `checkAndArchiveLearnings()` -- line-based rotation for learnings.md only
 - `pruneCodebaseMap()` -- TTL-based pruning for codebase_map.json
 - `getMemoryHealth()` -- health checks with thresholds
 
 The new system does NOT replace `memory-manager.cjs`. Instead:
+
 - `memory-rotator.cjs` generalizes `checkAndArchiveLearnings()` to all markdown files with section-based (not line-based) parsing
 - `smart-pruner.cjs` adds deduplication that `memory-manager.cjs` lacks for markdown files
 - `cold-storage.cjs` adds tiered archival that `memory-manager.cjs` does not have

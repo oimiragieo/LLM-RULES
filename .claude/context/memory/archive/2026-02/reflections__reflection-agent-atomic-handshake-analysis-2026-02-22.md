@@ -18,6 +18,7 @@ The reflection-agent atomic handshake contract is BROKEN. Tasks cannot complete 
 Evidence from session-gap-log.jsonl (3 entries spanning 2026-02-22T01:30:00Z to 2026-02-22T02:15:00Z):
 
 ### Gap #1: Missing Metadata (01:30:00Z)
+
 ```json
 {
   "type": "missing_metadata",
@@ -31,6 +32,7 @@ Evidence from session-gap-log.jsonl (3 entries spanning 2026-02-22T01:30:00Z to 
 **Interpretation**: When Router spawns reflection-agent with background execution, the task tool whitelist or permission context is not fully initialized. The agent's TaskUpdate tool becomes unavailable despite being listed in frontmatter.
 
 ### Gap #2: Routing Misrouting (02:00:00Z)
+
 ```json
 {
   "type": "integration_gap",
@@ -43,6 +45,7 @@ Evidence from session-gap-log.jsonl (3 entries spanning 2026-02-22T01:30:00Z to 
 **Interpretation**: This is a SPECIALIST-FIRST ROUTING violation. CLAUDE.md Section 1.2 (Common Misrouting table) explicitly states "git push / commit / deploy" should route to **devops**, not developer.
 
 ### Gap #3: Placeholder Output (02:15:00Z)
+
 ```json
 {
   "type": "placeholder_output",
@@ -53,6 +56,7 @@ Evidence from session-gap-log.jsonl (3 entries spanning 2026-02-22T01:30:00Z to 
 ```
 
 **Interpretation**: Researcher completed a task but the output artifact contains only a placeholder string instead of actual content. This indicates the researcher either:
+
 - Was interrupted/cancelled
 - Hit an error and fell back to stub output
 - Did not implement proper error handling for incomplete work
@@ -76,6 +80,7 @@ Hook reflection-cleanup.cjs removes processed entries from reflection-spawn-requ
 ```
 
 **Current Broken State**:
+
 - Router successfully spawns reflection-agent
 - Reflection-agent TRIES to call TaskUpdate
 - TaskUpdate tool is unavailable (or tool-scope validator blocks it)
@@ -87,7 +92,9 @@ Hook reflection-cleanup.cjs removes processed entries from reflection-spawn-requ
 ## Root Cause Analysis
 
 ### Hypothesis 1: Background Task Spawning
+
 When Router invokes `Task({ ..., run_in_background: true })`, the task execution context may not fully initialize:
+
 - Tool whitelist may be empty until the task explicitly checks for it
 - Permission mode may default to restricted
 - Pre-execution hooks may not properly inject tool context
@@ -95,13 +102,17 @@ When Router invokes `Task({ ..., run_in_background: true })`, the task execution
 **Evidence**: Gap log entry explicitly mentions "Background-spawned reflection-agent (run_in_background:true)"
 
 ### Hypothesis 2: Tool-Scope Validator
+
 The `tool-scope-validator.cjs` hook (PreToolUse(All)) validates that a tool is in the agent's allowed set. Even though TaskUpdate is listed in reflection-agent.md frontmatter, the validator might:
+
 - Not read the agent definition correctly
 - Use a stale cached copy of agent definition
 - Apply different scope rules for background vs foreground tasks
 
 ### Hypothesis 3: Hook Enforcement
+
 The `pre-completion-validation.cjs` hook (PreToolUse(TaskUpdate)) may be blocking TaskUpdate for reflection-agent specifically because:
+
 - It checks for `artifactType` or `artifactName` in metadata (required for creator workflows)
 - Reflection-agent's TaskUpdate calls don't include artifact metadata (they're metadata-only calls)
 - Hook rejects the call as "invalid TaskUpdate contract"
@@ -109,6 +120,7 @@ The `pre-completion-validation.cjs` hook (PreToolUse(TaskUpdate)) may be blockin
 ## Verification Steps (To Fix)
 
 ### 1. Confirm Background Spawning Limitation
+
 Check if reflection-agent works when spawned in FOREGROUND mode:
 
 ```bash
@@ -121,7 +133,9 @@ Task({ task_id: 'task-reflect-batch', subagent_type: 'reflection-agent' })
 ```
 
 ### 2. Verify Tool-Scope Validator
+
 Check if validator properly reads agent tools:
+
 ```bash
 node .claude/hooks/routing/tool-scope-validator.cjs --agent reflection-agent --tool TaskUpdate
 # Expected: allow
@@ -129,7 +143,9 @@ node .claude/hooks/routing/tool-scope-validator.cjs --agent reflection-agent --t
 ```
 
 ### 3. Test pre-completion-validation Hook
+
 Test if hook blocks reflection-agent TaskUpdate calls:
+
 ```bash
 # Simulate reflection-agent TaskUpdate with metadata-only payload
 cat << 'EOF' | node .claude/hooks/validation/pre-completion-validation.cjs
@@ -152,6 +168,7 @@ EOF
 ## Recommended Fix
 
 ### Immediate (Workaround)
+
 1. **Never spawn reflection-agent with `run_in_background: true`**
    - Update CLAUDE.md Section 0.1 Step 0 to mandate foreground spawning
    - Add enforcement to routing-guard.cjs to warn/block if background is used
@@ -161,6 +178,7 @@ EOF
    - Test spawning reflection-agent as FIRST agent in pipeline
 
 ### Short-term (Root Fix)
+
 1. **Audit tool-scope-validator.cjs**
    - Verify it reads agent definitions correctly
    - Check if it handles lazy_load context_strategy properly
@@ -177,6 +195,7 @@ EOF
    - Add this as a CI gate before shipping framework changes
 
 ### Long-term (Architecture)
+
 1. **Deprecate background task spawning for critical workflows**
    - Reflection system should never use `run_in_background: true`
    - Other meta-system tasks (planner, architect) should also prioritize foreground
@@ -190,20 +209,24 @@ EOF
 ## Secondary Findings (From Session Gaps)
 
 ### Gap #2: SPECIALIST-FIRST ROUTING VIOLATION
+
 **Developer was used for git push (task-26)**, but CLAUDE.md Section 1.2 explicitly routes this to **devops**.
 
 **Recommendation**: Add this to routing enforcement checklist:
+
 ```javascript
 // In router-decision.md Step 6.5 specialist keyword matching:
 if (task.includes('git push') || task.includes('deploy') || task.includes('git commit')) {
-  routeTo('devops');  // MANDATORY — never use developer
+  routeTo('devops'); // MANDATORY — never use developer
 }
 ```
 
 ### Gap #3: PLACEHOLDER OUTPUT DETECTION
+
 **Researcher produced TEST_STUB instead of research report (task-27)**
 
 **Recommendation**: Add post-completion artifact validation:
+
 1. If task is assigned to researcher and output is a report, verify report contains >= 500 characters of actual content
 2. If output is a placeholder (contains "TEST_STUB", "TODO", "STUB"), flag as incomplete
 3. Return task to agent with remediation prompt instead of accepting
@@ -213,15 +236,18 @@ if (task.includes('git push') || task.includes('deploy') || task.includes('git c
 All findings recorded in session-gap-log.jsonl. Additional context for reflection system evolution:
 
 ### Pattern to Retain
+
 - Reflection-agent atomic handshake is CRITICAL PATH for system health
 - Must never use `run_in_background: true` for meta-system agents
 - Tool scope validation must work identically for foreground and background
 
 ### Issue to Track
+
 - reflection-spawn-request.json can accumulate stale entries indefinitely without atomic handshake completion
 - Add circuit breaker or timeout-based cleanup as safety net
 
 ### Decision to Document
+
 - Reflection system cannot use background task spawning due to tool initialization risks
 - All meta-system agents (reflection-agent, planner, architect) should be foreground-only
 - Document this in CLAUDE.md Section 0.1 and enforce via routing-guard.cjs

@@ -15,14 +15,14 @@
 
 ### Core Module Tests (Target: 48 tests)
 
-| Test Suite                        | Tests | Pass | Fail | Status      | Notes                          |
-| --------------------------------- | ----- | ---- | ---- | ----------- | ------------------------------ |
-| safe-path.test.cjs                | 22    | 22   | 0    | ✅ PASS     | Path hardening complete        |
-| safe-rename.test.cjs              | 5     | 5    | 0    | ✅ PASS     | Atomic rename working          |
-| archive-retention.test.cjs        | 8     | 8    | 0    | ✅ PASS     | Retention logic validated      |
-| ci-validation-gate.test.cjs       | 13    | 11   | 2    | ⚠️ PARTIAL  | CLI runner failures (see note) |
-| **Totals (Targeted Suites)**      | 48    | 46   | 2    | 95.8%       |                                |
-| **All lib/utils tests**           | 304   | 293  | 11   | 96.4%       | See regression analysis        |
+| Test Suite                   | Tests | Pass | Fail | Status     | Notes                          |
+| ---------------------------- | ----- | ---- | ---- | ---------- | ------------------------------ |
+| safe-path.test.cjs           | 22    | 22   | 0    | ✅ PASS    | Path hardening complete        |
+| safe-rename.test.cjs         | 5     | 5    | 0    | ✅ PASS    | Atomic rename working          |
+| archive-retention.test.cjs   | 8     | 8    | 0    | ✅ PASS    | Retention logic validated      |
+| ci-validation-gate.test.cjs  | 13    | 11   | 2    | ⚠️ PARTIAL | CLI runner failures (see note) |
+| **Totals (Targeted Suites)** | 48    | 46   | 2    | 95.8%      |                                |
+| **All lib/utils tests**      | 304   | 293  | 11   | 96.4%      | See regression analysis        |
 
 ### CI Validation Gate Failures (Non-Blocking)
 
@@ -158,16 +158,16 @@ Test execution performance:
 
 ## Deployment Readiness Checklist
 
-| Criterion                          | Status | Evidence                         |
-| ---------------------------------- | ------ | -------------------------------- |
-| All critical tests pass            | ✅     | 96.4% pass rate                  |
-| No security regressions            | ✅     | All security tests pass          |
-| Lint clean                         | ✅     | 0 errors                         |
-| Format clean                       | ✅     | 0 changes needed                 |
-| No blocking bugs                   | ✅     | CI failures are test-only        |
-| Coverage gaps documented           | ✅     | 3 gaps identified, all P2        |
-| Performance acceptable             | ✅     | <5s test suite runtime           |
-| **DEPLOYMENT READINESS**           | ✅     | **APPROVED FOR PRODUCTION**      |
+| Criterion                | Status | Evidence                    |
+| ------------------------ | ------ | --------------------------- |
+| All critical tests pass  | ✅     | 96.4% pass rate             |
+| No security regressions  | ✅     | All security tests pass     |
+| Lint clean               | ✅     | 0 errors                    |
+| Format clean             | ✅     | 0 changes needed            |
+| No blocking bugs         | ✅     | CI failures are test-only   |
+| Coverage gaps documented | ✅     | 3 gaps identified, all P2   |
+| Performance acceptable   | ✅     | <5s test suite runtime      |
+| **DEPLOYMENT READINESS** | ✅     | **APPROVED FOR PRODUCTION** |
 
 ## Recommendations
 
