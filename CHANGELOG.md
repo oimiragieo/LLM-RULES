@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-04-22
+
+### Fixed
+
+- heartbeat-orchestrator agent definition hardened with explicit Queue Preservation IRON LAW — never clears `.claude/context/runtime/reflection-spawn-request.json` when `reflection-check.cjs` returns `QUEUED_ACTIONS:N`; preserves queue for router Gate 0 to drain on next UserPromptSubmit.
+- Prevents silent loss of queued reflections (root cause of 2 lost entries during v2.4.0 session).
+
 ## [2.4.0] - 2026-04-22 — Production-Grade Observability & Cost Control
 
 Agent Studio goes production-grade. This release directly addresses the top two community pain points — "black box" agent execution and cost unpredictability — with structured OpenTelemetry tracing, per-session spend ceilings, and pre-flight context budget enforcement.

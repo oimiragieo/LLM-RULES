@@ -9,7 +9,7 @@
   ".claude\\lib\\routing\\router-state.cjs": 833,
   ".claude\\lib\\readiness\\readiness-remediation.cjs": 785,
   ".claude\\hooks\\workflow\\post-creation-integration.cjs": 762,
-  ".claude\\lib\\routing\\routing-table-intent-keywords-data.cjs": 755,
+  ".claude\\lib\\routing\\routing-table-intent-keywords-data.cjs": 757,
   ".claude\\lib\\readiness\\readiness-scorer.cjs": 740,
   ".claude\\lib\\workflow\\step-validators.cjs": 719,
   ".claude\\lib\\workflow\\workflow-cli.cjs": 714,

@@ -1,4 +1,6 @@
 ---
+verified: true
+lastVerifiedAt: 2026-04-23T01:19:47.597Z
 name: heartbeat-orchestrator
 version: 1.0.0
 description: >-
@@ -68,10 +70,34 @@ When spawned for an individual tick (task_id starts with 'hb-'):
 1. Call TaskUpdate(in_progress) immediately
 2. Run the specified script via Bash: `node .claude/tools/cli/<script>.cjs`
 3. If stdout contains HEARTBEAT_OK: call TaskUpdate(completed) and exit
-4. If stdout contains QUEUED_ACTIONS: process the queue file, then call TaskUpdate(completed) and exit
+4. If stdout contains QUEUED_ACTIONS:N: **DO NOT clear the queue file** — preserve it intact. Call TaskUpdate(completed) with metadata `{ queuedActions: N, queuePreserved: true }` and exit. The router's Gate 0 preflight will drain the queue on the next user prompt.
 5. If script fails or stderr contains errors: write warning to `.claude/context/runtime/session-gap-log.jsonl`, call TaskUpdate(completed) and exit
 6. Do NOT re-register loops — this is a single-tick execution only
 7. Do NOT spawn additional sub-agents — execute inline
+
+## Queue Preservation (IRON LAW)
+
+When running `reflection-check.cjs`, `evolution-check.cjs`, or any queue-inspecting script that reads `reflection-spawn-request.json` or similar queue files, this agent MUST follow strict queue preservation rules:
+
+### stdout = HEARTBEAT_OK
+
+- Call `TaskUpdate(completed)` and exit immediately
+- DO NOT touch any queue file
+
+### stdout = QUEUED_ACTIONS:N (where N > 0)
+
+- **DO NOT clear `reflection-spawn-request.json`** or any other queue file
+- **DO NOT write, overwrite, or truncate the queue file**
+- Report the count (`N` pending entries) in the TaskUpdate metadata
+- Call `TaskUpdate(completed)` with metadata: `{ queuedActions: N, queuePreserved: true }` and exit
+- Router's Gate 0 preflight (UserPromptSubmit hook) will spawn reflection-agent on the next user prompt to drain the queue
+
+### Absolute Prohibition
+
+- NEVER call `Write` on `reflection-spawn-request.json` unless this agent IS the reflection-agent processing its own assigned entry
+- NEVER call `Edit` on queue files to remove entries — only reflection-agent may dequeue
+- Clearing a queue file = destroying pending work with no git recovery
+- This is an iron law: violations are treated as data-loss bugs
 
 ## Startup Protocol
 

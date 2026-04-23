@@ -716,6 +716,7 @@ const INTENT_KEYWORDS = {
   ],
   'release-guardian': ['release-guardian', 'release', 'guardian', 'safety', 'specialist'],
   'debug-agent': ['debug-agent', 'debug agent'],
+  'heartbeat-orchestrator': ['heartbeat-orchestrator', 'heartbeat', 'orchestrator'],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.
@@ -728,6 +729,7 @@ const ALLOWED_INTENT_KEYWORD_OVERLAPS = {
   code: ['code-reviewer', 'developer'],
   'core web vitals': ['performance_engineer', 'react_performance'],
   etl: ['data_engineer', 'data_science'],
+  heartbeat: ['heartbeat', 'heartbeat-orchestrator'],
   k8s: ['devops', 'kubernetes_specialist'],
   kanban: ['pm', 'pm_coordinator'],
   kubernetes: ['devops', 'kubernetes_specialist'],
