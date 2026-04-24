@@ -5,6 +5,18 @@ All notable changes to Agent Studio are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- D1: File-based agent-ID handshake (`.claude/lib/agent/agent-id-handshake.cjs`) replacing env-var-based propagation.
+
+### Changed
+
+- D2: Reflection queue unified with Task system via `.claude/lib/tasks/reflection-queue-adapter.cjs`. Legacy `reflection-spawn-request.json` preserved read-through.
+
+---
+
 ## [3.2.0] - 2026-04-23 — Memory-Marketplace Release
 
 ### Added
