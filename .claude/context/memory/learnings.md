@@ -166,3 +166,21 @@ Removed 50 orphaned worktree directories. Skipped 9 (reasons: 2 registered+locke
 - Updated workflow: evolution-workflow (2026-04-23)
 
 - Updated workflow: missing-workflow-xyz (2026-04-23)
+
+- Created new agent: qa-guardian (2026-04-24)
+
+- Created new agent: contract-check (2026-04-24)
+
+- Created new agent: bool-action (2026-04-24)
+
+- Created new agent: repo-onboarder (2026-04-24)
+
+- Created new agent: release-guardian (2026-04-24)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-04-24)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-04-24)
+
+- Updated workflow: evolution-workflow (2026-04-24)
+
+- Updated workflow: missing-workflow-xyz (2026-04-24)

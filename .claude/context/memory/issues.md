@@ -28,3 +28,5 @@ BUG: CLAUDE_AGENT_ID env var not propagated to Bash subprocess hook context; age
 - **Impact**: ALL Write/Edit tool calls that trigger this hook will crash with a path resolution error. Production-blocking.
 - **Fix**: Update `.claude/settings.json` hook registration to use the correct absolute or relative path for evolution-state-guard.cjs. Verify path matches actual file location on disk.
 - **Source**: v4.0.0 Phase 0 baseline audit, Task 3 (2026-04-24).
+
+## TEST-SUITE BASELINE 2026-04-24: 687/6239 fail (~11%). Root cause: missing ./task-manager.cjs referenced by reflection-queue-adapter.cjs. Report: .claude/context/reports/qa/test-suite-status-2026-04-24.md
