@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-04-23T18:31:38.259Z",
+  "generatedAt": "2026-04-24T19:44:50.369Z",
   "metadata": {
-    "totalSkills": 348,
+    "totalSkills": 349,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-04-23T18:31:38.260Z",
+    "lastValidated": "2026-04-24T19:44:50.370Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -9470,6 +9470,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "trust-neg-xNenr8": {
+      "name": "trust-neg-xNenr8",
+      "displayName": "Trust Neg XNenr8",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - trust-neg-xNenr8",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "trust-neg-xNenr8"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "tts-generation": {
       "name": "tts-generation",
       "displayName": "Tts Generation",
@@ -9914,6 +9936,7 @@
         "token-saver-memory-dedup",
         "tool-updater",
         "transcription",
+        "trust-neg-xNenr8",
         "tts-generation",
         "uat-verify",
         "user-flow-validator",
@@ -10368,6 +10391,7 @@
         "token-saver-memory-dedup",
         "tool-updater",
         "transcription",
+        "trust-neg-xNenr8",
         "tts-generation",
         "uat-verify",
         "user-flow-validator",
@@ -10804,6 +10828,7 @@
         "token-saver-memory-dedup",
         "tool-updater",
         "transcription",
+        "trust-neg-xNenr8",
         "tts-generation",
         "uat-verify",
         "user-flow-validator",
@@ -11086,6 +11111,7 @@
         "token-saver-memory-dedup",
         "tool-updater",
         "transcription",
+        "trust-neg-xNenr8",
         "tts-generation",
         "uat-verify",
         "user-flow-validator",
@@ -11308,6 +11334,7 @@
         "token-saver-context-compression",
         "token-saver-memory-dedup",
         "tool-updater",
+        "trust-neg-xNenr8",
         "uat-verify",
         "user-research",
         "voice-clone-generator",
@@ -12247,6 +12274,7 @@
         "token-saver-memory-dedup",
         "tool-updater",
         "transcription",
+        "trust-neg-xNenr8",
         "tts-generation",
         "uat-verify",
         "user-flow-validator",
@@ -14140,6 +14168,7 @@
         "token-saver-memory-dedup",
         "tool-updater",
         "transcription",
+        "trust-neg-xNenr8",
         "tts-generation",
         "uat-verify",
         "user-flow-validator",

@@ -2,6 +2,12 @@
 
 # Active Context — Session Handoff 2026-04-24
 
+## VERIFIED THIS SESSION (2026-04-24)
+- Test pass rate: 6506/6512 (99.92%) — +955 vs 5551/6239 baseline. Commit 7d46d28cc fix CONFIRMED working.
+- No regressions introduced.
+- 5 remaining failures are pre-existing: 3 Windows spawn-timeout flakes, 1 perf gate, 1 slo-alert-gate logic mismatch. None touch reflection-queue-adapter paths.
+- skills:index drift: RESOLVED via skills-provenance-migrate.cjs this session.
+
 ## NEXT ACTION (IMMEDIATE)
 1. Investigate `.claude/worktrees/agent-a21c286ed7fddcb8f/` — stale QA worktree causing nested worktree spawns for subsequent `developer` agents. Wait for orchestrator cron GC or escalate via devops to diagnose auto-worktree CWD inheritance.
 2. Once worktrees are clean, spawn Wave 1 tasks 001 + 002 (parallel-safe) per plan `.claude/context/plans/v3.3.0-audit-remediation-plan-2026-04-24.md`.
@@ -12,6 +18,8 @@
 - Whether worktree nesting affects ALL developer spawns or specific CWD conditions
 - F-LIFECYCLE phantom task-lifecycle-42 root cause (test-fixture leak unverified)
 - trust-neg-xNenr8 SKILL.md intent (archive vs complete)
+- Worktree nesting bug scope: reproduced 4/4 on `developer` agent spawns after long-running QA agent; other agent types unaffected. Root cause hypothesis: router CWD not reset between spawns when auto-worktree hook fires.
+- Wave 1 tasks 001/002 implementation: DEFERRED to next session due to worktree-nesting bug.
 
 ## This Session Landed
 | Artifact | Path |
