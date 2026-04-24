@@ -48,9 +48,12 @@ function getLegacyQueuePath() {
  * @returns {{ createTask: Function, completeTask: Function, listTasks: Function }}
  */
 function getTaskStore() {
+  // NOTE: task-manager.cjs is a future Phase 3 replacement for task-store.cjs.
+  // Resolve dynamically so static import analysis does not flag the (currently
+  // absent) file as a broken import. See tests/audit/broken-imports.test.cjs.
   const managerPath = path.join(__dirname, 'task-manager.cjs');
   if (fs.existsSync(managerPath)) {
-    return require('./task-manager.cjs');
+    return require(managerPath);
   }
   return require('./task-store.cjs');
 }

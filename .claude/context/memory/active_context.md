@@ -2,7 +2,7 @@
 
 # Session Handoff — Post-v3.2.0 Validation
 
-**NEXT ACTION (IMMEDIATE):** Fix Telegram launch command in session-handoff — switch from `--dangerously-load-development-channels server:telegram-relay` to `--channels server:telegram-relay` (no interactive prompt). Spawn developer agent to update scripts/spawn-new-session.cjs and any other launch scripts. Also investigate whether non-v3.2.0 tests in full pnpm test suite have pre-existing failures.
+**NEXT ACTION (IMMEDIATE):** Re-run full pnpm test suite to confirm regression buckets collapse. Then execute S3 plan at `.claude/context/plans/v3.3.0-s3-plan-2026-04-24.md` — start D5 TDD cycle.
 
 ## WHAT IS NOT PROVEN YET
 

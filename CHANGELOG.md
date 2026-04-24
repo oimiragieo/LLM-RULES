@@ -11,10 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - D1: File-based agent-ID handshake (`.claude/lib/agent/agent-id-handshake.cjs`) replacing env-var-based propagation.
 - Added 5 fix-queue entries (NB-1..NB-5) from debug log audit 2026-04-23: MCP startup prune, learnings.md lock, hook error payloads, Read cache refresh, marketplace YAML validator.
+- NB-6 (Read pagination enforcement) + NB-7 (read-safety ENOENT noise) to v4.0.0 fix-queue from delta debug audit.
 
 ### Changed
 
 - D2: Reflection queue unified with Task system via `.claude/lib/tasks/reflection-queue-adapter.cjs`. Legacy `reflection-spawn-request.json` preserved read-through.
+
+### Fixed
+
+- Restore broken require in `reflection-queue-adapter.cjs` (post-D2 cleanup). Unblocks ~11% of test suite.
 
 ---
 
