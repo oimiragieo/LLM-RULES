@@ -88,4 +88,3 @@
 - Managed Agents removes infra burden: evaluate delegating long-running agentic tasks to Anthropic's hosted harness.
 - Advisor Strategy cost savings: already implemented in agent-studio via model complexity routing; confirm haiku is used for heartbeat/trivial tasks.
 - ORCH deterministic voting pattern: candidate for high-stakes routing decisions where single-LLM confidence is low.
-

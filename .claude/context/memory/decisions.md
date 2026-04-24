@@ -1,3 +1,9 @@
+## 2026-04-23: v4.0.0 Campaign Phase 0 Approved
+
+10 architectural decisions approved (6 breaking changes). 42 sources validated (9 PASS, 1 REVISE: D6, 0 FAIL). P0 finding: evolution-state-guard.cjs path mismatch in settings.json (flagged for Session 2). Plan artifact: `.claude/context/plans/v4.0.0-spec-tdd-plan-2026-04-23.md`. Session 2 immediate action: write D1+D2 specs.
+
+---
+
 ## ADR: F7 skill-auto-creator archived (2026-04-19)
 
 Decision: Moved to \_archive/ with disabled stub. Rationale per LLM consult — GATE 4 IRON LAW violation (direct SKILL.md writes bypass unified-creator-guard). Roadmap: proposer-only refactor routing through skill-creator as effector.

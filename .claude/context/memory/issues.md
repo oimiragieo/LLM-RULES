@@ -1,5 +1,7 @@
 > ⚠️ Content archived to archive/issues-2026-04-19.md on 2026-04-19
 
+RECURRING: task-lifecycle-42 persisted stale 900+ min — router not reliably calling TaskUpdate(completed). Investigate auto-close hook.
+
 ## ~~Issue: unified-creator-guard blocks planner from writing plan files~~ — RESOLVED (2026-04-23)
 
 - **Status**: RESOLVED — confirmed FALSE POSITIVE
@@ -15,3 +17,14 @@
 - **Workaround**: Router must invoke heartbeat skill directly (not via Task()). Orchestrator role is reduced to instruction delivery only.
 - **Fix candidate**: Document this constraint prominently in `.claude/skills/heartbeat/SKILL.md` and the heartbeat orchestrator agent definition. Add a note to orchestrator-spawn.md warning that cron-registration tools are session-scoped.
 - **Source**: v2.1.1 session; two spawn failures confirmed by router observation.
+
+## BUG: CLAUDE_AGENT_ID env var not propagated to Bash subprocess hook context (2026-04-23)
+
+BUG: CLAUDE_AGENT_ID env var not propagated to Bash subprocess hook context; agents must use Write tool directly or fix env propagation in agent-wrapper.
+
+## P0 BUG: evolution-state-guard.cjs path mismatch in settings.json (2026-04-24)
+
+- **Symptom**: Task 3 baseline inventory found evolution-state-guard.cjs registered with a wrong directory path in `.claude/settings.json`. This will cause a crash on any Write event that the guard is meant to intercept.
+- **Impact**: ALL Write/Edit tool calls that trigger this hook will crash with a path resolution error. Production-blocking.
+- **Fix**: Update `.claude/settings.json` hook registration to use the correct absolute or relative path for evolution-state-guard.cjs. Verify path matches actual file location on disk.
+- **Source**: v4.0.0 Phase 0 baseline audit, Task 3 (2026-04-24).

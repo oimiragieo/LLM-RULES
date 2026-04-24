@@ -10,6 +10,8 @@
 
 > ⚠️ Content archived to archive/learnings-2026-04-17.md on 2026-04-17
 
+- ccusage output shows cumulative totals by default; use --today flag or parse last row for per-day cost.
+
 - [2026-04-17] [WORKFLOW] task-lifecycle-42 root cause confirmed (A-3 verdict): test-fixture leak in grand-lifecycle.test.cjs — missing TASKUPDATE_FIRST_STATE_FILE env-var override writes production runtime state during test runs. Root cause documented in `.claude/context/reports/backend/task-lifecycle-42-investigation-2026-04-17.md`. Fix spec: F-LIFECYCLE (4 code patches + 3 regression tests). 100% of 1023 gap-log missing_metadata entries trace to this single phantom.
 
 - [2026-04-17] [WORKFLOW] stale-task-detector.cjs has no idempotency / cooldown: every UserPromptSubmit re-emits a new gap-log entry for any stale task — no per-task emission cooldown, no cross-session orphan TTL. Defense-in-depth fix: add 1h cooldown per taskId (stale-task-emission-cooldown.json) + 7-day hard-prune for cross-session orphans.
@@ -27,6 +29,15 @@
 - [2026-04-22] [WORKFLOW] Large-scope docs agents should checkpoint intermediate state. S6 docs agent stalled at 94K tokens mid-update; required a resumption spawn. Pattern: any docs agent expected to touch >5 files or accumulate >60K tokens should write a .snapshot.json at each phase boundary to enable safe resumption.
 
 - [2026-04-22] [WORKFLOW] Research-driven planning (Exa + ArXiv + Reddit) successfully converged v2.4.0 scope on observability + cost control themes with zero scope drift during execution. Pattern: front-loading multi-source research before task decomposition prevents mid-sprint pivots on large release cycles.
+
+- [2026-04-23] [SYSTEMIC] developer-subagent-type always injects worktrees — causes "Prompt too long" at 0 tokens. Use general agent type for Bash-heavy tasks instead.
+- [2026-04-23] [SYSTEMIC] Reflection agent gets stuck in skill-invoke loop (memory-search) without clearing queue. Keep reflection prompts minimal — no Skill() calls inside reflection.
+- [2026-04-23] [PATTERN] pnpm test full suite (21 min) always times out agent context. Use targeted file lists: node --test file1 file2... for specific test suites.
+- [2026-04-23] [NOTE] Telegram --dangerously-load-development-channels shows interactive prompt (CLI version change). Fix: switch spawn to --channels server:telegram-relay.
+
+- [2026-04-24] [SYSTEMIC] task-lifecycle-42 gap-log noise (1034 entries): root cause is test-fixture leak in grand-lifecycle.test.cjs (confirmed 2026-04-17). NOT a new operational pattern. Entries will accumulate every UserPromptSubmit until F-LIFECYCLE fix (4 patches + 3 regression tests, part of v4.0.0 D2 task unification). stale-task-detector eventually self-heals via abandoned_task after 20+ min TTL. Reflection agents should treat task-lifecycle-42 missing_metadata entries as known noise — do not re-investigate.
+
+- [2026-04-24] [WORKFLOW] v4.0.0 Phase 0 complete: 10 architectural decisions approved (D1-D10), 42 sources validated, 9 PASS/1 REVISE (D6 needs consolidation trigger spec before impl). Constitution 4-gate passed. Campaign cost: $308.40/day, ~$13,522 cumulative (04-19..04-23). 4 integration-queue items carry to Session 2. Master TDD plan written with 7 phases, 10-session campaign, rollback via UPGRADE.md + migrate:v4 --dry-run.
 
 - [2026-04-17] [TOOLING] Exa MCP and Ref MCP tools unavailable in current execution environment (NoSuchToolError). Fallback: WebSearch + WebFetch to github.com. Do not rely on these MCP tools in non-interactive agent pipelines; check availability before dependency.
 
