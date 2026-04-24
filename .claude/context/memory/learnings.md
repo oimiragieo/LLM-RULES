@@ -184,3 +184,11 @@ Removed 50 orphaned worktree directories. Skipped 9 (reasons: 2 registered+locke
 - Updated workflow: evolution-workflow (2026-04-24)
 
 - Updated workflow: missing-workflow-xyz (2026-04-24)
+
+- [2026-04-24] [TESTING] Broken `require()` statements can mask massive test failure cascades. Detection heuristic: if a single commit unmasks >500 test failures, audit all adapter modules for similar missing dependencies. Root case example: `reflection-queue-adapter.cjs:53` referenced missing `./task-manager.cjs` (deleted during D2 unification in commit f3003e620), causing ~550 suites to fail at module-load time with generic test-failed errors — 687/6239 total failures (~11%). Fix was a single-file require restoration (commit 7d46d28cc). Pre-check: before any refactor that renames/moves modules, run `node -e require(module)` on all known importers to catch silent breakage before commit.
+
+- [2026-04-24] [WORKFLOW] Gap-log noise classification: entries with type:missing_metadata for task-lifecycle-42 are KNOWN NOISE (phantom from test-fixture leak, confirmed 2026-04-17). Root cause: grand-lifecycle.test.cjs missing TASKUPDATE_FIRST_STATE_FILE env-var override. Do NOT re-investigate; treat as background noise until F-LIFECYCLE fix ships.
+
+- [2026-04-24] [BUG] pre-completion-validation.cjs SE-03 violation: hook writes advisory output to stderr even when returning allow (exit 0). Claude Code pipeline surfaces any stderr as a blocking tool error. Pattern: ALL hook advisory messages must go to stdout JSON message field or be suppressed entirely on allow paths. Never write to stderr on non-error paths.
+
+- [2026-04-24] [SCHEMA] Gap-log orchestration_start and reflection event types are missing required description field. Consumers that key on description will silently skip these entries. Pattern: when writing new gap-log event types, always include description field mirroring the primary event summary.

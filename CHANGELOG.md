@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - D2: Reflection queue unified with Task system via `.claude/lib/tasks/reflection-queue-adapter.cjs`. Legacy `reflection-spawn-request.json` preserved read-through.
+- Audit artifacts and reflection learnings from v3.3.0 session committed (agent-registry.json drift regen, issues.md P1 hook-contract-violation, learnings.md reflection summaries).
 
 ### Fixed
 

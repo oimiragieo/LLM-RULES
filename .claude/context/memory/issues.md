@@ -30,3 +30,39 @@ BUG: CLAUDE_AGENT_ID env var not propagated to Bash subprocess hook context; age
 - **Source**: v4.0.0 Phase 0 baseline audit, Task 3 (2026-04-24).
 
 ## TEST-SUITE BASELINE 2026-04-24: 687/6239 fail (~11%). Root cause: missing ./task-manager.cjs referenced by reflection-queue-adapter.cjs. Report: .claude/context/reports/qa/test-suite-status-2026-04-24.md
+
+## SYSTEMIC: stale-task-detector has no per-task emission cooldown (confirmed 2026-04-17, still not fixed 2026-04-24)
+
+- **Symptom**: 1034 gap-log entries for task-lifecycle-42 across 22+ days (2026-04-02 to 2026-04-24), all identical missing_metadata type. Multiple entries emitted per UserPromptSubmit burst.
+- **Root cause confirmed (2026-04-17)**: test-fixture leak in grand-lifecycle.test.cjs; TASKUPDATE_FIRST_STATE_FILE env-var override missing from test fixture writes production runtime state, creating an unresolvable phantom stale task.
+- **Secondary defect**: stale-task-detector.cjs has no emission cooldown. Every UserPromptSubmit fires a new gap-log entry for any stale task, producing burst clusters (up to 10 entries per session). Fix: add 1h per-taskId cooldown + 7-day hard-prune for cross-session orphans.
+- **Impact**: Gap log ~99% noise from this phantom; real pipeline gaps are invisible.
+- **Fix required**: F-LIFECYCLE (4 patches + 3 regression tests, v4.0.0 D2). Also cooldown logic in stale-task-detector.cjs.
+- **Source**: gap-log analysis task 4 reflection (2026-04-24).
+
+## SYSTEMIC: pre-completion-validation.cjs stderr surfaces as tool error even on allow (2026-04-24)
+
+- **Symptom**: TaskUpdate status=completed blocked with tool error despite hook emitting allow. Logged gap-log line 1035 (2026-04-24T16:34:00Z).
+- **Root cause hypothesis**: Hook writes advisory content to stderr; Claude Code pipeline surfaces any stderr as a blocking tool error regardless of exit code or allow signal.
+- **Impact**: Legitimate completions blocked; agent stalls and must retry.
+- **Fix**: Audit process.stderr.write() calls in pre-completion-validation.cjs; suppress advisory output on allow path; reserve stderr for genuine errors only (SE-03 compliance).
+- **Source**: gap-log line 1035, DR-4 deviation (2026-04-24).
+
+## MISSING: orchestration_start and reflection event types have no description field in gap-log (2026-04-24)
+
+- **Symptom**: Gap-log entries with type:orchestration_start (line 1033) and type:reflection (line 1034) lack a description field.
+- **Impact**: Gap-log consumers that rely on description field for classification silently skip these entries.
+- **Fix**: Standardize gap-log schema — require description on all event types. Update writers for orchestration_start and reflection types.
+- **Source**: gap-log analysis task 4 reflection (2026-04-24).
+
+## P1 BUG: hook-contract-violation — pre-completion-validation.cjs stdout/stderr inversion (2026-04-24)
+
+- **Type**: hook-contract-violation
+- **Severity**: P1 — causes TaskUpdate(completed) to surface as a tool error even when the hook emits event=allow
+- **Symptom**: Task 5 TaskUpdate(completed) was BLOCKED by pre-completion-validation hook despite the hook audit log emitting event=allow to stderr. The stderr payload was surfaced as a tool error, leaving task 5 stuck in in_progress. Work was verified complete (commits 010863563, b477a078c pushed).
+- **Root cause**: In pre-completion-validation.cjs (line 449), auditLog writes {event:allow} to stderr. When GIT_COMMIT_VERIFICATION triggers a block (dirty state detection racing with pushed state), the stderr allow event was already emitted but exit code 2 was returned. Tool pipeline surfaces stderr payload as error message, creating misleading allow-event-caused-block appearance. The summary contained pushed to main which triggered isPipelineCompletion=true, activating MILESTONE_SELF_REVIEW_ENFORCEMENT (warn) and CCUSAGE_REPORT_ENFORCEMENT (warn) warnings. GIT_COMMIT_VERIFICATION then ran git status and may have found dirty state in a race condition after push.
+- **Contract rule**: allow events in auditLog should only write to stderr when DEBUG_HOOKS=true. block decisions must ONLY go to stdout via formatHookResult. Unconditional stderr from allow path creates noise that tool pipeline misinterprets.
+- **Workaround**: Set GIT_COMMIT_VERIFICATION=warn or GIT_COMMIT_VERIFICATION=off for cleanup/commit tasks.
+- **Fix candidate**: Guard auditLog call at pre-completion-validation.cjs line 449 behind debug flag. Remove unconditional stderr from allow transitions.
+- **Source**: Reflection of task 5 (2026-04-24); CRITICAL DEVIATION reported in reflection trigger.
+- **Tags**: hook-contract-violation, pre-completion-validation, stderr-stdout-inversion, task-5
