@@ -23,9 +23,9 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 
-const { PROJECT_ROOT } = require('../utils/project-root.cjs');
-const { validateData } = require('../utils/schema-validator.cjs');
-const { redactSecrets } = require('../utils/redact-secrets.cjs');
+const { PROJECT_ROOT } = require('../../utils/project-root.cjs');
+const { validateData } = require('../../utils/schema-validator.cjs');
+const { redactSecrets } = require('../../utils/redact-secrets.cjs');
 
 // ---------------------------------------------------------------------------
 // Constants

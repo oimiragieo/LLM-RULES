@@ -61,10 +61,7 @@ function _resolveHmacKey() {
     return envKey;
   }
   // Fall back to local secrets file (gitignored)
-  const secretsPath = path.resolve(
-    __dirname,
-    '../../context/secrets/marketplace-key.local'
-  );
+  const secretsPath = path.resolve(__dirname, '../../context/secrets/marketplace-key.local');
   if (fs.existsSync(secretsPath)) {
     const fileKey = fs.readFileSync(secretsPath, 'utf8').trim();
     if (fileKey) return fileKey;
@@ -203,8 +200,10 @@ async function installSkill(options) {
     const src = path.join(bundlePath, file);
     const dst = path.join(resolvedTarget, file);
     // H-1: verify resolved destination stays inside installTarget
-    if (!path.resolve(dst).startsWith(resolvedTarget + path.sep) &&
-        path.resolve(dst) !== resolvedTarget) {
+    if (
+      !path.resolve(dst).startsWith(resolvedTarget + path.sep) &&
+      path.resolve(dst) !== resolvedTarget
+    ) {
       return {
         status: 'signature-invalid',
         trustScore,
@@ -278,7 +277,9 @@ if (require.main === module) {
     const opts = _parseArgs(process.argv);
 
     if (!opts.bundlePath) {
-      console.error('Usage: node skill-install.cjs <bundle-path> [--signature <sig>] [--dry-run] [--force] [--trust-threshold <n>]');
+      console.error(
+        'Usage: node skill-install.cjs <bundle-path> [--signature <sig>] [--dry-run] [--force] [--trust-threshold <n>]'
+      );
       process.exit(3);
     }
     if (!opts.signature) {

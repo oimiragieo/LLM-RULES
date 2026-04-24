@@ -81,7 +81,11 @@ test('Test 1: minimal valid CAT7 record validates', () => {
   const { validateRecord } = freshRequire(CAT7_WRITER);
   const record = minimalRecord();
   const result = validateRecord(record);
-  assert.strictEqual(result.valid, true, `Expected valid=true, got: ${JSON.stringify(result.errors)}`);
+  assert.strictEqual(
+    result.valid,
+    true,
+    `Expected valid=true, got: ${JSON.stringify(result.errors)}`
+  );
 });
 
 // ── Test 2: Missing required field (concept) fails ────────────────────────
@@ -91,10 +95,11 @@ test('Test 2: missing required field (concept) fails', () => {
   delete record.concept;
   const result = validateRecord(record);
   assert.strictEqual(result.valid, false, 'Expected valid=false when concept is missing');
-  const hasConceptError = result.errors.some(
-    e => e.includes('concept') || e.includes('required')
+  const hasConceptError = result.errors.some(e => e.includes('concept') || e.includes('required'));
+  assert.ok(
+    hasConceptError,
+    `Expected error mentioning 'concept', got: ${JSON.stringify(result.errors)}`
   );
-  assert.ok(hasConceptError, `Expected error mentioning 'concept', got: ${JSON.stringify(result.errors)}`);
 });
 
 // ── Test 3: confidence out of [0,1] fails ─────────────────────────────────
@@ -125,7 +130,11 @@ test('Test 4: lineage as array of string IDs validates', () => {
   const { validateRecord } = freshRequire(CAT7_WRITER);
   const record = minimalRecord({ lineage: ['parent-id-001', 'parent-id-002'] });
   const result = validateRecord(record);
-  assert.strictEqual(result.valid, true, `lineage array should be valid: ${JSON.stringify(result.errors)}`);
+  assert.strictEqual(
+    result.valid,
+    true,
+    `lineage array should be valid: ${JSON.stringify(result.errors)}`
+  );
 });
 
 test('Test 4b: lineage with non-string element fails', () => {
@@ -189,7 +198,11 @@ test('Test 6: round-trip write→read preserves all 7 fields', () => {
     assert.deepStrictEqual(loaded.provenance, record.provenance, 'provenance preserved');
     assert.strictEqual(loaded.confidence, record.confidence, 'confidence preserved');
     assert.deepStrictEqual(loaded.lineage, record.lineage, 'lineage preserved');
-    assert.deepStrictEqual(loaded.embedding_refs, record.embedding_refs, 'embedding_refs preserved');
+    assert.deepStrictEqual(
+      loaded.embedding_refs,
+      record.embedding_refs,
+      'embedding_refs preserved'
+    );
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
@@ -210,7 +223,11 @@ test('Test 8: embedding_refs accepts null without schema error', () => {
   const { validateRecord } = freshRequire(CAT7_WRITER);
   const record = minimalRecord({ embedding_refs: null });
   const result = validateRecord(record);
-  assert.strictEqual(result.valid, true, `embedding_refs=null should be valid: ${JSON.stringify(result.errors)}`);
+  assert.strictEqual(
+    result.valid,
+    true,
+    `embedding_refs=null should be valid: ${JSON.stringify(result.errors)}`
+  );
 });
 
 // ── Summary ────────────────────────────────────────────────────────────────

@@ -163,7 +163,11 @@ describe('D2 Task-ID Unification', () => {
     // The legacy queue must only have one entry (no duplicates)
     const rawQueue = JSON.parse(fs.readFileSync(legacyQueuePath, 'utf8'));
     const matchingEntries = rawQueue.filter(e => e.description === params.description);
-    assert.strictEqual(matchingEntries.length, 1, 'legacy queue must have exactly 1 entry for duplicate enqueue');
+    assert.strictEqual(
+      matchingEntries.length,
+      1,
+      'legacy queue must have exactly 1 entry for duplicate enqueue'
+    );
   });
 
   // --------------------------------------------------------------------------

@@ -57,10 +57,7 @@ class SkillBundleError extends Error {
  */
 function _listBundleFiles(bundleDir) {
   if (!fs.existsSync(bundleDir)) {
-    throw new SkillBundleError(
-      `Bundle directory not found: ${bundleDir}`,
-      'BUNDLE_NOT_FOUND'
-    );
+    throw new SkillBundleError(`Bundle directory not found: ${bundleDir}`, 'BUNDLE_NOT_FOUND');
   }
 
   const entries = fs.readdirSync(bundleDir);
@@ -108,7 +105,7 @@ function _listBundleFiles(bundleDir) {
  */
 function _buildPayload(bundleDir, files) {
   return files
-    .map((fn) => {
+    .map(fn => {
       const content = fs.readFileSync(path.join(bundleDir, fn), 'utf8');
       return `${fn.length}:${fn}|${content.length}:${content}|`;
     })
@@ -159,10 +156,7 @@ function verifyBundle(bundleDir, signature, hmacKey) {
   if (computed.length !== signature.length) return false;
 
   try {
-    return crypto.timingSafeEqual(
-      Buffer.from(computed, 'hex'),
-      Buffer.from(signature, 'hex')
-    );
+    return crypto.timingSafeEqual(Buffer.from(computed, 'hex'), Buffer.from(signature, 'hex'));
   } catch {
     // Buffer.from will throw if signature contains non-hex characters
     return false;

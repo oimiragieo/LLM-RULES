@@ -67,10 +67,10 @@ describe('installSkill — valid bundle above trust threshold', () => {
     const { dir, sig } = makeSignedBundle();
     try {
       const result = await installSkill({
-        bundlePath: dir,        // local path, no network fetch in tests
+        bundlePath: dir, // local path, no network fetch in tests
         signature: sig,
         hmacKey: TEST_KEY,
-        dryRun: true,           // no actual file copy
+        dryRun: true, // no actual file copy
         force: false,
         trustThreshold: 50,
         // Provide quality signals so trust score >= 50
@@ -167,10 +167,10 @@ describe('installSkill — trust score below threshold', () => {
         hmacKey: TEST_KEY,
         dryRun: false,
         force: false,
-        trustThreshold: 80,    // high threshold
+        trustThreshold: 80, // high threshold
         trustSignals: {
           source: 'community',
-          hasTests: false,     // no tests → score ~0-30
+          hasTests: false, // no tests → score ~0-30
           ageDays: 0,
           downloadCount: 0,
           reviewRating: 0,
@@ -198,7 +198,7 @@ describe('installSkill — trust score below threshold', () => {
         signature: sig,
         hmacKey: TEST_KEY,
         dryRun: false,
-        force: true,           // force overrides threshold
+        force: true, // force overrides threshold
         installTarget,
         trustThreshold: 80,
         trustSignals: {
@@ -317,11 +317,21 @@ describe('installSkill — H-2: trust threshold coercion safety', () => {
         hmacKey: TEST_KEY,
         dryRun: false,
         force: false,
-        trustThreshold: 49.9,  // non-integer → coerced to fallback 50
-        trustSignals: { source: 'community', hasTests: false, ageDays: 0, downloadCount: 0, reviewRating: 0 },
+        trustThreshold: 49.9, // non-integer → coerced to fallback 50
+        trustSignals: {
+          source: 'community',
+          hasTests: false,
+          ageDays: 0,
+          downloadCount: 0,
+          reviewRating: 0,
+        },
       });
       // score=0, threshold=50 (fallback) → refused
-      assert.equal(result.status, 'refused', `Expected refused with float threshold coerced to 50, got ${result.status}`);
+      assert.equal(
+        result.status,
+        'refused',
+        `Expected refused with float threshold coerced to 50, got ${result.status}`
+      );
     } finally {
       cleanup(dir);
     }
@@ -341,10 +351,20 @@ describe('installSkill — H-2: trust threshold coercion safety', () => {
         dryRun: false,
         force: false,
         trustThreshold: -1,
-        trustSignals: { source: 'community', hasTests: false, ageDays: 0, downloadCount: 0, reviewRating: 0 },
+        trustSignals: {
+          source: 'community',
+          hasTests: false,
+          ageDays: 0,
+          downloadCount: 0,
+          reviewRating: 0,
+        },
       });
       // score=0, threshold=50 (fallback) → refused
-      assert.equal(result.status, 'refused', `Expected refused with negative threshold coerced to 50, got ${result.status}`);
+      assert.equal(
+        result.status,
+        'refused',
+        `Expected refused with negative threshold coerced to 50, got ${result.status}`
+      );
     } finally {
       cleanup(dir);
     }
@@ -364,10 +384,20 @@ describe('installSkill — H-2: trust threshold coercion safety', () => {
         dryRun: false,
         force: false,
         trustThreshold: 150,
-        trustSignals: { source: 'community', hasTests: false, ageDays: 0, downloadCount: 0, reviewRating: 0 },
+        trustSignals: {
+          source: 'community',
+          hasTests: false,
+          ageDays: 0,
+          downloadCount: 0,
+          reviewRating: 0,
+        },
       });
       // score=0, threshold=50 (fallback) → refused
-      assert.equal(result.status, 'refused', `Expected refused with >100 threshold coerced to 50, got ${result.status}`);
+      assert.equal(
+        result.status,
+        'refused',
+        `Expected refused with >100 threshold coerced to 50, got ${result.status}`
+      );
     } finally {
       cleanup(dir);
     }
@@ -387,10 +417,20 @@ describe('installSkill — H-2: trust threshold coercion safety', () => {
         dryRun: false,
         force: false,
         installTarget,
-        trustThreshold: 0,  // valid: 0 means allow everything
-        trustSignals: { source: 'community', hasTests: false, ageDays: 0, downloadCount: 0, reviewRating: 0 },
+        trustThreshold: 0, // valid: 0 means allow everything
+        trustSignals: {
+          source: 'community',
+          hasTests: false,
+          ageDays: 0,
+          downloadCount: 0,
+          reviewRating: 0,
+        },
       });
-      assert.equal(result.status, 'installed', `threshold=0 should allow install, got ${result.status}`);
+      assert.equal(
+        result.status,
+        'installed',
+        `threshold=0 should allow install, got ${result.status}`
+      );
     } finally {
       cleanup(dir);
       cleanup(installTarget);
@@ -409,11 +449,21 @@ describe('installSkill — H-2: trust threshold coercion safety', () => {
         hmacKey: TEST_KEY,
         dryRun: false,
         force: false,
-        trustThreshold: 100,  // valid: only score=100 passes
-        trustSignals: { source: 'community', hasTests: false, ageDays: 0, downloadCount: 0, reviewRating: 0 },
+        trustThreshold: 100, // valid: only score=100 passes
+        trustSignals: {
+          source: 'community',
+          hasTests: false,
+          ageDays: 0,
+          downloadCount: 0,
+          reviewRating: 0,
+        },
       });
       // score=0 < 100 → refused
-      assert.equal(result.status, 'refused', `threshold=100 with score=0 should refuse, got ${result.status}`);
+      assert.equal(
+        result.status,
+        'refused',
+        `threshold=100 with score=0 should refuse, got ${result.status}`
+      );
     } finally {
       cleanup(dir);
     }
@@ -429,7 +479,7 @@ describe('installSkill — invalid signature (hard block)', () => {
     try {
       const result = await installSkill({
         bundlePath: dir,
-        signature: 'deadbeef'.repeat(8),  // 64-char but wrong
+        signature: 'deadbeef'.repeat(8), // 64-char but wrong
         hmacKey: TEST_KEY,
         dryRun: false,
         force: false,
@@ -442,7 +492,11 @@ describe('installSkill — invalid signature (hard block)', () => {
           reviewRating: 4.0,
         },
       });
-      assert.equal(result.status, 'signature-invalid', `Expected signature-invalid, got "${result.status}"`);
+      assert.equal(
+        result.status,
+        'signature-invalid',
+        `Expected signature-invalid, got "${result.status}"`
+      );
     } finally {
       cleanup(dir);
     }
@@ -456,7 +510,7 @@ describe('installSkill — invalid signature (hard block)', () => {
         signature: 'deadbeef'.repeat(8),
         hmacKey: TEST_KEY,
         dryRun: false,
-        force: true,           // force does NOT override invalid signature
+        force: true, // force does NOT override invalid signature
         trustThreshold: 50,
         trustSignals: {
           source: 'community',
@@ -466,7 +520,11 @@ describe('installSkill — invalid signature (hard block)', () => {
           reviewRating: 4.0,
         },
       });
-      assert.equal(result.status, 'signature-invalid', `Expected signature-invalid even with --force, got "${result.status}"`);
+      assert.equal(
+        result.status,
+        'signature-invalid',
+        `Expected signature-invalid even with --force, got "${result.status}"`
+      );
     } finally {
       cleanup(dir);
     }

@@ -168,12 +168,9 @@ test('Test 4: missing predecessor → warning (not crash), returns partial chain
 
     // Act: must NOT throw — should return partial chain
     let result;
-    assert.doesNotThrow(
-      () => {
-        result = traceLineage('mB', tmpDir);
-      },
-      'traceLineage must not throw when predecessor is missing'
-    );
+    assert.doesNotThrow(() => {
+      result = traceLineage('mB', tmpDir);
+    }, 'traceLineage must not throw when predecessor is missing');
 
     // Assert: partial chain (at least the start record) is returned
     assert.ok(Array.isArray(result), 'traceLineage must return an array even for partial chains');
@@ -223,12 +220,9 @@ test('Test 6: cross-tier lineage (STM record references LTM predecessor) validat
 
     // Act: trace from stmChild — must cross tier boundary to find ltmRoot
     let chain;
-    assert.doesNotThrow(
-      () => {
-        chain = traceLineage('stmChild', tmpDir);
-      },
-      'Cross-tier lineage trace must not throw'
-    );
+    assert.doesNotThrow(() => {
+      chain = traceLineage('stmChild', tmpDir);
+    }, 'Cross-tier lineage trace must not throw');
 
     // Assert: ltmRoot is found even though it is in a different tier
     assert.ok(Array.isArray(chain), 'traceLineage must return an array');

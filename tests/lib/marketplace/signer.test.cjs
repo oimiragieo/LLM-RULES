@@ -153,7 +153,7 @@ describe('signBundle / verifyBundle — empty or missing directory', () => {
     try {
       assert.throws(
         () => signBundle(emptyDir, TEST_KEY),
-        (err) => {
+        err => {
           assert.equal(err.code, 'EMPTY_BUNDLE', `Expected EMPTY_BUNDLE, got ${err.code}`);
           return true;
         }
@@ -167,7 +167,7 @@ describe('signBundle / verifyBundle — empty or missing directory', () => {
     const missingDir = path.join(os.tmpdir(), 'nonexistent-skill-bundle-xyz-999');
     assert.throws(
       () => signBundle(missingDir, TEST_KEY),
-      (err) => {
+      err => {
         assert.equal(err.code, 'BUNDLE_NOT_FOUND', `Expected BUNDLE_NOT_FOUND, got ${err.code}`);
         return true;
       }
@@ -178,7 +178,7 @@ describe('signBundle / verifyBundle — empty or missing directory', () => {
     const missingDir = path.join(os.tmpdir(), 'nonexistent-skill-bundle-xyz-999');
     assert.throws(
       () => verifyBundle(missingDir, 'some-sig', TEST_KEY),
-      (err) => {
+      err => {
         assert.equal(err.code, 'BUNDLE_NOT_FOUND', `Expected BUNDLE_NOT_FOUND, got ${err.code}`);
         return true;
       }
@@ -207,7 +207,7 @@ describe('signer — H-3: weak key rejection', () => {
   it('signBundle throws when key is shorter than 32 chars', () => {
     assert.throws(
       () => signBundle(tmpDir, 'short-key'),
-      (err) => {
+      err => {
         assert.ok(
           err.message.includes('32') || err.message.toLowerCase().includes('hmac key'),
           `Expected key-length error, got: ${err.message}`
@@ -221,7 +221,7 @@ describe('signer — H-3: weak key rejection', () => {
     const key31 = 'a'.repeat(31);
     assert.throws(
       () => signBundle(tmpDir, key31),
-      (err) => {
+      err => {
         assert.ok(err.message.includes('32') || err.message.toLowerCase().includes('hmac key'));
         return true;
       }
@@ -235,17 +235,20 @@ describe('signer — H-3: weak key rejection', () => {
   });
 
   it('signBundle throws when key is not a string', () => {
-    assert.throws(() => signBundle(tmpDir, 12345), (err) => {
-      assert.ok(err.message.toLowerCase().includes('hmac key'));
-      return true;
-    });
+    assert.throws(
+      () => signBundle(tmpDir, 12345),
+      err => {
+        assert.ok(err.message.toLowerCase().includes('hmac key'));
+        return true;
+      }
+    );
   });
 
   it('verifyBundle throws when key is shorter than 32 chars', () => {
     const sig = signBundle(tmpDir, TEST_KEY);
     assert.throws(
       () => verifyBundle(tmpDir, sig, 'short'),
-      (err) => {
+      err => {
         assert.ok(err.message.includes('32') || err.message.toLowerCase().includes('hmac key'));
         return true;
       }
@@ -311,10 +314,12 @@ describe('signer — M-1: canonical payload format (length-prefixed)', () => {
       // With the fix, signBundle must throw NESTED_DIR_FOUND for bundles with subdirectories
       assert.throws(
         () => signBundle(dir, TEST_KEY),
-        (err) => {
+        err => {
           assert.ok(
-            err.code === 'NESTED_DIR_FOUND' || err.message.toLowerCase().includes('nested') ||
-            err.message.toLowerCase().includes('subdirector') || err.message.toLowerCase().includes('directory'),
+            err.code === 'NESTED_DIR_FOUND' ||
+              err.message.toLowerCase().includes('nested') ||
+              err.message.toLowerCase().includes('subdirector') ||
+              err.message.toLowerCase().includes('directory'),
             `Expected NESTED_DIR_FOUND error, got code=${err.code} message=${err.message}`
           );
           return true;
@@ -333,7 +338,7 @@ describe('signer — M-1: canonical payload format (length-prefixed)', () => {
       const files = fs.readdirSync(tmpDir).sort();
       // New canonical format: <flen>:<filename>|<clen>:<content>|
       const payload = files
-        .map((fn) => {
+        .map(fn => {
           const content = fs.readFileSync(path.join(tmpDir, fn), 'utf8');
           return `${fn.length}:${fn}|${content.length}:${content}|`;
         })
@@ -371,7 +376,7 @@ describe('signBundle — HMAC-SHA256 known-value vector (length-prefixed format)
       // Canonical form: length-prefixed "<flen>:<filename>|<clen>:<content>|"
       const files = fs.readdirSync(tmpDir).sort();
       const payload = files
-        .map((fn) => {
+        .map(fn => {
           const content = fs.readFileSync(path.join(tmpDir, fn), 'utf8');
           return `${fn.length}:${fn}|${content.length}:${content}|`;
         })

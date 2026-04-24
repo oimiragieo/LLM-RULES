@@ -81,11 +81,12 @@ describe('D8: Configurable Context Thresholds', () => {
 
   it('should use custom CONTEXT_THRESHOLD_BLOCK from env', () => {
     // Set block to 5K tokens (= 20K chars). Send 25K chars (6.25K tokens) -> should block
+    // v2.5.0 ADR: token hard-limit exits 4 (DEGRADE) instead of 2 (BLOCK)
     const result = runHook(makeTaskInput(25_000), {
       CONTEXT_THRESHOLD_WARN: '1000',
       CONTEXT_THRESHOLD_BLOCK: '5000',
     });
-    assert.equal(result.exitCode, 2, 'Should block (exit 2) above custom block threshold');
+    assert.equal(result.exitCode, 4, 'Should DEGRADE (exit 4) above custom block threshold');
   });
 
   it('should fall back to hardcoded 80K warn when env var is invalid', () => {
@@ -102,12 +103,13 @@ describe('D8: Configurable Context Thresholds', () => {
   });
 
   it('should fall back to hardcoded 120K block when env var is invalid', () => {
-    // Invalid env var, 130K tokens = 520K chars -> should block at default 120K
+    // Invalid env var, 130K tokens = 520K chars -> should DEGRADE at default 120K
+    // v2.5.0 ADR: token hard-limit exits 4 (DEGRADE) instead of 2 (BLOCK)
     const result = runHook(makeTaskInput(520_000), {
       CONTEXT_THRESHOLD_WARN: 'invalid',
       CONTEXT_THRESHOLD_BLOCK: 'invalid',
     });
-    assert.equal(result.exitCode, 2, 'Should block at default 120K threshold');
+    assert.equal(result.exitCode, 4, 'Should DEGRADE (exit 4) at default 120K threshold');
   });
 
   it('should allow prompts under custom warn threshold without message', () => {

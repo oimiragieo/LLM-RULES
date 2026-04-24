@@ -20,7 +20,10 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 
-const { scoreSkill, TIER_THRESHOLDS } = require('../../../.claude/lib/marketplace/trust-scorer.cjs');
+const {
+  scoreSkill,
+  TIER_THRESHOLDS,
+} = require('../../../.claude/lib/marketplace/trust-scorer.cjs');
 
 // ---------------------------------------------------------------------------
 // Test 1: builtin skill → tier=builtin, score=100 regardless of signals

@@ -82,7 +82,9 @@ function validateAgainstSchema(schema, data, currentPath) {
     const types = Array.isArray(schema.type) ? schema.type : [schema.type];
     const actualType = data === null ? 'null' : Array.isArray(data) ? 'array' : typeof data;
     if (!types.includes(actualType)) {
-      errors.push(`${currentPath || 'root'}: expected type [${types.join('|')}] but got ${actualType}`);
+      errors.push(
+        `${currentPath || 'root'}: expected type [${types.join('|')}] but got ${actualType}`
+      );
       return { valid: errors.length === 0, errors };
     }
   }
@@ -186,7 +188,9 @@ function createRecord(partial) {
   const now = new Date().toISOString();
   return Object.assign(
     {
-      id: crypto.randomUUID ? crypto.randomUUID() : `cat7-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      id: crypto.randomUUID
+        ? crypto.randomUUID()
+        : `cat7-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       concept: '',
       attributes: {},
       temporality: {

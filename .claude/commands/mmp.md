@@ -21,18 +21,18 @@ pnpm mmp:descendants <record-id> [flags]
 
 ## Subcommands
 
-| Subcommand    | Description                                                      |
-| ------------- | ---------------------------------------------------------------- |
+| Subcommand    | Description                                                     |
+| ------------- | --------------------------------------------------------------- |
 | `lineage`     | Print the ancestry chain from `record-id` back to earliest root |
 | `descendants` | Print all records whose lineage includes `record-id`            |
 
 ## Flags
 
-| Flag              | Default | Description                                    |
-| ----------------- | ------- | ---------------------------------------------- |
-| `--format=json`   | yes     | Output as JSON array                           |
-| `--format=tree`   | no      | Output as indented ASCII tree                  |
-| `--json`          | —       | Alias for `--format=json` (explicit override)  |
+| Flag            | Default | Description                                   |
+| --------------- | ------- | --------------------------------------------- |
+| `--format=json` | yes     | Output as JSON array                          |
+| `--format=tree` | no      | Output as indented ASCII tree                 |
+| `--json`        | —       | Alias for `--format=json` (explicit override) |
 
 ## Exit Codes
 
@@ -60,10 +60,10 @@ node .claude/tools/cli/mmp.cjs lineage my-record-id | jq '.[].concept'
 
 ## Environment Variables
 
-| Variable       | Description                                                       |
-| -------------- | ----------------------------------------------------------------- |
-| `MMP_BASE_DIR` | Override the base directory for CAT7 tier storage. Defaults to   |
-|                | `.claude/context/memory` relative to the project root.           |
+| Variable       | Description                                                    |
+| -------------- | -------------------------------------------------------------- |
+| `MMP_BASE_DIR` | Override the base directory for CAT7 tier storage. Defaults to |
+|                | `.claude/context/memory` relative to the project root.         |
 
 ## Notes
 
