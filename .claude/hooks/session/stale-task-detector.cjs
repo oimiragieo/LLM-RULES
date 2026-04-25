@@ -282,10 +282,21 @@ function runDetection() {
     }
 
     if (stale.length > 0) {
+      const cooldown = readCooldown();
+      const now2 = Date.now();
+      const fresh = stale.filter(({ taskId }) => {
+        const last = Number(cooldown[taskId] || 0);
+        return now2 - last > STALE_EMISSION_COOLDOWN_MS;
+      });
+      if (fresh.length > 0) {
+        for (const { taskId } of fresh) cooldown[taskId] = now2;
+        writeCooldown(cooldown);
+      }
+
       const detectedAt = new Date().toISOString();
       const queueEntries = [];
 
-      for (const { taskId, ageMin, subject } of stale) {
+      for (const { taskId, ageMin, subject } of fresh) {
         const msg = `[STALE-TASK] Task "${taskId}" has been in_progress for ${ageMin}m — router may have forgotten to call TaskUpdate(completed)`;
         process.stderr.write(msg + '\n');
         appendGapLog({
