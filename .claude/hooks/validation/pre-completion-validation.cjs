@@ -426,7 +426,9 @@ async function main() {
           if (taskStatusMode === 'block') {
             console.log(formatHookResult('block', msg));
             process.exit(2);
-          } else {
+          } else if (process.env.DEBUG_HOOKS === 'true') {
+            // Guard: only write advisory warn to stderr in debug mode to prevent
+            // stderr-write crashes from producing exit code 1 (SE-03).
             process.stderr.write(formatForStderr(asWarning(msg)) + '\n');
           }
         } else {
@@ -440,7 +442,9 @@ async function main() {
             if (taskStatusMode === 'block') {
               console.log(formatHookResult('block', msg));
               process.exit(2);
-            } else {
+            } else if (process.env.DEBUG_HOOKS === 'true') {
+              // Guard: only write advisory warn to stderr in debug mode to prevent
+              // stderr-write crashes from producing exit code 1 (SE-03).
               process.stderr.write(formatForStderr(asWarning(msg)) + '\n');
             }
           } else {

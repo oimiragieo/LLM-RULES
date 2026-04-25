@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Restore broken require in `reflection-queue-adapter.cjs` (post-D2 cleanup). Unblocks ~11% of test suite.
 - skills:index provenance drift for `trust-neg-xNenr8` SKILL.md — missing `source`, `trust_score`, and `provenance_sha` fields retroactively added via `skills-provenance-migrate.cjs`.
+- Guard advisory `process.stderr.write` calls in `pre-completion-validation.cjs` warn/allow path behind `DEBUG_HOOKS=true` to prevent stderr crashes from producing exit code 1 (SE-03 violation). TaskUpdate calls no longer fail with unhandled-error exit on task status warn path.
 
 ---
 
