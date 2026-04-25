@@ -66,3 +66,13 @@ BUG: CLAUDE_AGENT_ID env var not propagated to Bash subprocess hook context; age
 - **Fix candidate**: Guard auditLog call at pre-completion-validation.cjs line 449 behind debug flag. Remove unconditional stderr from allow transitions.
 - **Source**: Reflection of task 5 (2026-04-24); CRITICAL DEVIATION reported in reflection trigger.
 - **Tags**: hook-contract-violation, pre-completion-validation, stderr-stdout-inversion, task-5
+
+## P0 OPEN: Test pass rate unverified post-fix 7d46d28cc (2026-04-24)
+
+- **Status**: OPEN — MUST resolve before any release gate claim
+- **Symptom**: pnpm test re-run after commit 7d46d28cc timed out at 12min in the QA agent. active_context.md flags this as NOT PROVEN YET. Test suite audit report documents baseline of 5551/6239 (89%) BEFORE fix. Post-fix pass rate is UNVERIFIED.
+- **Risk**: Release gate cannot be claimed. The 6506/6512 (99.92%) figure in active_context.md was recorded as VERIFIED THIS SESSION but must be confirmed by a fresh pnpm test run in a clean session.
+- **Root cause**: QA agent pnpm test run timed out at 12min (default 120s timeout exceeded for 6239-test suite). Agent marked work partial and handed off without pass-rate evidence.
+- **Next action**: In next session, spawn QA agent with timeout:600000 (10min) to re-run pnpm test and compare output against 6506/6512 claim. If confirmed, update issues.md and CHANGELOG.
+- **Source**: Reflection of task 4 / gap-log trigger (2026-04-24T19:40:29Z).
+- **Tags**: test-suite, pass-rate-unverified, release-gate, timeout

@@ -1,11 +1,11 @@
 {
   "version": 1,
   "windowStartedAt": "2026-02-11T02:45:58.462Z",
-  "updatedAt": "2026-04-24T12:27:54.139Z",
+  "updatedAt": "2026-04-24T19:36:20.014Z",
   "counters": {
     "writesTotal": 0,
     "writesFailed": 0,
-    "readsTotal": 694,
+    "readsTotal": 695,
     "parseAttempts": 0,
     "parseFailures": 0,
     "lockAcquires": 0,
@@ -51,7 +51,7 @@
         31,
         42,
         420,
-        179,
+        180,
         15,
         5,
         2,
@@ -85,7 +85,7 @@
   },
   "latest": {
     "writeLatencyMs": null,
-    "readLatencyMs": 16,
+    "readLatencyMs": 14,
     "lockWaitMs": null,
     "lastError": null
   }

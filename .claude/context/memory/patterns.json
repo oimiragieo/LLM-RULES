@@ -509,5 +509,41 @@
     "archived": false,
     "id": "6107640b5a6b4a37bac66d0f96cb65f9f245dba9",
     "importance": 0.5
+  },
+  {
+    "text": "pnpm test (6200+ tests) consistently exceeds 120s default timeout. Always spawn QA agents with timeout:600000 (10min) and include pass-rate verification in post-run evidence before claiming release gate. Never accept a timed-out run as evidence of pass rate.",
+    "area": "main",
+    "timestamp": "2026-04-24T19:53:44.795Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "c4e515ba82c7f5f9415d9cf18260bea3d037dd97",
+    "importance": 0.5
+  },
+  {
+    "text": "Agent refresh (agent-updater skill) does NOT automatically verify integration wiring. After each agent refresh cycle, run artifact-integrator to verify catalog presence, routing keywords, and agent-registry.json entries are current. Confirmed gap: reflection-agent and artifact-integrator refreshed 2026-04-17/18 but wiring unverified.",
+    "area": "main",
+    "timestamp": "2026-04-24T19:55:06.562Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "2453a6f621e4e40be909df9958ebc2f973d55a7d",
+    "importance": 0.5
+  },
+  {
+    "text": "Dataflow audit pattern (task 3, 2026-04-24): End-to-end router→hooks→agents→skills→memory audit surfaces 7 class of integration gaps. Key categories: (1) agent registry/routing-table drift, (2) hook settings.json path mismatches, (3) hook stderr/stdout inversion (SE-03), (4) gap-log schema gaps (missing description field), (5) router tool-lockdown incomplete (mcp__* missing), (6) OWASP hook circuit-breaker absent, (7) SHA pinning absent in ingestion paths. Merge all findings into active_context.md for cross-session continuity.",
+    "area": "main",
+    "timestamp": "2026-04-24T19:58:27.095Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "6584f07057f20e6b4262feb5756fc458a5b60b32",
+    "importance": 0.5
   }
 ]
