@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const PROJECT_ROOT = process.cwd();
@@ -126,6 +127,85 @@ test('validate:sync script should work on Windows without bash', () => {
   );
 });
 
+test('validate-sync supports strict mode for CI parity enforcement', () => {
+  const scriptPath = join(PROJECT_ROOT, 'scripts', 'validation', 'validate-sync.mjs');
+  const script = readFileSync(scriptPath, 'utf-8');
+
+  assert.ok(script.includes('--strict'), 'validate-sync should expose a --strict mode');
+  assert.ok(
+    script.includes('VALIDATE_SYNC_STRICT'),
+    'validate-sync should support strict mode through an environment variable'
+  );
+  assert.ok(
+    script.includes('warnings treated as errors'),
+    'strict mode should fail when parity warnings are present'
+  );
+});
+
+test('validate-sync strict mode passes for the current multi-tool bundle contracts', () => {
+  const output = execFileSync(
+    process.execPath,
+    ['scripts/validation/validate-sync.mjs', '--strict'],
+    {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf-8',
+    }
+  );
+
+  assert.ok(output.includes('All checks passed!'), 'strict validate-sync should pass cleanly');
+  assert.ok(!output.includes('[WARN]'), 'strict validate-sync should not emit warnings');
+});
+
+test('bash validate-sync mirrors the current catalog ownership model', () => {
+  const scriptPath = join(PROJECT_ROOT, 'scripts', 'validation', 'validate-sync.sh');
+  const script = readFileSync(scriptPath, 'utf-8');
+
+  assert.ok(
+    !script.includes('.factory/droids'),
+    'bash validate-sync should not require legacy .factory/droids'
+  );
+  assert.ok(
+    !script.includes('"CLAUDE.md"') && !script.includes("'CLAUDE.md'"),
+    'bash validate-sync should not require root CLAUDE.md'
+  );
+  assert.ok(
+    !script.includes('CLAUDE_AGENTS" -eq "$CURSOR_AGENTS') &&
+      !script.includes('CLAUDE_AGENTS" -eq "$FACTORY_AGENTS'),
+    'bash validate-sync should not enforce one-to-one agent parity counts'
+  );
+  assert.ok(
+    script.includes('.claude/CLAUDE.md'),
+    'bash validate-sync should require .claude/CLAUDE.md as the canonical Claude doc'
+  );
+  assert.ok(
+    script.includes('.factory/skills'),
+    'bash validate-sync should validate Factory worker contracts under .factory/skills'
+  );
+});
+
+test('bash validate-sync checks Cursor routed agents and strict warnings mode', () => {
+  const scriptPath = join(PROJECT_ROOT, 'scripts', 'validation', 'validate-sync.sh');
+  const script = readFileSync(scriptPath, 'utf-8');
+
+  assert.ok(
+    script.includes('VALIDATE_SYNC_STRICT'),
+    'bash validate-sync should support strict mode through an environment variable'
+  );
+  assert.ok(script.includes('--strict'), 'bash validate-sync should expose a --strict mode');
+  assert.ok(
+    script.includes('agent_routing'),
+    'bash validate-sync should inspect .cursor/config.yaml agent_routing entries'
+  );
+  assert.ok(
+    script.includes('.cursor/subagents/${agent}.mdc'),
+    'bash validate-sync should validate routed agents against matching Cursor subagent files'
+  );
+  assert.ok(
+    script.includes('REQUIRED_CURSOR_SKILLS'),
+    'bash validate-sync should validate the required Cursor utility skills'
+  );
+});
+
 test('validate:full should include agent skill reference validation', () => {
   const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
   const fullScript = pkg.scripts['validate:full'] || '';
@@ -158,6 +238,24 @@ test('pnpm onlyBuiltDependencies should include better-sqlite3 for native bindin
   assert.ok(
     onlyBuiltDependencies.includes('better-sqlite3'),
     'pnpm.onlyBuiltDependencies should include better-sqlite3 so CI builds native bindings'
+  );
+  assert.ok(
+    Object.prototype.hasOwnProperty.call(pkg.dependencies || {}, 'better-sqlite3'),
+    'better-sqlite3 should remain a direct dependency when listed in onlyBuiltDependencies'
+  );
+});
+
+test('ESLint flat config replaces .eslintignore for node_modules and worktrees', () => {
+  assert.ok(
+    !existsSync(join(PROJECT_ROOT, '.eslintignore')),
+    '.eslintignore should be removed; ignore paths belong in eslint.config.js'
+  );
+  const cfg = readFileSync(join(PROJECT_ROOT, 'eslint.config.js'), 'utf-8');
+  assert.ok(cfg.includes('ignores:'), 'eslint.config.js should define a global ignores block');
+  assert.ok(cfg.includes('node_modules/'), 'eslint.config.js ignores should include node_modules/');
+  assert.ok(
+    cfg.includes('.claude/worktrees'),
+    'eslint.config.js ignores should include .claude/worktrees (was in .eslintignore)'
   );
 });
 

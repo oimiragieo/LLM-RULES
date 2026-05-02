@@ -14,6 +14,10 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PROJECT_ROOT = join(__dirname, '..', '..');
+const STRICT_WARNINGS =
+  process.argv.includes('--strict') ||
+  process.env.VALIDATE_SYNC_STRICT === '1' ||
+  String(process.env.VALIDATE_SYNC_STRICT || '').toLowerCase() === 'true';
 
 let ERRORS = 0;
 let WARNINGS = 0;
@@ -53,6 +57,35 @@ function countFiles(dir, extensions) {
   }
 }
 
+function extractCursorRoutingAgents(configText) {
+  if (!configText) {
+    return [];
+  }
+
+  const agents = [];
+  let inRouting = false;
+
+  for (const line of configText.split(/\r?\n/)) {
+    if (/^agent_routing:\s*$/.test(line)) {
+      inRouting = true;
+      continue;
+    }
+
+    if (inRouting && /^[^\s#][^:]*:\s*$/.test(line)) {
+      break;
+    }
+
+    if (inRouting) {
+      const match = line.match(/^[ ]{2}([a-z0-9-]+):\s*$/);
+      if (match) {
+        agents.push(match[1]);
+      }
+    }
+  }
+
+  return agents;
+}
+
 function fileExists(path) {
   return existsSync(join(PROJECT_ROOT, path));
 }
@@ -71,25 +104,35 @@ console.log('==========================================');
 console.log('');
 
 // ====================
-// 1. Count Agents
+// 1. Bundle Inventory
 // ====================
-console.log('1. Validating Agent Counts');
+console.log('1. Validating Bundle Inventory');
 console.log('-------------------------------------------');
 
 const CLAUDE_AGENTS = countFiles(join(PROJECT_ROOT, '.claude', 'agents'), ['.md']);
 const CURSOR_AGENTS = countFiles(join(PROJECT_ROOT, '.cursor', 'subagents'), ['.mdc']);
-const FACTORY_AGENTS = countFiles(join(PROJECT_ROOT, '.factory', 'droids'), ['.md']);
+const FACTORY_SKILLS = countFiles(join(PROJECT_ROOT, '.factory', 'skills'), ['SKILL.md']);
 
 info(`Claude agents: ${CLAUDE_AGENTS}`);
 info(`Cursor subagents: ${CURSOR_AGENTS}`);
-info(`Factory droids: ${FACTORY_AGENTS}`);
+info(`Factory worker skills: ${FACTORY_SKILLS}`);
 
-if (CLAUDE_AGENTS === CURSOR_AGENTS && CLAUDE_AGENTS === FACTORY_AGENTS) {
-  success('Agent counts match across all platforms');
+if (CLAUDE_AGENTS > 0) {
+  success('Claude canonical agent catalog is present');
 } else {
-  warning(
-    `Agent counts differ: Claude=${CLAUDE_AGENTS}, Cursor=${CURSOR_AGENTS}, Factory=${FACTORY_AGENTS}`
-  );
+  error('Claude canonical agent catalog is empty');
+}
+
+if (CURSOR_AGENTS > 0) {
+  success('Cursor curated subagent bundle is present');
+} else {
+  error('Cursor subagent bundle is empty');
+}
+
+if (FACTORY_SKILLS > 0) {
+  success('Factory worker skill bundle is present');
+} else {
+  error('Factory worker skill bundle is empty');
 }
 
 // ====================
@@ -107,17 +150,20 @@ if (existsSync(join(PROJECT_ROOT, '.cursor', 'plans'))) {
 
 if (existsSync(join(PROJECT_ROOT, '.cursor', 'subagents'))) {
   const CURSOR_SUBAGENTS = countFiles(join(PROJECT_ROOT, '.cursor', 'subagents'), ['.mdc']);
+  const routedAgents = extractCursorRoutingAgents(readFile('.cursor/config.yaml'));
+  const missingRoutedAgents = routedAgents.filter(
+    agent => !fileExists(`.cursor/subagents/${agent}.mdc`)
+  );
+
   info(`Cursor subagents: ${CURSOR_SUBAGENTS}`);
 
-  if (CLAUDE_AGENTS === CURSOR_SUBAGENTS) {
-    success('Cursor subagents count matches Claude agents');
+  if (missingRoutedAgents.length === 0) {
+    success(`Cursor routed agents are backed by subagent files (${routedAgents.length} checked)`);
   } else {
-    warning(
-      `Cursor subagents count (${CURSOR_SUBAGENTS}) differs from Claude agents (${CLAUDE_AGENTS})`
-    );
+    error(`Cursor config references missing subagents: ${missingRoutedAgents.join(', ')}`);
   }
 } else {
-  warning('.cursor/subagents/ directory not found');
+  error('.cursor/subagents/ directory not found');
 }
 
 // ====================
@@ -128,21 +174,44 @@ console.log('3. Validating Skill Parity');
 console.log('-------------------------------------------');
 
 const CLAUDE_SKILLS = countFiles(join(PROJECT_ROOT, '.claude', 'skills'), ['SKILL.md']);
+const REQUIRED_CURSOR_SKILLS = [
+  'artifact-publisher',
+  'context-bridge',
+  'handoff',
+  'repo-index',
+  'repo-rag',
+  'rule-auditor',
+  'rule-selector',
+  'scaffolder',
+];
+
 info(`Claude skills: ${CLAUDE_SKILLS}`);
 
 if (existsSync(join(PROJECT_ROOT, '.cursor', 'skills'))) {
-  const CURSOR_SKILLS = countFiles(join(PROJECT_ROOT, '.cursor', 'skills'), [
-    'SKILL.md',
-    'SKILL.mdc',
-  ]);
+  const CURSOR_SKILLS = countFiles(join(PROJECT_ROOT, '.cursor', 'skills'), ['.md', '.mdc']);
+  const missingCursorSkills = REQUIRED_CURSOR_SKILLS.filter(
+    skill =>
+      !fileExists(`.cursor/skills/${skill}.md`) &&
+      !fileExists(`.cursor/skills/${skill}/SKILL.md`) &&
+      !fileExists(`.cursor/skills/${skill}/SKILL.mdc`)
+  );
 
-  if (CLAUDE_SKILLS === CURSOR_SKILLS) {
-    success('Skill counts match between Claude and Cursor');
+  info(`Cursor skills: ${CURSOR_SKILLS}`);
+
+  if (missingCursorSkills.length === 0) {
+    success('Required Cursor utility skills are present');
   } else {
-    warning(`Skill counts differ: Claude=${CLAUDE_SKILLS}, Cursor=${CURSOR_SKILLS}`);
+    error(`Missing Cursor utility skills: ${missingCursorSkills.join(', ')}`);
   }
 } else {
-  info('Skipping skill parity checks (Cursor skills directory not found)');
+  error('Cursor skills directory not found');
+}
+
+if (existsSync(join(PROJECT_ROOT, '.factory', 'skills'))) {
+  info(`Factory worker skills: ${FACTORY_SKILLS}`);
+  success('Factory uses .factory/skills worker contracts; legacy .factory/droids is not required');
+} else {
+  error('Factory skills directory not found');
 }
 
 // ====================
@@ -208,6 +277,10 @@ if (ERRORS === 0 && WARNINGS === 0) {
   process.exit(0);
 } else if (ERRORS === 0) {
   console.log(`${colors.YELLOW}${WARNINGS} warning(s), 0 errors${colors.NC}`);
+  if (STRICT_WARNINGS) {
+    console.log(`${colors.RED}Strict mode: warnings treated as errors${colors.NC}`);
+    process.exit(1);
+  }
   process.exit(0);
 } else {
   console.log(`${colors.RED}${ERRORS} error(s), ${WARNINGS} warning(s)${colors.NC}`);

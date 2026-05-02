@@ -273,6 +273,7 @@
     "onlyBuiltDependencies": [
       "@ast-grep/cli",
       "@vscode/ripgrep",
+      "better-sqlite3",
       "esbuild",
       "onnxruntime-node",
       "protobufjs",
