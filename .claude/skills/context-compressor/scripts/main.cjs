@@ -31,7 +31,7 @@ function parseArgs(argv) {
   return options;
 }
 
-function runCommand(cmd, args, cwd = PROJECT_ROOT) {
+function runCommand(cmd, args, cwd = PROJECT_ROOT, extraEnv = {}) {
   return spawnSync(cmd, args, {
     cwd,
     encoding: 'utf8',
@@ -39,6 +39,7 @@ function runCommand(cmd, args, cwd = PROJECT_ROOT) {
     shell: false,
     env: {
       ...process.env,
+      ...extraEnv,
       PYTHONIOENCODING: 'utf-8', // Force UTF-8 on Windows (cp1252 breaks on unicode)
       PYTHONUTF8: '1', // Python 3.15+ UTF-8 mode
     },
@@ -46,20 +47,18 @@ function runCommand(cmd, args, cwd = PROJECT_ROOT) {
 }
 
 function runSearchQuery(run, query) {
-  const pnpmResult = run('pnpm', ['search:code', '--', query], PROJECT_ROOT);
-  if (pnpmResult.status === 0) return pnpmResult;
-
-  const fallback = run(
+  const localSearch = run(
     process.execPath,
     [path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'hybrid-search.cjs'), query],
-    PROJECT_ROOT
+    PROJECT_ROOT,
+    { HYBRID_SEARCH_DAEMON: 'off' }
   );
-  if (fallback.status === 0) return fallback;
+  if (localSearch.status === 0) return localSearch;
 
   return {
     status: 1,
-    stdout: fallback.stdout || pnpmResult.stdout || '',
-    stderr: fallback.stderr || pnpmResult.stderr || '',
+    stdout: localSearch.stdout || '',
+    stderr: localSearch.stderr || '',
   };
 }
 

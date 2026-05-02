@@ -78,7 +78,7 @@ test('main emits grouped memory records on successful workflow result', () => {
   assert.ok(result.memoryRecords.patterns.length > 0);
 });
 
-test('main falls back to direct hybrid-search CLI when pnpm search fails', () => {
+test('main calls direct hybrid-search CLI with daemon disabled', () => {
   const calls = [];
   const result = tokenSaver.main(
     {
@@ -86,11 +86,8 @@ test('main falls back to direct hybrid-search CLI when pnpm search fails', () =>
       failOnInsufficientEvidence: true,
     },
     {
-      runCommand: (cmd, args) => {
-        calls.push([cmd, ...args]);
-        if (cmd === 'pnpm') {
-          return { status: 1, stdout: '', stderr: 'pnpm failed' };
-        }
+      runCommand: (cmd, args, cwd, extraEnv) => {
+        calls.push({ cmd, args, cwd, extraEnv });
         return { status: 0, stdout: '1. src/router.cjs (88.2%)\n- routing flow', stderr: '' };
       },
       runTokenSaverWorkflow: () => ({
@@ -104,6 +101,8 @@ test('main falls back to direct hybrid-search CLI when pnpm search fails', () =>
   );
 
   assert.equal(result.ok, true);
-  assert.equal(calls[0][0], 'pnpm');
-  assert.equal(calls[1][0], process.execPath);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].cmd, process.execPath);
+  assert.ok(calls[0].args.some(arg => arg.endsWith('hybrid-search.cjs')));
+  assert.deepEqual(calls[0].extraEnv, { HYBRID_SEARCH_DAEMON: 'off' });
 });
