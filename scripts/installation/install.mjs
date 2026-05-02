@@ -161,12 +161,12 @@ function main() {
   }
 
   // Copy validation script to target directory
-  const validationScriptSrc = join(rootDir, 'scripts', 'validate-config.mjs');
-  const validationScriptDest = join(targetDir, 'scripts', 'validate-config.mjs');
+  const validationScriptSrc = join(rootDir, 'scripts', 'validation', 'validate-config.mjs');
+  const validationScriptDest = join(targetDir, 'scripts', 'validation', 'validate-config.mjs');
 
   if (existsSync(validationScriptSrc)) {
     try {
-      mkdirSync(join(targetDir, 'scripts'), { recursive: true });
+      mkdirSync(dirname(validationScriptDest), { recursive: true });
       copyFileSync(validationScriptSrc, validationScriptDest);
       console.log('+ Validation script copied\n');
     } catch (error) {
@@ -194,14 +194,14 @@ function main() {
     console.log('\nValidating configuration...\n');
     try {
       if (existsSync(validationScriptDest)) {
-        execSync('node scripts/validate-config.mjs', {
+        execSync('node scripts/validation/validate-config.mjs', {
           stdio: 'inherit',
           cwd: targetDir,
         });
         console.log('\n+ Configuration validation passed');
       } else {
         console.warn('+ Validation script not found, skipping validation');
-        console.warn('   Run manually: node scripts/validate-config.mjs');
+        console.warn('   Run manually: node scripts/validation/validate-config.mjs');
       }
     } catch (_error) {
       console.warn('\n+ Configuration validation found issues (see above)');
@@ -222,7 +222,7 @@ function main() {
   console.log('4. For Factory: Restart Factory Droid');
   console.log('\n5. Verify installation:');
   console.log(`   cd ${targetDir}`);
-  console.log('   node scripts/validate-config.mjs');
+  console.log('   node scripts/validation/validate-config.mjs');
   console.log('\n6. (Optional) Set up MCP servers:');
   console.log('   See .claude/docs/setup-guides/ for platform-specific setup');
   console.log('\n7. (Optional) Enable hooks:');
