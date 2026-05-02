@@ -38,7 +38,7 @@ class EntityExtractor {
         .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='entities'")
         .get();
       if (!tableCheck) {
-        console.log('[EntityExtractor] Database not initialized. Auto-initializing...');
+        process.stderr.write('[EntityExtractor] Database not initialized; auto-initializing\n');
         try {
           const initScript = require('../../tools/cli/init-memory-db.cjs');
           initScript.initializeDatabase(this.db);

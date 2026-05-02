@@ -10,6 +10,7 @@ const { MemoryVectorStore } = require('./lancedb-client.cjs');
 const { EntityQuery } = require('./entity-query.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
+const { calendarDaysBetween } = require('../utils/calendar-days.cjs');
 const {
   computeQualityScore,
   incrementLTMAccessCount,
@@ -371,18 +372,17 @@ class ContextualMemory {
     if (!Array.isArray(results) || results.length === 0) return results;
     const DECAY_RATE = parseFloat(process.env.MEMORY_RECENCY_DECAY_RATE || '0.1');
     const RECENCY_BOOST = parseFloat(process.env.MEMORY_RECENCY_BOOST || '0.3');
-    const now = Date.now();
-    const MS_PER_DAY = 86400000;
+    const now = new Date(Date.now());
 
     const weighted = results.map(r => {
       const meta = r?.metadata && typeof r.metadata === 'object' ? r.metadata : {};
       const ts = meta.consolidated_at || meta.created_at || meta.timestamp || null;
       let recencyWeight = 1.0;
       if (ts) {
-        const parsed = new Date(ts).getTime();
-        if (Number.isFinite(parsed) && parsed > 0) {
-          const daysSince = Math.max(0, (now - parsed) / MS_PER_DAY);
-          recencyWeight = 1.0 / (1 + daysSince * DECAY_RATE);
+        const daysSince = calendarDaysBetween(ts, now);
+        if (Number.isFinite(daysSince)) {
+          const clampedDaysSince = Math.max(0, daysSince);
+          recencyWeight = 1.0 / (1 + clampedDaysSince * DECAY_RATE);
         }
       }
       const originalScore = r.rrf_score ?? r.similarity ?? 0;

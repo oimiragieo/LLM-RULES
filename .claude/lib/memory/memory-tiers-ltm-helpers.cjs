@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { calendarDaysBetween } = require('../utils/calendar-days.cjs');
 
 /**
  * Determines whether a text string contains signal content worth storing in LTM.
@@ -147,8 +148,7 @@ function evictStaleLTMFiles(ltmDir) {
   if (files.length <= LTM_MAX_FILES) return { evicted: 0, skipped: 'below_max_files' };
 
   const { safeParseJSON } = require('../utils/safe-json.cjs');
-  const now = Date.now();
-  const MS_PER_DAY = 86400000;
+  const now = new Date(Date.now());
 
   // Fix 2 (P0 Mass Extinction Cap): pre-compute utilities for all evictable files,
   // then sort lowest utility first and cap at (files.length - LTM_MAX_FILES) evictions.
@@ -178,13 +178,14 @@ function evictStaleLTMFiles(ltmDir) {
     const ts = data.consolidated_at || data.created_at || data.timestamp || null;
     let stalenessDays;
     if (ts) {
-      const parsed = new Date(ts).getTime();
-      if (Number.isFinite(parsed) && parsed > 0) {
-        stalenessDays = Math.max(0, (now - parsed) / MS_PER_DAY);
+      const parsedDays = calendarDaysBetween(ts, now);
+      if (Number.isFinite(parsedDays)) {
+        stalenessDays = Math.max(0, parsedDays);
       } else {
         // Fix 3 (P1 mtime Fallback): invalid timestamp string → use file mtime
         try {
-          stalenessDays = Math.max(0, (now - fs.statSync(filePath).mtimeMs) / MS_PER_DAY);
+          const mtimeDays = calendarDaysBetween(new Date(fs.statSync(filePath).mtimeMs), now);
+          stalenessDays = Number.isFinite(mtimeDays) ? Math.max(0, mtimeDays) : Infinity;
         } catch (_e) {
           stalenessDays = Infinity;
         }
@@ -192,7 +193,8 @@ function evictStaleLTMFiles(ltmDir) {
     } else {
       // Fix 3 (P1 mtime Fallback): no timestamp fields at all → fall back to file mtime
       try {
-        stalenessDays = Math.max(0, (now - fs.statSync(filePath).mtimeMs) / MS_PER_DAY);
+        const mtimeDays = calendarDaysBetween(new Date(fs.statSync(filePath).mtimeMs), now);
+        stalenessDays = Number.isFinite(mtimeDays) ? Math.max(0, mtimeDays) : Infinity;
       } catch (_e) {
         stalenessDays = Infinity;
       }

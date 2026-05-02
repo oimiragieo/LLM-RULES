@@ -74,21 +74,6 @@ async function readFile(filePath) {
 }
 
 /**
- * Helper: Count lines in file
- */
-async function countLines(filePath) {
-  const content = await readFile(filePath);
-  if (!content) return 0;
-  const lines = content
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
-  if (lines.length === 0) return 0;
-  const expectedColumns = lines[0].split(',').length;
-  return lines.filter(line => line.split(',').length === expectedColumns).length;
-}
-
-/**
  * Helper: SHA-256 hash for integrity checking
  */
 function calculateHash(data) {
@@ -173,15 +158,24 @@ This is a test skill created for E2E testing. It should be indexed and searchabl
         'build-knowledge-base-index.cjs'
       );
 
-      // Get initial index line count
-      const initialLines = await countLines(KB_INDEX_PATH);
-
       // Build index
       exec(`node "${indexBuilder}"`, { silent: true });
 
-      // Verify index was updated
-      const finalLines = await countLines(KB_INDEX_PATH);
-      assert.ok(finalLines >= initialLines, 'Index should have same or more entries');
+      const indexContent = await readFile(KB_INDEX_PATH);
+      assert.ok(indexContent, 'Index file should exist and be readable');
+      assert.ok(
+        indexContent.startsWith(
+          'name,path,description,domain,complexity,use_cases,tools,deprecated,alias,usage_count,last_used'
+        ),
+        'Index should include the expected CSV header'
+      );
+
+      delete require.cache[require.resolve(KB_READER_PATH)];
+      const kb = require(KB_READER_PATH);
+      kb.clearCache();
+      const skill = kb.get(testSkillName);
+      assert.ok(skill, `Rebuilt index should include "${testSkillName}"`);
+      assert.strictEqual(skill.domain, 'skill', 'Indexed artifact should be a skill');
     });
 
     it('should find test skill in index via grep', async () => {
@@ -669,7 +663,6 @@ New content`;
 module.exports = {
   exec,
   readFile,
-  countLines,
   calculateHash,
 };
 

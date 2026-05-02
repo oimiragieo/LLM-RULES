@@ -16,6 +16,9 @@ const { spawn } = require('child_process');
 const { PROJECT_ROOT: _PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { assembleSpawnPrompt, assembleSpawnPromptAsync } = require('../spawn/prompt-assembler.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { createLogger } = require('../utils/logger.cjs');
+
+const logger = createLogger('task-tools');
 
 function cleanupSharedStores() {
   try {
@@ -122,7 +125,7 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
     throw new Error('prompt is required');
   }
 
-  console.log(`[Task Tool] Spawning ${subagent_type} agent for: ${description}`);
+  logger.info('Spawning task agent', { subagentType: subagent_type, description });
 
   try {
     // Assemble the complete spawn prompt with tools and skills
@@ -185,9 +188,10 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
       };
     }
 
-    console.log(
-      `[Task Tool] Simulating spawn for ${subagent_type} (prompt length: ${assembledPrompt.length})`
-    );
+    logger.info('Simulating task agent spawn', {
+      subagentType: subagent_type,
+      promptLength: assembledPrompt.length,
+    });
     return {
       status: 'completed',
       agent: subagent_type,

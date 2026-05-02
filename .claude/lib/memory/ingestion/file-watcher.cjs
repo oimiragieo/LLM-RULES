@@ -12,6 +12,9 @@
 const fs = require('fs');
 const path = require('path');
 const { enqueueMessage } = require('../../db/queue-operations.cjs');
+const { createLogger } = require('../../utils/logger.cjs');
+
+const logger = createLogger('memory-file-watcher');
 
 // Debounce map to prevent rapid-fire redundant events
 const debounceMap = new Map();
@@ -58,7 +61,7 @@ function shouldIgnore(filePath) {
  * @param {import('better-sqlite3').Database} db - SQLite db instance for enqueue
  */
 function startWatcher(rootDir = process.cwd(), db) {
-  console.log(`[Memory] Starting recursive file watcher on: ${rootDir}`);
+  logger.info('Starting recursive file watcher', { rootDir });
 
   try {
     fs.watch(rootDir, { recursive: true }, (eventType, filename) => {
@@ -98,9 +101,7 @@ function startWatcher(rootDir = process.cwd(), db) {
     });
   } catch (err) {
     console.error(`[Memory] Failed to start watcher: ${err.message}`);
-    console.log(
-      '[Memory] Ensure you are on a platform that supports native recursive fs.watch (Windows/macOS)'
-    );
+    logger.warn('Native recursive fs.watch is unavailable on this platform');
   }
 }
 

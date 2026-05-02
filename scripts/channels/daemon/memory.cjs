@@ -20,6 +20,10 @@
 const fs = require('fs');
 const path = require('path');
 const { claudeSync } = require('./claude-cli.cjs');
+const {
+  calendarDaysBetween,
+  formatLocalDateKey,
+} = require('../../../.claude/lib/utils/calendar-days.cjs');
 
 const MAX_MESSAGES_PER_CHAT = 30;
 const MAX_CONTEXT_CHARS = 6000;
@@ -329,7 +333,7 @@ class DaemonMemory {
   // ── Usage Tracking ──────────────────────────────────────────────────────
 
   trackUsage(chatId, model, estimatedTokens) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = formatLocalDateKey();
     const costRates = { haiku: 0.8, sonnet: 3.0, opus: 15.0 };
     const rate = costRates[model] || 3.0;
     const cost = (estimatedTokens / 1_000_000) * rate;
@@ -349,11 +353,11 @@ class DaemonMemory {
     const data = this.usage.get(chatId);
     if (!data) return { today: null, week: null, month: null };
 
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const today = formatLocalDateKey(now);
     const todayStats = data.dates[today] || null;
 
     // Aggregate week + month
-    const now = Date.now();
     let weekTokens = 0,
       weekCost = 0,
       weekMsgs = 0;
@@ -361,13 +365,14 @@ class DaemonMemory {
       monthCost = 0,
       monthMsgs = 0;
     for (const [date, stats] of Object.entries(data.dates)) {
-      const age = now - new Date(date).getTime();
-      if (age < 7 * 86400000) {
+      const ageDays = calendarDaysBetween(date, now);
+      if (!Number.isFinite(ageDays)) continue;
+      if (ageDays < 7) {
         weekTokens += stats.tokens;
         weekCost += stats.cost;
         weekMsgs += stats.messages;
       }
-      if (age < 30 * 86400000) {
+      if (ageDays < 30) {
         monthTokens += stats.tokens;
         monthCost += stats.cost;
         monthMsgs += stats.messages;

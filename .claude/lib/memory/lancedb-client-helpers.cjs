@@ -1,4 +1,7 @@
 const fs = require('fs');
+const { createLogger } = require('../utils/logger.cjs');
+
+const logger = createLogger('lancedb-client-helpers');
 
 const TYPED_METADATA_FIELDS = {
   filePath: 'meta_filePath',
@@ -29,7 +32,7 @@ function configureCudaPath() {
 
     process.env.CUDA_PATH = cudaPath;
     process.env.PATH = `${cudaBinPath};${process.env.PATH || ''}`;
-    console.log(`📍 CUDA_PATH configured for ${version} (found ${cudartDll})`);
+    logger.info('CUDA_PATH configured', { version, cudartDll });
     break;
   }
 

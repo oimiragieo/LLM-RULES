@@ -30,20 +30,19 @@ function escapeCSV(value) {
 
   // Formula characters that trigger Excel/Sheets execution
   const dangerousStarts = ['=', '+', '-', '@', '\t', '\r', '\n'];
+  const isDangerous = dangerousStarts.some(char => value.startsWith(char));
+  let escaped = value.replace(/\r?\n|\r/g, ' ');
 
-  for (const char of dangerousStarts) {
-    if (value.startsWith(char)) {
-      // Prefix with single quote to prevent formula execution
-      return "'" + value;
-    }
+  if (isDangerous) {
+    escaped = "'" + escaped;
   }
 
   // Handle commas and quotes in CSV
-  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
-    return `"${value.replace(/"/g, '""')}"`;
+  if (escaped.includes(',') || escaped.includes('"')) {
+    return `"${escaped.replace(/"/g, '""')}"`;
   }
 
-  return value;
+  return escaped;
 }
 
 /**

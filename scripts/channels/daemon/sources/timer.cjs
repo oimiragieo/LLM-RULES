@@ -11,6 +11,11 @@
  */
 'use strict';
 
+const {
+  calendarDaysBetween,
+  formatLocalDateKey,
+} = require('../../../../.claude/lib/utils/calendar-days.cjs');
+
 class TimerSource {
   constructor(config, dispatch, getLastActivityFn) {
     this.dispatch = dispatch;
@@ -35,10 +40,11 @@ class TimerSource {
     if (idleMs > 0 && idleMs < 300000) return; // <5 min idle → sleep
 
     const now = new Date();
+    const nowMs = Date.now();
     const hour = now.getHours();
     const minute = now.getMinutes();
     const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ...6=Sat
-    const today = now.toISOString().split('T')[0];
+    const today = formatLocalDateKey(now);
 
     for (const schedule of this.schedules) {
       // Dedup: max 1 fire per schedule per day
@@ -47,7 +53,7 @@ class TimerSource {
 
       // Simple cron matching: "H M * * DOW" or "H M * * *"
       if (this._matchesCron(schedule.cron, hour, minute, dayOfWeek)) {
-        this.lastFired.set(lastKey, Date.now());
+        this.lastFired.set(lastKey, nowMs);
         this.dispatch({
           type: `timer.${schedule.name}`,
           source: 'timer',
@@ -63,7 +69,13 @@ class TimerSource {
 
     // Clean old dedup entries (keep last 7 days)
     for (const [key, ts] of this.lastFired) {
-      if (Date.now() - ts > 7 * 86400000) this.lastFired.delete(key);
+      const dateStart = key.lastIndexOf(':') + 1;
+      const firedDate = dateStart > 0 ? key.slice(dateStart) : new Date(ts);
+      let ageDays = calendarDaysBetween(firedDate, now);
+      if (!Number.isFinite(ageDays)) ageDays = calendarDaysBetween(new Date(ts), now);
+      if (Number.isFinite(ageDays) && ageDays >= 7) {
+        this.lastFired.delete(key);
+      }
     }
   }
 

@@ -11,6 +11,9 @@ const fs = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { createLogger } = require('../utils/logger.cjs');
+
+const logger = createLogger('embedding-generator');
 
 // Default configuration for embedding generation
 const DEFAULT_OPTIONS = {
@@ -108,7 +111,7 @@ class EmbeddingGenerator {
       try {
         const { pipeline } = await import('@xenova/transformers');
 
-        console.log(`Loading embedding model: ${this.options.model}...`);
+        logger.info('Loading embedding model', { model: this.options.model });
         this.pipeline = await pipeline('feature-extraction', this.options.model, {
           quantized: true, // Use quantized model for faster inference
           // Note: GPU acceleration not available in Node.js
@@ -135,7 +138,7 @@ class EmbeddingGenerator {
 
     this.initialized = true;
     if (!forceMock) {
-      console.log('Embedding model loaded successfully');
+      logger.info('Embedding model loaded successfully');
     }
 
     // Load cache if enabled
@@ -165,8 +168,11 @@ class EmbeddingGenerator {
             this.batchSize = detector.recommendBatchSize(this.gpuMemoryMB);
           }
 
-          console.log(`✅ GPU Detected: ${this.gpuName} (${this.gpuMemoryMB}MB)`);
-          console.log(`Using batch size: ${this.batchSize}`);
+          logger.info('GPU detected', {
+            gpuName: this.gpuName,
+            gpuMemoryMB: this.gpuMemoryMB,
+            batchSize: this.batchSize,
+          });
           return;
         }
       }
@@ -186,14 +192,17 @@ class EmbeddingGenerator {
           this.batchSize = detector.recommendBatchSize(this.gpuMemoryMB);
         }
 
-        console.log(`✅ GPU Detected: ${this.gpuName} (${this.gpuMemoryMB}MB)`);
-        console.log(`Using batch size: ${this.batchSize}`);
+        logger.info('GPU detected', {
+          gpuName: this.gpuName,
+          gpuMemoryMB: this.gpuMemoryMB,
+          batchSize: this.batchSize,
+        });
       } else {
-        console.log('⚠️ No GPU detected, using CPU');
+        logger.warn('No GPU detected, using CPU');
         this.device = 'cpu';
       }
     } catch (error) {
-      console.log(`⚠️ GPU detection failed, falling back to CPU: ${error.message}`);
+      logger.warn('GPU detection failed, falling back to CPU', { error: error.message });
       this.device = 'cpu';
     }
   }
@@ -379,7 +388,7 @@ class EmbeddingGenerator {
       const data = await fs.readFile(this.options.cachePath, 'utf-8');
       const cacheData = safeParseJSON(data);
       this.cache = new Map(Object.entries(cacheData));
-      console.log(`Loaded ${this.cache.size} cached embeddings`);
+      logger.info('Loaded cached embeddings', { count: this.cache.size });
     } catch (_error) {
       // Cache file doesn't exist or is invalid
       this.cache = new Map();
