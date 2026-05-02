@@ -16,6 +16,7 @@ const os = require('node:os');
 const {
   parseAgents,
   discoverAgentsFile,
+  discoverAndParseAgents,
   extractSection,
 } = require('../../.claude/lib/mission/agents-parser.cjs');
 
@@ -220,6 +221,22 @@ Test info here.
       assert.ok(result.path.includes('parent'), 'should find parent version');
     });
 
+    it('discoverAndParseAgents respects stopDir during parent traversal', () => {
+      const parentAgents = `# Parent AGENTS
+
+## Build & Test
+- Parent command that must not leak
+`;
+      fs.writeFileSync(path.join(parentDir, 'AGENTS.md'), parentAgents, 'utf8');
+
+      const result = discoverAndParseAgents(cwdDir, { stopDir: cwdDir });
+
+      assert.ok(
+        !result.buildAndTest.includes('Parent command that must not leak'),
+        'discoverAndParseAgents should not parse AGENTS.md above stopDir'
+      );
+    });
+
     it('falls back to user global (~/.claude/AGENTS.md)', () => {
       // Skip this test on systems where home directory is not standard
       const homeDir = os.homedir();
@@ -249,7 +266,7 @@ Test info here.
         const previousDir = process.cwd();
         process.chdir(isolatedDir);
 
-        const result = discoverAgentsFile();
+        const result = discoverAgentsFile(isolatedDir, { stopDir: isolatedDir });
 
         // Restore previous directory before cleanup
         process.chdir(previousDir);

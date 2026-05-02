@@ -19,8 +19,16 @@ const { execFileSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 
 const HOOK_PATH = path.resolve(__dirname, '../../.claude/hooks/monitoring/ccusage-statusline.cjs');
+const PROJECT_STATUS_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'ccusage-status.txt'
+);
 
 /**
  * Run the hook with given env overrides and return { stdout, stderr, exitCode }.
@@ -258,5 +266,55 @@ test('writes status to runtime file when CCUSAGE_RUNTIME_DIR is set', () => {
     assert.match(content, /300/, 'status file must contain total token count (100+200=300)');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('writes default status file under PROJECT_ROOT when cwd is outside repo', () => {
+  const { spawnSync } = require('child_process');
+  const outsideCwd = fs.mkdtempSync(path.join(os.tmpdir(), 'ccusage-outside-cwd-'));
+  const backup = fs.existsSync(PROJECT_STATUS_FILE)
+    ? fs.readFileSync(PROJECT_STATUS_FILE, 'utf8')
+    : null;
+
+  try {
+    fs.rmSync(PROJECT_STATUS_FILE, { force: true });
+
+    const result = spawnSync('node', [HOOK_PATH], {
+      input: '{}',
+      cwd: outsideCwd,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        CCUSAGE_DISABLED: 'false',
+        CCUSAGE_TEST_MOCK_DATA: JSON.stringify({
+          inputTokens: 10,
+          outputTokens: 20,
+          cacheCreationTokens: 0,
+          cacheReadTokens: 0,
+          totalCost: 0.001,
+        }),
+      },
+      shell: false,
+      timeout: 10_000,
+    });
+
+    assert.equal(result.status ?? 0, 0, 'Hook must exit 0');
+    assert.ok(
+      fs.existsSync(PROJECT_STATUS_FILE),
+      'default ccusage status must be written under PROJECT_ROOT'
+    );
+    assert.equal(
+      fs.existsSync(path.join(outsideCwd, '.claude', 'context', 'runtime', 'ccusage-status.txt')),
+      false,
+      'default ccusage status must not be written under process.cwd()'
+    );
+  } finally {
+    if (backup === null) {
+      fs.rmSync(PROJECT_STATUS_FILE, { force: true });
+    } else {
+      fs.mkdirSync(path.dirname(PROJECT_STATUS_FILE), { recursive: true });
+      fs.writeFileSync(PROJECT_STATUS_FILE, backup, 'utf8');
+    }
+    fs.rmSync(outsideCwd, { recursive: true, force: true });
   }
 });

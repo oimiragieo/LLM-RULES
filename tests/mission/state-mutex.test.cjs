@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const Ajv = require('ajv');
+const addFormats = require('ajv-formats');
 
 // Module under test (will be created)
 const {
@@ -30,6 +31,7 @@ const STATE_SCHEMA = {
 };
 
 const ajv = new Ajv({ allErrors: true, strict: false });
+addFormats(ajv);
 const validateState = ajv.compile(STATE_SCHEMA);
 
 describe('State Mutex', () => {

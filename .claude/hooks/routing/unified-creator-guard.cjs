@@ -248,8 +248,9 @@ function mapMcpToWatchedTool(toolName) {
 function findRequiredCreator(filePath) {
   if (!filePath) return null;
 
-  // Normalize path separators for consistent matching
-  const normalizedPath = filePath.replace(/\\/g, '/');
+  const normalizedPath = String(filePath || '')
+    .replace(/%(?:25)*(2f|5c)/gi, (_, code) => (code.toLowerCase() === '2f' ? '/' : '\\'))
+    .replace(/\\/g, '/');
 
   for (const config of CREATOR_CONFIGS) {
     // Check exclude patterns first
@@ -258,7 +259,6 @@ function findRequiredCreator(filePath) {
       if (excluded) continue;
     }
 
-    // Check include patterns
     const matched = config.patterns.some(pattern => pattern.test(normalizedPath));
 
     if (matched) {

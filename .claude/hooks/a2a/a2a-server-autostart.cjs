@@ -169,14 +169,14 @@ function runMain(sessionId) {
         'node',
         [
           '-e',
-          `const s=require("net").createConnection(${probePort},"127.0.0.1");s.on("connect",()=>{s.destroy();process.exit(0)});s.on("error",()=>process.exit(1))`,
+          `const s=require("net").createConnection(${probePort},"127.0.0.1");s.on("connect",()=>{s.destroy();process.exit(0)});s.on("error",()=>process.exit(2))`,
         ],
         { timeout: 2000, stdio: 'ignore', windowsHide: true, shell: false }
       );
       // If we reach here (exit 0), port is in use — server already running
       process.exit(0);
     } catch (_) {
-      // Port not in use (exit 1 from probe) — continue to spawn
+      // Port not in use (non-zero probe exit) — continue to spawn
     }
 
     // ── 5. Determine port ─────────────────────────────────────────────────────

@@ -448,6 +448,9 @@ if (require.main === module) {
     const result = handler(hookInput);
 
     process.stdout.write(JSON.stringify(result));
-    process.exit(result.allowed ? 0 : 2);
+    if (result.allowed) {
+      process.exit(0);
+    }
+    process.exit(2);
   });
 }

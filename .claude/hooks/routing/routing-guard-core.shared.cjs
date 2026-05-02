@@ -48,8 +48,8 @@ function loadBlockDedupeStateFromDisk() {
   try {
     if (!fs.existsSync(BLOCK_DEDUPE_STATE_PATH)) return {};
     const raw = fs.readFileSync(BLOCK_DEDUPE_STATE_PATH, 'utf8');
-    const { success, data } = safeParseJSON(raw, 'routing-block-dedupe');
-    return success && data && typeof data === 'object' ? data : {};
+    const data = safeParseJSON(raw, null);
+    return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
   } catch (_err) {
     return {};
   }

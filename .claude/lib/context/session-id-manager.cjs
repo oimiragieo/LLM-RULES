@@ -2,11 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
-function getOrCreateSessionId(
-  runtimeDir = path.join(process.cwd(), '.claude/context/runtime'),
-  options = {}
-) {
+const DEFAULT_RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+
+function getOrCreateSessionId(runtimeDir = DEFAULT_RUNTIME_DIR, options = {}) {
   const { force = false } = options;
 
   if (process.env.CLAUDE_SESSION_ID) {

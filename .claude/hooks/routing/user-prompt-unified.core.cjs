@@ -19,14 +19,11 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync: spawnSync } = require('child_process');
-// Resolve paths for reliable module loading
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
-// Helper for lib requires
 function libRequire(modulePath) {
   return require(path.join(LIB_DIR, modulePath));
 }
-// Import shared utilities
 const { PROJECT_ROOT: _PROJECT_ROOT } = libRequire(path.join('utils', 'project-root.cjs'));
 const { parseHookInputAsync: parseHookInputAsync } = libRequire(
   path.join('utils', 'hook-input.cjs')
@@ -2286,9 +2283,12 @@ const INJECTION_PATTERNS = {
         });
         if (eventBus) {
           eventBus.emit(EventTypes.SECURITY_VIOLATION, {
-            type: 'prompt_injection_attempt',
+            type: EventTypes.SECURITY_VIOLATION,
             pattern: key,
             category: config.category,
+            violationType: 'prompt_injection_attempt',
+            toolName: 'UserPromptSubmit',
+            reason: `prompt_injection_detected:${config.category}`,
             timestamp: new Date().toISOString(),
           });
         }

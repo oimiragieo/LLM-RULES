@@ -583,9 +583,7 @@ async function main() {
   let targetFilePath = '';
   try {
     const hookInput = await parseHookInputAsync();
-    if (!hookInput) {
-      process.exit(0);
-    }
+    if (!hookInput) process.exit(0);
 
     const toolName = getToolName(hookInput);
     const toolInput = getToolInput(hookInput);
@@ -593,9 +591,7 @@ async function main() {
 
     // Only handle write tools
     const WRITE_TOOLS = ['Edit', 'Write', 'NotebookEdit'];
-    if (!WRITE_TOOLS.includes(toolName)) {
-      process.exit(0);
-    }
+    if (!WRITE_TOOLS.includes(toolName)) process.exit(0);
 
     // Run all checks sequentially
     for (const check of CHECKS) {
@@ -625,7 +621,8 @@ async function main() {
         });
 
         console.log(formatResult(result.result, result.message));
-        process.exit(result.result === 'block' ? 2 : 0);
+        if (result.result === 'block') process.exit(2);
+        process.exit(0);
       }
     }
 

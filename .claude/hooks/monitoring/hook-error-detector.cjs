@@ -23,8 +23,8 @@
 const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
-const PROJECT_ROOT = process.cwd();
 const RUNTIME_DIR =
   process.env.HOOK_ERROR_DETECTOR_RUNTIME_DIR ||
   path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');

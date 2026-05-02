@@ -10,7 +10,7 @@ const { spawnSync } = require('node:child_process');
 
 const GATE = path.resolve(__dirname, '../../../.claude/hooks/monitoring/slo-alert-gate.cjs');
 
-test('slo alert gate exits 2 when p95 exceeds threshold', () => {
+test('slo alert gate exits 4 when p95 exceeds threshold', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'slo-alert-'));
   const metricsPath = path.join(tempRoot, 'slo-metrics.json');
   try {
@@ -34,7 +34,7 @@ test('slo alert gate exits 2 when p95 exceeds threshold', () => {
       },
       encoding: 'utf8',
     });
-    assert.equal(result.status, 2);
+    assert.equal(result.status, 4);
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }

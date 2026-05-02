@@ -314,7 +314,7 @@ async function main() {
           process.stderr.write(
             'ESCALATE: blockerType=concurrent_evolution needsFrom=user blocker=evolution_lock_active\n'
           );
-          process.exit(3);
+          process.exit(2);
         } else {
           console.log(JSON.stringify({ result: 'warn', message: msg }));
           process.exit(0);

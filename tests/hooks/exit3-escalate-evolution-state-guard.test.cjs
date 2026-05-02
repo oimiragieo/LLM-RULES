@@ -1,13 +1,13 @@
 'use strict';
 
 /**
- * EXIT-3 ESCALATE regression tests: evolution-state-guard.cjs
+ * Evolution-state guard block regression tests.
  *
- * v2.5.0 slice B: Evolution lock active site converted from exit(2) to
- * exit(3) with structured ESCALATE: stderr trailer per ADR-2026-04-21.
+ * Direct hook blocks use exit 2. The stderr trailer keeps structured
+ * escalation metadata for downstream dispatchers.
  *
  * Site:
- *   Line ~314 — evolution lock active (concurrent evolution) → exit 3,
+ *   Line ~314 - evolution lock active (concurrent evolution) -> exit 2,
  *   blockerType=concurrent_evolution, blocker=evolution_lock_active
  */
 
@@ -81,10 +81,10 @@ function removeLock() {
 }
 
 // ---------------------------------------------------------------------------
-// Site 5: evolution lock active → exit 3 (not 2)
+// Site 5: evolution lock active -> exit 2
 // ---------------------------------------------------------------------------
 
-test('site5: evolution lock active when starting idle→evaluating → exit 3 (not 2)', () => {
+test('site5: evolution lock active when starting idle->evaluating -> exit 2', () => {
   // Pre-create a live lock so acquireEvolutionLock will fail
   writeFreshLock('other-evolution-process');
 
@@ -93,8 +93,8 @@ test('site5: evolution lock active when starting idle→evaluating → exit 3 (n
 
   assert.equal(
     result.status,
-    3,
-    `Expected exit 3 (ESCALATE) when evolution lock active, got ${result.status}. stderr: ${result.stderr}`
+    2,
+    `Expected exit 2 when evolution lock active, got ${result.status}. stderr: ${result.stderr}`
   );
 });
 
@@ -122,7 +122,7 @@ test('site5: evolution lock active → ESCALATE trailer with blockerType=concurr
   );
 });
 
-test('site5: evolution lock active in warn mode → exit 0 (warn unchanged)', () => {
+test('site5: evolution lock active in warn mode -> exit 0 (warn unchanged)', () => {
   writeFreshLock('other-process');
 
   const result = runHook('Write', evolutionWriteInput('evaluating'), {
@@ -137,7 +137,7 @@ test('site5: evolution lock active in warn mode → exit 0 (warn unchanged)', ()
   );
 });
 
-test('site5: no lock active → idle→evaluating transition succeeds (exit 0)', () => {
+test('site5: no lock active -> idle->evaluating transition succeeds (exit 0)', () => {
   // Ensure no lock exists
   removeLock();
 

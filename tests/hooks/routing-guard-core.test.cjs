@@ -198,6 +198,51 @@ test('Bug 2: setBlockDedupeState uses atomic write (atomicWriteJSONSync)', async
   });
 });
 
+test('Bug 2 regression: registerBlockAttempt loads persisted dedupe state before counting', async t => {
+  const tmpDir = makeTmpDir();
+  const dedupeFile = path.join(tmpDir, 'routing-block-dedupe.json');
+  const sessionId = 'test-session-bug2-persisted';
+  const dedupeKey = `${sessionId}:persisted-check:Task`;
+
+  fs.writeFileSync(
+    dedupeFile,
+    JSON.stringify({
+      [dedupeKey]: {
+        count: 1,
+        lastAt: Date.now(),
+      },
+    })
+  );
+
+  const savedDedupeFile = process.env.ROUTING_BLOCK_DEDUPE_PATH;
+  const savedSessionId = process.env.CLAUDE_SESSION_ID;
+
+  process.env.ROUTING_BLOCK_DEDUPE_PATH = dedupeFile;
+  process.env.CLAUDE_SESSION_ID = sessionId;
+
+  t.after(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    if (savedDedupeFile === undefined) delete process.env.ROUTING_BLOCK_DEDUPE_PATH;
+    else process.env.ROUTING_BLOCK_DEDUPE_PATH = savedDedupeFile;
+    if (savedSessionId === undefined) delete process.env.CLAUDE_SESSION_ID;
+    else process.env.CLAUDE_SESSION_ID = savedSessionId;
+  });
+
+  const sharedPath = require.resolve('../../.claude/hooks/routing/routing-guard-core.shared.cjs');
+  delete require.cache[sharedPath];
+
+  const shared = require('../../.claude/hooks/routing/routing-guard-core.shared.cjs');
+  const result = shared.registerBlockAttempt('persisted-check', 'Task', {
+    session_id: sessionId,
+  });
+
+  assert.strictEqual(result.count, 2, 'existing persisted count should be incremented');
+  assert.strictEqual(result.dedupe, true, 'second attempt should trip the dedupe threshold');
+
+  const savedState = JSON.parse(fs.readFileSync(dedupeFile, 'utf8'));
+  assert.strictEqual(savedState[dedupeKey].count, 2);
+});
+
 // ─── Atomic write integration test ───────────────────────────────────────────
 
 test('Bug 2 integration: shared.cjs uses atomicWriteJSONSync not fs.writeFileSync', async t => {

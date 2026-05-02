@@ -165,11 +165,13 @@ function parseAgents(agentsPath) {
  * 3. User global (~/.claude/AGENTS.md)
  *
  * @param {string} [startDir] - Optional starting directory (defaults to cwd)
+ * @param {{stopDir?: string}} [options] - Optional parent traversal boundary
  * @returns {Object} - { found: boolean, path: string, content: string }
  */
-function discoverAgentsFile(startDir) {
+function discoverAgentsFile(startDir, options = {}) {
   const cwd = startDir || process.cwd();
   const homeDir = os.homedir();
+  const stopDir = options.stopDir ? path.resolve(options.stopDir) : null;
 
   // Build search paths
   const searchPaths = [];
@@ -180,6 +182,7 @@ function discoverAgentsFile(startDir) {
 
   while (currentDir && currentDir !== root) {
     searchPaths.push(path.join(currentDir, 'AGENTS.md'));
+    if (stopDir && path.resolve(currentDir) === stopDir) break;
     const parentDir = path.dirname(currentDir);
     if (parentDir === currentDir) break; // Reached root
     currentDir = parentDir;
@@ -219,10 +222,11 @@ function discoverAgentsFile(startDir) {
  * Convenience function to discover and parse AGENTS.md
  *
  * @param {string} [startDir] - Optional starting directory
+ * @param {{stopDir?: string}} [options] - Optional parent traversal boundary
  * @returns {Object} - Parsed AGENTS.md structure
  */
-function discoverAndParseAgents(startDir) {
-  const discovered = discoverAgentsFile(startDir);
+function discoverAndParseAgents(startDir, options = {}) {
+  const discovered = discoverAgentsFile(startDir, options);
 
   if (!discovered.found) {
     return { ...DEFAULT_STRUCTURE };

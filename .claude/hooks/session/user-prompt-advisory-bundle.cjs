@@ -171,6 +171,10 @@ async function main() {
   const startupAlreadyFired = hasStartupAlreadyFired(sessionId);
 
   if (!startupAlreadyFired) {
+    // Mark startup hooks as fired before slow best-effort work. If pruning hangs
+    // or the host kills this async hook, subsequent prompts still skip startup work.
+    writeStartupSentinel(sessionId);
+
     // ── Sub-function 2: startup-failopen-audit ──────────────────────────────
     // Warns via stderr when any *_FAIL_OPEN=true env vars are active.
     try {
@@ -186,9 +190,6 @@ async function main() {
     } catch (_err) {
       // Error in this sub-function must not prevent others from running
     }
-
-    // Mark startup hooks as fired for this session
-    writeStartupSentinel(sessionId);
   }
 
   // ── Sub-function 4: session-budget-watchdog ───────────────────────────────

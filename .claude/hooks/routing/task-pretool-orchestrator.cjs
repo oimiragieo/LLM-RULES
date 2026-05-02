@@ -97,7 +97,10 @@ function main() {
         process.stdout.write(payload.endsWith('\n') ? payload : payload + '\n');
       }
 
-      process.exit(result.status || 2);
+      if (result.status === 4) {
+        process.exit(4);
+      }
+      process.exit(2);
       return;
     }
 

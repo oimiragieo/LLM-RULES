@@ -75,7 +75,7 @@ function main() {
   const taskId = process.env.CLAUDE_TASK_ID || process.env.TASK_ID || null;
 
   runner
-    .runProcess(scriptPath, hookArgs, { captureStderr: true })
+    .run(scriptPath, hookArgs, { captureStderr: true })
     .then(result => {
       const { code, stderr } = typeof result === 'object' ? result : { code: result, stderr: '' };
       const dispatch = dispatchExitCode({ code, stderr, hookName }, { taskId });
@@ -83,7 +83,13 @@ function main() {
         console.error(`[run-hook] anomaly: ${dispatch.anomaly.message}`);
       }
       // Dispatcher result is informational for routing layer; hook exit code is authoritative
-      process.exit(code);
+      if (code === 0) {
+        process.exit(0);
+      }
+      if (code === 4) {
+        process.exit(4);
+      }
+      process.exit(2);
     })
     .catch(err => {
       console.error(`Error executing hook: ${err.message}`);

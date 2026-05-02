@@ -1,16 +1,16 @@
 'use strict';
 
 /**
- * EXIT-3 ESCALATE regression tests: pre-completion-validation.cjs
+ * Pre-completion validation block regression tests.
  *
- * v2.5.0 slice B: Four policy-ambiguous sites converted from exit(2) to
- * exit(3) with structured ESCALATE: stderr trailer per ADR-2026-04-21.
+ * Direct hook blocks use exit 2. These sites retain structured ESCALATE
+ * trailers so downstream dispatchers can preserve escalation metadata.
  *
  * Sites:
- *   1. Line ~251 — REFLECTION_SCORE_ENFORCEMENT=block  → exit 3, blockerType=data_quality
- *   2. Line ~415 — MILESTONE_SELF_REVIEW_ENFORCEMENT=block → exit 3, blockerType=self_review
- *   3. Line ~438 — CCUSAGE_REPORT_ENFORCEMENT=block    → exit 3, blockerType=cost_tracking
- *   4. Line ~474 — PLANNER_TOKEN_ESTIMATION_ENFORCEMENT=block → exit 3, blockerType=planner_metadata
+ *   1. Line ~251 - REFLECTION_SCORE_ENFORCEMENT=block -> exit 2, blockerType=data_quality
+ *   2. Line ~415 - MILESTONE_SELF_REVIEW_ENFORCEMENT=block -> exit 2, blockerType=self_review
+ *   3. Line ~438 - CCUSAGE_REPORT_ENFORCEMENT=block -> exit 2, blockerType=cost_tracking
+ *   4. Line ~474 - PLANNER_TOKEN_ESTIMATION_ENFORCEMENT=block -> exit 2, blockerType=planner_metadata
  */
 
 const { test } = require('node:test');
@@ -60,7 +60,7 @@ function runHook(toolInput, envOverrides = {}) {
 // Site 1: REFLECTION_SCORE_ENFORCEMENT=block — missing dataQuality field
 // ---------------------------------------------------------------------------
 
-test('site1: reflection score without dataQuality → exit 3 (not 2) when REFLECTION_SCORE_ENFORCEMENT=block', () => {
+test('site1: reflection score without dataQuality -> exit 2 when REFLECTION_SCORE_ENFORCEMENT=block', () => {
   const input = {
     taskId: 'task-reflect-test',
     status: 'completed',
@@ -71,11 +71,7 @@ test('site1: reflection score without dataQuality → exit 3 (not 2) when REFLEC
     },
   };
   const result = runHook(input, { REFLECTION_SCORE_ENFORCEMENT: 'block' });
-  assert.equal(
-    result.status,
-    3,
-    `Expected exit 3 (ESCALATE), got ${result.status}. stderr: ${result.stderr}`
-  );
+  assert.equal(result.status, 2, `Expected exit 2, got ${result.status}. stderr: ${result.stderr}`);
 });
 
 test('site1: reflection score without dataQuality → ESCALATE trailer with blockerType=data_quality', () => {
@@ -107,7 +103,7 @@ test('site1: reflection score without dataQuality → ESCALATE trailer with bloc
   );
 });
 
-test('site1: reflection score WITH dataQuality present → no block/escalate', () => {
+test('site1: reflection score WITH dataQuality present -> no data_quality block', () => {
   const input = {
     taskId: 'task-reflect-ok',
     status: 'completed',
@@ -120,11 +116,11 @@ test('site1: reflection score WITH dataQuality present → no block/escalate', (
   };
   const result = runHook(input, { REFLECTION_SCORE_ENFORCEMENT: 'block' });
   assert.ok(
-    result.status === 0 || result.status === 3,
-    `Expected exit 0 (allow) when dataQuality present, got ${result.status}. stderr: ${result.stderr}`
+    result.status === 0 || result.status === 2,
+    `Expected exit 0 or non-data_quality block when dataQuality present, got ${result.status}. stderr: ${result.stderr}`
   );
-  // Specifically must NOT be 3 due to data_quality issue
-  if (result.status === 3) {
+  // Specifically must NOT block due to data_quality issue
+  if (result.status === 2) {
     assert.ok(
       !result.stderr.includes('blockerType=data_quality'),
       'Must not escalate data_quality when dataQuality field is present'
@@ -136,7 +132,7 @@ test('site1: reflection score WITH dataQuality present → no block/escalate', (
 // Site 2: MILESTONE_SELF_REVIEW_ENFORCEMENT=block — self-review not performed
 // ---------------------------------------------------------------------------
 
-test('site2: pipeline completion without self-review → exit 3 (not 2) when MILESTONE_SELF_REVIEW_ENFORCEMENT=block', () => {
+test('site2: pipeline completion without self-review -> exit 2 when MILESTONE_SELF_REVIEW_ENFORCEMENT=block', () => {
   const input = {
     taskId: 'task-pipeline-test',
     status: 'completed',
@@ -146,11 +142,7 @@ test('site2: pipeline completion without self-review → exit 3 (not 2) when MIL
     },
   };
   const result = runHook(input, { MILESTONE_SELF_REVIEW_ENFORCEMENT: 'block' });
-  assert.equal(
-    result.status,
-    3,
-    `Expected exit 3 (ESCALATE), got ${result.status}. stderr: ${result.stderr}`
-  );
+  assert.equal(result.status, 2, `Expected exit 2, got ${result.status}. stderr: ${result.stderr}`);
 });
 
 test('site2: pipeline completion without self-review → ESCALATE trailer with blockerType=self_review', () => {
@@ -180,7 +172,7 @@ test('site2: pipeline completion without self-review → ESCALATE trailer with b
   );
 });
 
-test('site2: pipeline completion WITH selfReviewCompleted:true → no self-review escalate', () => {
+test('site2: pipeline completion WITH selfReviewCompleted:true -> no self-review block', () => {
   const input = {
     taskId: 'task-pipeline-ok',
     status: 'completed',
@@ -191,7 +183,7 @@ test('site2: pipeline completion WITH selfReviewCompleted:true → no self-revie
   };
   const result = runHook(input, { MILESTONE_SELF_REVIEW_ENFORCEMENT: 'block' });
   // Must not escalate for self-review when flag is set
-  if (result.status === 3) {
+  if (result.status === 2) {
     assert.ok(
       !result.stderr.includes('blockerType=self_review'),
       'Must not escalate self_review when selfReviewCompleted:true is set'
@@ -203,7 +195,7 @@ test('site2: pipeline completion WITH selfReviewCompleted:true → no self-revie
 // Site 3: CCUSAGE_REPORT_ENFORCEMENT=block — ccusage missing on pipeline completion
 // ---------------------------------------------------------------------------
 
-test('site3: pipeline completion without token/cost data → exit 3 (not 2) when CCUSAGE_REPORT_ENFORCEMENT=block', () => {
+test('site3: pipeline completion without token/cost data -> exit 2 when CCUSAGE_REPORT_ENFORCEMENT=block', () => {
   const input = {
     taskId: 'task-ccusage-test',
     status: 'completed',
@@ -216,11 +208,7 @@ test('site3: pipeline completion without token/cost data → exit 3 (not 2) when
     CCUSAGE_REPORT_ENFORCEMENT: 'block',
     MILESTONE_SELF_REVIEW_ENFORCEMENT: 'off',
   });
-  assert.equal(
-    result.status,
-    3,
-    `Expected exit 3 (ESCALATE), got ${result.status}. stderr: ${result.stderr}`
-  );
+  assert.equal(result.status, 2, `Expected exit 2, got ${result.status}. stderr: ${result.stderr}`);
 });
 
 test('site3: pipeline completion without ccusage → ESCALATE trailer with blockerType=cost_tracking', () => {
@@ -253,7 +241,7 @@ test('site3: pipeline completion without ccusage → ESCALATE trailer with block
   );
 });
 
-test('site3: pipeline completion WITH tokenUsage in metadata → no ccusage escalate', () => {
+test('site3: pipeline completion WITH tokenUsage in metadata -> no ccusage block', () => {
   const input = {
     taskId: 'task-ccusage-ok',
     status: 'completed',
@@ -266,7 +254,7 @@ test('site3: pipeline completion WITH tokenUsage in metadata → no ccusage esca
     CCUSAGE_REPORT_ENFORCEMENT: 'block',
     MILESTONE_SELF_REVIEW_ENFORCEMENT: 'off',
   });
-  if (result.status === 3) {
+  if (result.status === 2) {
     assert.ok(
       !result.stderr.includes('blockerType=cost_tracking'),
       'Must not escalate cost_tracking when tokenUsage is present'
@@ -278,7 +266,7 @@ test('site3: pipeline completion WITH tokenUsage in metadata → no ccusage esca
 // Site 4: PLANNER_TOKEN_ESTIMATION_ENFORCEMENT=block — token estimate missing
 // ---------------------------------------------------------------------------
 
-test('site4: planner completion without token estimate → exit 3 (not 2) when PLANNER_TOKEN_ESTIMATION_ENFORCEMENT=block', () => {
+test('site4: planner completion without token estimate -> exit 2 when PLANNER_TOKEN_ESTIMATION_ENFORCEMENT=block', () => {
   const input = {
     taskId: 'task-planner-test',
     status: 'completed',
@@ -292,11 +280,7 @@ test('site4: planner completion without token estimate → exit 3 (not 2) when P
     MILESTONE_SELF_REVIEW_ENFORCEMENT: 'off',
     CCUSAGE_REPORT_ENFORCEMENT: 'off',
   });
-  assert.equal(
-    result.status,
-    3,
-    `Expected exit 3 (ESCALATE), got ${result.status}. stderr: ${result.stderr}`
-  );
+  assert.equal(result.status, 2, `Expected exit 2, got ${result.status}. stderr: ${result.stderr}`);
 });
 
 test('site4: planner completion without token estimate → ESCALATE trailer with blockerType=planner_metadata', () => {
@@ -330,7 +314,7 @@ test('site4: planner completion without token estimate → ESCALATE trailer with
   );
 });
 
-test('site4: planner completion WITH estimatedTokens in metadata → no planner_metadata escalate', () => {
+test('site4: planner completion WITH estimatedTokens in metadata -> no planner_metadata block', () => {
   const input = {
     taskId: 'task-planner-ok',
     status: 'completed',
@@ -344,7 +328,7 @@ test('site4: planner completion WITH estimatedTokens in metadata → no planner_
     MILESTONE_SELF_REVIEW_ENFORCEMENT: 'off',
     CCUSAGE_REPORT_ENFORCEMENT: 'off',
   });
-  if (result.status === 3) {
+  if (result.status === 2) {
     assert.ok(
       !result.stderr.includes('blockerType=planner_metadata'),
       'Must not escalate planner_metadata when estimatedTokens is present'

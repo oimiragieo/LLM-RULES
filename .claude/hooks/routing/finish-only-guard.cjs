@@ -3,12 +3,13 @@ const path = require('path');
 const { isDraining } = require('../../lib/context/drain-state.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { formatResult } = require('../../lib/utils/hook-input.cjs');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 function getSessionId() {
   if (process.env.CLAUDE_SESSION_ID) {
     return process.env.CLAUDE_SESSION_ID;
   }
-  const sessionPath = path.join(process.cwd(), '.claude/context/runtime/session-id.json');
+  const sessionPath = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'session-id.json');
   if (fs.existsSync(sessionPath)) {
     try {
       const data = safeParseJSON(fs.readFileSync(sessionPath, 'utf8'));

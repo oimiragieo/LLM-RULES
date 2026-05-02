@@ -26,6 +26,9 @@
 const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const {
+  validateIntegrationQueueEntry,
+} = require('../../lib/workflow/integration-queue-contract.cjs');
 
 // Use shared utility for project root
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
@@ -150,6 +153,7 @@ function queueIntegrationTasks(violations) {
     }
 
     // Append violations to queue
+    let queued = 0;
     for (const violation of violations) {
       const entry = {
         timestamp: new Date().toISOString(),
@@ -160,11 +164,25 @@ function queueIntegrationTasks(violations) {
         source: 'creator-compliance-validator',
         processed: false,
       };
+
+      const validation = validateIntegrationQueueEntry(entry);
+      if (!validation.valid) {
+        const details = (validation.errors || []).map(error => error.message).join('; ');
+        console.error(
+          `[creator-compliance-validator] Skipped malformed integration queue entry: ` +
+            `${details || 'schema validation failed'}`
+        );
+        continue;
+      }
+
       fs.appendFileSync(queuePath, JSON.stringify(entry) + '\n', 'utf-8');
+      queued += 1;
     }
+    return queued;
   } catch (err) {
     // Best-effort - don't fail if queueing fails
     console.error(`[creator-compliance-validator] Failed to queue violations: ${err.message}`);
+    return 0;
   }
 }
 
@@ -433,6 +451,7 @@ if (require.main === module) {
 
 module.exports = {
   main,
+  queueIntegrationTasks,
   runValidatorScript,
   validateCreatorEcosystemStrict,
 };

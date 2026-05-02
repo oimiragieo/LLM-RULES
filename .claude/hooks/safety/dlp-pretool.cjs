@@ -187,5 +187,8 @@ main().catch(err => {
   );
   // In warn mode, fail-open on errors to not block workflow
   const mode = process.env.DLP_PRETOOL_ENFORCEMENT || 'warn';
-  process.exit(mode === 'block' ? 2 : 0);
+  if (mode === 'block') {
+    process.exit(2);
+  }
+  process.exit(0);
 });

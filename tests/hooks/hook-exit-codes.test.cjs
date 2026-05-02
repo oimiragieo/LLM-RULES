@@ -2,7 +2,7 @@
 /**
  * hook-exit-codes.test.cjs
  *
- * TDD tests verifying that hooks emit exit code 2 when blocking.
+ * TDD tests verifying that hooks emit supported contract exit codes.
  *
  * Bug C-3: pre-completion-validation.cjs exits 0 on block (should exit 2)
  * Bug C-4: bash-pretool-bundle.cjs exits 1 on error (should exit 2 or 0)
@@ -13,10 +13,74 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('fs');
 const { spawnSync } = require('child_process');
 const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
+const ALLOWED_DIRECT_EXIT_CODES = new Set(['0', '2', '4']);
+const REVIEWED_DYNAMIC_EXITS = {
+  [path.join(PROJECT_ROOT, '.claude/hooks/routing/routing-guard-core.impl.cjs')]: new Set([
+    'resolveExitCode(result)',
+  ]),
+  [path.join(PROJECT_ROOT, '.claude/hooks/routing/unified-creator-guard.cjs')]: new Set([
+    "result.result === 'block' ? 2 : 0",
+  ]),
+};
+
+function walkHookFiles(dir, acc = []) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) walkHookFiles(full, acc);
+    else if (entry.isFile() && full.endsWith('.cjs')) acc.push(full);
+  }
+  return acc;
+}
+
+function hookExitContractFiles() {
+  return [
+    ...walkHookFiles(path.join(PROJECT_ROOT, '.claude/hooks')),
+    path.join(PROJECT_ROOT, '.claude/tools/cli/run-hook.cjs'),
+  ];
+}
+
+function stripComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
+function isReviewedDynamicExit(file, arg, source) {
+  if (!REVIEWED_DYNAMIC_EXITS[file]?.has(arg)) return false;
+  if (arg === 'resolveExitCode(result)') {
+    return /function resolveExitCode\(result\)\s*{\s*return result\.result === 'block' \? 2 : 0;\s*}/.test(
+      source
+    );
+  }
+  return /\?\s*(0|2|4)\s*:\s*(0|2|4)$/.test(arg);
+}
+
+function findProcessExitArgs(source) {
+  const args = [];
+  const needle = 'process.exit(';
+  let searchFrom = 0;
+
+  while (true) {
+    const start = source.indexOf(needle, searchFrom);
+    if (start === -1) break;
+
+    let depth = 1;
+    let cursor = start + needle.length;
+    while (cursor < source.length && depth > 0) {
+      if (source[cursor] === '(') depth++;
+      else if (source[cursor] === ')') depth--;
+      cursor++;
+    }
+
+    args.push(source.slice(start + needle.length, cursor - 1).trim());
+    searchFrom = cursor;
+  }
+
+  return args;
+}
 
 /**
  * Spawn a hook as a child process with mock stdin.
@@ -38,6 +102,30 @@ function runHook(hookPath, input, envOverrides = {}) {
     stderr: result.stderr || '',
   };
 }
+
+describe('hook exit-code contract', () => {
+  it('uses only direct or reviewed normalized process.exit codes', () => {
+    const offenders = hookExitContractFiles().flatMap(file => {
+      const source = stripComments(fs.readFileSync(file, 'utf8'));
+      return findProcessExitArgs(source)
+        .map(arg => ({ arg }))
+        .filter(
+          ({ arg }) =>
+            !ALLOWED_DIRECT_EXIT_CODES.has(arg) && !isReviewedDynamicExit(file, arg, source)
+        )
+        .map(({ arg }) => ({
+          file: path.relative(PROJECT_ROOT, file),
+          code: arg || '<empty>',
+        }));
+    });
+
+    assert.deepEqual(
+      offenders,
+      [],
+      'hooks must use direct or reviewed-normalized exit 0 for allow, 2 for block, or 4 for degrade'
+    );
+  });
+});
 
 // ---------------------------------------------------------------------------
 // Bug C-3: pre-completion-validation.cjs

@@ -333,6 +333,20 @@ describe('unified-creator-guard.cjs - Helper Functions', () => {
     assert.equal(required.artifactType, 'skill');
   });
 
+  it('should find required creator for percent-encoded skill path', () => {
+    const required = creatorGuard.findRequiredCreator('.claude%2Fskills%2Fencoded%2FSKILL.md');
+    assert.ok(required);
+    assert.equal(required.creator, 'skill-creator');
+    assert.equal(required.artifactType, 'skill');
+  });
+
+  it('should find required creator for percent-encoded Windows separators', () => {
+    const required = creatorGuard.findRequiredCreator('.claude%5Cskills%5Cencoded%5CSKILL.md');
+    assert.ok(required);
+    assert.equal(required.creator, 'skill-creator');
+    assert.equal(required.artifactType, 'skill');
+  });
+
   it('should find required creator for agent path', () => {
     const required = creatorGuard.findRequiredCreator('.claude/agents/core/planner.md');
     assert.ok(required);

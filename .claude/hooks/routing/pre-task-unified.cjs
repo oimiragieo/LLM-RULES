@@ -126,7 +126,10 @@ async function main() {
         );
       }
       console.log(formatResult(result.exitCode === 2 ? 'block' : 'warn', result.message));
-      process.exit(result.exitCode);
+      if (result.exitCode === 2) {
+        process.exit(2);
+      }
+      process.exit(0);
     }
 
     try {

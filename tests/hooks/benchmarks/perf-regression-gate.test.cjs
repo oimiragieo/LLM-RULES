@@ -3,7 +3,7 @@
  * Tests for Performance Gate (Phase 4.1)
  *
  * Verifies that the performance gate:
- * 1. Correctly identifies regressions (exit code 2).
+ * 1. Correctly identifies regressions (exit code 4).
  * 2. Allows healthy performance (exit code 0).
  */
 
@@ -57,7 +57,7 @@ async function testPerfGate() {
     if (code !== 0) throw new Error(`Expected 0, got ${code}`);
   });
 
-  await test('should exit 2 when performance regresses (mode: process)', async () => {
+  await test('should exit 4 when performance regresses (mode: process)', async () => {
     // In process mode, latency is ~40ms, which is > 10ms limit
     const child = spawn(process.execPath, [GATE_PATH], {
       stdio: 'ignore',
@@ -65,7 +65,7 @@ async function testPerfGate() {
     });
 
     const code = await new Promise(r => child.on('close', r));
-    if (code !== 2) throw new Error(`Expected 2 (regression), got ${code}`);
+    if (code !== 4) throw new Error(`Expected 4 (regression), got ${code}`);
   });
 
   console.log(`

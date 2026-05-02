@@ -4,16 +4,18 @@ const crypto = require('crypto');
 const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 const SCHEMA_VERSION = '1.0.0';
+const DEFAULT_RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+const SCHEMA_PATH = path.join(PROJECT_ROOT, '.claude', 'schemas', 'shift-change-log.schema.json');
 
 function validateHandoverLog(data) {
-  const schemaPath = path.join(process.cwd(), '.claude/schemas/shift-change-log.schema.json');
-  if (!fs.existsSync(schemaPath)) {
-    throw new Error('Schema file not found at ' + schemaPath);
+  if (!fs.existsSync(SCHEMA_PATH)) {
+    throw new Error('Schema file not found at ' + SCHEMA_PATH);
   }
 
-  const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf8'));
+  const schema = safeParseJSON(fs.readFileSync(SCHEMA_PATH, 'utf8'));
   const ajv = new Ajv();
   addFormats(ajv);
   const validate = ajv.compile(schema);
@@ -25,7 +27,7 @@ function validateHandoverLog(data) {
   return true;
 }
 
-function writeHandoverLog(data, outputDir = path.join(process.cwd(), '.claude/context/runtime')) {
+function writeHandoverLog(data, outputDir = DEFAULT_RUNTIME_DIR) {
   // 1. Set Defaults
   const logData = {
     ...data,

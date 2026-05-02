@@ -16,6 +16,8 @@ const fs = require('fs');
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const WORKTREE_DIR = path.join(PROJECT_ROOT, '.claude', 'worktrees');
 const TIERED_CLAUDE_MD = path.join(WORKTREE_DIR, 'CLAUDE.md');
+const DEFAULT_PRUNE_TIMEOUT_MS = 3000;
+const MAX_PRUNE_TIMEOUT_MS = 15000;
 
 const SUBAGENT_CLAUDE_MD = `# SUBAGENT EXECUTION CONTEXT
 
@@ -45,6 +47,14 @@ function shouldSkipPruneForHookAudit() {
   return process.env.A2A_AUTO_START === 'false' && process.env.CHANNEL_AUTO_START === 'false';
 }
 
+function getPruneTimeoutMs(env = process.env) {
+  const requested = Number(env.WORKTREE_PRUNE_TIMEOUT_MS);
+  if (!Number.isFinite(requested) || requested <= 0) {
+    return DEFAULT_PRUNE_TIMEOUT_MS;
+  }
+  return Math.min(Math.floor(requested), MAX_PRUNE_TIMEOUT_MS);
+}
+
 function main() {
   try {
     ensureSubagentClaudeMd();
@@ -62,7 +72,7 @@ function main() {
       cwd: PROJECT_ROOT,
       stdio: 'ignore', // Must not emit any output; this is a side-effect startup hook
       windowsHide: true,
-      timeout: 15000, // Don't block startup forever if git hangs
+      timeout: getPruneTimeoutMs(), // Don't block startup forever if git hangs
     });
   } catch (_err) {
     // Fail-open: If pruning fails (e.g., git is locked), just ignore it and let the session continue.
@@ -75,4 +85,4 @@ if (require.main === module) {
 }
 
 // Export for programmatic use by consolidated bundles
-module.exports = { main, ensureSubagentClaudeMd, shouldSkipPruneForHookAudit };
+module.exports = { main, ensureSubagentClaudeMd, shouldSkipPruneForHookAudit, getPruneTimeoutMs };

@@ -126,7 +126,7 @@ async function main() {
   // Skip if reflection system is disabled
   if (process.env.REFLECTION_ENABLED === 'false') {
     stderrLog('info', 'Reflection system disabled, skipping Step 0 check');
-    process.exit(EXIT_ALLOW);
+    process.exit(0);
   }
 
   let hookInput = null;
@@ -138,7 +138,7 @@ async function main() {
 
   if (isTaskNotificationPrompt(hookInput)) {
     stderrLog('info', 'Skipping Step 0 check for internal task notification payload');
-    process.exit(EXIT_ALLOW);
+    process.exit(0);
   }
 
   stderrLog('info', 'Checking for pending reflections (Step 0)');
@@ -170,7 +170,7 @@ async function main() {
       spawn_request_count: requestCount,
       action: 'allow_with_advisory',
     });
-    process.exit(EXIT_ALLOW);
+    process.exit(0);
   }
 
   stderrLog('error', 'BLOCKING: Pending reflections must be processed before proceeding', {
@@ -201,7 +201,7 @@ async function main() {
     })
   );
 
-  process.exit(EXIT_BLOCK);
+  process.exit(2);
 }
 
 if (require.main === module) {

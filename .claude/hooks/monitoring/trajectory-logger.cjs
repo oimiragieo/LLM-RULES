@@ -16,17 +16,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
-
-function findProjectRoot() {
-  let dir = __dirname;
-  while (dir !== path.parse(dir).root) {
-    if (fs.existsSync(path.join(dir, '.claude'))) return dir;
-    dir = path.dirname(dir);
-  }
-  return process.cwd();
-}
-
-const PROJECT_ROOT = findProjectRoot();
+const { PROJECT_ROOT, findProjectRoot } = require('../../lib/utils/project-root.cjs');
 
 /**
  * Sanitize and truncate a value for safe JSONL logging.

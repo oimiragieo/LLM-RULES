@@ -69,7 +69,10 @@ function main() {
   }
 
   process.stderr.write(`${issues.join('\n')}\n`);
-  process.exit(strict ? 2 : 0);
+  if (strict) {
+    process.exit(2);
+  }
+  process.exit(0);
 }
 
 if (require.main === module) {

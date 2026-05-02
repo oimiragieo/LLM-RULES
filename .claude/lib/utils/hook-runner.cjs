@@ -33,14 +33,15 @@ class HookRunner {
    * Run a hook
    * @param {string} scriptPath - Absolute path to hook script
    * @param {string[]} hookArgs - Arguments for the hook
-   * @returns {Promise<number>} Exit code
+   * @param {object} [options] - Runner options passed to process mode
+   * @returns {Promise<number|{code:number,stderr:string}>} Exit code or process-mode result
    */
-  async run(scriptPath, hookArgs = []) {
+  async run(scriptPath, hookArgs = [], options = {}) {
     const ext = path.extname(scriptPath);
 
     // Non-JS hooks always use process mode
     if (ext === '.sh' || this.mode === 'process') {
-      return this.runProcess(scriptPath, hookArgs);
+      return this.runProcess(scriptPath, hookArgs, options);
     }
 
     return this.runWorker(scriptPath, hookArgs);

@@ -61,3 +61,43 @@ test('run-hook compatibility shim executes the underlying CLI when invoked direc
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('run-hook dispatcher honors HOOK_RUNNER_MODE=worker', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'run-hook-worker-mode-'));
+  const hooksDir = path.join(tmpDir, '.claude', 'hooks');
+  const markerPath = path.join(tmpDir, 'mode.txt');
+
+  fs.mkdirSync(hooksDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(hooksDir, 'worker-check.cjs'),
+    [
+      "'use strict';",
+      "const fs = require('node:fs');",
+      "const { isMainThread } = require('node:worker_threads');",
+      "fs.writeFileSync(process.env.HOOK_WORKER_MARKER, isMainThread ? 'process' : 'worker');",
+    ].join('\n'),
+    'utf8'
+  );
+
+  try {
+    const result = spawnSync(
+      process.execPath,
+      [path.join(process.cwd(), '.claude', 'hooks', 'run-hook.cjs'), 'worker-check'],
+      {
+        cwd: tmpDir,
+        encoding: 'utf8',
+        timeout: 10000,
+        env: {
+          ...process.env,
+          HOOK_RUNNER_MODE: 'worker',
+          HOOK_WORKER_MARKER: markerPath,
+        },
+      }
+    );
+
+    assert.equal(result.status, 0, result.stderr || result.stdout);
+    assert.equal(fs.readFileSync(markerPath, 'utf8'), 'worker');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

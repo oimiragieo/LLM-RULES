@@ -25,12 +25,13 @@ process.stdin.on('data', chunk => {
 });
 process.stdin.on('end', () => {
   try {
-    const { success, data } = safeParseJSON(inputData, {});
-    if (!success) {
-      process.exit(0); // fail-open on parse error
-    }
+    const data = safeParseJSON(inputData, null);
 
     // Only check Task tool calls
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      process.exit(0); // fail-open on malformed or non-object input
+    }
+
     const toolName = data.tool_name || data.toolName || '';
     if (toolName !== 'Task') {
       process.exit(0);

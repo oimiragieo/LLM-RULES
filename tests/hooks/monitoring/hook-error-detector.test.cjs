@@ -15,8 +15,12 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+const { PROJECT_ROOT } = require('../../../.claude/lib/utils/project-root.cjs');
 
 const HOOK = path.resolve(__dirname, '../../../.claude/hooks/monitoring/hook-error-detector.cjs');
+const PROJECT_RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+const PROJECT_GAP_LOG = path.join(PROJECT_RUNTIME_DIR, 'session-gap-log.jsonl');
+const PROJECT_SIGNAL_FILE = path.join(PROJECT_RUNTIME_DIR, 'hook-recovery-needed.txt');
 
 /**
  * Helper: run the hook with stdin and optional env overrides.
@@ -172,5 +176,58 @@ test('exits 0 on malformed stdin (fail-open)', () => {
     assert.equal(result.status, 0, `Expected exit 0 on bad stdin, got ${result.status}`);
   } finally {
     cleanup();
+  }
+});
+
+test('uses PROJECT_ROOT runtime directory when cwd is outside repo', () => {
+  const outsideCwd = fs.mkdtempSync(path.join(os.tmpdir(), 'hook-err-det-outside-cwd-'));
+  const gapBackup = fs.existsSync(PROJECT_GAP_LOG)
+    ? fs.readFileSync(PROJECT_GAP_LOG, 'utf8')
+    : null;
+  const signalBackup = fs.existsSync(PROJECT_SIGNAL_FILE)
+    ? fs.readFileSync(PROJECT_SIGNAL_FILE, 'utf8')
+    : null;
+
+  try {
+    fs.mkdirSync(PROJECT_RUNTIME_DIR, { recursive: true });
+    fs.rmSync(PROJECT_GAP_LOG, { force: true });
+    fs.rmSync(PROJECT_SIGNAL_FILE, { force: true });
+
+    const result = spawnSync(process.execPath, [HOOK], {
+      input: makeWorktreeModuleNotFoundStdin(),
+      cwd: outsideCwd,
+      env: process.env,
+      encoding: 'utf8',
+      timeout: 8000,
+    });
+
+    assert.equal(result.status, 0, `Expected exit 0, got ${result.status}: ${result.stderr}`);
+    assert.ok(
+      fs.existsSync(PROJECT_SIGNAL_FILE),
+      'signal file must be written under PROJECT_ROOT runtime dir'
+    );
+    assert.ok(
+      fs.existsSync(PROJECT_GAP_LOG),
+      'gap log must be written under PROJECT_ROOT runtime dir'
+    );
+    assert.equal(
+      fs.existsSync(path.join(outsideCwd, '.claude', 'context', 'runtime')),
+      false,
+      'hook-error-detector must not create runtime files under process.cwd()'
+    );
+  } finally {
+    if (gapBackup === null) {
+      fs.rmSync(PROJECT_GAP_LOG, { force: true });
+    } else {
+      fs.mkdirSync(PROJECT_RUNTIME_DIR, { recursive: true });
+      fs.writeFileSync(PROJECT_GAP_LOG, gapBackup, 'utf8');
+    }
+    if (signalBackup === null) {
+      fs.rmSync(PROJECT_SIGNAL_FILE, { force: true });
+    } else {
+      fs.mkdirSync(PROJECT_RUNTIME_DIR, { recursive: true });
+      fs.writeFileSync(PROJECT_SIGNAL_FILE, signalBackup, 'utf8');
+    }
+    fs.rmSync(outsideCwd, { recursive: true, force: true });
   }
 });

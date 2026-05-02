@@ -6,6 +6,15 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+const QUEUE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'integration-queue.jsonl'
+);
+
 test('validateCreatorEcosystemStrict passes when both validators pass', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'creator-compliance-pass-'));
   const creatorValidatorPath = path.join(tmpDir, 'creator-validator.cjs');
@@ -88,6 +97,26 @@ test('validateCreatorEcosystemStrict fails when agent skill reference validator 
   delete process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH;
   delete process.env.SKILL_ECOSYSTEM_VALIDATOR_PATH;
   delete process.env.AGENT_SKILL_REFERENCE_VALIDATOR_PATH;
+  delete require.cache[
+    require.resolve('../../.claude/hooks/validation/creator-compliance-validator.cjs')
+  ];
+});
+
+test('queueIntegrationTasks skips malformed queue entries', () => {
+  if (fs.existsSync(QUEUE_PATH)) fs.unlinkSync(QUEUE_PATH);
+
+  delete require.cache[
+    require.resolve('../../.claude/hooks/validation/creator-compliance-validator.cjs')
+  ];
+  const hook = require('../../.claude/hooks/validation/creator-compliance-validator.cjs');
+
+  const written = hook.queueIntegrationTasks([
+    { file: '', type: 'skill', check: 'catalog', detail: 'missing catalog entry' },
+  ]);
+
+  assert.equal(written, 0);
+  assert.equal(fs.existsSync(QUEUE_PATH), false);
+
   delete require.cache[
     require.resolve('../../.claude/hooks/validation/creator-compliance-validator.cjs')
   ];

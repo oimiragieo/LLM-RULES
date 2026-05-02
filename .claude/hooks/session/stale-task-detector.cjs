@@ -21,7 +21,7 @@ const PROJECT_ROOT = (() => {
       if (fs.existsSync(path.join(d, 'package.json'))) return d;
       d = path.dirname(d);
     }
-    return process.cwd();
+    return path.resolve(__dirname, '..', '..', '..');
   }
 })();
 

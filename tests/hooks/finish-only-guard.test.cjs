@@ -2,6 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
 const fs = require('node:fs');
+const os = require('node:os');
+const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 
 const {
   enterDrainMode,
@@ -112,7 +114,7 @@ test('drain-state > getDrainState returns parsed state or null', () => {
 
 const { execFileSync } = require('child_process');
 
-function runHook(inputJson, env = {}) {
+function runHook(inputJson, env = {}, options = {}) {
   try {
     const hookPath = path.join(process.cwd(), '.claude/hooks/routing/finish-only-guard.cjs');
     // Ensure file exists before running
@@ -122,6 +124,7 @@ function runHook(inputJson, env = {}) {
     const result = execFileSync('node', [hookPath], {
       input: JSON.stringify(inputJson),
       env: { ...process.env, ...env },
+      cwd: options.cwd,
       stdio: ['pipe', 'pipe', 'ignore'],
       encoding: 'utf8',
     });
@@ -236,4 +239,57 @@ test('finish-only-guard hook > is fail-open (allows on unexpected errors)', () =
   assert.strictEqual(res.allow, true, 'Should be fail-open');
 
   exitDrainMode(tmpDir);
+});
+
+test('finish-only-guard hook > reads default session and drain state from PROJECT_ROOT when cwd is outside repo', () => {
+  const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+  const sessionPath = path.join(runtimeDir, 'session-id.json');
+  const drainPath = path.join(runtimeDir, 'drain-state.json');
+  const outsideCwd = fs.mkdtempSync(path.join(os.tmpdir(), 'finish-guard-cwd-'));
+  const sessionBackup = fs.existsSync(sessionPath) ? fs.readFileSync(sessionPath, 'utf8') : null;
+  const drainBackup = fs.existsSync(drainPath) ? fs.readFileSync(drainPath, 'utf8') : null;
+
+  try {
+    fs.mkdirSync(runtimeDir, { recursive: true });
+    fs.writeFileSync(
+      sessionPath,
+      JSON.stringify({ sessionId: 'project-root-session', generatedAt: new Date().toISOString() })
+    );
+    fs.writeFileSync(
+      drainPath,
+      JSON.stringify({
+        sessionId: 'project-root-session',
+        activatedAt: new Date().toISOString(),
+        drainDeadline: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+      })
+    );
+
+    const res = runHook(
+      { tool_name: 'TaskCreate', arguments: {} },
+      { CLAUDE_SESSION_ID: '' },
+      { cwd: outsideCwd }
+    );
+
+    assert.strictEqual(
+      res.allow,
+      false,
+      'TaskCreate should be blocked using project runtime state'
+    );
+    assert.ok(
+      !fs.existsSync(path.join(outsideCwd, '.claude', 'context', 'runtime')),
+      'finish-only-guard must not read/write runtime state under process.cwd()'
+    );
+  } finally {
+    if (sessionBackup === null) {
+      fs.rmSync(sessionPath, { force: true });
+    } else {
+      fs.writeFileSync(sessionPath, sessionBackup, 'utf8');
+    }
+    if (drainBackup === null) {
+      fs.rmSync(drainPath, { force: true });
+    } else {
+      fs.writeFileSync(drainPath, drainBackup, 'utf8');
+    }
+    fs.rmSync(outsideCwd, { recursive: true, force: true });
+  }
 });

@@ -32,9 +32,11 @@ const { safeParseJSON } = require('./safe-json.cjs');
 
 // Lazy-load Ajv (graceful if missing)
 let Ajv = null;
+let addFormats = null;
 try {
   const ajvModule = require('ajv');
   Ajv = ajvModule.default || ajvModule;
+  addFormats = require('ajv-formats');
 } catch (_e) {
   // Ajv not installed -- all validation will be skipped
 }
@@ -72,6 +74,7 @@ function createValidator(schemaPath) {
     // validateSchema:false allows schemas with $schema meta-references
     // (draft-2020-12, draft-07) that Ajv doesn't auto-resolve
     const ajv = new Ajv({ allErrors: true, strict: false, validateSchema: false });
+    if (addFormats) addFormats(ajv);
     const validate = ajv.compile(schema);
 
     _validatorCache.set(schemaPath, validate);

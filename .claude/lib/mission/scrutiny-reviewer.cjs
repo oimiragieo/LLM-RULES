@@ -234,7 +234,7 @@ function createVerdictSchema() {
  * @returns {{ valid: boolean, errors?: Array }}
  */
 function validateVerdict(verdict) {
-  const ajv = new Ajv({ allErrors: true });
+  const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
   addFormats(ajv); // Add date-time and other formats
   const schema = createVerdictSchema();
   const validate = ajv.compile(schema);

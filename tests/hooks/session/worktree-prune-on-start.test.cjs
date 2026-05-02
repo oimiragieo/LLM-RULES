@@ -168,5 +168,11 @@ test('uses shell:false for git command (source check)', () => {
     'Hook must not use shell: true'
   );
   assert.ok(src.includes('windowsHide: true'), 'Hook must hide Windows console windows');
-  assert.ok(src.includes('timeout: 15000'), 'Hook must bound prune execution time');
+  assert.ok(src.includes('getPruneTimeoutMs'), 'Hook must use the bounded timeout helper');
+
+  const { getPruneTimeoutMs } = require(HOOK);
+  assert.ok(
+    getPruneTimeoutMs() <= 5000,
+    `Default prune timeout should not block startup for too long: ${getPruneTimeoutMs()}ms`
+  );
 });

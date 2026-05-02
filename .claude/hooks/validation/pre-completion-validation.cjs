@@ -4,9 +4,7 @@
  *
  * PreToolUse hook that validates artifact integration and task status transitions
  * before allowing TaskUpdate.
- *
  * Trigger: PreToolUse on TaskUpdate
- *
  * ENVIRONMENT VARIABLES:
  * - TASK_STATUS_ENFORCEMENT: 'block' (default) | 'warn' | 'off'
  * - PRE_COMPLETION_SUMMARY_ENFORCEMENT: 'block' (default) | 'warn' | 'off' — legacy summary gate
@@ -14,7 +12,6 @@
  * - REFLECTION_SCORE_ENFORCEMENT: 'warn' (default) | 'block' | 'off'
  * - TASK_OUTPUT_ENFORCEMENT: 'block' (default) | 'warn' | 'off'
  */
-
 'use strict';
 
 // SE-03 safety: hooks must exit 0 (allow) or 2 (block). Exit 1 is treated as
@@ -380,7 +377,7 @@ function enforceReflectionScore(toolParams) {
       process.stderr.write(
         'ESCALATE: blockerType=data_quality needsFrom=user blocker=missing_dataquality_field\n'
       );
-      process.exit(3);
+      process.exit(2);
     } else if (reflectionMode !== 'off') {
       process.stderr.write(reflectionMsg + '\n');
     }
@@ -551,7 +548,7 @@ async function main() {
             process.stderr.write(
               'ESCALATE: blockerType=self_review needsFrom=user blocker=self_review_not_performed\n'
             );
-            process.exit(3);
+            process.exit(2);
           } else {
             process.stderr.write(`[pre-completion-validation] WARNING: ${selfReviewMsg}\n`);
           }
@@ -577,7 +574,7 @@ async function main() {
             process.stderr.write(
               'ESCALATE: blockerType=cost_tracking needsFrom=user blocker=ccusage_missing\n'
             );
-            process.exit(3);
+            process.exit(2);
           } else {
             process.stderr.write(`[pre-completion-validation] WARNING: ${ccusageMsg}\n`);
           }
@@ -616,7 +613,7 @@ async function main() {
               process.stderr.write(
                 'ESCALATE: blockerType=planner_metadata needsFrom=user blocker=missing_token_estimate\n'
               );
-              process.exit(3);
+              process.exit(2);
             } else {
               process.stderr.write(`[pre-completion-validation] WARNING: ${plannerMsg}\n`);
             }
@@ -678,8 +675,7 @@ async function main() {
 if (require.main === module) {
   // SE-03: advisory hook must fail-open. Attach .catch() so an unexpected
   // rejection from main() does not become an unhandled-rejection that Node.js
-  // terminates with exit code 1 (which Claude Code treats as a hard error,
-  // silently blocking the tool with no stderr output).
+  // terminates with a hard error and silently blocks the tool with no stderr output.
   main().catch(err => {
     process.stderr.write(`[pre-completion-validation] Fatal: ${(err && err.message) || String(err)}
 `);

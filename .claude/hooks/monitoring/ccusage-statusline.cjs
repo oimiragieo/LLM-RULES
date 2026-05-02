@@ -21,10 +21,10 @@
 const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require(path.resolve(__dirname, '../../lib/utils/safe-json.cjs'));
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 // ── Runtime file output ───────────────────────────────────────────────────────
 
-const PROJECT_ROOT = process.cwd();
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const STATUS_FILE = process.env.CCUSAGE_RUNTIME_DIR
   ? path.join(process.env.CCUSAGE_RUNTIME_DIR, 'ccusage-status.txt')

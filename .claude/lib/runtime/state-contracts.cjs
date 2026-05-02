@@ -3,12 +3,14 @@
 const fs = require('fs');
 const path = require('path');
 const Ajv = require('ajv');
+const addFormats = require('ajv-formats');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const SCHEMAS_DIR = path.join(PROJECT_ROOT, '.claude', 'schemas');
 
 const ajv = new Ajv({ allErrors: false, strict: false });
+addFormats(ajv);
 const validators = new Map();
 
 function loadSchema(schemaFile) {
