@@ -242,5 +242,29 @@
     "archived": false,
     "id": "446c1b0a69b669b60b379214c43848d00f3885d9",
     "importance": 0.5
+  },
+  {
+    "text": "[SECURITY] Runtime queue files (stale-tasks.json, integration-queue.jsonl, heartbeat-reminder.txt) are NOT protected from subagent writes. Only files with \"reflection-\" prefix are in REFLECTION_ALLOWED_PATHS. A misbehaving subagent can wipe stale-tasks.json, causing the router to skip Gate 3. Fix: add these files to the protected-paths allowlist in unified-creator-guard.cjs. P1-SEC-001 from audit 2026-05-01.",
+    "area": "main",
+    "timestamp": "2026-05-01T06:06:24.687Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "79f6f097066305ad982f21131dbf64c42bc60767",
+    "importance": 0.6
+  },
+  {
+    "text": "[SECURITY] safeParseJSON destructure antipattern silently disables security hooks. The function returns the parsed object directly, NOT a { success, data } envelope. Destructuring { success, data } always gives success=undefined. Any guard that checks \"if (!success)\" exits 0 before enforcement, silently disabling the hook. Always use: const data = safeParseJSON(input, schema, undefined, defaults); then: if (!data) exit(0). Files confirmed broken: worktree-preflight-check.cjs line 28 and routing-guard-core.shared.cjs line 51. Audit 2026-05-01.",
+    "area": "main",
+    "timestamp": "2026-05-01T06:06:42.506Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "8df4f3ec1d89f6ccd2ca8f8b2bc0271eb52e716e",
+    "importance": 0.6
   }
 ]

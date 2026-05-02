@@ -545,5 +545,41 @@
     "archived": false,
     "id": "6584f07057f20e6b4262feb5756fc458a5b60b32",
     "importance": 0.5
+  },
+  {
+    "text": "[WORKFLOW] Subagent first-invocation partial-output failure mode: 5 of 7 specialist agents returned mid-thought partial output rather than structured reports on first invocation during 2026-05-01 audit, requiring a second force-finalize invocation (doubles cost). Root causes under investigation: (1) SubagentStart bootstrap context bloat (Vercel plugin + skills list) consuming context budget, (2) specialists lack output_contract/report_template enforcement in frontmatter, (3) verification-before-completion timing gap. Pattern: always check for structured report envelope before claiming TaskUpdate(completed) in multi-specialist pipelines. If agent output is mid-thought, send a follow-up \"Please produce your final structured report now.\" prompt rather than re-spawning the full task.",
+    "area": "main",
+    "timestamp": "2026-05-01T06:06:24.223Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "1249f07428ac699732712b238f71ca31d96dca9f",
+    "importance": 0.5
+  },
+  {
+    "text": "[WORKFLOW] Audit pipeline spawn protocol: when spawning specialist audit agents (qa, code-reviewer, security-architect, architect), include an explicit \"FINAL REPORT REQUIRED\" instruction and a structured output template in the prompt. Agents without output contracts tend to produce mid-thought dumps. After spawn, check that the first invocation produced a structured report (has section headers, severity counts, executive summary) before accepting TaskUpdate(completed). If not: send a follow-up finalize prompt before moving to next phase. Source: self-diagnostics-audit 2026-05-01 AT-2 finding.",
+    "area": "main",
+    "timestamp": "2026-05-01T06:06:24.447Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "c70e547156b2482e81da0d53547e38fd8da82f8c",
+    "importance": 0.6
+  },
+  {
+    "text": "[CODE][SECURITY] safeParseJSON returns the parsed object directly, NOT an envelope with success/data keys. Any code doing: const { success, data } = safeParseJSON(...) is broken. success is always undefined, causing silent guard failure. Correct: const data = safeParseJSON(input, \"schema\", undefined, defaultVal); followed by: if (!data || typeof data !== \"object\") then handle the error. Two broken instances found in audit 2026-05-01: hooks/safety/worktree-preflight-check.cjs lines 28-31 (worktree guard silently dead) and hooks/routing/routing-guard-core.shared.cjs lines 51-52 (routing dedupe state never loads). Sweep all .cjs/.js for remaining instances of this antipattern.",
+    "area": "main",
+    "timestamp": "2026-05-01T06:06:42.273Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "archived": false,
+    "id": "33bf8d3d4c0f124a63447beb9f37fb25ce6ca95b",
+    "importance": 0.6
   }
 ]
