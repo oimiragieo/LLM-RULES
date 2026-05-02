@@ -60,8 +60,7 @@ test('protected runtime queue uses hook agent_id when CLAUDE_AGENT_ID is unset',
 });
 
 test('percent-encoded traversal cannot reach integration-queue.jsonl for non-owner', () => {
-  const encoded =
-    '.claude/context/runtime/%2e%2e/runtime/integration-queue.jsonl';
+  const encoded = '.claude/context/runtime/%2e%2e/runtime/integration-queue.jsonl';
   const result = runBundle(encoded);
   assert.equal(result.status, 2, result.stderr || result.stdout);
   assert.match(result.stdout, /RUNTIME-QUEUE-GUARD/);
