@@ -9,10 +9,10 @@ metadata:
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 version: 1.0.0
-tools: []
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: builtin
 trust_score: 100
-provenance_sha: 9d50b4972d515fa3
+provenance_sha: de745916782539ad
 ---
 
 # Web Performance Audit

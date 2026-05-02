@@ -8,11 +8,7 @@
 
 **You NEVER execute work. You ONLY route via Task().**
 
-> **TOOL DISCIPLINE REMINDERS (HOOKS WILL BLOCK)**
->
-> - Preflight queue files → `Read` specific paths under `.claude/context/runtime/`, NEVER `Bash ls` or `Bash cat`
-> - Epic/planning prompts → spawn `planner` via `Task()` FIRST, NEVER `TaskCreate` directly for multi-step work
-> - See `.claude/rules/agents.md` for specialist routing and §TOOL LOCKDOWN below for allowed tools
+Hooks enforce `Read` on files, planner-first routing, and specialists for creator/framework paths; avoid `MaxFileReadTokenExceededError`, `EISDIR`, and malformed `TaskCreate` (`subject`/`description`).
 
 ---
 
@@ -65,16 +61,6 @@ Then: `TaskList()` → spawn 1+ agents via `Task(...)`. Router does not execute 
 
 ---
 
-## TOOL USAGE & GUARDRAILS
-
-When agents attempt to use tools, they MUST adhere to the following safety guardrails:
-
-1. Prevent `MaxFileReadTokenExceededError`: never full-read huge files; paginate with `offset`/`limit` or search first.
-2. Prevent `EISDIR`: never `Read` a directory path.
-3. `TaskCreate` requires string `subject` and `description`; never pass nested `tasks: []`.
-
----
-
 ## PRIME DIRECTIVE
 
 ### SPECIALIST-FIRST ROUTING LAW (IRON LAW)
@@ -117,13 +103,7 @@ Task({ task_id: 'task-N', subagent_type, prompt, model? })
 
 ### Epic Task Rule (IRON LAW)
 
-For any request that needs 3+ steps, multiple files, or planning (keywords: "plan", "roadmap", "implement X", "add feature Y", "what's next", "build out"):
-
-- **MUST** spawn `planner` via `Task()` FIRST
-- **NEVER** call `TaskCreate` yourself for an epic — the routing-guard hook will block it with `[TASK-CREATE VIOLATION]`
-- Planner owns task decomposition and creates the sub-tasks
-
-**When router MAY use `TaskCreate` directly**: only for single-step, single-file, trivial follow-up tasks that require no planning (e.g., "close out task X", "update task metadata", "mark task Y complete").
+Requests needing 3+ steps, multiple files, or planning keywords (`plan`, `roadmap`, `implement`, `build out`) MUST spawn `planner` via `Task()` first. Never `TaskCreate` an epic yourself; the routing guard blocks it. Router may use `TaskCreate` only for trivial single-step task hygiene.
 
 ---
 
@@ -165,20 +145,13 @@ Full routing: **@AGENT_ROUTING_TABLE.md** | Creator skills: **@CREATOR_SKILLS_TA
 
 ---
 
-## MEMORY
+## MEMORY (Section 8)
 
 - Agents write to `learnings.md`, `decisions.md`, `issues.md`
-- Use `MemoryRecord` for structured updates (patterns/gotchas/discoveries)
-- Do not edit `patterns.json` or `gotchas.json` directly; use `MemoryRecord`
+- Use `MemoryRecord` for structured patterns/gotchas/discoveries; never edit `patterns.json` or `gotchas.json` directly
 - Context budget: compress at 80K tokens, mandatory at 120K, RED LINE at 150K
 - Use runtime reminder files as the trigger source for compression and reflection checks.
 - If `compression-reminder.txt` exists → handle before spawning
-
----
-
-## 8. Memory Record Policy (Section 8)
-
-Structured memory writes MUST go through `MemoryRecord` — do not edit `patterns.json` or `gotchas.json` directly. `MemoryRecord` enforces schema validation, dedupe, and tier routing (STM/MTM/LTM). Direct edits to `patterns.json` or `gotchas.json` are blocked by hook enforcement. See **@MEMORY_PROTOCOL.md** for full memory architecture and APIs.
 
 ---
 
@@ -199,4 +172,4 @@ Catalog: **@SKILL_CATALOG_TABLE.md** | Discovery: read catalog, then `Skill({ sk
 
 ## DIRECTORY INDEX
 
-Each subdirectory has its own CLAUDE.md. Key: `agents/`, `skills/`, `hooks/`, `lib/`, `workflows/`, `commands/`, `schemas/`, `context/`, `config/`, `docs/`, `rules/`.
+Each major subdirectory has its own CLAUDE.md.

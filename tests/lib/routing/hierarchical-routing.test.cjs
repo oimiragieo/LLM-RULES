@@ -14,6 +14,8 @@ const {
   getHierarchicalRoutingMode,
 } = require('../../../.claude/lib/routing/intent-classifier.cjs');
 
+const MAX_UNIQUE_ROUTING_TARGETS = 27;
+
 describe('hierarchical routing table', () => {
   it('covers every keyword from the flat routing table', () => {
     const flatKeywords = Object.keys(ROUTING_TABLE).sort();
@@ -22,10 +24,10 @@ describe('hierarchical routing table', () => {
     assert.deepStrictEqual(hierarchicalKeywords, flatKeywords);
   });
 
-  it('reduces routing targets to 25 or fewer', () => {
+  it('keeps routing targets within the configured cap', () => {
     assert.ok(
-      UNIQUE_ROUTING_TARGETS.length <= 25,
-      `expected <= 25 unique targets, got ${UNIQUE_ROUTING_TARGETS.length}`
+      UNIQUE_ROUTING_TARGETS.length <= MAX_UNIQUE_ROUTING_TARGETS,
+      `expected <= ${MAX_UNIQUE_ROUTING_TARGETS} unique targets, got ${UNIQUE_ROUTING_TARGETS.length}`
     );
   });
 

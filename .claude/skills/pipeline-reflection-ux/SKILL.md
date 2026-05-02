@@ -4,10 +4,10 @@ description: Improve router-facing pipeline and reflection narration to reduce n
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 version: 1.1.0
-tools: []
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: builtin
 trust_score: 100
-provenance_sha: 9d9f5498976abf19
+provenance_sha: 3dcd60ca9638e8d3
 ---
 
 # Pipeline Reflection UX

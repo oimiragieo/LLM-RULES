@@ -1,4 +1,12 @@
 ---
+name: token-saver-memory-dedup
+description: Helper skill that deduplicates token-saver memory records before persistence.
+version: 1.0.0
+category: helper
+invoked_by: skill
+user_invocable: false
+agents: [context-compressor]
+tags: [token-saver, memory, deduplication, helper]
 source: builtin
 trust_score: 100
 provenance_sha: 323f2531fc4f8d0f

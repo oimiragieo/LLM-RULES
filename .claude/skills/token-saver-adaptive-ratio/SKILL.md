@@ -1,4 +1,12 @@
 ---
+name: token-saver-adaptive-ratio
+description: Helper skill that exposes adaptive token-saver compression ratios for large context corpora.
+version: 1.0.0
+category: helper
+invoked_by: skill
+user_invocable: false
+agents: [context-compressor]
+tags: [token-saver, compression, helper]
 source: builtin
 trust_score: 100
 provenance_sha: 31cd24bf51f50786

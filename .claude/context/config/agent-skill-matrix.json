@@ -1542,6 +1542,21 @@
           "context-compressor"
         ]
       },
+      "cron-scheduler-agent": {
+        "primary": ["task-management-protocol", "workflow-patterns"],
+        "secondary": ["devops", "monitoring"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
       "reverse-engineer": {
         "primary": [
           "binary-analysis-patterns",
@@ -1761,6 +1776,21 @@
       "task-manager": {
         "primary": ["omega-codex-cli", "omega-gemini-cli"],
         "secondary": [],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "token-saver-context-compression",
+          "ripgrep",
+          "memory-search",
+          "context-compressor",
+          "code-structural-search",
+          "code-semantic-search"
+        ]
+      },
+      "telegram-channel-agent": {
+        "primary": ["task-management-protocol", "workflow-patterns"],
+        "secondary": ["devops", "monitoring"],
         "contextual": {},
         "always": [
           "verification-before-completion",
@@ -2268,11 +2298,11 @@
     }
   },
   "metadata": {
-    "totalAgents": 119,
+    "totalAgents": 121,
     "agentsByCategory": {
       "core": 11,
       "domain": 68,
-      "specialized": 25,
+      "specialized": 27,
       "orchestrators": 15
     },
     "skillMappingCoverage": "100%",

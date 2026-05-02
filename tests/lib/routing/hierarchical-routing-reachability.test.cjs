@@ -34,6 +34,8 @@ const META_ROUTE_CASES = [
   ['reflection-agent', 'Run a reflection retrospective on this completed session.'],
   ['memory-manager', 'Run memory maintenance with a memory health check and memory rotation.'],
   ['task-manager', 'task-manager task hygiene stale tasks'],
+  ['cron-scheduler-agent', 'cron scheduler recurring job health'],
+  ['telegram-channel-agent', 'telegram channel delivery health'],
   ['ecosystem-auditor', 'Audit the ecosystem for missing agents and skills.'],
   ['conductor-validator', 'Validate this CDD conductor workflow.'],
   ['claude-md-auditor', 'Check CLAUDE.md for stale references.'],
@@ -73,7 +75,7 @@ describe('hierarchical reachability and preserved direct routes', () => {
   });
 
   it('keeps all meta-orchestration agents preserved as direct routes', () => {
-    assert.equal(META_ORCHESTRATION_AGENTS.length, 14);
+    assert.equal(META_ORCHESTRATION_AGENTS.length, 16);
 
     for (const agent of META_ORCHESTRATION_AGENTS) {
       assert.ok(

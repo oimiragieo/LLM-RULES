@@ -9,7 +9,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
-import { spawnSync } from 'child_process';
+import prettier from 'prettier';
 
 // Try to import js-yaml, fallback to simple parsing if not available
 let yaml;
@@ -443,33 +443,23 @@ async function generateIndex() {
   await fs.mkdir(outputDir, { recursive: true });
 
   // Write index file
-  await fs.writeFile(OUTPUT_PATH, JSON.stringify(index, null, 2) + '\n', 'utf-8');
-
-  // Run prettier on the output file to ensure consistent formatting
-  // Use spawnSync with array args to avoid command injection
-  try {
-    const result = spawnSync('pnpm', ['exec', 'prettier', '--write', OUTPUT_PATH], {
-      cwd: ROOT,
-      stdio: 'pipe', // Suppress output
-      shell: process.platform === 'win32', // Use shell on Windows for pnpm.cmd
-    });
-    if (result.status !== 0) {
-      console.warn('⚠️  Could not run prettier on output file, formatting may differ');
-    }
-  } catch {
-    // If prettier fails, the file is still valid JSON, just may not be formatted
-    console.warn('⚠️  Could not run prettier on output file, formatting may differ');
-  }
+  const prettierOptions = (await prettier.resolveConfig(OUTPUT_PATH)) || {};
+  const formattedIndex = await prettier.format(JSON.stringify(index, null, 2), {
+    ...prettierOptions,
+    filepath: OUTPUT_PATH,
+  });
+  await fs.writeFile(OUTPUT_PATH, formattedIndex, 'utf-8');
 
   // Calculate approximate token count (rough estimate: 1 token ≈ 4 chars)
   const indexSize = JSON.stringify(index).length;
   const estimatedTokens = Math.ceil(indexSize / 4);
+  const technologyCount = Object.keys(technologyMap).length;
 
   const indexType = isPrebuilt ? 'pre-built (lightweight)' : 'full';
   console.log(`✅ Generated ${indexType} index with ${allRules.length} rules`);
   console.log(`   - ${masterRules.length} master rules`);
   console.log(`   - ${libraryRules.length} library rules (formerly archive)`);
-  console.log(`   - ${Object.keys(technologyMap).length} technologies mapped`);
+  console.log(`   - ${technologyCount} technologies mapped`);
   console.log(
     `   - Index size: ${(indexSize / 1024).toFixed(2)} KB (~${estimatedTokens.toLocaleString()} tokens)`
   );

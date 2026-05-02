@@ -11,10 +11,10 @@ metadata:
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
 version: 1.0.0
-tools: []
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: builtin
 trust_score: 100
-provenance_sha: 527148585ffb5c06
+provenance_sha: 4b8ee85f73fe3cb8
 ---
 
 # React Native Skills

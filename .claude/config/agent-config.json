@@ -411,6 +411,23 @@
       ],
       "model": "claude-sonnet-4-6"
     },
+    "cron-scheduler-agent": {
+      "tools": [
+        "Read",
+        "Bash",
+        "Grep",
+        "Glob",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill",
+        "MemoryRecord",
+        "Write",
+        "Edit"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
     "database-architect": {
       "tools": [
         "Read",
@@ -643,6 +660,23 @@
         "Write",
         "Edit",
         "Skill"
+      ],
+      "model": "claude-sonnet-4-6"
+    },
+    "telegram-channel-agent": {
+      "tools": [
+        "Read",
+        "Bash",
+        "Grep",
+        "Glob",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill",
+        "MemoryRecord",
+        "Write",
+        "Edit"
       ],
       "model": "claude-sonnet-4-6"
     },

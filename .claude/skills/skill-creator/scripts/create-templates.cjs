@@ -1,5 +1,7 @@
 'use strict';
 
+const { computeProvenanceSha } = require('../../../lib/validation/skill-provenance.cjs');
+
 function toTitleCase(name) {
   return name
     .split('-')
@@ -145,10 +147,14 @@ function generateSkillContent(config) {
           'Handle errors gracefully',
         ];
 
-  return `---
+  const provenancePlaceholder = '0000000000000000';
+  const content = `---
 name: ${name}
 description: ${description}
 version: ${version}
+source: builtin
+trust_score: 100
+provenance_sha: ${provenancePlaceholder}
 model: ${model}
 invoked_by: ${invokedBy}
 user_invocable: ${userInvocable}
@@ -233,6 +239,13 @@ cat .claude/context/memory/decisions.md
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
 `;
+
+  const contentForFingerprint = content.replace(`provenance_sha: ${provenancePlaceholder}\n`, '');
+  const provenanceSha = computeProvenanceSha(contentForFingerprint);
+  return content.replace(
+    `provenance_sha: ${provenancePlaceholder}`,
+    `provenance_sha: ${provenanceSha}`
+  );
 }
 
 function generateScriptContent(name, description) {

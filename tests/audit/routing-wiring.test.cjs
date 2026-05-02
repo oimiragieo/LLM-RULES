@@ -5,7 +5,7 @@
  *
  * Verifies that the flat routing system is correctly wired:
  *
- *   1. All 119 agents in agent-config.json appear in flat routing tables
+ *   1. All agents in agent-config.json appear in flat routing tables
  *      (routing-table-core-map.cjs or routing-table-intent-agents.cjs).
  *      Note: domain-router-* agents are meta-routing agents used only in
  *      hierarchical mode and are therefore exempt from this requirement.
@@ -65,6 +65,7 @@ const INTENT_AGENTS_PATH = path.join(
   'routing-table-intent-agents.cjs'
 );
 const AGENT_CONFIG_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'agent-config.json');
+const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
 const MODEL_REGISTRY_PATH = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -95,12 +96,15 @@ describe('routing-wiring: flat routing coverage', () => {
   let intentMap;
   /** @type {object} */
   let agentConfig;
+  /** @type {object} */
+  let agentRegistry;
 
   before(() => {
     // Load agent-config.json
     const raw = fs.readFileSync(AGENT_CONFIG_PATH, 'utf8');
     agentConfig = JSON.parse(raw);
     allAgentIds = Object.keys(agentConfig.agents);
+    agentRegistry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
 
     // Load routing tables
     const coreMapModule = require(CORE_MAP_PATH);
@@ -115,11 +119,22 @@ describe('routing-wiring: flat routing coverage', () => {
     flatRoutingTargets = new Set([...coreMapTargets, ...intentAgentTargets]);
   });
 
-  it('agent-config.json has exactly 119 agents', () => {
+  it('agent-config.json covers the full generated registry', () => {
+    const registryIds = Object.keys(agentRegistry.agents);
     assert.strictEqual(
       allAgentIds.length,
-      119,
-      `Expected 119 agents but found ${allAgentIds.length}: ${allAgentIds.join(', ')}`
+      registryIds.length,
+      'agent-config.json agent count should match agent-registry.json'
+    );
+    assert.strictEqual(
+      allAgentIds.length,
+      agentRegistry.metadata.totalAgents,
+      'agent-config.json agent count should match registry metadata'
+    );
+    assert.deepEqual(
+      [...allAgentIds].sort(),
+      [...registryIds].sort(),
+      'agent-config.json should contain every generated registry agent'
     );
   });
 
@@ -252,6 +267,7 @@ describe('routing-wiring: newly wired agents have keywords', () => {
     'azure-infra-pro',
     'business-analyst',
     'context-manager',
+    'cron-scheduler-agent',
     'data-scientist',
     'django-developer',
     'dotnet-pro',
@@ -274,6 +290,7 @@ describe('routing-wiring: newly wired agents have keywords', () => {
     'sql-pro',
     'swift-pro',
     'terraform-engineer',
+    'telegram-channel-agent',
     'terragrunt-pro',
     'voice-replicator-agent',
     'windows-infra-pro',

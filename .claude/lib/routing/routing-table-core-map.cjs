@@ -429,11 +429,10 @@ const ROUTING_TABLE = {
   channel: 'channel-responder',
   'slack-message': 'channel-responder',
   'discord-message': 'channel-responder',
-
   // Task Management
   'task-hygiene': 'task-manager',
   'task-audit': 'task-manager',
-
+  cron: 'cron-scheduler-agent',
   // Memory Management
   'memory-audit': 'memory-manager',
   'memory-health': 'memory-manager',
@@ -606,6 +605,7 @@ const ROUTING_TABLE = {
   heartbeat: 'heartbeat-orchestrator',
   'heartbeat-loop': 'heartbeat-orchestrator',
   'heartbeat-start': 'heartbeat-orchestrator',
+  telegram: 'telegram-channel-agent',
   loop: 'loop-operator',
   'loop-operator': 'loop-operator',
   'autonomous-loop': 'loop-operator',

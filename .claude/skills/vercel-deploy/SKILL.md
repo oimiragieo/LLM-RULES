@@ -9,10 +9,10 @@ metadata:
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 version: 1.1.0
-tools: []
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: builtin
 trust_score: 100
-provenance_sha: b1577528b6e50d2e
+provenance_sha: b04cb087ba665489
 ---
 
 # Vercel Deploy

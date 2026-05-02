@@ -178,6 +178,10 @@ const INTENT_TO_AGENT = {
   'ecosystem-auditor': 'ecosystem-auditor',
   'task-manager': 'task-manager',
   'memory-manager': 'memory-manager',
+  cron_scheduler: 'cron-scheduler-agent',
+  'cron-scheduler-agent': 'cron-scheduler-agent',
+  telegram_channel: 'telegram-channel-agent',
+  'telegram-channel-agent': 'telegram-channel-agent',
 
   // Loop governance
   'loop-operator': 'loop-operator',

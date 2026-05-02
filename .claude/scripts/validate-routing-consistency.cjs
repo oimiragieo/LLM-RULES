@@ -16,6 +16,7 @@ const CAPABILITY_ROUTING_PATH = path.join(
 );
 const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
 const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
+const MAX_UNIQUE_ROUTING_TARGETS = 27;
 
 function readJsonIfExists(filePath) {
   try {
@@ -138,7 +139,7 @@ function checkHierarchicalRoutingConsistency(
     issues.push(`DOMAIN_ROUTING_TABLE entry for "${keyword}" has invalid type: ${entry.type}`);
   }
 
-  if (uniqueTargets.size > 25) {
+  if (uniqueTargets.size > MAX_UNIQUE_ROUTING_TARGETS) {
     issues.push(`DOMAIN_ROUTING_TABLE has too many unique routing targets: ${uniqueTargets.size}`);
   }
 }

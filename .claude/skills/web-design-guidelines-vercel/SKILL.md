@@ -8,10 +8,10 @@ metadata:
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
 version: 1.0.0
-tools: []
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: builtin
 trust_score: 100
-provenance_sha: 91f309c3d05d4fa2
+provenance_sha: 946e6dd3da9b1919
 ---
 
 # Web Interface Guidelines

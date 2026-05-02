@@ -9,10 +9,10 @@ metadata:
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 version: 1.0.0
-tools: []
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: builtin
 trust_score: 100
-provenance_sha: 1576a2d30e4b3591
+provenance_sha: f3f15cbc4a532e6b
 ---
 
 # shadcn/ui Expert

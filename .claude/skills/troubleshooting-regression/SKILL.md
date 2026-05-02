@@ -5,10 +5,10 @@ argument-hint: '[--prompt "..."] [--log-path <path>] [--mode quick|full]'
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 version: 1.0.0
-tools: []
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: builtin
 trust_score: 100
-provenance_sha: f595427971aeffe2
+provenance_sha: b44d6767fd4adf12
 ---
 
 # Troubleshooting Regression

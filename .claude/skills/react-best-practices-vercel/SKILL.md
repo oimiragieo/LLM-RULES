@@ -8,10 +8,10 @@ metadata:
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
 version: 1.0.0
-tools: []
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: builtin
 trust_score: 100
-provenance_sha: 9e99b9cb8f97fc61
+provenance_sha: afe06d2060d273e5
 ---
 
 # Vercel React Best Practices

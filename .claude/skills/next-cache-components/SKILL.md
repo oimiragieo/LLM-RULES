@@ -9,10 +9,10 @@ metadata:
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 version: 1.1.0
-tools: []
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: builtin
 trust_score: 100
-provenance_sha: 560b674a568c740a
+provenance_sha: 5ec0c5069a7f54d5
 ---
 
 # Next.js Cache Components
