@@ -125,3 +125,21 @@
 - Updated workflow: evolution-workflow (2026-05-01)
 
 - Updated workflow: missing-workflow-xyz (2026-05-01)
+
+- Created new agent: qa-guardian (2026-05-02)
+
+- Created new agent: contract-check (2026-05-02)
+
+- Created new agent: bool-action (2026-05-02)
+
+- Created new agent: repo-onboarder (2026-05-02)
+
+- Created new agent: release-guardian (2026-05-02)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-05-02)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-05-02)
+
+- Updated workflow: evolution-workflow (2026-05-02)
+
+- Updated workflow: missing-workflow-xyz (2026-05-02)
