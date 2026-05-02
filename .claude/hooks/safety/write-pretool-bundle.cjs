@@ -41,6 +41,71 @@ function formatHookError(err) {
   return text || 'Unknown hook failure (empty error message)';
 }
 
+const RUNTIME_QUEUE_POLICIES = new Map([
+  [
+    '.claude/context/runtime/reflection-spawn-request.json',
+    { label: 'reflection runtime queue', allowedAgents: new Set(['reflection-agent']) },
+  ],
+  [
+    '.claude/context/runtime/reflection-reminder.txt',
+    { label: 'reflection runtime queue', allowedAgents: new Set(['reflection-agent']) },
+  ],
+  [
+    '.claude/context/runtime/stale-tasks.json',
+    { label: 'stale task queue', allowedAgents: new Set(['router', 'task-manager']) },
+  ],
+  [
+    '.claude/context/runtime/integration-queue.jsonl',
+    { label: 'integration queue', allowedAgents: new Set(['router', 'artifact-integrator']) },
+  ],
+  [
+    '.claude/context/runtime/heartbeat-reminder.txt',
+    { label: 'heartbeat reminder', allowedAgents: new Set(['router', 'heartbeat-orchestrator']) },
+  ],
+]);
+
+/** Returned when path normalization cannot confine the target under runtime/. */
+const RUNTIME_GUARD_TRAVERSAL_REJECT = '.claude/context/runtime/__guard_reject_traversal__';
+
+function normalizeRuntimeGuardPath(rawPath) {
+  let normalized = String(rawPath || '').trim();
+  try {
+    normalized = decodeURIComponent(normalized);
+  } catch (_err) {
+    // Malformed percent-encoding is handled by the normalized raw path below.
+  }
+
+  normalized = normalized.split('\\').join('/');
+  const lower = normalized.toLowerCase();
+  const marker = '.claude/context/runtime/';
+  const markerIndex = lower.lastIndexOf(marker);
+  if (markerIndex === -1) {
+    return path.posix.normalize(lower);
+  }
+  const tail = path.posix.normalize(lower.slice(markerIndex));
+  if (!tail.startsWith(marker)) {
+    return RUNTIME_GUARD_TRAVERSAL_REJECT;
+  }
+  if (/[\x00-\x1f]/.test(tail)) {
+    return RUNTIME_GUARD_TRAVERSAL_REJECT;
+  }
+  for (const protectedPath of RUNTIME_QUEUE_POLICIES.keys()) {
+    if (tail.startsWith(`${protectedPath}/`)) {
+      return RUNTIME_GUARD_TRAVERSAL_REJECT;
+    }
+  }
+  return tail;
+}
+
+/**
+ * Prefer CLAUDE_AGENT_ID (subprocess identity); fall back to hook agent_id when unset.
+ */
+function resolveWriteActorAgentId(hookInput, envAgentId) {
+  const fromEnv = String(envAgentId || '').trim();
+  if (fromEnv) return fromEnv;
+  return hookInput && String(hookInput.agent_id || '').trim();
+}
+
 /**
  * Enforces reflection-agent runtime queue isolation.
  * Exits process directly (0=allow, 2=block) when a runtime path is matched.
@@ -51,28 +116,38 @@ function applyReflectionGuard(hookInput, agentId) {
       hookInput.tool_input &&
       (hookInput.tool_input.file_path || hookInput.tool_input.path)) ||
     '';
-  const normPath = rawPath.split('\\').join('/');
-  const REFLECTION_ALLOWED_PATHS = [
-    '.claude/context/runtime/reflection-spawn-request.json',
-    '.claude/context/runtime/reflection-reminder.txt',
-  ];
-  const isReflectionPath = REFLECTION_ALLOWED_PATHS.some(p => normPath.endsWith(p));
+  const normPath = normalizeRuntimeGuardPath(rawPath);
+  const agent = resolveWriteActorAgentId(hookInput, agentId);
+  const policy = RUNTIME_QUEUE_POLICIES.get(normPath);
   const isRuntimePath = normPath.includes('.claude/context/runtime/');
 
-  if (isReflectionPath) {
-    if (agentId === 'reflection-agent') {
+  if (normPath === RUNTIME_GUARD_TRAVERSAL_REJECT) {
+    console.log(
+      JSON.stringify({
+        result: 'block',
+        message:
+          '[RUNTIME-QUEUE-GUARD] Path traversal or invalid runtime path is not allowed for runtime queue writes.',
+      })
+    );
+    process.exit(2);
+  }
+
+  if (policy) {
+    if (policy.allowedAgents.has(agent)) {
       process.exit(0);
     }
     console.log(
       JSON.stringify({
         result: 'block',
         message:
-          '[REFLECTION-RUNTIME-GUARD] Only reflection-agent may write to reflection runtime queue paths.',
+          `[RUNTIME-QUEUE-GUARD] Only ${Array.from(policy.allowedAgents).sort().join(', ')} ` +
+          `may write ${policy.label} paths.`,
       })
     );
     process.exit(2);
   }
-  if (agentId === 'reflection-agent' && isRuntimePath) {
+
+  if (agent === 'reflection-agent' && isRuntimePath) {
     console.log(
       JSON.stringify({
         result: 'block',
@@ -122,6 +197,7 @@ async function main() {
     // Sub-agent bypass: non-router sub-agents skip all write safety checks.
     // Checks hookInput.agent_id (Claude Code native), CLAUDE_AGENT_ID env, and task_id.
     if (isSubagentBypass(hookInput, _agentId)) {
+      emitPerf('subagent_bypass');
       process.exit(0);
     }
 
@@ -147,6 +223,7 @@ async function main() {
       ? normalizedWritePath.slice(normalizedWritePath.indexOf('.claude/context/'))
       : normalizedWritePath;
     if (SAFE_WRITE_PREFIXES.some(prefix => relWritePath.startsWith(prefix))) {
+      emitPerf('safe_write_prefix');
       process.exit(0);
     }
 

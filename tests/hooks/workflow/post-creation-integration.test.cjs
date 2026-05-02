@@ -5,6 +5,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const HOOK_PATH = path.resolve(
   __dirname,
   '..',
@@ -21,8 +22,10 @@ const {
   appendToQueueWithImpact,
   MAX_QUEUE_ENTRY_BYTES,
 } = require(HOOK_PATH);
+const { INTEGRATION_QUEUE_ENTRY_SCHEMA_PATH, validateIntegrationQueueEntry } = require(
+  path.join(PROJECT_ROOT, '.claude', 'lib', 'workflow', 'integration-queue-contract.cjs')
+);
 
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const QUEUE_PATH = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -231,4 +234,72 @@ test('appendToQueueWithImpact sanitizes invalid impactReport shape', () => {
   assert.equal(parsed.impactReportInvalid, true);
 
   fs.unlinkSync(QUEUE_PATH);
+});
+
+test('integration queue entries validate against the queue schema', () => {
+  assert.ok(fs.existsSync(INTEGRATION_QUEUE_ENTRY_SCHEMA_PATH));
+
+  const entry = {
+    timestamp: new Date().toISOString(),
+    artifactId: 'skill:schema-valid',
+    creatorType: 'skill',
+    changeType: 'created',
+    source: 'post-creation-integration.cjs',
+    gaps: ['catalog'],
+    priority: 'P1',
+    processed: false,
+    impactReport: null,
+  };
+
+  const result = validateIntegrationQueueEntry(entry);
+  assert.deepStrictEqual(result.errors, null);
+});
+
+test('validateIntegrationQueueEntry rejects malformed entries (ambiguous shape)', () => {
+  const bad = {
+    timestamp: new Date().toISOString(),
+    source: 'test',
+    processed: false,
+    artifactId: 'skill:x',
+    creatorType: 'skill',
+    changeType: 'created',
+    gaps: ['a'],
+    priority: 'P1',
+    artifactPath: 'should-not-coexist',
+    artifactType: 'skill',
+    missingIntegration: 'x',
+    detail: 'y',
+  };
+  const result = validateIntegrationQueueEntry(bad);
+  assert.strictEqual(result.valid, false);
+  const joined = (result.errors || []).map(e => String(e.message || '')).join(' | ');
+  assert.ok(
+    joined.includes('exactly one integration queue shape') ||
+      /oneof|must match exactly one|not.*oneof/i.test(joined),
+    `expected schema/shape rejection, got: ${joined}`
+  );
+});
+
+test('validateIntegrationQueueEntry rejects entries with unknown creatorType', () => {
+  const bad = {
+    timestamp: new Date().toISOString(),
+    source: 'test',
+    processed: false,
+    artifactId: 'skill:x',
+    creatorType: 'not-a-real-type',
+    changeType: 'created',
+    gaps: ['a'],
+    priority: 'P1',
+  };
+  const result = validateIntegrationQueueEntry(bad);
+  assert.strictEqual(result.valid, false);
+});
+
+test('appendToQueueWithImpact rejects malformed entries before writing JSONL', () => {
+  if (fs.existsSync(QUEUE_PATH)) fs.unlinkSync(QUEUE_PATH);
+
+  const result = appendToQueueWithImpact('', 'skill', ['missing-link'], null);
+
+  assert.equal(result, false);
+  assert.equal(fs.existsSync(QUEUE_PATH), false);
 });

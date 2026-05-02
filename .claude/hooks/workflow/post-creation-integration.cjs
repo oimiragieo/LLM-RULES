@@ -33,6 +33,9 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { DEFAULT_ARTIFACT_GRAPH_PATH } = require('../../lib/workflow/artifact-graph.cjs');
+const {
+  validateIntegrationQueueEntryForAppend,
+} = require('../../lib/workflow/integration-queue-contract.cjs');
 const { INTEGRATION_QUEUE_PATH } = require('../../lib/utils/path-constants.cjs');
 
 const GRAPH_PATH = DEFAULT_ARTIFACT_GRAPH_PATH;
@@ -321,17 +324,14 @@ function appendToQueueWithImpact(artifactId, creatorType, gaps, impactReport) {
     entry.impactReportSanitized = true;
   }
 
-  // Ensure queue directory exists
+  if (!validateIntegrationQueueEntryForAppend(entry)) return false;
+
   const queueDir = path.dirname(QUEUE_PATH);
   if (!fs.existsSync(queueDir)) {
     fs.mkdirSync(queueDir, { recursive: true });
   }
-
-  // Append to queue
   const serialized = serializeQueueEntryWithCap(entry);
   fs.appendFileSync(QUEUE_PATH, serialized + '\n', 'utf8');
-
-  // Rotate if needed
   rotateQueue();
 }
 

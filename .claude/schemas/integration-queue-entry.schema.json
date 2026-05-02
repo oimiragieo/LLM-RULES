@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.local/schemas/integration-queue-entry.schema.json",
+  "title": "Integration Queue Entry",
+  "description": "JSONL entry contract for .claude/context/runtime/integration-queue.jsonl.",
+  "type": "object",
+  "oneOf": [
+    { "required": ["artifactId", "creatorType", "changeType", "gaps", "priority"] },
+    { "required": ["artifactPath", "artifactType", "missingIntegration", "detail"] }
+  ],
+  "required": ["timestamp", "source", "processed"],
+  "properties": {
+    "timestamp": { "type": "string", "minLength": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "processed": { "type": "boolean" },
+    "artifactId": {
+      "type": "string",
+      "minLength": 1,
+      "not": { "const": "unknown:unknown" }
+    },
+    "creatorType": {
+      "type": "string",
+      "enum": [
+        "agent",
+        "skill",
+        "hook",
+        "workflow",
+        "template",
+        "schema",
+        "tool",
+        "rule",
+        "command"
+      ]
+    },
+    "changeType": { "type": "string", "enum": ["created", "updated", "deleted"] },
+    "gaps": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "maxItems": 200
+    },
+    "priority": { "type": "string", "enum": ["P0", "P1", "P2", "P3"] },
+    "impactReport": {
+      "type": ["object", "null"]
+    },
+    "impactReportInvalid": { "type": "boolean" },
+    "impactReportSanitized": { "type": "boolean" },
+    "impactReportTruncated": { "type": "boolean" },
+    "impactReportOmitted": { "type": "boolean" },
+    "entryTruncated": { "type": "boolean" },
+    "artifactPath": { "type": "string", "minLength": 1 },
+    "artifactType": {
+      "type": "string",
+      "enum": [
+        "agent",
+        "skill",
+        "hook",
+        "workflow",
+        "template",
+        "schema",
+        "tool",
+        "rule",
+        "command"
+      ]
+    },
+    "missingIntegration": { "type": "string", "minLength": 1 },
+    "detail": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}
