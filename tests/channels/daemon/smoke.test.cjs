@@ -56,7 +56,7 @@ function httpPost(port, urlPath, body) {
 }
 
 describe('Smoke Test — In-process daemon HTTP API', () => {
-  const PORT = 13101; // Use non-standard port to avoid conflicts
+  let port;
   let server;
   let dispatcher;
   let tmpDir;
@@ -124,7 +124,14 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
       res.end(JSON.stringify({ error: 'not found' }));
     });
 
-    await new Promise(resolve => server.listen(PORT, '127.0.0.1', resolve));
+    await new Promise((resolve, reject) => {
+      server.once('error', reject);
+      server.listen(0, '127.0.0.1', () => {
+        port = server.address().port;
+        server.off('error', reject);
+        resolve();
+      });
+    });
   });
 
   after(async () => {
@@ -137,7 +144,7 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
   });
 
   it('/health returns ok', async () => {
-    const { status, data } = await httpGet(PORT, '/health');
+    const { status, data } = await httpGet(port, '/health');
     assert.equal(status, 200);
     const body = JSON.parse(data);
     assert.equal(body.status, 'ok');
@@ -145,7 +152,7 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
   });
 
   it('/status returns correct shape', async () => {
-    const { status, data } = await httpGet(PORT, '/status');
+    const { status, data } = await httpGet(port, '/status');
     assert.equal(status, 200);
     const body = JSON.parse(data);
     assert.equal(body.status, 'running');
@@ -155,7 +162,7 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
   });
 
   it('POST /event accepts and processes event', async () => {
-    const { status, data } = await httpPost(PORT, '/event', {
+    const { status, data } = await httpPost(port, '/event', {
       type: 'test.message',
       data: { chatId: '123', text: 'smoke test', user: 'tester', messageId: 1 },
     });
@@ -167,26 +174,26 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
     await new Promise(r => setTimeout(r, 200));
 
     // Verify it was processed
-    const statusRes = await httpGet(PORT, '/status');
+    const statusRes = await httpGet(port, '/status');
     const statusBody = JSON.parse(statusRes.data);
     assert.ok(statusBody.dispatcher.received >= 1);
   });
 
   it('POST /event rejects invalid body', async () => {
-    const { status } = await httpPost(PORT, '/event', { noType: true });
+    const { status } = await httpPost(port, '/event', { noType: true });
     assert.equal(status, 400);
   });
 
   it('/history returns events after processing', async () => {
     await new Promise(r => setTimeout(r, 300));
-    const { status, data } = await httpGet(PORT, '/history');
+    const { status, data } = await httpGet(port, '/history');
     assert.equal(status, 200);
     const body = JSON.parse(data);
     assert.ok(Array.isArray(body.events));
   });
 
   it('/memory returns stats', async () => {
-    const { status, data } = await httpGet(PORT, '/memory');
+    const { status, data } = await httpGet(port, '/memory');
     assert.equal(status, 200);
     const body = JSON.parse(data);
     assert.ok(body.memory);
@@ -194,7 +201,7 @@ describe('Smoke Test — In-process daemon HTTP API', () => {
   });
 
   it('404 for unknown route', async () => {
-    const { status } = await httpGet(PORT, '/nonexistent');
+    const { status } = await httpGet(port, '/nonexistent');
     assert.equal(status, 404);
   });
 });

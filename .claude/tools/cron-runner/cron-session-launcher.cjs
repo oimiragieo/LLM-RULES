@@ -27,6 +27,7 @@ const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const PID_FILE = path.join(RUNTIME_DIR, 'cron-session.pid');
 const SESSION_PING_FILE = path.join(RUNTIME_DIR, 'cron-session-ping.json');
 const VALID_MODES = ['shadow', 'active'];
+const WINDOWS_CMD_EXTENSIONS = new Set(['.cmd', '.bat']);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -167,6 +168,31 @@ function resolveMode() {
   return { mode, valid: VALID_MODES.includes(mode) };
 }
 
+function quoteWindowsCmdArg(value) {
+  const arg = String(value);
+  if (!/^[a-zA-Z0-9._:=/\\-]+$/.test(arg)) {
+    throw new Error(`Unsafe cron launcher argument for cmd.exe dispatch: ${arg}`);
+  }
+  return `"${arg}"`;
+}
+
+function buildSpawnSpec(claudeBinary, spawnArgs, platform = process.platform) {
+  if (platform !== 'win32') {
+    return { command: claudeBinary, args: spawnArgs };
+  }
+
+  const extension = path.extname(claudeBinary).toLowerCase();
+  if (extension && !WINDOWS_CMD_EXTENSIONS.has(extension)) {
+    return { command: claudeBinary, args: spawnArgs };
+  }
+
+  const commandLine = [claudeBinary, ...spawnArgs].map(quoteWindowsCmdArg).join(' ');
+  return {
+    command: process.env.ComSpec || 'cmd.exe',
+    args: ['/d', '/s', '/c', commandLine],
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Launcher
 // ---------------------------------------------------------------------------
@@ -211,13 +237,15 @@ function launch(options) {
   const baseArgs = ['--dangerously-skip-permissions'];
   const spawnArgs = opts.args ? baseArgs.concat(opts.args) : baseArgs;
 
-  // Step 5: Spawn detached subprocess (shell: required for .cmd on Windows)
+  // Step 5: Spawn detached subprocess. On Windows, cmd.exe resolves .cmd shims
+  // without using child_process shell mode, avoiding Node's shell-args warning.
   let child;
   try {
-    child = spawn(claudeBinary, spawnArgs, {
+    const spawnSpec = buildSpawnSpec(claudeBinary, spawnArgs);
+    child = spawn(spawnSpec.command, spawnSpec.args, {
       detached: true,
       stdio: 'ignore',
-      shell: process.platform === 'win32',
+      shell: false,
       windowsHide: true,
       env: process.env, // Inherit full env
     });
@@ -283,6 +311,7 @@ module.exports = {
   writeSessionPing,
   validateEnvironment,
   resolveMode,
+  buildSpawnSpec,
   PID_FILE,
   SESSION_PING_FILE,
   RUNTIME_DIR,

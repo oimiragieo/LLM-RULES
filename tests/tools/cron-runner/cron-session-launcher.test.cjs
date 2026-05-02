@@ -201,6 +201,28 @@ describe('cron-session-launcher', () => {
     });
   });
 
+  describe('buildSpawnSpec', () => {
+    it('uses cmd.exe argument mode for Windows command shims without shell:true', () => {
+      const spec = launcher.buildSpawnSpec(
+        'claude.cmd',
+        ['--dangerously-skip-permissions'],
+        'win32'
+      );
+
+      assert.match(spec.command.toLowerCase(), /cmd\.exe$/);
+      assert.deepEqual(spec.args.slice(0, 3), ['/d', '/s', '/c']);
+      assert.match(spec.args[3], /"claude\.cmd"/);
+      assert.match(spec.args[3], /"--dangerously-skip-permissions"/);
+    });
+
+    it('rejects unsafe Windows command arguments before cmd.exe dispatch', () => {
+      assert.throws(
+        () => launcher.buildSpawnSpec('claude.cmd', ['--flag', 'bad&arg'], 'win32'),
+        /Unsafe cron launcher argument/
+      );
+    });
+  });
+
   describe('writeSessionPing', () => {
     let testEnv;
 

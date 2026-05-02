@@ -7,7 +7,7 @@
 'use strict';
 
 const { execSync, spawn } = require('child_process');
-const { claudeSync, nodeSync } = require('./claude-cli.cjs');
+const { claudeSync, nodeSync, buildClaudeSpawnSpec } = require('./claude-cli.cjs');
 
 const SYSTEM_PROMPT = `You are Agent Studio — an AI assistant running as a persistent background daemon, communicating via Telegram.
 
@@ -444,14 +444,12 @@ main().catch(() => process.exit(1));
         '3',
       ];
 
-      const child = spawn('claude', args, {
+      const spawnSpec = buildClaudeSpawnSpec('claude', args);
+      const child = spawn(spawnSpec.command, spawnSpec.args, {
         cwd: this.projectRoot,
         env,
         windowsHide: true,
-        // shell: true required for Windows .cmd wrapper resolution (claude.cmd);
-        // all args are internal-only; prompt is piped via stdin, not args.
-        // Audit reference: M-01 (security hardening review 2026-04-10)
-        shell: true,
+        shell: false,
         stdio: ['pipe', 'pipe', 'pipe'],
       });
 

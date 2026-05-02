@@ -235,3 +235,35 @@ describe('claudeAsync', () => {
     });
   });
 });
+
+describe('buildClaudeSpawnSpec', () => {
+  it('dispatches Claude command shims through cmd.exe without child_process shell mode on Windows', () => {
+    const { buildClaudeSpawnSpec } = require('../../../scripts/channels/daemon/claude-cli.cjs');
+    const spec = buildClaudeSpawnSpec('claude', ['--model', 'sonnet', '-p'], 'win32');
+
+    assert.match(spec.command.toLowerCase(), /cmd\.exe$/);
+    assert.deepEqual(spec.args.slice(0, 3), ['/d', '/s', '/c']);
+    assert.match(spec.args[3], /"claude"/);
+    assert.match(spec.args[3], /"--model"/);
+    assert.match(spec.args[3], /"sonnet"/);
+    assert.match(spec.args[3], /"-p"/);
+  });
+
+  it('spawns non-Windows platforms directly', () => {
+    const { buildClaudeSpawnSpec } = require('../../../scripts/channels/daemon/claude-cli.cjs');
+    const args = ['--model', 'sonnet', '-p'];
+    const spec = buildClaudeSpawnSpec('claude', args, 'linux');
+
+    assert.equal(spec.command, 'claude');
+    assert.equal(spec.args, args);
+  });
+
+  it('rejects unsafe Windows command arguments before cmd.exe dispatch', () => {
+    const { buildClaudeSpawnSpec } = require('../../../scripts/channels/daemon/claude-cli.cjs');
+
+    assert.throws(
+      () => buildClaudeSpawnSpec('claude', ['--model', 'sonnet', 'bad&arg'], 'win32'),
+      /Unsafe Claude CLI argument/
+    );
+  });
+});
