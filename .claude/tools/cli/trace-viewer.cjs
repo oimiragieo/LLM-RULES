@@ -20,6 +20,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // ---------------------------------------------------------------------------
 // ANSI colour helpers (no external deps)
@@ -212,11 +213,14 @@ function main() {
     .split('\n')
     .filter(Boolean)
     .map(l => {
-      try {
-        return JSON.parse(l);
-      } catch (_e) {
+      const parsed = safeParseJSON(l, null);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
         return { _error: true, _raw: l, 'gen_ai.tool.name': '(parse error)' };
       }
+      if (Object.keys(parsed).length === 0 && !/^\s*\{\s*\}\s*$/.test(l)) {
+        return { _error: true, _raw: l, 'gen_ai.tool.name': '(parse error)' };
+      }
+      return parsed;
     });
 
   const filtered = allLines.filter(l => matchesFilters(l, opts));

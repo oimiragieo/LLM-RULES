@@ -29,6 +29,7 @@ const https = require('https');
 const http = require('http');
 
 const { convertManagedAgent } = require('../../lib/import/managed-agent-adapter.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -105,11 +106,12 @@ function fetchJson(url, headers) {
             reject(new Error(`HTTP ${res.statusCode}: ${data.slice(0, 200)}`));
             return;
           }
-          try {
-            resolve(JSON.parse(data));
-          } catch (e) {
-            reject(new Error(`Failed to parse JSON response: ${e.message}`));
+          const parsedJson = safeParseJSON(data, null);
+          if (!parsedJson || typeof parsedJson !== 'object' || Array.isArray(parsedJson)) {
+            reject(new Error('Failed to parse JSON response: response was not a JSON object'));
+            return;
           }
+          resolve(parsedJson);
         });
       }
     );
@@ -242,7 +244,15 @@ async function main() {
       process.stderr.write(`[claude-import] Error: Fixture file not found: ${fixturePath}\n`);
       process.exit(1);
     }
-    managedAgentJson = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+    managedAgentJson = safeParseJSON(fs.readFileSync(fixturePath, 'utf8'), null);
+    if (
+      !managedAgentJson ||
+      typeof managedAgentJson !== 'object' ||
+      Array.isArray(managedAgentJson)
+    ) {
+      process.stderr.write(`[claude-import] Error: Fixture did not contain a JSON object\n`);
+      process.exit(1);
+    }
   } else if (args.agentId) {
     // Fetch from Anthropic Managed Agents API
     try {
