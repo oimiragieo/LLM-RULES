@@ -33,9 +33,17 @@
 const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
-const Ajv = require('ajv');
 
-const { commandExists } = require('../utils/command-exists.cjs');
+const {
+  getPackageCommandInfo,
+  getPackageCommandSkipReason,
+  isCommandAvailable,
+} = require('./package-command-policy.cjs');
+const {
+  READINESS_REPORT_SCHEMA,
+  createAjv,
+  validateReport,
+} = require('./readiness-report-schema.cjs');
 
 /**
  * Pillar weights from specification
@@ -72,6 +80,13 @@ const GATE_THRESHOLD = 80;
  * Default command timeout (30 seconds)
  */
 const DEFAULT_TIMEOUT = 30000;
+
+/**
+ * Default to static/fast scoring. Running repository package scripts from a
+ * readiness scan can recursively launch this test suite or leave descendant
+ * processes alive after Windows timeouts.
+ */
+const DEFAULT_RUN_PACKAGE_COMMANDS = false;
 
 /**
  * Pillar definitions: command patterns and scoring logic
@@ -291,51 +306,6 @@ const PILLAR_DEFINITIONS = [
 ];
 
 /**
- * JSON Schema for readiness report validation
- */
-const READINESS_REPORT_SCHEMA = {
-  type: 'object',
-  required: ['repoPath', 'timestamp', 'level', 'overallScore', 'pillars', 'gateStatus'],
-  properties: {
-    repoPath: { type: 'string' },
-    timestamp: { type: 'string', format: 'date-time' },
-    level: { type: 'string', enum: ['L1', 'L2', 'L3', 'L4', 'L5'] },
-    overallScore: { type: 'number', minimum: 0, maximum: 100 },
-    pillars: {
-      type: 'object',
-      additionalProperties: {
-        type: 'object',
-        required: ['score', 'passed', 'weight', 'command', 'exitCode'],
-        properties: {
-          score: { type: 'number', minimum: 0, maximum: 100 },
-          passed: { type: 'boolean' },
-          weight: { type: 'number' },
-          command: { type: 'string' },
-          exitCode: { type: 'number', nullable: true },
-          reason: { type: 'string', nullable: true },
-        },
-        additionalProperties: false,
-      },
-    },
-    gateStatus: {
-      type: 'object',
-      required: ['passed', 'threshold'],
-      properties: {
-        passed: { type: 'boolean' },
-        threshold: { type: 'number' },
-        details: { type: 'string' },
-      },
-      additionalProperties: true,
-    },
-    recommendations: {
-      type: 'array',
-      items: { type: 'string' },
-    },
-  },
-  additionalProperties: true,
-};
-
-/**
  * Get level name from score
  * @param {number} score - Overall score (0-100)
  * @returns {string} Level name (L1-L5)
@@ -370,7 +340,7 @@ function executeCommand(command, timeout, cwd) {
   if (nodeEvalMatch) {
     const code = nodeEvalMatch[1];
     try {
-      const directResult = childProcess.spawnSync('node', ['-e', code], {
+      const directResult = childProcess.spawnSync(process.execPath, ['-e', code], {
         cwd,
         timeout,
         maxBuffer: 1024 * 1024,
@@ -475,7 +445,7 @@ function checkFileExists(basePath, filePattern) {
  * @param {Object} mockData - Optional mock data for testing
  * @returns {Object} Pillar result { score, passed, weight, command, exitCode, reason }
  */
-function evaluatePillar(pillarDef, repoPath, timeout, mockData = null) {
+function evaluatePillar(pillarDef, repoPath, timeout, mockData = null, options = {}) {
   // Use mock data if provided
   if (mockData && mockData[pillarDef.name]) {
     const mock = mockData[pillarDef.name];
@@ -508,10 +478,19 @@ function evaluatePillar(pillarDef, repoPath, timeout, mockData = null) {
 
   // Execute commands
   let commandScore = 0;
+  const runPackageCommands = Boolean(options.runPackageCommands);
   for (const cmdDef of pillarDef.commands) {
+    const skipReason = getPackageCommandSkipReason(cmdDef.cmd, repoPath, runPackageCommands);
+    if (skipReason) {
+      if (!cmdDef.optional) {
+        reason = `Command '${cmdDef.cmd}' skipped: ${skipReason}`;
+      }
+      continue;
+    }
+
     // Skip if binary doesn't exist
     const binary = cmdDef.cmd.split(' ')[0];
-    if (!commandExists(binary)) {
+    if (!isCommandAvailable(binary)) {
       if (!cmdDef.optional) {
         reason = `Binary '${binary}' not found`;
       }
@@ -633,6 +612,7 @@ class ReadinessScorer {
     this.timeout = options.timeout || DEFAULT_TIMEOUT;
     this.mockPillars = options.mockPillars || null;
     this.mockScore = options.mockScore !== undefined ? options.mockScore : null;
+    this.runPackageCommands = options.runPackageCommands ?? DEFAULT_RUN_PACKAGE_COMMANDS;
   }
 
   /**
@@ -653,7 +633,8 @@ class ReadinessScorer {
         pillarDef,
         this.repoPath,
         this.timeout,
-        this.mockPillars
+        this.mockPillars,
+        { runPackageCommands: this.runPackageCommands }
       );
     }
 
@@ -693,8 +674,7 @@ class ReadinessScorer {
     };
 
     // Validate report against schema
-    const ajv = new Ajv({ strict: false });
-    const validate = ajv.compile(READINESS_REPORT_SCHEMA);
+    const validate = createAjv().compile(READINESS_REPORT_SCHEMA);
     const valid = validate(report);
 
     if (!valid) {
@@ -720,10 +700,6 @@ function scoreReadiness(repoPath, options = {}) {
   return scorer.score();
 }
 
-// Initialize AJV validator for external use
-const ajv = new Ajv({ strict: false });
-const validateReport = ajv.compile(READINESS_REPORT_SCHEMA);
-
 module.exports = {
   ReadinessScorer,
   scoreReadiness,
@@ -731,9 +707,12 @@ module.exports = {
   LEVEL_BOUNDARIES,
   GATE_THRESHOLD,
   DEFAULT_TIMEOUT,
+  DEFAULT_RUN_PACKAGE_COMMANDS,
   PILLAR_DEFINITIONS,
   READINESS_REPORT_SCHEMA,
   validateReport,
   getLevelFromScore,
   calculateOverallScore,
+  getPackageCommandInfo,
+  getPackageCommandSkipReason,
 };

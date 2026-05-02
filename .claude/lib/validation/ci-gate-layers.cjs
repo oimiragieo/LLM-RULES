@@ -44,6 +44,77 @@ function resolveHookPath(projectRoot, hookPath) {
   return path.isAbsolute(hookPath) ? hookPath : path.join(projectRoot, hookPath);
 }
 
+function extractFrontmatter(content) {
+  const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  return frontmatterMatch ? frontmatterMatch[1] : '';
+}
+
+function normalizeFrontmatterValue(value) {
+  return value
+    .trim()
+    .replace(/,$/, '')
+    .replace(/^['"]|['"]$/g, '');
+}
+
+function readFrontmatterScalar(frontmatter, key) {
+  const keyPattern = new RegExp(`^${key}:\\s*(.*)$`);
+  for (const line of frontmatter.split(/\r?\n/)) {
+    const match = line.match(keyPattern);
+    if (match) return normalizeFrontmatterValue(match[1]);
+  }
+  return '';
+}
+
+function readFrontmatterList(frontmatter, key) {
+  const lines = frontmatter.split(/\r?\n/);
+  const keyPattern = new RegExp(`^${key}:\\s*(.*)$`);
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const match = lines[i].match(keyPattern);
+    if (!match) continue;
+
+    const inlineValue = match[1].trim();
+    if (inlineValue.startsWith('[') && inlineValue.endsWith(']')) {
+      return inlineValue.slice(1, -1).split(',').map(normalizeFrontmatterValue).filter(Boolean);
+    }
+
+    if (inlineValue && inlineValue !== '[]') {
+      return [normalizeFrontmatterValue(inlineValue)].filter(Boolean);
+    }
+
+    const values = [];
+    for (let j = i + 1; j < lines.length; j += 1) {
+      const itemMatch = lines[j].match(/^\s*-\s+(.+)$/);
+      if (itemMatch) {
+        values.push(normalizeFrontmatterValue(itemMatch[1]));
+        continue;
+      }
+      if (lines[j].trim() !== '') break;
+    }
+    return values;
+  }
+
+  return [];
+}
+
+function readFrontmatterBoolean(frontmatter, key) {
+  return readFrontmatterScalar(frontmatter, key).toLowerCase() === 'true';
+}
+
+function walkFiles(dir, predicate, files = []) {
+  if (!fs.existsSync(dir)) return files;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      walkFiles(fullPath, predicate, files);
+    } else if (predicate(fullPath)) {
+      files.push(fullPath);
+    }
+  }
+  return files;
+}
+
 /**
  * Layer 1: Validate file existence
  * Checks that all files referenced in registries exist on disk
@@ -117,28 +188,18 @@ async function validateForwardRefs(projectRoot, options = {}) {
 
     try {
       const content = fs.readFileSync(agentPath, 'utf8');
-      const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+      const frontmatter = extractFrontmatter(content);
 
-      if (frontmatterMatch) {
-        const frontmatter = frontmatterMatch[1];
-
-        // More flexible skill parsing - handle both list and array formats
-        const skillsMatch = frontmatter.match(/skills:\s*\n((?:\s*-\s*.+(?:\n|$))+)/);
-
-        if (skillsMatch) {
-          const skillLines = skillsMatch[1].trim().split('\n');
-          const skills = skillLines.map(line => line.trim().replace(/^-\s*/, '')).filter(Boolean);
-
-          for (const skill of skills) {
-            const skillPath = path.join(skillsDir, skill, 'SKILL.md');
-            if (!fs.existsSync(skillPath)) {
-              errors.push({
-                layer: 'forward-ref',
-                source: agentPath,
-                target: skill,
-                message: `Agent references non-existent skill: ${skill}`,
-              });
-            }
+      if (frontmatter) {
+        for (const skill of readFrontmatterList(frontmatter, 'skills')) {
+          const skillPath = path.join(skillsDir, skill, 'SKILL.md');
+          if (!fs.existsSync(skillPath)) {
+            errors.push({
+              layer: 'forward-ref',
+              source: agentPath,
+              target: skill,
+              message: `Agent references non-existent skill: ${skill}`,
+            });
           }
         }
       }
@@ -197,20 +258,10 @@ async function validateBackwardRefs(projectRoot, options = {}) {
 
     try {
       const content = fs.readFileSync(agentPath, 'utf8');
-      const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+      const frontmatter = extractFrontmatter(content);
 
-      if (frontmatterMatch) {
-        const frontmatter = frontmatterMatch[1];
-        const skillsMatch = frontmatter.match(/skills:\s*\n((?:\s*-\s*.+\n)*)/);
-
-        if (skillsMatch) {
-          const skills = skillsMatch[1]
-            .split('\n')
-            .map(line => line.trim().replace(/^-\s*/, ''))
-            .filter(Boolean);
-
-          skills.forEach(skill => referencedSkills.add(skill));
-        }
+      if (frontmatter) {
+        readFrontmatterList(frontmatter, 'skills').forEach(skill => referencedSkills.add(skill));
       }
     } catch (_error) {
       // Skip parse errors
@@ -221,11 +272,33 @@ async function validateBackwardRefs(projectRoot, options = {}) {
   if (fs.existsSync(skillsDir)) {
     const skillDirs = fs
       .readdirSync(skillsDir, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
+      .filter(dirent => dirent.isDirectory() && !dirent.name.startsWith('_'))
       .map(dirent => dirent.name);
 
     for (const skillName of skillDirs) {
-      if (!referencedSkills.has(skillName)) {
+      if (referencedSkills.has(skillName)) continue;
+
+      const skillPath = path.join(skillsDir, skillName, 'SKILL.md');
+      let skillFrontmatter = '';
+      if (fs.existsSync(skillPath)) {
+        try {
+          skillFrontmatter = extractFrontmatter(fs.readFileSync(skillPath, 'utf8'));
+        } catch (_error) {
+          // Semantic validation reports unreadable skill files.
+        }
+      }
+
+      const metadataAgents = readFrontmatterList(skillFrontmatter, 'agents');
+      const isUserInvocable = readFrontmatterBoolean(skillFrontmatter, 'user_invocable');
+      const invokedBy = readFrontmatterScalar(skillFrontmatter, 'invoked_by').toLowerCase();
+      const hasKnownConsumer =
+        metadataAgents.length > 0 ||
+        isUserInvocable ||
+        invokedBy === 'user' ||
+        invokedBy === 'both' ||
+        invokedBy === 'skill';
+
+      if (!hasKnownConsumer) {
         warnings.push({
           layer: 'backward-ref',
           artifact: skillName,
@@ -236,27 +309,37 @@ async function validateBackwardRefs(projectRoot, options = {}) {
     }
   }
 
-  // Check for orphaned hooks (registered in settings.json but no clear consumer)
+  // Registered hooks have a settings.json consumer. If hooksDir is explicitly
+  // supplied, report hook files that are present on disk but not registered.
   const settingsPath = options.settingsPath || path.join(projectRoot, '.claude/settings.json');
+  const registeredHookPaths = new Set();
   if (fs.existsSync(settingsPath)) {
     try {
       const settings = safeParseJSON(fs.readFileSync(settingsPath, 'utf8'));
 
       if (settings.hooks) {
         for (const hookRelPath of extractHookPaths(settings)) {
-          if (fs.existsSync(resolveHookPath(projectRoot, hookRelPath))) {
-            warnings.push({
-              layer: 'backward-ref',
-              artifact: hookRelPath,
-              hookType: 'registered',
-              reason: 'registered',
-              message: `Hook registered in settings: ${path.basename(hookRelPath)}`,
-            });
-          }
+          registeredHookPaths.add(path.resolve(resolveHookPath(projectRoot, hookRelPath)));
         }
       }
     } catch (_error) {
       // Skip parse errors
+    }
+  }
+
+  if (options.hooksDir && fs.existsSync(options.hooksDir)) {
+    const hookFiles = walkFiles(options.hooksDir, filePath => filePath.endsWith('.cjs'));
+    for (const hookPath of hookFiles) {
+      const resolvedHookPath = path.resolve(hookPath);
+      if (!registeredHookPaths.has(resolvedHookPath)) {
+        warnings.push({
+          layer: 'backward-ref',
+          artifact: hookPath,
+          hookType: 'unregistered',
+          reason: 'unregistered',
+          message: `Hook file is not registered in settings: ${path.basename(hookPath)}`,
+        });
+      }
     }
   }
 

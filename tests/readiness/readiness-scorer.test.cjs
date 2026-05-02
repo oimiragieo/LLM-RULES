@@ -17,6 +17,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const Ajv = require('ajv');
+const addFormats = require('ajv-formats');
 
 // Module under test
 const {
@@ -355,6 +356,7 @@ describe('Readiness Scorer', () => {
 
       // Validate with AJV
       const ajv = new Ajv({ strict: false });
+      addFormats(ajv);
       const validate = ajv.compile(READINESS_REPORT_SCHEMA);
       const valid = validate(report);
 

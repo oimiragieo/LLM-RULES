@@ -211,9 +211,9 @@ skills: []
       fs.rmSync(tempDir, { recursive: true });
     });
 
-    test('detects orphaned hooks (registered but no consumer)', async () => {
+    test('does not warn for hooks registered in settings', async () => {
       const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ci-gate-test-'));
-      const hookPath = path.join(tempDir, 'hooks/orphan-hook.cjs');
+      const hookPath = path.join(tempDir, 'hooks/registered-hook.cjs');
       const settingsPath = path.join(tempDir, 'settings.json');
 
       // Create hook file
@@ -235,8 +235,56 @@ skills: []
         hooksDir: path.join(tempDir, 'hooks'),
       });
 
-      // Orphaned hooks generate warnings, not errors
-      assert.ok(result.warnings.some(w => w.layer === 'backward-ref'));
+      assert.deepStrictEqual(result.warnings, []);
+
+      // Cleanup
+      fs.rmSync(tempDir, { recursive: true });
+    });
+
+    test('detects unregistered hook files when hooksDir is explicitly checked', async () => {
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ci-gate-test-'));
+      const hookPath = path.join(tempDir, 'hooks/unregistered-hook.cjs');
+      const settingsPath = path.join(tempDir, 'settings.json');
+
+      fs.mkdirSync(path.join(tempDir, 'hooks'), { recursive: true });
+      fs.writeFileSync(hookPath, 'module.exports = {};');
+      fs.writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));
+
+      const result = await validateBackwardRefs(tempDir, {
+        settingsPath,
+        hooksDir: path.join(tempDir, 'hooks'),
+      });
+
+      assert.ok(
+        result.warnings.some(w => w.layer === 'backward-ref' && w.reason === 'unregistered')
+      );
+
+      // Cleanup
+      fs.rmSync(tempDir, { recursive: true });
+    });
+
+    test('does not warn for user-invocable or archived skills', async () => {
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ci-gate-test-'));
+      const skillsDir = path.join(tempDir, 'skills');
+      const skillPath = path.join(skillsDir, 'user-command/SKILL.md');
+      const archivedSkillPath = path.join(skillsDir, '_archive/SKILL.md');
+
+      fs.mkdirSync(path.dirname(skillPath), { recursive: true });
+      fs.mkdirSync(path.dirname(archivedSkillPath), { recursive: true });
+      fs.writeFileSync(
+        skillPath,
+        `---
+name: user-command
+user_invocable: true
+trigger: when user asks for command
+---
+# User Command`
+      );
+      fs.writeFileSync(archivedSkillPath, '# Archive');
+
+      const result = await validateBackwardRefs(tempDir, { skillsDir });
+
+      assert.deepStrictEqual(result.warnings, []);
 
       // Cleanup
       fs.rmSync(tempDir, { recursive: true });
