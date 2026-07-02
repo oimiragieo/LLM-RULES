@@ -15,7 +15,7 @@
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
-const { execFileSync } = require('child_process');
+const { spawn } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const RUNTIME = path.join(ROOT, '.claude', 'context', 'runtime');
@@ -88,56 +88,50 @@ async function main() {
 
   fs.mkdirSync(RUNTIME, { recursive: true });
 
-  // Don't pass ANTHROPIC_API_KEY — it would override OAuth and fail with OAuth tokens.
-  // Without --bare, claude -p uses the normal OAuth session automatically.
-  const daemonWin = DAEMON.replace(/\//g, '\\');
-  const rootWin = ROOT.replace(/\//g, '\\');
-
-  // Write launcher bat
-  const batPath = path.join(RUNTIME, 'channel-daemon-launch.bat').replace(/\//g, '\\');
-  fs.writeFileSync(
-    batPath,
-    [
-      '@echo off',
-      `set TELEGRAM_HEADLESS_SESSION=1`,
-      `set TELEGRAM_BOT_TOKEN=${botToken}`,
-      'rem auth via OAuth session (no API key needed)',
-      process.env.TELEGRAM_ALLOWED_USERS
-        ? `set TELEGRAM_ALLOWED_USERS=${process.env.TELEGRAM_ALLOWED_USERS}`
-        : '',
-      process.env.TELEGRAM_OWNER_ID ? `set TELEGRAM_OWNER_ID=${process.env.TELEGRAM_OWNER_ID}` : '',
-      `cd /d "${rootWin}"`,
-      `node "${daemonWin}"`,
-    ]
-      .filter(Boolean)
-      .join('\r\n'),
-    'utf8'
-  );
-
-  // Launch hidden via PowerShell
   try {
-    execFileSync(
-      'powershell',
-      [
-        '-NoProfile',
-        '-Command',
-        `Start-Process -WindowStyle Hidden -FilePath cmd.exe -ArgumentList '/c,"${batPath}"'`,
-      ],
-      { timeout: 5000, stdio: 'ignore', windowsHide: true }
-    );
-
+    launchDaemon();
     process.stderr.write('[telegram-start] Channel daemon started\n');
   } catch (err) {
     process.stderr.write(`[telegram-start] Failed: ${err.message}\n`);
   }
 }
 
-// Read stdin (hook protocol) then run
-const chunks = [];
-process.stdin.on('data', c => chunks.push(c));
-process.stdin.on('error', () =>
-  main().catch(e => process.stderr.write(`[WARN] telegram-start: ${e.message}\n`))
-);
-process.stdin.on('end', () =>
-  main().catch(e => process.stderr.write(`[WARN] telegram-start: ${e.message}\n`))
-);
+function buildDaemonEnv(baseEnv = process.env) {
+  const env = { ...baseEnv, TELEGRAM_HEADLESS_SESSION: '1' };
+  delete env.ANTHROPIC_API_KEY;
+  return env;
+}
+
+function launchDaemon(options = {}) {
+  const spawnFn = options.spawnFn || spawn;
+  const child = spawnFn(process.execPath, [DAEMON], {
+    cwd: ROOT,
+    env: buildDaemonEnv(options.env || process.env),
+    detached: true,
+    stdio: 'ignore',
+    windowsHide: true,
+    shell: false,
+  });
+  if (typeof child.unref === 'function') child.unref();
+  return child;
+}
+
+if (require.main === module) {
+  // Read stdin (hook protocol) then run
+  const chunks = [];
+  process.stdin.on('data', c => chunks.push(c));
+  process.stdin.on('error', () =>
+    main().catch(e => process.stderr.write(`[WARN] telegram-start: ${e.message}\n`))
+  );
+  process.stdin.on('end', () =>
+    main().catch(e => process.stderr.write(`[WARN] telegram-start: ${e.message}\n`))
+  );
+}
+
+module.exports = {
+  buildDaemonEnv,
+  launchDaemon,
+  main,
+  DAEMON,
+  ROOT,
+};

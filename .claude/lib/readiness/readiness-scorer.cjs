@@ -44,6 +44,7 @@ const {
   createAjv,
   validateReport,
 } = require('./readiness-report-schema.cjs');
+const { checkFileExists, evaluateStaticExistsCommand } = require('./readiness-static-checks.cjs');
 
 /**
  * Pillar weights from specification
@@ -422,22 +423,6 @@ function executeCommand(command, timeout, cwd) {
 }
 
 /**
- * Check if a file or directory exists
- * @param {string} basePath - Base path to check from
- * @param {Object} filePattern - File pattern definition
- * @returns {boolean} True if exists
- */
-function checkFileExists(basePath, filePattern) {
-  const fullPath = path.join(basePath, filePattern.pattern);
-
-  if (filePattern.isDir) {
-    return fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory();
-  }
-
-  return fs.existsSync(fullPath) && fs.statSync(fullPath).isFile();
-}
-
-/**
  * Evaluate a single pillar
  * @param {Object} pillarDef - Pillar definition
  * @param {string} repoPath - Repository path
@@ -497,7 +482,9 @@ function evaluatePillar(pillarDef, repoPath, timeout, mockData = null, options =
       continue;
     }
 
-    const result = executeCommand(cmdDef.cmd, timeout, repoPath);
+    const result =
+      evaluateStaticExistsCommand(cmdDef.cmd, repoPath) ||
+      executeCommand(cmdDef.cmd, timeout, repoPath);
 
     // Handle timeout
     if (result.timedOut) {

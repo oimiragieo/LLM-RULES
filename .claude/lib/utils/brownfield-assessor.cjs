@@ -36,7 +36,7 @@ async function assess(projectPath) {
     suggested_agents: [],
   };
 
-  if (!fs.existsSync(projectPath)) {
+  if (!isReadableDirectory(projectPath)) {
     return result;
   }
 
@@ -98,7 +98,7 @@ async function scoreStructure(projectPath) {
     'dist',
   ];
 
-  const files = fs.readdirSync(projectPath);
+  const files = readDirectoryEntries(projectPath);
   const dirCount = expectedDirs.filter(dir => files.includes(dir)).length;
 
   // Base score on directory organization
@@ -168,7 +168,7 @@ async function scoreDocs(projectPath) {
     'SECURITY.md',
   ];
 
-  const files = fs.readdirSync(projectPath);
+  const files = readDirectoryEntries(projectPath);
   const docCount = docFiles.filter(doc => files.includes(doc)).length;
 
   // Check README quality
@@ -216,7 +216,7 @@ async function scorePatterns(projectPath) {
     'rollup.config.js',
   ];
 
-  const files = fs.readdirSync(projectPath);
+  const files = readDirectoryEntries(projectPath);
   const configCount = configFiles.filter(config => files.includes(config)).length;
 
   // Score based on config file count
@@ -351,15 +351,20 @@ async function suggestAgents(projectPath) {
 function countFilesRecursive(dir, pattern) {
   let count = 0;
 
-  if (!fs.existsSync(dir)) {
+  if (!isReadableDirectory(dir)) {
     return count;
   }
 
-  const files = fs.readdirSync(dir);
+  const files = readDirectoryEntries(dir);
 
   for (const file of files) {
     const filePath = path.join(dir, file);
-    const stat = fs.statSync(filePath);
+    let stat;
+    try {
+      stat = fs.statSync(filePath);
+    } catch (_err) {
+      continue;
+    }
 
     if (stat.isDirectory()) {
       count += countFilesRecursive(filePath, pattern);
@@ -369,6 +374,26 @@ function countFilesRecursive(dir, pattern) {
   }
 
   return count;
+}
+
+function isReadableDirectory(dir) {
+  if (!dir) {
+    return false;
+  }
+
+  try {
+    return fs.statSync(dir).isDirectory();
+  } catch (_err) {
+    return false;
+  }
+}
+
+function readDirectoryEntries(dir) {
+  try {
+    return fs.readdirSync(dir);
+  } catch (_err) {
+    return [];
+  }
 }
 
 module.exports = {

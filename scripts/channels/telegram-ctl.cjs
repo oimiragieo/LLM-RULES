@@ -21,16 +21,28 @@ const { execFileSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const HOOK = path.join(ROOT, '.claude', 'hooks', 'channels', 'telegram-start.cjs');
+const RUNTIME = path.join(ROOT, '.claude', 'context', 'runtime');
+const PID_FILE = path.join(RUNTIME, 'channel-daemon.pid');
 const PORT = process.env.CHANNEL_DAEMON_PORT || 3101;
 
 const cmd = process.argv[2] || 'status';
 
+function getDaemonApiToken() {
+  const token = String(
+    process.env.CHANNEL_DAEMON_API_TOKEN || process.env.CHANNEL_DAEMON_TOKEN || ''
+  ).trim();
+  if (token) return token;
+  return String(loadEnvFile(ENV_PATH).CHANNEL_DAEMON_API_TOKEN || '').trim();
+}
+
 function httpGet(urlPath) {
   return new Promise((resolve, _reject) => {
-    const req = http.get(`http://127.0.0.1:${PORT}${urlPath}`, res => {
+    const token = getDaemonApiToken();
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const req = http.get({ hostname: '127.0.0.1', port: PORT, path: urlPath, headers }, res => {
       let data = '';
       res.on('data', c => (data += c));
-      res.on('end', () => resolve(data));
+      res.on('end', () => resolve(res.statusCode >= 200 && res.statusCode < 400 ? data : null));
     });
     req.on('error', () => resolve(null));
     req.setTimeout(3000, () => {
@@ -38,6 +50,23 @@ function httpGet(urlPath) {
       resolve(null);
     });
   });
+}
+
+function stopByPidFile() {
+  try {
+    const pid = parseInt(fs.readFileSync(PID_FILE, 'utf8').trim(), 10);
+    if (!Number.isFinite(pid) || pid <= 0) return false;
+    process.kill(pid, 'SIGTERM');
+    fs.unlinkSync(PID_FILE);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function stopDaemon() {
+  const result = await httpGet('/stop');
+  return !!result || stopByPidFile();
 }
 
 // ---------------------------------------------------------------------------
@@ -417,8 +446,7 @@ async function main() {
       break;
     }
     case 'stop': {
-      const result = await httpGet('/stop');
-      if (result) {
+      if (await stopDaemon()) {
         console.log('Telegram daemon stopped');
       } else {
         console.log('Telegram daemon not running');
@@ -426,7 +454,7 @@ async function main() {
       break;
     }
     case 'restart': {
-      await httpGet('/stop');
+      await stopDaemon();
       await new Promise(r => setTimeout(r, 2000));
       execFileSync('node', [HOOK], {
         cwd: ROOT,
@@ -457,4 +485,13 @@ async function main() {
   }
 }
 
-main().catch(err => console.error(err.message));
+if (require.main === module) {
+  main().catch(err => console.error(err.message));
+}
+
+module.exports = {
+  getDaemonApiToken,
+  httpGet,
+  stopByPidFile,
+  stopDaemon,
+};

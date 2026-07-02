@@ -4,7 +4,7 @@ Status: active triage baseline (PR14)
 
 ## Baseline
 
-- Current archived test files (`*.archived`): `114`
+- Current archived test files (`*.archived`): `89`
 - Enforcement: `scripts/validation/validate-archived-tests.mjs`
 - CI gate: `pnpm validate:full` includes archived-test validation.
 

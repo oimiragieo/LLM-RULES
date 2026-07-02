@@ -122,7 +122,11 @@ context/sessions/
 # Local Settings
 .claude/settings.local.json
 .cursor/settings.local.json
-.factory/
+
+# Factory source/config is versioned; generated mission evidence stays local.
+.factory/investigation/
+.factory/validation/
+.factory/validations/
 
 # Ralph (runtime/cache; .cursor/.ralph/progress.md and guardrails.md are tracked)
 .cursor/.ralph/.iteration
@@ -133,7 +137,6 @@ context/sessions/
 .env
 .env.local
 .env.*.local
-.env.minimal
 
 # Secrets and Credentials
 **/secrets/
@@ -331,6 +334,7 @@ tests/lib/memory/.test-memory-contracts-*/
 
 # Memory daily logs (auto-generated, not source-controlled)
 .claude/context/memory/logs/
+.claude/context/memory/archive/
 
 # Channel daemon conversation memory (runtime data)
 .claude/context/runtime/channel-memory/

@@ -191,6 +191,32 @@ describe('claudeAsync', () => {
       assert.equal(args[args.length - 1], '-p', '-p should be last');
       handle.promise.catch(() => {});
     });
+
+    it('does not bypass Claude permissions unless explicitly opted in', () => {
+      const mod = require('../../../scripts/channels/daemon/claude-cli.cjs');
+      const spawn = mock.fn(() => createFakeChild());
+      const handle = mod._claudeAsyncImpl('test', {}, spawn);
+      handle.cancel();
+      handle.promise.catch(() => {});
+
+      const args = spawn.mock.calls[0].arguments[1];
+      assert.equal(args.includes('--dangerously-skip-permissions'), false);
+    });
+
+    it('allows permission bypass only with the daemon opt-in env var', () => {
+      const mod = require('../../../scripts/channels/daemon/claude-cli.cjs');
+      const spawn = mock.fn(() => createFakeChild());
+      const handle = mod._claudeAsyncImpl(
+        'test',
+        { env: { CHANNEL_DAEMON_SKIP_PERMISSIONS: 'true' } },
+        spawn
+      );
+      handle.cancel();
+      handle.promise.catch(() => {});
+
+      const args = spawn.mock.calls[0].arguments[1];
+      assert.equal(args.includes('--dangerously-skip-permissions'), true);
+    });
   });
 
   describe('1.7 — pipes prompt via stdin', () => {

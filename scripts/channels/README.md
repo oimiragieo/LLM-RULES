@@ -61,16 +61,20 @@ node scripts/channels/daemon/index.cjs --stop     # stop
 
 Default port: `3101` (configurable via `CHANNEL_DAEMON_PORT`)
 
-| Endpoint   | Method | Description                                    |
-| ---------- | ------ | ---------------------------------------------- |
-| `/health`  | GET    | Health check                                   |
-| `/status`  | GET    | Full stats                                     |
-| `/send`    | POST   | Send message: `{"chat_id":"...","text":"..."}` |
-| `/history` | GET    | Conversation history (`?limit=N`)              |
-| `/memory`  | GET    | Memory stats + profiles                        |
-| `/dream`   | GET    | Trigger memory consolidation                   |
-| `/event`   | POST   | Inject custom event                            |
-| `/stop`    | GET    | Shutdown                                       |
+Set `CHANNEL_DAEMON_API_TOKEN` to enable state-changing HTTP routes. Mutating routes
+return `503` when no token is configured and `401` when the bearer token is missing
+or wrong.
+
+| Endpoint   | Method | Description                                  |
+| ---------- | ------ | -------------------------------------------- |
+| `/health`  | GET    | Health check                                 |
+| `/status`  | GET    | Full stats                                   |
+| `/send`    | POST   | Send message (auth required)                 |
+| `/history` | GET    | Conversation history (`?limit=N`)            |
+| `/memory`  | GET    | Memory stats + profiles                      |
+| `/dream`   | GET    | Trigger memory consolidation (auth required) |
+| `/event`   | POST   | Inject custom event (auth required)          |
+| `/stop`    | GET    | Shutdown (auth required)                     |
 
 ### Examples
 
@@ -78,6 +82,7 @@ Default port: `3101` (configurable via `CHANNEL_DAEMON_PORT`)
 # Send a message
 curl -X POST http://127.0.0.1:3101/send \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $CHANNEL_DAEMON_API_TOKEN" \
   -d '{"chat_id":"123456","text":"Hello from the API!"}'
 
 # Check status
@@ -87,7 +92,7 @@ curl http://127.0.0.1:3101/status
 curl http://127.0.0.1:3101/memory
 
 # Trigger dream
-curl http://127.0.0.1:3101/dream
+curl -H "Authorization: Bearer $CHANNEL_DAEMON_API_TOKEN" http://127.0.0.1:3101/dream
 ```
 
 ## Bot Commands (24 total)

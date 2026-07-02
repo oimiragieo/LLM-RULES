@@ -36,6 +36,28 @@ const os = require('os');
 const TASK_WORKSPACE = path.join(os.homedir(), '.claude', 'channels', 'workspace');
 const WINDOWS_CMD_EXTENSIONS = new Set(['', '.cmd', '.bat']);
 
+function isTruthyEnv(value) {
+  return /^(1|true|yes|on)$/i.test(String(value || '').trim());
+}
+
+function shouldSkipPermissions(opts = {}) {
+  const env = { ...process.env, ...(opts.env || {}) };
+  return isTruthyEnv(env.CHANNEL_DAEMON_SKIP_PERMISSIONS);
+}
+
+function buildClaudeArgs(opts = {}) {
+  const model = opts.model || 'sonnet';
+  const maxTurns = String(opts.maxTurns || 3);
+  const args = [];
+
+  if (shouldSkipPermissions(opts)) {
+    args.push('--dangerously-skip-permissions');
+  }
+
+  args.push('--model', model, '--max-turns', maxTurns);
+  return args;
+}
+
 function quoteWindowsCmdArg(value) {
   const arg = String(value);
   if (!/^[a-zA-Z0-9._:=/\\\- ]+$/.test(arg)) {
@@ -103,7 +125,7 @@ function claudeSync(prompt, opts = {}) {
   }
 
   // Build args — `-p` must be LAST (no value) so stdin is read as the prompt
-  const args = ['--dangerously-skip-permissions', '--model', model, '--max-turns', maxTurns];
+  const args = buildClaudeArgs({ ...opts, model, maxTurns });
 
   // When using workspace isolation, add the project dir for file access
   if (opts.useWorkspace && opts.projectRoot) {
@@ -203,7 +225,7 @@ function _claudeAsyncImpl(prompt, opts, spawnFn) {
   }
 
   // Build args
-  const args = ['--dangerously-skip-permissions', '--model', model, '--max-turns', maxTurns];
+  const args = buildClaudeArgs({ ...opts, model, maxTurns });
 
   if (opts.useWorkspace && opts.projectRoot) {
     args.push('--add-dir', opts.projectRoot);
@@ -339,5 +361,7 @@ module.exports = {
   _claudeAsyncImpl,
   nodeSync,
   buildClaudeSpawnSpec,
+  buildClaudeArgs,
+  shouldSkipPermissions,
   TASK_WORKSPACE,
 };

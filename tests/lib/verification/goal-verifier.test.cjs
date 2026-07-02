@@ -7,6 +7,8 @@
 
 const { test, describe, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 
 const MODULE_PATH = path.resolve(__dirname, '../../../.claude/lib/verification/goal-verifier.cjs');
@@ -65,6 +67,21 @@ describe('checkTruths', () => {
     };
     const result = checkTruths([{ description: 'my-check', command: 'foo' }], { exec: fakeExec });
     assert.match(result.errors[0], /my-check/);
+  });
+
+  test('rejects shell metacharacters in default command execution', () => {
+    const marker = path.join(os.tmpdir(), `goal-verifier-injection-${Date.now()}.txt`);
+    const result = checkTruths([
+      {
+        description: 'unsafe shell string',
+        command: `${process.execPath} -e "process.exit(0)" && echo pwned > "${marker}"`,
+      },
+    ]);
+
+    assert.equal(result.passed, 0);
+    assert.equal(result.failed, 1);
+    assert.match(result.errors[0], /shell metacharacters/);
+    assert.equal(fs.existsSync(marker), false);
   });
 });
 

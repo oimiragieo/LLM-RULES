@@ -28,7 +28,7 @@ function main() {
   const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
 
-  const toolsets = manifest.toolsets || {};
+  const toolsets = manifest.tools?.toolsets || manifest.toolsets || {};
   const validation = manifest.validation || {};
   const agentDefaults = validation.agentDefaults || {};
 
@@ -47,7 +47,9 @@ function main() {
     }
 
     const manifestToolset = manifestDefault.toolset;
-    const manifestTools = toolsets[manifestToolset] || [];
+    const manifestTools = Array.isArray(manifestDefault.tools)
+      ? manifestDefault.tools
+      : toolsets[manifestToolset] || [];
 
     const configSet = new Set(configTools);
     const manifestSet = new Set(manifestTools);
@@ -72,10 +74,9 @@ function main() {
     process.exit(0);
   }
 
-  console.log(`[WARN] ${warnings.length} tool-manifest drift issue(s) found:`);
+  console.log(`[FAIL] ${warnings.length} tool-manifest drift issue(s) found:`);
   warnings.forEach(w => console.log(`  ${w}`));
-  // Advisory only — exit 0 so it doesn't block CI until manually reviewed
-  process.exit(0);
+  process.exit(1);
 }
 
 main();

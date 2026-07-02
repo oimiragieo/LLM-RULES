@@ -89,6 +89,11 @@ function getQueueSize(queuePath) {
     return 0;
   }
 
+  const stats = fs.statSync(targetPath);
+  if (!stats.isFile()) {
+    return 0;
+  }
+
   const content = fs.readFileSync(targetPath, 'utf8');
   const lines = content
     .trim()

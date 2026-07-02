@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-07-02T16:49:54.074Z",
+  "generatedAt": "2026-07-02T23:39:01.120Z",
   "metadata": {
-    "totalTools": 31,
-    "totalCoreTools": 22,
-    "totalMcpTools": 9,
+    "totalTools": 37,
+    "totalCoreTools": 26,
+    "totalMcpTools": 11,
     "totalAgents": 121,
-    "lastValidated": "2026-07-02T16:49:54.075Z",
-    "source": ".claude/CLAUDE.md sections 1.1-1.4"
+    "lastValidated": "2026-07-02T23:39:01.121Z",
+    "source": ".claude/CLAUDE.md sections 1.1-1.4 + agent-config.json"
   },
   "tools": {
     "core": [
@@ -222,6 +222,51 @@
         }
       },
       {
+        "name": "CronCreate",
+        "category": "Scheduled Tasks",
+        "description": "Create a recurring scheduled task",
+        "status": "available",
+        "mandatory": false,
+        "canEdit": true,
+        "optional": false,
+        "requiresActiveProject": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "CronList",
+        "category": "Scheduled Tasks",
+        "description": "List recurring scheduled tasks",
+        "status": "available",
+        "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "CronDelete",
+        "category": "Scheduled Tasks",
+        "description": "Delete a recurring scheduled task",
+        "status": "available",
+        "mandatory": false,
+        "canEdit": true,
+        "optional": false,
+        "requiresActiveProject": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
         "name": "Skill",
         "category": "Capability",
         "description": "Invoke skill workflows",
@@ -230,6 +275,21 @@
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": true,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "Agent",
+        "category": "Orchestration",
+        "description": "Legacy alias for spawning a specialist agent; prefer Task for new flows",
+        "status": "available",
+        "mandatory": false,
+        "canEdit": false,
+        "optional": true,
+        "requiresActiveProject": false,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -442,6 +502,34 @@
         "requiresActiveProject": false
       },
       {
+        "name": "mcp__filesystem__read_text_file",
+        "category": "MCP - filesystem",
+        "description": "Read a text file through the filesystem MCP server",
+        "status": "unavailable",
+        "reason": "MCP server 'filesystem' not configured",
+        "mcp_server": "filesystem",
+        "fallback": "Read",
+        "fallback_status": "available",
+        "fallback_tools": ["Read"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
+      },
+      {
+        "name": "mcp__filesystem__write_file",
+        "category": "MCP - filesystem",
+        "description": "Write a file through the filesystem MCP server",
+        "status": "unavailable",
+        "reason": "MCP server 'filesystem' not configured",
+        "mcp_server": "filesystem",
+        "fallback": "Write",
+        "fallback_status": "available",
+        "fallback_tools": ["Write"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
+      },
+      {
         "name": "mcp__shadcn__getComponents",
         "category": "MCP - shadcn",
         "description": "Get shadcn/ui components list",
@@ -486,7 +574,11 @@
         "TaskGet",
         "TaskOutput",
         "TaskStop",
+        "CronCreate",
+        "CronList",
+        "CronDelete",
         "Skill",
+        "Agent",
         "AskUserQuestion",
         "EnterPlanMode",
         "ExitPlanMode",
@@ -588,122 +680,227 @@
     "maxToolsPerAgent": 15,
     "maxToolsPerOrchestrator": 18,
     "toolCounts": {
-      "coreTools": 22,
-      "mcpTools": 9,
-      "totalAvailable": 22,
-      "totalUnavailable": 9
+      "coreTools": 26,
+      "mcpTools": 11,
+      "totalAvailable": 26,
+      "totalUnavailable": 11
     }
   },
   "validation": {
     "agentDefaults": {
-      "developer": {
-        "toolset": "DEVELOPER",
+      "architect": {
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
           "Write",
           "Edit",
-          "Bash",
           "Glob",
           "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
+          "MemoryRecord",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 15
+      },
+      "context-compressor": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Bash",
+          "Grep",
+          "Glob",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
           "Skill",
-          "MemoryRecord"
+          "MemoryRecord",
+          "Edit"
         ],
         "maxTools": 12
       },
-      "qa": {
-        "toolset": "DEVELOPER",
+      "developer": {
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
           "Write",
           "Edit",
-          "Bash",
           "Glob",
           "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
+          "MemoryRecord",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 15
+      },
+      "general-assistant": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
           "Skill",
-          "MemoryRecord"
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet"
         ],
         "maxTools": 12
       },
       "planner": {
-        "toolset": "PLANNER",
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
           "Write",
           "Edit",
+          "Glob",
+          "Grep",
           "Bash",
+          "WebFetch",
+          "WebSearch",
+          "MemoryRecord",
+          "Task",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "AskUserQuestion",
+          "Skill"
+        ],
+        "maxTools": 17
+      },
+      "pm": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
           "Glob",
           "Grep",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",
           "TaskGet",
-          "TaskOutput",
           "Skill",
           "MemoryRecord",
-          "EnterPlanMode",
-          "ExitPlanMode"
+          "Bash",
+          "AskUserQuestion",
+          "WebFetch"
         ],
         "maxTools": 14
       },
-      "architect": {
-        "toolset": "PLANNER",
+      "qa": {
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
           "Write",
           "Edit",
-          "Bash",
           "Glob",
           "Grep",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "TaskOutput",
-          "Skill",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
           "MemoryRecord",
-          "EnterPlanMode",
-          "ExitPlanMode"
-        ],
-        "maxTools": 14
-      },
-      "security-architect": {
-        "toolset": "DEVELOPER",
-        "tools": [
-          "Read",
-          "Write",
-          "Edit",
-          "Bash",
-          "Glob",
-          "Grep",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 15
+      },
+      "reflection-agent": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Bash",
+          "Edit",
+          "Glob",
+          "Grep",
+          "MemoryRecord",
+          "Read",
           "Skill",
-          "MemoryRecord"
+          "TaskCreate",
+          "TaskGet",
+          "TaskList",
+          "TaskUpdate",
+          "Write"
         ],
         "maxTools": 12
+      },
+      "technical-program-manager": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill",
+          "MemoryRecord",
+          "Bash",
+          "AskUserQuestion",
+          "Task"
+        ],
+        "maxTools": 15
       },
       "technical-writer": {
-        "toolset": "DEVELOPER",
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
           "Write",
           "Edit",
-          "Bash",
           "Glob",
           "Grep",
+          "WebSearch",
+          "WebFetch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "Bash",
+          "Task"
+        ],
+        "maxTools": 15
+      },
+      "accessibility-tester": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",
@@ -712,38 +909,505 @@
           "Skill",
           "MemoryRecord"
         ],
-        "maxTools": 12
+        "maxTools": 15
       },
-      "devops": {
-        "toolset": "DEVELOPER",
+      "advanced-debugging": {
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
           "Write",
           "Edit",
           "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 14
+      },
+      "c4-code": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Grep",
+          "Glob",
+          "Write",
+          "Bash",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Edit"
+        ],
+        "maxTools": 12
+      },
+      "c4-component": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Grep",
+          "Glob",
+          "Write",
+          "Bash",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Edit"
+        ],
+        "maxTools": 12
+      },
+      "c4-container": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Grep",
+          "Glob",
+          "Write",
+          "Bash",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Edit"
+        ],
+        "maxTools": 12
+      },
+      "c4-context": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Grep",
+          "Glob",
+          "Write",
+          "Bash",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Edit"
+        ],
+        "maxTools": 12
+      },
+      "channel-responder": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Bash",
+          "Grep",
+          "Glob",
+          "TaskList",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskCreate",
+          "Write",
+          "Edit"
+        ],
+        "maxTools": 12
+      },
+      "chaos-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
           "Glob",
           "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 15
+      },
+      "claude-md-auditor": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
           "Skill",
           "MemoryRecord"
         ],
         "maxTools": 12
       },
       "code-reviewer": {
-        "toolset": "READ_ONLY",
-        "tools": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill", "MemoryRecord"],
-        "maxTools": 6
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "Task"
+        ],
+        "maxTools": 13
       },
-      "researcher": {
-        "toolset": "RESEARCHER",
+      "code-simplifier": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 12
+      },
+      "conductor-validator": {
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
           "Glob",
           "Grep",
+          "Bash",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Write",
+          "Edit"
+        ],
+        "maxTools": 12
+      },
+      "cron-scheduler-agent": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Bash",
+          "Grep",
+          "Glob",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Write",
+          "Edit"
+        ],
+        "maxTools": 12
+      },
+      "database-architect": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 12
+      },
+      "devops-troubleshooter": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Grep",
+          "Glob",
+          "Bash",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 12
+      },
+      "devops": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Grep",
+          "Glob",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 14
+      },
+      "ecosystem-auditor": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 12
+      },
+      "incident-responder": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Grep",
+          "Glob",
+          "Bash",
+          "Write",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "Edit",
+          "WebFetch"
+        ],
+        "maxTools": 13
+      },
+      "memory-manager": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "MemoryRecord",
+          "TaskUpdate",
+          "Skill",
+          "TaskCreate",
+          "TaskList",
+          "TaskGet"
+        ],
+        "maxTools": 12
+      },
+      "penetration-tester": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 15
+      },
+      "performance-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 15
+      },
+      "researcher": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "Bash",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "Edit"
+        ],
+        "maxTools": 14
+      },
+      "reverse-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 12
+      },
+      "security-architect": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "WebFetch"
+        ],
+        "maxTools": 14
+      },
+      "sre-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 15
+      },
+      "task-manager": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Bash",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Write",
+          "Edit",
+          "Skill"
+        ],
+        "maxTools": 10
+      },
+      "telegram-channel-agent": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Bash",
+          "Grep",
+          "Glob",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Write",
+          "Edit"
+        ],
+        "maxTools": 12
+      },
+      "ai-ml-specialist": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
           "WebSearch",
           "WebFetch",
           "TaskUpdate",
@@ -753,148 +1417,1621 @@
           "Skill",
           "MemoryRecord"
         ],
+        "maxTools": 14
+      },
+      "android-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "angular-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "api-designer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 15
+      },
+      "app-generator-agent": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 12
+      },
+      "aso-specialist": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 14
+      },
+      "azure-infra-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "brand-guardian": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 14
+      },
+      "business-analyst": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "AskUserQuestion"
+        ],
+        "maxTools": 15
+      },
+      "compliance-checker": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "context-manager": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 12
+      },
+      "data-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "data-scientist": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "WebSearch",
+          "WebFetch"
+        ],
+        "maxTools": 14
+      },
+      "django-developer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "dotnet-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "expo-mobile-developer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "fastapi-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "feedback-synthesizer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "forum-monitor-agent": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Glob",
+          "Grep"
+        ],
+        "maxTools": 14
+      },
+      "frontend-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 12
+      },
+      "gamedev-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "golang-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "graphql-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "ios-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "iot-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "java-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "kotlin-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "kubernetes-specialist": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 14
+      },
+      "legacy-modernizer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "legal-advisor": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "llm-architect": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "m365-admin": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "marketing-strategist": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "mcp-developer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "medical-research-triage": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 15
+      },
+      "microservices-architect": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebFetch",
+          "WebSearch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 15
+      },
+      "ml-researcher": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 12
+      },
+      "mlops-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "WebSearch",
+          "WebFetch"
+        ],
+        "maxTools": 14
+      },
+      "mobile-ux-reviewer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Grep",
+          "Glob",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "model-benchmarker-agent": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Grep",
+          "Glob"
+        ],
+        "maxTools": 14
+      },
+      "multi-llm-consultant": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Edit",
+          "TaskCreate"
+        ],
+        "maxTools": 12
+      },
+      "nextjs-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "nlp-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "nodejs-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "php-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "pm-coordinator": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "AskUserQuestion"
+        ],
+        "maxTools": 15
+      },
+      "post-analyzer-agent": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "Grep",
+          "Glob",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "postgres-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "product-manager": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "AskUserQuestion"
+        ],
+        "maxTools": 15
+      },
+      "prompt-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "python-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "quant-analyst": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "rails-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "rust-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "scientific-research-expert": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "spring-boot-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "sql-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "sveltekit-expert": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "swift-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "tauri-desktop-developer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "terraform-engineer": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 12
+      },
+      "terragrunt-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "typescript-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "ux-researcher": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "MemoryRecord",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 14
+      },
+      "voice-replicator-agent": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 13
+      },
+      "web3-blockchain-expert": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "windows-infra-pro": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "wordpress-master": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 14
+      },
+      "artifact-integrator": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "MemoryRecord",
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Bash",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Task",
+          "Skill",
+          "WebFetch"
+        ],
+        "maxTools": 14
+      },
+      "domain-router-ai-ml": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Task",
+          "Skill",
+          "TaskCreate",
+          "TaskList",
+          "TaskGet",
+          "TaskUpdate",
+          "Write",
+          "Bash",
+          "Edit"
+        ],
         "maxTools": 10
       },
-      "master-orchestrator": {
-        "toolset": "ORCHESTRATOR",
+      "domain-router-arch-data": {
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
-          "Write",
-          "Edit",
-          "Bash",
-          "Glob",
-          "Grep",
           "Task",
-          "Orchestrator",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "TaskOutput",
           "Skill",
-          "MemoryRecord"
+          "TaskCreate",
+          "TaskList",
+          "TaskGet",
+          "TaskUpdate",
+          "Write",
+          "Bash",
+          "Edit"
         ],
-        "maxTools": 13
+        "maxTools": 10
       },
-      "swarm-coordinator": {
-        "toolset": "ORCHESTRATOR",
+      "domain-router-backend": {
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
-          "Write",
-          "Edit",
-          "Bash",
-          "Glob",
-          "Grep",
           "Task",
-          "Orchestrator",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "TaskOutput",
           "Skill",
-          "MemoryRecord"
+          "TaskCreate",
+          "TaskList",
+          "TaskGet",
+          "TaskUpdate",
+          "Write",
+          "Bash",
+          "Edit"
         ],
-        "maxTools": 13
+        "maxTools": 10
+      },
+      "domain-router-infra": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Task",
+          "Skill",
+          "TaskCreate",
+          "TaskList",
+          "TaskGet",
+          "TaskUpdate",
+          "Write",
+          "Bash",
+          "Edit"
+        ],
+        "maxTools": 10
+      },
+      "domain-router-mobile": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Task",
+          "Skill",
+          "TaskCreate",
+          "TaskList",
+          "TaskGet",
+          "TaskUpdate",
+          "Write",
+          "Bash",
+          "Edit"
+        ],
+        "maxTools": 10
+      },
+      "domain-router-niche": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Task",
+          "Skill",
+          "TaskCreate",
+          "TaskList",
+          "TaskGet",
+          "TaskUpdate",
+          "Write",
+          "Bash",
+          "Edit"
+        ],
+        "maxTools": 10
+      },
+      "domain-router-product": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Task",
+          "Skill",
+          "TaskCreate",
+          "TaskList",
+          "TaskGet",
+          "TaskUpdate",
+          "Write",
+          "Bash",
+          "Edit"
+        ],
+        "maxTools": 10
+      },
+      "domain-router-security": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Task",
+          "Skill",
+          "TaskCreate",
+          "TaskList",
+          "TaskGet",
+          "TaskUpdate",
+          "Write",
+          "Bash",
+          "Edit"
+        ],
+        "maxTools": 10
+      },
+      "domain-router-web-frontend": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Task",
+          "Skill",
+          "TaskCreate",
+          "TaskList",
+          "TaskGet",
+          "TaskUpdate",
+          "Write",
+          "Bash",
+          "Edit"
+        ],
+        "maxTools": 10
       },
       "evolution-orchestrator": {
-        "toolset": "ORCHESTRATOR",
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep",
+          "Task",
+          "TaskCreate",
+          "TaskUpdate",
+          "TaskList",
+          "TaskGet",
+          "Bash",
+          "Skill",
+          "WebSearch",
+          "WebFetch",
+          "MemoryRecord"
+        ],
+        "maxTools": 15
+      },
+      "heartbeat-orchestrator": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "CronCreate",
+          "CronList",
+          "CronDelete",
+          "Read",
+          "Write",
+          "Bash",
+          "Task",
+          "TaskCreate",
+          "TaskUpdate",
+          "TaskList",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord",
+          "Edit"
+        ],
+        "maxTools": 14
+      },
+      "loop-operator": {
+        "toolset": "AGENT_CONFIG",
         "tools": [
           "Read",
           "Write",
           "Edit",
           "Bash",
-          "Glob",
           "Grep",
+          "Glob",
           "Task",
-          "Orchestrator",
-          "TaskUpdate",
-          "TaskList",
           "TaskCreate",
           "TaskGet",
-          "TaskOutput",
+          "TaskList",
+          "TaskUpdate",
           "Skill",
           "MemoryRecord"
+        ],
+        "maxTools": 13
+      },
+      "master-orchestrator": {
+        "toolset": "AGENT_CONFIG",
+        "tools": [
+          "Bash",
+          "Glob",
+          "Grep",
+          "Read",
+          "Skill",
+          "Task",
+          "TaskCreate",
+          "TaskGet",
+          "TaskList",
+          "TaskUpdate",
+          "MemoryRecord",
+          "Write",
+          "Edit"
         ],
         "maxTools": 13
       },
       "party-orchestrator": {
-        "toolset": "ORCHESTRATOR",
+        "toolset": "AGENT_CONFIG",
         "tools": [
-          "Read",
-          "Write",
-          "Edit",
           "Bash",
-          "Glob",
-          "Grep",
+          "Read",
+          "Skill",
           "Task",
-          "Orchestrator",
-          "TaskUpdate",
-          "TaskList",
           "TaskCreate",
           "TaskGet",
-          "TaskOutput",
-          "Skill",
-          "MemoryRecord"
+          "TaskList",
+          "TaskUpdate",
+          "MemoryRecord",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep"
         ],
         "maxTools": 13
       },
-      "context-compressor": {
-        "toolset": "DEVELOPER",
+      "swarm-coordinator": {
+        "toolset": "AGENT_CONFIG",
         "tools": [
-          "Read",
-          "Write",
-          "Edit",
           "Bash",
-          "Glob",
-          "Grep",
-          "TaskUpdate",
-          "TaskList",
+          "Read",
+          "Skill",
+          "Task",
           "TaskCreate",
           "TaskGet",
-          "TaskOutput",
-          "Skill",
-          "MemoryRecord"
-        ],
-        "maxTools": 5
-      },
-      "data-engineer": {
-        "toolset": "DATA_SCIENCE",
-        "tools": [
-          "Read",
+          "TaskList",
+          "TaskUpdate",
+          "MemoryRecord",
           "Write",
           "Edit",
-          "Bash",
           "Glob",
-          "Grep",
-          "NotebookEdit",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "Skill",
-          "MemoryRecord"
+          "Grep"
         ],
-        "maxTools": 12
-      },
-      "ai-ml-specialist": {
-        "toolset": "DATA_SCIENCE",
-        "tools": [
-          "Read",
-          "Write",
-          "Edit",
-          "Bash",
-          "Glob",
-          "Grep",
-          "NotebookEdit",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "Skill",
-          "MemoryRecord"
-        ],
-        "maxTools": 12
+        "maxTools": 13
       }
     },
     "reservedTools": {

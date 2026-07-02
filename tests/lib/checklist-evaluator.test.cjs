@@ -3,6 +3,8 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
 const path = require('path');
 
 const { evaluateChecklist } = require('../../.claude/lib/orchestration/checklist-evaluator.cjs');
@@ -117,6 +119,40 @@ describe('checklist-evaluator', () => {
     });
   });
 
+  describe('test_passes checks', () => {
+    it('runs argv-style commands without a shell', () => {
+      const result = evaluateChecklist([
+        {
+          id: 'node-ok',
+          description: 'node exits successfully',
+          check_type: 'test_passes',
+          check_value: {
+            command: process.execPath,
+            args: ['-e', 'process.exit(0)'],
+          },
+        },
+      ]);
+      assert.equal(result.passed.length, 1);
+      assert.equal(result.failed.length, 0);
+    });
+
+    it('rejects legacy shell strings with metacharacters', () => {
+      const marker = path.join(os.tmpdir(), `checklist-injection-${Date.now()}.txt`);
+      const result = evaluateChecklist([
+        {
+          id: 'unsafe',
+          description: 'unsafe shell string',
+          check_type: 'test_passes',
+          check_value: `${process.execPath} -e "process.exit(0)" && echo pwned > "${marker}"`,
+        },
+      ]);
+
+      assert.equal(result.failed.length, 1);
+      assert.match(result.failed[0].message, /shell metacharacters/);
+      assert.equal(fs.existsSync(marker), false);
+    });
+  });
+
   describe('halt_on_fail behavior', () => {
     it('halts evaluation on critical failure', () => {
       const result = evaluateChecklist([
@@ -124,7 +160,7 @@ describe('checklist-evaluator', () => {
           id: 'blocker',
           description: 'critical check',
           check_type: 'file_exists',
-          check_value: '/nonexistent',
+          check_value: path.join(os.tmpdir(), `missing-checklist-${Date.now()}-halt`),
           halt_on_fail: true,
           severity: 'critical',
         },
@@ -148,7 +184,7 @@ describe('checklist-evaluator', () => {
           id: 'soft-fail',
           description: 'non-critical',
           check_type: 'file_exists',
-          check_value: '/nonexistent',
+          check_value: path.join(os.tmpdir(), `missing-checklist-${Date.now()}-soft`),
           halt_on_fail: false,
           severity: 'warning',
         },
@@ -185,7 +221,7 @@ describe('checklist-evaluator', () => {
           id: 'no-severity',
           description: 'test',
           check_type: 'file_exists',
-          check_value: '/nonexistent',
+          check_value: path.join(os.tmpdir(), `missing-checklist-${Date.now()}-severity`),
         },
       ]);
       assert.equal(result.failed[0].severity, 'error');

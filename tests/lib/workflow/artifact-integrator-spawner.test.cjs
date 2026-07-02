@@ -14,9 +14,23 @@ test('C-003: artifact-integrator-spawner exports spawnArtifactIntegrator', () =>
 
 test('C-003: getQueueSize returns 0 for missing file', () => {
   const spawner = require('../../../.claude/lib/workflow/artifact-integrator-spawner.cjs');
-  // getQueueSize should handle nonexistent file gracefully
-  const size = spawner.getQueueSize('/nonexistent/path');
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'c003-missing-'));
+  const missingQueue = path.join(tmpDir, 'missing-queue.jsonl');
+
+  const size = spawner.getQueueSize(missingQueue);
   assert.strictEqual(size, 0);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('C-003: getQueueSize returns 0 for directory paths', () => {
+  const spawner = require('../../../.claude/lib/workflow/artifact-integrator-spawner.cjs');
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'c003-dir-'));
+
+  const size = spawner.getQueueSize(tmpDir);
+  assert.strictEqual(size, 0);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
 test('C-003: getQueueSize counts lines correctly', () => {

@@ -91,6 +91,11 @@ function loadConfig(root) {
         fileConfig.daemon?.port ||
         DEFAULT_PORT,
       host: process.env.CHANNEL_DAEMON_HOST || fileConfig.daemon?.host || '127.0.0.1',
+      apiToken: (
+        process.env.CHANNEL_DAEMON_API_TOKEN ||
+        process.env.CHANNEL_DAEMON_TOKEN ||
+        ''
+      ).trim(),
     },
     renderer: {
       model: process.env.CHANNEL_MODEL || fileConfig.renderer?.model || DEFAULT_MODEL,

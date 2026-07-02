@@ -31,6 +31,13 @@ function test() { return ${i}; }`
   });
 
   await t.test('should index files in batches and honor concurrency', async () => {
+    const logs = [];
+    const originalLog = console.log;
+    console.log = message => {
+      logs.push(String(message));
+      originalLog(message);
+    };
+
     // Mock discoverFiles to return our 100 files
     manager._discoverFiles = async () => files;
 
@@ -51,8 +58,21 @@ function test() { return ${i}; }`
     manager._saveCheckpoint = async () => {};
     manager._clearCheckpoint = async () => {};
 
-    const result = await manager.indexDirectory(tmpDir);
-    assert.strictEqual(result.filesIndexed, 100);
+    try {
+      const result = await manager.indexDirectory(tmpDir);
+      assert.strictEqual(result.filesIndexed, 100);
+    } finally {
+      console.log = originalLog;
+    }
+
+    assert.ok(
+      logs.some(message => message.includes('BM25-only in-process indexing')),
+      'expected BM25-only indexing to stay in-process'
+    );
+    assert.ok(
+      logs.every(message => !message.includes('Piscina worker pool')),
+      'BM25-only indexing should not start unused Piscina workers'
+    );
   });
 
   // Clean up

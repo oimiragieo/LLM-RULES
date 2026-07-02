@@ -8,6 +8,9 @@
  */
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
 const { TaskExecutor } = require('./executor.cjs');
 const { TaskPool } = require('./task-pool.cjs');
 const { createMissionExecutor } = require('./mission-executor.cjs');
@@ -20,6 +23,7 @@ class Dispatcher {
     this.log = log || console.log;
     this.memory = memory || null;
     this.skillStore = skillStore || null;
+    this.projectRoot = path.resolve((config && config.projectRoot) || process.cwd());
     this.executor = new TaskExecutor(config || {}, log);
     this.missionExecutor = createMissionExecutor(this.executor, {
       projectRoot: (config && config.projectRoot) || process.cwd(),
@@ -823,12 +827,40 @@ class Dispatcher {
   /** @private Send extracted file paths from task results */
   async _sendExtractedFiles(sink, chatId, filePaths) {
     for (const fp of [...new Set(filePaths)].slice(0, 3)) {
+      const trimmed = fp.trim();
+      if (!this._isAllowedAttachmentPath(trimmed)) {
+        this.log(`[dispatcher] Blocked file attachment outside artifact roots: ${trimmed}`);
+        continue;
+      }
       try {
-        const sent = await sink.sendFile(chatId, fp.trim());
-        if (sent) this.log(`[dispatcher] Sent file: ${fp}`);
+        const sent = await sink.sendFile(chatId, trimmed);
+        if (sent) this.log(`[dispatcher] Sent file: ${trimmed}`);
       } catch {
         /* ignored */
       }
+    }
+  }
+
+  _isAllowedAttachmentPath(filePath) {
+    try {
+      const resolved = path.resolve(filePath);
+      if (!fs.existsSync(resolved) || !fs.statSync(resolved).isFile()) return false;
+
+      const realFile = fs.realpathSync(resolved);
+      const allowedRoots = [
+        path.join(this.projectRoot, '.claude', 'context', 'artifacts'),
+        path.join(this.projectRoot, '.claude', 'context', 'reports'),
+        path.join(this.projectRoot, 'tmp'),
+        path.join(this.projectRoot, '.tmp'),
+      ];
+
+      return allowedRoots.some(root => {
+        const resolvedRoot = fs.existsSync(root) ? fs.realpathSync(root) : path.resolve(root);
+        const relative = path.relative(resolvedRoot, realFile);
+        return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+      });
+    } catch {
+      return false;
     }
   }
 

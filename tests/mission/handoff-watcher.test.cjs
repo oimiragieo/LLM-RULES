@@ -294,6 +294,61 @@ describe('HandoffWatcher', () => {
       assert.strictEqual(events[2].name, 'Z', 'Third should be Z');
       fastWatcher.stop();
     });
+
+    it('reconciles directory contents when only the newest file event arrives', async () => {
+      const fastWatcher = new HandoffWatcher(handoffsDir, { debounceMs: 50 });
+      const now = Date.now();
+      const newestFile = `${now}-c.json`;
+      const events = [];
+
+      try {
+        fastWatcher.on('handoff-detected', payload => {
+          events.push(payload);
+        });
+
+        writeJsonFile(handoffsDir, newestFile, { order: 'C' });
+        writeJsonFile(handoffsDir, `${now - 1000}-b.json`, { order: 'B' });
+        writeJsonFile(handoffsDir, `${now - 2000}-a.json`, { order: 'A' });
+
+        // Simulate a loaded filesystem watcher that reports only the newest file.
+        fastWatcher.isWatching = true;
+        fastWatcher._handleFileEvent(newestFile, 'change');
+
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        assert.deepStrictEqual(
+          events.map(event => event.order),
+          ['A', 'B', 'C'],
+          'Processing should scan changed files and emit timestamp order'
+        );
+      } finally {
+        fastWatcher.stop();
+      }
+    });
+
+    it('ignores unchanged duplicate events after the debounce window', async () => {
+      const fastWatcher = new HandoffWatcher(handoffsDir, { debounceMs: 50 });
+      const filename = `${Date.now()}-stable.json`;
+      const events = [];
+
+      try {
+        fastWatcher.on('handoff-detected', payload => {
+          events.push(payload);
+        });
+
+        writeJsonFile(handoffsDir, filename, { stable: true });
+        fastWatcher.isWatching = true;
+        fastWatcher._handleFileEvent(filename, 'change');
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        fastWatcher._handleFileEvent(filename, 'change');
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        assert.strictEqual(events.length, 1, 'Unchanged duplicate events should not re-emit');
+      } finally {
+        fastWatcher.stop();
+      }
+    });
   });
 
   describe('VAL-HW-004: Malformed JSON emits error event without crash', () => {

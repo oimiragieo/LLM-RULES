@@ -65,7 +65,32 @@ const CORE_TOOLS = [
     description: 'Stop running task',
     mandatory: false,
   },
+  {
+    name: 'CronCreate',
+    category: 'Scheduled Tasks',
+    description: 'Create a recurring scheduled task',
+    mandatory: false,
+  },
+  {
+    name: 'CronList',
+    category: 'Scheduled Tasks',
+    description: 'List recurring scheduled tasks',
+    mandatory: false,
+  },
+  {
+    name: 'CronDelete',
+    category: 'Scheduled Tasks',
+    description: 'Delete a recurring scheduled task',
+    mandatory: false,
+  },
   { name: 'Skill', category: 'Capability', description: 'Invoke skill workflows', mandatory: true },
+  {
+    name: 'Agent',
+    category: 'Orchestration',
+    description: 'Legacy alias for spawning a specialist agent; prefer Task for new flows',
+    mandatory: false,
+    optional: true,
+  },
   {
     name: 'AskUserQuestion',
     category: 'Interaction',
@@ -105,12 +130,24 @@ const CORE_TOOLS = [
   },
 ];
 
-const EDITING_TOOLS = new Set(['Write', 'Edit', 'Bash', 'NotebookEdit', 'TaskStop']);
+const EDITING_TOOLS = new Set([
+  'Write',
+  'Edit',
+  'Bash',
+  'NotebookEdit',
+  'TaskStop',
+  'CronCreate',
+  'CronDelete',
+]);
 const OPTIONAL_TOOLS = new Set(['EnterPlanMode', 'ExitPlanMode']);
 const NO_PROJECT_TOOLS = new Set([
   'Task',
+  'Agent',
   'TaskList',
   'TaskCreate',
+  'CronCreate',
+  'CronList',
+  'CronDelete',
   'AskUserQuestion',
   'WebSearch',
   'WebFetch',
@@ -166,6 +203,20 @@ const MCP_TOOLS = [
     description: 'Company research via Exa',
     fallback: 'WebSearch',
     fallbackTools: ['WebSearch'],
+  },
+  {
+    name: 'mcp__filesystem__read_text_file',
+    server: 'filesystem',
+    description: 'Read a text file through the filesystem MCP server',
+    fallback: 'Read',
+    fallbackTools: ['Read'],
+  },
+  {
+    name: 'mcp__filesystem__write_file',
+    server: 'filesystem',
+    description: 'Write a file through the filesystem MCP server',
+    fallback: 'Write',
+    fallbackTools: ['Write'],
   },
   {
     name: 'mcp__shadcn__getComponents',

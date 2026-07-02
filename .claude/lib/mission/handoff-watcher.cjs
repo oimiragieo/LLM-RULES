@@ -19,53 +19,21 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { EventEmitter } = require('node:events');
+const {
+  collectProcessableFiles,
+  compareFilenames,
+  extractTimestamp,
+  forgetFile,
+  getFileSignature,
+  hasUnprocessedChanges,
+  markProcessed,
+} = require('./handoff-watcher-queue.cjs');
 
 // Configuration constants
 const DEBOUNCE_MS = 500;
 const POLLING_INTERVAL_MS = 1000;
 const RETRY_COUNT = 3;
 const RETRY_DELAY_MS = 200;
-
-/**
- * Extract timestamp from filename
- * Format: <timestamp>-<name>.json
- * @param {string} filename - Filename to parse
- * @returns {number|null} - Timestamp or null if not parseable
- */
-function extractTimestamp(filename) {
-  const match = filename.match(/^(\d+)-/);
-  if (match) {
-    return parseInt(match[1], 10);
-  }
-  return null;
-}
-
-/**
- * Compare two filenames for FIFO sorting
- * @param {string} a - First filename
- * @param {string} b - Second filename
- * @returns {number} - Comparison result
- */
-function compareFilenames(a, b) {
-  const tsA = extractTimestamp(a);
-  const tsB = extractTimestamp(b);
-
-  // If both have timestamps, compare by timestamp
-  if (tsA !== null && tsB !== null) {
-    if (tsA !== tsB) {
-      return tsA - tsB;
-    }
-    // Same timestamp: sort alphabetically
-    return a.localeCompare(b);
-  }
-
-  // If only one has timestamp, prioritize the one with timestamp
-  if (tsA !== null) return -1;
-  if (tsB !== null) return 1;
-
-  // Neither has timestamp: sort alphabetically
-  return a.localeCompare(b);
-}
 
 /**
  * HandoffWatcher class
@@ -98,7 +66,9 @@ class HandoffWatcher extends EventEmitter {
 
     // Tracking for debounce
     this.lastProcessedTime = new Map(); // filename -> timestamp when last processed
+    this.processedFileSignatures = new Map(); // filename -> "size:mtimeMs"
     this.pendingFiles = []; // Files queued for processing
+    this.isProcessing = false;
   }
 
   /**
@@ -150,7 +120,9 @@ class HandoffWatcher extends EventEmitter {
 
     // Clear state
     this.lastProcessedTime.clear();
+    this.processedFileSignatures.clear();
     this.pendingFiles = [];
+    this.isProcessing = false;
   }
 
   /**
@@ -167,8 +139,6 @@ class HandoffWatcher extends EventEmitter {
 
       // Process each file sequentially in FIFO order
       for (const file of jsonFiles) {
-        // Mark as processed to avoid re-processing within debounce window
-        this.lastProcessedTime.set(file, Date.now());
         await this._readWithRetryAsync(path.join(this.handoffsDir, file), file, 0);
       }
     } catch (err) {
@@ -229,9 +199,8 @@ class HandoffWatcher extends EventEmitter {
         const jsonFiles = files.filter(f => f.endsWith('.json'));
 
         for (const file of jsonFiles) {
-          // Check if this file needs processing
-          const lastTime = this.lastProcessedTime.get(file);
-          if (!lastTime || Date.now() - lastTime >= this.debounceMs) {
+          // Check if this file changed since the last successful/error processing pass.
+          if (hasUnprocessedChanges(this, file)) {
             this._handleFileEvent(file, 'change');
           }
         }
@@ -265,30 +234,22 @@ class HandoffWatcher extends EventEmitter {
   /**
    * Handle a file system event
    * @param {string} filename - Filename that triggered the event
-   * @param {string} eventType - 'rename' or 'change'
+   * @param {string} _eventType - 'rename' or 'change'
    * @private
    */
-  _handleFileEvent(filename, eventType) {
+  _handleFileEvent(filename, _eventType) {
     // Only process .json files
     if (!filename.endsWith('.json')) {
       return;
     }
 
-    // Ignore deletions (rename event with file no longer existing)
-    if (eventType === 'rename') {
-      const filePath = path.join(this.handoffsDir, filename);
-      if (!fs.existsSync(filePath)) {
-        // File was deleted, remove from tracking
-        this.lastProcessedTime.delete(filename);
-        return;
-      }
+    // Ignore deletions and unchanged duplicate watcher events.
+    const signature = getFileSignature(this, filename);
+    if (!signature) {
+      forgetFile(this, filename);
+      return;
     }
-
-    const now = Date.now();
-    const lastTime = this.lastProcessedTime.get(filename);
-
-    // Debounce check: if processed within the window, skip
-    if (lastTime && now - lastTime < this.debounceMs) {
+    if (this.processedFileSignatures.get(filename) === signature) {
       return;
     }
 
@@ -322,27 +283,31 @@ class HandoffWatcher extends EventEmitter {
    * @private
    */
   async _processPendingFiles() {
-    if (this.pendingFiles.length === 0) {
+    if (this.isProcessing) {
+      this._scheduleProcessing();
       return;
     }
 
-    // Sort by FIFO order
-    this.pendingFiles.sort(compareFilenames);
+    const toProcess = collectProcessableFiles(this);
+    if (toProcess.length === 0) {
+      this.pendingFiles = [];
+      return;
+    }
 
-    // Take a snapshot of files to process
-    const toProcess = [...this.pendingFiles];
     this.pendingFiles = [];
+    this.isProcessing = true;
 
-    // Process each file sequentially in FIFO order
-    for (const filename of toProcess) {
-      if (!this.isWatching) break;
+    try {
+      // Process each file sequentially in FIFO order
+      for (const filename of toProcess) {
+        if (!this.isWatching) break;
 
-      // Mark as processed
-      this.lastProcessedTime.set(filename, Date.now());
-
-      // Read and process the file, waiting for completion
-      const filePath = path.join(this.handoffsDir, filename);
-      await this._readWithRetryAsync(filePath, filename, 0);
+        // Read and process the file, waiting for completion
+        const filePath = path.join(this.handoffsDir, filename);
+        await this._readWithRetryAsync(filePath, filename, 0);
+      }
+    } finally {
+      this.isProcessing = false;
     }
   }
 
@@ -360,7 +325,7 @@ class HandoffWatcher extends EventEmitter {
         if (err) {
           // File doesn't exist or was deleted - ignore
           if (err.code === 'ENOENT') {
-            this.lastProcessedTime.delete(filename);
+            forgetFile(this, filename);
             resolve();
             return;
           }
@@ -378,6 +343,7 @@ class HandoffWatcher extends EventEmitter {
             filename,
             error: err.message,
           });
+          markProcessed(this, filename);
           resolve();
           return;
         }
@@ -387,6 +353,7 @@ class HandoffWatcher extends EventEmitter {
           const payload = JSON.parse(content);
           // Add filename to payload for reference
           payload._filename = filename;
+          markProcessed(this, filename);
           this.emit('handoff-detected', payload);
           resolve();
         } catch (parseErr) {
@@ -403,6 +370,7 @@ class HandoffWatcher extends EventEmitter {
             filename,
             error: parseErr.message,
           });
+          markProcessed(this, filename);
           resolve();
         }
       });
@@ -421,7 +389,7 @@ class HandoffWatcher extends EventEmitter {
       if (err) {
         // File doesn't exist or was deleted - ignore
         if (err.code === 'ENOENT') {
-          this.lastProcessedTime.delete(filename);
+          forgetFile(this, filename);
           return;
         }
 
@@ -438,6 +406,7 @@ class HandoffWatcher extends EventEmitter {
           filename,
           error: err.message,
         });
+        markProcessed(this, filename);
         return;
       }
 
@@ -446,6 +415,7 @@ class HandoffWatcher extends EventEmitter {
         const payload = JSON.parse(content);
         // Add filename to payload for reference
         payload._filename = filename;
+        markProcessed(this, filename);
         this.emit('handoff-detected', payload);
       } catch (parseErr) {
         // Retry for partial writes
@@ -461,6 +431,7 @@ class HandoffWatcher extends EventEmitter {
           filename,
           error: parseErr.message,
         });
+        markProcessed(this, filename);
       }
     });
   }

@@ -356,6 +356,7 @@ test('pnpm major should be pinned consistently across local setup and CI', () =>
     file => file.endsWith('.yml') || file.endsWith('.yaml')
   );
   const pnpmVersion = pkg.packageManager.replace(/^pnpm@/, '');
+  const pnpmActionSetupV6Sha = 'b0f76dfb45f55f8421693e4803ac7bb65143bd34';
 
   assert.equal(pkg.packageManager, 'pnpm@11.4.0');
   assert.equal(
@@ -380,8 +381,8 @@ test('pnpm major should be pinned consistently across local setup and CI', () =>
     pnpmActionFiles.push(file);
 
     assert.ok(
-      workflow.includes('pnpm/action-setup@v6'),
-      `${file} should use pnpm/action-setup@v6 for pnpm 11 support`
+      workflow.includes(`pnpm/action-setup@${pnpmActionSetupV6Sha}`),
+      `${file} should use the pinned pnpm/action-setup v6 SHA for pnpm 11 support`
     );
     assert.ok(
       !/pnpm\/action-setup@v[0-5]\b/.test(workflow),

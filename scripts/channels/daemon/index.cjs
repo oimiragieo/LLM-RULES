@@ -47,6 +47,7 @@ const { DaemonMemory } = require('./memory.cjs');
 const { SkillStore } = require('./skills.cjs');
 const { TimerSource } = require('./sources/timer.cjs');
 const { CommandHandler } = require('./commands.cjs');
+const { isAuthorizedDaemonRequest, writeDaemonAuthFailure } = require('./http-auth.cjs');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const RUNTIME = path.join(ROOT, '.claude', 'context', 'runtime');
@@ -292,11 +293,22 @@ async function main() {
 
   // eslint-disable-next-line complexity
   const server = http.createServer((req, res) => {
-    const url = new URL(req.url, `http://${req.headers.host}`);
+    const url = new URL(req.url, 'http://127.0.0.1');
 
     // CORS headers for local dev
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'application/json');
+
+    if (
+      !isAuthorizedDaemonRequest(req, {
+        method: req.method,
+        pathname: url.pathname,
+        token: config.daemon.apiToken,
+      })
+    ) {
+      writeDaemonAuthFailure(res, { token: config.daemon.apiToken });
+      return;
+    }
 
     // Health check
     if (url.pathname === '/health' || url.pathname === '/api/health') {

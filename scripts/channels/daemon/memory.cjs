@@ -32,6 +32,22 @@ const DREAM_INTERVAL_MS = 3600000; // 1 hour
 const SESSION_ROT_THRESHOLD = 5; // After N compactions, auto-rotate session
 const MAX_SUMMARY_LENGTH = 3000;
 
+function buildNamedSessionKey(chatId, name) {
+  return JSON.stringify([String(chatId), String(name)]);
+}
+
+function parseNamedSessionKey(key, session) {
+  try {
+    const parsed = JSON.parse(key);
+    if (Array.isArray(parsed) && parsed.length === 2) {
+      return { chatId: String(parsed[0]), name: String(parsed[1]) };
+    }
+  } catch {
+    /* legacy plain-name key */
+  }
+  return { chatId: String(session?.chatId || ''), name: key };
+}
+
 /**
  * Atomic file write — write to temp file then rename.
  * Prevents data corruption from crashes mid-write.
@@ -402,8 +418,9 @@ class DaemonMemory {
   saveNamedSession(chatId, name) {
     const history = this.chats.get(chatId) || [];
     const summary = this.summaries.get(chatId) || '';
-    this.namedSessions.set(name, {
+    this.namedSessions.set(buildNamedSessionKey(chatId, name), {
       chatId,
+      name,
       history: history.slice(-20), // Keep last 20 messages
       summary,
       savedAt: new Date().toISOString(),
@@ -412,7 +429,19 @@ class DaemonMemory {
   }
 
   loadNamedSession(chatId, name) {
-    const session = this.namedSessions.get(name);
+    let session = this.namedSessions.get(buildNamedSessionKey(chatId, name));
+    if (!session) {
+      const legacySession = this.namedSessions.get(name);
+      if (legacySession && String(legacySession.chatId) === String(chatId)) {
+        session = legacySession;
+        this.namedSessions.delete(name);
+        this.namedSessions.set(buildNamedSessionKey(chatId, name), {
+          ...legacySession,
+          name,
+        });
+        this._saveNamedSessions();
+      }
+    }
     if (!session) return false;
     this.chats.set(chatId, [...session.history]);
     this.summaries.set(chatId, session.summary);
@@ -421,12 +450,15 @@ class DaemonMemory {
     return true;
   }
 
-  listNamedSessions() {
-    return [...this.namedSessions.entries()].map(([name, s]) => ({
-      name,
-      savedAt: s.savedAt,
-      messageCount: s.history.length,
-    }));
+  listNamedSessions(chatId = null) {
+    return [...this.namedSessions.entries()]
+      .map(([key, session]) => ({ ...parseNamedSessionKey(key, session), session }))
+      .filter(({ chatId: sessionChatId }) => chatId === null || sessionChatId === String(chatId))
+      .map(({ name, session }) => ({
+        name,
+        savedAt: session.savedAt,
+        messageCount: session.history.length,
+      }));
   }
 
   _saveNamedSessions() {

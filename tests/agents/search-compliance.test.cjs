@@ -12,7 +12,7 @@
 
 'use strict';
 
-const { describe, it, before, test } = require('node:test');
+const { describe, it, before } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
@@ -323,13 +323,12 @@ describe('Router tool whitelist', () => {
     }
   });
 
-  it('router.md exists (or was deleted per ADR — skip if absent)', () => {
-    // Router.md was deleted per memory entry — this test documents that state
-    if (!routerAgent) {
-      test.todo('router.md was deleted — router is defined in CLAUDE.md only');
-      return;
-    }
-    assert.ok(routerAgent, 'router.md should exist in core/');
+  it('router.md is intentionally absent because the router is defined in CLAUDE.md', () => {
+    assert.equal(
+      routerAgent,
+      undefined,
+      'router.md should remain absent; router policy is centralized in CLAUDE.md'
+    );
   });
 
   it('router does NOT have banned tools in its tools array', () => {

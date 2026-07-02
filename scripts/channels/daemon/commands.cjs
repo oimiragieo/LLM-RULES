@@ -334,7 +334,7 @@ class CommandHandler {
 
       case '/resume': {
         if (!args) {
-          const sessions = this.memory.listNamedSessions();
+          const sessions = this.memory.listNamedSessions(chatId);
           if (sessions.length === 0)
             return this._reply(
               chatId,
@@ -365,7 +365,7 @@ class CommandHandler {
       }
 
       case '/sessions': {
-        const sessions = this.memory.listNamedSessions();
+        const sessions = this.memory.listNamedSessions(chatId);
         if (sessions.length === 0) return this._reply(chatId, messageId, '📂 No saved sessions.');
         const list = sessions
           .map(s => `• ${s.name} (${s.messageCount} msgs, ${s.savedAt.split('T')[0]})`)

@@ -13,6 +13,52 @@
 
 const { isStub, STUB_PATTERNS } = require('./stub-patterns.cjs');
 
+const SHELL_META_PATTERN = /[&|;<>`$]/;
+
+function normalizeCommandSpec(commandSpec) {
+  if (Array.isArray(commandSpec)) {
+    const [command, ...args] = commandSpec;
+    if (!command || typeof command !== 'string') {
+      throw new Error('Command array must start with a command string');
+    }
+    return { command, args: args.map(String), display: [command, ...args].join(' ') };
+  }
+
+  if (commandSpec && typeof commandSpec === 'object') {
+    const command = String(commandSpec.command || '').trim();
+    if (!command) throw new Error('Command object requires command');
+    const args = Array.isArray(commandSpec.args) ? commandSpec.args.map(String) : [];
+    return { command, args, display: [command, ...args].join(' ') };
+  }
+
+  const legacy = String(commandSpec || '').trim();
+  if (!legacy) throw new Error('Command string is empty');
+  if (SHELL_META_PATTERN.test(legacy)) {
+    throw new Error('Command string contains shell metacharacters; use { command, args } instead');
+  }
+  if (/['"]/.test(legacy)) {
+    throw new Error('Command string contains quotes; use { command, args } instead');
+  }
+
+  const [command, ...args] = legacy.split(/\s+/);
+  return { command, args, display: legacy };
+}
+
+function runCommandNoShell(commandSpec) {
+  const { spawnSync } = require('node:child_process');
+  const spec = normalizeCommandSpec(commandSpec);
+  const result = spawnSync(spec.command, spec.args, {
+    shell: false,
+    stdio: 'pipe',
+    windowsHide: true,
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    throw new Error(`Command failed (${result.status}): ${spec.display}`);
+  }
+  return result.stdout;
+}
+
 // ------------------------------------------------------------------
 // checkTruths
 // ------------------------------------------------------------------
@@ -25,13 +71,7 @@ const { isStub, STUB_PATTERNS } = require('./stub-patterns.cjs');
  * @returns {{ passed: number, failed: number, errors: string[] }}
  */
 function checkTruths(truths, deps) {
-  const executeCmd =
-    deps && deps.exec
-      ? deps.exec
-      : (() => {
-          const { execSync } = require('node:child_process');
-          return cmd => execSync(cmd, { shell: false, stdio: 'pipe', windowsHide: true });
-        })();
+  const executeCmd = deps && deps.exec ? deps.exec : runCommandNoShell;
 
   const errors = [];
   let passed = 0;

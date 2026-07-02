@@ -9,6 +9,10 @@ function readWorkflow() {
   return fs.readFileSync(path.join('.github', 'workflows', 'ci-flake-ops.yml'), 'utf8');
 }
 
+function pinnedActionPattern(actionName) {
+  return new RegExp(`${actionName.replace('/', '\\/')}@[a-f0-9]{40}`, 'i');
+}
+
 test('ci-flake-ops workflow runs on schedule and workflow_dispatch only', () => {
   const workflow = readWorkflow();
 
@@ -21,12 +25,13 @@ test('ci-flake-ops workflow runs on schedule and workflow_dispatch only', () => 
 test('ci-flake-ops workflow enumerates recent artifacts and builds flake summaries', () => {
   const workflow = readWorkflow();
 
-  assert.match(workflow, /actions\/github-script@v7/);
+  assert.match(workflow, pinnedActionPattern('actions/github-script'));
   assert.match(workflow, /listWorkflowRunsForRepo/);
   assert.match(workflow, /listWorkflowRunArtifacts/);
   assert.match(workflow, /pnpm ci:artifact:index --json/);
   assert.match(workflow, /pnpm flake:report --json/);
   assert.match(workflow, /ci:summary:write --kind flake-ops/);
+  assert.match(workflow, pinnedActionPattern('actions/upload-artifact'));
   assert.match(
     workflow,
     /ci-flake-ops-\$\{\{\s*github\.run_id\s*\}\}-\$\{\{\s*github\.run_attempt\s*\}\}/

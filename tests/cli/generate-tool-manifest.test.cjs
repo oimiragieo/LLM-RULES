@@ -3,9 +3,10 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
+const fs = require('node:fs');
 const path = require('path');
 
-const { formatManifestJson } = require(
+const { formatManifestJson, generateManifest } = require(
   path.join('..', '..', '.claude', 'tools', 'cli', 'generate-tool-manifest.cjs')
 );
 
@@ -34,5 +35,21 @@ describe('generate-tool-manifest formatting', () => {
 
     assert.strictEqual(actual, normalizedExpected);
     assert.ok(actual.endsWith('\n'));
+  });
+
+  it('derives agent defaults from the live agent-config tool lists', () => {
+    const agentConfigPath = path.join(process.cwd(), '.claude', 'config', 'agent-config.json');
+    const agentConfig = JSON.parse(fs.readFileSync(agentConfigPath, 'utf8'));
+    const manifest = generateManifest();
+    const defaults = manifest.validation.agentDefaults;
+
+    for (const [agentName, agentConfigEntry] of Object.entries(agentConfig.agents || {})) {
+      assert.ok(defaults[agentName], `Missing manifest defaults for ${agentName}`);
+      assert.deepStrictEqual(
+        defaults[agentName].tools,
+        agentConfigEntry.tools,
+        `Manifest tools should match agent-config tools for ${agentName}`
+      );
+    }
   });
 });

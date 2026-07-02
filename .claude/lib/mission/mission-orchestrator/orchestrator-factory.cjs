@@ -27,7 +27,7 @@ const {
  * @returns {object} Orchestrator with step functions
  */
 function createMissionOrchestrator(missionDir) {
-  if (!missionDir || !fs.existsSync(missionDir)) {
+  if (!isDirectory(missionDir)) {
     throw new Error(`Mission directory does not exist: ${missionDir}`);
   }
 
@@ -451,6 +451,18 @@ function createMissionOrchestrator(missionDir) {
     /** Expose logger for direct event access */
     logger,
   };
+}
+
+function isDirectory(dir) {
+  if (!dir) {
+    return false;
+  }
+
+  try {
+    return fs.statSync(dir).isDirectory();
+  } catch (_err) {
+    return false;
+  }
 }
 
 module.exports = {

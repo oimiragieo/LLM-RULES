@@ -7,7 +7,7 @@
 'use strict';
 
 const { execSync, spawn } = require('child_process');
-const { claudeSync, nodeSync, buildClaudeSpawnSpec } = require('./claude-cli.cjs');
+const { claudeSync, nodeSync, buildClaudeSpawnSpec, buildClaudeArgs } = require('./claude-cli.cjs');
 
 const SYSTEM_PROMPT = `You are Agent Studio — an AI assistant running as a persistent background daemon, communicating via Telegram.
 
@@ -434,15 +434,8 @@ main().catch(() => process.exit(1));
 
     return new Promise((resolve, _reject) => {
       // Use -p - to read prompt from stdin (avoids Windows shell quoting issues)
-      const args = [
-        '-p',
-        '-',
-        '--dangerously-skip-permissions',
-        '--model',
-        model,
-        '--max-turns',
-        '3',
-      ];
+      const args = buildClaudeArgs({ model, maxTurns: 3, env });
+      args.push('-p');
 
       const spawnSpec = buildClaudeSpawnSpec('claude', args);
       const child = spawn(spawnSpec.command, spawnSpec.args, {

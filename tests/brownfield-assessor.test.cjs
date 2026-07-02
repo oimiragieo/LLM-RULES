@@ -257,7 +257,19 @@ describe('Brownfield Assessor', () => {
     it('should handle missing directory gracefully', async () => {
       if (!assessor) return;
 
-      const result = await assessor.assess('/nonexistent/path');
+      const result = await assessor.assess(path.join(tempDir, 'missing-project'));
+
+      assert.strictEqual(result.type, 'greenfield');
+      assert.strictEqual(result.scores.structure, 0);
+    });
+
+    it('should handle a file path gracefully', async () => {
+      if (!assessor) return;
+
+      const projectPath = path.join(tempDir, 'not-a-directory');
+      fs.writeFileSync(projectPath, 'not a project directory');
+
+      const result = await assessor.assess(projectPath);
 
       assert.strictEqual(result.type, 'greenfield');
       assert.strictEqual(result.scores.structure, 0);

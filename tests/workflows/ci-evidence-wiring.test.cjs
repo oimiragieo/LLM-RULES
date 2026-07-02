@@ -13,6 +13,10 @@ function readPackageJson() {
   return JSON.parse(fs.readFileSync('package.json', 'utf8'));
 }
 
+function pinnedActionPattern(actionName) {
+  return new RegExp(`${actionName.replace('/', '\\/')}@[a-f0-9]{40}`, 'i');
+}
+
 test('ci workflow wires advisory changed-files, impacted-validation, release-gate summary, and artifact upload', () => {
   const workflow = readWorkflow('ci.yml');
 
@@ -23,7 +27,7 @@ test('ci workflow wires advisory changed-files, impacted-validation, release-gat
   assert.match(workflow, /if:\s*github\.event_name == 'pull_request'/);
   assert.match(workflow, /node\s+\.claude\/tools\/cli\/release-gate\.cjs\s+--json/);
   assert.match(workflow, /ci:summary:write --kind release-gate/);
-  assert.match(workflow, /actions\/upload-artifact@v4/);
+  assert.match(workflow, pinnedActionPattern('actions/upload-artifact'));
   assert.match(workflow, /ci-advisory-/);
   assert.doesNotMatch(workflow, /pnpm validate:affected --json/);
   assert.doesNotMatch(workflow, /pnpm release:gate --json/);
@@ -71,7 +75,7 @@ test('authoritative workflows upload uniquely named failure evidence artifacts a
     assert.match(workflow, /if:\s*failure\(\)/, `${workflowName} missing failure-only step`);
     assert.match(
       workflow,
-      /actions\/upload-artifact@v4/,
+      pinnedActionPattern('actions/upload-artifact'),
       `${workflowName} missing artifact upload`
     );
     assert.match(
@@ -110,7 +114,7 @@ test('full validation wires an authoritative PR-only release governance gate', (
   assert.match(workflow, /--commit-message-file/);
   assert.match(workflow, /release-intent\.txt/);
   assert.match(workflow, /ci:summary:write --kind release-gate/);
-  assert.match(workflow, /actions\/upload-artifact@v4/);
+  assert.match(workflow, pinnedActionPattern('actions/upload-artifact'));
   assert.match(
     workflow,
     /release-governance-\$\{\{\s*github\.run_id\s*\}\}-\$\{\{\s*github\.run_attempt\s*\}\}/

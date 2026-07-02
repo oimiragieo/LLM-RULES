@@ -194,13 +194,17 @@ This is a test skill created for E2E testing. It should be indexed and searchabl
       // Step 4: Search using KB reader API
       delete require.cache[require.resolve(KB_READER_PATH)]; // Clear cache
       const kb = require(KB_READER_PATH);
+      kb.listAll(); // Warm the index; this assertion measures search, not disk read + CSV parse.
 
-      const searchStartTime = Date.now();
+      const searchStartTime = performance.now();
       const results = kb.search('e2e');
-      const searchDuration = Date.now() - searchStartTime;
+      const searchDuration = performance.now() - searchStartTime;
 
       // Verify search performance
-      assert.ok(searchDuration < 150, `Search should take <150ms, took ${searchDuration}ms`);
+      assert.ok(
+        searchDuration < 50,
+        `Cached search should take <50ms, took ${searchDuration.toFixed(2)}ms`
+      );
 
       // Verify results
       assert.ok(Array.isArray(results), 'Search should return array');
@@ -232,18 +236,19 @@ This is a test skill created for E2E testing. It should be indexed and searchabl
       // Performance benchmark
       delete require.cache[require.resolve(KB_READER_PATH)];
       const kb = require(KB_READER_PATH);
+      kb.listAll(); // Warm the index before measuring repeated search throughput.
 
       const iterations = 10;
       const times = [];
 
       for (let i = 0; i < iterations; i++) {
-        const start = Date.now();
+        const start = performance.now();
         kb.search('testing');
-        times.push(Date.now() - start);
+        times.push(performance.now() - start);
       }
 
       const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
-      assert.ok(avgTime < 150, `Average search time should be <150ms, was ${avgTime.toFixed(2)}ms`);
+      assert.ok(avgTime < 50, `Average search time should be <50ms, was ${avgTime.toFixed(2)}ms`);
     });
   });
 
@@ -567,13 +572,17 @@ New content`;
       // Step 1: Search KB
       delete require.cache[require.resolve(KB_READER_PATH)];
       const kb = require(KB_READER_PATH);
+      kb.listAll(); // Warm the index; integration timing covers cached search overhead.
 
-      const searchStartTime = Date.now();
+      const searchStartTime = performance.now();
       const results = kb.search('testing');
-      const searchDuration = Date.now() - searchStartTime;
+      const searchDuration = performance.now() - searchStartTime;
 
       // Verify search worked
-      assert.ok(searchDuration < 150, `Search should be <150ms, was ${searchDuration}ms`);
+      assert.ok(
+        searchDuration < 50,
+        `Cached search should be <50ms, was ${searchDuration.toFixed(2)}ms`
+      );
       assert.ok(results.length > 0, 'Search should return results');
 
       // Step 2: Simulate cost tracking (in real scenario, would happen automatically)
@@ -597,7 +606,6 @@ New content`;
       assert.ok(logExists, 'Cost log should be created');
 
       // Step 3: Verify integration (search fast + cost tracked)
-      assert.ok(searchDuration < 150, 'KB search fast');
       assert.ok(logExists, 'Cost tracked');
     });
 
@@ -620,15 +628,16 @@ New content`;
   });
 
   describe('Performance Assertions', () => {
-    it('should search KB in <50ms', async () => {
+    it('should search cached KB in <50ms', async () => {
       delete require.cache[require.resolve(KB_READER_PATH)];
       const kb = require(KB_READER_PATH);
+      kb.listAll(); // Warm the index so this benchmark is not measuring filesystem I/O.
 
-      const start = Date.now();
+      const start = performance.now();
       kb.search('testing');
-      const duration = Date.now() - start;
+      const duration = performance.now() - start;
 
-      assert.ok(duration < 150, `Search took ${duration}ms, expected <150ms`);
+      assert.ok(duration < 50, `Search took ${duration.toFixed(2)}ms, expected <50ms`);
     });
 
     it('should track cost with low average overhead', async () => {

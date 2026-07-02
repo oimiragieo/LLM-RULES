@@ -223,7 +223,7 @@ describe('DaemonMemory', () => {
       const mem = new DaemonMemory(tmpDir, {});
       mem.addMessage('chat1', 'user', 'msg', 'omar');
       mem.saveNamedSession('chat1', 'test-session');
-      const list = mem.listNamedSessions();
+      const list = mem.listNamedSessions('chat1');
       assert.equal(list.length, 1);
       assert.equal(list[0].name, 'test-session');
       assert.ok(list[0].savedAt);
@@ -235,9 +235,19 @@ describe('DaemonMemory', () => {
       mem1.saveNamedSession('chat1', 'persist-test');
 
       const mem2 = new DaemonMemory(tmpDir, {});
-      const list = mem2.listNamedSessions();
+      const list = mem2.listNamedSessions('chat1');
       assert.equal(list.length, 1);
       assert.equal(list[0].name, 'persist-test');
+    });
+
+    it('does not list or load another chat named session with the same title', () => {
+      const mem = new DaemonMemory(tmpDir, {});
+      mem.addMessage('chat1', 'user', 'secret from chat1', 'omar');
+      mem.saveNamedSession('chat1', 'shared-title');
+
+      assert.deepEqual(mem.listNamedSessions('chat2'), []);
+      assert.equal(mem.loadNamedSession('chat2', 'shared-title'), false);
+      assert.equal(mem.getContext('chat2'), '');
     });
   });
 

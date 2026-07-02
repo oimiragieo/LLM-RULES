@@ -8,6 +8,14 @@
     "nightly-strict-gate",
     "creator-ecosystem-validation",
     "validate-commands",
-    "validate-skills"
+    "validate-skills",
+    "lint-and-format",
+    "validate-and-test",
+    "agent-skill-refs",
+    "agent-template-contract",
+    "hooks-docs",
+    "registry-health",
+    "release-governance",
+    "tests"
   ]
 }

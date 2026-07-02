@@ -32,6 +32,7 @@ let prettierLoadAttempted = false;
 const PROJECT_ROOT = process.cwd();
 const CONFIG_DIR = path.join(PROJECT_ROOT, '.claude', 'config');
 const MANIFEST_PATH = path.join(CONFIG_DIR, 'tool-manifest.json');
+const AGENT_CONFIG_PATH = path.join(CONFIG_DIR, 'agent-config.json');
 const SETTINGS_PATH = path.join(PROJECT_ROOT, '.claude', 'settings.json');
 const SKILL_INDEX_PATH = path.join(CONFIG_DIR, 'skill-index.json');
 const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
@@ -71,6 +72,45 @@ function checkMCPServers() {
   }
 
   return configuredServers;
+}
+
+function sameToolList(left, right) {
+  if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) {
+    return false;
+  }
+  return left.every((toolName, index) => toolName === right[index]);
+}
+
+function findMatchingToolset(toolNames) {
+  for (const [toolsetName, definition] of Object.entries(TOOLSET_DEFINITIONS)) {
+    if (sameToolList(toolNames, definition.tools)) {
+      return toolsetName;
+    }
+  }
+  return 'AGENT_CONFIG';
+}
+
+function loadAgentDefaultsFromConfig() {
+  if (!fs.existsSync(AGENT_CONFIG_PATH)) return null;
+
+  try {
+    const agentConfig = safeParseJSON(fs.readFileSync(AGENT_CONFIG_PATH, 'utf8'));
+    const agents = agentConfig.agents || {};
+    const defaults = {};
+
+    for (const [agentName, agent] of Object.entries(agents)) {
+      if (!Array.isArray(agent?.tools) || agent.tools.length === 0) continue;
+      defaults[agentName] = {
+        toolset: findMatchingToolset(agent.tools),
+        tools: [...agent.tools],
+        maxTools: agent.maxTools || agent.tools.length,
+      };
+    }
+
+    return Object.keys(defaults).length > 0 ? defaults : null;
+  } catch (error) {
+    throw new Error(`Failed to load agent-config.json for manifest defaults: ${error.message}`);
+  }
 }
 
 /**
@@ -126,15 +166,19 @@ function generateManifest(options = {}) {
     };
   });
 
-  // Build agent defaults with tools
-  const agentDefaults = {};
-  for (const [agent, config] of Object.entries(AGENT_DEFAULTS)) {
-    const toolset = TOOLSET_DEFINITIONS[config.toolset];
-    agentDefaults[agent] = {
-      toolset: config.toolset,
-      tools: toolset.tools,
-      maxTools: config.maxTools,
-    };
+  // Build agent defaults with tools. agent-config.json is the live routing
+  // contract; the static defaults remain a fallback for partial checkouts.
+  const configuredAgentDefaults = loadAgentDefaultsFromConfig();
+  const agentDefaults = configuredAgentDefaults || {};
+  if (!configuredAgentDefaults) {
+    for (const [agent, config] of Object.entries(AGENT_DEFAULTS)) {
+      const toolset = TOOLSET_DEFINITIONS[config.toolset];
+      agentDefaults[agent] = {
+        toolset: config.toolset,
+        tools: toolset.tools,
+        maxTools: config.maxTools,
+      };
+    }
   }
 
   // Count total agents from agent-registry.json
@@ -153,7 +197,7 @@ function generateManifest(options = {}) {
       totalMcpTools: MCP_TOOLS.length,
       totalAgents: totalAgents,
       lastValidated: new Date().toISOString(),
-      source: '.claude/CLAUDE.md sections 1.1-1.4',
+      source: '.claude/CLAUDE.md sections 1.1-1.4 + agent-config.json',
     },
     tools: {
       core: coreToolsArray,
@@ -280,8 +324,8 @@ function validateManifest(manifestPath) {
 
     // Check MCP tools count
     const mcpTools = manifest.tools?.mcp || [];
-    if (mcpTools.length !== 9) {
-      warnings.push(`Expected 9 MCP tools, found ${mcpTools.length}`);
+    if (mcpTools.length !== MCP_TOOLS.length) {
+      warnings.push(`Expected ${MCP_TOOLS.length} MCP tools, found ${mcpTools.length}`);
     }
 
     // Check mandatory tools have fallbacks

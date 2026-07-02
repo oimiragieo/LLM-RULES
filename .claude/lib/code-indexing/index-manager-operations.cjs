@@ -49,31 +49,35 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
   const chunkBuffer = [];
   const flushPromise = Promise.resolve();
 
-  // Worker setup moved outside loop
+  const embeddingActive = manager.vectorStore && manager.vectorStore.embeddingMode !== 'off';
   const workerPath = path.resolve(__dirname, 'parse-chunk-worker.cjs');
+  let effectiveConcurrency = concurrency;
   let pool = null;
   let parseInProcess = null;
 
-  // OOM FIX: When embeddings are active, always use Piscina worker pool
-  // (min concurrency 2). The in-process path leaks memory through LanceDB's
-  // Arrow IPC buffers because the event loop never yields for GC.
-  const embeddingActive = manager.vectorStore && manager.vectorStore.embeddingMode !== 'off';
-  const effectiveConcurrency = embeddingActive ? Math.max(concurrency, 2) : concurrency;
+  if (embeddingActive) {
+    // OOM FIX: When embeddings are active, always use Piscina worker pool
+    // (min concurrency 2). The in-process path leaks memory through LanceDB's
+    // Arrow IPC buffers because the event loop never yields for GC.
+    effectiveConcurrency = Math.max(concurrency, 2);
 
-  if (effectiveConcurrency <= 1) {
-    console.log('[INDEX] Using in-process parsing (no worker threads)');
-    parseInProcess = require(workerPath);
-  } else {
-    console.log(`[INDEX] Using Piscina worker pool (${effectiveConcurrency} threads)`);
-    pool = new Piscina({
-      filename: workerPath,
-      maxThreads: effectiveConcurrency,
-      minThreads: 1,
-      resourceLimits: {
-        maxOldGenerationSizeMb: manager.memoryConfig.maxOldGenerationSizeMb,
-        maxYoungGenerationSizeMb: manager.memoryConfig.maxYoungGenerationSizeMb,
-      },
-    });
+    if (effectiveConcurrency <= 1) {
+      console.log('[INDEX] Using in-process parsing (no worker threads)');
+      parseInProcess = require(workerPath);
+    } else {
+      console.log(`[INDEX] Using Piscina worker pool (${effectiveConcurrency} threads)`);
+      pool = new Piscina({
+        filename: workerPath,
+        maxThreads: effectiveConcurrency,
+        minThreads: 1,
+        resourceLimits: {
+          maxOldGenerationSizeMb: manager.memoryConfig.maxOldGenerationSizeMb,
+          maxYoungGenerationSizeMb: manager.memoryConfig.maxYoungGenerationSizeMb,
+        },
+      });
+    }
+  } else if (manager.options.verbose) {
+    console.log('[INDEX] Using BM25-only in-process indexing');
   }
 
   const flushBuffer = async () => {

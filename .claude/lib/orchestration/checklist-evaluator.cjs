@@ -19,7 +19,38 @@
  */
 
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
+
+const SHELL_META_PATTERN = /[&|;<>`$]/;
+
+function normalizeCommandSpec(commandSpec) {
+  if (Array.isArray(commandSpec)) {
+    const [command, ...args] = commandSpec;
+    if (!command || typeof command !== 'string') {
+      throw new Error('Command array must start with a command string');
+    }
+    return { command, args: args.map(String), display: [command, ...args].join(' ') };
+  }
+
+  if (commandSpec && typeof commandSpec === 'object') {
+    const command = String(commandSpec.command || '').trim();
+    if (!command) throw new Error('Command object requires command');
+    const args = Array.isArray(commandSpec.args) ? commandSpec.args.map(String) : [];
+    return { command, args, display: [command, ...args].join(' ') };
+  }
+
+  const legacy = String(commandSpec || '').trim();
+  if (!legacy) throw new Error('Command string is empty');
+  if (SHELL_META_PATTERN.test(legacy)) {
+    throw new Error('Command string contains shell metacharacters; use { command, args } instead');
+  }
+  if (/['"]/.test(legacy)) {
+    throw new Error('Command string contains quotes; use { command, args } instead');
+  }
+
+  const [command, ...args] = legacy.split(/\s+/);
+  return { command, args, display: legacy };
+}
 
 /**
  * @typedef {Object} ChecklistItem
@@ -72,14 +103,25 @@ function checkFileExists(id, filePath, severity) {
  * @returns {CheckResult}
  */
 function checkTestPasses(id, command, severity) {
+  let spec;
   try {
-    execSync(command, { stdio: 'pipe', timeout: 30000, shell: false, windowsHide: true });
+    spec = normalizeCommandSpec(command);
+    const result = spawnSync(spec.command, spec.args, {
+      stdio: 'pipe',
+      timeout: 30000,
+      shell: false,
+      windowsHide: true,
+    });
+    if (result.error) throw result.error;
+    if (result.status !== 0) {
+      throw new Error(`exit ${result.status}`);
+    }
     return { id, passed: true, severity };
   } catch (err) {
     return {
       id,
       passed: false,
-      message: `Command failed (exit ${err.status}): ${command}`,
+      message: `Command failed: ${spec?.display || String(command)} — ${err.message}`,
       severity,
     };
   }

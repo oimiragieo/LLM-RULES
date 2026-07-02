@@ -19,6 +19,9 @@ function getProjectRoot() {
 
 // Cache
 let cachedIndex = null;
+let cachedSearchRows = null;
+let cachedTagRows = null;
+let cachedByName = null;
 let cacheTimestamp = null;
 
 /**
@@ -58,6 +61,9 @@ function loadIndex() {
 
   const headers = lines[0].split(',');
   const artifacts = [];
+  const searchRows = [];
+  const tagRows = [];
+  const byName = new Map();
 
   for (let i = 1; i < lines.length; i++) {
     const values = parseCsvLine(lines[i]);
@@ -73,10 +79,26 @@ function loadIndex() {
     });
 
     artifacts.push(artifact);
+    searchRows.push({
+      artifact,
+      text: `${artifact.name || ''}\n${artifact.description || ''}\n${artifact.use_cases || ''}`.toLowerCase(),
+    });
+    tagRows.push({
+      artifact,
+      tags: String(artifact.use_cases || '')
+        .toLowerCase()
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean),
+    });
+    byName.set(artifact.name, artifact);
   }
 
   // Update cache
   cachedIndex = artifacts;
+  cachedSearchRows = searchRows;
+  cachedTagRows = tagRows;
+  cachedByName = byName;
   cacheTimestamp = fileTimestamp;
 
   return artifacts;
@@ -122,16 +144,10 @@ function parseCsvLine(line) {
  * @returns {Array<Object>} Matching artifacts
  */
 function search(keyword) {
-  const artifacts = loadIndex();
-  const lowerKeyword = keyword.toLowerCase();
+  loadIndex();
+  const lowerKeyword = String(keyword || '').toLowerCase();
 
-  return artifacts.filter(artifact => {
-    return (
-      artifact.name.toLowerCase().includes(lowerKeyword) ||
-      artifact.description.toLowerCase().includes(lowerKeyword) ||
-      artifact.use_cases.toLowerCase().includes(lowerKeyword)
-    );
-  });
+  return cachedSearchRows.filter(row => row.text.includes(lowerKeyword)).map(row => row.artifact);
 }
 
 /**
@@ -150,18 +166,12 @@ function filterByDomain(domain) {
  * @returns {Array<Object>} Artifacts matching all tags
  */
 function filterByTags(tags) {
-  const artifacts = loadIndex();
+  loadIndex();
   const lowerTags = tags.map(t => t.toLowerCase());
 
-  return artifacts.filter(artifact => {
-    const artifactTags = artifact.use_cases
-      .toLowerCase()
-      .split(',')
-      .map(t => t.trim());
-
-    // AND logic: all tags must be present
-    return lowerTags.every(tag => artifactTags.some(at => at.includes(tag)));
-  });
+  return cachedTagRows
+    .filter(row => lowerTags.every(tag => row.tags.some(artifactTag => artifactTag.includes(tag))))
+    .map(row => row.artifact);
 }
 
 /**
@@ -170,8 +180,8 @@ function filterByTags(tags) {
  * @returns {Object|null} Artifact object or null
  */
 function get(name) {
-  const artifacts = loadIndex();
-  return artifacts.find(artifact => artifact.name === name) || null;
+  loadIndex();
+  return cachedByName.get(name) || null;
 }
 
 /**
@@ -218,6 +228,9 @@ function stats() {
  */
 function clearCache() {
   cachedIndex = null;
+  cachedSearchRows = null;
+  cachedTagRows = null;
+  cachedByName = null;
   cacheTimestamp = null;
 }
 

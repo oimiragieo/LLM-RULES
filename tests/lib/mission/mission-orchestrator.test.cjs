@@ -138,7 +138,17 @@ describe('getMilestones', () => {
 
 describe('createMissionOrchestrator', () => {
   it('throws on missing mission directory', () => {
-    assert.throws(() => createMissionOrchestrator('/nonexistent'), /does not exist/);
+    assert.throws(
+      () => createMissionOrchestrator(path.join(tmpDir, 'missing-mission')),
+      /does not exist/
+    );
+  });
+
+  it('throws when mission path is not a directory', () => {
+    const missionPath = path.join(tmpDir, 'mission-file');
+    fs.writeFileSync(missionPath, 'not a mission directory', 'utf8');
+
+    assert.throws(() => createMissionOrchestrator(missionPath), /does not exist/);
   });
 
   it('initialize() transitions pending → running', () => {
