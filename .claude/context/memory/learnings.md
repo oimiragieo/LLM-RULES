@@ -1,4 +1,5 @@
 > ⚠️ Content archived to archive/learnings-2026-05-01.md on 2026-05-01
+
 - Created new agent: qa-guardian (2026-05-01)
 - Created new agent: contract-check (2026-05-01)
 - Created new agent: bool-action (2026-05-01)
