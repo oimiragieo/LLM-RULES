@@ -38,3 +38,11 @@ test('workflow trigger parity for creator ecosystem enforcement', () => {
     }
   }
 });
+
+test('ci-flake-ops stays manual and scheduled only', () => {
+  const workflow = readWorkflow('ci-flake-ops.yml');
+  assert.match(workflow, /schedule:/);
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.doesNotMatch(workflow, /pull_request:/);
+  assert.doesNotMatch(workflow, /push:/);
+});

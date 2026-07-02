@@ -1,0 +1,197 @@
+name: CI Flake Ops
+
+on:
+  schedule:
+    - cron: '30 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+jobs:
+  ci-flake-ops:
+    name: CI Flake Ops
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Enumerate recent CI artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const { owner, repo } = context.repo;
+            const workflowNames = new Set(['CI', 'Full Validation', 'Global Quality Gates', 'Observability CI']);
+            const cutoff = Date.now() - (14 * 24 * 60 * 60 * 1000);
+            const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+              owner,
+              repo,
+              per_page: 100,
+              status: 'completed',
+            });
+
+            const recentRuns = runs
+              .filter(run => workflowNames.has(run.name) && Date.parse(run.created_at) >= cutoff)
+              .slice(0, 50);
+
+            const artifacts = [];
+            for (const run of recentRuns) {
+              const runArtifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+                owner,
+                repo,
+                run_id: run.id,
+                per_page: 100,
+              });
+
+              for (const artifact of runArtifacts) {
+                if (artifact.expired) continue;
+                if (
+                  !artifact.name.startsWith('failure-evidence-') &&
+                  !artifact.name.startsWith('ci-advisory-')
+                ) {
+                  continue;
+                }
+
+                artifacts.push({
+                  id: artifact.id,
+                  name: artifact.name,
+                  workflowName: run.name,
+                  head_sha: run.head_sha,
+                  ref_name: run.head_branch,
+                  created_at: artifact.created_at,
+                  archive_download_url: artifact.archive_download_url,
+                  runId: run.id,
+                });
+              }
+            }
+
+            const outputPath = path.join(process.cwd(), '.claude', 'context', 'ci', 'recent-artifacts.json');
+            fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+            fs.writeFileSync(outputPath, JSON.stringify(artifacts, null, 2));
+            core.setOutput('artifact-count', String(artifacts.length));
+
+      - name: Build CI artifact index
+        run: pnpm ci:artifact:index --json --input .claude/context/ci/recent-artifacts.json > .claude/context/ci/recent-artifact-index.json
+
+      - name: Build local flake report
+        run: pnpm flake:report --json > .claude/context/ci/flake-report.json
+
+      - name: Build flake summary
+        id: build-flake-summary
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const artifactIndex = JSON.parse(
+            fs.readFileSync(path.join(process.cwd(), '.claude', 'context', 'ci', 'recent-artifact-index.json'), 'utf8')
+          ).index;
+          const flakeReport = JSON.parse(
+            fs.readFileSync(path.join(process.cwd(), '.claude', 'context', 'ci', 'flake-report.json'), 'utf8')
+          ).summary;
+
+          const byCategory = {};
+          for (const artifact of artifactIndex.artifacts) {
+            const key = artifact.kind || 'generic';
+            byCategory[key] = (byCategory[key] || 0) + 1;
+          }
+
+          const failureEvidenceCount = byCategory.failure_evidence || 0;
+          const payload = {
+            observationWindow: '14d',
+            totalArtifacts: artifactIndex.artifacts.length,
+            totalOccurrences:
+              flakeReport.totalOccurrences > 0 ? flakeReport.totalOccurrences : failureEvidenceCount,
+            actionable: failureEvidenceCount > 0,
+            byCategory,
+          };
+
+          const summaryPath = path.join(process.cwd(), '.claude', 'context', 'ci', 'flake-ops-summary.json');
+          fs.writeFileSync(summaryPath, JSON.stringify(payload, null, 2));
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `actionable=${payload.actionable}\n`);
+          NODE
+
+      - name: Write flake ops summary
+        run: pnpm ci:summary:write --kind flake-ops --input .claude/context/ci/flake-ops-summary.json
+
+      - name: Upload flake ops artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-flake-ops-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          path: |
+            .claude/context/ci/recent-artifacts.json
+            .claude/context/ci/recent-artifact-index.json
+            .claude/context/ci/flake-report.json
+            .claude/context/ci/flake-ops-summary.json
+
+      - name: Open or update flake ops issue
+        if: steps.build-flake-summary.outputs.actionable == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const { owner, repo } = context.repo;
+            const summaryPath = path.join(process.cwd(), '.claude', 'context', 'ci', 'flake-ops-summary.json');
+            const payload = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+            const title = 'CI Flake Ops Report';
+            const body = [
+              'Automated flake report detected actionable CI evidence.',
+              '',
+              `- Observation window: ${payload.observationWindow}`,
+              `- Total artifacts: ${payload.totalArtifacts}`,
+              `- Total occurrences: ${payload.totalOccurrences}`,
+              '',
+              'Category counts:',
+              ...Object.entries(payload.byCategory || {}).map(([name, count]) => `- ${name}: ${count}`),
+            ].join('\n');
+
+            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              labels: 'ci-flake-ops',
+              per_page: 100,
+            });
+            const existing = openIssues.find(issue => issue.title === title);
+
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body,
+              });
+              return;
+            }
+
+            await github.rest.issues.create({
+              owner,
+              repo,
+              title,
+              body,
+              labels: ['ci-flake-ops'],
+            });

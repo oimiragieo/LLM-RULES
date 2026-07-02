@@ -184,6 +184,12 @@ Full guide: `docs/migration/v2-to-v3.md`
 - **Timing-sensitive suites de-flaked**: Phase 1A cost tracking and minimal profiler tests now use warmup/margin-aware thresholds instead of brittle 10 ms boundaries
 - **Full suite re-verified**: `pnpm test` completed cleanly at 3,063 top-level tests with 12,528 passing assertions and 0 failures
 
+### Phase 12 — Remote CI Evidence and Release Ops
+
+- **Advisory CI evidence persisted**: `CI` now uploads impacted-validation and release-gate advisory artifacts so selective validation decisions are inspectable after the run
+- **Authoritative PR release governance added**: `Full Validation` now runs a PR-only `Release Governance` job that diffs governed agent/skill/schema artifacts from the PR base SHA to the PR head SHA, preserves deletions and renames, uploads durable release evidence, reads release intent from the PR title/body, and blocks semver-major changes that do not carry both breaking-change signaling and a migration guide
+- **Scheduled flake ops added**: `CI Flake Ops` aggregates recent advisory/failure artifacts on a schedule, writes a maintainer-facing summary, and opens or updates a tracking issue when recurring failures become actionable
+
 ### Prompt Cache Optimization (Zylos-inspired)
 
 - **Envelope fingerprint**: Stable hash across spawns of same agent type (excludes per-spawn basePrompt). Enables cache hits for tools/skills/safety prefix.
@@ -491,7 +497,7 @@ Use this path if you are proposing changes to the ecosystem itself.
 pnpm run setup
 ```
 
-2. Run baseline validation:
+1. Run baseline validation:
 
 ```bash
 pnpm validate
@@ -501,7 +507,7 @@ pnpm validate:commands
 pnpm validate:routing
 ```
 
-3. Run tests relevant to your change:
+1. Run tests relevant to your change:
 
 ```bash
 pnpm test
@@ -510,14 +516,14 @@ pnpm test:tools
 pnpm test:code-indexing
 ```
 
-4. Enforce style before shipping:
+1. Enforce style before shipping:
 
 ```bash
 pnpm lint
 pnpm format:check
 ```
 
-5. Mission CLI (Factory Droid-aligned orchestration):
+1. Mission CLI (Factory Droid-aligned orchestration):
 
 ```bash
 pnpm mission:init                      # scaffold new mission bundle
@@ -546,7 +552,7 @@ pnpm manifest:generate
 pnpm routing:prototypes
 ```
 
-3. Memory lineage and Skill Marketplace (v3.2.0):
+1. Memory lineage and Skill Marketplace (v3.2.0):
 
 ```bash
 pnpm mmp:lineage <record-id>      # walk ancestry chain for a CAT7 memory record
@@ -554,7 +560,7 @@ pnpm mmp:descendants <record-id>  # list all downstream records
 pnpm skill:install <package>      # install a verified skill package from the marketplace
 ```
 
-2. Track memory and operational health:
+1. Track memory and operational health:
 
 ```bash
 pnpm memory:status
@@ -562,14 +568,14 @@ pnpm memory:health
 pnpm worker:summary
 ```
 
-3. Run integration checks before larger pipeline runs:
+1. Run integration checks before larger pipeline runs:
 
 ```bash
 pnpm integration:headless:json
 pnpm validate:full
 ```
 
-4. Reset context safely when sessions get noisy:
+1. Reset context safely when sessions get noisy:
 
 ```bash
 pnpm context:reset --scope soft --force

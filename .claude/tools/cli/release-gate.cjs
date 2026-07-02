@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const fs = require('fs');
+
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 const { evaluateReleaseGate } = require('../../lib/ci/release-gate.cjs');
 
@@ -12,6 +14,7 @@ function parseArgs(argv) {
   let newPath = null;
   let artifactType = 'agent';
   let commitMessage = '';
+  let commitMessageFile = null;
   let migrationGuidePath = null;
 
   for (let i = 0; i < args.length; i++) {
@@ -36,6 +39,10 @@ function parseArgs(argv) {
       commitMessage = args[++i];
       continue;
     }
+    if (current === '--commit-message-file' && args[i + 1]) {
+      commitMessageFile = args[++i];
+      continue;
+    }
     if (current === '--migration-guide' && args[i + 1]) {
       migrationGuidePath = args[++i];
       continue;
@@ -51,14 +58,31 @@ function parseArgs(argv) {
     newPath,
     artifactType,
     commitMessage,
+    commitMessageFile,
     migrationGuidePath,
     changedFiles,
   };
 }
 
+function resolveCommitMessage(opts) {
+  if (typeof opts.commitMessage === 'string' && opts.commitMessage.trim() !== '') {
+    return opts.commitMessage;
+  }
+
+  if (typeof opts.commitMessageFile === 'string' && opts.commitMessageFile.trim() !== '') {
+    return fs.readFileSync(opts.commitMessageFile, 'utf8');
+  }
+
+  return '';
+}
+
 function main() {
   const opts = parseArgs(process.argv);
-  const result = evaluateReleaseGate(opts);
+  const commitMessage = resolveCommitMessage(opts);
+  const result = evaluateReleaseGate({
+    ...opts,
+    commitMessage,
+  });
 
   if (opts.json) {
     console.log(JSON.stringify({ result }, null, 2));
@@ -87,5 +111,6 @@ if (require.main === module) {
 
 module.exports = {
   parseArgs,
+  resolveCommitMessage,
   main,
 };
