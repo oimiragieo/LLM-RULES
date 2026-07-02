@@ -2,7 +2,12 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { TaskExecutor } = require('../../../scripts/channels/daemon/executor.cjs');
+const {
+  TaskExecutor,
+  buildVerifySpawnSpec,
+  normalizeVerifyCommand,
+  runVerifyCommand,
+} = require('../../../scripts/channels/daemon/executor.cjs');
 
 describe('TaskExecutor', () => {
   it('module loads without error', () => {
@@ -13,6 +18,61 @@ describe('TaskExecutor', () => {
     const exec = new TaskExecutor({ model: 'sonnet', projectRoot: '/tmp' });
     assert.equal(exec.model, 'sonnet');
     assert.equal(exec.projectRoot, '/tmp');
+  });
+
+  describe('verify command hardening', () => {
+    it('normalizes legacy simple command strings without a shell', () => {
+      assert.deepEqual(normalizeVerifyCommand('node --test "tests/foo bar.test.cjs"'), {
+        command: 'node',
+        args: ['--test', 'tests/foo bar.test.cjs'],
+      });
+    });
+
+    it('accepts argv and object verify command forms', () => {
+      assert.deepEqual(normalizeVerifyCommand(['pnpm', 'test']), {
+        command: 'pnpm',
+        args: ['test'],
+      });
+      assert.deepEqual(normalizeVerifyCommand({ command: 'node', args: ['--test'] }), {
+        command: 'node',
+        args: ['--test'],
+      });
+    });
+
+    it('rejects shell metacharacters in legacy string commands', () => {
+      assert.throws(
+        () => normalizeVerifyCommand('pnpm test && echo owned'),
+        /shell metacharacters/
+      );
+    });
+
+    it('uses cmd.exe argument mode for Windows command shims without shell:true', () => {
+      const spec = buildVerifySpawnSpec('pnpm.cmd', ['test'], 'win32', { COMSPEC: 'cmd.exe' });
+
+      assert.equal(spec.command, 'cmd.exe');
+      assert.deepEqual(spec.args.slice(0, 3), ['/d', '/s', '/c']);
+      assert.match(spec.args[3], /"pnpm\.cmd"/);
+      assert.match(spec.args[3], /"test"/);
+    });
+
+    it('runs verification via spawnSync with shell:false and strips Anthropic auth', () => {
+      let captured = null;
+      const output = runVerifyCommand(['node', '--test'], {
+        cwd: '/repo',
+        env: { PATH: '/bin', ANTHROPIC_API_KEY: 'secret' },
+        platform: 'linux',
+        spawnSync: (command, args, options) => {
+          captured = { command, args, options };
+          return { status: 0, stdout: 'PASS\n', stderr: '' };
+        },
+      });
+
+      assert.equal(output, 'PASS');
+      assert.equal(captured.command, 'node');
+      assert.deepEqual(captured.args, ['--test']);
+      assert.equal(captured.options.shell, false);
+      assert.equal(captured.options.env.ANTHROPIC_API_KEY, undefined);
+    });
   });
 
   describe('executeRalphLoop', () => {

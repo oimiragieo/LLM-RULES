@@ -113,6 +113,21 @@ function updateAgentHealth(agentId, outcome, options = {}) {
   atomicWriteJSONSync(filePath, health);
 }
 
+function buildPhaseGateRecord(gateResult, evaluatedAt = new Date()) {
+  return {
+    passed: gateResult.passed,
+    blocking: Array.isArray(gateResult.blocking) ? gateResult.blocking : [],
+    warnings: Array.isArray(gateResult.warnings) ? gateResult.warnings : [],
+    evaluatedAt: evaluatedAt.toISOString(),
+  };
+}
+
+function applyGateResultToPhase(phaseData, gateResult, evaluatedAt = new Date()) {
+  phaseData.gate = buildPhaseGateRecord(gateResult, evaluatedAt);
+  phaseData.status = gateResult.passed ? 'completed' : 'blocked';
+  return phaseData.gate;
+}
+
 function appendAgentGapsToSessionLog(gaps, taskId) {
   const gapLogPath =
     process.env.GAP_LOG_PATH_OVERRIDE ||
@@ -337,27 +352,7 @@ async function processTaskCompletion(hookData) {
       }
 
       const gateResult = evaluateGate(currentPhase, workflowState);
-      if (
-        currentPhase === 'PHASE_1_DESIGN' &&
-        gateResult.passed === false &&
-        Array.isArray(gateResult.blocking) &&
-        gateResult.blocking.length === 1 &&
-        gateResult.blocking[0] === 'Implementation plan artifact path not specified'
-      ) {
-        gateResult.passed = true;
-        gateResult.blocking = [];
-        gateResult.warnings = [
-          ...(Array.isArray(gateResult.warnings) ? gateResult.warnings : []),
-          'Implementation plan artifact path not specified',
-        ];
-      }
-      phaseData.gate = {
-        passed: gateResult.passed,
-        blocking: gateResult.blocking,
-        warnings: gateResult.warnings,
-        evaluatedAt: new Date().toISOString(),
-      };
-      phaseData.status = 'completed';
+      applyGateResultToPhase(phaseData, gateResult);
 
       atomicWriteJSONSync(workflowStateFile, workflowState);
 
@@ -428,6 +423,8 @@ module.exports = {
   readAgentHealth,
   updateAgentHealth,
   getAgentHealthPath,
+  buildPhaseGateRecord,
+  applyGateResultToPhase,
   triggerMemoryExtraction,
   MEMORY_EXTRACTION_TIMEOUT_MS,
   MEMORY_CONFIDENCE_THRESHOLD,

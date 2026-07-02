@@ -134,17 +134,21 @@ describe('mcp-agent-allowlist-guard hook', { concurrency: 1 }, () => {
     assert.equal(stderr.trim(), '', 'allowed tool must produce no stderr');
   });
 
-  // Case 5: malformed hook input → exit 0 (fail-open)
-  test('malformed hook input exits 0 fail-open', async () => {
+  // Case 5: malformed hook input in block mode → exit 2 (fail-closed)
+  test('malformed hook input exits 2 in block mode', async () => {
     return new Promise(resolve => {
       const child = spawn(process.execPath, [HOOK_SCRIPT], {
         stdio: ['pipe', 'pipe', 'pipe'],
         env: { ...process.env, MCP_AGENT_ALLOWLIST_ENFORCEMENT: 'block' },
       });
+      let stdout = '';
+      child.stdout.on('data', d => (stdout += d));
       child.stdin.write('not valid json at all{{{');
       child.stdin.end();
       child.on('close', exitCode => {
-        assert.equal(exitCode, 0, 'malformed input must fail open (exit 0)');
+        assert.equal(exitCode, 2, 'malformed input must fail closed in block mode');
+        const parsed = JSON.parse(stdout.trim());
+        assert.equal(parsed.permissionDecision, 'deny');
         resolve();
       });
     });

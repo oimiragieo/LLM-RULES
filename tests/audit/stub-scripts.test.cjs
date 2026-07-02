@@ -48,6 +48,26 @@ function readFile(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
 
+function listFiles(root, predicate, result = []) {
+  if (!fs.existsSync(root)) return result;
+
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    const fullPath = path.join(root, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === '_archive' || entry.name === 'archive' || entry.name === 'node_modules') {
+        continue;
+      }
+      listFiles(fullPath, predicate, result);
+      continue;
+    }
+    if (!predicate || predicate(fullPath)) {
+      result.push(fullPath);
+    }
+  }
+
+  return result;
+}
+
 /**
  * Run `node --check <file>` and return true if syntax is valid.
  */
@@ -329,5 +349,26 @@ describe('stub-scripts: broad scan for remaining stubs', () => {
         `${name} (${path.relative(PROJECT_ROOT, filePath)}) still contains "Not implemented"`
       );
     }
+  });
+
+  it('active skill hooks and scaffolders do not contain generated placeholder TODOs', () => {
+    const markers = [
+      'TODO: Add your validation logic here',
+      'TODO: Add your post-processing logic here',
+    ];
+    const files = [
+      ...listFiles(SKILLS_DIR, filePath => filePath.endsWith('.cjs')),
+      path.join(PROJECT_ROOT, '.claude', 'lib', 'creators', 'enterprise-bundle-scaffolder.cjs'),
+    ].filter(filePath => fs.existsSync(filePath));
+
+    const offenders = files
+      .filter(filePath => markers.some(marker => readFile(filePath).includes(marker)))
+      .map(filePath => path.relative(PROJECT_ROOT, filePath));
+
+    assert.deepStrictEqual(
+      offenders,
+      [],
+      `Generated hook placeholder TODOs must be removed:\n${offenders.join('\n')}`
+    );
   });
 });

@@ -16,7 +16,50 @@
  */
 
 const { spawnSync } = require('child_process');
+const path = require('path');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
+const WINDOWS_CMD_EXTENSIONS = new Set(['', '.cmd', '.bat']);
+const SECRET_ENV_KEYS = [
+  'ANTHROPIC_API_KEY',
+  'TELEGRAM_ALLOWED_USERS',
+  'TELEGRAM_BOT_TOKEN',
+  'TELEGRAM_OWNER_CHAT_ID',
+  'TELEGRAM_OWNER_ID',
+];
+
+function quoteWindowsCmdArg(value) {
+  const arg = String(value);
+  if (!/^[a-zA-Z0-9._:=/\\\- ]+$/.test(arg)) {
+    throw new Error(`Unsafe Claude CLI argument for cmd.exe dispatch: ${arg}`);
+  }
+  return `"${arg}"`;
+}
+
+function buildClaudeSpawnSpec(bin, spawnArgs, platform = process.platform) {
+  if (platform !== 'win32') {
+    return { command: bin, args: spawnArgs };
+  }
+
+  const extension = path.extname(bin).toLowerCase();
+  if (!WINDOWS_CMD_EXTENSIONS.has(extension)) {
+    return { command: bin, args: spawnArgs };
+  }
+
+  const commandLine = [bin, ...spawnArgs].map(quoteWindowsCmdArg).join(' ');
+  return {
+    command: process.env.ComSpec || process.env.COMSPEC || 'cmd.exe',
+    args: ['/d', '/s', '/c', commandLine],
+  };
+}
+
+function buildClaudeEnv(sourceEnv = process.env) {
+  const env = { ...sourceEnv, CLAUDECODE: '' };
+  for (const key of SECRET_ENV_KEYS) {
+    delete env[key];
+  }
+  return env;
+}
 
 /**
  * Resolve the claude CLI binary path once at startup.
@@ -39,7 +82,7 @@ function resolveClaude(env) {
 }
 
 /**
- * Invoke Claude headlessly via `claude -p <prompt>`.
+ * Invoke Claude headlessly via stdin (`claude ... -p`).
  *
  * On Windows, claude is an npm `.cmd` script that must be run via cmd.exe
  * with shell:false (prevents shell injection — security rule).
@@ -53,16 +96,14 @@ function resolveClaude(env) {
  */
 function invokeClaude(bin, prompt, timeoutMs) {
   const timeout = timeoutMs || 90000;
-  const isWin = process.platform === 'win32';
-  const exe = isWin ? 'cmd.exe' : bin;
-  const args = isWin
-    ? ['/c', bin, '-p', prompt, '--output-format', 'text']
-    : ['-p', prompt, '--output-format', 'text'];
-  const result = spawnSync(exe, args, {
+  const spawnSpec = buildClaudeSpawnSpec(bin, ['--output-format', 'text', '-p']);
+  const result = spawnSync(spawnSpec.command, spawnSpec.args, {
     encoding: 'utf8',
     timeout,
     shell: false,
-    env: Object.assign({}, process.env, { CLAUDECODE: '' }),
+    env: buildClaudeEnv(),
+    input: prompt,
+    stdio: ['pipe', 'pipe', 'pipe'],
   });
   if (result.error) throw result.error;
   if (result.status !== 0) {
@@ -97,16 +138,12 @@ function invokeClaude(bin, prompt, timeoutMs) {
  */
 function invokeClaudeAsync(bin, prompt, chatId, outboxPath, opts) {
   const fs = require('fs');
-  const isWin = process.platform === 'win32';
-  const exe = isWin ? 'cmd.exe' : bin;
-  const args = isWin
-    ? ['/c', bin, '-p', prompt, '--output-format', 'text']
-    : ['-p', prompt, '--output-format', 'text'];
+  const spawnSpec = buildClaudeSpawnSpec(bin, ['--output-format', 'text', '-p']);
 
-  const child = require('child_process').spawn(exe, args, {
+  const child = require('child_process').spawn(spawnSpec.command, spawnSpec.args, {
     shell: false,
-    env: Object.assign({}, process.env, { CLAUDECODE: '' }),
-    stdio: ['ignore', 'pipe', 'pipe'],
+    env: buildClaudeEnv(),
+    stdio: ['pipe', 'pipe', 'pipe'],
     detached: false,
   });
 
@@ -132,6 +169,14 @@ function invokeClaudeAsync(bin, prompt, chatId, outboxPath, opts) {
   child.stderr.on('data', d => {
     stderr += d;
   });
+
+  if (child.stdin) {
+    child.stdin.on('error', err => {
+      stderr += `\nstdin error: ${err.message}`;
+      child.kill('SIGTERM');
+    });
+    child.stdin.end(prompt);
+  }
 
   // Kill after 120s to prevent zombie processes
   const timer = setTimeout(() => {
@@ -262,4 +307,12 @@ async function handleAsk(ctx, chatId, text) {
   auditLog({ type: 'ask_queued', chatId, promptLength: text.length, editMessageId });
 }
 
-module.exports = { resolveClaude, invokeClaude, invokeClaudeAsync, sendTyping, handleAsk };
+module.exports = {
+  buildClaudeEnv,
+  buildClaudeSpawnSpec,
+  resolveClaude,
+  invokeClaude,
+  invokeClaudeAsync,
+  sendTyping,
+  handleAsk,
+};

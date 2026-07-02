@@ -215,41 +215,20 @@ Task({
 
 **Config:** Define presets in `.claude/config/presets.json` (see `.claude/schemas/presets.schema.json`). Each preset can set `agentId`, `enabledSkills`, and optional `ruleSnippetPath`. Presets are optional; omit `preset_id` / `presetId` to use default routing and skill selection.
 
-## Worker Runtime (Optional)
+## Maintenance Tasks
 
-Agent Studio can run an **optional headless worker** for periodic maintenance tasks (opt-in only).
-
-**Enable:**
+This checkout does not ship `agent:worker` or `agent:production` package scripts. For
+headless or rarely closed sessions, schedule the supported maintenance commands
+directly:
 
 ```bash
-WORKER_ENABLED=1 pnpm run agent:worker
+pnpm run memory:weekly
+pnpm run code:index:reindex
+node .claude/hooks/reflection/reflection-queue-processor.cjs
 ```
 
-**What it runs (per tick):**
-
-- Memory maintenance (`memory-scheduler.cjs`, daily or weekly when overdue)
-- Code index incremental update (if an index exists)
-- Reflection queue processing (`reflection-queue-processor.cjs`)
-
-**Heartbeat file:**
-
-`.claude/context/runtime/worker-heartbeat.json` (includes `lastTick`, `status`, and per-task results)
-
-**Quick summary:**
-
-`pnpm worker:summary` (reads `.claude/context/metrics/worker.jsonl`)
-
-**Key env vars:**
-
-- `WORKER_ENABLED=1` (required)
-- `WORKER_INTERVAL_MS=60000` (default 60s)
-- `WORKER_TASKS=maintenance,index,reflection`
-- `WORKER_ONCE=1` (one tick then exit)
-- `WORKER_PROJECT_ROOT=...` (override project root)
-- `WORKER_METRICS=off` (disable JSONL writes to `worker.jsonl`, default: on)
-- `WORKER_EVENTS=off` (disable per-tick event bus emission, default: on)
-- `WORKER_METRICS_MAX_LINES=1000` (cap `worker.jsonl` to last N lines)
-- `WORKER_BACKOFF_BASE_MS=30000` / `WORKER_BACKOFF_MAX_MS=300000` (failure backoff tuning)
+`pnpm run worker:summary` only reads `.claude/context/metrics/worker.jsonl` if an
+external or future worker writes that file; it does not start a worker.
 
 For details, see the Memory System documentation.
 
@@ -351,7 +330,8 @@ Agent Studio:
 
 ## Scripts and entry points
 
-- **agent:production** is a stub; **agent:worker** is a placeholder that does not run the hook framework (hooks are host-driven today).
+- **agent:production** and **agent:worker** are intentionally not package scripts. Hooks
+  are host-driven today; use the maintenance commands above for scheduled upkeep.
 - Memory scripts: `memory:init`, `memory:embeddings`, `memory:health`, `memory:weekly`, `memory:dashboard` (health), `memory:dashboard:budget` (token/budget) — see [MEMORY_SYSTEM.md](./MEMORY_SYSTEM.md). Set `MEMORY_EMBED_ON_EDIT=on` in `.env` for automatic embedding updates on memory file edits.
 - For headless or rarely-closed sessions, enable `REFLECTION_QUEUE_PROCESS_ON_PROMPT` and schedule `memory:weekly` (or use the worker).
 

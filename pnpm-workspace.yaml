@@ -2,8 +2,8 @@
 packages:
   - '.'
 
-# NOTE: As of pnpm v10+, the `pnpm` field in package.json is IGNORED.
-# All overrides / onlyBuiltDependencies / patchedDependencies MUST live here.
+# NOTE: As of pnpm v11, the `pnpm` field in package.json is IGNORED.
+# All overrides, patchedDependencies, and allowBuilds settings MUST live here.
 # See https://pnpm.io/settings
 
 # Security overrides — pin transitive deps to patched versions.
@@ -34,22 +34,6 @@ overrides:
   linkify-it: '>=5.0.1'
   js-yaml: '^4.2.0'
 
-onlyBuiltDependencies:
-  - '@ast-grep/cli'
-  - '@vscode/ripgrep'
-  - better-sqlite3
-  - esbuild
-  - onnxruntime-node
-  - protobufjs
-  - sharp
-  - tree-sitter
-  - tree-sitter-go
-  - tree-sitter-javascript
-  - tree-sitter-python
-  - tree-sitter-rust
-  - tree-sitter-typescript
-  - unrs-resolver
-
 patchedDependencies:
   tree-sitter@0.25.0: patches/tree-sitter@0.25.0.patch
 
@@ -67,3 +51,15 @@ allowBuilds:
   tree-sitter-rust: true
   tree-sitter-typescript: true
   unrs-resolver: true
+
+minimumReleaseAgeExclude:
+  - '@anthropic-ai/claude-agent-sdk-darwin-arm64@0.3.198'
+  - '@anthropic-ai/claude-agent-sdk-darwin-x64@0.3.198'
+  - '@anthropic-ai/claude-agent-sdk-linux-arm64-musl@0.3.198'
+  - '@anthropic-ai/claude-agent-sdk-linux-arm64@0.3.198'
+  - '@anthropic-ai/claude-agent-sdk-linux-x64-musl@0.3.198'
+  - '@anthropic-ai/claude-agent-sdk-linux-x64@0.3.198'
+  - '@anthropic-ai/claude-agent-sdk-win32-arm64@0.3.198'
+  - '@anthropic-ai/claude-agent-sdk-win32-x64@0.3.198'
+  - '@anthropic-ai/claude-agent-sdk@0.3.198'
+  - '@anthropic-ai/sdk@0.109.1'

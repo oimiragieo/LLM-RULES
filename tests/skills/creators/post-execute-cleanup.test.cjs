@@ -18,7 +18,7 @@
 
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -34,20 +34,18 @@ const path = require('path');
  */
 function runHookWithInput(hookPath, input, cwd) {
   const jsonInput = JSON.stringify(input);
-  // Pass JSON via environment variable to avoid shell quoting issues
-  const result = { stdout: '', stderr: '' };
-  try {
-    result.stdout = execSync(`node "${hookPath}" "${jsonInput.replace(/"/g, '\\"')}"`, {
-      cwd,
-      stdio: 'pipe',
-      encoding: 'utf8',
-      env: { ...process.env, HOOK_INPUT_JSON: jsonInput },
-    });
-  } catch (err) {
-    result.stdout = err.stdout || '';
-    result.stderr = err.stderr || '';
-  }
-  return result;
+  const result = spawnSync(process.execPath, [hookPath, jsonInput], {
+    cwd,
+    stdio: 'pipe',
+    encoding: 'utf8',
+    env: { ...process.env, HOOK_INPUT_JSON: jsonInput },
+    shell: false,
+    windowsHide: true,
+  });
+  return {
+    stdout: result.stdout || '',
+    stderr: result.stderr || '',
+  };
 }
 
 const { PROJECT_ROOT } = require('../../../.claude/lib/utils/project-root.cjs');
@@ -236,8 +234,11 @@ describe('CRIT-002: Post-execute hooks have clearCreatorActive logic', () => {
       assert.ok(hasCreatorName, `${hookPath} should reference creator name`);
 
       // Should NOT be a stub (should have actual cleanup logic)
+      const hasGeneratedNoOp = content.includes(
+        'No skill-specific post-processing is configured for this generated hook.'
+      );
       const isStub =
-        content.includes('TODO: Add your post-processing logic here') &&
+        hasGeneratedNoOp &&
         !content.includes('clearCreatorActive') &&
         !content.includes('active = false');
       assert.strictEqual(

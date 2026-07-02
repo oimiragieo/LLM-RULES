@@ -287,8 +287,14 @@ The memory system is designed to stay bounded:
 ### When does weekly maintenance run?
 
 - Weekly maintenance (including `archiveOldLTM`) runs when **SessionEnd** fires (via `unified-reflection-handler.cjs` → `triggerMaintenance()` → `memory-scheduler.cjs` `runWeeklyMaintenance()`) or when **UserPromptSubmit** detects it is overdue: `user-prompt-unified.cjs` reads `.claude/context/memory/maintenance-status.json`; if `lastWeekly` is missing or older than 7 days, it invokes weekly maintenance in a child process. Timeout is configurable via `MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS` (default 60000 ms; for large repos or many LTM files, consider 120000 or higher). On timeout or non-zero exit, the hook logs a one-line warning so operators know maintenance may have been partial. Manual fallback: `pnpm run memory:weekly` (or `memory:daily`). To check last run: `pnpm run memory:status`. LTM cold archival is performed by `cold-storage.cjs` inside `runArchiveOldLTM` in the scheduler.
-- **Headless or rarely-used environments:** There is no cron or daemon. Maintenance runs only on SessionEnd or when a user prompt occurs and weekly is overdue. If SessionEnd rarely or never fires, set `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on` and run `pnpm run memory:weekly` (or `memory:daily`) on a schedule (e.g. cron) or use the worker so LTM retention and cold archival run.
-- **Optional worker runtime:** You can run the headless worker (`pnpm run agent:worker`) to execute memory maintenance, code-index incremental updates, and reflection queue processing on an interval. See GETTING_STARTED.md for how to enable it and the heartbeat file location.
+- **Headless or rarely-used environments:** There is no packaged cron or worker daemon.
+  Maintenance runs only on SessionEnd or when a user prompt occurs and weekly is overdue.
+  If SessionEnd rarely or never fires, set `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on` and
+  schedule `pnpm run memory:weekly` (or `memory:daily`) plus
+  `node .claude/hooks/reflection/reflection-queue-processor.cjs` externally.
+- **Worker metrics:** `pnpm run worker:summary` reads existing worker metrics if an
+  external worker writes `.claude/context/metrics/worker.jsonl`; it does not start a
+  worker.
 
 ### Scheduled soak regimen
 

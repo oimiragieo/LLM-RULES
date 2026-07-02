@@ -12,7 +12,11 @@ const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 
-const { parseWorktreeList } = require('../../../.claude/tools/cli/worktree-prune.cjs');
+const {
+  isSameOrInsidePath,
+  parseWorktreeList,
+  shouldRemoveWorktree,
+} = require('../../../.claude/tools/cli/worktree-prune.cjs');
 
 const TOOL_PATH = path.resolve(
   __dirname,
@@ -97,5 +101,61 @@ describe('worktree-prune CLI', () => {
     assert.equal(worktrees[1].branch, 'worktree-agent-a077670c');
     assert.equal(worktrees[1].locked, true);
     assert.equal(worktrees[1].lockedReason, 'claude agent agent-a077670c (pid 147960)');
+  });
+
+  it('parses label-only git locked worktree metadata', () => {
+    const [worktree] = parseWorktreeList(
+      [
+        'worktree C:/repo/.claude/worktrees/agent-a077670c',
+        'HEAD a8ba65da9a2ef7973dd43b68d553d0f6545d5bfa',
+        'branch refs/heads/worktree-agent-a077670c',
+        'locked',
+        '',
+      ].join('\n')
+    );
+
+    assert.equal(worktree.locked, true);
+    assert.equal(worktree.lockedReason, '');
+  });
+
+  it('does not remove TTL-expired worktrees with unique commits', () => {
+    const decision = shouldRemoveWorktree({
+      branch: 'worktree-agent-a077670c-1700000000000',
+      uniqueCommitsOutput: 'abc123 important work\n',
+      statusOutput: '',
+      now: 1800000000000,
+    });
+
+    assert.equal(decision.remove, false);
+    assert.equal(decision.reason, 'unique commits');
+  });
+
+  it('does not remove merged worktrees with uncommitted or untracked files', () => {
+    const decision = shouldRemoveWorktree({
+      branch: 'worktree-agent-a077670c-1700000000000',
+      uniqueCommitsOutput: '',
+      statusOutput: '?? scratch.txt\n M package.json\n',
+      now: 1800000000000,
+    });
+
+    assert.equal(decision.remove, false);
+    assert.equal(decision.reason, 'worktree changes');
+  });
+
+  it('uses case-insensitive segment-aware current worktree checks on Windows paths', () => {
+    assert.equal(
+      isSameOrInsidePath(
+        'C:/Repo/.claude/worktrees/agent-a/file.txt',
+        'c:/repo/.claude/worktrees/agent-a'
+      ),
+      true
+    );
+    assert.equal(
+      isSameOrInsidePath(
+        'C:/Repo/.claude/worktrees/agent-a2/file.txt',
+        'c:/repo/.claude/worktrees/agent-a'
+      ),
+      false
+    );
   });
 });

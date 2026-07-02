@@ -115,7 +115,7 @@ Write(
 );
 
 // 3. Run test - it MUST fail
-Bash({ type: 'bash_20250124', command: 'npm test -- feature.test.ts' });
+Bash({ type: 'bash_20250124', command: 'pnpm test -- feature.test.ts' });
 
 // Expected output: FAIL (test fails because feature doesn't exist yet)
 ```
@@ -136,12 +136,12 @@ Write(
 );
 
 // Run test - it MUST pass now
-Bash({ type: 'bash_20250124', command: 'npm test -- feature.test.ts' });
+Bash({ type: 'bash_20250124', command: 'pnpm test -- feature.test.ts' });
 
 // Expected output: PASS (all tests pass)
 ```
 
-**Verification Gate**: Run `Bash({ command: 'npm test' })` and verify 0 failures in output.
+**Verification Gate**: Run `Bash({ command: 'pnpm test' })` and verify 0 failures in output.
 
 #### Step 3: REFACTOR - Improve Quality
 
@@ -153,7 +153,7 @@ Edit('src/feature.ts', {
 });
 
 // Run tests again - MUST still pass
-Bash({ type: 'bash_20250124', command: 'npm test' });
+Bash({ type: 'bash_20250124', command: 'pnpm test' });
 
 // Expected output: PASS (no regressions)
 ```
@@ -281,7 +281,7 @@ fetch('http://localhost:3000'); // Hardcoded URL
 
 ```bash
 # Run full test suite
-npm test
+pnpm test
 
 # Check for 0 failures
 # Example output:
@@ -375,7 +375,7 @@ TaskList();
 1. **Read the failure output carefully**
 
    ```bash
-   npm test 2>&1 | tee test-output.txt
+   pnpm test 2>&1 | tee test-output.txt
    # Review FULL output, not just summary
    ```
 
@@ -396,7 +396,7 @@ TaskList();
    Edit('src/feature.ts', {
      /* fix */
    });
-   Bash({ command: 'npm test' });
+   Bash({ command: 'pnpm test' });
    ```
 
 5. **Update task metadata**
@@ -449,22 +449,22 @@ TaskList();
 1. **Identify missing dependency**
 
    ```bash
-   npm test
+   pnpm test
    # Error: Cannot find module 'some-package'
    ```
 
 2. **Install dependency**
 
    ```bash
-   npm install some-package
+   pnpm add some-package
    # or for dev dependencies
-   npm install -D some-package
+   pnpm add -D some-package
    ```
 
 3. **Verify installation**
 
    ```bash
-   npm test
+   pnpm test
    # Should now pass
    ```
 

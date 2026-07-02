@@ -160,6 +160,14 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 | -------------------------------- | ------ | ------- | ------------------------------------- |
 | `MEMORY_SCHEDULER_HISTORY_LIMIT` | number | 30      | Max history entries retained per job. |
 
+### ML Feature Variables
+
+The active `.claude/lib/ml/index.cjs` module is a disabled compatibility facade. Legacy
+flags such as `PATTERN_DETECTION_ENABLED`, `COST_PREDICTION_ENABLED`,
+`ADAPTIVE_EXECUTION_ENABLED`, and `PERFORMANCE_PROFILING_ENABLED` do not instantiate ML
+components in this checkout. `ML_AUTOMATION_MODE` is exposed for status/reporting only
+and defaults to `off`.
+
 ### Reflection Queue Variables
 
 | Variable                               | Values | Default | Purpose                                                 |
@@ -189,18 +197,20 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 
 ### Worker Runtime Variables
 
-| Variable                   | Values         | Default                      | Purpose                               |
-| -------------------------- | -------------- | ---------------------------- | ------------------------------------- |
-| `WORKER_ENABLED`           | 1/true/0/false | off                          | Enable worker runtime loop.           |
-| `WORKER_ONCE`              | 1/true/0/false | off                          | Run one tick then exit.               |
-| `WORKER_INTERVAL_MS`       | number         | 60000                        | Worker tick interval in milliseconds. |
-| `WORKER_BACKOFF_BASE_MS`   | number         | 30000                        | Backoff base delay after failures.    |
-| `WORKER_BACKOFF_MAX_MS`    | number         | 300000                       | Max backoff delay.                    |
-| `WORKER_METRICS`           | on/off         | on                           | Enable worker.jsonl metrics output.   |
-| `WORKER_EVENTS`            | on/off         | on                           | Emit worker tick events to event bus. |
-| `WORKER_METRICS_MAX_LINES` | number         | 1000                         | Max lines to keep in worker.jsonl.    |
-| `WORKER_PROJECT_ROOT`      | string         | (auto)                       | Override project root for worker.     |
-| `WORKER_TASKS`             | csv            | maintenance,index,reflection | Tasks to run each tick.               |
+Agent Studio currently has no packaged `agent:worker` script and no active runtime module
+that reads `WORKER_*` variables. Treat these variables as legacy/host-managed only. For
+repository-native maintenance, schedule `pnpm run memory:weekly`,
+`pnpm run code:index:reindex`, and
+`node .claude/hooks/reflection/reflection-queue-processor.cjs` externally.
+
+### A2A Standalone Dispatcher Variables
+
+| Variable                       | Values            | Default | Purpose                                                |
+| ------------------------------ | ----------------- | ------- | ------------------------------------------------------ |
+| `A2A_TASK_DISPATCH_BIN`        | executable path   | unset   | Optional safe runner for queued A2A tasks.             |
+| `A2A_TASK_DISPATCH_ARGS_JSON`  | JSON string array | `[]`    | Arguments for the dispatcher binary; no shell is used. |
+| `A2A_TASK_DISPATCH_TIMEOUT_MS` | positive integer  | 300000  | Max runtime for one queued task dispatch.              |
+| `A2A_TASK_ROW_ID`              | string            | runtime | Set for the child process with the queue row id.       |
 
 ### Staging Environment
 
@@ -283,9 +293,6 @@ SPAWN_ASSEMBLY_PROFILING=true claude
 
 # Enable context/mode tool guard in warn mode
 CONTEXT_MODE_TOOL_GUARD=warn claude
-
-# Enable worker runtime loop
-WORKER_ENABLED=true claude
 
 # Use staging environment
 AGENT_STUDIO_ENV=staging claude

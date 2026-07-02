@@ -133,20 +133,69 @@ function isTTLExpired(branch) {
   return Date.now() - ts > WORKTREE_TTL_MS;
 }
 
+function normalizeComparablePath(filePath) {
+  const resolved = path.resolve(filePath).replace(/\\/g, '/');
+  return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+}
+
+function isSameOrInsidePath(candidatePath, parentPath) {
+  if (!candidatePath || !parentPath) return false;
+  const candidate = normalizeComparablePath(candidatePath);
+  const parent = normalizeComparablePath(parentPath).replace(/\/+$/, '');
+  return candidate === parent || candidate.startsWith(`${parent}/`);
+}
+
+function getUniqueCommitsOutput(branch, defaultBranch = detectDefaultBranch(PROJECT_ROOT)) {
+  if (!branch) return null;
+  return git(['log', '--oneline', `${defaultBranch}..${branch}`], { throws: false });
+}
+
+function getWorktreeStatusOutput(worktreePath) {
+  if (!worktreePath) return null;
+  const nativePath = worktreePath.replace(/\//g, path.sep);
+  return git(['status', '--porcelain'], { cwd: nativePath, throws: false });
+}
+
+function shouldRemoveWorktree({
+  branch,
+  uniqueCommitsOutput,
+  statusOutput,
+  now = Date.now(),
+  shieldMs = WORKTREE_SHIELD_MS,
+}) {
+  if (!branch) return { remove: false, reason: 'no branch info' };
+  if (uniqueCommitsOutput === null) return { remove: false, reason: 'could not inspect commits' };
+  if (String(uniqueCommitsOutput).trim().length > 0) {
+    return { remove: false, reason: 'unique commits' };
+  }
+  if (statusOutput === null) return { remove: false, reason: 'could not inspect worktree status' };
+  if (String(statusOutput).trim().length > 0) {
+    return { remove: false, reason: 'worktree changes' };
+  }
+
+  const branchCreationMs = extractBranchTimestamp(branch);
+  if (branchCreationMs !== null && now - branchCreationMs < shieldMs) {
+    return { remove: false, reason: 'inside age shield' };
+  }
+
+  return {
+    remove: true,
+    reason: isTTLExpired(branch) ? 'TTL expired and clean' : 'merged into main',
+  };
+}
+
 /**
  * Determine whether a worktree branch is stale (fully merged into main OR TTL-expired).
  *
  * A branch is stale when:
- *   - It has an embedded timestamp and is older than WORKTREE_TTL_MS, OR
- *   - `git log --oneline main..<branch>` returns zero lines (fully merged) AND the embedded branch timestamp is older than 12 hours.
+ *   - `git log --oneline main..<branch>` returns zero lines (fully merged)
+ *   - The embedded branch timestamp, when present, is outside the 12-hour shield.
  *
  * @param {string} branch - Branch name (short, e.g. "worktree-agent-abc123-1741000000000")
  * @returns {boolean}
  */
 function isStale(branch) {
   if (!branch) return false;
-  // TTL-based check: branch older than WORKTREE_TTL_MS is always stale
-  if (isTTLExpired(branch)) return true;
 
   // ZOMBIE PREVENTION (IRON SHIELD): Extract the embedded timestamp from the branch name
   // If the branch name contains a valid timestamp that is less than 12 hours old, it is
@@ -183,11 +232,7 @@ function isStale(branch) {
   }
 
   try {
-    const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
-    // SE-02: shell: false, array args
-    const uniqueCommits = git(['log', '--oneline', `${defaultBranch}..${branch}`], {
-      throws: false,
-    });
+    const uniqueCommits = getUniqueCommitsOutput(branch);
     if (uniqueCommits === null) return false;
     return uniqueCommits.trim().length === 0;
   } catch (_err) {
@@ -242,15 +287,37 @@ function deleteBranch(branch) {
 function removeWorktree(worktreePath, branch) {
   // Convert back to OS-native path for git command
   const nativePath = worktreePath.replace(/\//g, path.sep);
+  const preRemoveStatus = getWorktreeStatusOutput(worktreePath);
+  if (preRemoveStatus === null) {
+    return { success: false, error: 'Could not inspect worktree status before removal' };
+  }
+  if (preRemoveStatus.trim().length > 0) {
+    return { success: false, error: 'Worktree has local changes — skipping removal' };
+  }
+
   const removeArgs = ['worktree', 'remove', nativePath];
   if (FORCE) removeArgs.push('--force');
   try {
     git(removeArgs);
-  } catch (_worktreeRemoveErr) {
+  } catch (worktreeRemoveErr) {
+    const removeErrorText = [
+      worktreeRemoveErr.message,
+      worktreeRemoveErr.stdout && worktreeRemoveErr.stdout.toString(),
+      worktreeRemoveErr.stderr && worktreeRemoveErr.stderr.toString(),
+    ]
+      .filter(Boolean)
+      .join('\n');
+    if (/locked/i.test(removeErrorText)) {
+      return { success: false, error: 'Worktree is git-locked — skipping fallback removal' };
+    }
     // Windows file-lock fallback: aggressively rm the directory
     // Increased maxRetries to 10 and retryDelay to 1000 (10 seconds total) for aggressive Defender lockouts
     try {
       if (fs.existsSync(nativePath)) {
+        const fallbackStatus = getWorktreeStatusOutput(worktreePath);
+        if (fallbackStatus === null || fallbackStatus.trim().length > 0) {
+          return { success: false, error: 'Fallback removal blocked by unknown or dirty status' };
+        }
         fs.rmSync(nativePath, { recursive: true, force: true, maxRetries: 10, retryDelay: 1000 });
         // Clean up git's internal state after brute-force removal
         pruneGitWorktrees();
@@ -258,7 +325,7 @@ function removeWorktree(worktreePath, branch) {
     } catch (rmErr) {
       return {
         success: false,
-        error: `Git worktree remove failed: ${_worktreeRemoveErr.message || String(_worktreeRemoveErr)} AND fallback rmSync failed: ${rmErr.message || String(rmErr)}`,
+        error: `Git worktree remove failed: ${worktreeRemoveErr.message || String(worktreeRemoveErr)} AND fallback rmSync failed: ${rmErr.message || String(rmErr)}`,
       };
     }
   }
@@ -343,7 +410,7 @@ function main() {
     const shortPath = worktreePath.replace(normalizedProjectRoot + '/', '');
 
     // Safety guard: never remove the current session's worktree
-    if (normalizedCwd.startsWith(worktreePath)) {
+    if (isSameOrInsidePath(normalizedCwd, worktreePath)) {
       console.log(`  SKIP  ${shortPath}  (current session worktree)`);
       skipped++;
       continue;
@@ -366,17 +433,18 @@ function main() {
       continue;
     }
 
-    const ttlExpired = isTTLExpired(branch);
-    const stale = isStale(branch);
-    if (!stale) {
-      console.log(
-        `  KEEP  ${shortPath}  [${branch}]  (has unique commits not in main OR is inside 12-hour age shield)`
-      );
+    const decision = shouldRemoveWorktree({
+      branch,
+      uniqueCommitsOutput: getUniqueCommitsOutput(branch),
+      statusOutput: getWorktreeStatusOutput(worktreePath),
+    });
+    if (!decision.remove) {
+      console.log(`  KEEP  ${shortPath}  [${branch}]  (${decision.reason})`);
       skipped++;
       continue;
     }
 
-    const staleReason = ttlExpired ? 'TTL expired' : 'merged into main';
+    const staleReason = decision.reason;
 
     if (DRY_RUN) {
       console.log(`  [DRY-RUN] REMOVE  ${shortPath}  [${branch}]  (${staleReason})`);
@@ -414,8 +482,10 @@ module.exports = {
   extractBranchTimestamp,
   isStale,
   isTTLExpired,
+  isSameOrInsidePath,
   listWorktrees,
   parseWorktreeList,
   pruneGitWorktrees,
   removeWorktree,
+  shouldRemoveWorktree,
 };

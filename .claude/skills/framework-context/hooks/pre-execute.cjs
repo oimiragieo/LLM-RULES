@@ -22,7 +22,7 @@ console.log('🔍 [FRAMEWORK-CONTEXT] Pre-execute validation...');
 function validateInput(_input) {
   const errors = [];
 
-  // TODO: Add your validation logic here
+  // No skill-specific validation is configured for this generated hook.
   // Example:
   // if (!input.requiredField) {
   //   errors.push('Missing required field: requiredField');

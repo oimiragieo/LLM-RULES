@@ -36,8 +36,8 @@ const nodeVer = process.version;
 const minorNode = parseInt(nodeVer.split('.')[1], 10);
 const majorNode = parseInt(nodeVer.slice(1).split('.')[0], 10);
 
-if (majorNode < 22 || (majorNode === 22 && minorNode < 5)) {
-  console.log(`${c.red}✖ Setup requires Node.js >= 22.5.0 (Current: ${nodeVer})${c.reset}`);
+if (majorNode < 22 || (majorNode === 22 && minorNode < 13)) {
+  console.log(`${c.red}✖ Setup requires Node.js >= 22.13.0 (Current: ${nodeVer})${c.reset}`);
   process.exit(1);
 } else {
   console.log(` ${c.green}✔ Node.js version OK (${nodeVer})${c.reset}`);

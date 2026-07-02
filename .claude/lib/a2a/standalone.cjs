@@ -17,6 +17,7 @@
 
 const path = require('path');
 const net = require('net');
+const { spawn } = require('child_process');
 const { createA2aServer } = require('./server.cjs');
 const { getDb, runMigrations } = require('../db/sqlite-manager.cjs');
 const { WorkerPool } = require('../workers/worker-pool.cjs');
@@ -61,6 +62,130 @@ function loadEnv() {
   }
 }
 
+function parseA2aTaskParams(row) {
+  const parsed = safeParseJSON(row.text, null);
+  if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+    return parsed;
+  }
+  return { raw: row.text };
+}
+
+function parseDispatchArgs(env = process.env) {
+  const raw = env.A2A_TASK_DISPATCH_ARGS_JSON;
+  if (!raw || !raw.trim()) return [];
+
+  const parsed = safeParseJSON(raw, null);
+  if (!Array.isArray(parsed) || !parsed.every(arg => typeof arg === 'string')) {
+    throw new Error('A2A_TASK_DISPATCH_ARGS_JSON must be a JSON array of strings');
+  }
+  return parsed;
+}
+
+function getDispatchConfig(env = process.env) {
+  const bin = String(env.A2A_TASK_DISPATCH_BIN || '').trim();
+  if (!bin) return null;
+
+  const timeoutMs = parseInt(env.A2A_TASK_DISPATCH_TIMEOUT_MS || '300000', 10);
+  return {
+    bin,
+    args: parseDispatchArgs(env),
+    timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 300000,
+  };
+}
+
+function appendBounded(current, chunk, maxChars = 65536) {
+  const next = current + chunk;
+  return next.length > maxChars ? next.slice(next.length - maxChars) : next;
+}
+
+function runConfiguredDispatcher(taskParams, row, { env = process.env, spawnImpl = spawn } = {}) {
+  const config = getDispatchConfig(env);
+  if (!config) {
+    return Promise.resolve({ skipped: true });
+  }
+
+  return new Promise((resolve, reject) => {
+    const childEnv = {
+      ...env,
+      A2A_TASK_ROW_ID: String(row.id || ''),
+    };
+    const child = spawnImpl(config.bin, config.args, {
+      env: childEnv,
+      shell: false,
+      stdio: ['pipe', 'pipe', 'pipe'],
+      windowsHide: true,
+    });
+    let stdout = '';
+    let stderr = '';
+    let settled = false;
+
+    const finish = (err, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (err) {
+        reject(err);
+      } else {
+        resolve(value);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      child.kill();
+      finish(new Error(`A2A task dispatcher timed out after ${config.timeoutMs}ms`));
+    }, config.timeoutMs);
+    if (timer.unref) timer.unref();
+
+    child.stdout.on('data', chunk => {
+      stdout = appendBounded(stdout, chunk.toString('utf8'));
+    });
+    child.stderr.on('data', chunk => {
+      stderr = appendBounded(stderr, chunk.toString('utf8'));
+    });
+    child.on('error', err => finish(err));
+    child.on('close', code => {
+      if (code === 0) {
+        finish(null, { skipped: false, code, stdout, stderr });
+        return;
+      }
+      const message = stderr.trim() || stdout.trim() || `exit code ${code}`;
+      finish(new Error(`A2A task dispatcher failed: ${message}`));
+    });
+
+    child.stdin.on('error', err => finish(err));
+    child.stdin.end(
+      JSON.stringify({
+        rowId: row.id,
+        taskParams,
+      }) + '\n'
+    );
+  });
+}
+
+function buildA2aTaskProcessor({ env = process.env, spawnImpl = spawn } = {}) {
+  return async row => {
+    const taskParams = parseA2aTaskParams(row);
+    process.stderr.write(
+      `[A2A] Processing queued message ${row.id} (attempt ${row.attempt_count || 1})\n`
+    );
+
+    const dispatchResult = await runConfiguredDispatcher(taskParams, row, { env, spawnImpl });
+    if (dispatchResult.skipped) {
+      process.stderr.write(
+        '[A2A] No task dispatcher configured; queue entry drained without agent execution\n'
+      );
+      process.stderr.write(`[A2A] Task params: ${JSON.stringify(taskParams).slice(0, 200)}\n`);
+      return dispatchResult;
+    }
+
+    process.stderr.write(`[A2A] Task ${row.id} dispatched via configured runner\n`);
+    if (dispatchResult.stderr && dispatchResult.stderr.trim()) {
+      process.stderr.write(`[A2A] Dispatcher stderr: ${dispatchResult.stderr.trim()}\n`);
+    }
+    return dispatchResult;
+  };
+}
+
 async function main() {
   loadEnv();
 
@@ -77,23 +202,7 @@ async function main() {
     pool = new WorkerPool({
       db,
       concurrency: 2,
-      processFn: async row => {
-        // row contains: id, chat_id, user_id, text, attachments, timestamp, status, attempt_count
-        // text is JSON.stringify(a2aTaskParams) from server.cjs enqueueMessage call.
-        // safeParseJSON returns the parsed object directly (or an empty object on
-        // parse failure), NOT a {success, data} envelope.
-        const parsed = safeParseJSON(row.text, null);
-        const taskParams =
-          parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0
-            ? parsed
-            : { raw: row.text };
-        process.stderr.write(
-          `[A2A] Processing queued message ${row.id} (attempt ${row.attempt_count || 1})\n`
-        );
-        // TODO: Wire to agent dispatch (e.g., spawn Claude CLI subprocess for the task)
-        // For now, log the task params so the queue drains correctly
-        process.stderr.write(`[A2A] Task params: ${JSON.stringify(taskParams).slice(0, 200)}\n`);
-      },
+      processFn: buildA2aTaskProcessor(),
     });
   } catch (e) {
     process.stderr.write(`[A2A] WorkerPool initialization failed: ${e.message}\n`);
@@ -147,7 +256,18 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  process.stderr.write(`[A2A] Fatal error: ${err.message}\n`);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(err => {
+    process.stderr.write(`[A2A] Fatal error: ${err.message}\n`);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  appendBounded,
+  buildA2aTaskProcessor,
+  getDispatchConfig,
+  parseA2aTaskParams,
+  parseDispatchArgs,
+  runConfiguredDispatcher,
+};

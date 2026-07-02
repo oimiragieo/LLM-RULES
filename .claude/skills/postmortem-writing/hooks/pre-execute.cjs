@@ -20,7 +20,7 @@ console.log('🔍 [POSTMORTEM-WRITING] Pre-execute validation...');
 function validateInput(_input) {
   const errors = [];
 
-  // TODO: Add your validation logic here
+  // No skill-specific validation is configured for this generated hook.
 
   return errors;
 }

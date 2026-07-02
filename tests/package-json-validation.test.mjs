@@ -355,20 +355,56 @@ test('pnpm major should be pinned consistently across local setup and CI', () =>
   const workflowFiles = readdirSync(workflowsDir).filter(
     file => file.endsWith('.yml') || file.endsWith('.yaml')
   );
+  const pnpmVersion = pkg.packageManager.replace(/^pnpm@/, '');
 
   assert.equal(pkg.packageManager, 'pnpm@11.4.0');
+  assert.equal(
+    pkg.engines?.node,
+    '>=22.13.0',
+    'package engines should meet pnpm 11.4.0 Node floor'
+  );
   assert.ok(
     setupScript.includes('pnpm@11.4.0'),
     'setup should prepare the same pnpm version as packageManager'
   );
+  assert.ok(
+    setupScript.includes('>= 22.13.0'),
+    'setup should enforce the same Node floor required by pinned pnpm'
+  );
+
+  const pnpmActionFiles = [];
 
   for (const file of workflowFiles) {
     const workflow = readFileSync(join(workflowsDir, file), 'utf-8');
-    if (!workflow.includes('pnpm/action-setup@v4')) continue;
+    if (!workflow.includes('pnpm/action-setup@')) continue;
+    pnpmActionFiles.push(file);
 
+    assert.ok(
+      workflow.includes('pnpm/action-setup@v6'),
+      `${file} should use pnpm/action-setup@v6 for pnpm 11 support`
+    );
+    assert.ok(
+      !/pnpm\/action-setup@v[0-5]\b/.test(workflow),
+      `${file} should not use old pnpm/action-setup majors`
+    );
+    assert.ok(
+      !/node-version:\s*['"]?(?:18|20|21)(?:['"]?\s*$)/m.test(workflow),
+      `${file} should not run pnpm 11 on Node <22`
+    );
+    assert.ok(
+      /node-version:\s*['"]?22\.13\.0['"]?\s*$/m.test(workflow),
+      `${file} should use the exact Node 22.13.0 floor required by pinned pnpm`
+    );
     assert.ok(!/version:\s*9\b/.test(workflow), `${file} should not install pnpm 9`);
-    assert.ok(/version:\s*11\b/.test(workflow), `${file} should install pnpm 11`);
+    assert.ok(
+      new RegExp(`version:\\s*['"]?${pnpmVersion.replace(/\./g, '\\.')}['"]?\\s*$`, 'm').test(
+        workflow
+      ),
+      `${file} should install pinned pnpm ${pnpmVersion}, not a moving major range`
+    );
   }
+
+  assert.ok(pnpmActionFiles.length > 0, 'expected at least one workflow to install pnpm');
 });
 
 test('ESLint flat config replaces .eslintignore for node_modules and worktrees', () => {
@@ -395,11 +431,28 @@ test('validate:full should include status check governance validation', () => {
   );
 });
 
-test('better-sqlite3 should be listed in onlyBuiltDependencies for CI native builds', () => {
+test('pnpm workspace should use pnpm 11 allowBuilds instead of deprecated build settings', () => {
   const workspaceConfig = readFileSync(join(PROJECT_ROOT, 'pnpm-workspace.yaml'), 'utf-8');
 
   assert.ok(
-    /^ {2}- better-sqlite3$/m.test(workspaceConfig),
-    'pnpm-workspace.yaml onlyBuiltDependencies should include better-sqlite3 so CI builds its native binding'
+    !/^onlyBuiltDependencies:/m.test(workspaceConfig),
+    'pnpm 11 should not use onlyBuiltDependencies'
+  );
+  assert.ok(
+    !/^neverBuiltDependencies:/m.test(workspaceConfig),
+    'pnpm 11 should not use neverBuiltDependencies'
+  );
+  assert.ok(
+    !/^ignoredBuiltDependencies:/m.test(workspaceConfig),
+    'pnpm 11 should not use ignoredBuiltDependencies'
+  );
+  assert.ok(
+    !/^onlyBuiltDependenciesFile:/m.test(workspaceConfig),
+    'pnpm 11 should not use onlyBuiltDependenciesFile'
+  );
+  assert.ok(/^allowBuilds:/m.test(workspaceConfig), 'pnpm 11 should use allowBuilds');
+  assert.ok(
+    /^ {2}better-sqlite3:\s*true$/m.test(workspaceConfig),
+    'pnpm-workspace.yaml allowBuilds should include better-sqlite3 so CI builds its native binding'
   );
 });

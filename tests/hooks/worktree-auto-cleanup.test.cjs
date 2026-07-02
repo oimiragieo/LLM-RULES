@@ -29,7 +29,8 @@ function runHook(payload, env = {}) {
   });
 }
 
-const { parseWorktreeList, isPathInsideDirectory } = require(HOOK_PATH)._test_internals;
+const { parseWorktreeList, isPathInsideDirectory, shouldRemoveWorktree } =
+  require(HOOK_PATH)._test_internals;
 
 // Helper: build a TTL-stamped branch name with a specific age
 function ttlBranchName(ageMs) {
@@ -329,6 +330,21 @@ describe('worktree-auto-cleanup — worktree parsing and path safety', () => {
     assert.strictEqual(worktree.lockedReason, 'claude agent agent-a077670c (pid 147960)');
   });
 
+  it('parses label-only locked worktree entries', () => {
+    const raw = [
+      'worktree C:/dev/project/.claude/worktrees/agent-a077670c',
+      'HEAD abc123',
+      'branch refs/heads/worktree-agent-a077670c',
+      'locked',
+      '',
+    ].join('\n');
+
+    const [worktree] = parseWorktreeList(raw);
+
+    assert.strictEqual(worktree.locked, true);
+    assert.strictEqual(worktree.lockedReason, '');
+  });
+
   it('rejects sibling paths that only share a directory-name prefix', () => {
     const baseDir = 'C:/dev/project/.claude/worktrees';
     const sibling = 'C:/dev/project/.claude/worktrees-evil/agent';
@@ -341,6 +357,30 @@ describe('worktree-auto-cleanup — worktree parsing and path safety', () => {
     const child = 'C:/dev/project/.claude/worktrees/agent-a077670c';
 
     assert.strictEqual(isPathInsideDirectory(child, baseDir), true);
+  });
+
+  it('does not remove an old TTL-stamped branch when it has unique commits', () => {
+    const decision = shouldRemoveWorktree({
+      branch: 'worktree-agent-a077670c-1700000000000',
+      uniqueCommitsOutput: 'abc123 important work\n',
+      statusOutput: '',
+      now: 1800000000000,
+    });
+
+    assert.strictEqual(decision.remove, false);
+    assert.strictEqual(decision.reason, 'unique commits');
+  });
+
+  it('does not remove an otherwise stale worktree with local changes', () => {
+    const decision = shouldRemoveWorktree({
+      branch: 'worktree-agent-a077670c-1700000000000',
+      uniqueCommitsOutput: '',
+      statusOutput: '?? scratch.txt\n M package.json\n',
+      now: 1800000000000,
+    });
+
+    assert.strictEqual(decision.remove, false);
+    assert.strictEqual(decision.reason, 'worktree changes');
   });
 });
 

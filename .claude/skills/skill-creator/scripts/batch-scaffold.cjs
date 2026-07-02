@@ -125,7 +125,7 @@ console.log('🔍 [${name.toUpperCase()}] Pre-execute validation...');
 function validateInput(input) {
   const errors = [];
 
-  // TODO: Add your validation logic here
+  // No skill-specific validation is configured for this generated hook.
 
   return errors;
 }
@@ -167,7 +167,7 @@ console.log('📝 [${name.toUpperCase()}] Post-execute processing...');
  * Process execution result
  */
 function processResult(result) {
-  // TODO: Add your post-processing logic here
+  // No skill-specific post-processing is configured for this generated hook.
 
   return { success: true };
 }

@@ -120,7 +120,7 @@ If `.eslintignore` is deleted, confirm equivalent ignore patterns exist in flat 
 
 - [ ] **Step 2: Verify native dependency policy**
 
-Confirm the `better-sqlite3` entry in `pnpm.onlyBuiltDependencies` is intentional and covered by package validation tests.
+Confirm the `better-sqlite3` entry in `pnpm-workspace.yaml` `allowBuilds` is intentional and covered by package validation tests.
 
 - [ ] **Step 3: Patch validation tests first if gaps exist**
 

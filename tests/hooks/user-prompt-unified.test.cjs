@@ -5,7 +5,7 @@
  * This unified hook consolidates 5 UserPromptSubmit hooks:
  * 1. router-mode-reset.cjs - Resets router state on new prompts
  * 2. router-enforcer.cjs - Analyzes prompts for routing recommendations
- * 3. memory-reminder.cjs - Reminds agents to read memory files
+ * 3. Inlined memory reminder - Reminds agents to read memory files
  * 4. evolution-trigger-detector.cjs - Detects evolution trigger patterns
  * 5. memory-health-check.cjs - Checks memory system health
  *
@@ -434,7 +434,7 @@ describe('checkRouterEnforcement', () => {
 });
 
 // =============================================================================
-// Test: Memory Reminder Logic (from memory-reminder.cjs)
+// Test: Memory Reminder Logic (inlined from the former standalone hook)
 // =============================================================================
 
 describe('checkMemoryReminder', () => {
@@ -538,9 +538,9 @@ describe('evolution auto-trigger reminders', () => {
   it('should write evolution reminder files when recurring threshold is met', () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'evolution-reminder-'));
-    const requestsPath = path.join(tmpDir, 'evolution-requests.jsonl');
-    const spawnPath = path.join(tmpDir, 'evolution-spawn-request.json');
-    const reminderPath = path.join(tmpDir, 'evolution-reminder.txt');
+    const requestsPath = path.resolve(tmpDir, 'evolution-requests.jsonl');
+    const spawnPath = path.resolve(tmpDir, 'evolution-spawn-request.json');
+    const reminderPath = path.resolve(tmpDir, 'evolution-reminder.txt');
     try {
       const entries = [
         { priority: 'high', summary: 'missing autonomous trigger' },

@@ -9,48 +9,36 @@
 
 'use strict';
 
-const { execSync } = require('child_process');
+const { execFileSync, spawnSync } = require('child_process');
 const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 const SCRIPT_PATH = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'env-backup.cjs');
 const NODE_CMD = process.execPath;
 
-// ── Gate: only run if PERSISTENT_SCHEDULE=true ──────────────────────────────
-const enabled = process.env.PERSISTENT_SCHEDULE;
-if (enabled !== 'true') {
-  console.log(
-    '[setup-persistent-schedule] PERSISTENT_SCHEDULE is not "true" — skipping OS-level scheduling.'
-  );
-  console.log(
-    '  Set PERSISTENT_SCHEDULE=true in your .env (or shell) and re-run to register the schedule.'
-  );
-  process.exit(0);
+function buildWindowsTaskCommand({ taskName, nodeCmd, scriptPath }) {
+  const scriptWin = scriptPath.replace(/\//g, '\\');
+  const nodeWin = nodeCmd.replace(/\//g, '\\');
+  const taskRunValue = `"${nodeWin}" "${scriptWin}"`;
+
+  return ['/Create', '/TN', taskName, '/TR', taskRunValue, '/SC', 'DAILY', '/ST', '08:17', '/F'];
 }
 
-console.log(
-  '[setup-persistent-schedule] PERSISTENT_SCHEDULE=true — registering OS-level schedule...'
-);
-console.log(`  Script: ${SCRIPT_PATH}`);
-console.log(`  Schedule: daily at 08:17`);
-console.log('');
-
-if (process.platform === 'win32') {
-  setupWindows();
-} else {
-  setupUnix();
+function buildCronLine({ projectRoot, nodeCmd, scriptPath }) {
+  const cronEntry = `17 8 * * * cd "${projectRoot}" && "${nodeCmd}" "${scriptPath}"`;
+  const marker = '# AgentStudio-EnvBackup';
+  return `${cronEntry} ${marker}`;
 }
 
 // ── Windows: Task Scheduler ──────────────────────────────────────────────────
-function setupWindows() {
+function setupWindows(options = {}) {
+  const execFileSyncImpl = options.execFileSync || execFileSync;
   const taskName = 'AgentStudio-EnvBackup';
-  const scriptWin = SCRIPT_PATH.replace(/\//g, '\\');
-  const nodeWin = NODE_CMD.replace(/\//g, '\\');
 
   // Check if task already exists
   let exists = false;
   try {
-    execSync(['schtasks', '/Query', '/TN', taskName, '/FO', 'LIST'].join(' '), {
+    execFileSyncImpl('schtasks', ['/Query', '/TN', taskName, '/FO', 'LIST'], {
       stdio: 'pipe',
       shell: false,
     });
@@ -70,24 +58,15 @@ function setupWindows() {
   }
 
   // Register the task: daily at 08:17, run as current user
-  // Build the /TR value: schtasks requires a single quoted string for the command
-  const trValue = '"' + nodeWin + '" "' + scriptWin + '"';
-  const cmd = [
-    'schtasks',
-    '/Create',
-    '/TN',
+  // Build the /TR value as one argv entry; no shell is used.
+  const args = buildWindowsTaskCommand({
     taskName,
-    '/TR',
-    trValue,
-    '/SC',
-    'DAILY',
-    '/ST',
-    '08:17',
-    '/F',
-  ];
+    nodeCmd: NODE_CMD,
+    scriptPath: SCRIPT_PATH,
+  });
 
   try {
-    execSync(cmd.join(' '), { stdio: 'inherit', shell: false });
+    execFileSyncImpl('schtasks', args, { stdio: 'inherit', shell: false });
     console.log('');
     console.log(`[setup-persistent-schedule] SUCCESS — Windows Task "${taskName}" registered.`);
     console.log('  The env-backup script will run daily at 08:17.');
@@ -101,15 +80,20 @@ function setupWindows() {
 }
 
 // ── Linux / macOS: crontab ───────────────────────────────────────────────────
-function setupUnix() {
-  const cronEntry = `17 8 * * * cd "${PROJECT_ROOT}" && "${NODE_CMD}" "${SCRIPT_PATH}"`;
+function setupUnix(options = {}) {
+  const execFileSyncImpl = options.execFileSync || execFileSync;
+  const spawnSyncImpl = options.spawnSync || spawnSync;
   const marker = '# AgentStudio-EnvBackup';
-  const fullLine = `${cronEntry} ${marker}`;
+  const fullLine = buildCronLine({
+    projectRoot: PROJECT_ROOT,
+    nodeCmd: NODE_CMD,
+    scriptPath: SCRIPT_PATH,
+  });
 
   // Read existing crontab
   let existing = '';
   try {
-    existing = execSync('crontab -l', { stdio: 'pipe', shell: false }).toString();
+    existing = execFileSyncImpl('crontab', ['-l'], { stdio: 'pipe', shell: false }).toString();
   } catch (_e) {
     // No crontab yet — start fresh
   }
@@ -130,8 +114,7 @@ function setupUnix() {
 
   try {
     // Write new crontab via stdin
-    const { spawnSync } = require('child_process');
-    const result = spawnSync('crontab', ['-'], {
+    const result = spawnSyncImpl('crontab', ['-'], {
       input: newCrontab,
       stdio: ['pipe', 'inherit', 'inherit'],
       shell: false,
@@ -150,4 +133,43 @@ function setupUnix() {
     console.error('[setup-persistent-schedule] ERROR writing crontab:', err.message);
     process.exit(1);
   }
+}
+
+function main() {
+  // ── Gate: only run if PERSISTENT_SCHEDULE=true ──────────────────────────────
+  const enabled = process.env.PERSISTENT_SCHEDULE;
+  if (enabled !== 'true') {
+    console.log(
+      '[setup-persistent-schedule] PERSISTENT_SCHEDULE is not "true" — skipping OS-level scheduling.'
+    );
+    console.log(
+      '  Set PERSISTENT_SCHEDULE=true in your .env (or shell) and re-run to register the schedule.'
+    );
+    return;
+  }
+
+  console.log(
+    '[setup-persistent-schedule] PERSISTENT_SCHEDULE=true — registering OS-level schedule...'
+  );
+  console.log(`  Script: ${SCRIPT_PATH}`);
+  console.log(`  Schedule: daily at 08:17`);
+  console.log('');
+
+  if (process.platform === 'win32') {
+    setupWindows();
+  } else {
+    setupUnix();
+  }
+}
+
+module.exports = {
+  buildCronLine,
+  buildWindowsTaskCommand,
+  main,
+  setupUnix,
+  setupWindows,
+};
+
+if (require.main === module) {
+  main();
 }

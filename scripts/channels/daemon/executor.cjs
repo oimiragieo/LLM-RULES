@@ -8,13 +8,15 @@
  */
 'use strict';
 
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const http = require('http');
 const path = require('path');
 const { claudeSync, claudeAsync } = require('./claude-cli.cjs');
 
 // Task executor system prompt — overrides router CLAUDE.md for headless sessions
 const TASK_EXECUTOR_PROMPT = path.join(__dirname, 'task-executor-prompt.txt');
+const WINDOWS_CMD_EXTENSIONS = new Set(['', '.cmd', '.bat']);
+const SHELL_METACHARS = /[;&|<>`$()]/;
 
 // Pre-research prompt — tells haiku to gather context with read-only tools
 const PRE_RESEARCH_PROMPT = `You are a fast research assistant. Your ONLY job is to gather context for a task that another AI will execute.
@@ -27,6 +29,129 @@ Rules:
 - Output a brief context summary (under 1000 chars) of what you found: relevant file paths, key code snippets, current state
 
 If the task is purely web-based (search, news, research) or doesn't involve the codebase, just output: NO_CONTEXT_NEEDED`;
+
+function splitSimpleCommand(commandText) {
+  const text = String(commandText || '').trim();
+  if (!text) throw new Error('verifyCommand cannot be empty');
+  if (SHELL_METACHARS.test(text)) {
+    throw new Error('verifyCommand contains shell metacharacters; use {command,args} instead');
+  }
+
+  const tokens = [];
+  let current = '';
+  let quote = null;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (quote) {
+      if (char === quote) {
+        quote = null;
+      } else {
+        current += char;
+      }
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char;
+      continue;
+    }
+
+    if (/\s/.test(char)) {
+      if (current) {
+        tokens.push(current);
+        current = '';
+      }
+      continue;
+    }
+
+    current += char;
+  }
+
+  if (quote) throw new Error('verifyCommand has an unterminated quote');
+  if (current) tokens.push(current);
+  if (tokens.length === 0) throw new Error('verifyCommand cannot be empty');
+  return tokens;
+}
+
+function normalizeVerifyCommand(verifyCommand) {
+  if (Array.isArray(verifyCommand)) {
+    const [command, ...args] = verifyCommand;
+    if (!command || typeof command !== 'string') {
+      throw new Error('verifyCommand array must start with a command string');
+    }
+    return { command, args: args.map(String) };
+  }
+
+  if (verifyCommand && typeof verifyCommand === 'object') {
+    const command = String(verifyCommand.command || '').trim();
+    if (!command) throw new Error('verifyCommand.command is required');
+    const args = Array.isArray(verifyCommand.args) ? verifyCommand.args.map(String) : [];
+    return { command, args };
+  }
+
+  const [command, ...args] = splitSimpleCommand(verifyCommand);
+  return { command, args };
+}
+
+function quoteWindowsCmdArg(value) {
+  const arg = String(value);
+  if (!/^[a-zA-Z0-9._:=/\\\- ]+$/.test(arg)) {
+    throw new Error(`Unsafe verify command argument for cmd.exe dispatch: ${arg}`);
+  }
+  return `"${arg}"`;
+}
+
+function buildVerifySpawnSpec(command, args, platform = process.platform, env = process.env) {
+  if (platform !== 'win32') {
+    return { command, args };
+  }
+
+  const extension = path.extname(command).toLowerCase();
+  if (!WINDOWS_CMD_EXTENSIONS.has(extension)) {
+    return { command, args };
+  }
+
+  const commandLine = [command, ...args].map(quoteWindowsCmdArg).join(' ');
+  return {
+    command: env.ComSpec || env.COMSPEC || 'cmd.exe',
+    args: ['/d', '/s', '/c', commandLine],
+  };
+}
+
+function runVerifyCommand(verifyCommand, options = {}) {
+  const env = { ...(options.env || process.env) };
+  delete env.ANTHROPIC_API_KEY;
+  const normalized = normalizeVerifyCommand(verifyCommand);
+  const spawnSpec = buildVerifySpawnSpec(
+    normalized.command,
+    normalized.args,
+    options.platform || process.platform,
+    env
+  );
+
+  const result = (options.spawnSync || spawnSync)(spawnSpec.command, spawnSpec.args, {
+    cwd: options.cwd || process.cwd(),
+    encoding: 'utf8',
+    timeout: options.timeout || 60000,
+    env,
+    windowsHide: true,
+    shell: false,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    const err = new Error(
+      (result.stderr || result.stdout || `verify command exited ${result.status}`).toString()
+    );
+    err.stdout = result.stdout;
+    err.stderr = result.stderr;
+    err.status = result.status;
+    throw err;
+  }
+
+  return (result.stdout || '').trim();
+}
 
 class TaskExecutor {
   constructor(config, log) {
@@ -111,24 +236,10 @@ class TaskExecutor {
       // If verify command provided, run it to check completion
       if (verifyCommand) {
         try {
-          const env = { ...process.env };
-          delete env.ANTHROPIC_API_KEY;
-          const verifyResult = execSync(verifyCommand, {
+          const verifyResult = runVerifyCommand(verifyCommand, {
             cwd: this.projectRoot,
-            encoding: 'utf8',
             timeout: 60000,
-            env,
-            windowsHide: true,
-            // shell: true required here: verifyCommand is an arbitrary shell
-            // command string (e.g. "pnpm test", "node --test tests/...") that
-            // cannot be expressed as a fixed array. The value is set by daemon
-            // config/dispatcher — never sourced from user-controlled Telegram
-            // input — so shell injection from external callers is not possible.
-            // ANTHROPIC_API_KEY is removed from env before execution.
-            // Audit reference: M-01 (security hardening review 2026-04-10)
-            shell: true,
-            stdio: ['pipe', 'pipe', 'pipe'],
-          }).trim();
+          });
 
           if (
             verifyResult.includes('PASS') ||
@@ -567,4 +678,10 @@ class TaskExecutor {
   }
 }
 
-module.exports = { TaskExecutor };
+module.exports = {
+  TaskExecutor,
+  buildVerifySpawnSpec,
+  normalizeVerifyCommand,
+  runVerifyCommand,
+  splitSimpleCommand,
+};

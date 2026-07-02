@@ -55,5 +55,5 @@ echo ==========================================
 echo.
 echo Next steps:
 echo   - Run 'pnpm code:index:reindex' to refresh code index after file changes
-echo   - Set WORKER_ENABLED=1 and run 'pnpm agent:worker' for maintenance mode
+echo   - Schedule 'pnpm run memory:weekly' for headless maintenance if SessionEnd rarely fires
 echo   - Start coding with 'claude' command

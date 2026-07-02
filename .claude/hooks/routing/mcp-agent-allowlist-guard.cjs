@@ -38,7 +38,16 @@ async function main() {
   if (enforcement === 'off') process.exit(0);
 
   const hookInput = await parseHookInputAsync();
-  if (!hookInput) process.exit(0);
+  if (!hookInput) {
+    const message = '[MCP-ALLOWLIST] Malformed or missing hook input';
+    if (enforcement === 'block') {
+      console.log(formatResult('block', message));
+      process.stderr.write(JSON.stringify({ event: 'mcp_allowlist_malformed_input' }) + '\n');
+      process.exit(2);
+    }
+    process.stderr.write(`${message}\n`);
+    process.exit(0);
+  }
 
   const toolName = getToolName(hookInput);
   if (!toolName || !toolName.startsWith('mcp__')) process.exit(0);
@@ -81,6 +90,11 @@ async function main() {
 if (require.main === module) {
   main().catch(err => {
     process.stderr.write(`[mcp-agent-allowlist-guard] ${err.message}\n`);
+    const enforcement = getEnforcementMode('MCP_AGENT_ALLOWLIST_ENFORCEMENT', 'warn');
+    if (enforcement === 'block') {
+      console.log(formatResult('block', '[MCP-ALLOWLIST] Internal guard error'));
+      process.exit(2);
+    }
     process.exit(0);
   });
 }

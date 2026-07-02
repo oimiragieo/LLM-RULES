@@ -32,6 +32,7 @@ const GIT_TIMEOUT_MS = parseInt(process.env.WORKTREE_GIT_TIMEOUT_MS ?? '5000', 1
 
 // TTL for worktree branches (default 24 hours). Override with WORKTREE_TTL_MS env var.
 const WORKTREE_TTL_MS = parseInt(process.env.WORKTREE_TTL_MS ?? '86400000', 10);
+const WORKTREE_SHIELD_MS = parseInt(process.env.WORKTREE_SHIELD_MS ?? '43200000', 10);
 
 // TTL for delegation PID files (default 24 hours).
 const DELEGATION_PID_TTL_MS = parseInt(process.env.DELEGATION_PID_TTL_MS ?? '86400000', 10);
@@ -162,19 +163,32 @@ function isTTLExpired(branch) {
   return Date.now() - ts > WORKTREE_TTL_MS;
 }
 
-/**
- * Check if a branch is stale (fully merged into the default branch) OR TTL-expired.
- * @param {string} branch
- * @returns {boolean}
- */
-function isStale(branch, defaultBranch = detectDefaultBranch(PROJECT_ROOT)) {
-  if (!branch) return false;
-  // TTL-based check: branch older than WORKTREE_TTL_MS is always stale
-  if (isTTLExpired(branch)) return true;
-  // Merge-based check: zero unique commits compared to default branch
-  const result = git(['log', '--oneline', `${defaultBranch}..${branch}`]);
-  if (result === null) return false;
-  return result.trim().length === 0;
+function shouldRemoveWorktree({
+  branch,
+  uniqueCommitsOutput,
+  statusOutput,
+  now = Date.now(),
+  shieldMs = WORKTREE_SHIELD_MS,
+}) {
+  if (!branch) return { remove: false, reason: 'no branch info' };
+  if (uniqueCommitsOutput === null) return { remove: false, reason: 'could not inspect commits' };
+  if (String(uniqueCommitsOutput).trim().length > 0) {
+    return { remove: false, reason: 'unique commits' };
+  }
+  if (statusOutput === null) return { remove: false, reason: 'could not inspect worktree status' };
+  if (String(statusOutput).trim().length > 0) {
+    return { remove: false, reason: 'worktree changes' };
+  }
+
+  const branchCreationMs = extractBranchTimestamp(branch);
+  if (branchCreationMs !== null && now - branchCreationMs < shieldMs) {
+    return { remove: false, reason: 'inside age shield' };
+  }
+
+  return {
+    remove: true,
+    reason: isTTLExpired(branch) ? 'TTL expired and clean' : 'merged into main',
+  };
 }
 
 /**
@@ -283,7 +297,7 @@ function run() {
     // Safety: skip if no branch info
     if (!branch) continue;
 
-    // Safety: Never delete a worktree that was created less than 2 hours ago.
+    // Safety: Never delete a worktree that was created inside the active-agent shield.
     // This prevents agents from deleting OTHER active agents' worktrees that haven't committed yet.
     let ts = extractBranchTimestamp(branch);
     if (!ts) {
@@ -294,14 +308,17 @@ function run() {
         // Ignore stats error
       }
     }
-    if (ts && Date.now() - ts < 2 * 60 * 60 * 1000) {
+    if (ts && Date.now() - ts < WORKTREE_SHIELD_MS) {
       continue;
     }
 
-    if (isStale(branch, defaultBranch)) {
-      const nativePath = worktreePath.replace(/\//g, path.sep);
+    const nativePath = worktreePath.replace(/\//g, path.sep);
+    const uniqueCommitsOutput = git(['log', '--oneline', `${defaultBranch}..${branch}`]);
+    const statusOutput = git(['status', '--porcelain'], nativePath);
+    const decision = shouldRemoveWorktree({ branch, uniqueCommitsOutput, statusOutput });
+    if (decision.remove) {
       // SE-02: shell: false with array args
-      const removed = git(['worktree', 'remove', nativePath, '--force']);
+      const removed = git(['worktree', 'remove', nativePath]);
       if (removed !== null) {
         process.stderr.write(`[worktree-auto-cleanup] Removed ${worktreePath}\n`);
       }
@@ -328,5 +345,6 @@ if (require.main === module) {
     isPathInsideDirectory,
     parseWorktreeList,
     readStdin,
+    shouldRemoveWorktree,
   };
 }

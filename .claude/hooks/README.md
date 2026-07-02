@@ -70,12 +70,13 @@ before `user-prompt-unified.cjs` so the reminder precedes routing analysis.
 
 Located in `.claude/hooks/session/`
 
-#### Memory Reminder (`memory-reminder.cjs`)
+#### Memory Reminder
 
-Reminds agents to read and update memory files.
+Memory reminder behavior is consolidated into
+`.claude/hooks/routing/user-prompt-unified.cjs`.
 
-**When it runs:** Session start, periodic intervals
-**What it does:** Prompts reading learnings.md before starting work
+**When it runs:** `UserPromptSubmit`
+**What it does:** Emits memory protocol reminders and prompt-time reflection queue checks
 
 ### Memory Injection
 

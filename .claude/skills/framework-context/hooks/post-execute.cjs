@@ -20,7 +20,7 @@ console.log('📝 [FRAMEWORK-CONTEXT] Post-execute processing...');
  * Process execution result
  */
 function processResult(_result) {
-  // TODO: Add your post-processing logic here
+  // No skill-specific post-processing is configured for this generated hook.
   // Examples:
   // - Log execution to audit file
   // - Send notifications

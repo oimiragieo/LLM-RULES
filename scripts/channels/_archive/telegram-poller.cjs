@@ -16,10 +16,13 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 const ROOT = process.env.TELEGRAM_POLLER_ROOT || process.cwd();
 const LOG_FILE = path.join(ROOT, '.claude', 'context', 'runtime', 'telegram-headless.log');
+const { buildClaudeEnv, buildClaudeSpawnSpec, resolveClaude } = require(
+  path.join(ROOT, '.claude', 'tools', 'cli', 'telegram-claude-bridge.cjs')
+);
 
 function log(msg) {
   const ts = new Date().toISOString();
@@ -94,18 +97,53 @@ function telegramApi(token, method, body) {
   });
 }
 
+function buildClaudePrompt(text) {
+  return `A Telegram user sent this message:
+
+${String(text)}
+
+Write a helpful, concise response (under 500 chars). Just the response text, nothing else.`;
+}
+
 // Get Claude response for a message
-function getClaudeResponse(text, _chatId) {
+function getClaudeResponse(text, _chatId, deps = {}) {
   const authToken = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_OAUTH_TOKEN || '';
-  const prompt = `A Telegram user sent this message: "${text.replace(/"/g, '\\"')}". Write a helpful, concise response (under 500 chars). Just the response text, nothing else.`;
+  const prompt = buildClaudePrompt(text);
   try {
     const env = { ...process.env };
     if (authToken) env.ANTHROPIC_API_KEY = authToken;
-    const result = execSync(
-      `claude -p "${prompt.replace(/"/g, '\\"')}" --dangerously-skip-permissions --model sonnet --max-turns 1 --bare`,
-      { cwd: ROOT, encoding: 'utf8', timeout: 60000, env, windowsHide: true }
-    ).trim();
-    return result || 'Sorry, I could not generate a response.';
+    const resolveClaudeFn = deps.resolveClaude || resolveClaude;
+    const buildSpawnSpecFn = deps.buildClaudeSpawnSpec || buildClaudeSpawnSpec;
+    const buildEnvFn = deps.buildClaudeEnv || buildClaudeEnv;
+    const spawnSyncFn = deps.spawnSync || spawnSync;
+    const bin = resolveClaudeFn(env);
+    const spawnSpec = buildSpawnSpecFn(bin, [
+      '--output-format',
+      'text',
+      '--dangerously-skip-permissions',
+      '--model',
+      'sonnet',
+      '--max-turns',
+      '1',
+      '--bare',
+      '-p',
+    ]);
+    const result = spawnSyncFn(spawnSpec.command, spawnSpec.args, {
+      cwd: ROOT,
+      encoding: 'utf8',
+      timeout: 60000,
+      env: buildEnvFn(env),
+      input: prompt,
+      stdio: ['pipe', 'pipe', 'pipe'],
+      windowsHide: true,
+      shell: false,
+    });
+    if (result.error) throw result.error;
+    if (result.status !== 0) {
+      throw new Error(`claude exited ${result.status}: ${(result.stderr || '').slice(0, 300)}`);
+    }
+    const stdout = (result.stdout || '').trim();
+    return stdout || 'Sorry, I could not generate a response.';
   } catch (err) {
     log(`Claude error: ${err.message}`);
     return 'Sorry, I encountered an error processing your message.';
@@ -183,7 +221,16 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  log(`Fatal: ${err.message}`);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(err => {
+    log(`Fatal: ${err.message}`);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  buildClaudePrompt,
+  getClaudeResponse,
+  loadAllowed,
+  loadEnv,
+};

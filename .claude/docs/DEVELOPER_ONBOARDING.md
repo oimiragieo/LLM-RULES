@@ -44,7 +44,7 @@ git clone https://github.com/your-org/agent-studio.git
 cd agent-studio
 
 # Install dependencies
-npm install
+pnpm add
 
 # Copy environment template
 cp .env.example .env
@@ -58,12 +58,8 @@ Edit `.env` with your local settings:
 # Development environment
 AGENT_STUDIO_ENV=development
 
-# ML Features (enable all for development)
-PATTERN_DETECTION_ENABLED=true
-COST_PREDICTION_ENABLED=true
-ADAPTIVE_EXECUTION_ENABLED=true
-PERFORMANCE_PROFILING_ENABLED=true
-PATTERN_LIBRARY_ENABLED=true
+# ML facade status reporting (runtime ML modules are disabled in this checkout)
+ML_AUTOMATION_MODE=off
 
 # Memory settings
 HEAP_WARNING_THRESHOLD=70
@@ -76,7 +72,7 @@ Verify everything works:
 
 ```bash
 # Run the full test suite
-npm test
+pnpm test
 
 # Expected output:
 # tests 1364
@@ -447,10 +443,10 @@ If you suspect a memory leak:
 
 ```bash
 # Run with GC tracing
-NODE_OPTIONS="--trace-gc --max-old-space-size=2048" npm test
+NODE_OPTIONS="--trace-gc --max-old-space-size=2048" pnpm test
 
 # Generate heap snapshot on OOM
-NODE_OPTIONS="--heapsnapshot-on-oom" npm test
+NODE_OPTIONS="--heapsnapshot-on-oom" pnpm test
 
 # Use Chrome DevTools for profiling
 node --inspect index.js
@@ -518,7 +514,7 @@ Now improve the implementation while keeping tests green.
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run specific test file
 node --test tests/my-feature.test.cjs
@@ -527,10 +523,10 @@ node --test tests/my-feature.test.cjs
 node --test tests/workflow*.test.cjs
 
 # Run with memory monitoring
-NODE_OPTIONS="--trace-gc --max-old-space-size=4096" npm test
+NODE_OPTIONS="--trace-gc --max-old-space-size=4096" pnpm test
 
 # Run with verbose output
-npm test -- --test-reporter spec
+pnpm test -- --test-reporter spec
 ```
 
 ### Writing Memory Leak Regression Tests

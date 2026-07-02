@@ -6,7 +6,7 @@
  * Consolidates 5 UserPromptSubmit hooks into a single file for reduced I/O and process spawning:
  * 1. router-mode-reset.cjs - Resets router state on new prompts
  * 2. router-enforcer.cjs - Advisory prompt analysis (shared routing-table.cjs)
- * 3. memory-reminder.cjs - Reminds agents to read memory files
+ * 3. Inlined memory reminder - Reminds agents to read memory files
  * 4. evolution-trigger-detector.cjs - Detects evolution trigger patterns (merged)
  * 5. memory-health-check.cjs - Checks memory system health (merged)
  *
@@ -1343,7 +1343,7 @@ async function checkRouterEnforcement(hookInput, options = {}) {
   return result;
 }
 // =============================================================================
-// Check 3: Memory Reminder (from memory-reminder.cjs)
+// Check 3: Memory Reminder (inlined from the former standalone hook)
 // =============================================================================
 /**
  * Check memory files and remind if content exists.
