@@ -51,7 +51,7 @@ try {
   console.log(` ${c.yellow}⚠ pnpm not found. Attempting to install via corepack...${c.reset}`);
   try {
     execFileSync('corepack', ['enable'], { shell: false, stdio: 'inherit' });
-    execFileSync('corepack', ['prepare', 'pnpm@latest', '--activate'], {
+    execFileSync('corepack', ['prepare', 'pnpm@11.4.0', '--activate'], {
       shell: false,
       stdio: 'inherit',
     });

@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const PROJECT_ROOT = process.cwd();
@@ -348,6 +348,29 @@ test('pnpm allowBuilds should approve better-sqlite3 native bindings', () => {
   );
 });
 
+test('pnpm major should be pinned consistently across local setup and CI', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const setupScript = readFileSync(join(PROJECT_ROOT, 'scripts', 'setup.cjs'), 'utf-8');
+  const workflowsDir = join(PROJECT_ROOT, '.github', 'workflows');
+  const workflowFiles = readdirSync(workflowsDir).filter(
+    file => file.endsWith('.yml') || file.endsWith('.yaml')
+  );
+
+  assert.equal(pkg.packageManager, 'pnpm@11.4.0');
+  assert.ok(
+    setupScript.includes('pnpm@11.4.0'),
+    'setup should prepare the same pnpm version as packageManager'
+  );
+
+  for (const file of workflowFiles) {
+    const workflow = readFileSync(join(workflowsDir, file), 'utf-8');
+    if (!workflow.includes('pnpm/action-setup@v4')) continue;
+
+    assert.ok(!/version:\s*9\b/.test(workflow), `${file} should not install pnpm 9`);
+    assert.ok(/version:\s*11\b/.test(workflow), `${file} should install pnpm 11`);
+  }
+});
+
 test('ESLint flat config replaces .eslintignore for node_modules and worktrees', () => {
   assert.ok(
     !existsSync(join(PROJECT_ROOT, '.eslintignore')),
@@ -373,11 +396,10 @@ test('validate:full should include status check governance validation', () => {
 });
 
 test('better-sqlite3 should be listed in onlyBuiltDependencies for CI native builds', () => {
-  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
-  const builtDeps = pkg?.pnpm?.onlyBuiltDependencies || [];
+  const workspaceConfig = readFileSync(join(PROJECT_ROOT, 'pnpm-workspace.yaml'), 'utf-8');
 
   assert.ok(
-    Array.isArray(builtDeps) && builtDeps.includes('better-sqlite3'),
-    'pnpm.onlyBuiltDependencies should include better-sqlite3 so CI builds its native binding'
+    /^ {2}- better-sqlite3$/m.test(workspaceConfig),
+    'pnpm-workspace.yaml onlyBuiltDependencies should include better-sqlite3 so CI builds its native binding'
   );
 });

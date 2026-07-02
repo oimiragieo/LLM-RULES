@@ -66,12 +66,13 @@ function git(gitArgs, { cwd = PROJECT_ROOT, throws = true } = {}) {
 /**
  * Parse `git worktree list --porcelain` output into an array of worktree objects.
  *
- * Each object has: { worktreePath, HEAD, branch }
+ * Each object has: { worktreePath, HEAD, branch, locked, lockedReason }
  *
- * @returns {{ worktreePath: string, HEAD: string, branch: string }[]}
+ * @param {string} raw - Output from `git worktree list --porcelain`.
+ * @returns {{ worktreePath: string, HEAD: string, branch: string, locked: boolean, lockedReason: string }[]}
  */
-function listWorktrees() {
-  const raw = git(['worktree', 'list', '--porcelain']);
+function parseWorktreeList(raw) {
+  if (!raw || raw.trim() === '') return [];
   const blocks = raw.trim().split(/\n\n+/);
   const worktrees = [];
   for (const block of blocks) {
@@ -79,14 +80,26 @@ function listWorktrees() {
     const wtLine = lines.find(l => l.startsWith('worktree '));
     const headLine = lines.find(l => l.startsWith('HEAD '));
     const branchLine = lines.find(l => l.startsWith('branch '));
+    const lockedLine = lines.find(l => l.startsWith('locked'));
     if (!wtLine) continue;
     // SE-01: normalize backslashes
     const worktreePath = wtLine.slice('worktree '.length).trim().replace(/\\/g, '/');
     const HEAD = headLine ? headLine.slice('HEAD '.length).trim() : '';
     const branch = branchLine ? branchLine.slice('branch refs/heads/'.length).trim() : '';
-    worktrees.push({ worktreePath, HEAD, branch });
+    const locked = Boolean(lockedLine);
+    const lockedReason = lockedLine ? lockedLine.slice('locked'.length).trim() : '';
+    worktrees.push({ worktreePath, HEAD, branch, locked, lockedReason });
   }
   return worktrees;
+}
+
+/**
+ * Parse `git worktree list --porcelain` output into an array of worktree objects.
+ *
+ * @returns {{ worktreePath: string, HEAD: string, branch: string, locked: boolean, lockedReason: string }[]}
+ */
+function listWorktrees() {
+  return parseWorktreeList(git(['worktree', 'list', '--porcelain']));
 }
 
 /**
@@ -326,12 +339,22 @@ function main() {
 
   // Step 4: For each worktree, check staleness and optionally remove
   for (const wt of subagentWorktrees) {
-    const { worktreePath, branch } = wt;
+    const { worktreePath, branch, locked, lockedReason } = wt;
     const shortPath = worktreePath.replace(normalizedProjectRoot + '/', '');
 
     // Safety guard: never remove the current session's worktree
     if (normalizedCwd.startsWith(worktreePath)) {
       console.log(`  SKIP  ${shortPath}  (current session worktree)`);
+      skipped++;
+      continue;
+    }
+
+    // Safety guard: never remove a Git-locked worktree. Git locks are advisory
+    // but can represent an active agent session; recursive fallback deletion
+    // must not bypass them.
+    if (locked) {
+      const reason = lockedReason ? `locked: ${lockedReason}` : 'locked by git';
+      console.log(`  SKIP  ${shortPath}  (${reason})`);
       skipped++;
       continue;
     }
@@ -382,4 +405,17 @@ function main() {
   process.exit(errors > 0 ? 1 : 0);
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  deleteBranch,
+  extractBranchTimestamp,
+  isStale,
+  isTTLExpired,
+  listWorktrees,
+  parseWorktreeList,
+  pruneGitWorktrees,
+  removeWorktree,
+};

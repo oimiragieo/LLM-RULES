@@ -12,6 +12,8 @@ const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 
+const { parseWorktreeList } = require('../../../.claude/tools/cli/worktree-prune.cjs');
+
 const TOOL_PATH = path.resolve(
   __dirname,
   '..',
@@ -71,5 +73,29 @@ describe('worktree-prune CLI', () => {
       /Summary: \d+ removed, \d+ skipped, \d+ errors/,
       `stdout should contain summary line. Got: ${result.stdout}`
     );
+  });
+
+  it('parses git-locked worktree metadata so active agents can be skipped', () => {
+    const worktrees = parseWorktreeList(
+      [
+        'worktree C:/repo',
+        'HEAD 1111111111111111111111111111111111111111',
+        'branch refs/heads/main',
+        '',
+        'worktree C:/repo/.claude/worktrees/agent-a077670c',
+        'HEAD a8ba65da9a2ef7973dd43b68d553d0f6545d5bfa',
+        'branch refs/heads/worktree-agent-a077670c',
+        'locked claude agent agent-a077670c (pid 147960)',
+        '',
+      ].join('\n')
+    );
+
+    assert.equal(worktrees.length, 2);
+    assert.equal(worktrees[0].locked, false);
+    assert.equal(worktrees[0].lockedReason, '');
+    assert.equal(worktrees[1].worktreePath, 'C:/repo/.claude/worktrees/agent-a077670c');
+    assert.equal(worktrees[1].branch, 'worktree-agent-a077670c');
+    assert.equal(worktrees[1].locked, true);
+    assert.equal(worktrees[1].lockedReason, 'claude agent agent-a077670c (pid 147960)');
   });
 });
