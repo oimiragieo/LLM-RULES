@@ -12,6 +12,7 @@ const SIMPLE_REQUIRE = /require\(\s*['"]([^'"]+)['"]\s*\)/g;
 const PATH_JOIN_REQUIRE =
   /require\(\s*path\.join\(\s*(['"][^'"]*['"](?:\s*,\s*['"][^'"]*['"])*)\s*\)\s*\)/g;
 const IS_RELATIVE = /^\.\.?\//;
+const PROJECT_ROOT_MARKERS = ['.claude', 'package.json', 'pnpm-lock.yaml', '.git'];
 
 // Node.js built-in modules (don't need resolution)
 const NODE_BUILTINS = new Set([
@@ -39,6 +40,25 @@ const NODE_BUILTINS = new Set([
   'node:assert',
   'node:assert/strict',
 ]);
+
+function findProjectRoot(startDir) {
+  let current = startDir;
+
+  while (current && current !== path.parse(current).root) {
+    if (PROJECT_ROOT_MARKERS.some(marker => fs.existsSync(path.join(current, marker)))) {
+      return current;
+    }
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+
+  if (current && PROJECT_ROOT_MARKERS.some(marker => fs.existsSync(path.join(current, marker)))) {
+    return current;
+  }
+
+  return null;
+}
 
 /**
  * Extract require() paths from a .cjs file using regex.
@@ -172,19 +192,17 @@ function resolveRequirePath(requirePath, fromFile) {
     // Use real path to resolve symlinks
     const realResolved = fs.existsSync(resolved) ? fs.realpathSync(resolved) : resolved;
 
-    // Get project root from fromFile (traverse up to find .claude directory)
-    let projectRoot = fromDir;
-    while (projectRoot && projectRoot !== path.parse(projectRoot).root) {
-      if (fs.existsSync(path.join(projectRoot, '.claude'))) {
-        break;
-      }
-      projectRoot = path.dirname(projectRoot);
-    }
+    const projectRoot = findProjectRoot(fromDir) || fromDir;
 
     // Validate resolved path is within project root
     const realProjectRoot = fs.existsSync(projectRoot) ? fs.realpathSync(projectRoot) : projectRoot;
 
-    if (!realResolved.startsWith(realProjectRoot)) {
+    const relativeToRoot = path.relative(realProjectRoot, realResolved);
+    if (
+      relativeToRoot === ''
+        ? false
+        : relativeToRoot.startsWith('..') || path.isAbsolute(relativeToRoot)
+    ) {
       // Path traversal attempt - reject
       return null;
     }
@@ -196,4 +214,4 @@ function resolveRequirePath(requirePath, fromFile) {
   }
 }
 
-module.exports = { extractRequires, resolveRequirePath };
+module.exports = { extractRequires, resolveRequirePath, findProjectRoot };

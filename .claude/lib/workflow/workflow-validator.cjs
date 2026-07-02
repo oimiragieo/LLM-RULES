@@ -5,7 +5,149 @@
  */
 
 const fs = require('fs');
-const yaml = require('yaml');
+
+function parseYamlScalar(rawValue) {
+  const value = String(rawValue || '').trim();
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  if (value === 'null') return null;
+  if (/^-?\d+(?:\.\d+)?$/.test(value)) return Number(value);
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    return value.slice(1, -1);
+  }
+  return value;
+}
+
+function splitYamlKeyValue(text) {
+  const separatorIndex = text.indexOf(':');
+  if (separatorIndex === -1) {
+    throw new Error(`Invalid YAML line: ${text}`);
+  }
+  return {
+    key: text.slice(0, separatorIndex).trim(),
+    valueText: text.slice(separatorIndex + 1).trim(),
+  };
+}
+
+function parseYamlObject(lines, startIndex, indent) {
+  const objectValue = {};
+  let index = startIndex;
+
+  while (index < lines.length) {
+    const line = lines[index];
+    if (line.indent < indent || line.text.startsWith('- ')) break;
+    if (line.indent > indent) {
+      throw new Error(`Invalid YAML indentation near: ${line.text}`);
+    }
+
+    const { key, valueText } = splitYamlKeyValue(line.text);
+    if (valueText) {
+      objectValue[key] = parseYamlScalar(valueText);
+      index += 1;
+      continue;
+    }
+
+    const nextLine = lines[index + 1];
+    if (!nextLine || nextLine.indent <= indent) {
+      objectValue[key] = null;
+      index += 1;
+      continue;
+    }
+
+    const nested = parseYamlBlock(lines, index + 1, nextLine.indent);
+    objectValue[key] = nested.value;
+    index = nested.nextIndex;
+  }
+
+  return { value: objectValue, nextIndex: index };
+}
+
+function parseYamlArray(lines, startIndex, indent) {
+  const arrayValue = [];
+  let index = startIndex;
+
+  while (index < lines.length) {
+    const line = lines[index];
+    if (line.indent < indent || !line.text.startsWith('- ')) break;
+    if (line.indent !== indent) {
+      throw new Error(`Invalid YAML indentation near: ${line.text}`);
+    }
+
+    const itemText = line.text.slice(2).trim();
+    if (!itemText) {
+      const nextLine = lines[index + 1];
+      if (!nextLine || nextLine.indent <= indent) {
+        arrayValue.push(null);
+        index += 1;
+        continue;
+      }
+      const nested = parseYamlBlock(lines, index + 1, nextLine.indent);
+      arrayValue.push(nested.value);
+      index = nested.nextIndex;
+      continue;
+    }
+
+    if (itemText.includes(':')) {
+      const itemValue = {};
+      const { key, valueText } = splitYamlKeyValue(itemText);
+      itemValue[key] = valueText ? parseYamlScalar(valueText) : null;
+      let nextIndex = index + 1;
+      const continuation = lines[nextIndex];
+      if (continuation && continuation.indent > indent) {
+        const nested = parseYamlObject(lines, nextIndex, continuation.indent);
+        Object.assign(itemValue, nested.value);
+        nextIndex = nested.nextIndex;
+      }
+      arrayValue.push(itemValue);
+      index = nextIndex;
+      continue;
+    }
+
+    arrayValue.push(parseYamlScalar(itemText));
+    index += 1;
+  }
+
+  return { value: arrayValue, nextIndex: index };
+}
+
+function parseYamlBlock(lines, startIndex, indent) {
+  const current = lines[startIndex];
+  if (!current) {
+    return { value: {}, nextIndex: startIndex };
+  }
+  if (current.text.startsWith('- ')) {
+    return parseYamlArray(lines, startIndex, indent);
+  }
+  return parseYamlObject(lines, startIndex, indent);
+}
+
+function parseYamlFallback(content) {
+  const lines = String(content)
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map(line => ({
+      indent: (line.match(/^ */) || [''])[0].length,
+      text: line.trim(),
+    }))
+    .filter(line => line.text.length > 0 && !line.text.startsWith('#'));
+
+  if (lines.length === 0) {
+    return {};
+  }
+
+  return parseYamlBlock(lines, 0, lines[0].indent).value;
+}
+
+function parseWorkflowYaml(content) {
+  try {
+    return require('yaml').parse(content);
+  } catch (_err) {
+    return parseYamlFallback(content);
+  }
+}
 
 class WorkflowValidator {
   /**
@@ -24,7 +166,7 @@ class WorkflowValidator {
     if (typeof workflowOrPath === 'string') {
       try {
         const content = fs.readFileSync(workflowOrPath, 'utf8');
-        workflow = yaml.parse(content);
+        workflow = parseWorkflowYaml(content);
       } catch (err) {
         if (returnErrors) {
           return { valid: false, errors: [`Failed to read workflow file: ${err.message}`] };

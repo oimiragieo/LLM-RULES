@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { isCrossPlatformAbsolutePath } = require('../../lib/utils/path-canonicalizer.cjs');
 
 const {
   PROJECT_ROOT,
@@ -111,6 +112,9 @@ function normalizeTaskOutputPath(rawPath) {
       normalized = `${drive}:\\${rest}`;
     }
   }
+  if (isCrossPlatformAbsolutePath(normalized)) {
+    return path.normalize(normalized);
+  }
   return path.resolve(normalized);
 }
 
@@ -118,8 +122,8 @@ function extractTaskOutputPathsFromCommand(command) {
   if (!command || typeof command !== 'string') return [];
   const results = new Set();
   const regexes = [
-    /([A-Za-z]:\\[^\s"'`]*?tasks\\[^\s"'`]+\.output)/g,
-    /(\/[a-zA-Z]\/[^\s"'`]*?\/tasks\/[^\s"'`]+\.output)/g,
+    /([A-Za-z]:[\\/][^\s"'`]*?tasks[\\/][^\s"'`]+\.output)/g,
+    /(\/[^\s"'`]*?\/tasks\/[^\s"'`]+\.output)/g,
   ];
   for (const regex of regexes) {
     let match = regex.exec(command);
@@ -362,7 +366,12 @@ function checkBashArtifactWriteSafety(toolName, toolInput, hookInput) {
 function normalizeToolPath(rawPath) {
   if (!rawPath || typeof rawPath !== 'string') return null;
   const canonical = canonicalizePathForPlatform(rawPath, PROJECT_ROOT);
-  const resolved = path.isAbsolute(canonical) ? canonical : path.resolve(PROJECT_ROOT, canonical);
+  const resolved = isCrossPlatformAbsolutePath(canonical)
+    ? canonical
+    : path.resolve(PROJECT_ROOT, canonical);
+  if (isCrossPlatformAbsolutePath(resolved) && !path.isAbsolute(resolved)) {
+    return null;
+  }
   const relative = path.relative(PROJECT_ROOT, resolved);
   if (relative.startsWith('..')) return null;
   return relative.replace(/\\/g, '/');

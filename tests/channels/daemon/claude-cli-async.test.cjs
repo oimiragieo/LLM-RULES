@@ -16,10 +16,19 @@ function createFakeChild(opts = {}) {
   child.pid = opts.pid || 12345;
   child.killed = false;
 
-  child.stdin = {
-    write: mock.fn(),
-    end: mock.fn(),
-  };
+  child.stdin = new EventEmitter();
+  child.stdin.write = mock.fn(chunk => {
+    if (typeof opts.onWrite === 'function') {
+      return opts.onWrite(chunk, child.stdin, child);
+    }
+    return true;
+  });
+  child.stdin.end = mock.fn(() => {
+    if (typeof opts.onEnd === 'function') {
+      return opts.onEnd(child.stdin, child);
+    }
+    return undefined;
+  });
   child.stdout = new EventEmitter();
   child.stderr = new EventEmitter();
 
@@ -121,6 +130,30 @@ describe('claudeAsync', () => {
         return true;
       });
       assert.equal(fakeChild.kill.mock.callCount(), 1);
+    });
+
+    it('handles stdin EPIPE emitted after cancel without leaking async errors', async () => {
+      const mod = require('../../../scripts/channels/daemon/claude-cli.cjs');
+      const child = createFakeChild({
+        onWrite(_chunk, stdin) {
+          setImmediate(() => {
+            const err = new Error('write EPIPE');
+            err.code = 'EPIPE';
+            stdin.emit('error', err);
+          });
+          return true;
+        },
+      });
+      const spawn = mock.fn(() => child);
+      const handle = mod._claudeAsyncImpl('slow task', {}, spawn);
+      handle.cancel();
+
+      await assert.rejects(handle.promise, err => {
+        assert.ok(err.message.includes('cancelled') || err.message.includes('cancel'));
+        return true;
+      });
+
+      assert.equal(child.kill.mock.callCount(), 1);
     });
   });
 

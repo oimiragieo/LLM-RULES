@@ -19,9 +19,31 @@
     "gotchasSentinelRemoved": true,
     "gotchasRemainingCount": 13
   },
-  "lastDaily": "2026-04-17T00:05:47.064Z",
+  "lastDaily": "2026-04-18T00:06:13.767Z",
   "lastWeekly": "2026-04-13T05:23:04.894Z",
   "history": [
+    {
+      "type": "daily",
+      "timestamp": "2026-04-18T00:06:13.767Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        }
+      ]
+    },
     {
       "type": "daily",
       "timestamp": "2026-04-17T00:05:47.064Z",
@@ -787,31 +809,9 @@
           "success": true
         }
       ]
-    },
-    {
-      "type": "daily",
-      "timestamp": "2026-03-21T03:14:45.515Z",
-      "tasks": [
-        {
-          "type": "consolidation",
-          "success": true
-        },
-        {
-          "type": "healthCheck",
-          "success": true
-        },
-        {
-          "type": "metricsLog",
-          "success": true
-        },
-        {
-          "type": "taskRecovery",
-          "success": true
-        }
-      ]
     }
   ],
-  "lastRun": "2026-04-17T00:05:47.064Z",
+  "lastRun": "2026-04-18T00:06:13.767Z",
   "lastColdArchive": "2026-04-13T05:23:05.402Z",
   "lastAudit": "2026-03-19T18:53:00.000Z",
   "auditResult": {

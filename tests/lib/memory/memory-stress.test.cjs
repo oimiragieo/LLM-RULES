@@ -22,10 +22,6 @@ function cleanupTestRoot() {
     if (lancedbClient && typeof lancedbClient.closeConnection === 'function') {
       lancedbClient.closeConnection();
     }
-    const dbClient = require('../../../.claude/lib/memory/db-client.cjs');
-    if (dbClient && typeof dbClient.closeDb === 'function') {
-      dbClient.closeDb();
-    }
   } catch (_err) {
     // Ignore cleanup errs
   }

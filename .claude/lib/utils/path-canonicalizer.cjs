@@ -1,6 +1,8 @@
 'use strict';
 
 const path = require('path');
+const WINDOWS_ABSOLUTE_PATH = /^[a-zA-Z]:[\\/]/;
+const UNC_PATH = /^\\\\[^\\]+\\[^\\]+/;
 
 function toWindowsDrivePath(rawPath) {
   if (!rawPath || typeof rawPath !== 'string') return rawPath;
@@ -9,6 +11,18 @@ function toWindowsDrivePath(rawPath) {
   const drive = unixDriveMatch[1].toUpperCase();
   const rest = unixDriveMatch[2].replace(/\//g, '\\');
   return `${drive}:\\${rest}`;
+}
+
+function isWindowsAbsolutePath(rawPath) {
+  return (
+    typeof rawPath === 'string' && (WINDOWS_ABSOLUTE_PATH.test(rawPath) || UNC_PATH.test(rawPath))
+  );
+}
+
+function isCrossPlatformAbsolutePath(rawPath) {
+  return (
+    typeof rawPath === 'string' && (path.isAbsolute(rawPath) || isWindowsAbsolutePath(rawPath))
+  );
 }
 
 function canonicalizePathForPlatform(rawPath, projectRoot = null) {
@@ -21,7 +35,7 @@ function canonicalizePathForPlatform(rawPath, projectRoot = null) {
     normalized = toWindowsDrivePath(normalized);
   }
 
-  if (projectRoot && !path.isAbsolute(normalized)) {
+  if (projectRoot && !isCrossPlatformAbsolutePath(normalized)) {
     return path.resolve(projectRoot, normalized);
   }
 
@@ -40,6 +54,8 @@ function canonicalizePathMentionsInText(text) {
 
 module.exports = {
   toWindowsDrivePath,
+  isWindowsAbsolutePath,
+  isCrossPlatformAbsolutePath,
   canonicalizePathForPlatform,
   canonicalizePathMentionsInText,
 };

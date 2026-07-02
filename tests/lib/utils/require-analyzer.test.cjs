@@ -149,6 +149,7 @@ describe('resolveRequirePath', () => {
   let tempDir;
   let hookFile;
   let targetFile;
+  let escapedSiblingFile;
 
   before(() => {
     // Create temp directory structure
@@ -161,15 +162,21 @@ describe('resolveRequirePath', () => {
 
     hookFile = path.join(hooksDir, 'hook.cjs');
     targetFile = path.join(hooksDir, 'error-tracker.cjs');
+    escapedSiblingFile = path.join(path.dirname(tempDir), `${path.basename(tempDir)}-outside.cjs`);
 
+    fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify({ name: 'fixture-root' }));
     fs.writeFileSync(hookFile, '// test hook');
     fs.writeFileSync(targetFile, '// test target');
     fs.writeFileSync(path.join(libDir, 'hook-input.cjs'), '// lib file');
+    fs.writeFileSync(escapedSiblingFile, '// outside fixture root');
   });
 
   after(() => {
     if (tempDir && fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+    if (escapedSiblingFile && fs.existsSync(escapedSiblingFile)) {
+      fs.rmSync(escapedSiblingFile, { force: true });
     }
   });
 
@@ -216,5 +223,13 @@ describe('resolveRequirePath', () => {
     assert.ok(resolved);
     // Path should be within the temp directory (simulating PROJECT_ROOT)
     assert.ok(resolved.startsWith(tempDir));
+  });
+
+  it('[SEC-CI-002] rejects existing sibling files outside a fixture root discovered via package.json', () => {
+    const maliciousPath = `../../../${path.basename(escapedSiblingFile)}`;
+
+    const resolved = resolveRequirePath(maliciousPath, hookFile);
+
+    assert.equal(resolved, null);
   });
 });

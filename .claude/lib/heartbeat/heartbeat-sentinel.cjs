@@ -23,6 +23,8 @@ try {
   // proper-lockfile unavailable — will use atomic tmp-rename instead
 }
 
+let sentinelWriteSequence = 0;
+
 /** Absolute path to the sentinel file. */
 function getSentinelPath() {
   const projectRoot = path.resolve(__dirname, '..', '..', '..');
@@ -47,7 +49,7 @@ function writeSentinel(loops) {
   const sentinelData = {
     written_at: now.toISOString(),
     expires_at: expiresAt.toISOString(),
-    session_id: Date.now().toString(36),
+    session_id: createSessionId(),
     loop_count: loops.length,
     loops: loops.map(loop => ({
       id: loop.id || null,
@@ -92,6 +94,15 @@ function writeSentinel(loops) {
   }
 
   return sentinelPath;
+}
+
+function createSessionId() {
+  sentinelWriteSequence += 1;
+  return [
+    Date.now().toString(36),
+    process.pid.toString(36),
+    sentinelWriteSequence.toString(36),
+  ].join('-');
 }
 
 /**
