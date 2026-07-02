@@ -11,7 +11,40 @@ const {
   LIMITS,
 } = require('../../.claude/lib/orchestration/large-file-interceptor.cjs');
 
+const MODULE_PATH = require.resolve('../../.claude/lib/orchestration/large-file-interceptor.cjs');
+
 describe('large-file-interceptor', () => {
+  describe('env limit parsing', () => {
+    it('preserves an explicit limit of 0 (does not fall back to default)', () => {
+      const saved = process.env.INTERCEPT_LIMIT_CODE;
+      process.env.INTERCEPT_LIMIT_CODE = '0';
+      try {
+        delete require.cache[MODULE_PATH];
+        const fresh = require('../../.claude/lib/orchestration/large-file-interceptor.cjs');
+        assert.equal(fresh.LIMITS.code, 0, 'configured 0 must be preserved, not replaced by 50000');
+      } finally {
+        if (saved === undefined) delete process.env.INTERCEPT_LIMIT_CODE;
+        else process.env.INTERCEPT_LIMIT_CODE = saved;
+        delete require.cache[MODULE_PATH];
+        require('../../.claude/lib/orchestration/large-file-interceptor.cjs');
+      }
+    });
+
+    it('falls back to default for an unset/invalid limit', () => {
+      const saved = process.env.INTERCEPT_LIMIT_CODE;
+      process.env.INTERCEPT_LIMIT_CODE = 'not-a-number';
+      try {
+        delete require.cache[MODULE_PATH];
+        const fresh = require('../../.claude/lib/orchestration/large-file-interceptor.cjs');
+        assert.equal(fresh.LIMITS.code, 50000, 'invalid value must fall back to default');
+      } finally {
+        if (saved === undefined) delete process.env.INTERCEPT_LIMIT_CODE;
+        else process.env.INTERCEPT_LIMIT_CODE = saved;
+        delete require.cache[MODULE_PATH];
+        require('../../.claude/lib/orchestration/large-file-interceptor.cjs');
+      }
+    });
+  });
   describe('shouldIntercept', () => {
     it('returns false for small content', () => {
       assert.equal(shouldIntercept('small text'), false);

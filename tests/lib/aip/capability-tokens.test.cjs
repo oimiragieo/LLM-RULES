@@ -235,3 +235,59 @@ describe('AIP capability-tokens — Test 7: overhead benchmark < 5ms', () => {
     assert.ok(avgMs < 3, `issueToken avg ${avgMs.toFixed(2)}ms exceeds 3ms hard limit`);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Test 8: Fail-closed in production when no signing secret is configured
+// ---------------------------------------------------------------------------
+
+describe('AIP capability-tokens — Test 8: production fail-closed key policy', () => {
+  const MODULE_PATH = require.resolve('../../../.claude/lib/aip/capability-tokens.cjs');
+
+  it('refuses to issue tokens in production with no AIP_TOKEN_SECRET (no predictable key)', () => {
+    const savedNodeEnv = process.env.NODE_ENV;
+    const savedSecret = process.env.AIP_TOKEN_SECRET;
+    const savedAllow = process.env.AIP_ALLOW_DEV_KEY;
+    process.env.NODE_ENV = 'production';
+    delete process.env.AIP_TOKEN_SECRET;
+    delete process.env.AIP_ALLOW_DEV_KEY;
+    try {
+      delete require.cache[MODULE_PATH];
+      const fresh = require('../../../.claude/lib/aip/capability-tokens.cjs');
+      assert.throws(
+        () => fresh.issueToken('router', 'developer', ['Read'], 3600),
+        /production|predictable|AIP_TOKEN_SECRET/i,
+        'must fail closed rather than sign with a guessable dev key'
+      );
+    } finally {
+      if (savedNodeEnv === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = savedNodeEnv;
+      if (savedSecret === undefined) delete process.env.AIP_TOKEN_SECRET;
+      else process.env.AIP_TOKEN_SECRET = savedSecret;
+      if (savedAllow === undefined) delete process.env.AIP_ALLOW_DEV_KEY;
+      else process.env.AIP_ALLOW_DEV_KEY = savedAllow;
+      delete require.cache[MODULE_PATH];
+    }
+  });
+
+  it('AIP_ALLOW_DEV_KEY=1 permits the dev fallback even in production', () => {
+    const savedNodeEnv = process.env.NODE_ENV;
+    const savedSecret = process.env.AIP_TOKEN_SECRET;
+    const savedAllow = process.env.AIP_ALLOW_DEV_KEY;
+    process.env.NODE_ENV = 'production';
+    delete process.env.AIP_TOKEN_SECRET;
+    process.env.AIP_ALLOW_DEV_KEY = '1';
+    try {
+      delete require.cache[MODULE_PATH];
+      const fresh = require('../../../.claude/lib/aip/capability-tokens.cjs');
+      assert.doesNotThrow(() => fresh.issueToken('router', 'developer', ['Read'], 3600));
+    } finally {
+      if (savedNodeEnv === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = savedNodeEnv;
+      if (savedSecret === undefined) delete process.env.AIP_TOKEN_SECRET;
+      else process.env.AIP_TOKEN_SECRET = savedSecret;
+      if (savedAllow === undefined) delete process.env.AIP_ALLOW_DEV_KEY;
+      else process.env.AIP_ALLOW_DEV_KEY = savedAllow;
+      delete require.cache[MODULE_PATH];
+    }
+  });
+});

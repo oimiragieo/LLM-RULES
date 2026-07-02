@@ -252,6 +252,12 @@ class MerkleTree {
         differences.modified.push(...childDiff.modified);
         differences.deleted.push(...childDiff.deleted);
       }
+    } else {
+      // Type changed at this path (file ↔ directory). Neither branch above
+      // applies — treat the old node as deleted and the new node as added so
+      // the change is not silently dropped, leaving the index stale.
+      differences.deleted.push(basePath);
+      differences.added.push(basePath);
     }
 
     return differences;

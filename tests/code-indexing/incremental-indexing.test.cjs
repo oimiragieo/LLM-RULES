@@ -137,6 +137,49 @@ describe('Incremental indexing', () => {
       assert.strictEqual(result.updateType, 'incremental');
       assert.ok(result.filesDeleted >= 1, 'Should detect deletion');
     });
+
+    test('modified files are searchable after BM25-only incremental update', async () => {
+      const isolatedRoot = path.join(INCREMENTAL_TEST_DIR, 'bm25-only-search');
+      const dataDir = path.join(isolatedRoot, '.claude/context/data/lancedb');
+      const targetPath = path.join(isolatedRoot, 'search-target.js');
+      const previousMode = process.env.LANCEDB_EMBEDDING_MODE;
+      const previousUri = process.env.LANCEDB_URI;
+      const previousTable = process.env.LANCEDB_TABLE_CODE;
+      let bm25Manager = null;
+
+      process.env.LANCEDB_EMBEDDING_MODE = 'off';
+      process.env.LANCEDB_URI = dataDir;
+      delete process.env.LANCEDB_TABLE_CODE;
+
+      try {
+        await fs.mkdir(isolatedRoot, { recursive: true });
+        await fs.writeFile(targetPath, 'function marker() { return "initial token"; }\n');
+
+        bm25Manager = new IndexManager({ projectRoot: isolatedRoot, concurrency: 1 });
+        await bm25Manager.indexDirectory(isolatedRoot);
+
+        await fs.writeFile(
+          targetPath,
+          'function marker() {\n  return "quantum sparse retrieval";\n}\n'
+        );
+        await bm25Manager.incrementalUpdate();
+
+        const results = await bm25Manager.semanticSearch('quantum sparse retrieval', { limit: 5 });
+        assert.ok(
+          results.some(result => result.filePath === targetPath),
+          'BM25-only semanticSearch should find content added by incrementalUpdate'
+        );
+      } finally {
+        if (bm25Manager) await bm25Manager.close();
+        if (previousMode === undefined) delete process.env.LANCEDB_EMBEDDING_MODE;
+        else process.env.LANCEDB_EMBEDDING_MODE = previousMode;
+        if (previousUri === undefined) delete process.env.LANCEDB_URI;
+        else process.env.LANCEDB_URI = previousUri;
+        if (previousTable === undefined) delete process.env.LANCEDB_TABLE_CODE;
+        else process.env.LANCEDB_TABLE_CODE = previousTable;
+        await fs.rm(isolatedRoot, { recursive: true, force: true }).catch(() => {});
+      }
+    });
   });
 
   describe('incrementalUpdate when no previous tree', () => {

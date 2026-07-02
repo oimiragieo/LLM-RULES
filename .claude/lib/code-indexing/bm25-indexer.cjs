@@ -333,7 +333,7 @@ class BM25Indexer {
             score *= timeDecay;
           }
         }
-        results.push({ id: doc.id, score });
+        results.push({ id: doc.id, score, metadata: this.docMetadata[doc.id] || {} });
       }
     }
 

@@ -2,7 +2,68 @@
 packages:
   - '.'
 
+# NOTE: As of pnpm v10+, the `pnpm` field in package.json is IGNORED.
+# All overrides / onlyBuiltDependencies / patchedDependencies MUST live here.
+# See https://pnpm.io/settings
+
+# Security overrides — pin transitive deps to patched versions.
+# Verified against `pnpm audit` (see scripts/security for regeneration).
+overrides:
+  # Pre-existing hardening (carried over from package.json, version-bumped)
+  tar: '>=7.5.16'
+  minimatch: '>=10.2.1'
+  ajv@^6: '^6.14.0'
+  flatted: '>=3.4.2'
+  path-to-regexp: '>=8.4.0'
+  picomatch: '>=4.0.4'
+  brace-expansion: '>=5.0.7'
+  hono: '>=4.12.27'
+  '@hono/node-server': '>=1.19.13'
+  # Added 2026-06 — close open `pnpm audit` advisories
+  protobufjs: '>=8.6.5'
+  '@protobufjs/utf8': '>=1.1.1'
+  fast-uri: '^3.1.3'
+  shell-quote: '>=1.8.4'
+  ws: '>=8.21.0'
+  form-data: '>=4.0.6'
+  qs: '>=6.15.2'
+  ip-address: '>=10.1.1'
+  esbuild: '>=0.28.1'
+  '@babel/core': '^7.29.6'
+  markdown-it: '>=14.1.2'
+  linkify-it: '>=5.0.1'
+  js-yaml: '^4.2.0'
+
 onlyBuiltDependencies:
+  - '@ast-grep/cli'
   - '@vscode/ripgrep'
+  - better-sqlite3
+  - esbuild
   - onnxruntime-node
+  - protobufjs
   - sharp
+  - tree-sitter
+  - tree-sitter-go
+  - tree-sitter-javascript
+  - tree-sitter-python
+  - tree-sitter-rust
+  - tree-sitter-typescript
+  - unrs-resolver
+
+patchedDependencies:
+  tree-sitter@0.25.0: patches/tree-sitter@0.25.0.patch
+
+allowBuilds:
+  '@ast-grep/cli': true
+  '@vscode/ripgrep': true
+  better-sqlite3: true
+  esbuild: true
+  onnxruntime-node: true
+  sharp: true
+  tree-sitter: true
+  tree-sitter-go: true
+  tree-sitter-javascript: true
+  tree-sitter-python: true
+  tree-sitter-rust: true
+  tree-sitter-typescript: true
+  unrs-resolver: true

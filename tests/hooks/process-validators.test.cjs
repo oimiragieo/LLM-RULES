@@ -240,14 +240,24 @@ describe('process-validators', () => {
         const result = processValidators.validateKillCommand('kill -9 -1');
         assert.strictEqual(result.valid, false);
       });
+
+      it('should block killing PID 1', () => {
+        const result = processValidators.validateKillCommand('kill -9 1');
+        assert.strictEqual(result.valid, false);
+        assert.match(result.error, /PID 1/);
+      });
+
+      it('should block kill with a signal but no PID target', () => {
+        const result = processValidators.validateKillCommand('kill -SIGTERM');
+        assert.strictEqual(result.valid, false);
+        assert.match(result.error, /PID target/);
+      });
     });
 
     describe('edge cases', () => {
-      it('should handle empty command (allows by default)', () => {
-        // Note: Empty command has no dangerous patterns, so it passes
-        // The validator only blocks specific dangerous patterns (-1, 0, -0)
+      it('should reject empty command', () => {
         const result = processValidators.validateKillCommand('');
-        assert.strictEqual(result.valid, true);
+        assert.strictEqual(result.valid, false);
       });
 
       it('should handle unclosed quotes', () => {

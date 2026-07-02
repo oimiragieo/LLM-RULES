@@ -168,6 +168,23 @@ test('Test 5c: tier routing — confidence >= 0.8 → LTM', () => {
   assert.strictEqual(routeToTier(r2), 'ltm', `Expected ltm for 1.0, got ${routeToTier(r2)}`);
 });
 
+test('Test 5d: tier routing — missing/NaN confidence defaults to STM (not LTM)', () => {
+  const { routeToTier } = freshRequire(CAT7_WRITER);
+  const missing = minimalRecord();
+  delete missing.confidence;
+  assert.strictEqual(routeToTier(missing), 'stm', 'missing confidence must default to stm');
+  assert.strictEqual(
+    routeToTier(minimalRecord({ confidence: NaN })),
+    'stm',
+    'NaN confidence must default to stm'
+  );
+  assert.strictEqual(
+    routeToTier(minimalRecord({ confidence: 'oops' })),
+    'stm',
+    'non-numeric confidence must default to stm'
+  );
+});
+
 // ── Test 6: Round-trip write→read preserves all 7 fields ─────────────────
 test('Test 6: round-trip write→read preserves all 7 fields', () => {
   const { writeRecord, readRecord } = freshRequire(CAT7_WRITER);

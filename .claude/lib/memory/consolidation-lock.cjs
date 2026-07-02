@@ -34,6 +34,9 @@ const { MEMORY_DIR } = require('./memory-paths.cjs');
 /** Lock file name within the memory directory */
 const LOCK_FILENAME = '.consolidate-lock';
 
+/** Serializes lock acquisition attempts so stale-lock reclaim is single-writer */
+const ACQUIRE_LOCK_SUFFIX = '.acquire';
+
 /** Stale threshold: 60 minutes in ms */
 const STALE_THRESHOLD_MS = 60 * 60 * 1000;
 
@@ -66,6 +69,10 @@ function getLockPath(memoryDir) {
   return path.join(memoryDir || MEMORY_DIR, LOCK_FILENAME);
 }
 
+function getAcquireLockPath(lockPath) {
+  return `${lockPath}${ACQUIRE_LOCK_SUFFIX}`;
+}
+
 /**
  * Check whether a process with the given PID is currently running.
  * Uses `process.kill(pid, 0)` which is cross-platform in Node.js:
@@ -85,6 +92,37 @@ function isProcessAlive(pid) {
     if (e.code === 'EPERM') return true;
     // ESRCH (or other): process does not exist
     return false;
+  }
+}
+
+function tryAcquireSerializationLock(lockPath) {
+  const acquirePath = getAcquireLockPath(lockPath);
+  try {
+    fs.mkdirSync(acquirePath);
+    return acquirePath;
+  } catch (err) {
+    if (err.code !== 'EEXIST') return null;
+  }
+
+  try {
+    const stat = fs.statSync(acquirePath);
+    if (Date.now() - stat.mtimeMs <= STALE_THRESHOLD_MS) {
+      return null;
+    }
+    fs.rmSync(acquirePath, { recursive: true, force: true });
+    fs.mkdirSync(acquirePath);
+    return acquirePath;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function releaseSerializationLock(acquirePath) {
+  if (!acquirePath) return;
+  try {
+    fs.rmSync(acquirePath, { recursive: true, force: true });
+  } catch (_err) {
+    // Best-effort cleanup; a stale acquisition lock is reclaimable by mtime.
   }
 }
 
@@ -125,64 +163,71 @@ function readLastConsolidatedAt(memoryDir) {
  */
 function tryAcquireConsolidationLock(memoryDir) {
   const lockPath = getLockPath(memoryDir);
-  let priorMtime = 0;
-
-  // ── Step 1 & 2: Check existing lock ────────────────────────────────────────
-  try {
-    const stat = fs.statSync(lockPath);
-    priorMtime = stat.mtimeMs;
-
-    // Try to read holder PID
-    let content = '';
-    try {
-      content = fs.readFileSync(lockPath, 'utf8').trim();
-    } catch (_readErr) {
-      // Unreadable → treat as corrupted → reclaimable
-    }
-
-    const holderPid = parseInt(content, 10);
-    // A valid PID is a positive integer whose decimal form equals the content
-    const isPidValid =
-      Number.isInteger(holderPid) && holderPid > 0 && String(holderPid) === content;
-
-    if (isPidValid) {
-      const isStale = Date.now() - stat.mtimeMs > STALE_THRESHOLD_MS;
-      if (!isStale && isProcessAlive(holderPid)) {
-        // Lock is held by a live process within the stale window → blocked
-        return null;
-      }
-      // Dead PID or stale lock → fall through to reclaim
-    }
-    // Corrupted content → fall through to reclaim
-  } catch (_statErr) {
-    // ENOENT (file doesn't exist) or other stat error → priorMtime stays 0
-  }
-
-  // ── Step 3: Ensure directory exists and write our PID ─────────────────────
   try {
     fs.mkdirSync(path.dirname(lockPath), { recursive: true });
   } catch (_mkdirErr) {
     return null;
   }
 
-  try {
-    fs.writeFileSync(lockPath, String(process.pid), 'utf8');
-  } catch (_writeErr) {
-    return null;
-  }
+  const acquirePath = tryAcquireSerializationLock(lockPath);
+  if (!acquirePath) return null;
 
-  // ── Step 4: Verify by re-reading (race detection) ─────────────────────────
   try {
-    const written = fs.readFileSync(lockPath, 'utf8').trim();
-    if (written !== String(process.pid)) {
-      return null; // Another process won the race
+    let priorMtime = 0;
+
+    // ── Step 1 & 2: Check existing lock ────────────────────────────────────────
+    try {
+      const stat = fs.statSync(lockPath);
+      priorMtime = stat.mtimeMs;
+
+      // Try to read holder PID
+      let content = '';
+      try {
+        content = fs.readFileSync(lockPath, 'utf8').trim();
+      } catch (_readErr) {
+        // Unreadable → treat as corrupted → reclaimable
+      }
+
+      const holderPid = parseInt(content, 10);
+      // A valid PID is a positive integer whose decimal form equals the content
+      const isPidValid =
+        Number.isInteger(holderPid) && holderPid > 0 && String(holderPid) === content;
+
+      if (isPidValid) {
+        const isStale = Date.now() - stat.mtimeMs > STALE_THRESHOLD_MS;
+        if (!isStale && isProcessAlive(holderPid)) {
+          // Lock is held by a live process within the stale window → blocked
+          return null;
+        }
+        // Dead PID or stale lock → fall through to reclaim
+      }
+      // Corrupted content → fall through to reclaim
+    } catch (_statErr) {
+      // ENOENT (file doesn't exist) or other stat error → priorMtime stays 0
     }
-  } catch (_readErr) {
-    return null;
-  }
 
-  // ── Step 5: Return prior mtime for rollback ───────────────────────────────
-  return priorMtime;
+    // ── Step 3: Write our PID ───────────────────────────────────────────────
+    try {
+      fs.writeFileSync(lockPath, String(process.pid), 'utf8');
+    } catch (_writeErr) {
+      return null;
+    }
+
+    // ── Step 4: Verify by re-reading (race detection) ─────────────────────────
+    try {
+      const written = fs.readFileSync(lockPath, 'utf8').trim();
+      if (written !== String(process.pid)) {
+        return null; // Another process won the race
+      }
+    } catch (_readErr) {
+      return null;
+    }
+
+    // ── Step 5: Return prior mtime for rollback ───────────────────────────────
+    return priorMtime;
+  } finally {
+    releaseSerializationLock(acquirePath);
+  }
 }
 
 /**

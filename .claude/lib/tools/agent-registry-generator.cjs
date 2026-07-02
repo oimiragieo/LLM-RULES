@@ -192,7 +192,10 @@ function generateCapabilityCard(
  * AgentRegistryGenerator class
  */
 class AgentRegistryGenerator {
-  constructor() {
+  constructor(options = {}) {
+    this.schemaPath =
+      options.schemaPath ||
+      path.join(PROJECT_ROOT, '.claude/schemas/agent-capability-card.schema.json');
     this.agents = new Map();
     this.registry = {
       version: '1.0.0',
@@ -365,17 +368,33 @@ class AgentRegistryGenerator {
    * @returns {Object} Validation result
    */
   validate(registry) {
-    const schemaPath = path.join(PROJECT_ROOT, '.claude/schemas/agent-capability-card.schema.json');
-
-    if (!fs.existsSync(schemaPath)) {
-      return { valid: true, errors: [], message: 'Schema file not found, skipping validation' };
+    if (!fs.existsSync(this.schemaPath)) {
+      return {
+        valid: false,
+        errors: [
+          {
+            agentId: 'registry',
+            errors: [{ instancePath: '', message: `schema file not found: ${this.schemaPath}` }],
+          },
+        ],
+        message: 'Schema file not found',
+      };
     }
 
     if (!Ajv || !addFormats) {
-      return { valid: true, errors: [], message: 'AJV not available, skipping validation' };
+      return {
+        valid: false,
+        errors: [
+          {
+            agentId: 'registry',
+            errors: [{ instancePath: '', message: 'AJV dependencies are not available' }],
+          },
+        ],
+        message: 'AJV not available',
+      };
     }
 
-    const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf-8'));
+    const schema = safeParseJSON(fs.readFileSync(this.schemaPath, 'utf-8'));
     const ajv = new Ajv({ allErrors: true, strict: false });
     addFormats(ajv);
 

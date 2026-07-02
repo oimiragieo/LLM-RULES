@@ -727,12 +727,9 @@ test('redis-cli FLUSHALL is blocked', () => {
 
 console.log('\n--- Process Kill Commands ---');
 
-// Note: The kill validator only blocks kill -1 and kill 0.
-// It does NOT specifically block kill 1 (PID 1, the init process).
-// This is a potential security gap that should be evaluated.
-test('kill -9 1 is allowed (current behavior - potential gap)', () => {
+test('kill -9 1 is blocked (PID 1)', () => {
   const result = validateCommand('kill -9 1');
-  assertTrue(result.valid, 'kill with specific PID is currently allowed');
+  assertFalse(result.valid, 'kill PID 1 should be blocked');
 });
 
 test('kill -1 (all processes) is blocked', () => {

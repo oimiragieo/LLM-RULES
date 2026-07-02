@@ -357,6 +357,29 @@ describe('Plugin Tool Registration', () => {
       assert.ok('command' in result[0], 'must have command field');
       assert.ok('description' in result[0], 'must have description field');
     });
+
+    it('filters tool commands that escape the plugin directory', () => {
+      const pluginDir = path.join(tmpDir, 'escaped-tool-plugin');
+      const outsideCommand = path.join(tmpDir, 'outside-tool.cjs');
+      writePluginJson(
+        pluginDir,
+        makeValidManifest({
+          tools: [
+            { name: 'safe-tool', command: 'bin/safe.cjs', description: 'Safe tool' },
+            { name: 'traversal-tool', command: '../outside-tool.cjs', description: 'Bad tool' },
+            { name: 'absolute-tool', command: outsideCommand, description: 'Bad absolute tool' },
+          ],
+        })
+      );
+
+      const result = loader.loadTools(pluginDir);
+      assert.equal(result.length, 1);
+      assert.equal(result[0].name, 'safe-tool');
+      assert.ok(
+        result[0].command.startsWith(pluginDir),
+        'safe command should resolve inside the plugin directory'
+      );
+    });
   });
 
   // -------------------------------------------------------------------------

@@ -6,6 +6,7 @@
  */
 
 import fs from 'fs/promises';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
@@ -16,7 +17,7 @@ const ROOT = path.join(__dirname, '../..');
 
 import { resolveConfigPath } from '../../.claude/lib/utils/context-path-resolver.mjs';
 const RULE_INDEX_PATH = resolveConfigPath('rule-index.json', { read: true });
-const BACKUP_PATH = path.join(ROOT, '.claude/context/rule-index.backup.json');
+let testRuleIndexPath = null;
 
 /**
  * Run validation script and capture output
@@ -25,6 +26,10 @@ function runValidation(args = []) {
   return new Promise((resolve, reject) => {
     const child = spawn('node', ['scripts/validate-rule-index-paths.mjs', ...args], {
       cwd: ROOT,
+      env: {
+        ...process.env,
+        ...(testRuleIndexPath ? { RULE_INDEX_PATH: testRuleIndexPath } : {}),
+      },
       shell: false,
     });
 
@@ -73,15 +78,13 @@ async function testVersionMatches() {
 async function testVersionMismatch() {
   console.log('Test 2: Version mismatch (simulated)');
 
-  // Backup original index
-  const originalContent = await fs.readFile(RULE_INDEX_PATH, 'utf-8');
-  await fs.writeFile(BACKUP_PATH, originalContent);
+  const originalContent = await fs.readFile(testRuleIndexPath, 'utf-8');
 
   try {
     // Modify version to create mismatch
     const ruleIndex = JSON.parse(originalContent);
     ruleIndex.version = '1.0.0';
-    await fs.writeFile(RULE_INDEX_PATH, JSON.stringify(ruleIndex, null, 2));
+    await fs.writeFile(testRuleIndexPath, JSON.stringify(ruleIndex, null, 2));
 
     const result = await runValidation(['--check-version']);
 
@@ -95,9 +98,7 @@ async function testVersionMismatch() {
       return false;
     }
   } finally {
-    // Restore original index
-    await fs.writeFile(RULE_INDEX_PATH, originalContent);
-    await fs.rm(BACKUP_PATH, { force: true });
+    await fs.writeFile(testRuleIndexPath, originalContent);
   }
 }
 
@@ -107,15 +108,13 @@ async function testVersionMismatch() {
 async function testMissingVersion() {
   console.log('Test 3: Missing version field');
 
-  // Backup original index
-  const originalContent = await fs.readFile(RULE_INDEX_PATH, 'utf-8');
-  await fs.writeFile(BACKUP_PATH, originalContent);
+  const originalContent = await fs.readFile(testRuleIndexPath, 'utf-8');
 
   try {
     // Remove version field
     const ruleIndex = JSON.parse(originalContent);
     delete ruleIndex.version;
-    await fs.writeFile(RULE_INDEX_PATH, JSON.stringify(ruleIndex, null, 2));
+    await fs.writeFile(testRuleIndexPath, JSON.stringify(ruleIndex, null, 2));
 
     const result = await runValidation(['--check-version']);
 
@@ -129,9 +128,7 @@ async function testMissingVersion() {
       return false;
     }
   } finally {
-    // Restore original index
-    await fs.writeFile(RULE_INDEX_PATH, originalContent);
-    await fs.rm(BACKUP_PATH, { force: true });
+    await fs.writeFile(testRuleIndexPath, originalContent);
   }
 }
 
@@ -164,12 +161,21 @@ async function runAllTests() {
   console.log('Running version validation tests...\n');
   console.log('='.repeat(60));
 
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rule-index-validation-'));
+  testRuleIndexPath = path.join(tempDir, 'rule-index.json');
+  await fs.copyFile(RULE_INDEX_PATH, testRuleIndexPath);
+
   const results = [];
 
-  results.push(await testVersionMatches());
-  results.push(await testVersionMismatch());
-  results.push(await testMissingVersion());
-  results.push(await testFullValidation());
+  try {
+    results.push(await testVersionMatches());
+    results.push(await testVersionMismatch());
+    results.push(await testMissingVersion());
+    results.push(await testFullValidation());
+  } finally {
+    testRuleIndexPath = null;
+    await fs.rm(tempDir, { recursive: true, force: true });
+  }
 
   console.log('='.repeat(60));
   console.log('\nTest Results:');

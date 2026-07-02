@@ -70,8 +70,27 @@ class AsyncLogBuffer {
       }
 
       if (!this.writeStream.write(chunk)) {
-        // Backpressure: wait for drain if buffer full
-        await new Promise(resolve => this.writeStream.once('drain', resolve));
+        // Backpressure: wait for drain. Also settle on 'error' (and a timeout)
+        // so a stream error can't leave this promise — and isFlushing — stuck
+        // forever, which would stall all future flushes and grow the buffer
+        // unbounded.
+        await new Promise(resolve => {
+          const stream = this.writeStream;
+          if (!stream) return resolve();
+          let settled = false;
+          const done = () => {
+            if (settled) return;
+            settled = true;
+            stream.removeListener('drain', done);
+            stream.removeListener('error', done);
+            clearTimeout(timer);
+            resolve();
+          };
+          const timer = setTimeout(done, this.flushInterval || 5000);
+          if (timer.unref) timer.unref();
+          stream.once('drain', done);
+          stream.once('error', done);
+        });
       }
     } catch (err) {
       console.error(`[AsyncLogBuffer] Write error: ${err.message}`);

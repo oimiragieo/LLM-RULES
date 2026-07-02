@@ -63,6 +63,39 @@ function reviewEventFlag(event) {
   return flag;
 }
 
+/**
+ * Validate a PR number is a positive integer before interpolating it into a
+ * command string. Prevents shell injection via a malicious "prNumber" value.
+ *
+ * @private
+ * @param {number|string} value
+ * @returns {number}
+ */
+function prNum(value) {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n <= 0) {
+    throw new Error(`Invalid PR number: ${value}`);
+  }
+  return n;
+}
+
+/**
+ * Map a merge method to its gh CLI flag from a strict allowlist.
+ * Prevents injection via a crafted "method" value.
+ *
+ * @private
+ * @param {string} method - One of merge, squash, rebase
+ * @returns {string} CLI flag, e.g. '--squash'
+ */
+function mergeMethodFlag(method) {
+  const map = { merge: '--merge', squash: '--squash', rebase: '--rebase' };
+  const flag = map[String(method).toLowerCase()];
+  if (!flag) {
+    throw new Error(`Unknown merge method: ${method}. Expected merge, squash, or rebase.`);
+  }
+  return flag;
+}
+
 // ---------------------------------------------------------------------------
 // GitHubCLI class
 // ---------------------------------------------------------------------------
@@ -157,7 +190,7 @@ class GitHubCLI {
    * @param {string} body     - Comment body text
    */
   commentOnPR(prNumber, body) {
-    const cmd = `gh pr comment ${prNumber} --body ${q(body)}`;
+    const cmd = `gh pr comment ${prNum(prNumber)} --body ${q(body)}`;
     this._exec(cmd);
   }
 
@@ -168,7 +201,7 @@ class GitHubCLI {
    * @returns {string} - Raw unified diff text
    */
   getPRDiff(prNumber) {
-    const cmd = `gh pr diff ${prNumber}`;
+    const cmd = `gh pr diff ${prNum(prNumber)}`;
     return this._exec(cmd);
   }
 
@@ -193,7 +226,7 @@ class GitHubCLI {
    * @returns {object} - Full PR object
    */
   getPR(number) {
-    const cmd = `gh pr view ${number} --json number,title,state,author,body,url,headRefName,baseRefName`;
+    const cmd = `gh pr view ${prNum(number)} --json number,title,state,author,body,url,headRefName,baseRefName`;
     const output = this._exec(cmd);
     return safeParseJSON(output, {});
   }
@@ -207,7 +240,7 @@ class GitHubCLI {
    * @param {string} [opts.event] - Review event: APPROVE, REQUEST_CHANGES, or COMMENT
    */
   createReview(prNumber, { body, event } = {}) {
-    let cmd = `gh pr review ${prNumber}`;
+    let cmd = `gh pr review ${prNum(prNumber)}`;
     if (event != null) cmd += ` ${reviewEventFlag(event)}`;
     if (body != null) cmd += ` --body ${q(body)}`;
     this._exec(cmd);
@@ -221,8 +254,8 @@ class GitHubCLI {
    * @param {string} [opts.method] - Merge method: merge, squash, or rebase
    */
   mergePR(prNumber, { method } = {}) {
-    let cmd = `gh pr merge ${prNumber}`;
-    if (method != null) cmd += ` --${method}`;
+    let cmd = `gh pr merge ${prNum(prNumber)}`;
+    if (method != null) cmd += ` ${mergeMethodFlag(method)}`;
     this._exec(cmd);
   }
 }

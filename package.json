@@ -50,7 +50,7 @@
     "metrics:reflection:alert": "node .claude/tools/cli/reflection-degradation-alert.cjs",
     "metrics:velocity": "node .claude/tools/cli/velocity-report.cjs",
     "validate": "node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs",
-    "validate:full": "pnpm validate && node scripts/validate-package-scripts.mjs && node scripts/validate-env-budget.mjs && node scripts/validation/validate-no-silent-catch.cjs && node scripts/validation/validate-archived-tests.mjs && node scripts/validation/validate-intent-keyword-overlap.cjs && node scripts/validation/validate-tool-stub-policy.cjs && node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs && pnpm validate:docs:stale && pnpm validate:hooks:docs && pnpm validate:env:enforcement && pnpm validate:module-size && pnpm validate:windows-hide && pnpm validate:workflow-skill-contracts && pnpm validate:cujs && pnpm validate:index && pnpm index-rules && pnpm validate:schemas && pnpm validate:commands && pnpm validate:agent-skill-refs && pnpm validate:agent-template-contract && pnpm validate:artifact-regression && pnpm validate:status-check-governance && pnpm validate:agent-memory && pnpm validate:sync && pnpm validate:routing && pnpm validate:ci-gate",
+    "validate:full": "pnpm validate && node scripts/validate-package-scripts.mjs && node scripts/validate-env-budget.mjs && node scripts/validation/validate-no-silent-catch.cjs && node scripts/validation/validate-archived-tests.mjs && node scripts/validation/validate-intent-keyword-overlap.cjs && node scripts/validation/validate-tool-stub-policy.cjs && node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs && pnpm validate:docs:stale && pnpm validate:hooks:docs && pnpm validate:env:enforcement && pnpm validate:module-size && pnpm validate:windows-hide && pnpm validate:workflow-skill-contracts && pnpm validate:cujs && pnpm validate:index && pnpm validate:index-paths && pnpm validate:schemas && pnpm validate:commands && pnpm validate:agent-skill-refs && pnpm validate:agent-template-contract && pnpm validate:artifact-regression && pnpm validate:status-check-governance && pnpm validate:agent-memory && pnpm validate:sync && pnpm validate:routing && pnpm validate:ci-gate",
     "validate:full:parallel": "node scripts/validation/validate-full-sequential.cjs",
     "validate:verbose": "node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs --verbose",
     "validate:sync": "node scripts/validation/validate-sync.mjs",
@@ -102,7 +102,7 @@
     "test:staging:smoke": "node --test tests/staging-smoke.test.mjs",
     "test:staging": "cross-env AGENT_STUDIO_ENV=staging node --test --test-concurrency=1 tests/*.test.mjs",
     "test:unit": "node --test --test-concurrency=1 tests/unit/**/*.test.mjs tests/unit/**/*.test.cjs",
-    "test:integration": "node --test tests/integration/*.test.mjs",
+    "test:integration": "node --test --test-concurrency=1 \"tests/integration/**/*.test.{mjs,cjs}\"",
     "test:tools": "node scripts/test-tools-runner.cjs",
     "test:framework": "node --test --test-concurrency=1 tests/hooks/**/*.test.cjs tests/lib/**/*.test.cjs tests/cli/*.test.cjs",
     "test:framework:memory": "node --test --test-concurrency=1 tests/lib/memory/*.test.cjs",
@@ -112,7 +112,7 @@
     "test:code-indexing": "node --test --test-concurrency=1 tests/code-indexing/ripgrep-integration.test.cjs tests/code-indexing/ast-grep-wrapper.test.cjs tests/code-indexing/merkle-tree.test.cjs tests/code-indexing/incremental-indexing.test.cjs tests/code-indexing/search-tools-integration.test.cjs tests/code-indexing/vector-store-lancedb.test.cjs tests/hooks/code-index-updater.test.cjs",
     "test:all": "concurrently -n test,framework \"pnpm test\" \"pnpm test:framework\" --max-processes=2",
     "test:ci": "node --test --test-concurrency=1 --test-reporter=spec \"tests/**/*.test.{mjs,cjs}\"",
-    "test:coverage": "node --test --test-concurrency=1 --experimental-test-coverage tests/*.test.mjs",
+    "test:coverage": "node --test --test-concurrency=1 --experimental-test-coverage \"tests/**/*.test.{mjs,cjs}\"",
     "lint": "node -e \"console.log('Linting .js, .cjs, .mjs...')\" && eslint . --ext .js,.cjs,.mjs --max-warnings 0 && node -e \"console.log('Linting .md...')\" && pnpm lint:md && node -e \"console.log('All linting passed.')\"",
     "lint:fix": "node -e \"console.log('Linting and fixing .js, .cjs, .mjs...')\" && eslint . --ext .js,.cjs,.mjs --fix && node -e \"console.log('Linting and fixing .md...')\" && pnpm lint:md:fix && node -e \"console.log('All linting passed.')\"",
     "lint:md": "markdownlint-cli2 \".claude/agents/**/*.md\" \".claude/skills/**/SKILL.md\" \".claude/rules/*.md\" \".claude/docs/**/*.md\" \".claude/workflows/core/*.md\" \".claude/templates/**/*.md\"",
@@ -239,9 +239,9 @@
     "express": "^5.2.1",
     "fastembed": "^2.1.0",
     "glob": "^13.0.6",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^4.2.0",
     "onnxruntime-node": "^1.24.3",
-    "piscina": "^5.1.4",
+    "piscina": "^5.2.0",
     "proper-lockfile": "^4.1.2",
     "sharp": "^0.34.5",
     "tree-sitter": "^0.25.0",
@@ -250,45 +250,12 @@
     "tree-sitter-python": "^0.25.0",
     "tree-sitter-rust": "^0.24.0",
     "tree-sitter-typescript": "^0.23.2",
-    "ws": "^8.20.0",
+    "ws": "^8.21.0",
     "yaml": "^2.8.3",
     "zod": "^4.3.6"
   },
   "optionalDependencies": {
     "onnxruntime-node-gpu": "^1.14.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "tar": ">=7.5.10",
-      "minimatch": ">=10.2.1",
-      "ajv@^6": "^6.14.0",
-      "flatted": ">=3.4.2",
-      "path-to-regexp": ">=8.4.0",
-      "picomatch": ">=4.0.4",
-      "brace-expansion": ">=5.0.5",
-      "hono": ">=4.12.14",
-      "@hono/node-server": ">=1.19.13",
-      "protobufjs": ">=7.5.5"
-    },
-    "onlyBuiltDependencies": [
-      "@ast-grep/cli",
-      "@vscode/ripgrep",
-      "better-sqlite3",
-      "esbuild",
-      "onnxruntime-node",
-      "protobufjs",
-      "sharp",
-      "tree-sitter",
-      "tree-sitter-go",
-      "tree-sitter-javascript",
-      "tree-sitter-python",
-      "tree-sitter-rust",
-      "tree-sitter-typescript",
-      "unrs-resolver"
-    ],
-    "patchedDependencies": {
-      "tree-sitter@0.25.0": "patches/tree-sitter@0.25.0.patch"
-    }
   },
   "devDependencies": {
     "@types/node": "^20.19.37",

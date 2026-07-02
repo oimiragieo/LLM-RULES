@@ -231,8 +231,10 @@ function collectAndBindEvidence(options) {
       try {
         const assertion = gatekeeper.getAssertion(valId);
         if (assertion && assertion.status !== 'passed') {
-          // Check if all verification steps passed
-          const allPassed = results.every(r => r.exitCode === 0);
+          // Check if all verification steps passed. Require at least one
+          // result — an empty `results` array would make `every()` vacuously
+          // true and mark the assertion 'passed' with NO verification run.
+          const allPassed = results.length > 0 && results.every(r => r.exitCode === 0);
 
           if (allPassed) {
             gatekeeper.transition(valId, 'passed', {

@@ -32,6 +32,9 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
   } else if (manager.options.verbose) {
     console.log(`[CHECKPOINT] Resuming from file ${startIndex}, skipping dropCodeTable()`);
   }
+  if (startIndex > 0) {
+    await manager.vectorStore.loadBM25Index();
+  }
 
   const batchSize = manager.options.batchSize || 100;
   const totalFilesCount = allFiles.length;
@@ -136,7 +139,18 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
               .join('\n')
               .trim();
             if (text.length === 0) continue;
-            chunks.push({ id: `${relPath}:${lineIdx}`, text });
+            // Carry filePath + line metadata so incremental deleteFile()
+            // (which matches on metadata.filePath) can find and remove these
+            // BM25 docs. Without it, updates/deletes silently no-op and stale
+            // duplicates accumulate. filePath is the absolute path, matching
+            // the embedding-mode convention and deleteFile(fullPath).
+            chunks.push({
+              id: `${relPath}:${lineIdx}`,
+              text,
+              filePath,
+              lineStart: lineIdx + 1,
+              lineEnd: Math.min(lineIdx + 50, lines.length),
+            });
           }
 
           filesProcessed++;
@@ -286,6 +300,7 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
 async function incrementalUpdateImpl(manager, options = {}) {
   const startTime = Date.now();
   await manager._initializeComponents();
+  await manager.vectorStore.loadBM25Index();
 
   const merklePath = path.join(
     manager.options.projectRoot,
@@ -377,6 +392,7 @@ async function incrementalUpdateImpl(manager, options = {}) {
 
       await manager.vectorStore.deleteFile(fullPath);
       chunksDeleted += chunks.length;
+      await manager.vectorStore.addChunksToBM25(chunks);
       await manager.vectorStore.addChunks(chunks, { addOnly: true });
 
       if (diff.added.includes(filePath)) {
@@ -390,6 +406,7 @@ async function incrementalUpdateImpl(manager, options = {}) {
   }
 
   await newTree.save(merklePath);
+  await manager.vectorStore.saveBM25Index();
 
   return {
     updateType: 'incremental',
@@ -406,16 +423,26 @@ async function incrementalUpdateImpl(manager, options = {}) {
 async function semanticSearchImpl(manager, query, options = {}) {
   await manager._initializeComponents();
 
-  const limit = options.limit || 10;
-  const minScore = options.minScore || 0.5;
+  const searchOptions = typeof options === 'number' ? { limit: options } : options || {};
+  const limit = searchOptions.limit || 10;
+  // Preserve an explicit minScore of 0 (return-all); `|| 0.5` would discard it.
+  const minScore = typeof searchOptions.minScore === 'number' ? searchOptions.minScore : 0.5;
 
   let searchResults = [];
   try {
-    searchResults = await manager.vectorStore.search(query, {
-      limit,
-      minScore,
-      filters: options.filters || {},
-    });
+    if (manager.vectorStore.embeddingMode === 'off') {
+      await manager.vectorStore.loadBM25Index();
+      searchResults = await manager.vectorStore.hybridSearch(query, {
+        mode: 'sparse',
+        k_sparse: limit,
+      });
+    } else {
+      searchResults = await manager.vectorStore.search(query, {
+        limit,
+        minScore,
+        filters: searchOptions.filters || {},
+      });
+    }
   } catch (error) {
     if (process.env.CODE_INDEX_DEBUG) {
       console.warn('[code-indexing] Semantic search unavailable:', error.message);
@@ -426,12 +453,14 @@ async function semanticSearchImpl(manager, query, options = {}) {
   const results = [];
   for (const result of searchResults) {
     const metadata = result.metadata || {};
+    const lineStart = metadata.lineStart || metadata.startLine || 1;
+    const lineEnd = metadata.lineEnd || metadata.endLine || lineStart;
     let code = null;
 
     try {
       const content = await fs.readFile(metadata.filePath, 'utf-8');
       const lines = content.split('\n');
-      code = lines.slice(metadata.lineStart - 1, metadata.lineEnd).join('\n');
+      code = lines.slice(lineStart - 1, lineEnd).join('\n');
     } catch (_error) {
       code = null;
     }
@@ -442,8 +471,8 @@ async function semanticSearchImpl(manager, query, options = {}) {
       filePath: metadata.filePath,
       language: metadata.language,
       type: metadata.type,
-      lineRange: [metadata.lineStart, metadata.lineEnd],
-      similarity: result.similarity,
+      lineRange: [lineStart, lineEnd],
+      similarity: result.similarity ?? result.score ?? result.rrf_score ?? 0,
       metadata,
     });
   }

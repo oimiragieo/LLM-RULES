@@ -6,13 +6,17 @@
 
 const { test, suite, before, after } = require('node:test');
 const assert = require('node:assert');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
 
 const CLI_PATH = path.join(__dirname, '../../.claude/tools/cli/index-codebase.cjs');
 const TEST_PROJECT = path.join(__dirname, 'fixtures/test-project');
 const INDEX_DIR = path.join(TEST_PROJECT, '.claude/context/code-index');
+
+function runCli(args, options = {}) {
+  return execFileSync(process.execPath, [CLI_PATH, ...args], { encoding: 'utf8', ...options });
+}
 
 suite('CLI - index-codebase', () => {
   before(async () => {
@@ -30,7 +34,7 @@ suite('CLI - index-codebase', () => {
   });
 
   test('42.1: --help shows usage', () => {
-    const output = execSync(`node "${CLI_PATH}" --help`, { encoding: 'utf8' });
+    const output = runCli(['--help']);
     assert.ok(output.includes('Usage:'), 'Help should show usage');
     assert.ok(output.includes('index'), 'Help should mention index command');
     assert.ok(output.includes('search'), 'Help should mention search command');
@@ -39,7 +43,7 @@ suite('CLI - index-codebase', () => {
   });
 
   test('42.2: index command creates metadata', async () => {
-    execSync(`node "${CLI_PATH}" index "${TEST_PROJECT}"`, { encoding: 'utf8' });
+    runCli(['index', TEST_PROJECT]);
 
     // Check metadata file exists
     const metadataPath = path.join(INDEX_DIR, 'metadata.json');
@@ -55,28 +59,22 @@ suite('CLI - index-codebase', () => {
   });
 
   test('42.3: search command displays results', () => {
-    // Note: VectorDB is in-memory only for Phase 1, so search won't find results
-    // This test confirms the command runs without error (Phase 1 limitation)
-    const output = execSync(`node "${CLI_PATH}" search "hello" --topK 5`, {
-      encoding: 'utf8',
+    const output = runCli(['search', 'hello', '--topK', '5'], {
       cwd: TEST_PROJECT,
     });
-    // Accept both "Found X results" and "No results found" as valid
-    assert.ok(
-      output.includes('Found') || output.includes('No results'),
-      'Output should show search results or no results message'
-    );
+    assert.ok(output.includes('Found'), 'Output should show persisted sparse search results');
+    assert.ok(output.includes('src/example.js'), 'Search should find the indexed fixture file');
   });
 
   test('42.4: status command shows statistics', async () => {
-    const output = execSync(`node "${CLI_PATH}" status`, { encoding: 'utf8', cwd: TEST_PROJECT });
+    const output = runCli(['status'], { cwd: TEST_PROJECT });
     assert.ok(output.includes('Index Status:'), 'Output should show status header');
     assert.ok(output.includes('Files:'), 'Output should show file count');
     assert.ok(output.includes('Chunks:'), 'Output should show chunk count');
   });
 
   test('42.5: clear command removes index', async () => {
-    execSync(`node "${CLI_PATH}" clear --confirm`, { encoding: 'utf8', cwd: TEST_PROJECT });
+    runCli(['clear', '--confirm'], { cwd: TEST_PROJECT });
 
     const metadataPath = path.join(INDEX_DIR, 'metadata.json');
     const exists = await fs

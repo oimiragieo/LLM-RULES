@@ -280,13 +280,8 @@ describe('evictStaleLTMFiles', () => {
     assert.strictEqual(result.evicted, 0);
   });
 
-  // ---- Test 14: Malformed JSON files — does not crash ----
-  // BUG DISCOVERED: safeParseJSON(malformedStr, null) returns {} (empty object)
-  // instead of null, so malformed JSON files are NOT skipped — they become
-  // eviction candidates with default access_count=1 and mtime-based staleness.
-  // Ideally, the function should check for empty objects or use a different
-  // safeParseJSON fallback. Filed as a known issue.
-  it('does not crash when encountering malformed JSON files', () => {
+  // ---- Test 14: Malformed JSON files — preserved for manual repair ----
+  it('does not evict malformed JSON files as stale candidates', () => {
     const ltmDir = makeLtmDir();
     process.env.LTM_MAX_FILES = '1';
     process.env.LTM_EVICTION_THRESHOLD = '999';
@@ -304,6 +299,10 @@ describe('evictStaleLTMFiles', () => {
     try {
       const result = evictStaleLTMFiles(ltmDir);
       assert.ok(typeof result.evicted === 'number');
+      assert.ok(
+        fs.existsSync(path.join(ltmDir, 'broken.json')),
+        'Malformed JSON should be skipped, not evicted'
+      );
     } finally {
       process.stderr.write = origStderr;
     }

@@ -23,7 +23,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.join(__dirname, '../..');
 
-const RULE_INDEX_PATH = resolveConfigPath('rule-index.json', { read: true });
+const RULE_INDEX_PATH = process.env.RULE_INDEX_PATH
+  ? path.resolve(process.env.RULE_INDEX_PATH)
+  : resolveConfigPath('rule-index.json', { read: true });
 const _PACKAGE_JSON_PATH = path.join(ROOT, 'package.json');
 
 // Expected rule index version (increment when index structure changes)

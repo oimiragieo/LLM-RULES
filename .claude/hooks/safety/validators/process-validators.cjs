@@ -182,10 +182,21 @@ function validateKillCommand(commandString) {
     return { valid: false, error: 'Could not parse kill command' };
   }
 
-  // Allow kill with specific PIDs or signal + PID
-  // Block kill -9 -1 (kill all processes) and similar
+  if (tokens.length === 0) {
+    return { valid: false, error: 'Empty kill command' };
+  }
+
+  const targets = [];
+
+  // Allow kill with specific PIDs or signal + PID.
+  // Block process-group/all-process targets and PID 1 (init/system process).
   for (let i = 1; i < tokens.length; i++) {
     const token = tokens[i];
+    const isLeadingSignal = i === 1 && /^-(?:\d+|[A-Za-z][A-Za-z0-9]*)$/.test(token);
+
+    if (isLeadingSignal && tokens.length > 2) {
+      continue;
+    }
 
     if (token === '-1' || token === '0' || token === '-0') {
       return {
@@ -193,6 +204,28 @@ function validateKillCommand(commandString) {
         error: 'kill -1 and kill 0 are not allowed (affects all processes)',
       };
     }
+
+    if (token === '1') {
+      return {
+        valid: false,
+        error: 'killing PID 1 is not allowed',
+      };
+    }
+
+    if (/^\d+$/.test(token)) {
+      targets.push(token);
+      continue;
+    }
+
+    if (/^-(?:\d+|[A-Za-z][A-Za-z0-9]*)$/.test(token)) {
+      return { valid: false, error: 'kill requires at least one PID target' };
+    }
+
+    return { valid: false, error: `Invalid kill target: ${token}` };
+  }
+
+  if (targets.length === 0) {
+    return { valid: false, error: 'kill requires at least one PID target' };
   }
 
   return { valid: true, error: '' };

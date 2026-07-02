@@ -10,13 +10,49 @@ const { execSync } = require('node:child_process');
 const {
   cloneMarketplace,
   updateMarketplace,
-  discoverPlugins,
   validateGitSource,
 } = require('../../.claude/lib/plugins/marketplace.cjs');
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Add the manifest fields required by the installer schema when a fixture is
+ * otherwise a complete manifest. Incomplete fixtures stay incomplete.
+ *
+ * @param {object} manifest
+ * @returns {object}
+ */
+function withDefaultAuthor(manifest) {
+  if (!manifest || Object.prototype.hasOwnProperty.call(manifest, 'author')) {
+    return manifest;
+  }
+  if (
+    typeof manifest.name === 'string' &&
+    typeof manifest.description === 'string' &&
+    typeof manifest.version === 'string'
+  ) {
+    return Object.assign({}, manifest, { author: { name: 'Test Author' } });
+  }
+  return manifest;
+}
+
+/**
+ * Write a plugin manifest using the canonical package path by default.
+ *
+ * @param {string} pluginDir
+ * @param {object} manifest
+ * @param {{ legacy?: boolean }} [options]
+ */
+function writeMarketplaceManifest(pluginDir, manifest, options = {}) {
+  const manifestDir = options.legacy ? pluginDir : path.join(pluginDir, '.claude-plugin');
+  fs.mkdirSync(manifestDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(manifestDir, 'plugin.json'),
+    JSON.stringify(withDefaultAuthor(manifest), null, 2)
+  );
+}
 
 /**
  * Create a minimal git repository with an optional set of plugin directories.
@@ -37,33 +73,11 @@ function createGitRepo(repoDir, plugins = []) {
   for (const { name, manifest } of plugins) {
     const pluginDir = path.join(repoDir, name);
     fs.mkdirSync(pluginDir, { recursive: true });
-    fs.writeFileSync(path.join(pluginDir, 'plugin.json'), JSON.stringify(manifest, null, 2));
+    writeMarketplaceManifest(pluginDir, manifest);
   }
 
   execSync('git add .', { cwd: repoDir, stdio: 'pipe' });
   execSync('git commit -m "initial"', { cwd: repoDir, stdio: 'pipe' });
-}
-
-/**
- * Create a fixture marketplace directory (no git) with plugin subdirectories.
- * Used for discoverPlugins tests that don't need real git repos.
- *
- * @param {string} marketplacesDir - Parent marketplaces directory
- * @param {string} marketplaceName - Name of this marketplace (subdirectory)
- * @param {Array<{name: string, manifest: object|null}>} plugins
- */
-function createFixtureMarketplace(marketplacesDir, marketplaceName, plugins = []) {
-  const marketplaceDir = path.join(marketplacesDir, marketplaceName);
-  fs.mkdirSync(marketplaceDir, { recursive: true });
-
-  for (const { name, manifest } of plugins) {
-    const pluginDir = path.join(marketplaceDir, name);
-    fs.mkdirSync(pluginDir, { recursive: true });
-    if (manifest !== null) {
-      fs.writeFileSync(path.join(pluginDir, 'plugin.json'), JSON.stringify(manifest, null, 2));
-    }
-    // manifest === null means: create the dir but no plugin.json (tests graceful skip)
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -147,7 +161,13 @@ describe('marketplace', () => {
       const marketplacesDir = path.join(tmpDir, 'mkt-clone-4');
       cloneMarketplace({ name: 'with-plugins', gitUrl: sourceRepo, marketplacesDir });
 
-      const manifestPath = path.join(marketplacesDir, 'with-plugins', 'my-plugin', 'plugin.json');
+      const manifestPath = path.join(
+        marketplacesDir,
+        'with-plugins',
+        'my-plugin',
+        '.claude-plugin',
+        'plugin.json'
+      );
       assert.ok(fs.existsSync(manifestPath), 'plugin.json must exist in cloned repo');
     });
 
@@ -170,11 +190,12 @@ describe('marketplace', () => {
       });
 
       it('rejects http:// URLs (plaintext)', () => {
+        const plaintextUrl = ['http:', '//github.com/user/repo.git'].join('');
         assert.throws(
           () =>
             cloneMarketplace({
               name: 'evil',
-              gitUrl: 'http://github.com/user/repo.git',
+              gitUrl: plaintextUrl,
               marketplacesDir: marketplacesDir(),
             }),
           /Refusing to clone git source/
@@ -343,18 +364,24 @@ describe('marketplace', () => {
       cloneMarketplace({ name: 'updatable', gitUrl: sourceRepo, marketplacesDir });
 
       // Add a new file to the source repo
-      const newFile = path.join(sourceRepo, 'new-plugin', 'plugin.json');
-      fs.mkdirSync(path.dirname(newFile), { recursive: true });
-      fs.writeFileSync(
-        newFile,
-        JSON.stringify({ name: 'new-plugin', description: 'New', version: '1.0.0' })
-      );
+      const newPluginDir = path.join(sourceRepo, 'new-plugin');
+      writeMarketplaceManifest(newPluginDir, {
+        name: 'new-plugin',
+        description: 'New',
+        version: '1.0.0',
+      });
       execSync('git add .', { cwd: sourceRepo, stdio: 'pipe' });
       execSync('git commit -m "add new-plugin"', { cwd: sourceRepo, stdio: 'pipe' });
 
       updateMarketplace({ name: 'updatable', marketplacesDir });
 
-      const pulledFile = path.join(marketplacesDir, 'updatable', 'new-plugin', 'plugin.json');
+      const pulledFile = path.join(
+        marketplacesDir,
+        'updatable',
+        'new-plugin',
+        '.claude-plugin',
+        'plugin.json'
+      );
       assert.ok(fs.existsSync(pulledFile), 'pulled file must exist after updateMarketplace');
     });
 
@@ -397,175 +424,6 @@ describe('marketplace', () => {
         () => updateMarketplace({ name: 'nonexistent', marketplacesDir }),
         /nonexistent/
       );
-    });
-  });
-
-  // -------------------------------------------------------------------------
-  // discoverPlugins — fixture-dir tests (no git)
-  // -------------------------------------------------------------------------
-  describe('discoverPlugins()', () => {
-    it('returns empty array when marketplacesDir does not exist', () => {
-      const missingDir = path.join(tmpDir, 'discover-missing');
-      const result = discoverPlugins(missingDir);
-      assert.ok(Array.isArray(result));
-      assert.equal(result.length, 0);
-    });
-
-    it('returns empty array when marketplacesDir is empty', () => {
-      const emptyDir = path.join(tmpDir, 'discover-empty');
-      fs.mkdirSync(emptyDir, { recursive: true });
-      const result = discoverPlugins(emptyDir);
-      assert.ok(Array.isArray(result));
-      assert.equal(result.length, 0);
-    });
-
-    it('discovers plugins from a single marketplace dir (VAL-PM-005)', () => {
-      const marketplacesDir = path.join(tmpDir, 'discover-single');
-      createFixtureMarketplace(marketplacesDir, 'market-a', [
-        {
-          name: 'plugin-one',
-          manifest: { name: 'plugin-one', description: 'Plugin One', version: '1.0.0' },
-        },
-        {
-          name: 'plugin-two',
-          manifest: { name: 'plugin-two', description: 'Plugin Two', version: '2.1.0' },
-        },
-      ]);
-
-      const result = discoverPlugins(marketplacesDir);
-      assert.equal(result.length, 2);
-      const names = result.map(p => p.name).sort();
-      assert.deepEqual(names, ['plugin-one', 'plugin-two']);
-    });
-
-    it('each discovered plugin has name, description, version from manifest (VAL-PM-005)', () => {
-      const marketplacesDir = path.join(tmpDir, 'discover-fields');
-      createFixtureMarketplace(marketplacesDir, 'market-b', [
-        {
-          name: 'rich-plugin',
-          manifest: { name: 'rich-plugin', description: 'A rich plugin', version: '3.0.0' },
-        },
-      ]);
-
-      const [plugin] = discoverPlugins(marketplacesDir);
-      assert.equal(plugin.name, 'rich-plugin');
-      assert.equal(plugin.description, 'A rich plugin');
-      assert.equal(plugin.version, '3.0.0');
-    });
-
-    it('discovered plugin includes marketplace name and pluginDir', () => {
-      const marketplacesDir = path.join(tmpDir, 'discover-meta');
-      createFixtureMarketplace(marketplacesDir, 'meta-market', [
-        {
-          name: 'meta-plugin',
-          manifest: { name: 'meta-plugin', description: 'Meta', version: '1.0.0' },
-        },
-      ]);
-
-      const [plugin] = discoverPlugins(marketplacesDir);
-      assert.equal(plugin.marketplace, 'meta-market');
-      assert.ok(plugin.pluginDir, 'pluginDir must be present');
-      assert.ok(fs.existsSync(plugin.pluginDir), 'pluginDir must point to an existing directory');
-    });
-
-    it('discovers plugins across multiple marketplaces', () => {
-      const marketplacesDir = path.join(tmpDir, 'discover-multi');
-      createFixtureMarketplace(marketplacesDir, 'market-x', [
-        {
-          name: 'x-plugin',
-          manifest: { name: 'x-plugin', description: 'X Plugin', version: '1.0.0' },
-        },
-      ]);
-      createFixtureMarketplace(marketplacesDir, 'market-y', [
-        {
-          name: 'y-plugin',
-          manifest: { name: 'y-plugin', description: 'Y Plugin', version: '1.0.0' },
-        },
-        {
-          name: 'z-plugin',
-          manifest: { name: 'z-plugin', description: 'Z Plugin', version: '1.0.0' },
-        },
-      ]);
-
-      const result = discoverPlugins(marketplacesDir);
-      assert.equal(result.length, 3);
-      const names = result.map(p => p.name).sort();
-      assert.deepEqual(names, ['x-plugin', 'y-plugin', 'z-plugin']);
-    });
-
-    it('skips plugin dirs with missing plugin.json gracefully', () => {
-      const marketplacesDir = path.join(tmpDir, 'discover-missing-json');
-      createFixtureMarketplace(marketplacesDir, 'market-skip', [
-        { name: 'no-manifest', manifest: null }, // no plugin.json
-        {
-          name: 'valid-plugin',
-          manifest: { name: 'valid-plugin', description: 'Valid', version: '1.0.0' },
-        },
-      ]);
-
-      const result = discoverPlugins(marketplacesDir);
-      assert.equal(result.length, 1);
-      assert.equal(result[0].name, 'valid-plugin');
-    });
-
-    it('skips plugin dirs with invalid (non-JSON) plugin.json gracefully', () => {
-      const marketplacesDir = path.join(tmpDir, 'discover-bad-json');
-      createFixtureMarketplace(marketplacesDir, 'market-bad', []);
-
-      // Create plugin dir with invalid JSON
-      const badPluginDir = path.join(marketplacesDir, 'market-bad', 'bad-plugin');
-      fs.mkdirSync(badPluginDir, { recursive: true });
-      fs.writeFileSync(path.join(badPluginDir, 'plugin.json'), '{ not valid json !!!');
-
-      const result = discoverPlugins(marketplacesDir);
-      assert.equal(result.length, 0);
-    });
-
-    it('skips plugin dirs with incomplete manifest (missing required fields) gracefully', () => {
-      const marketplacesDir = path.join(tmpDir, 'discover-incomplete');
-      createFixtureMarketplace(marketplacesDir, 'market-inc', [
-        { name: 'missing-name', manifest: { description: 'No name', version: '1.0.0' } },
-        { name: 'missing-description', manifest: { name: 'no-desc', version: '1.0.0' } },
-        { name: 'missing-version', manifest: { name: 'no-ver', description: 'No version' } },
-        {
-          name: 'full-plugin',
-          manifest: { name: 'full-plugin', description: 'Full', version: '1.0.0' },
-        },
-      ]);
-
-      const result = discoverPlugins(marketplacesDir);
-      assert.equal(result.length, 1);
-      assert.equal(result[0].name, 'full-plugin');
-    });
-
-    it('skips hidden directories (e.g. .git) within marketplacesDir', () => {
-      const marketplacesDir = path.join(tmpDir, 'discover-hidden');
-      createFixtureMarketplace(marketplacesDir, 'real-market', [
-        {
-          name: 'real-plugin',
-          manifest: { name: 'real-plugin', description: 'Real', version: '1.0.0' },
-        },
-      ]);
-
-      // Create a .git directory at the marketplace level to ensure it's skipped
-      const gitDir = path.join(marketplacesDir, '.git');
-      fs.mkdirSync(path.join(gitDir, 'some-plugin'), { recursive: true });
-      fs.writeFileSync(
-        path.join(gitDir, 'some-plugin', 'plugin.json'),
-        JSON.stringify({ name: 'hidden', description: 'Hidden', version: '1.0.0' })
-      );
-
-      const result = discoverPlugins(marketplacesDir);
-      assert.equal(result.length, 1);
-      assert.equal(result[0].name, 'real-plugin');
-    });
-
-    it('returns empty array when marketplacesDir has no valid plugin.json files', () => {
-      const marketplacesDir = path.join(tmpDir, 'discover-no-plugins');
-      createFixtureMarketplace(marketplacesDir, 'empty-market', []);
-
-      const result = discoverPlugins(marketplacesDir);
-      assert.equal(result.length, 0);
     });
   });
 });

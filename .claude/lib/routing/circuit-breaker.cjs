@@ -153,7 +153,13 @@ class CircuitBreaker {
 
     if (state === STATE_CLOSED) return true;
     if (state === STATE_HALF_OPEN) {
-      return record.halfOpenAttempts < this._halfOpenMax;
+      // Each permitted probe consumes one half-open slot. Without this
+      // increment the cap was never enforced (halfOpenAttempts stayed 0).
+      if (record.halfOpenAttempts < this._halfOpenMax) {
+        record.halfOpenAttempts += 1;
+        return true;
+      }
+      return false;
     }
     return false; // OPEN
   }

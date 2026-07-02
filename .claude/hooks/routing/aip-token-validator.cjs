@@ -25,9 +25,27 @@
 const { verifyToken } = require('../../lib/aip/capability-tokens.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
-// Representative capability checked during validation.
-// We verify 'Read' as the minimum capability any agent should have.
-const REPRESENTATIVE_CAPABILITY = 'Read';
+const DEFAULT_CAPABILITIES_TO_VERIFY = ['Read'];
+
+function normalizeCapabilities(value) {
+  const raw = Array.isArray(value) ? value : typeof value === 'string' ? value.split(/[,\s]+/) : [];
+  const capabilities = [];
+  const seen = new Set();
+
+  for (const item of raw) {
+    const capability = String(item || '').trim();
+    if (!capability || seen.has(capability)) continue;
+    seen.add(capability);
+    capabilities.push(capability);
+  }
+
+  return capabilities;
+}
+
+function getRequestedCapabilities(toolInput) {
+  const capabilities = normalizeCapabilities(toolInput?.allowed_tools);
+  return capabilities.length > 0 ? capabilities : DEFAULT_CAPABILITIES_TO_VERIFY;
+}
 
 // ---------------------------------------------------------------------------
 // Main
@@ -53,8 +71,9 @@ process.stdin.on('end', () => {
       process.exit(0);
     }
 
-    const subagentType = input?.tool_input?.subagent_type || '';
-    const token = input?.tool_input?._aip_token || '';
+    const toolInput = input?.tool_input || {};
+    const subagentType = toolInput.subagent_type || '';
+    const token = toolInput._aip_token || '';
 
     // Token missing — BC-3: block in production mode
     if (!token) {
@@ -71,13 +90,16 @@ process.stdin.on('end', () => {
       process.exit(2);
     }
 
-    // Verify the token
-    const valid = verifyToken(token, subagentType, REPRESENTATIVE_CAPABILITY);
+    // Verify the token against every explicitly requested tool capability.
+    const requestedCapabilities = getRequestedCapabilities(toolInput);
+    const valid = requestedCapabilities.every(capability =>
+      verifyToken(token, subagentType, capability)
+    );
 
     if (!valid) {
       const msg =
         `[aip-token-validator] BLOCKED: Task(${subagentType}) has invalid/expired AIP token. ` +
-        'Token failed signature, expiry, delegatee, or capability check.';
+        `Token failed signature, expiry, delegatee, or requested capability check (${requestedCapabilities.join(', ')}).`;
       process.stderr.write(`${msg}\n`);
       process.stdout.write(
         JSON.stringify({

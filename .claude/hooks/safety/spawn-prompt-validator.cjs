@@ -754,7 +754,7 @@ function isOrchestratorSpawn(toolInput) {
   // Description can be manipulated by users to bypass validation
   const subagentType = (toolInput.subagent_type || '').trim().toLowerCase();
 
-  return orchestratorTypes.some(orch => subagentType.includes(orch));
+  return orchestratorTypes.includes(subagentType);
 }
 
 /**
@@ -763,7 +763,11 @@ function isOrchestratorSpawn(toolInput) {
  * @returns {boolean} True if using template reference
  */
 function isTemplateBasedSpawn(prompt) {
-  return prompt.includes('.claude/templates/spawn/') || prompt.includes('See .claude/templates');
+  const normalizedPrompt = String(prompt || '').replace(/\\/g, '/');
+  return (
+    /(^|[\s@])\.claude\/templates\/spawn\/[^\s"'<>]+/i.test(normalizedPrompt) ||
+    /\bSee\s+\.claude\/templates(?=$|\s)/i.test(normalizedPrompt)
+  );
 }
 
 function emitRuntimeHealth(status, durationMs, extra = {}) {

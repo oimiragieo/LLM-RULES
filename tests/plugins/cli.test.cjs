@@ -415,4 +415,51 @@ describe('Plugin CLI', () => {
       );
     });
   });
+
+  // -------------------------------------------------------------------------
+  // Security: path traversal / input validation
+  // -------------------------------------------------------------------------
+  describe('install path validation', () => {
+    it('rejects a pluginId that attempts path traversal', () => {
+      const registryDir = path.join(tmpDir, 'trav-1-registry');
+      const pluginsDir = path.join(tmpDir, 'trav-1-plugins');
+      const sourceDir = path.join(tmpDir, 'trav-1-src');
+      createFakePlugin(sourceDir);
+
+      assert.throws(
+        () =>
+          installPlugin({
+            pluginId: '../../evil',
+            scope: 'user',
+            registryDir,
+            pluginsDir,
+            sourceDir,
+          }),
+        /Invalid plugin id|escapes plugins directory/
+      );
+      assert.ok(
+        !fs.existsSync(path.join(tmpDir, 'evil')),
+        'traversal target must not be created outside pluginsDir'
+      );
+    });
+
+    it('rejects an unknown installation scope', () => {
+      const registryDir = path.join(tmpDir, 'scope-1-registry');
+      const pluginsDir = path.join(tmpDir, 'scope-1-plugins');
+      const sourceDir = path.join(tmpDir, 'scope-1-src');
+      createFakePlugin(sourceDir);
+
+      assert.throws(
+        () =>
+          installPlugin({
+            pluginId: 'ok-plugin',
+            scope: '../../etc',
+            registryDir,
+            pluginsDir,
+            sourceDir,
+          }),
+        /Invalid plugin scope/
+      );
+    });
+  });
 });

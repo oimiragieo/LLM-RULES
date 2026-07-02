@@ -102,10 +102,10 @@ function archiveWarmToCold(memoryDir, opts = {}) {
       let release;
       try {
         const lockfile = require('proper-lockfile');
-        release = lockfile.lockSync(coldFile, { stale: 15000, retries: 3 });
+        release = lockfile.lockSync(coldFile, { stale: 15000 });
       } catch (_lockErr) {
-        // Fall through to best-effort append if locking fails
-        release = null;
+        // Do not append without a lock; leave the warm archive for a later retry.
+        continue;
       }
       try {
         fs.appendFileSync(coldFile, jsonlEntries, 'utf8');

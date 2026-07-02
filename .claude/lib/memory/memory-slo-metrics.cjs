@@ -15,6 +15,12 @@ const DEFAULT_SLO_TARGETS = {
 };
 
 const HISTOGRAM_BUCKETS_MS = [1, 5, 10, 25, 50, 100, 250, 500];
+const LOCK_TIMEOUT_MS = Number(process.env.MEMORY_SLO_LOCK_TIMEOUT_MS || 10000);
+const LOCK_RETRY_MS = Number(process.env.MEMORY_SLO_LOCK_RETRY_MS || 10);
+const LOCK_STALE_MS = Number(process.env.MEMORY_SLO_LOCK_STALE_MS || 30000);
+const LOCK_RELEASE_RETRIES = Number(process.env.MEMORY_SLO_LOCK_RELEASE_RETRIES || 8);
+const RECORD_RETRY_ATTEMPTS = Number(process.env.MEMORY_SLO_RECORD_RETRY_ATTEMPTS || 5);
+const RECORD_RETRY_MS = Number(process.env.MEMORY_SLO_RECORD_RETRY_MS || 20);
 
 function getMetricsDir(projectRoot = PROJECT_ROOT) {
   return path.join(projectRoot, '.claude', 'context', 'memory', 'metrics');
@@ -83,28 +89,74 @@ function sleepSync(ms) {
   }
 }
 
+function isRetryableFileError(err) {
+  return (
+    err &&
+    ['EBUSY', 'EPERM', 'EACCES', 'ENOTEMPTY', 'EEXIST', 'ENOENT'].includes(String(err.code || ''))
+  );
+}
+
+function removeDirectoryWithRetries(dirPath) {
+  const maxAttempts =
+    Number.isFinite(LOCK_RELEASE_RETRIES) && LOCK_RELEASE_RETRIES > 0 ? LOCK_RELEASE_RETRIES : 8;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      fs.rmSync(dirPath, { recursive: true, force: true });
+      return true;
+    } catch (err) {
+      if (err && err.code === 'ENOENT') {
+        return true;
+      }
+      if (!isRetryableFileError(err)) {
+        return false;
+      }
+      sleepSync(10 * (attempt + 1));
+    }
+  }
+  return false;
+}
+
 function withFileLockSync(filePath, callback) {
   const lockPath = `${filePath}.lock`;
-  const deadline = Date.now() + 2000;
+  const ownerPath = path.join(lockPath, 'owner');
+  const ownerToken = `${process.pid}:${Date.now()}:${Math.random().toString(16).slice(2)}`;
+  const maxWaitMs =
+    Number.isFinite(LOCK_TIMEOUT_MS) && LOCK_TIMEOUT_MS > 0 ? LOCK_TIMEOUT_MS : 10000;
+  const retryMs = Number.isFinite(LOCK_RETRY_MS) && LOCK_RETRY_MS > 0 ? LOCK_RETRY_MS : 10;
+  const staleMs = Number.isFinite(LOCK_STALE_MS) && LOCK_STALE_MS > 0 ? LOCK_STALE_MS : 30000;
+  const deadline = Date.now() + maxWaitMs;
   while (true) {
     try {
       fs.mkdirSync(lockPath);
+      fs.writeFileSync(ownerPath, ownerToken, 'utf8');
       break;
     } catch (err) {
       if (err.code !== 'EEXIST') {
         throw err;
       }
+      try {
+        const stat = fs.statSync(lockPath);
+        if (Date.now() - stat.mtimeMs > staleMs) {
+          removeDirectoryWithRetries(lockPath);
+          continue;
+        }
+      } catch (_staleErr) {
+        // Lock disappeared or could not be inspected; retry until deadline.
+      }
       if (Date.now() >= deadline) {
         throw new Error(`Timed out acquiring SLO metrics lock: ${path.basename(filePath)}`);
       }
-      sleepSync(10);
+      sleepSync(retryMs);
     }
   }
   try {
     return callback();
   } finally {
     try {
-      fs.rmSync(lockPath, { recursive: true, force: true });
+      const currentOwner = fs.readFileSync(ownerPath, 'utf8');
+      if (currentOwner === ownerToken) {
+        removeDirectoryWithRetries(lockPath);
+      }
     } catch {
       // ignore
     }
@@ -113,6 +165,10 @@ function withFileLockSync(filePath, callback) {
 
 function loadOperationalMetrics(projectRoot = PROJECT_ROOT) {
   const metricsPath = getOperationalMetricsPath(projectRoot);
+  return loadOperationalMetricsFromPath(metricsPath);
+}
+
+function loadOperationalMetricsFromPath(metricsPath) {
   if (!fs.existsSync(metricsPath)) {
     return createDefaultMetrics();
   }
@@ -141,31 +197,46 @@ function loadOperationalMetrics(projectRoot = PROJECT_ROOT) {
   }
 }
 
-function saveOperationalMetrics(metrics, projectRoot = PROJECT_ROOT) {
-  ensureMetricsDir(projectRoot);
+function writeOperationalMetricsUnlocked(target, metrics) {
   const payload = {
     ...metrics,
     updatedAt: new Date().toISOString(),
   };
+  let lastErr = null;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      // The caller owns any required locking.
+      atomicWriteJSONSync(target, payload, { skipLock: true });
+      return target;
+    } catch (err) {
+      lastErr = err;
+      if (err && (err.code === 'EPERM' || err.code === 'EBUSY' || err.code === 'EACCES')) {
+        sleepSync(10 * (attempt + 1));
+        continue;
+      }
+      throw err;
+    }
+  }
+  if (lastErr) throw lastErr;
+  return target;
+}
+
+function saveOperationalMetrics(metrics, projectRoot = PROJECT_ROOT) {
+  ensureMetricsDir(projectRoot);
   const target = getOperationalMetricsPath(projectRoot);
   return withFileLockSync(target, () => {
-    let lastErr = null;
-    for (let attempt = 0; attempt < 5; attempt++) {
-      try {
-        // We already hold a per-file lock in withFileLockSync; skip nested lock acquisition.
-        atomicWriteJSONSync(target, payload, { skipLock: true });
-        return target;
-      } catch (err) {
-        lastErr = err;
-        if (err && (err.code === 'EPERM' || err.code === 'EBUSY' || err.code === 'EACCES')) {
-          sleepSync(10 * (attempt + 1));
-          continue;
-        }
-        throw err;
-      }
-    }
-    if (lastErr) throw lastErr;
-    return target;
+    return writeOperationalMetricsUnlocked(target, metrics);
+  });
+}
+
+function updateOperationalMetrics(projectRoot, updater) {
+  ensureMetricsDir(projectRoot);
+  const target = getOperationalMetricsPath(projectRoot);
+  return withFileLockSync(target, () => {
+    const metrics = loadOperationalMetricsFromPath(target);
+    updater(metrics);
+    writeOperationalMetricsUnlocked(target, metrics);
+    return metrics;
   });
 }
 
@@ -206,59 +277,73 @@ function estimatePercentileMs(hist, percentile) {
 }
 
 function recordMemoryOperation(operation = {}, projectRoot = PROJECT_ROOT) {
-  try {
-    const metrics = loadOperationalMetrics(projectRoot);
-    const kind = String(operation.kind || '').toLowerCase();
-    const ok = operation.ok !== false;
-    const parseFailure = operation.parseFailure === true;
-    const parseAttempt = operation.parseAttempt === true || parseFailure;
-    const lockWaitMs = Number(operation.lockWaitMs || 0);
-    const writeLatencyMs = Number(operation.writeLatencyMs || 0);
-    const readLatencyMs = Number(operation.readLatencyMs || 0);
+  const maxAttempts =
+    Number.isFinite(RECORD_RETRY_ATTEMPTS) && RECORD_RETRY_ATTEMPTS > 0 ? RECORD_RETRY_ATTEMPTS : 5;
 
-    if (kind === 'write') {
-      metrics.counters.writesTotal += 1;
-      if (!ok) metrics.counters.writesFailed += 1;
-      if (Number.isFinite(writeLatencyMs) && writeLatencyMs >= 0) {
-        metrics.latest.writeLatencyMs = writeLatencyMs;
-        recordHistogram(metrics.histograms.writeLatencyMs, writeLatencyMs);
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return updateOperationalMetrics(projectRoot, metrics => {
+        const kind = String(operation.kind || '').toLowerCase();
+        const ok = operation.ok !== false;
+        const parseFailure = operation.parseFailure === true;
+        const parseAttempt = operation.parseAttempt === true || parseFailure;
+        const lockWaitMs = Number(operation.lockWaitMs || 0);
+        const writeLatencyMs = Number(operation.writeLatencyMs || 0);
+        const readLatencyMs = Number(operation.readLatencyMs || 0);
+
+        if (kind === 'write') {
+          metrics.counters.writesTotal += 1;
+          if (!ok) metrics.counters.writesFailed += 1;
+          if (Number.isFinite(writeLatencyMs) && writeLatencyMs >= 0) {
+            metrics.latest.writeLatencyMs = writeLatencyMs;
+            recordHistogram(metrics.histograms.writeLatencyMs, writeLatencyMs);
+          }
+        }
+
+        if (kind === 'read') {
+          metrics.counters.readsTotal += 1;
+          if (Number.isFinite(readLatencyMs) && readLatencyMs >= 0) {
+            metrics.latest.readLatencyMs = readLatencyMs;
+            recordHistogram(metrics.histograms.readLatencyMs, readLatencyMs);
+          }
+        }
+
+        if (parseAttempt) {
+          metrics.counters.parseAttempts += 1;
+          if (parseFailure) metrics.counters.parseFailures += 1;
+        }
+
+        if (Number.isFinite(lockWaitMs) && lockWaitMs > 0) {
+          metrics.counters.lockAcquires += 1;
+          metrics.latest.lockWaitMs = lockWaitMs;
+          recordHistogram(metrics.histograms.lockWaitMs, lockWaitMs);
+        }
+
+        if (!ok && operation.error) {
+          metrics.latest.lastError = String(operation.error);
+        }
+
+        if (
+          Number.isFinite(operation.staleTempFilesRemoved) &&
+          operation.staleTempFilesRemoved > 0
+        ) {
+          metrics.counters.staleTempCleanups += 1;
+          metrics.counters.staleTempFilesRemoved += Number(operation.staleTempFilesRemoved);
+        }
+      });
+    } catch (err) {
+      if (attempt < maxAttempts - 1 && isRetryableFileError(err)) {
+        const retryMs =
+          Number.isFinite(RECORD_RETRY_MS) && RECORD_RETRY_MS > 0 ? RECORD_RETRY_MS : 20;
+        sleepSync(retryMs * (attempt + 1));
+        continue;
       }
+      break;
     }
-
-    if (kind === 'read') {
-      metrics.counters.readsTotal += 1;
-      if (Number.isFinite(readLatencyMs) && readLatencyMs >= 0) {
-        metrics.latest.readLatencyMs = readLatencyMs;
-        recordHistogram(metrics.histograms.readLatencyMs, readLatencyMs);
-      }
-    }
-
-    if (parseAttempt) {
-      metrics.counters.parseAttempts += 1;
-      if (parseFailure) metrics.counters.parseFailures += 1;
-    }
-
-    if (Number.isFinite(lockWaitMs) && lockWaitMs > 0) {
-      metrics.counters.lockAcquires += 1;
-      metrics.latest.lockWaitMs = lockWaitMs;
-      recordHistogram(metrics.histograms.lockWaitMs, lockWaitMs);
-    }
-
-    if (!ok && operation.error) {
-      metrics.latest.lastError = String(operation.error);
-    }
-
-    if (Number.isFinite(operation.staleTempFilesRemoved) && operation.staleTempFilesRemoved > 0) {
-      metrics.counters.staleTempCleanups += 1;
-      metrics.counters.staleTempFilesRemoved += Number(operation.staleTempFilesRemoved);
-    }
-
-    saveOperationalMetrics(metrics, projectRoot);
-    return metrics;
-  } catch (_err) {
-    // SLO collection is best-effort and must never break memory operations.
-    return null;
   }
+
+  // SLO collection is best-effort and must never break memory operations.
+  return null;
 }
 
 function summarizeOperationalSLO(projectRoot = PROJECT_ROOT) {

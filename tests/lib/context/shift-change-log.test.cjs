@@ -125,6 +125,7 @@ test('shift-change-log writer > rejects invalid data (missing required fields)',
 const {
   readHandoverLog,
   claimHandoverLog,
+  recoverStaleClaimingLog,
 } = require('../../../.claude/lib/context/shift-change-log-reader.cjs');
 
 test('shift-change-log reader > reads and parses a READY log', () => {
@@ -230,6 +231,50 @@ test('shift-change-log reader > claimHandoverLog sets status to CLAIMED', () => 
   //   3. Atomic rewrite"
   // It does not explicitly say to update the sessionId to the new session id, but maybe it should?
   // Let's just assert status is CLAIMED.
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('shift-change-log reader > restores stale claiming log before read', () => {
+  const tmpDir = path.join(
+    process.cwd(),
+    '.claude/context/runtime/test-reader-stale-claiming-' + Date.now()
+  );
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  const log = writeHandoverLog({ schemaVersion: '1.0.0', generation: 1, sessionId: 'abc' }, tmpDir);
+  const finalPath = path.join(tmpDir, 'shift-change-log.json');
+  const claimingPath = path.join(tmpDir, 'shift-change-log.claiming-old-session.json');
+  fs.renameSync(finalPath, claimingPath);
+
+  const staleDate = new Date(Date.now() - 10 * 60 * 1000);
+  fs.utimesSync(claimingPath, staleDate, staleDate);
+
+  const restored = readHandoverLog(tmpDir);
+  assert.ok(restored, 'Should read restored READY handover log');
+  assert.strictEqual(restored.handoffId, log.handoffId);
+  assert.ok(fs.existsSync(finalPath), 'Stale claiming file should be restored to final path');
+  assert.equal(fs.existsSync(claimingPath), false, 'Claiming file should be consumed');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('shift-change-log reader > does not restore fresh claiming log', () => {
+  const tmpDir = path.join(
+    process.cwd(),
+    '.claude/context/runtime/test-reader-fresh-claiming-' + Date.now()
+  );
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  writeHandoverLog({ schemaVersion: '1.0.0', generation: 1, sessionId: 'abc' }, tmpDir);
+  const finalPath = path.join(tmpDir, 'shift-change-log.json');
+  const claimingPath = path.join(tmpDir, 'shift-change-log.claiming-active-session.json');
+  fs.renameSync(finalPath, claimingPath);
+
+  assert.equal(recoverStaleClaimingLog(tmpDir), false);
+  assert.strictEqual(readHandoverLog(tmpDir), null);
+  assert.equal(fs.existsSync(finalPath), false, 'Fresh claiming file should not be restored');
+  assert.equal(fs.existsSync(claimingPath), true, 'Fresh claiming file should remain in place');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });

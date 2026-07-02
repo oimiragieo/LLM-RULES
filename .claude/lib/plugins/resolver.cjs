@@ -27,6 +27,18 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+const INVALID_RESOURCE_NAME_CHARS = /[<>:"|?*\x00]/;
+
+function isSafeResourceName(name) {
+  if (typeof name !== 'string' || name.length === 0) return false;
+  if (path.isAbsolute(name) || path.win32.isAbsolute(name) || path.posix.isAbsolute(name)) {
+    return false;
+  }
+  if (INVALID_RESOURCE_NAME_CHARS.test(name)) return false;
+  const parts = name.split(/[\\/]+/);
+  return parts.length === 1 && parts[0] !== '.' && parts[0] !== '..';
+}
+
 /**
  * PluginResolver resolves skills, hooks, and agents across three plugin scopes.
  *
@@ -97,6 +109,8 @@ class PluginResolver {
    * @returns {string|null} Absolute path to the skill file, or null
    */
   _findSkillInPlugin(pluginDir, name) {
+    if (!isSafeResourceName(name)) return null;
+
     const skillsDir = path.join(pluginDir, 'skills');
     if (!fs.existsSync(skillsDir)) return null;
 
@@ -160,6 +174,8 @@ class PluginResolver {
    * @returns {Array<{ path: string, scope: string, plugin: string }>}
    */
   resolveHook(eventName) {
+    if (!isSafeResourceName(eventName)) return [];
+
     const results = [];
 
     for (const [scopeName, scopeDir] of this._scopes()) {
@@ -216,6 +232,8 @@ class PluginResolver {
    * @returns {string | null} Absolute path to the agent file, or null
    */
   resolveAgent(name) {
+    if (!isSafeResourceName(name)) return null;
+
     for (const [, scopeDir] of this._scopes()) {
       const plugins = this._listPlugins(scopeDir);
       for (const pluginDir of plugins) {
@@ -287,4 +305,4 @@ class PluginResolver {
   }
 }
 
-module.exports = { PluginResolver };
+module.exports = { PluginResolver, isSafeResourceName };

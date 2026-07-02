@@ -5,6 +5,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('node:child_process');
 
 const {
   recordMemoryOperation,
@@ -21,7 +22,17 @@ function setup() {
 }
 
 function cleanup() {
-  fs.rmSync(TEST_ROOT, { recursive: true, force: true });
+  let lastErr = null;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      fs.rmSync(TEST_ROOT, { recursive: true, force: true });
+      return;
+    } catch (err) {
+      lastErr = err;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 25 * (attempt + 1));
+    }
+  }
+  if (lastErr) throw lastErr;
 }
 
 test('memory-slo-metrics records write/read/parse and computes SLO summary', () => {
@@ -78,6 +89,57 @@ test('memory-slo-metrics records operation even if SharedArrayBuffer throws', ()
     assert.equal(metrics.counters.writesTotal, 1);
   } finally {
     global.SharedArrayBuffer = originalSharedArrayBuffer;
+    cleanup();
+  }
+});
+
+test('memory-slo-metrics preserves counters across concurrent writer processes', async () => {
+  setup();
+  try {
+    const modulePath = path.join(__dirname, '../../../.claude/lib/memory/memory-slo-metrics.cjs');
+    const workerCount = 6;
+    const iterations = 20;
+    const code = `
+      const { recordMemoryOperation } = require(${JSON.stringify(modulePath)});
+      const root = ${JSON.stringify(TEST_ROOT)};
+      let failures = 0;
+      for (let i = 0; i < ${iterations}; i++) {
+        if (!recordMemoryOperation({ kind: 'write', writeLatencyMs: 1 }, root)) {
+          failures++;
+        }
+      }
+      if (failures > 0) {
+        console.error('recordMemoryOperation failures:', failures);
+        process.exit(1);
+      }
+    `;
+
+    await Promise.all(
+      Array.from({ length: workerCount }, () => {
+        return new Promise((resolve, reject) => {
+          const child = spawn(process.execPath, ['-e', code], {
+            stdio: ['ignore', 'pipe', 'pipe'],
+            windowsHide: true,
+          });
+          let stderr = '';
+          child.stderr.on('data', chunk => {
+            stderr += chunk;
+          });
+          child.on('error', reject);
+          child.on('exit', code => {
+            if (code === 0) {
+              resolve();
+            } else {
+              reject(new Error(`worker exited ${code}: ${stderr}`));
+            }
+          });
+        });
+      })
+    );
+
+    const metrics = loadOperationalMetrics(TEST_ROOT);
+    assert.equal(metrics.counters.writesTotal, workerCount * iterations);
+  } finally {
     cleanup();
   }
 });

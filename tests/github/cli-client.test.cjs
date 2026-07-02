@@ -510,4 +510,25 @@ describe('GitHubCLI', () => {
       assert.doesNotThrow(() => new GitHubCLI());
     });
   });
+
+  // -------------------------------------------------------------------------
+  // Input validation / injection hardening
+  // -------------------------------------------------------------------------
+  describe('input validation', () => {
+    it('mergePR rejects an unknown merge method (no shell injection via --${method})', () => {
+      const { fn, calls } = mockExec('');
+      const gh = new GitHubCLI({ _execSync: fn });
+      assert.throws(() => gh.mergePR(3, { method: 'merge; rm -rf /' }), /Unknown merge method/);
+      assert.equal(calls.length, 0, 'no command should be executed for an invalid method');
+    });
+
+    it('rejects a non-integer PR number (no injection via prNumber)', () => {
+      const { fn, calls } = mockExec('');
+      const gh = new GitHubCLI({ _execSync: fn });
+      assert.throws(() => gh.commentOnPR('1; rm -rf /', 'x'), /Invalid PR number/);
+      assert.throws(() => gh.getPR('$(whoami)'), /Invalid PR number/);
+      assert.throws(() => gh.mergePR(-5), /Invalid PR number/);
+      assert.equal(calls.length, 0, 'no command should be executed for an invalid PR number');
+    });
+  });
 });

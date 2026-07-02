@@ -8,13 +8,17 @@
 
 const { test, suite, before, after } = require('node:test');
 const assert = require('node:assert/strict');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
 
 suite('Hybrid Search CLI', () => {
   const testRoot = path.join(__dirname, '../fixtures/hybrid-search-cli');
   const cliPath = path.join(__dirname, '../../.claude/tools/cli/index-codebase.cjs');
+
+  function runCli(args, options = {}) {
+    return execFileSync(process.execPath, [cliPath, ...args], { encoding: 'utf8', ...options });
+  }
 
   before(async () => {
     // Create test project
@@ -43,8 +47,7 @@ async function fetchUserData(userId: string): Promise<User> {
 
     // Index the test files
     try {
-      execSync(`node "${cliPath}" index "${testRoot}"`, {
-        encoding: 'utf8',
+      runCli(['index', testRoot], {
         stdio: 'ignore',
       });
     } catch (_error) {
@@ -60,8 +63,8 @@ async function fetchUserData(userId: string): Promise<User> {
 
   test('hybrid-search command exists', () => {
     try {
-      execSync(`node "${cliPath}" --help`, { encoding: 'utf8' });
-      const helpOutput = execSync(`node "${cliPath}" --help`, { encoding: 'utf8' });
+      runCli(['--help']);
+      const helpOutput = runCli(['--help']);
       assert.ok(
         helpOutput.includes('hybrid-search'),
         'Help output should include hybrid-search command'
@@ -73,10 +76,9 @@ async function fetchUserData(userId: string): Promise<User> {
 
   test('hybrid-search shows results with semantic scores', () => {
     try {
-      const output = execSync(
-        `node "${cliPath}" hybrid-search "authentication function" --file "${testRoot}"`,
-        { encoding: 'utf8', cwd: testRoot }
-      );
+      const output = runCli(['hybrid-search', 'authentication function', '--file', testRoot], {
+        cwd: testRoot,
+      });
 
       assert.ok(output.includes('Hybrid Search:'), 'Should show "Hybrid Search:" header');
       assert.ok(
@@ -98,57 +100,62 @@ async function fetchUserData(userId: string): Promise<User> {
   });
 
   test('hybrid-search supports semantic-only mode', () => {
-    const output = execSync(
-      `node "${cliPath}" hybrid-search "user data" --semantic-only --file "${testRoot}"`,
-      { encoding: 'utf8', cwd: testRoot }
-    );
+    const output = runCli(['hybrid-search', 'user data', '--semantic-only', '--file', testRoot], {
+      cwd: testRoot,
+    });
 
     assert.ok(output.includes('Mode: Semantic only'), 'Should indicate semantic-only mode');
     assert.ok(!output.includes('Structural'), 'Should not show structural stage');
   });
 
   test('hybrid-search supports structural-only mode', () => {
-    const output = execSync(
-      `node "${cliPath}" hybrid-search "function $NAME($$$)" --structural-only --lang js --file "${testRoot}"`,
-      { encoding: 'utf8', cwd: testRoot }
+    const output = runCli(
+      [
+        'hybrid-search',
+        'function $NAME($$$)',
+        '--structural-only',
+        '--lang',
+        'js',
+        '--file',
+        testRoot,
+      ],
+      { cwd: testRoot }
     );
 
     assert.ok(output.includes('Mode: Structural only'), 'Should indicate structural-only mode');
     assert.ok(!output.includes('Semantic'), 'Should not show semantic stage');
+    assert.ok(output.includes('Results:'), 'Structural-only mode should return ast-grep matches');
+    assert.ok(output.includes('auth.js'), 'Structural-only mode should search the requested root');
   });
 
   test('hybrid-search supports language filter', () => {
-    const output = execSync(
-      `node "${cliPath}" hybrid-search "function" --lang ts --file "${testRoot}"`,
-      { encoding: 'utf8', cwd: testRoot }
-    );
+    const output = runCli(['hybrid-search', 'function', '--lang', 'ts', '--file', testRoot], {
+      cwd: testRoot,
+    });
 
     assert.ok(output.includes('Language: ts'), 'Should show language filter');
   });
 
   test('hybrid-search shows timing information', () => {
-    const output = execSync(
-      `node "${cliPath}" hybrid-search "authentication" --file "${testRoot}"`,
-      { encoding: 'utf8', cwd: testRoot }
-    );
+    const output = runCli(['hybrid-search', 'authentication', '--file', testRoot], {
+      cwd: testRoot,
+    });
 
     assert.ok(output.includes('Timing:'), 'Should show timing header');
     assert.ok(output.includes('ms'), 'Should show milliseconds');
   });
 
   test('hybrid-search handles no results gracefully', () => {
-    const output = execSync(
-      `node "${cliPath}" hybrid-search "nonexistent_pattern_xyz" --file "${testRoot}"`,
-      { encoding: 'utf8', cwd: testRoot }
-    );
+    const output = runCli(['hybrid-search', 'nonexistent_pattern_xyz', '--file', testRoot], {
+      cwd: testRoot,
+    });
 
     assert.ok(output.includes('No results found'), 'Should show "No results found" message');
   });
 
   test('hybrid-search handles missing file argument', () => {
     try {
-      execSync(`node "${cliPath}" hybrid-search "function"`, {
-        encoding: 'utf8',
+      runCli(['hybrid-search', 'function'], {
         cwd: testRoot,
       });
     } catch (error) {
@@ -161,10 +168,9 @@ async function fetchUserData(userId: string): Promise<User> {
 
   test('hybrid-search shows file paths in results', () => {
     try {
-      const output = execSync(
-        `node "${cliPath}" hybrid-search "authenticate" --file "${testRoot}"`,
-        { encoding: 'utf8', cwd: testRoot }
-      );
+      const output = runCli(['hybrid-search', 'authenticate', '--file', testRoot], {
+        cwd: testRoot,
+      });
 
       assert.ok(
         output.includes('auth.js') || output.includes('File:') || output.includes('No results'),
@@ -178,8 +184,7 @@ async function fetchUserData(userId: string): Promise<User> {
 
   test('hybrid-search shows top results with scores', () => {
     try {
-      const output = execSync(`node "${cliPath}" hybrid-search "function" --file "${testRoot}"`, {
-        encoding: 'utf8',
+      const output = runCli(['hybrid-search', 'function', '--file', testRoot], {
         cwd: testRoot,
       });
 
@@ -199,10 +204,9 @@ async function fetchUserData(userId: string): Promise<User> {
 
   test('hybrid-search respects topK limit', () => {
     try {
-      const output = execSync(
-        `node "${cliPath}" hybrid-search "function" --file "${testRoot}" --topK 1`,
-        { encoding: 'utf8', cwd: testRoot }
-      );
+      const output = runCli(['hybrid-search', 'function', '--file', testRoot, '--topK', '1'], {
+        cwd: testRoot,
+      });
 
       // If results exist, check topK limit
       if (output.includes('1.')) {

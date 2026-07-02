@@ -379,7 +379,6 @@ function resolveFindingsFromCompletion(projectRoot, completionText, metadata = {
       if (completionTokens.has(token)) {
         overlap++;
       }
-      if (overlap >= minOverlap) break;
     }
     if (overlap < minOverlap) continue;
 

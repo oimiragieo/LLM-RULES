@@ -69,7 +69,19 @@ function getSigningKey() {
     // File unreadable — fall through to deterministic fallback
   }
 
-  // 3. Deterministic dev fallback — never use in production
+  // 3. Deterministic dev fallback — never use in production.
+  // Fail CLOSED in production: refuse to sign/verify with a predictable,
+  // forgeable key. Allow the dev fallback only outside production or when an
+  // operator explicitly opts in via AIP_ALLOW_DEV_KEY=1.
+  const allowDevKey =
+    process.env.AIP_ALLOW_DEV_KEY === '1' || process.env.NODE_ENV !== 'production';
+  if (!allowDevKey) {
+    throw new Error(
+      '[aip-tokens] No AIP_TOKEN_SECRET or aip-key.local configured in production. ' +
+        'Refusing to sign/verify capability tokens with a predictable dev key. ' +
+        'Set AIP_TOKEN_SECRET (>=16 chars), or AIP_ALLOW_DEV_KEY=1 to override.'
+    );
+  }
   process.stderr.write(
     '[aip-tokens] WARN: No AIP_TOKEN_SECRET or aip-key.local found. ' +
       'Using deterministic dev fallback key. Set AIP_TOKEN_SECRET for production.\n'

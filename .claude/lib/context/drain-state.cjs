@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 
 const DEFAULT_RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 
@@ -23,7 +24,9 @@ function enterDrainMode({ sessionId, drainDeadlineMinutes = 5 }, runtimeDir = DE
     drainDeadline: new Date(deadlineMs).toISOString(),
   };
 
-  fs.writeFileSync(getDrainStatePath(runtimeDir), JSON.stringify(state, null, 2), 'utf8');
+  // Atomic write (tmp + rename) — a crash mid-write must not leave a truncated
+  // drain-state.json that getDrainState() then fails to parse.
+  atomicWriteJSONSync(getDrainStatePath(runtimeDir), state);
 }
 
 function getDrainState(runtimeDir = DEFAULT_RUNTIME_DIR) {

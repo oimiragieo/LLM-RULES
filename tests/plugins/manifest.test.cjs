@@ -9,7 +9,9 @@ const os = require('node:os');
 const {
   PLUGIN_MANIFEST_SCHEMA,
   PLUGIN_STRUCTURE,
+  PLUGIN_MANIFEST_RELATIVE_PATHS,
   validateManifest,
+  findManifestPath,
   loadManifest,
 } = require('../../.claude/lib/plugins/manifest.cjs');
 
@@ -39,6 +41,12 @@ function writePluginJson(pluginDir, data) {
     JSON.stringify(data, null, 2),
     'utf8'
   );
+}
+
+/** Writes legacy plugin.json under pluginDir/plugin.json */
+function writeLegacyPluginJson(pluginDir, data) {
+  fs.mkdirSync(pluginDir, { recursive: true });
+  fs.writeFileSync(path.join(pluginDir, 'plugin.json'), JSON.stringify(data, null, 2), 'utf8');
 }
 
 // ---------------------------------------------------------------------------
@@ -102,6 +110,15 @@ describe('Plugin Manifest Schema', () => {
 
     it('has exactly 4 subdirs', () => {
       assert.equal(PLUGIN_STRUCTURE.subdirs.length, 4);
+    });
+  });
+
+  describe('PLUGIN_MANIFEST_RELATIVE_PATHS', () => {
+    it('checks the canonical manifest path before the legacy root path', () => {
+      assert.deepEqual(PLUGIN_MANIFEST_RELATIVE_PATHS, [
+        path.join('.claude-plugin', 'plugin.json'),
+        'plugin.json',
+      ]);
     });
   });
 
@@ -224,6 +241,30 @@ describe('Plugin Manifest Schema', () => {
       assert.equal(result.errors, null);
       assert.ok(result.manifest, 'manifest object must be returned');
       assert.equal(result.manifest.name, 'my-plugin');
+    });
+
+    it('supports legacy root plugin.json for marketplace compatibility', () => {
+      const pluginDir = path.join(tmpDir, 'legacy-root-plugin');
+      writeLegacyPluginJson(pluginDir, makeValidManifest({ name: 'legacy-root' }));
+
+      const result = loadManifest(pluginDir);
+      assert.equal(result.valid, true);
+      assert.equal(result.manifest.name, 'legacy-root');
+    });
+
+    it('prefers .claude-plugin/plugin.json when both manifest locations exist', () => {
+      const pluginDir = path.join(tmpDir, 'canonical-precedence-plugin');
+      writeLegacyPluginJson(pluginDir, makeValidManifest({ name: 'legacy-root' }));
+      writePluginJson(pluginDir, makeValidManifest({ name: 'canonical' }));
+
+      assert.equal(
+        findManifestPath(pluginDir),
+        path.join(pluginDir, '.claude-plugin', 'plugin.json')
+      );
+
+      const result = loadManifest(pluginDir);
+      assert.equal(result.valid, true);
+      assert.equal(result.manifest.name, 'canonical');
     });
 
     it('returns valid: false when plugin.json is missing', () => {

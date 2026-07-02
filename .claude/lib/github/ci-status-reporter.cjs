@@ -170,6 +170,11 @@ class CIStatusReporter {
    * @param {string}  [opts.details] - Optional extended markdown content
    */
   reportToPR(prNumber, { status, summary, details }) {
+    if (!this._githubCLI || typeof this._githubCLI.commentOnPR !== 'function') {
+      throw new Error(
+        'CIStatusReporter requires a githubCLI with a commentOnPR(prNumber, body) method'
+      );
+    }
     const emoji = this._statusEmoji(status);
 
     let body = `## ${emoji} CI Status\n\n**Status:** ${status}\n\n${summary}`;

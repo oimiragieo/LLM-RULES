@@ -16,7 +16,7 @@
  *     → same format, for a specific commit (including initial commits)
  */
 
-const { execSync } = require('node:child_process');
+const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -26,16 +26,19 @@ const path = require('node:path');
 
 /**
  * Execute a git command and return its stdout.
- * Returns an empty string on non-zero exit (e.g. nothing to diff).
  *
- * @param {string} cmd   - Full command string to pass to the shell
- * @param {string} cwd   - Working directory
+ * Uses execFileSync (argv form, no shell) so that refs such as `baseBranch`
+ * and `commitHash` are passed as literal arguments to git and can never be
+ * interpreted as shell syntax — closing a command-injection hole.
+ *
+ * @param {string[]} args - git arguments (without the leading "git")
+ * @param {string} cwd    - Working directory
  * @returns {string}
  */
-function runGit(cmd, cwd) {
+function runGit(args, cwd) {
   // git diff exits 0 for empty diffs; a non-zero exit means an invalid ref or
   // other git error — let it propagate to the caller.
-  return execSync(cmd, {
+  return execFileSync('git', args, {
     cwd,
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
@@ -242,7 +245,7 @@ function parseUnifiedDiff(diffOutput) {
  */
 function computeBaseBranchDiff(repoPath, baseBranch) {
   // Three-dot syntax: diff from merge-base of baseBranch and HEAD to HEAD
-  const diffOutput = runGit('git diff ' + baseBranch + '...HEAD --unified=3', repoPath);
+  const diffOutput = runGit(['diff', String(baseBranch) + '...HEAD', '--unified=3'], repoPath);
   return { files: parseUnifiedDiff(diffOutput) };
 }
 
@@ -264,11 +267,11 @@ function computeUncommittedDiff(repoPath) {
   // --- Staged + unstaged (tracked files only) ---
   let headDiff = '';
   try {
-    headDiff = runGit('git diff HEAD --unified=3', repoPath);
+    headDiff = runGit(['diff', 'HEAD', '--unified=3'], repoPath);
   } catch {
     // No HEAD yet (empty repo) or other error — fall back to staged-only diff
     try {
-      headDiff = runGit('git diff --cached --unified=3', repoPath);
+      headDiff = runGit(['diff', '--cached', '--unified=3'], repoPath);
     } catch {
       headDiff = '';
     }
@@ -282,7 +285,7 @@ function computeUncommittedDiff(repoPath) {
   // --- Untracked files ---
   let untrackedOutput = '';
   try {
-    untrackedOutput = runGit('git ls-files --others --exclude-standard', repoPath);
+    untrackedOutput = runGit(['ls-files', '--others', '--exclude-standard'], repoPath);
   } catch {
     untrackedOutput = '';
   }
@@ -345,7 +348,10 @@ function computeCommitDiff(repoPath, commitHash) {
   // `git diff-tree --no-commit-id -p -r` shows the diff for the commit vs its
   // parent(s). `--root` ensures the initial commit (no parent) is treated as a
   // diff against the empty tree, so all added files are included.
-  const diffOutput = runGit('git diff-tree --no-commit-id -p -r --root ' + commitHash, repoPath);
+  const diffOutput = runGit(
+    ['diff-tree', '--no-commit-id', '-p', '-r', '--root', String(commitHash)],
+    repoPath
+  );
   return { files: parseUnifiedDiff(diffOutput) };
 }
 

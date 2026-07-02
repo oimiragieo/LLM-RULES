@@ -55,7 +55,23 @@ function copyDirSync(src, dest) {
 }
 
 /**
+ * Valid installation scopes.
+ * @type {Set<string>}
+ */
+const VALID_PLUGIN_SCOPES = new Set(['project', 'user', 'org']);
+
+/**
+ * Plugin ids must be simple identifiers — no path separators, no leading dot,
+ * so they can never be used to traverse outside the plugins directory.
+ */
+const PLUGIN_ID_RE = /^[a-zA-Z0-9][\w.-]*$/;
+
+/**
  * Derive the installed path for a plugin given its registered scope.
+ *
+ * Validates both `scope` (allowlist) and `pluginId` (safe-identifier regex) and
+ * asserts the resolved destination stays inside `pluginsDir`, preventing path
+ * traversal / arbitrary write or delete (e.g. pluginId = '../../evil').
  *
  * @param {string} pluginsDir
  * @param {string} scope       'project' | 'user' | 'org'
@@ -63,7 +79,19 @@ function copyDirSync(src, dest) {
  * @returns {string}
  */
 function pluginInstallPath(pluginsDir, scope, pluginId) {
-  return path.join(pluginsDir, scope, pluginId);
+  if (!VALID_PLUGIN_SCOPES.has(String(scope))) {
+    throw new Error(`Invalid plugin scope: ${scope}. Expected project, user, or org.`);
+  }
+  if (typeof pluginId !== 'string' || !PLUGIN_ID_RE.test(pluginId)) {
+    throw new Error(`Invalid plugin id: ${pluginId}`);
+  }
+  const dest = path.join(pluginsDir, scope, pluginId);
+  const resolvedBase = path.resolve(pluginsDir);
+  const resolvedDest = path.resolve(dest);
+  if (resolvedDest !== resolvedBase && !resolvedDest.startsWith(resolvedBase + path.sep)) {
+    throw new Error(`Plugin path escapes plugins directory: ${pluginId}`);
+  }
+  return dest;
 }
 
 // ---------------------------------------------------------------------------

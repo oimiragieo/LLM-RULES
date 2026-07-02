@@ -244,7 +244,10 @@ function validateRecord(record) {
  * @returns {'stm' | 'mtm' | 'ltm'}
  */
 function routeToTier(record) {
-  const confidence = record.confidence;
+  const confidence = Number(record && record.confidence);
+  // Guard against missing/NaN confidence: default to the most conservative
+  // (shortest-lived) tier rather than silently landing in long-term memory.
+  if (!Number.isFinite(confidence)) return 'stm';
   if (confidence < TIER_THRESHOLDS.STM_MAX) return 'stm';
   if (confidence < TIER_THRESHOLDS.LTM_MIN) return 'mtm';
   return 'ltm';

@@ -614,6 +614,11 @@ describe('isOrchestratorSpawn()', () => {
     assert.strictEqual(isOrchestratorSpawn(toolInput), false);
   });
 
+  test('should not detect subagent_type values that only contain orchestrator ids', () => {
+    assert.strictEqual(isOrchestratorSpawn({ subagent_type: 'router-helper' }), false);
+    assert.strictEqual(isOrchestratorSpawn({ subagent_type: 'not-master-orchestrator' }), false);
+  });
+
   test('should not detect regular developer', () => {
     const toolInput = { description: 'developer implementing feature' };
     assert.strictEqual(isOrchestratorSpawn(toolInput), false);
@@ -651,6 +656,11 @@ describe('isTemplateBasedSpawn()', () => {
 
   test('should not detect non-template prompt', () => {
     const prompt = 'This is a regular prompt';
+    assert.strictEqual(isTemplateBasedSpawn(prompt), false);
+  });
+
+  test('should not detect paths that only share a template path prefix', () => {
+    const prompt = 'See .claude/templates/spawnish/universal-agent-spawn.md';
     assert.strictEqual(isTemplateBasedSpawn(prompt), false);
   });
 

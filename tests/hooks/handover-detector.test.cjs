@@ -31,6 +31,23 @@ test('session-id-manager > returns same sessionId on subsequent calls', () => {
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
+test('session-id-manager > fails closed when existing session-id.json is invalid', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-session-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  fs.writeFileSync(sessionPath, 'not json{{', 'utf8');
+
+  assert.throws(
+    () => getOrCreateSessionId(tmpDir),
+    /no valid sessionId/,
+    'Should not return an unpersisted fallback session id'
+  );
+
+  assert.equal(fs.readFileSync(sessionPath, 'utf8'), 'not json{{');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
 test('session-id-manager > generates NEW sessionId when called with force=true', () => {
   const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-session-' + Date.now());
   fs.mkdirSync(tmpDir, { recursive: true });

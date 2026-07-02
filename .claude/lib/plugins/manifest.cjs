@@ -65,6 +65,13 @@ const PLUGIN_STRUCTURE = {
   subdirs: ['skills', 'hooks', 'agents', 'commands'],
 };
 
+/**
+ * Manifest locations checked in order. `.claude-plugin/plugin.json` is the
+ * canonical package location; root `plugin.json` is retained for older
+ * marketplace repositories.
+ */
+const PLUGIN_MANIFEST_RELATIVE_PATHS = [path.join('.claude-plugin', 'plugin.json'), 'plugin.json'];
+
 const _compiledValidate = ajv.compile(PLUGIN_MANIFEST_SCHEMA);
 
 /**
@@ -82,14 +89,44 @@ function validateManifest(manifestObj) {
 }
 
 /**
+ * Find the manifest path for a plugin directory.
+ *
+ * @param {string} pluginDir - Path to the plugin root directory
+ * @returns {string|null} Absolute manifest path, or null when none exists
+ */
+function findManifestPath(pluginDir) {
+  for (const relativePath of PLUGIN_MANIFEST_RELATIVE_PATHS) {
+    const candidate = path.join(pluginDir, relativePath);
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+/**
  * Loads and validates a plugin manifest from a plugin directory.
- * Reads `.claude-plugin/plugin.json` within the given directory.
+ * Reads `.claude-plugin/plugin.json` within the given directory, falling back
+ * to root `plugin.json` for legacy marketplace repositories.
  *
  * @param {string} pluginDir - Path to the plugin root directory
  * @returns {{ valid: boolean, errors: Array|null, manifest: object|null }}
  */
 function loadManifest(pluginDir) {
-  const pluginJsonPath = path.join(pluginDir, '.claude-plugin', 'plugin.json');
+  const pluginJsonPath = findManifestPath(pluginDir);
+
+  if (!pluginJsonPath) {
+    return {
+      valid: false,
+      errors: [
+        {
+          message:
+            'Failed to read plugin.json: missing .claude-plugin/plugin.json or root plugin.json',
+        },
+      ],
+      manifest: null,
+    };
+  }
 
   let content;
   try {
@@ -124,6 +161,8 @@ function loadManifest(pluginDir) {
 module.exports = {
   PLUGIN_MANIFEST_SCHEMA,
   PLUGIN_STRUCTURE,
+  PLUGIN_MANIFEST_RELATIVE_PATHS,
   validateManifest,
+  findManifestPath,
   loadManifest,
 };

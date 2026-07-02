@@ -12,6 +12,8 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+const PROJECT_ROOT = path.resolve(__dirname, '../..');
+
 describe('sync-memory-index file safety', () => {
   let tempDir;
 
@@ -87,5 +89,48 @@ describe('sync-memory-index file safety', () => {
     } finally {
       cleanup();
     }
+  });
+
+  it('getCoreMemoryFileType rejects sibling memory-prefix directories', () => {
+    const {
+      _private: { getCoreMemoryFileType },
+    } = require('../../.claude/hooks/memory/sync-memory-index.cjs');
+
+    const siblingPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'context',
+      'memory-backup',
+      'learnings.md'
+    );
+
+    assert.strictEqual(getCoreMemoryFileType(siblingPath), false);
+  });
+
+  it('getCoreMemoryFileType rejects nested files under memory archive directories', () => {
+    const {
+      _private: { getCoreMemoryFileType },
+    } = require('../../.claude/hooks/memory/sync-memory-index.cjs');
+
+    const archivePath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'context',
+      'memory',
+      'archive',
+      'learnings.md'
+    );
+
+    assert.strictEqual(getCoreMemoryFileType(archivePath), false);
+  });
+
+  it('getCoreMemoryFileType still accepts direct core memory files', () => {
+    const {
+      _private: { getCoreMemoryFileType },
+    } = require('../../.claude/hooks/memory/sync-memory-index.cjs');
+
+    const directPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
+
+    assert.strictEqual(getCoreMemoryFileType(directPath), 'markdown');
   });
 });

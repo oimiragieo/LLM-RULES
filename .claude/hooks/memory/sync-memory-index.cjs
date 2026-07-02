@@ -47,9 +47,11 @@ const EMBEDDING_MEMORY_FILES = new Set([
 
 function getCoreMemoryFileType(absPath) {
   if (!absPath) return false;
-  const normalized = path.normalize(absPath);
-  const memDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
-  if (!normalized.startsWith(memDir)) return false;
+  const normalized = path.resolve(absPath);
+  const memDir = path.resolve(PROJECT_ROOT, '.claude', 'context', 'memory');
+  const relative = path.relative(memDir, normalized);
+  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) return false;
+  if (relative.split(path.sep).length !== 1) return false;
   const base = path.basename(normalized);
   if (CORE_MEMORY_MARKDOWN_FILES.has(base)) return 'markdown';
   if (CORE_MEMORY_JSON_FILES.has(base)) return 'json';
@@ -414,6 +416,7 @@ module.exports = {
   buildEmbeddingSpawnOptions,
   _private: {
     buildEntityId,
+    getCoreMemoryFileType,
     qualityFromAccess,
   },
   main,

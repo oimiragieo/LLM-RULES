@@ -29,6 +29,8 @@ function runHook(payload, env = {}) {
   });
 }
 
+const { parseWorktreeList, isPathInsideDirectory } = require(HOOK_PATH)._test_internals;
+
 // Helper: build a TTL-stamped branch name with a specific age
 function ttlBranchName(ageMs) {
   const ts = Date.now() - ageMs;
@@ -308,6 +310,37 @@ describe('worktree-auto-cleanup — branch timestamp extraction logic', () => {
     const branch = `worktree-1234567890123-agent-aa75a292-${ts}`;
     const result = extractBranchTimestamp(branch);
     assert.strictEqual(result, ts, 'Expected trailing 13-digit segment to be extracted');
+  });
+});
+
+describe('worktree-auto-cleanup — worktree parsing and path safety', () => {
+  it('parses locked worktree entries so active agent worktrees can be skipped', () => {
+    const raw = [
+      'worktree C:/dev/project/.claude/worktrees/agent-a077670c',
+      'HEAD abc123',
+      'branch refs/heads/worktree-agent-a077670c',
+      'locked claude agent agent-a077670c (pid 147960)',
+      '',
+    ].join('\n');
+
+    const [worktree] = parseWorktreeList(raw);
+
+    assert.strictEqual(worktree.locked, true);
+    assert.strictEqual(worktree.lockedReason, 'claude agent agent-a077670c (pid 147960)');
+  });
+
+  it('rejects sibling paths that only share a directory-name prefix', () => {
+    const baseDir = 'C:/dev/project/.claude/worktrees';
+    const sibling = 'C:/dev/project/.claude/worktrees-evil/agent';
+
+    assert.strictEqual(isPathInsideDirectory(sibling, baseDir), false);
+  });
+
+  it('accepts nested paths under the worktrees directory', () => {
+    const baseDir = 'C:/dev/project/.claude/worktrees';
+    const child = 'C:/dev/project/.claude/worktrees/agent-a077670c';
+
+    assert.strictEqual(isPathInsideDirectory(child, baseDir), true);
   });
 });
 

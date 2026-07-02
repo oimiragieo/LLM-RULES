@@ -297,3 +297,41 @@ test('archiveWarmToCold - appends without reading existing cold file content', (
     cleanupTempDir(testDir);
   }
 });
+
+test('archiveWarmToCold - skips append and preserves source when cold file lock fails', () => {
+  const testDir = createTempDir();
+  const archiveDir = path.join(testDir, 'archive');
+  const coldDir = path.join(archiveDir, 'cold');
+  fs.mkdirSync(coldDir, { recursive: true });
+
+  const oldDate = new Date();
+  oldDate.setDate(oldDate.getDate() - 45);
+  const oldMonth = oldDate.toISOString().slice(0, 7);
+  const coldFile = path.join(coldDir, `cold-${oldMonth}.jsonl`);
+  const seed = JSON.stringify({ title: 'seed', content: 'seed' }) + '\n';
+  fs.writeFileSync(coldFile, seed, 'utf8');
+
+  const oldArchive = path.join(archiveDir, `issues-${oldMonth}.md`);
+  fs.writeFileSync(
+    oldArchive,
+    `## Archived issue\n\n**Date:** ${oldDate.toISOString().slice(0, 10)}\n\nBody\n`,
+    'utf8'
+  );
+
+  const lockfile = require('proper-lockfile');
+  const originalLockSync = lockfile.lockSync;
+  lockfile.lockSync = () => {
+    throw new Error('lock unavailable');
+  };
+
+  try {
+    const result = coldStorage.archiveWarmToCold(testDir, { maxAgeDays: 30 });
+
+    assert.equal(result.archivedFiles, 0, 'Should not count an archive when lock fails');
+    assert.equal(fs.readFileSync(coldFile, 'utf8'), seed, 'Cold file should remain unchanged');
+    assert.equal(fs.existsSync(oldArchive), true, 'Source archive should remain for retry');
+  } finally {
+    lockfile.lockSync = originalLockSync;
+    cleanupTempDir(testDir);
+  }
+});

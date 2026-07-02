@@ -12,7 +12,8 @@
  *   marketplacesDir/
  *     <marketplace-name>/      ← cloned git repo
  *       <plugin-name>/         ← plugin directory
- *         plugin.json          ← plugin manifest (name, description, version, …)
+ *         .claude-plugin/
+ *           plugin.json        ← plugin manifest (name, description, version, …)
  *     known_marketplaces.json  ← registry of known marketplaces (PluginRegistry)
  */
 
@@ -20,6 +21,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
+const { loadManifest } = require('./manifest.cjs');
 const { PluginRegistry } = require('./registry.cjs');
 
 // ---------------------------------------------------------------------------
@@ -202,9 +204,8 @@ function updateMarketplace({ name, marketplacesDir }) {
  * Discover all available plugins across all cloned marketplace directories.
  *
  * Scans every subdirectory of `marketplacesDir` as a potential marketplace
- * repo, then scans each marketplace's subdirectories for a `plugin.json`
- * manifest.  Entries with a missing, unparseable, or incomplete manifest
- * (missing name / description / version) are silently skipped.
+ * repo, then scans each marketplace's subdirectories for a manifest. Entries
+ * with a missing, unparseable, or schema-invalid manifest are silently skipped.
  *
  * @param {string} marketplacesDir - Directory containing cloned marketplace repos
  * @returns {Array<{
@@ -248,30 +249,8 @@ function discoverPlugins(marketplacesDir) {
 
     for (const pluginEntry of pluginEntries) {
       const pluginDir = path.join(marketplaceDir, pluginEntry.name);
-      const manifestPath = path.join(pluginDir, 'plugin.json');
-
-      // Skip directories without a plugin.json
-      if (!fs.existsSync(manifestPath)) {
-        continue;
-      }
-
-      // Parse the manifest; skip on JSON errors
-      let manifest;
-      try {
-        manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-      } catch (_err) {
-        continue;
-      }
-
-      // Skip manifests missing required fields
-      if (
-        typeof manifest.name !== 'string' ||
-        !manifest.name ||
-        typeof manifest.description !== 'string' ||
-        !manifest.description ||
-        typeof manifest.version !== 'string' ||
-        !manifest.version
-      ) {
+      const { valid, manifest } = loadManifest(pluginDir);
+      if (!valid) {
         continue;
       }
 

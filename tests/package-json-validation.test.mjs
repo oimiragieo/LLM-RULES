@@ -80,6 +80,29 @@ test('test script should run actual tests and fail if 0 tests found', () => {
   );
 });
 
+test('test:integration should match recursive integration tests', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const integrationScript = pkg.scripts['test:integration'];
+
+  assert.ok(integrationScript, 'test:integration script should exist');
+  assert.ok(
+    integrationScript.includes('--test-concurrency=1'),
+    'test:integration should run sequentially like the main Node test suites'
+  );
+  assert.ok(
+    integrationScript.includes('tests/integration/**/*.test'),
+    'test:integration should use a recursive integration glob'
+  );
+  assert.ok(
+    integrationScript.includes('{mjs,cjs}'),
+    'test:integration should include active .cjs integration tests'
+  );
+  assert.ok(
+    !integrationScript.includes('tests/integration/*.test.mjs'),
+    'test:integration must not use the old root-only .mjs glob that matched zero tests'
+  );
+});
+
 test('count-all-tests.mjs should report failed test files, not hide them', () => {
   const scriptPath = join(PROJECT_ROOT, 'scripts', 'testing', 'count-all-tests.mjs');
   const script = readFileSync(scriptPath, 'utf-8');
@@ -216,6 +239,38 @@ test('validate:full should include agent skill reference validation', () => {
   );
 });
 
+test('validate:full should not mutate generated rule index outputs', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const fullScript = pkg.scripts['validate:full'] || '';
+
+  assert.ok(
+    fullScript.includes('pnpm validate:index-paths'),
+    'validate:full should validate the generated rule index paths'
+  );
+  assert.ok(
+    !/(^|&&)\s*pnpm index-rules(\s|&&|$)/.test(fullScript),
+    'validate:full must not run mutating pnpm index-rules; generation should be explicit'
+  );
+});
+
+test('test:coverage should use recursive active test globs', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const coverageScript = pkg.scripts['test:coverage'] || '';
+
+  assert.ok(
+    coverageScript.includes('--experimental-test-coverage'),
+    'test:coverage should enable Node test coverage'
+  );
+  assert.ok(
+    coverageScript.includes('tests/**/*.test') && coverageScript.includes('{mjs,cjs}'),
+    'test:coverage should cover recursive .mjs and .cjs tests'
+  );
+  assert.ok(
+    !coverageScript.includes('tests/*.test.mjs'),
+    'test:coverage must not use the old root-only .mjs glob'
+  );
+});
+
 test('validate:status-check-governance script should exist', () => {
   const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
   const script = pkg.scripts['validate:status-check-governance'] || '';
@@ -231,17 +286,17 @@ test('validate:status-check-governance script should exist', () => {
   );
 });
 
-test('pnpm onlyBuiltDependencies should include better-sqlite3 for native bindings', () => {
+test('pnpm allowBuilds should approve better-sqlite3 native bindings', () => {
   const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
-  const onlyBuiltDependencies = pkg.pnpm?.onlyBuiltDependencies || [];
+  const workspaceConfig = readFileSync(join(PROJECT_ROOT, 'pnpm-workspace.yaml'), 'utf-8');
 
   assert.ok(
-    onlyBuiltDependencies.includes('better-sqlite3'),
-    'pnpm.onlyBuiltDependencies should include better-sqlite3 so CI builds native bindings'
+    /^ {2}better-sqlite3:\s*true$/m.test(workspaceConfig),
+    'pnpm-workspace.yaml allowBuilds should approve better-sqlite3 so CI builds native bindings'
   );
   assert.ok(
     Object.prototype.hasOwnProperty.call(pkg.dependencies || {}, 'better-sqlite3'),
-    'better-sqlite3 should remain a direct dependency when listed in onlyBuiltDependencies'
+    'better-sqlite3 should remain a direct dependency when listed in allowBuilds'
   );
 });
 

@@ -192,6 +192,28 @@ test('VAL-ML-002: tryAcquireConsolidationLock returns prior mtime when lock exis
   }
 });
 
+test('VAL-ML-002: tryAcquireConsolidationLock does not modify lock while acquisition is serialized', () => {
+  const { tryAcquireConsolidationLock } = getModule();
+  const tmpDir = createTempDir();
+  try {
+    const oldMtime = Date.now() - 2 * 60 * 60 * 1000;
+    createLockFile(tmpDir, '99999999', oldMtime);
+    fs.mkdirSync(path.join(tmpDir, '.consolidate-lock.acquire'));
+
+    const priorMtime = tryAcquireConsolidationLock(tmpDir);
+    assert.strictEqual(priorMtime, null, 'Should not acquire while another acquire is active');
+
+    const lockPath = path.join(tmpDir, '.consolidate-lock');
+    assert.strictEqual(
+      fs.readFileSync(lockPath, 'utf8').trim(),
+      '99999999',
+      'Existing lock holder should remain untouched'
+    );
+  } finally {
+    cleanupTempDir(tmpDir);
+  }
+});
+
 // ── VAL-ML-003: Lock blocks when held by live process ─────────────────────────
 
 test('VAL-ML-003: second acquire returns null when lock held by live PID within stale threshold', () => {

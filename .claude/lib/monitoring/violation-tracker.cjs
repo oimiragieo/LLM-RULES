@@ -29,7 +29,7 @@ const VIOLATIONS_FILE = path.join(
 const DEFAULT_MAX_LINES = 2000;
 const DEFAULT_RATE_LIMIT = 5000; // per hour
 const DEFAULT_THRESHOLD = 5;
-const DEFAULT_WINDOW_MS = 60000; // 60 minutes
+const DEFAULT_WINDOW_MS = 60 * 60 * 1000; // 60 minutes (matches getViolationStats' 60-min default)
 
 // SEC-MON-001: Tool name whitelist
 const KNOWN_TOOLS = new Set([
@@ -265,7 +265,7 @@ function getViolationStats(options = {}) {
  *
  * @param {Object} [options]
  * @param {number} [options.threshold] - Max violations before alert (default: 5)
- * @param {number} [options.windowMs] - Time window in milliseconds (default: 60000)
+ * @param {number} [options.windowMs] - Time window in milliseconds (default: 3600000 = 60 min)
  * @param {string} [options.metricsFile] - Optional override for testing
  * @returns {{ exceeded: boolean, count: number, threshold: number, windowMs: number }}
  */

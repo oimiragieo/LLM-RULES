@@ -98,6 +98,40 @@ describe('OPEN → HALF_OPEN', () => {
     now += 6000;
     assert.equal(cb.canExecute('agent-a'), true);
   });
+
+  it('canExecute enforces halfOpenMax cap (2nd probe blocked at limit 1)', () => {
+    let now = 1000000;
+    const cb = new CircuitBreaker(
+      { failureThreshold: 2, resetTimeout: 5000, halfOpenMax: 1 },
+      () => now
+    );
+
+    cb.recordFailure('agent-a');
+    cb.recordFailure('agent-a');
+
+    now += 6000;
+    assert.equal(cb.getState('agent-a'), STATE_HALF_OPEN);
+    // First probe consumes the single half-open slot.
+    assert.equal(cb.canExecute('agent-a'), true);
+    // Second probe must be blocked until success/failure resolves the circuit.
+    assert.equal(cb.canExecute('agent-a'), false);
+  });
+
+  it('canExecute allows halfOpenMax probes when limit > 1', () => {
+    let now = 1000000;
+    const cb = new CircuitBreaker(
+      { failureThreshold: 2, resetTimeout: 5000, halfOpenMax: 2 },
+      () => now
+    );
+
+    cb.recordFailure('agent-a');
+    cb.recordFailure('agent-a');
+
+    now += 6000;
+    assert.equal(cb.canExecute('agent-a'), true);
+    assert.equal(cb.canExecute('agent-a'), true);
+    assert.equal(cb.canExecute('agent-a'), false);
+  });
 });
 
 // ─── HALF_OPEN → CLOSED on success ─────────────────────────────────────────

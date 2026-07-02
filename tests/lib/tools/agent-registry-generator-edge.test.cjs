@@ -111,4 +111,21 @@ describe('Agent registry generator edge cases', () => {
       `Validation failed: ${JSON.stringify(validation.errors)}`
     );
   });
+
+  it('should fail validation when schema file is missing', async () => {
+    if (!fs.existsSync(generatorPath)) {
+      console.log('Skipping: Generator not yet implemented');
+      return;
+    }
+
+    const { AgentRegistryGenerator } = require(generatorPath);
+    const generator = new AgentRegistryGenerator({
+      schemaPath: path.join(PROJECT_ROOT, '.claude/schemas/missing-agent-card.schema.json'),
+    });
+    const registry = await generator.generate(AGENTS_DIR);
+    const validation = generator.validate(registry);
+
+    assert.strictEqual(validation.valid, false);
+    assert.match(validation.message, /Schema file not found/);
+  });
 });

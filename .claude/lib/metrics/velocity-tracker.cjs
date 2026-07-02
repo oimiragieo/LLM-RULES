@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 
 const DATA_PATH = path.resolve(__dirname, '..', '..', 'context', 'memory', 'velocity-data.json');
 
@@ -31,7 +32,9 @@ function saveData(data) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2), 'utf8');
+  // Atomic write (tmp + rename) so a crash mid-write can't corrupt the
+  // shared velocity-data.json that loadData() later parses.
+  atomicWriteJSONSync(DATA_PATH, data);
 }
 
 function recordTaskCompletion(agentType, durationMs, taskId) {

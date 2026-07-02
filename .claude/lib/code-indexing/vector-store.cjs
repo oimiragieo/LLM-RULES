@@ -259,8 +259,15 @@ class VectorStore {
       text: chunk.content || chunk.text,
       metadata: {
         filePath: chunk.filePath,
+        language: chunk.language,
+        type: chunk.type,
         startLine: chunk.lineStart || chunk.startLine,
         endLine: chunk.lineEnd || chunk.endLine,
+        lineStart: chunk.lineStart || chunk.startLine,
+        lineEnd: chunk.lineEnd || chunk.endLine,
+        name: chunk.name,
+        signature: chunk.signature,
+        tokenCount: chunk.tokenCount,
       },
     }));
 
@@ -345,6 +352,9 @@ class VectorStore {
     // Add dense results with weighted RRF scores
     denseResults.forEach((result, rank) => {
       const id = result.id || result.metadata?.id;
+      // Skip results without a resolvable id — otherwise every id-less result
+      // collapses into a single `undefined` key and all but one are dropped.
+      if (id == null) return;
       const score = denseWeight * (1 / (k + rank));
       if (!scoreMap.has(id)) {
         scoreMap.set(id, { ...result, id, rrf_score: 0 });

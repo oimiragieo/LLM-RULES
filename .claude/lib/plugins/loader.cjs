@@ -56,6 +56,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { loadManifest } = require('./manifest.cjs');
 
+function isPathInside(parentDir, candidatePath) {
+  const relative = path.relative(path.resolve(parentDir), path.resolve(candidatePath));
+  return (
+    relative === '' || (!!relative && !relative.startsWith('..') && !path.isAbsolute(relative))
+  );
+}
+
 class PluginLoader {
   /**
    * @param {import('./resolver.cjs').PluginResolver} resolver - Resolver instance to delegate to
@@ -205,11 +212,18 @@ class PluginLoader {
     if (!result.valid || !result.manifest || !Array.isArray(result.manifest.tools)) {
       return [];
     }
-    return result.manifest.tools.map(tool => ({
-      name: tool.name,
-      command: path.resolve(pluginDir, tool.command),
-      description: tool.description,
-    }));
+    const tools = [];
+    for (const tool of result.manifest.tools) {
+      if (typeof tool.command !== 'string') continue;
+      const command = path.resolve(pluginDir, tool.command);
+      if (!isPathInside(pluginDir, command)) continue;
+      tools.push({
+        name: tool.name,
+        command,
+        description: tool.description,
+      });
+    }
+    return tools;
   }
 
   // ---------------------------------------------------------------------------

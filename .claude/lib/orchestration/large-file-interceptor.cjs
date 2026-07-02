@@ -22,12 +22,20 @@ const { summarize, detectContentType } = require('./summarization-tiers.cjs');
  * Default size limits by content type (in characters).
  * Can be overridden via environment variables.
  */
+function _envLimit(name, fallback) {
+  // NaN-aware: preserve an explicit 0 (means "intercept everything") while
+  // unset/invalid values still fall back to the default. `parseInt(x,10) || d`
+  // would wrongly discard a configured 0.
+  const n = parseInt(process.env[name], 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 const LIMITS = {
-  code: parseInt(process.env.INTERCEPT_LIMIT_CODE, 10) || 50000, // ~12K tokens
-  documentation: parseInt(process.env.INTERCEPT_LIMIT_DOCS, 10) || 80000, // ~20K tokens
-  logs: parseInt(process.env.INTERCEPT_LIMIT_LOGS, 10) || 30000, // ~7K tokens
-  conversation: parseInt(process.env.INTERCEPT_LIMIT_CONV, 10) || 60000, // ~15K tokens
-  default: parseInt(process.env.INTERCEPT_LIMIT_DEFAULT, 10) || 50000,
+  code: _envLimit('INTERCEPT_LIMIT_CODE', 50000), // ~12K tokens
+  documentation: _envLimit('INTERCEPT_LIMIT_DOCS', 80000), // ~20K tokens
+  logs: _envLimit('INTERCEPT_LIMIT_LOGS', 30000), // ~7K tokens
+  conversation: _envLimit('INTERCEPT_LIMIT_CONV', 60000), // ~15K tokens
+  default: _envLimit('INTERCEPT_LIMIT_DEFAULT', 50000),
 };
 
 /**

@@ -163,6 +163,7 @@ function evictStaleLTMFiles(ltmDir) {
     let data;
     try {
       const raw = fs.readFileSync(filePath, 'utf8');
+      JSON.parse(raw);
       data = safeParseJSON(raw, null);
     } catch (_e) {
       continue;

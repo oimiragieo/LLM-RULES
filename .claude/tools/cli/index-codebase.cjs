@@ -28,6 +28,16 @@ const path = require('path');
 const { IndexManager } = require('../../lib/code-indexing/index-manager.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
+function formatResultPath(filePath, basePath = process.cwd()) {
+  if (!filePath || typeof filePath !== 'string') return 'unknown';
+  const relativePath = path.relative(basePath, filePath);
+  const displayPath =
+    relativePath && !relativePath.startsWith('..') && !path.isAbsolute(relativePath)
+      ? relativePath
+      : filePath;
+  return displayPath.replace(/\\/g, '/');
+}
+
 // Chalk 5.x is ESM-only, so we use a simple fallback for CommonJS
 const chalk = {
   blue: text => `\x1b[34m${text}\x1b[0m`,
@@ -177,9 +187,11 @@ program
 
       results.forEach((result, index) => {
         const [lineStart, lineEnd] = result.lineRange;
+        const type = result.type || 'code';
+        const filePath = formatResultPath(result.filePath);
         console.log(
           chalk.bold(
-            `${index + 1}. ${result.type} - ${result.filePath}:${lineStart}-${lineEnd} (${Math.round(result.similarity * 100)}% match)`
+            `${index + 1}. ${type} - ${filePath}:${lineStart}-${lineEnd} (${Math.round(result.similarity * 100)}% match)`
           )
         );
 
@@ -240,7 +252,7 @@ program
       const manager = new IndexManager({ projectRoot: filePath });
 
       // Initialize hybrid search
-      const astGrep = new AstGrepSearch();
+      const astGrep = new AstGrepSearch({ projectRoot: filePath });
       const hybridSearch = new HybridSearch(manager, { astGrep });
 
       // Execute search
@@ -266,13 +278,17 @@ program
           results = await hybridSearch.semanticStage(query, topK, language);
           results = results.map(r => ({ ...r, score: r.similarity }));
         } else {
-          // Get semantic results first for structural refinement
-          const semanticResults = await manager.semanticSearch(query, { limit: topK * 2 });
-          results = await hybridSearch.structuralStage(
-            semanticResults,
-            analysis.astPattern,
-            language
-          );
+          const structuralLanguage = language || 'javascript';
+          const structuralResults = await astGrep.search(analysis.astPattern, structuralLanguage, {
+            maxResults: topK,
+          });
+          results = structuralResults.map(result => ({
+            ...result,
+            lineRange: [result.lineStart, result.lineEnd],
+            score: 1,
+            structuralScore: 1,
+            type: result.type || 'code',
+          }));
         }
       } else {
         // Full hybrid search

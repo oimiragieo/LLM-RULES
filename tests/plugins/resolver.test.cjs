@@ -90,6 +90,17 @@ describe('PluginResolver', () => {
       hooks: ['PreToolUse'],
       agents: ['shared-agent', 'project-agent'],
     });
+    fs.writeFileSync(path.join(projectDir, 'plugin-foo', 'escape.md'), '# escaped skill\n', 'utf8');
+    fs.writeFileSync(
+      path.join(projectDir, 'plugin-foo', 'escape-agent.md'),
+      '# escaped agent\n',
+      'utf8'
+    );
+    fs.writeFileSync(
+      path.join(projectDir, 'plugin-foo', 'escape-hook.cjs'),
+      `'use strict';\nmodule.exports = {};\n`,
+      'utf8'
+    );
 
     // User scope: plugin-bar with 'shared-skill' (overridden by project), 'user-skill',
     //             hook 'PreToolUse' (additive), 'PostToolUse'
@@ -226,6 +237,12 @@ describe('PluginResolver', () => {
       assert.ok(result !== null);
       assert.equal(result.scope, 'user');
     });
+
+    it('rejects skill names that escape the skills directory', () => {
+      const r = new PluginResolver({ projectDir, userDir, orgDir });
+      const result = r.resolveSkill('../escape');
+      assert.equal(result, null, 'path traversal skill names must not resolve');
+    });
   });
 
   // -------------------------------------------------------------------------
@@ -277,6 +294,12 @@ describe('PluginResolver', () => {
       const result = r.resolveHook('PreToolUse');
       const userHooks = result.filter(h => h.scope === 'user');
       assert.ok(userHooks.length >= 1, 'user scope hook must be included');
+    });
+
+    it('rejects hook event names that escape the hooks directory', () => {
+      const r = new PluginResolver({ projectDir, userDir, orgDir });
+      const result = r.resolveHook('../escape-hook');
+      assert.deepEqual(result, [], 'path traversal hook names must not resolve');
     });
 
     it('PostToolUse hook from user and org scopes both returned (additive)', () => {
@@ -347,6 +370,12 @@ describe('PluginResolver', () => {
       const result = r.resolveAgent('project-agent');
       assert.ok(result !== null);
       assert.ok(fs.existsSync(result), 'resolved agent path must exist');
+    });
+
+    it('rejects agent names that escape the agents directory', () => {
+      const r = new PluginResolver({ projectDir, userDir, orgDir });
+      const result = r.resolveAgent('../escape-agent');
+      assert.equal(result, null, 'path traversal agent names must not resolve');
     });
   });
 

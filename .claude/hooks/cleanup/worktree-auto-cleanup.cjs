@@ -27,6 +27,9 @@ const path = require('path');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { detectDefaultBranch } = require('../../lib/worktree/worktree-utils.cjs');
 
+// Git calls in hooks must stay short; cleanup is best-effort and must not block workflows.
+const GIT_TIMEOUT_MS = parseInt(process.env.WORKTREE_GIT_TIMEOUT_MS ?? '5000', 10);
+
 // TTL for worktree branches (default 24 hours). Override with WORKTREE_TTL_MS env var.
 const WORKTREE_TTL_MS = parseInt(process.env.WORKTREE_TTL_MS ?? '86400000', 10);
 
@@ -71,7 +74,7 @@ function git(gitArgs, cwd = PROJECT_ROOT) {
       shell: false,
       windowsHide: true,
       encoding: 'utf8',
-      timeout: 15000,
+      timeout: Number.isFinite(GIT_TIMEOUT_MS) && GIT_TIMEOUT_MS > 0 ? GIT_TIMEOUT_MS : 5000,
     });
   } catch (_err) {
     return null;
@@ -80,10 +83,10 @@ function git(gitArgs, cwd = PROJECT_ROOT) {
 
 /**
  * Parse `git worktree list --porcelain` output.
- * @returns {{ worktreePath: string, HEAD: string, branch: string }[]}
+ * @param {string} raw
+ * @returns {{ worktreePath: string, HEAD: string, branch: string, locked: boolean, lockedReason: string }[]}
  */
-function listWorktrees() {
-  const raw = git(['worktree', 'list', '--porcelain']);
+function parseWorktreeList(raw) {
   if (!raw) return [];
   const blocks = raw.trim().split(/\n\n+/);
   const worktrees = [];
@@ -92,14 +95,40 @@ function listWorktrees() {
     const wtLine = lines.find(l => l.startsWith('worktree '));
     const headLine = lines.find(l => l.startsWith('HEAD '));
     const branchLine = lines.find(l => l.startsWith('branch '));
+    const lockedLine = lines.find(l => l.startsWith('locked'));
     if (!wtLine) continue;
     // SE-01: normalize backslashes
     const worktreePath = wtLine.slice('worktree '.length).trim().replace(/\\/g, '/');
     const HEAD = headLine ? headLine.slice('HEAD '.length).trim() : '';
     const branch = branchLine ? branchLine.slice('branch refs/heads/'.length).trim() : '';
-    worktrees.push({ worktreePath, HEAD, branch });
+    const lockedReason = lockedLine ? lockedLine.slice('locked'.length).trim() : '';
+    worktrees.push({ worktreePath, HEAD, branch, locked: Boolean(lockedLine), lockedReason });
   }
   return worktrees;
+}
+
+/**
+ * List git worktrees registered for this repository.
+ * @returns {{ worktreePath: string, HEAD: string, branch: string, locked: boolean, lockedReason: string }[]}
+ */
+function listWorktrees() {
+  return parseWorktreeList(git(['worktree', 'list', '--porcelain']));
+}
+
+/**
+ * Check if a path is inside a directory, respecting path segment boundaries.
+ *
+ * @param {string} candidatePath
+ * @param {string} directoryPath
+ * @returns {boolean}
+ */
+function isPathInsideDirectory(candidatePath, directoryPath) {
+  if (!candidatePath || !directoryPath) return false;
+  const resolvedCandidate = path.resolve(candidatePath);
+  const resolvedDirectory = path.resolve(directoryPath);
+  const relative = path.relative(resolvedDirectory, resolvedCandidate);
+
+  return Boolean(relative) && !relative.startsWith('..') && !path.isAbsolute(relative);
 }
 
 /**
@@ -138,12 +167,11 @@ function isTTLExpired(branch) {
  * @param {string} branch
  * @returns {boolean}
  */
-function isStale(branch) {
+function isStale(branch, defaultBranch = detectDefaultBranch(PROJECT_ROOT)) {
   if (!branch) return false;
   // TTL-based check: branch older than WORKTREE_TTL_MS is always stale
   if (isTTLExpired(branch)) return true;
   // Merge-based check: zero unique commits compared to default branch
-  const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
   const result = git(['log', '--oneline', `${defaultBranch}..${branch}`]);
   if (result === null) return false;
   return result.trim().length === 0;
@@ -223,26 +251,27 @@ function run() {
   }
 
   // SE-01: normalize paths for cross-platform comparisons
-  const normalizedProjectRoot = PROJECT_ROOT.replace(/\\/g, '/');
-  const normalizedWorktreesDir = normalizedProjectRoot + '/.claude/worktrees/';
+  const worktreesDir = path.join(PROJECT_ROOT, '.claude', 'worktrees');
 
   // Step 3: git worktree prune (removes admin entries for missing paths)
   git(['worktree', 'prune']);
 
   // Step 4: List worktrees and remove any stale ones
   const worktrees = listWorktrees();
+  const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
 
   for (const wt of worktrees) {
-    const { worktreePath, branch } = wt;
+    const { worktreePath, branch, locked } = wt;
 
     // Use path.resolve() to guarantee absolute, OS-specific path normalization for all sources
     const resolvedWtPath = path.resolve(worktreePath);
-    const resolvedWorktreesDir = path.resolve(normalizedWorktreesDir);
-    const _resolvedRoot = path.resolve(PROJECT_ROOT);
     const resolvedCwd = path.resolve(process.cwd());
 
     // Only process worktrees securely under the designated directory
-    if (!resolvedWtPath.toLowerCase().startsWith(resolvedWorktreesDir.toLowerCase())) continue;
+    if (!isPathInsideDirectory(resolvedWtPath, worktreesDir)) continue;
+
+    // Do not touch explicitly locked worktrees; git uses this for active or protected sessions.
+    if (locked) continue;
 
     // Safety: bulletproof check to ensure we never delete the active session's worktree (Windows EBUSY risk + Stop hook crash)
     const wtLower = resolvedWtPath.replace(/\\/g, '/').toLowerCase();
@@ -269,11 +298,13 @@ function run() {
       continue;
     }
 
-    if (isStale(branch)) {
+    if (isStale(branch, defaultBranch)) {
       const nativePath = worktreePath.replace(/\//g, path.sep);
       // SE-02: shell: false with array args
-      git(['worktree', 'remove', nativePath, '--force']);
-      process.stderr.write(`[worktree-auto-cleanup] Removed ${worktreePath}\n`);
+      const removed = git(['worktree', 'remove', nativePath, '--force']);
+      if (removed !== null) {
+        process.stderr.write(`[worktree-auto-cleanup] Removed ${worktreePath}\n`);
+      }
     }
   }
 
@@ -291,5 +322,11 @@ if (require.main === module) {
   process.exit(0);
 } else {
   // When required (for testing), export internals only
-  module.exports._test_internals = { extractBranchTimestamp, isTTLExpired, readStdin };
+  module.exports._test_internals = {
+    extractBranchTimestamp,
+    isTTLExpired,
+    isPathInsideDirectory,
+    parseWorktreeList,
+    readStdin,
+  };
 }

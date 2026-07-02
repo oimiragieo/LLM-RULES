@@ -31,13 +31,20 @@ function resolveSpawnTemplate(agentType, options = {}) {
   // Priority 1: Explicit override
   if (options.templateName) {
     const explicitPath = path.join(TEMPLATES_DIR, options.templateName);
-    if (fs.existsSync(explicitPath)) {
+    // Containment guard: reject path traversal (e.g. '../../etc/passwd').
+    // The resolved path must stay inside TEMPLATES_DIR.
+    const resolvedRoot = path.resolve(TEMPLATES_DIR);
+    const resolvedExplicit = path.resolve(explicitPath);
+    const contained =
+      resolvedExplicit === resolvedRoot || resolvedExplicit.startsWith(resolvedRoot + path.sep);
+    if (contained && fs.existsSync(explicitPath)) {
       return {
         templateName: options.templateName,
         templatePath: explicitPath,
         reason: 'explicit_override',
       };
     }
+    // Non-contained or missing override falls through to default resolution.
   }
 
   // Priority 2: One-shot subordinate

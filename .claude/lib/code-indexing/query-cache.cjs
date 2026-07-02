@@ -19,6 +19,10 @@ class QueryCache {
     const exact = this._cache.get(query);
     if (exact && !this._isExpired(exact)) {
       this._hits++;
+      // Touch-on-hit: re-insert so this entry becomes most-recently-used,
+      // keeping the Map's insertion order an accurate LRU ordering.
+      this._cache.delete(query);
+      this._cache.set(query, exact);
       return {
         results: exact.results,
         fromCache: true,
@@ -58,8 +62,12 @@ class QueryCache {
 
   set(query, results, embedding = null) {
     if (!this.enabled) return;
-    // LRU eviction
-    if (this._cache.size >= this.maxEntries) {
+    // True LRU: refresh an existing key so it moves to the most-recent end.
+    if (this._cache.has(query)) {
+      this._cache.delete(query);
+    } else if (this._cache.size >= this.maxEntries) {
+      // Evict the least-recently-used entry (insertion-order head, kept
+      // accurate by the touch-on-hit logic in get()).
       const oldest = this._cache.keys().next().value;
       this._cache.delete(oldest);
     }

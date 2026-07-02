@@ -79,9 +79,14 @@ async function main() {
       concurrency: 2,
       processFn: async row => {
         // row contains: id, chat_id, user_id, text, attachments, timestamp, status, attempt_count
-        // text is JSON.stringify(a2aTaskParams) from server.cjs enqueueMessage call
-        const parsed = safeParseJSON(row.text);
-        const taskParams = parsed.success ? parsed.data : { raw: row.text };
+        // text is JSON.stringify(a2aTaskParams) from server.cjs enqueueMessage call.
+        // safeParseJSON returns the parsed object directly (or an empty object on
+        // parse failure), NOT a {success, data} envelope.
+        const parsed = safeParseJSON(row.text, null);
+        const taskParams =
+          parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0
+            ? parsed
+            : { raw: row.text };
         process.stderr.write(
           `[A2A] Processing queued message ${row.id} (attempt ${row.attempt_count || 1})\n`
         );
@@ -103,7 +108,7 @@ async function main() {
     try {
       await stop();
       if (pool) {
-        pool.shutdown();
+        pool.stop();
       }
     } catch (e) {
       process.stderr.write(`[A2A] Shutdown error: ${e.message}\n`);

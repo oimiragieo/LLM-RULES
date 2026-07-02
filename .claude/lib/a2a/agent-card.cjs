@@ -24,8 +24,10 @@ const REGISTRY_PATH = path.join(__dirname, '..', '..', 'context', 'agent-registr
 function loadRegistry() {
   try {
     const raw = fs.readFileSync(REGISTRY_PATH, 'utf8');
-    const { success, data } = safeParseJSON(raw, {});
-    if (!success || typeof data.agents !== 'object') return { agents: {} };
+    // safeParseJSON returns the parsed object directly (or defaults on error),
+    // NOT a {success, data} envelope. Treat the return value as the data.
+    const data = safeParseJSON(raw, null);
+    if (!data || typeof data.agents !== 'object') return { agents: {} };
     return data;
   } catch {
     return { agents: {} };
