@@ -241,6 +241,26 @@ function _claudeAsyncImpl(prompt, opts, spawnFn) {
   let cancelled = false;
   let timedOut = false;
   let timeoutTimer = null;
+  let settled = false;
+  let stdinError = null;
+
+  const cleanupTempFile = () => {
+    if (!tmpSysFile) return;
+    try {
+      fs.unlinkSync(tmpSysFile);
+    } catch {
+      /* ignored */
+    }
+    tmpSysFile = null;
+  };
+
+  const finish = (settleFn, value) => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(timeoutTimer);
+    cleanupTempFile();
+    settleFn(value);
+  };
 
   if (child.stdout)
     child.stdout.on('data', data => {
@@ -251,53 +271,57 @@ function _claudeAsyncImpl(prompt, opts, spawnFn) {
       stderr += data;
     });
 
-  // Write prompt to stdin
-  if (child.stdin) {
-    child.stdin.write(prompt);
-    child.stdin.end();
-  }
-
   const promise = new Promise((resolve, reject) => {
     // Timeout handler
     timeoutTimer = setTimeout(() => {
       timedOut = true;
       if (child.kill) child.kill('SIGTERM');
-      reject(new Error(`Timeout: claude process exceeded ${timeout}ms`));
+      finish(reject, new Error(`Timeout: claude process exceeded ${timeout}ms`));
     }, timeout);
 
     child.on('close', code => {
-      clearTimeout(timeoutTimer);
-      // Clean up temp file
-      if (tmpSysFile) {
-        try {
-          fs.unlinkSync(tmpSysFile);
-        } catch {
-          /* ignored */
-        }
-      }
+      if (settled) return;
       if (cancelled) {
-        reject(new Error('Task cancelled'));
+        finish(reject, new Error('Task cancelled'));
         return;
       }
       if (timedOut) return; // already rejected
+      if (stdinError) {
+        finish(reject, stdinError);
+        return;
+      }
       if (code === 0 || code === null) {
-        resolve(stdout.trim());
+        finish(resolve, stdout.trim());
       } else {
-        reject(new Error(stderr.trim() || `claude exited with code ${code}`));
+        finish(reject, new Error(stderr.trim() || `claude exited with code ${code}`));
       }
     });
 
     child.on('error', err => {
-      clearTimeout(timeoutTimer);
-      if (tmpSysFile) {
-        try {
-          fs.unlinkSync(tmpSysFile);
-        } catch {
-          /* ignored */
-        }
-      }
-      reject(err);
+      finish(reject, err);
     });
+
+    const handleStdinError = err => {
+      if (settled || cancelled || timedOut) return;
+      stdinError = err;
+      if (child.kill) {
+        child.kill('SIGTERM');
+      } else {
+        finish(reject, err);
+      }
+    };
+
+    if (child.stdin) {
+      if (typeof child.stdin.on === 'function') {
+        child.stdin.on('error', handleStdinError);
+      }
+      try {
+        child.stdin.write(prompt);
+        child.stdin.end();
+      } catch (err) {
+        handleStdinError(err);
+      }
+    }
   });
 
   const cancel = () => {

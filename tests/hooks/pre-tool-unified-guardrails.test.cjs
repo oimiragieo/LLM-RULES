@@ -9,7 +9,9 @@ const {
   checkAgentGuardrails,
   readAgentGuardrailsState,
   writeAgentGuardrailsState,
+  extractTaskOutputPathsFromCommand,
 } = require('../../.claude/hooks/routing/pre-tool-unified.cjs');
+const { isCrossPlatformAbsolutePath } = require('../../.claude/lib/utils/path-canonicalizer.cjs');
 
 describe('pre-tool-unified agent guardrails', () => {
   function withTempGuardrailState(fn) {
@@ -234,6 +236,17 @@ describe('pre-tool-unified agent guardrails', () => {
     });
   });
 
+  test('extracts Linux temp task-output paths from polling commands', () => {
+    const command = 'cat "/tmp/agent-studio-run/tasks/linux-done.output" | grep -i fail | tail -30';
+    const paths = extractTaskOutputPathsFromCommand(command);
+
+    assert.equal(paths.length, 1);
+    assert.match(
+      paths[0].replace(/\\/g, '/'),
+      /\/tmp\/agent-studio-run\/tasks\/linux-done\.output$/
+    );
+  });
+
   test('blocks bash redirection writes to reports/memory artifacts', () => {
     withTempGuardrailState(stateFile => {
       seedSession(stateFile, 'session-8');
@@ -332,5 +345,18 @@ describe('pre-tool-unified agent guardrails', () => {
       assert.equal(result.action, 'block');
       assert.match(result.message, /ROUTER-FIRST PROTOCOL VIOLATION/i);
     });
+  });
+});
+
+describe('path canonicalizer cross-platform absolutes', () => {
+  test('recognizes Windows and POSIX absolute paths without treating relative paths as absolute', () => {
+    assert.equal(
+      isCrossPlatformAbsolutePath(
+        'C:\\dev\\projects\\agent-studio\\.claude\\context\\memory\\patterns.json'
+      ),
+      true
+    );
+    assert.equal(isCrossPlatformAbsolutePath('/tmp/agent-studio-run/tasks/done.output'), true);
+    assert.equal(isCrossPlatformAbsolutePath('.claude/context/memory/patterns.json'), false);
   });
 });

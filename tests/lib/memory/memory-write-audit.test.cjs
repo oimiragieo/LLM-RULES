@@ -60,4 +60,23 @@ describe('memory write audit and migration (S15-S16)', () => {
     assert.equal(result.violationCount, 0);
     assert.equal(result.ok, true);
   });
+
+  test('S16b: migration rewrites direct_write entries to the configured source', () => {
+    writeJson(path.join(MEMORY_DIR, 'gotchas.json'), [
+      { text: 'legacy direct write', writeSource: 'direct_write' },
+    ]);
+    writeJson(path.join(MEMORY_DIR, 'patterns.json'), [
+      { text: 'valid', writeSource: 'memory_api' },
+    ]);
+
+    const migration = migrateMemoryWriteSources(TEST_ROOT, { apply: true, source: 'memory_api' });
+    assert.equal(migration.updatedEntries, 1);
+
+    const gotchas = JSON.parse(fs.readFileSync(path.join(MEMORY_DIR, 'gotchas.json'), 'utf8'));
+    assert.equal(gotchas[0].writeSource, 'memory_api');
+
+    const result = auditMemoryWriteSources(TEST_ROOT);
+    assert.equal(result.violationCount, 0);
+    assert.equal(result.ok, true);
+  });
 });

@@ -98,18 +98,18 @@ function loadState(statePath) {
     return { state: { assertions: {} }, recovered: true, created: false };
   }
 
-  // Detect malformed JSON before schema-safe parsing.
-  // safeParseJSON intentionally normalizes parse failures to {} for many callers,
-  // but validation-state corruption must be preserved and backed up.
+  // Validate raw JSON syntax first so malformed files trigger corruption
+  // backup/recovery instead of silently falling through safe-json fallback.
+  let state;
   try {
     JSON.parse(content);
+    state = safeParseJSON(content, null);
   } catch (_parseErr) {
+    // Invalid JSON - backup and reinitialize
     createCorruptionBackup(statePath);
     initializeState(statePath);
     return { state: { assertions: {} }, recovered: true, created: false };
   }
-
-  const state = safeParseJSON(content, null);
 
   // Validate required fields exist
   if (typeof state !== 'object' || state === null) {

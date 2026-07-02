@@ -27,6 +27,8 @@ paths:
 
 **Hard cap: 25KB per markdown memory file** (matches Claude Code's 200-line/25KB MEMORY.md discipline). Active files (`learnings.md`, `decisions.md`, `issues.md`) rotate to `.claude/context/memory/archive/` when they exceed 25KB. Rotation handles both section-delimited (`---`/`##`) and flat bullet-point formats via synthetic sectioning. Threshold constants include `LEARNINGS_ARCHIVE_THRESHOLD_KB` and `DECISIONS_WARN_THRESHOLD_KB`. `codebase_map.json` max 500 entries. JSON files (`patterns.json`, `gotchas.json`) capped at 20 items each.
 
+Budget thresholds still apply: warn at 80K tokens, mandatory compression at 120K, RED LINE at 150K.
+
 ## Memory APIs
 
 **Named memory** (`.claude/context/memory/named/`): `manager.readMemory('topic')`, `writeMemory`, `listMemories`, `deleteMemory`.

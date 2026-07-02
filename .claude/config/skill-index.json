@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-07-02T14:16:54.476Z",
+  "generatedAt": "2026-07-02T14:47:30.515Z",
   "metadata": {
-    "totalSkills": 349,
+    "totalSkills": 348,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-07-02T14:16:54.477Z",
+    "lastValidated": "2026-07-02T14:47:30.516Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -8094,28 +8094,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "enterprise-skill-test-1783001814041-explicit": {
-      "name": "enterprise-skill-test-1783001814041-explicit",
-      "displayName": "Enterprise Skill Test 1783001814041 Explicit",
-      "category": "Other",
-      "domain": "other",
-      "description": "Explicit enterprise scaffold validation skill for test coverage.",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "enterprise-skill-test-1783001814041-explicit"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
     "error-recovery-escalation": {
       "name": "error-recovery-escalation",
       "displayName": "Error Recovery Escalation",
@@ -9962,7 +9940,6 @@
         "doc-coauthoring",
         "electron-pro",
         "enable-telegram",
-        "enterprise-skill-test-1783001814041-explicit",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -10417,7 +10394,6 @@
         "doc-coauthoring",
         "electron-pro",
         "enable-telegram",
-        "enterprise-skill-test-1783001814041-explicit",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -10863,7 +10839,6 @@
         "doc-coauthoring",
         "electron-pro",
         "enable-telegram",
-        "enterprise-skill-test-1783001814041-explicit",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -11168,7 +11143,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1783001814041-explicit",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -11629,7 +11603,6 @@
         "deep-research",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1783001814041-explicit",
         "error-recovery-escalation",
         "exa-monitor",
         "feedback-analysis",
@@ -12374,7 +12347,6 @@
         "doc-coauthoring",
         "electron-pro",
         "enable-telegram",
-        "enterprise-skill-test-1783001814041-explicit",
         "exa-monitor",
         "figma",
         "frontend-design",
@@ -14290,7 +14262,6 @@
         "doc-coauthoring",
         "electron-pro",
         "enable-telegram",
-        "enterprise-skill-test-1783001814041-explicit",
         "exa-monitor",
         "figma",
         "frontend-design",

@@ -12,7 +12,6 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { calendarDaysBetween } = require('../utils/calendar-days.cjs');
 const {
-  computeQualityScore,
   incrementLTMAccessCount,
   isPathInside,
   loadContextSync,
@@ -189,11 +188,11 @@ class ContextualMemory {
     try {
       const nowIso = new Date().toISOString();
       const update = db.prepare(
-        'UPDATE entities SET access_count = ?, last_accessed = ?, quality_score = ? WHERE id = ?'
+        'UPDATE entities SET access_count = ?, last_accessed = ? WHERE id = ?'
       );
       for (const r of rows) {
         const nextCount = toSafeInt(r.access_count, 0) + 1;
-        update.run(nextCount, nowIso, computeQualityScore(nextCount), r.id);
+        update.run(nextCount, nowIso, r.id);
       }
     } catch (_e) {
       // best-effort

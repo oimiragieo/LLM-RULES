@@ -11,8 +11,9 @@ permissionMode: default
 priority: high
 verified: true
 lastVerifiedAt: '{{lastVerifiedAt}}'
-skills: [{ { skills_csv } }]
-tools: [{ { tools_csv } }]
+tools: [{{tools_csv}}]
+skills:
+{{skills_yaml}}
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -56,11 +57,7 @@ Do NOT invoke token-saver for normal small tasks (few files, short snippets); us
 
 ## Memory Protocol (MANDATORY)
 
-**Before starting:**
-\`\`\`bash
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
-\`\`\`
+**Before starting:** review `learnings.md` and `decisions.md`.
 
 **After completing:**
 

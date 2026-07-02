@@ -37,6 +37,12 @@ function writeArrayJson(filePath, value) {
   fs.writeFileSync(filePath, JSON.stringify(value, null, 2) + '\n', 'utf8');
 }
 
+function needsWriteSourceMigration(writeSource) {
+  return (
+    writeSource === 'direct_write' || typeof writeSource !== 'string' || writeSource.trim() === ''
+  );
+}
+
 export function auditMemoryWriteSources(projectRoot = DEFAULT_PROJECT_ROOT) {
   const files = getMemoryFiles(projectRoot);
   const violations = [];
@@ -79,7 +85,7 @@ export function migrateMemoryWriteSources(
     const next = entries.map(entry => {
       if (!entry || typeof entry !== 'object') return entry;
       const writeSource = entry.writeSource;
-      if (typeof writeSource === 'string' && writeSource.trim() !== '') return entry;
+      if (!needsWriteSourceMigration(writeSource)) return entry;
       changed = true;
       updatedEntries += 1;
       return { ...entry, writeSource: source };

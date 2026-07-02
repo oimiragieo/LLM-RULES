@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 const { createLogger } = require('../utils/logger.cjs');
+const { loadLegacyFileBackedMemory } = require('./prompt-assembler-legacy-memory.cjs');
 
 const logger = createLogger('prompt-assembler');
 
@@ -190,12 +191,15 @@ function loadMemoryContext(projectRoot = PROJECT_ROOT) {
     } catch (_e) {
       // best-effort
     }
+
+    const legacyMemory = loadLegacyFileBackedMemory(projectRoot, MAX_MEMORY_SECTION_CHARS);
     return {
-      gotchas: [],
-      patterns: [],
-      discoveries: [],
-      recent_sessions: [],
-      legacy_summary: '',
+      gotchas: legacyMemory.gotchas,
+      patterns: legacyMemory.patterns,
+      decisions: legacyMemory.decisions,
+      discoveries: legacyMemory.discoveries,
+      recent_sessions: legacyMemory.recent_sessions,
+      legacy_summary: legacyMemory.legacy_summary,
       reflection_actionables: loadReflectionActionables(projectRoot),
     };
   }

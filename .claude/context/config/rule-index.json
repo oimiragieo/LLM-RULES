@@ -110,8 +110,8 @@
       "priority": "",
       "technologies": ["api", "go"],
       "type": "master",
-      "size": 2258,
-      "line_count": 42
+      "size": 2359,
+      "line_count": 44
     },
     {
       "path": ".claude/rules/plan-file-update.md",

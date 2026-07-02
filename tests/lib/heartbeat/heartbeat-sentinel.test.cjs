@@ -1,6 +1,6 @@
 'use strict';
 
-const { describe, it, before, afterEach } = require('node:test');
+const { describe, it, before, afterEach, mock } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
@@ -41,6 +41,7 @@ describe('heartbeat-sentinel', () => {
   });
 
   afterEach(() => {
+    mock.restoreAll();
     // Clean up the sentinel file after each test so tests are isolated.
     const p = mod.getSentinelPath();
     if (fs.existsSync(p)) fs.unlinkSync(p);
@@ -142,9 +143,9 @@ describe('heartbeat-sentinel', () => {
     });
 
     it('overwrites an existing sentinel file', () => {
+      mock.method(Date, 'now', () => 1_700_000_000_000);
       mod.writeSentinel(LOOPS_8);
       const first = JSON.parse(fs.readFileSync(mod.getSentinelPath(), 'utf8'));
-      // Small delay to ensure different session_id.
       mod.writeSentinel(LOOPS_5);
       const second = JSON.parse(fs.readFileSync(mod.getSentinelPath(), 'utf8'));
       assert.equal(second.loop_count, 5, 'second write should have loop_count 5');

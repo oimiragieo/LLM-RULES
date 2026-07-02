@@ -225,6 +225,16 @@ function updateAccessStatsInPlace(stats, returnedEntries, nowIso) {
   return changed;
 }
 
+function cloneMemoryEntries(entries) {
+  if (!Array.isArray(entries)) return [];
+  return entries.map(entry => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      return entry;
+    }
+    return { ...entry };
+  });
+}
+
 function loadContextSync(memory, options = {}) {
   const defaultMaxItems = getDefaultMaxItems();
   const defaultMaxChars = getDefaultMaxChars();
@@ -294,7 +304,7 @@ function loadContextSync(memory, options = {}) {
   if (!dbGotchasLoaded) {
     const allGotchas = safeParseWithCache(gotchasFile);
     if (Array.isArray(allGotchas)) {
-      const selectedGotchas = allGotchas.slice(-maxItems.gotchas);
+      const selectedGotchas = cloneMemoryEntries(allGotchas.slice(-maxItems.gotchas));
       result.gotchas = memory._truncateItems(selectedGotchas, maxChars.gotchas);
       applyAccessStats(result.gotchas, accessStats);
     }
@@ -304,7 +314,7 @@ function loadContextSync(memory, options = {}) {
   if (!dbPatternsLoaded) {
     const allPatterns = safeParseWithCache(patternsFile);
     if (Array.isArray(allPatterns)) {
-      const selectedPatterns = allPatterns.slice(-maxItems.patterns);
+      const selectedPatterns = cloneMemoryEntries(allPatterns.slice(-maxItems.patterns));
       result.patterns = memory._truncateItems(selectedPatterns, maxChars.patterns);
       applyAccessStats(result.patterns, accessStats);
     }

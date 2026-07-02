@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { isCrossPlatformAbsolutePath } = require('../../lib/utils/path-canonicalizer.cjs');
 
 const {
   PROJECT_ROOT,
@@ -111,6 +112,9 @@ function normalizeTaskOutputPath(rawPath) {
       normalized = `${drive}:\\${rest}`;
     }
   }
+  if (isCrossPlatformAbsolutePath(normalized)) {
+    return path.normalize(normalized);
+  }
   return path.resolve(normalized);
 }
 
@@ -118,8 +122,8 @@ function extractTaskOutputPathsFromCommand(command) {
   if (!command || typeof command !== 'string') return [];
   const results = new Set();
   const regexes = [
-    /([A-Za-z]:\\[^\s"'`]*?tasks\\[^\s"'`]+\.output)/g,
-    /(\/[a-zA-Z]\/[^\s"'`]*?\/tasks\/[^\s"'`]+\.output)/g,
+    /([A-Za-z]:[\\/][^\s"'`]*?tasks[\\/][^\s"'`]+\.output)/g,
+    /(\/[^\s"'`]*?\/tasks\/[^\s"'`]+\.output)/g,
   ];
   for (const regex of regexes) {
     let match = regex.exec(command);
@@ -362,7 +366,12 @@ function checkBashArtifactWriteSafety(toolName, toolInput, hookInput) {
 function normalizeToolPath(rawPath) {
   if (!rawPath || typeof rawPath !== 'string') return null;
   const canonical = canonicalizePathForPlatform(rawPath, PROJECT_ROOT);
-  const resolved = path.isAbsolute(canonical) ? canonical : path.resolve(PROJECT_ROOT, canonical);
+  const resolved = isCrossPlatformAbsolutePath(canonical)
+    ? canonical
+    : path.resolve(PROJECT_ROOT, canonical);
+  if (isCrossPlatformAbsolutePath(resolved) && !path.isAbsolute(resolved)) {
+    return null;
+  }
   const relative = path.relative(PROJECT_ROOT, resolved);
   if (relative.startsWith('..')) return null;
   return relative.replace(/\\/g, '/');
@@ -377,11 +386,27 @@ function getMutationPath(toolName, toolInput) {
   return normalizeToolPath(filePath);
 }
 
+function normalizeStructuredMemoryPath(rawPath) {
+  const normalized = normalizeToolPath(rawPath);
+  if (normalized) return normalized;
+  if (!rawPath || typeof rawPath !== 'string') return null;
+
+  const canonical = canonicalizePathForPlatform(rawPath, PROJECT_ROOT).replace(/\\/g, '/');
+  const marker = '/.claude/context/memory/';
+  const markerIndex = canonical.toLowerCase().indexOf(marker);
+  if (markerIndex === -1) return null;
+
+  return canonical.slice(markerIndex + 1);
+}
+
 function checkStructuredMemoryDirectWrite(toolName, toolInput) {
   const mode = (process.env.MEMORY_DIRECT_WRITE_ENFORCEMENT || 'block').toLowerCase();
   if (mode === 'off') return { checked: false, reason: 'disabled' };
 
-  const mutationPath = getMutationPath(toolName, toolInput);
+  const filePath =
+    toolInput?.file_path || toolInput?.filePath || toolInput?.path || toolInput?.notebook_path;
+  const mutationPath =
+    getMutationPath(toolName, toolInput) || normalizeStructuredMemoryPath(filePath);
   if (!mutationPath) return { checked: false, reason: 'no_mutation_path' };
 
   const normalizedPath = mutationPath.toLowerCase();
