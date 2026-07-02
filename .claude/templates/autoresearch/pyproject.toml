@@ -13,7 +13,7 @@ dependencies = [
     "requests>=2.32.0",
     "rustbpe>=0.1.0",
     "tiktoken>=0.11.0",
-    "torch==2.11.0",
+    "torch==2.12.1",
 ]
 
 [tool.uv.sources]
