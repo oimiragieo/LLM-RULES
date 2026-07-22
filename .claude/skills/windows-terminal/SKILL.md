@@ -575,7 +575,7 @@ Node handles backslash paths correctly.
 - `.claude/hooks/channels/channel-auto-start.cjs` — Production hook using all patterns above
 - `.claude/tools/cli/channel-manager.cjs` — Channel session lifecycle management
 - `.claude/tools/cli/terminal-tracker.cjs` — PID tracking for spawned sessions
-- `scripts/channels/start-telegram.bat` — Simple one-line launcher reference
+- `scripts/channels/_archive/start-telegram.bat` — Simple one-line launcher reference (archived)
 
 ---
 
