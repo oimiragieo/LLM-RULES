@@ -1,6 +1,6 @@
 ---
 name: codebase-cleaner
-description: Safe codebase cleanup: delete AI slop, consolidate duplicates, update imports — always test-verified before committing
+description: 'Safe codebase cleanup: delete AI slop, consolidate duplicates, update imports — always test-verified before committing'
 version: 1.0
 model: sonnet
 invoked_by: both
