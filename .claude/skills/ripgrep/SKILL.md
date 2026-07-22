@@ -998,8 +998,8 @@ No manual binary management required - the npm package handles everything automa
 
 ## Related Skills
 
-- [`grep`](../grep/SKILL.md) - Built-in Claude Code grep (simpler, less features)
-- [`glob`](../glob/SKILL.md) - File pattern matching
+- `Grep` - Built-in Claude Code grep tool (simpler, less features)
+- `Glob` - Built-in Claude Code file pattern matching tool
 
 ## Iron Laws
 
