@@ -20,7 +20,7 @@ trust_score: 100
 provenance_sha: 068a55cd5b5bb7c0
 ---
 
-**References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — embedding/semantic tool discovery from everything-claude-code backend-patterns, tdd-workflow.
+**References (archive):** embedding/semantic tool discovery from everything-claude-code backend-patterns, tdd-workflow.
 
 # Tool Search Skill
 
@@ -321,14 +321,6 @@ issues = await asyncio.gather(*[
 ])
 # Only final results in context, not all intermediate data
 ```
-
-See [PTC Patterns Guide](../docs/PTC_PATTERNS.md) for comprehensive PTC documentation.
-
-## Related Documentation
-
-- [Advanced Tool Use](../docs/ADVANCED_TOOL_USE.md) - Comprehensive tool use guide
-- [PTC Patterns](../docs/PTC_PATTERNS.md) - Programmatic Tool Calling patterns
-- [Context Optimization](../docs/CONTEXT_OPTIMIZATION.md) - Context management
 
 ## References
 
