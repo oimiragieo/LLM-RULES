@@ -20,7 +20,7 @@ trust_score: 100
 provenance_sha: 068a55cd5b5bb7c0
 ---
 
-**References (archive):** embedding/semantic tool discovery from everything-claude-code backend-patterns, tdd-workflow.
+**References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — embedding/semantic tool discovery from everything-claude-code backend-patterns, tdd-workflow.
 
 # Tool Search Skill
 
