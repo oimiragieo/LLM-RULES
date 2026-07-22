@@ -51,6 +51,11 @@ Use this skill when:
 
 ## Five-Step Workflow
 
+> **Note**: `scripts/init-artifact.sh` and `scripts/bundle-artifact.sh` referenced below are not
+> currently bundled with this skill. Until they are added, perform the equivalent steps manually
+> (`npm create vite@latest -- --template react-ts`, then install and configure Tailwind CSS and
+> shadcn/ui, then bundle with Parcel/`vite-plugin-singlefile` as described in each step).
+
 ### Step 1: Initialize Project
 
 ```bash
