@@ -61,6 +61,6 @@ Read `.claude/context/memory/learnings.md`
 
 ## References
 
-- Detailed UX review: `references/ui-reflection-review.md`
+- Research requirements: `references/research-requirements.md`
 - Troubleshooting runbook: `.claude/docs/TROUBLESHOOTING.md`
 - Task tracking protocol: `.claude/docs/@TASK_TRACKING_GUIDE.md`

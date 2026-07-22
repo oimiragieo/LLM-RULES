@@ -234,8 +234,6 @@ Use RAG to retrieve relevant schema information:
 
 ## Related Documentation
 
-- [Classification Patterns](../docs/CLASSIFICATION_PATTERNS.md) - Classification guide
-- [Evaluation Guide](../docs/EVALUATION_GUIDE.md) - Comprehensive evaluation
 - [Claude Cookbooks - Text-to-SQL](https://github.com/anthropics/anthropic-cookbook/tree/main/capabilities/text_to_sql)
 
 ## Iron Laws

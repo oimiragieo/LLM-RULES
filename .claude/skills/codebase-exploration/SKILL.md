@@ -1,4 +1,6 @@
 ---
+name: codebase-exploration
+description: 7-phase progressive exploration protocol for analyzing unfamiliar codebases while keeping token usage under 34K. Use when you need to build structural understanding of a repo before making changes.
 source: builtin
 trust_score: 100
 provenance_sha: 64ce784f47914cbd

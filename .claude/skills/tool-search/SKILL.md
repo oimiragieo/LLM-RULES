@@ -322,14 +322,6 @@ issues = await asyncio.gather(*[
 # Only final results in context, not all intermediate data
 ```
 
-See [PTC Patterns Guide](../docs/PTC_PATTERNS.md) for comprehensive PTC documentation.
-
-## Related Documentation
-
-- [Advanced Tool Use](../docs/ADVANCED_TOOL_USE.md) - Comprehensive tool use guide
-- [PTC Patterns](../docs/PTC_PATTERNS.md) - Programmatic Tool Calling patterns
-- [Context Optimization](../docs/CONTEXT_OPTIMIZATION.md) - Context management
-
 ## References
 
 - [Tool Search with Embeddings Cookbook](https://github.com/anthropics/anthropic-cookbook/tree/main/tool_use/tool_search_with_embeddings.ipynb)

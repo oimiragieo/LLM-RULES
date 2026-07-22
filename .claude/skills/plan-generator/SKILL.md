@@ -172,7 +172,7 @@ Every task MUST include:
 - Each phase has <=7 tasks
 - Every task has executable commands
 - Include verification gates between phases
-- For **HIGH** or **EPIC** complexity tasks, invoke `discuss-phase` skill BEFORE generating the plan to surface ambiguities and resolve scope, architecture, and acceptance criteria questions with the user
+- For **HIGH** or **EPIC** complexity tasks, invoke `spec-gathering` skill BEFORE generating the plan to surface ambiguities and resolve scope, architecture, and acceptance criteria questions with the user
 
 ### Step 4: Assess Risks
 
@@ -549,8 +549,8 @@ See `.claude/templates/plan-template.md` for complete token list.
 ## Related Skills
 
 - [`template-renderer`](../template-renderer/SKILL.md) - Renders plan-template with token replacement
-- [`writing-plans`](../writing-plans/SKILL.md) - Bite-sized task plans with complete code for implementation
-- [`discuss-phase`](../discuss-phase/SKILL.md) - Requirement disambiguation for HIGH/EPIC tasks before planning
+- `writing-plans` (superpowers plugin skill) - Bite-sized task plans with complete code for implementation
+- [`spec-gathering`](../spec-gathering/SKILL.md) - Requirement disambiguation for HIGH/EPIC tasks before planning
 
 ## Memory Protocol (MANDATORY)
 

@@ -1,4 +1,6 @@
 ---
+name: mcp-catalog
+description: Comprehensive reference for Model Context Protocol (MCP) servers — official, community, and Agent Studio integrated. Use when selecting, configuring, or building MCP servers for Claude Code projects.
 source: builtin
 trust_score: 100
 provenance_sha: 2de56f048397bca1
