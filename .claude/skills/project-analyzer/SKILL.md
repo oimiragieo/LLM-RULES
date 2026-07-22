@@ -25,7 +25,7 @@ trust_score: 100
 provenance_sha: 641607b45a34f39a
 ---
 
-**References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — ProjectAnalyzer monorepo/service detection from Auto-Claude-develop analysis/analyzers.
+**References (archive):** ProjectAnalyzer monorepo/service detection from Auto-Claude-develop analysis/analyzers.
 
 <identity>
 Project Analyzer - Automated brownfield codebase analysis for rapid project onboarding and understanding.
