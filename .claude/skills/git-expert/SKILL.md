@@ -300,10 +300,6 @@ git clone --depth=1 <url>
 GIT_TRACE_PERFORMANCE=1 git status
 ```
 
-## Related Skills
-
-- [`gitflow`](../gitflow/SKILL.md) - Branch workflow patterns (feature, release, hotfix branches)
-
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
