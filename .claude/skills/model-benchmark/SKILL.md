@@ -1,4 +1,6 @@
 ---
+name: model-benchmark
+description: Standardized 5-dimension LLM evaluation workflow (accuracy, latency, memory, cost, safety). Use when polling for new models or benchmarking a model against stored baselines.
 source: builtin
 trust_score: 100
 provenance_sha: 1edb93a29eaa72d7
