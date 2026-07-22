@@ -1,4 +1,6 @@
 ---
+name: token-saver-context-compression
+description: Alias for context-compressor. Use when agents reference token-saver-context-compression by name in their skills arrays and it needs to resolve to the context-compressor implementation.
 source: builtin
 trust_score: 100
 provenance_sha: d2c972832558e537
